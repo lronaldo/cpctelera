@@ -1,12 +1,29 @@
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
 ###########################################################################
-##                   USE EXAMPLE OF CPCTELERA ENGINE                     ##
-##                                                                       ##
+##     CPCTELERA ENGINE: Example of use of cpct_drawSprite2x8_aligned    ##
+##                       Main Building Makefile                          ##
 ##-----------------------------------------------------------------------##
-## This example demonstrates how to use the simple function to put tiles ##
-## (2x8 byte sprites): cpct_drawSprite2x8_aligned.                       ##
-##-----------------------------------------------------------------------##
-## Author:  ronaldo / @FranGallegoBR                                     ##
-## (C) 2014 Fremos / Cheesetea / ByteRealms                              ##
+## This file contains the rules for building an example of use of the    ##
+## CPCtelera engine.                                                     ##
+## Usually, this file should be left unchanged. To configure your build  ##
+## you should change the build.conf file.                                ##
 ###########################################################################
 # INCLUDES
 include build.conf

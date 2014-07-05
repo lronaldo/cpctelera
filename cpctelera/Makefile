@@ -1,13 +1,29 @@
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
 ###########################################################################
 ##                          CPCTELERA ENGINE                             ##
 ##                     Linux Main Building Makefile                      ##
 ##-----------------------------------------------------------------------##
-## This file describes the way in which Cpctelera library should be      ##
-## built. In general, there is no need to make changes to this file.     ##
+## This file describes the way in which CPCtelera library should be      ##
+## built.                                                                ##
+## In general, there is no need to make changes to this file.            ##
 ## Instead, you should modify build.conf to set up your building config. ##
-##-----------------------------------------------------------------------##
-## Author:  ronaldo / @FranGallegoBR                                     ##
-## (C) 2014 Fremos / Cheesetea / ByteRealms                              ##
 ###########################################################################
 # INCLUDES
 include build.conf
