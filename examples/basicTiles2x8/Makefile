@@ -30,11 +30,28 @@ include build.conf
 
 # UTILITY FUNCTIONS
 define PRINT
- echo -en "\033[1;31;49m"
- echo -n  "[$(LIBRARYNAME)]>"
- echo -en "\033[1;33;49m $(1)"
- echo -e  "\033[0;39;49m"
+ echo -n "\033[1;31;49m"
+ echo -n "[$(PROJNAME)]>"
+ echo -n "\033[1;33;49m $(1)"
+ echo    "\033[0;39;49m"
 endef
+
+define CREATEDSK
+ (LOADADDR=$$( sed -n 's/^Lowest address  = 0000\([0-9]*\).*$$/\1/p' <$(1).log ) ; \
+  RUNADDR=$$( sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' <$(1:.bin=.map) ) ; \
+  if [ -z "$$RUNADDR" ] ; then \
+  RUNADDR=$$( sed -n 's/^ *0000\([0-9A-F]*\) *init  *.*$$/\1/p' <$(1:.bin=.map) ) ; \
+  fi ; \
+  if [ -z "$$RUNADDR" ] ; then \
+  RUNADDR=$$( sed -n 's/^ *0000\([0-9A-F]*\) *_main  *.*$$/\1/p' <$(1:.bin=.map) ) ; \
+  fi ; \
+  if [ -z "$$RUNADDR" ] ; then \
+  echo "Cannot figure out run address. Aborting." ; exit 1 ; \
+  fi ; \
+  $(IDSK) $2.tmp -n -i $1 -e $${RUNADDR} -c $${LOADADDR} -t 1 && mv -vf $2.tmp $2 ; \
+ )
+endef
+
 
 # TOOLS CONFIG
 RM=rm -f
@@ -43,7 +60,7 @@ MKDIR=mkdir
 # BINARY CONFIG
 PROJNAME=example1
 VPATH=$(SRCDIR)
-TARGET=$(PROJNAME).bin
+TARGET=$(PROJNAME).dsk
 
 # CALCULATED VARIABLES
 OBJ=$(foreach FILE,$(OBJFILES),$(OBJDIR)/$(FILE))
@@ -53,20 +70,26 @@ OBJ=$(foreach FILE,$(OBJFILES),$(OBJDIR)/$(FILE))
 # MAIN TARGET
 all: $(OBJDIR) $(TARGET)
 
+# LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
 $(OBJDIR)/$(PROJNAME).ihx: $(OBJ)
 	@$(call PRINT,"Linking binary file")
 	$(Z80CC) $(Z80CCLINKARGS) $^ -o "$@"
-	@$(call PRINT,"Successfully created $@")
 
-# SUBTARGETS
+# COMPILE C FILES => GENERATE RELOCATABLE (.REL) MACHINE CODE FILES
 $(OBJDIR)/%.rel: %.c
 	$(Z80CC) $(Z80CCINCLUDE) -mz80 $(Z80CCFLAGS) -c $< -o $(OBJDIR)/
 
-$(OBJDIR)/%.bin.log %.bin: $(OBJDIR)/%.ihx
-	$(HEX2BIN) -e "bin" -p 00 "$<" | tee "$<.log"
+# GENERATE AMSDOS BINARY FILE (.BIN) FROM INTEL HEX BINARY (.IHX)
+$(OBJDIR)/%.bin.log $(OBJDIR)/%.bin: $(OBJDIR)/%.ihx
+	@$(call PRINT,"Creating Amsdos binary file $@")
+	$(HEX2BIN) -e "bin" -p 00 "$<" | tee "$(patsubst %.ihx,%.bin,$<).log"
 
+# GENERATE A DISK FILE (.DSK) AND INCLUDE BINARY FILE (.BIN) INTO IT
+%.dsk: $(OBJDIR)/%.bin
+	@$(call PRINT,"Creating Disk File $@")
+	@$(call CREATEDSK,$<,$@)
+	@$(call PRINT,"Successfully created $@")
 
-	
 # CLEANING TARGETS
 cleanall: clean
 	@$(call PRINT,"Deleting $(TARGET)")
