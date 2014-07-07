@@ -24,47 +24,54 @@
 ;
 
 ;
-;######################################################################
-;### FUNCTION: cpct_drawSprite2x8_aligned                           ###
-;######################################################################
-;### Copies a 2x8-bytes sprite from its original memory storage     ###
-;### position to a video memory position (taking into account video ###
-;### memory distribution). This function asumes that the destination###
-;### in the video memory will be the starting line of a character.  ###
-;### (First byte line of video memory, where characters from the 25 ###
-;###  lines start)                                                  ###
-;######################################################################
-;### INPUTS (4 Bytes)                                               ###
-;###  * (2B) Original Sprite Pointer                                ###
-;###  * (2B) Destiny aligned video memory location (first VDU line) ###
-;######################################################################
-;### EXIT STATUS                                                    ###
-;###  Destroyed Register values: AF, BC, DE, HL                     ###
-;######################################################################
+;########################################################################
+;### FUNCTION: cpct_drawSprite2x8_aligned                             ###
+;########################################################################
+;### Copies a 2x8-bytes sprite from its original memory storage       ###
+;### position to a video memory position (taking into account video   ###
+;### memory distribution). This function asumes that the destination  ###
+;### in the video memory will be the starting line of a character.    ###
+;### (First byte line of video memory, where characters from the 25   ###
+;###  lines start)                                                    ###
+;########################################################################
+;### INPUTS (4 Bytes)                                                 ###
+;###  * (2B) Source Sprite Pointer (16-byte vector with pixel data)   ###
+;###  * (2B) Destiny aligned video memory start location              ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  93 + 8 * 50 + 7 * 27 = 682 cycles                               ###
+;########################################################################
 ;
 .globl _cpct_drawSprite2x8_aligned
 _cpct_drawSprite2x8_aligned::
-  ;; Save registers that should be restored
-  PUSH IX
- 
-  ;; GET Parameters from the stack using IX
-  LD  IX, #4	;; 4 = 2B (IX) + 2B (Return Address)
-  ADD IX, SP
-  LD  L, 0(IX)	;; HL = Original sprite pointer
-  LD  H, 1(IX)  ;; DE = Destiny Aligned video memory
-  LD  E, 2(IX)
-  LD  D, 3(IX)
-
-  ;; Copy 8 lines of 2 bytes width
-  LD  A,  #8
-  LD  BC, #0x7FE	;; 800h - 2 = 7FEh (Quantity to jump to next line)
-dsa_next_line:
-  LDI			;; Copy 2 bytes with (DE) <- (HL)
-  LDI
-  ADD HL, BC		;; Move HL to the start point of next line in video memory
-  DEC A			;; 1 less line to go
-  JP NZ, dsa_next_line
+  ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+  POP  AF			;; [10c] AF = Return Address
+  POP  HL			;; [10c] HL = Source address
+  POP  DE			;; [10c] DE = Destination address
+  PUSH DE			;; [11c] Leave the stack as it was
+  PUSH HL			;; [11c] 
+  PUSH AF			;; [11c] 
   
-  ;; Restore saved registers and return
-  POP IX
-  RET
+  ;; Copy 8 lines of 2 bytes width
+  LD   BC, #16			;; [10c] 16 bytes is the total we have to transfer (2x8)
+  JP   dsa28_first_line		;; [10c] First line does not need to do math to start transfering data. 
+
+dsa28_next_line:
+  LD   A, D			;; [ 4c] Add 800h and Subtract 2h to DE (Jump to next visual line in the video memory)
+  ADD  A, #8			;; [ 7c]
+  LD   D, A			;; [ 4c]
+  DEC  DE			;; [ 6c]
+  DEC  DE			;; [ 6c]
+
+dsa28_first_line:
+  LDI				;; [16c] Copy 2 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
+  LDI				;; [16c]
+  XOR  A			;; [ 4c] A = 0
+  XOR  C			;; [ 4c] Check if C = 0 using XOR (as A is already 0)
+  JP   NZ,dsa28_next_line 	;; [10c] 
+  
+  ;; RETURN
+  RET			;; [10c]

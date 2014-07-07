@@ -30,10 +30,10 @@ include build.conf
 
 # UTILITY FUNCTIONS
 define PRINT
- echo -n "\033[1;31;49m"
- echo -n "[$(LIBRARYNAME)]>"
- echo -n "\033[1;33;49m $(1)"
- echo    "\033[0;39;49m"
+ echo -ne "\033[1;31;49m"
+ echo -ne "[$(LIBRARYNAME)]>"
+ echo -ne "\033[1;33;49m $(1)"
+ echo -e  "\033[0;39;49m"
 endef
 
 # TOOLS CONFIG
