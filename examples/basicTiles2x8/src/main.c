@@ -29,7 +29,8 @@ void main(void) {
         0x60, 0x60,
         0x07, 0x07
     };
-    cpct_setVideoMode(2);
+    cpct_disableFirmware();
+    cpct_setVideoMode(0);
     cpct_drawSprite2x8_aligned(sprite, (char*)0xC000);
     while(1);
 }

@@ -176,3 +176,26 @@ _cpct_setVideoMode::
         OUT (C),A		;; [12c] Send request to Port
         
         RET			;; [10c] Return
+
+        
+        
+.globl _cpct_disableFirmware
+_cpct_disableFirmware::
+	DI			;; disable interrupts
+	LD HL,(#0x38)
+	LD (firmware_call_add),HL
+	IM 1			;; interrupt mode 1 (CPU will jump to &0038 when a interrupt occrs)
+	LD HL,#0xC9FB		;; C9 FB are the bytes for the Z80 opcodes EI:RET
+	LD (#0x38), HL		;; setup interrupt handler
+	EI
+	RET
+
+firmware_call_add: .DW 0
+
+.globl 	_cpct_enableFirmware
+_cpct_enableFirmware::
+	DI
+	LD HL, (firmware_call_add)
+	LD (#0x38), HL			;EI
+	EI
+	RET
