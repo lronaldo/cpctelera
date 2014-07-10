@@ -22,7 +22,7 @@
 extern void cpct_drawSprite2x8_aligned(char *sprite, char* memory);
 extern void cpct_drawSprite4x8_aligned(char *sprite, char* memory);
 extern void cpct_setVideoMode(char videoMode);
-extern void cpct_enableFirmware();
+extern void cpct_reenableFirmware();
 extern void cpct_disableFirmware();
 
 #endif

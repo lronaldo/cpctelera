@@ -178,24 +178,74 @@ _cpct_setVideoMode::
         RET			;; [10c] Return
 
         
-        
+;
+;########################################################################
+;### FUNCTION: _cpct_disableFirmware                                  ###
+;########################################################################
+;###  Disables the firmware modifying the interrupt vector at 0x38.   ###
+;### Normally, firmware routines are called and executed at each      ###
+;### interrupt and the ROM entry point is stored at 0x38.             ###
+;### This function substitutes the 2 bytes located at 0x38 by 0xC9FB, ###
+;### (FB = EI, C9 = RET), which basically does nothing at each        ###
+;### interruption.                                                    ###
+;########################################################################
+;### INPUTS (none)                                                    ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values:HL                                    ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  84 cycles                                                       ###
+;########################################################################
+;### CREDITS:                                                         ###
+;###  This function was coded copying and modifying                   ###
+;### cpc_disableFirmware from cpcrslib by Raul Simarro.               ###
+;########################################################################
+;        
 .globl _cpct_disableFirmware
 _cpct_disableFirmware::
-	DI			;; disable interrupts
-	LD HL,(#0x38)
-	LD (firmware_call_add),HL
-	IM 1			;; interrupt mode 1 (CPU will jump to &0038 when a interrupt occrs)
-	LD HL,#0xC9FB		;; C9 FB are the bytes for the Z80 opcodes EI:RET
-	LD (#0x38), HL		;; setup interrupt handler
-	EI
-	RET
+	DI			    ;; [ 4c] Disable interrupts
+	LD HL,(#0x38)               ;; [16c] Obtain firmware ROM code pointer and store it for restoring it later
+	LD (firmware_call_add),HL   ;; [16c]
+
+        IM 1			    ;; [ 8c] Set Interrupt Mode 1 (CPU will jump to &0038 when a interrupt occrs)
+	LD HL,#0xC9FB		    ;; [10c] FB C9 (take into account little endian) => EI : RET
+
+        LD (#0x38), HL		    ;; [16c] Setup new "interrupt handler" and enable interrupts again
+	EI                          ;; [ 4c] 
+
+	RET                         ;; [10c]
 
 firmware_call_add: .DW 0
 
-.globl 	_cpct_enableFirmware
-_cpct_enableFirmware::
-	DI
-	LD HL, (firmware_call_add)
-	LD (#0x38), HL			;EI
-	EI
-	RET
+;
+;########################################################################
+;### FUNCTION: _cpct_reenableFirmware                                 ###
+;########################################################################
+;###   Restores the ROM address where the firmware routines start.    ###
+;### Beware: cpct_disableFirmware has to be called before calling     ###
+;### this routine; otherwise, it would put a 0 in 0x38 and a reset    ###
+;### will be performed at the next interrupt.                         ###
+;########################################################################
+;### INPUTS (none)                                                    ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: HL                                   ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  50 cycles                                                       ###
+;########################################################################
+;### CREDITS:                                                         ###
+;###  This function was coded copying and modifying                   ###
+;### cpc_disableFirmware from cpcrslib by Raul Simarro.               ###
+;########################################################################
+;        
+.globl 	_cpct_reenableFirmware
+_cpct_reenableFirmware::
+	DI                          ;; [ 4c] Disable interrupts
+
+	LD HL, (firmware_call_add)  ;; [16c] Restore previously saved pointer to ROM code
+	LD (#0x38), HL		    ;; [16c]
+
+	EI                          ;; [ 4c] Reenable interrupts and return
+	RET                         ;; [10c]
