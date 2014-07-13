@@ -56,12 +56,15 @@ Z80LNK=$(SDCCBIN_PATH)sdar
 ## be built. Normally, you want to change the OBJ files you want to be built, selecting
 ## only the ones that contain the actual code that will be used by you in your application.
 ##
-## SRCDIR   >> Directory under which assembly source files are located
-## OBJDIR   >> Directory where generated intermediate object files will be written to
-## OBJFILES >> intermediate .rel files that will be needed for your application (their names
-##             have to correspond to existing source files in the SRCDIR, but with .rel extension)
+## SRCDIR       >> Directory under which assembly source files are located
+## OBJDIR       >> Directory where generated intermediate object files will be written to
+## ASMFILES_ALL >> All .s files to be found under $(SRCDIR)/ (just filenames, without path)
+## OBJFILES 	>> intermediate .rel files that will be needed for your application (their names
+##             	   have to correspond to existing source files in the SRCDIR, but with .rel extension)
 #####
 
 SRCDIR=src
 OBJDIR=obj
-OBJFILES=sprites.rel
+ASMFILES_ALL=$(foreach file,$(wildcard $(SRCDIR)/*.s),$(subst $(SRCDIR)/,,$(file)))
+OBJFILES=$(ASMFILES_ALL:%.s=%.rel)
+#OBJFILES=sprites.rel firmware_ed.rel videomode.rel

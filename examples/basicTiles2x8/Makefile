@@ -26,7 +26,7 @@
 ## you should change the build.conf file.                                ##
 ###########################################################################
 # INCLUDES
-include build.conf
+include build_config.mk
 
 # UTILITY FUNCTIONS
 define PRINT
@@ -73,6 +73,7 @@ all: $(OBJDIR) $(TARGET)
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
 $(OBJDIR)/$(PROJNAME).ihx: $(OBJ)
 	@$(call PRINT,"Linking binary file")
+	@$(call PRINT,$(CSRCFILES))
 	$(Z80CC) $(Z80CCLINKARGS) $^ -o "$@"
 
 # COMPILE C FILES => GENERATE RELOCATABLE (.REL) MACHINE CODE FILES

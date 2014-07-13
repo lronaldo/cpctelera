@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCT_SPRITES_H
-#define CPCT_SPRITES_H
+#ifndef CPCT_VIDEOMODE_H
+#define CPCT_VIDEOMODE_H
 
-extern void cpct_drawSprite2x8_aligned(char *sprite, char* memory);
-extern void cpct_drawSprite4x8_aligned(char *sprite, char* memory);
+extern void cpct_setVideoMode(char videoMode);
 
 #endif

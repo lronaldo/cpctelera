@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#include <sprites.h>
+#include <cpctelera_all.h>
 
 void main(void) {
     char sprite[16] = {

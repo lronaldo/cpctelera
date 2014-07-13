@@ -26,7 +26,7 @@
 ## Instead, you should modify build.conf to set up your building config. ##
 ###########################################################################
 # INCLUDES
-include build.conf
+include build_config.mk
 
 # UTILITY FUNCTIONS
 define PRINT

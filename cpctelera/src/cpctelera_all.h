@@ -16,10 +16,11 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCT_SPRITES_H
-#define CPCT_SPRITES_H
+#ifndef CPCTELERA_ALL_H
+#define CPCTELERA_ALL_H
 
-extern void cpct_drawSprite2x8_aligned(char *sprite, char* memory);
-extern void cpct_drawSprite4x8_aligned(char *sprite, char* memory);
+#include "firmware_ed.h"
+#include "videomode.h"
+#include "sprites.h"
 
 #endif
