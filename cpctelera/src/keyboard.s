@@ -22,9 +22,17 @@
 ;#####################################################################
 ;### TECHNICAL INFORMATION:                                        ###
 ;### Keyboard and joystick are connected to AY-3-8912 Programable  ###
-;### Sound Generator (PSG) and the 8255 Programable Peripheral     ###
-;### Interface (PPI) chips. To read keyboard status we have to     ###
-;### communicate with these two chips using OUT command.           ###
+;### Sound Generator (PSG) which recieves, processes and stores    ###
+;### pressed/not pressed information. The PSG is connected to the  ###
+;### 8255 Programable Peripheral Interface (PPI), which the CPU    ###
+;### can directly address. Therefore, to read the keyboard and     ###
+;### joystick status, the Z80 has to communicate with the PPI and  ###
+;### ask it to read the PSG status. This is done using OUT         ###
+;### instruction to the 8255 PPI ports:                            ###
+;###  > PPI Port A           = #F4xx                               ###
+;###  > PPI Port B           = #F5xx                               ###
+;###  > PPI Port C           = #F6xx                               ###
+;###  > PPI Control-Register = #F7xx                               ###
 ;###                                                               ###
 ;### Keyboard and joystick switches and buttons are arranged in a  ###
 ;### 10x8 matrix. Each element of the matrix represents the state  ###
@@ -45,16 +53,22 @@
 ;### exact mapping between matrix values and switches pressed is   ###
 ;### included below as Table1.                                     ###
 ;###                                                               ###
-;### To query for the values, you should address Port A from PSG   ###
-;### (Using Register 14 from PSG). Bits 3..0 of PPI port C are     ###
-;### used to select the matrix line to be read. The data of the    ###
-;### selected line will then be presente at PSG Port A (R14).      ###
-;###                                                               ###
-;### Amstrad CPC 8255 PPI Port Reference:                          ###
-;###  > PPI Port A           = #F4xx                               ###
-;###  > PPI Port B           = #F5xx                               ###
-;###  > PPI Port C           = #F6xx                               ###
-;###  > PPI Control-Register = #F7xx                               ###
+;### To query for the values, we should select PSG's Register 14,  ###
+;### which is done writting to 8255 PPI port A. Then, Bits 3..0 of ###
+;### PPI port C are connected to a decoder that sends this to      ###
+;### the keyboard, selecting Matrix Line to be read. Bits 7-6 are  ###
+;### conected to PSG's operation mode selector, and lets us select ###
+;### between (00)inactive/read/write/(11)register_select operation modes.  ###
+;### Once we select Reg14 and ask it to write its value to de PPI, ###
+;### the data of the selected Matrix Line will be present at PSG's ###
+;### Reg14 which could read through PPI port A. Summing up:        ###
+;###     > 1: Configure PPI Operation Mode for:                    ###
+;###          >> Port A: Ouput, Port C: Output (10000010b = 82h)   ###
+;###     > 2: Write 14 (0Eh) to Port A (the index of the register) ###
+;###     > 3: Write C0h to Port C (11 000000) to tell PSG that we  ###
+;###          want to select a register (indexed at Port A).       ###
+;###     > 4: Write 0 (00h) to Port C to validate (PSG=inactive)   ###
+;###     > 5: Write 
 ;#####################################################################
 ;
 
@@ -84,7 +98,8 @@
 ;########################################################################
 ;### FUNCTION: _cpct_readFullKeyboardStatus                           ###
 ;########################################################################
-;###  ###
+;### This function reads the status of keyboard and joysticks and     ###
+;### stores it in the 10 bytes reserverd as "keyboardBuffer"
 ;########################################################################
 ;### INPUTS (-)                                                       ###
 ;########################################################################
@@ -97,48 +112,52 @@
 ;###  ?? cycles                                                       ###
 ;########################################################################
 ;### CREDITS:                                                         ###
+;###    This fragment of code is based on a scanKeyboard code issued  ###
+;### by CPCWiki.                                                      ###
+;### http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning    ###
 ;########################################################################
 ;
 ; Define a 10-byte buffer to store keyboard data
-keyboardBuffer: .ds 10
+keyboardStatusBuffer: .ds 10
 
 .globl _cpct_readFullKeyboardStatus
-_cpct_readFullKeyboardStatus::
+_cpct_readFullKeyboardStatus:: 
     
     DI
-    LD HL, #keyboardBuffer    ;; [] HL Points to the start of the keyboardBuffer, where scanned data will be stored
+    LD  HL,  #keyboardStatusBuffer  ;; [10c] HL Points to the start of the keyboardBuffer, where scanned data will be stored
     
-    LD BC, #0xF782            ;; [] Configure PPI 8255: Set Both Port A and Port C as Output
-    OUT (C), C                ;; []
+    LD  BC,  #0xF782                ;; [10c] Configure PPI 8255: Set Both Port A and Port C as Output. 
+    OUT (C), C                      ;; [12c] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
+                                    ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
     
-    LD BC, #0xF40E            ;; [] Select AY-3-8912 Register 14 (0E) on PPI 8255 Port A (F4)
-    LD E,  B                  ;; []
-    OUT (C), C                ;; []
+    LD  BC,  #0xF40E                ;; [10c] Select AY-3-8912 Register 14 (0E) on PPI 8255 Port A (F4). 
+    LD  E,   B                      ;; [ 4c] Save F4 into E: We will use it in the loop later on
+    OUT (C), C                      ;; [12c] 
     
-    LD BC, #0xF6C0            ;; [] 
-    LD D,  B                  ;; []
-    OUT (C), C                ;; []
+    LD  BC,  #0xF6C0                ;; [10c]  
+    LD  D,   B                      ;; [ 4c]
+    OUT (C), C                      ;; [12c]
+    .DW #0x71ED                     ;; [12c] OUT (C), 0 => Ensure that previous action is completed
+    ;LD  C,   #0x00
+    ;OUT (C), C
 
-    LD C,  #0x00
-    OUT (C), C                ;; []
+    LD  BC,  #0xf792
+    OUT (C), C                      ;; [12c]
 
-    LD BC, #0xf792
-    OUT (C), C                ;; []
-
-    LD A, #0x40
-    LD C, #0x4a
+    LD  A,   #0x40                  ;; [ 7c] A refers to the next keyboard line to be read (40h to 49h)
+    LD  C,   #0x4a
     
 rfks_nextKeyboardLine:
-    LD B, D
-    OUT (C), A                ;; []
+    LD  B,   D
+    OUT (C), A                ;; [11c]
     
-    LD B, E
+    LD  B,   E
     INI
     INC A
-    CP C
-    JR C,rfks_nextKeyboardLine
+    CP  C
+    JR  C, rfks_nextKeyboardLine
     
-    LD BC, #0xF782
+    LD  BC,  #0xF782
     OUT (C), C                ;; []
     EI
     
