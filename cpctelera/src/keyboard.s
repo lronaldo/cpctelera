@@ -54,21 +54,34 @@
 ;### included below as Table1.                                     ###
 ;###                                                               ###
 ;### To query for the values, we should select PSG's Register 14,  ###
-;### which is done writting to 8255 PPI port A. Then, Bits 3..0 of ###
-;### PPI port C are connected to a decoder that sends this to      ###
-;### the keyboard, selecting Matrix Line to be read. Bits 7-6 are  ###
-;### conected to PSG's operation mode selector, and lets us select ###
-;### between (00)inactive/read/write/(11)register_select operation modes.  ###
-;### Once we select Reg14 and ask it to write its value to de PPI, ###
-;### the data of the selected Matrix Line will be present at PSG's ###
-;### Reg14 which could read through PPI port A. Summing up:        ###
+;### which is done writting 0Eh (14) to 8255 PPI port A (which is  ###
+;### directly connected to the PSG). Then, Bits 3..0 of PPI port C ###
+;### are connected to a decoder that sends this to the keyboard,   ###
+;### selecting Matrix Line to be read. Bits 7-6 are conected to    ###
+;### PSG's operation mode selector, and lets us select between     ###
+;### (00)inactive / (01)read / (10)write / (11)register_select     ###
+;### operation modes. So, writting C0h (11 000000) to Port C we    ###
+;### tell the PSG to select a register (the 0Eh that previouly was ###
+;### send to PSG through port A). Then, it is possible to start    ###
+;### asking for Matrix Lines and reading the Reg14 through Port A  ###
+;### to get the pressed/not pressed values from the Matrix.        ###
+;### Just one detail left: it is necessary to put PSG into inactive###
+;### mode between different opperations.                           ###
+;### Summing up:                                                   ###
 ;###     > 1: Configure PPI Operation Mode for:                    ###
 ;###          >> Port A: Ouput, Port C: Output (10000010b = 82h)   ###
 ;###     > 2: Write 14 (0Eh) to Port A (the index of the register) ###
 ;###     > 3: Write C0h to Port C (11 000000) to tell PSG that we  ###
 ;###          want to select a register (indexed at Port A).       ###
-;###     > 4: Write 0 (00h) to Port C to validate (PSG=inactive)   ###
-;###     > 5: Write 
+;###     > 4: Write 0 (00 000000) to Port C to finish operation    ###
+;###         (put PSG inactive between different operations)       ###
+;###     > 5: Configure PPI Operation Mode for:                    ###
+;###          >> Port A: Input, Port C: Output (10010010b = 92h)   ###
+;###     > 6: Write Matrix Line ID to Port C                       ###
+;###     > 7: Read Matrix Line Status from Port A                  ###
+;###     > 8: Repeat 6 until all Matrix Lines are read             ###
+;###     > 9: Configure Again PPI as in (1) (82h Output/Output)    ###
+;###          to leave it in this state.                           ###
 ;#####################################################################
 ;
 
@@ -99,17 +112,18 @@
 ;### FUNCTION: _cpct_readFullKeyboardStatus                           ###
 ;########################################################################
 ;### This function reads the status of keyboard and joysticks and     ###
-;### stores it in the 10 bytes reserverd as "keyboardBuffer"
+;### stores it in the 10 bytes reserverd as "keyboardStatusBuffer"    ###
 ;########################################################################
 ;### INPUTS (-)                                                       ###
 ;########################################################################
-;### OUTPUTS (-)                                                      ###
+;### OUTPUTS (10B)                                                    ###
+;###   -> KeyboardStatusBuffer full with pressed/not pressed info     ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, HL                           ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  ?? cycles                                                       ###
+;###  136 + 54*10 + 36 = 712 cycles (178 us)                          ###
 ;########################################################################
 ;### CREDITS:                                                         ###
 ;###    This fragment of code is based on a scanKeyboard code issued  ###
@@ -123,42 +137,42 @@ keyboardStatusBuffer: .ds 10
 .globl _cpct_readFullKeyboardStatus
 _cpct_readFullKeyboardStatus:: 
     
-    DI
+    DI                              ;; [ 4c] Disable interrupts
     LD  HL,  #keyboardStatusBuffer  ;; [10c] HL Points to the start of the keyboardBuffer, where scanned data will be stored
     
     LD  BC,  #0xF782                ;; [10c] Configure PPI 8255: Set Both Port A and Port C as Output. 
     OUT (C), C                      ;; [12c] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
                                     ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
     
-    LD  BC,  #0xF40E                ;; [10c] Select AY-3-8912 Register 14 (0E) on PPI 8255 Port A (F4). 
-    LD  E,   B                      ;; [ 4c] Save F4 into E: We will use it in the loop later on
+    LD  BC,  #0xF40E                ;; [10c] Write (0Eh = 14) on PPI 8255 Port A (F4h): the register we want to select on AY-3-8912  
+    LD  E,   B                      ;; [ 4c] Save F4h into E to use it later in the loop
     OUT (C), C                      ;; [12c] 
     
-    LD  BC,  #0xF6C0                ;; [10c]  
-    LD  D,   B                      ;; [ 4c]
+    LD  BC,  #0xF6C0                ;; [10c] Write (C0h = 11 000000b) on PPI Port C (F6h): operation > select register 
+    LD  D,   B                      ;; [ 4c] Save F6h into D to use it later in the loop
     OUT (C), C                      ;; [12c]
-    .DW #0x71ED                     ;; [12c] OUT (C), 0 => Ensure that previous action is completed
-    ;LD  C,   #0x00
-    ;OUT (C), C
+    .DW #0x71ED                     ;; [12c] OUT (C), 0 => Write 0 on PPI's Port C to put PSG's in inactive mode (required in between different operations)
 
-    LD  BC,  #0xf792
-    OUT (C), C                      ;; [12c]
+    LD  BC,  #0xF792                ;; [10c] Configure PPI 8255: Set Port A = Input, Port C = Output. 
+    OUT (C), C                      ;; [12c] 92h= 1001 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=1)=> Port A=Input, 
+                                    ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
 
     LD  A,   #0x40                  ;; [ 7c] A refers to the next keyboard line to be read (40h to 49h)
-    LD  C,   #0x4a
+    LD  C,   #0x4a                  ;; [ 7c] 4a is used to compare A and know when we have read all the Matrix Lines
     
 rfks_nextKeyboardLine:
-    LD  B,   D
-    OUT (C), A                ;; [11c]
+    LD  B,   D                      ;; [ 4c] B = F6h => Write to PPI's Port C to select next Matrix Line
+    OUT (C), A                      ;; [12c]
     
-    LD  B,   E
-    INI
-    INC A
-    CP  C
-    JR  C, rfks_nextKeyboardLine
+    LD  B,   E                      ;; [ 4c] B = F4h => Read from PPI's Port A: Pressed/Not Pressed Values from PSG
+    INI                             ;; [16c] The read value is written to (HL), then HL<-HL+1 and B<-B-1
+
+    INC A                           ;; [ 4c] Loop: Increment A => Next Matrix Line. 
+    CP  C                           ;; [ 4c] Check if we have arrived to line 4a, which is the end 
+    JP  C, rfks_nextKeyboardLine    ;; [10c] Repeat loop if we are not done.
     
-    LD  BC,  #0xF782
-    OUT (C), C                ;; []
-    EI
+    LD  BC,  #0xF782                ;; [10c] Put again PPI in Output/Output mode for Ports A/C.
+    OUT (C), C                      ;; [12c]
+    EI                              ;; [ 4c] Reenable interrupt
     
-    RET
+    RET                             ;; [10c] Return
