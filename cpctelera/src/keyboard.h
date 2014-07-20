@@ -19,6 +19,8 @@
 #ifndef CPCT_KEYBOARD_H
 #define CPCT_KEYBOARD_H
 
-extern void cpct_readFullKeyboardStatus();
+extern void cpct_scanKeyboard();
+extern void cpct_scanKeyboardFast();
+extern unsigned char cpct_isKeyPressed(unsigned int key);
 
 #endif

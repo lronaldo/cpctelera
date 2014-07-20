@@ -109,7 +109,7 @@
 
 ;
 ;########################################################################
-;### FUNCTION: _cpct_readFullKeyboardStatus                           ###
+;### FUNCTION: _cpct_scanKeyboard                                     ###
 ;########################################################################
 ;### This function reads the status of keyboard and joysticks and     ###
 ;### stores it in the 10 bytes reserverd as "keyboardStatusBuffer"    ###
@@ -134,12 +134,15 @@
 ; Define a 10-byte buffer to store keyboard data
 keyboardStatusBuffer: .ds 10
 
-.globl _cpct_readFullKeyboardStatus
-_cpct_readFullKeyboardStatus:: 
+.globl _cpct_scanKeyboard
+_cpct_scanKeyboard:: 
     
     DI                              ;; [ 4c] Disable interrupts
+
     LD  HL,  #keyboardStatusBuffer  ;; [10c] HL Points to the start of the keyboardBuffer, where scanned data will be stored
-    
+
+    ;; Configure PPI: Select Register 14 (the one connected with keyboard status) and set it for reading
+    ;;
     LD  BC,  #0xF782                ;; [10c] Configure PPI 8255: Set Both Port A and Port C as Output. 
     OUT (C), C                      ;; [12c] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
                                     ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
@@ -156,12 +159,14 @@ _cpct_readFullKeyboardStatus::
     LD  BC,  #0xF792                ;; [10c] Configure PPI 8255: Set Port A = Input, Port C = Output. 
     OUT (C), C                      ;; [12c] 92h= 1001 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=1)=> Port A=Input, 
                                     ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
-
+    
+    ;; Read Loop: We read the 10-bytes that define the pressed/not pressed status
+    ;;
     LD  A,   #0x40                  ;; [ 7c] A refers to the next keyboard line to be read (40h to 49h)
     LD  C,   #0x4a                  ;; [ 7c] 4a is used to compare A and know when we have read all the Matrix Lines
     
 rfks_nextKeyboardLine:
-    LD  B,   D                      ;; [ 4c] B = F6h => Write to PPI's Port C to select next Matrix Line
+    LD  B,   D                      ;; [ 4c] B = F6h => Write the value of A to PPI's Port C to select next Matrix Line
     OUT (C), A                      ;; [12c]
     
     LD  B,   E                      ;; [ 4c] B = F4h => Read from PPI's Port A: Pressed/Not Pressed Values from PSG
@@ -171,8 +176,187 @@ rfks_nextKeyboardLine:
     CP  C                           ;; [ 4c] Check if we have arrived to line 4a, which is the end 
     JP  C, rfks_nextKeyboardLine    ;; [10c] Repeat loop if we are not done.
     
+
+    ;; Restore PPI status to Port A=Output, Port C=Output
+    ;;
     LD  BC,  #0xF782                ;; [10c] Put again PPI in Output/Output mode for Ports A/C.
     OUT (C), C                      ;; [12c]
+
     EI                              ;; [ 4c] Reenable interrupt
     
     RET                             ;; [10c] Return
+
+;
+;########################################################################
+;### FUNCTION: _cpct_scanKeyboardFast                                 ###
+;########################################################################
+;### This function reads the status of keyboard and joysticks and     ###
+;### stores it in the 10 bytes reserverd as "keyboardStatusBuffer"    ###
+;### It uses an unrolled version of its main loop to gain 147 cycles. ###
+;########################################################################
+;### INPUTS (-)                                                       ###
+;########################################################################
+;### OUTPUTS (10B)                                                    ###
+;###   -> KeyboardStatusBuffer full with pressed/not pressed info     ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  129 + 40*9 + 36 + 36 = 561 cycles (140,25 us)                   ###
+;########################################################################
+;### CREDITS:                                                         ###
+;###    This fragment of code is based on a scanKeyboard code issued  ###
+;### by CPCWiki.                                                      ###
+;### http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning    ###
+;########################################################################
+;
+
+.globl _cpct_scanKeyboardFast
+_cpct_scanKeyboardFast:: 
+    
+    DI                              ;; [ 4c] Disable interrupts
+
+    LD  HL,  #keyboardStatusBuffer  ;; [10c] HL Points to the start of the keyboardBuffer, where scanned data will be stored
+
+    ;; Configure PPI: Select Register 14 (the one connected with keyboard status) and set it for reading
+    ;;
+    LD  BC,  #0xF782                ;; [10c] Configure PPI 8255: Set Both Port A and Port C as Output. 
+    OUT (C), C                      ;; [12c] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
+                                    ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
+    
+    LD  BC,  #0xF40E                ;; [10c] Write (0Eh = 14) on PPI 8255 Port A (F4h): the register we want to select on AY-3-8912  
+    LD  E,   B                      ;; [ 4c] Save F4h into E to use it later in the loop
+    OUT (C), C                      ;; [12c] 
+    
+    LD  BC,  #0xF6C0                ;; [10c] Write (C0h = 11 000000b) on PPI Port C (F6h): operation > select register 
+    LD  D,   B                      ;; [ 4c] Save F6h into D to use it later in the loop
+    OUT (C), C                      ;; [12c]
+    .DW #0x71ED                     ;; [12c] OUT (C), 0 => Write 0 on PPI's Port C to put PSG's in inactive mode (required in between different operations)
+
+    LD  BC,  #0xF792                ;; [10c] Configure PPI 8255: Set Port A = Input, Port C = Output. 
+    OUT (C), C                      ;; [12c] 92h= 1001 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=1)=> Port A=Input, 
+                                    ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
+    
+    ;; Read Loop (Unrolled version): We read the 10-bytes that define the pressed/not pressed status
+    ;;
+    LD  A,   #0x40                  ;; [ 7c] A refers to the next keyboard line to be read (40h to 49h)
+
+    ;; Read line 40h
+    LD  B,   D                      ;; [ 4c] B = F6h => Write the value of A to PPI's Port C to select next Matrix Line
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c] B = F4h => Read from PPI's Port A: Pressed/Not Pressed Values from PSG
+    INI                             ;; [16c] The read value is written to (HL), then HL<-HL+1 and B<-B-1
+    INC A                           ;; [ 4c] Loop: Increment A => Next Matrix Line. 
+    
+    ;; Read line 41h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+
+    ;; Read line 42h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+    
+    ;; Read line 43h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+
+    ;; Read line 44h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+ 
+    ;; Read line 45h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+
+    ;; Read line 46h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+    
+    ;; Read line 47h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+
+    ;; Read line 48h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+    INC A                           ;; [ 4c]
+    
+    ;; Read line 49h
+    LD  B,   D                      ;; [ 4c]
+    OUT (C), A                      ;; [12c] 
+    LD  B,   E                      ;; [ 4c]
+    INI                             ;; [16c]
+
+    ;; Restore PPI status to Port A=Output, Port C=Output
+    ;;
+    LD  BC,  #0xF782                ;; [10c] Put again PPI in Output/Output mode for Ports A/C.
+    OUT (C), C                      ;; [12c]
+
+    EI                              ;; [ 4c] Reenable interrupt
+    
+    RET                             ;; [10c] Return
+;
+;########################################################################
+;### FUNCTION: _cpct_isKeyPressed                                     ###
+;########################################################################
+;### Checks if a concrete key is pressed or not. It does it looking   ###
+;### at the keyboardStatusBuffer, which is filled up by scan routines.###
+;### So, take into account that keyboard has to be scanned before     ###
+;### using this routine or it won't work.                             ###
+;########################################################################
+;### INPUTS (2B)                                                      ###
+;###   -> KeyID, which contains Matrix Line(1B) and Bit Mask(1B)      ### 
+;########################################################################
+;### OUTPUTS (1B)                                                     ###
+;###   -> True if the selected key is pressed, False otherwise.       ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  109/113 cyles (27,25/28,25 us)                                  ###
+;########################################################################
+;
+
+.globl _cpct_isKeyPressed
+_cpct_isKeyPressed::
+   POP  AF                          ;; [10c] Get the return address from stack
+   POP  BC                          ;; [10c] Get the KeyID parameter from stack
+   PUSH BC                          ;; [11c] Restore stack status
+   PUSH AF                          ;; [11c]
+  
+   LD  A,  B                        ;; [ 4c] Save Key's Bit Mask into A 
+   LD  B,  #0                       ;; [ 7c] B = 0 to leave BC with the contents of C (Matrix Line)
+   LD  HL, #keyboardStatusBuffer    ;; [10c] Make HL Point to &keyboardStatusBuffer
+   ADD HL, BC                       ;; [11c] Make HL Point to &keyboardStatusBuffer + Matrix Line (C)
+   AND (HL)                         ;; [ 7c] A = AND operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
+   LD  H,  B                        ;; [ 4c] H = 0, prepare for returning value in L
+   LD  L,  B                        ;; [ 4c] L = 0
+   JP NZ,  ikp_returnFalse          ;; [10c] If AND resulted non-zero, Key's bit was 1, what means key was not pressed (return false = 0)
+   INC L                            ;; [ 4c] Else, Key's bit was 0, what means key was pressed (return true = 1)
+ikp_returnFalse:
+   RET                              ;; [10c]

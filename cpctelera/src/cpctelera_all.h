@@ -22,5 +22,6 @@
 #include "firmware_ed.h"
 #include "videomode.h"
 #include "sprites.h"
+#include "keyboard.h"
 
 #endif

@@ -17,7 +17,7 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##     CPCTELERA ENGINE: Example of use of cpct_drawSprite2x8_aligned    ##
+##     CPCTELERA ENGINE: Example of use of cpct_scanKeyboard             ##
 ##                     Build configuration file                          ##
 ##-----------------------------------------------------------------------##
 ## This file is intendend for you to be able to config the way in which  ##
@@ -91,6 +91,6 @@ IDSK=$(IDSK_PATH)iDSK
 SRCDIR=src
 OBJDIR=obj
 CSRCFILES=$(foreach file,$(wildcard $(SRCDIR)/*.c),$(subst $(SRCDIR)/,,$(file)))
-OBJFILES=$(CSRCFILES:.c=.rel)
+OBJFILES=$(CSRCFILES:%.c=%.rel)
 #CSRCFILES=$(wildcard *.c)
 #OBJFILES=main.rel
