@@ -134,3 +134,116 @@ dsa48_first_line:
    JP   NZ,dsa48_next_line ;; [10c] 
 
    RET                     ;; [10c]
+
+
+;;
+;;  WORK IN PROGRESS...
+;;
+
+; (Max sprite width=80 bytes)
+;.globl _cpct_drawSprite
+_cpct_drawSprite::
+   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   POP  AF                 ;; [10c] AF = Return Address
+   POP  HL                 ;; [10c] HL = Source address
+   POP  DE                 ;; [10c] DE = Destination address
+   POP  BC                 ;; [10c] BC = Height/Width
+   PUSH BC                 ;; [11c] Leave the stack as it was
+   PUSH DE                 ;; [11c] 
+   PUSH HL                 ;; [11c] 
+   PUSH AF                 ;; [11c] 
+
+   ;; B = Height, C = Width
+
+   ;; Modify code using with to jump in drawSpriteWidth
+   LD  A, #80                    ;; [ 7c]
+   SUB C                         ;; [ 4c]
+   LD (ds_drawSpriteWidth+#1), A ;; [13c]
+
+ds_drawSpriteWidth:
+   ;; Draw a sprite-line of n bytes
+   JR 0                    ;; [12c] Self modifying instruction: the 0 will be substituted by the required jump forward
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+
+   
+
+   RET                     ;; [10c]
