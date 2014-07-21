@@ -168,7 +168,7 @@ _cpct_scanKeyboard::
 rfks_nextKeyboardLine:
     LD  B,   D                      ;; [ 4c] B = F6h => Write the value of A to PPI's Port C to select next Matrix Line
     OUT (C), A                      ;; [12c]
-    
+   
     LD  B,   E                      ;; [ 4c] B = F4h => Read from PPI's Port A: Pressed/Not Pressed Values from PSG
     INI                             ;; [16c] The read value is written to (HL), then HL<-HL+1 and B<-B-1
 
@@ -182,7 +182,7 @@ rfks_nextKeyboardLine:
     LD  BC,  #0xF782                ;; [10c] Put again PPI in Output/Output mode for Ports A/C.
     OUT (C), C                      ;; [12c]
 
-    EI                              ;; [ 4c] Reenable interrupt
+    EI                              ;; [ 4c] Reenable interrupts
     
     RET                             ;; [10c] Return
 
@@ -316,7 +316,7 @@ _cpct_scanKeyboardFast::
     LD  BC,  #0xF782                ;; [10c] Put again PPI in Output/Output mode for Ports A/C.
     OUT (C), C                      ;; [12c]
 
-    EI                              ;; [ 4c] Reenable interrupt
+    EI                              ;; [ 4c] Reenable interrupts
     
     RET                             ;; [10c] Return
 ;

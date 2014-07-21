@@ -44,9 +44,9 @@ void main(void) {
     cpct_disableFirmware();
     cpct_setVideoMode(0);
     while (1) {
-        cpct_scanKeyboard();
+        cpct_scanKeyboardFast();
 
-        if (cpct_isKeyPressed(0x8005))  // Matrix Line 5, bit 7 => Space
+        if (cpct_isKeyPressed(Key_Space))
             sprite = sprite_pressed;
         else
             sprite = sprite_notpressed;
