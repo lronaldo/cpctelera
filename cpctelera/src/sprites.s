@@ -135,13 +135,30 @@ dsa48_first_line:
 
    RET                     ;; [10c]
 
-
-;;
-;;  WORK IN PROGRESS...
-;;
-
-; (Max sprite width=80 bytes)
-;.globl _cpct_drawSprite
+;
+;########################################################################
+;### FUNCTION: cpct_drawSprite                                        ###
+;########################################################################
+;### This function copies a generic NxM bytes sprite from memory to a ###
+;### video-memory location (either present video-memory or hardware   ###
+;### backbuffer. The original sprite must be stored as an array (i.e. ###
+;### with all of its pixels stored as consecutive bytes in memory) It ###
+;### only works for solid, rectangular sprites, with 1-80 bytes width ###
+;########################################################################
+;### INPUTS (6 Bytes)                                                 ###
+;###  * (2B) Source Sprite Pointer (array with pixel data)            ###
+;###  * (2B) Destination video memory pointer                         ###
+;###  * (1B) Sprite Width in bytes                                    ###
+;###  * (1B) Sprite Height in bytes                                   ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;### 102+(71+16×w)×h + 32×boundarycrosses  cycles                               ###
+;########################################################################
+;
+.globl _cpct_drawSprite
 _cpct_drawSprite::
    ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
    POP  AF                 ;; [10c] AF = Return Address
@@ -156,11 +173,129 @@ _cpct_drawSprite::
    ;; B = Width, C = Height
 
    ;; Modify code using width to jump in drawSpriteWidth
-   LD  A, #80                    ;; [ 7c]
-   SUB B                         ;; [ 4c]
-   LD (ds_drawSpriteWidth+#4), A ;; [13c]
+   LD  A, #80                    ;; [ 7c] We need to jump 80 bytes less the width of the sprite (B)
+   SUB B                         ;; [ 4c]    to do as much LDIs as bytes has the Sprite in width
+   LD (ds_drawSpriteWidth+#4), A ;; [13c] Modify JR data to create the jump we need
 
-   ;; Get the current pixel-row of the screen where we are painting (there are 8 pixel rows)
+   LD   A, C                 ;; [ 4c] A = Height (used as counter for the number of lines we have to copy)
+   EX   DE, HL               ;; [ 4c] Instead of jumping over the next line, we do the inverse operation because it is only 4 cycles and not 10, as a JP would be)
+
+ds_drawSpriteWidth_next:
+   ;; NEXT LINE
+   EX   DE, HL             ;; [ 4c] HL and DE are exchanged every line to do 16bit math with DE. This line reverses it before proceeding to copy the next line.
+
+ds_drawSpriteWidth:
+   ;; Draw a sprite-line of n bytes
+   LD BC, #0x800           ;; [10c] 0x800 bytes is the distance in memory from one pixel line to the next within every 8 pixel lines. Each LDI performed will decrease this by 1, as we progress through memory copying the present line
+   JR 0                    ;; [12c] Self modifying instruction: the 0 will be substituted by the required jump forward
+   LDI                     ;; [16c] <| 80 LDIs, which are able to copy up to 80 bytes each time.
+   LDI                     ;; [16c]  | That means that each Sprite line should be 80 bytes width at most.
+   LDI                     ;; [16c]  | The JR instruction at the start makes us ingnore the LDIs we dont need (jumping over them)
+   LDI                     ;; [16c] <| That ensures we will be doing only as much LDIs as bytes our sprit is wide
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c] <|
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c]  |
+   LDI                     ;; [16c] <|
+
+   DEC A                   ;; [ 4c] Another line finished: we discount it from A
+   RET Z                   ;; [11c/5c] If that was the last line, we safely return
+   ;;JP Z, ds_drawEnds       ;; [10c]
+
+   ;; Jump destination pointer to the start of the next line in video memory
+   EX  DE, HL              ;; [ 4c] DE has destination, but we have to exchange it with HL to be able to do 16bit math
+   ADD HL, BC              ;; [11c] We add 0x800 minus the width of the sprite (BC) to destination pointer 
+   LD  A, H                ;; [ 4c] We check if we have crossed video memory boundaries (which will happen every 8 lines). If that happens, bits 13,12 and 11 of destination pointer will be 0
+   AND #0x38               ;; [ 7c] leave out only bits 13,12 and 11
+   JP NZ, ds_drawSpriteWidth_next ;; [10c] If that does not leave as with 0, we are still inside video memory boundaries, so proceed with next line
+   
+   ;; Every 8 lines, we cross the 16K video memory boundaries and have to
+   ;; reposition destination pointer. That means our next line is 16K+0x800-0x50 bytes back
+   ;; which is the same as advancing 48K+0x50-0x800=0xB850 bytes, as memory is 64K 
+   ;; and our 16bit pointers cycle over it
+   LD  BC, #0xB850         ;; [10c] B850h = C050h - 800h
+   ADD HL, BC              ;; [11c] We advance destination pointer to next line
+   JP ds_drawSpriteWidth_next ;; [10c] and then continue copying
+
+ds_drawEnds:   
+   ;;RET                     ;; [10c]
+ 
+ 
+ 
+ ;; This piece of code could be useful later
+ 
+  ;; Get the current pixel-row of the screen where we are painting (there are 8 pixel rows)
    ;; Pixel row are bits 11-13 of the address pointer (14-15 identify the page 0000/4000/8000/C000)
    ;;LD  A, D                ;; [ 4c]
    ;;RRCA                    ;; [ 4c]
@@ -173,127 +308,3 @@ _cpct_drawSprite::
    ;;LD  A, C                ;; [ 4c]
    ;;SUB B                   ;; [ 4c]
    ;;.DW #0x67DD             ;; [ 8c] LD IXh, A (Save A = C - A)
-   
-   ;;LD  A, B                ;; [ 4c]
-   
-   LD   A, C                 ;; [ 4c] A = Height
-   ;;JP  ds_drawSpriteWidth  ;; [10c]
-   EX   DE, HL               ;; [ 4c]
-
-ds_drawSpriteWidth_next:
-   ;; NEXT LINE
-   EX   DE, HL             ;; [ 4c]
-
-ds_drawSpriteWidth:
-   ;; Draw a sprite-line of n bytes
-   LD BC, #0x800           ;; [10c]
-   JR 0                    ;; [12c] Self modifying instruction: the 0 will be substituted by the required jump forward
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c] <|
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
-
-   DEC A                   ;; [ 4c]
-   RET Z                   ;; [11c/5c]
-   ;;JP Z, ds_drawEnds       ;; [10c]
-
-   EX  DE, HL              ;; [ 4c]
-   ADD HL, BC              ;; [11c]
-   LD  A, D                ;; [ 4c]
-   AND #0x38               ;; [ 7c]
-   JP NZ, ds_drawSpriteWidth_next ;; [10c]
-
-   LD  BC, #0xB850         ;; [10c] B850h = C050h - 800h
-   ADD HL, BC              ;; [11c]
-   JP ds_drawSpriteWidth_next ;; [10c]
-
-ds_drawEnds:   
-   RET                     ;; [10c]
-   
-C000
-C800
-D000 11 011100
-D800 11 011100 BC-800 = -Width
-E000 11 100000 BC-37B0
-E800 11 101100
-F000 11 110000
-F800 11 111100 -37B0-Width
-
-C050
-- 3FB0
