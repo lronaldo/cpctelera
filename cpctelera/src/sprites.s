@@ -147,21 +147,46 @@ _cpct_drawSprite::
    POP  AF                 ;; [10c] AF = Return Address
    POP  HL                 ;; [10c] HL = Source address
    POP  DE                 ;; [10c] DE = Destination address
-   POP  BC                 ;; [10c] BC = Height/Width
+   POP  BC                 ;; [10c] BC = Width/Height
    PUSH BC                 ;; [11c] Leave the stack as it was
    PUSH DE                 ;; [11c] 
    PUSH HL                 ;; [11c] 
    PUSH AF                 ;; [11c] 
 
-   ;; B = Height, C = Width
+   ;; B = Width, C = Height
 
-   ;; Modify code using with to jump in drawSpriteWidth
+   ;; Modify code using width to jump in drawSpriteWidth
    LD  A, #80                    ;; [ 7c]
-   SUB C                         ;; [ 4c]
-   LD (ds_drawSpriteWidth+#1), A ;; [13c]
+   SUB B                         ;; [ 4c]
+   LD (ds_drawSpriteWidth+#4), A ;; [13c]
+
+   ;; Get the current pixel-row of the screen where we are painting (there are 8 pixel rows)
+   ;; Pixel row are bits 11-13 of the address pointer (14-15 identify the page 0000/4000/8000/C000)
+   ;;LD  A, D                ;; [ 4c]
+   ;;RRCA                    ;; [ 4c]
+   ;;RRCA                    ;; [ 4c]
+   ;;RRCA                    ;; [ 4c]
+   ;;NEG                     ;; [ 8c] Two's Complement
+   ;;AND #0x07               ;; [ 7c] 07 = 00000111
+
+   ;;LD  B, A                ;; [ 4c]
+   ;;LD  A, C                ;; [ 4c]
+   ;;SUB B                   ;; [ 4c]
+   ;;.DW #0x67DD             ;; [ 8c] LD IXh, A (Save A = C - A)
+   
+   ;;LD  A, B                ;; [ 4c]
+   
+   LD   A, C                 ;; [ 4c] A = Height
+   ;;JP  ds_drawSpriteWidth  ;; [10c]
+   EX   DE, HL               ;; [ 4c]
+
+ds_drawSpriteWidth_next:
+   ;; NEXT LINE
+   EX   DE, HL             ;; [ 4c]
 
 ds_drawSpriteWidth:
    ;; Draw a sprite-line of n bytes
+   LD BC, #0x800           ;; [10c]
    JR 0                    ;; [12c] Self modifying instruction: the 0 will be substituted by the required jump forward
    LDI                     ;; [16c] <|
    LDI                     ;; [16c]  |
@@ -244,6 +269,31 @@ ds_drawSpriteWidth:
    LDI                     ;; [16c]  |
    LDI                     ;; [16c] <|
 
-   
+   DEC A                   ;; [ 4c]
+   RET Z                   ;; [11c/5c]
+   ;;JP Z, ds_drawEnds       ;; [10c]
 
+   EX  DE, HL              ;; [ 4c]
+   ADD HL, BC              ;; [11c]
+   LD  A, D                ;; [ 4c]
+   AND #0x38               ;; [ 7c]
+   JP NZ, ds_drawSpriteWidth_next ;; [10c]
+
+   LD  BC, #0xB850         ;; [10c] B850h = C050h - 800h
+   ADD HL, BC              ;; [11c]
+   JP ds_drawSpriteWidth_next ;; [10c]
+
+ds_drawEnds:   
    RET                     ;; [10c]
+   
+C000
+C800
+D000 11 011100
+D800 11 011100 BC-800 = -Width
+E000 11 100000 BC-37B0
+E800 11 101100
+F000 11 110000
+F800 11 111100 -37B0-Width
+
+C050
+- 3FB0
