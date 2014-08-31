@@ -21,5 +21,6 @@
 
 extern void cpct_drawSprite2x8_aligned(char *sprite, char* memory);
 extern void cpct_drawSprite4x8_aligned(char *sprite, char* memory);
+extern void cpct_drawSprite(char *sprite, char* memory, unsigned char width, unsigned char height);
 
 #endif
