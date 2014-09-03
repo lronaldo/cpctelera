@@ -155,7 +155,10 @@ dsa48_first_line:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;### 106+(79+16×w)×h + 32×boundarycrosses  cycles                     ###
+;### [82 + (79 + 16w)h + 31c] cycles; w=width,h=height,c=8linecrosses ###
+;### Examples:                                                        ###
+;### 2x16 byte sprite = 1920/1889 cycles                              ###
+;### 4x32 byte sprite = 4782/4751 cycles                              ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite
@@ -188,7 +191,7 @@ ds_drawSpriteWidth_next:
 ds_drawSpriteWidth:
    ;; Draw a sprite-line of n bytes
    LD BC, #0x800           ;; [10c] 0x800 bytes is the distance in memory from one pixel line to the next within every 8 pixel lines. Each LDI performed will decrease this by 1, as we progress through memory copying the present line
-   JR 0                    ;; [12c] Self modifying instruction: the 0 will be substituted by the required jump forward
+   .DW #0x0018  ;; JR 0    ;; [12c] Self modifying instruction: the '00' will be substituted by the required jump forward. (Note: Writting JR 0 compiles but later it gives odd linking errors)
    LDI                     ;; [16c] <| 80 LDIs, which are able to copy up to 80 bytes each time.
    LDI                     ;; [16c]  | That means that each Sprite line should be 80 bytes width at most.
    LDI                     ;; [16c]  | The JR instruction at the start makes us ingnore the LDIs we dont need (jumping over them)
@@ -255,7 +258,6 @@ ds_drawSpriteWidth:
 
    DEC A                   ;; [ 4c] Another line finished: we discount it from A
    RET Z                   ;; [11c/5c] If that was the last line, we safely return
-   ;;JP Z, ds_drawEnds       ;; [10c]
 
    ;; Jump destination pointer to the start of the next line in video memory
    EX  DE, HL              ;; [ 4c] DE has destination, but we have to exchange it with HL to be able to do 16bit math
@@ -265,7 +267,7 @@ ds_drawSpriteWidth:
    AND #0x38               ;; [ 7c] leave out only bits 13,12 and 11
    LD  A, B                ;; [ 4c] Restore A from B (A = B)
    JP NZ, ds_drawSpriteWidth_next ;; [10c] If that does not leave as with 0, we are still inside video memory boundaries, so proceed with next line
-   
+
    ;; Every 8 lines, we cross the 16K video memory boundaries and have to
    ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
    ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
@@ -274,10 +276,6 @@ ds_drawSpriteWidth:
    ADD HL, BC              ;; [11c] We advance destination pointer to next line
    JP ds_drawSpriteWidth_next ;; [10c] and then continue copying
 
-ds_drawEnds:   
-   ;;RET                     ;; [10c]
- 
- 
  
  ;; This piece of code could be useful later
  
