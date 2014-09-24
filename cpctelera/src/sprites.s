@@ -276,6 +276,99 @@ ds_drawSpriteWidth:
    ADD HL, BC              ;; [11c] We advance destination pointer to next line
    JP ds_drawSpriteWidth_next ;; [10c] and then continue copying
 
+;
+;########################################################################
+;### FUNCTION: cpct_setVideoMemoryPage                                ###
+;########################################################################
+;### Changes the place where the video memory starts. Concretely, it  ###
+;### changes de Video Memory Page, which correponds to the 6 Most     ###
+;### significant bits (MSb) from the memory address where video memo- ###
+;### ry starts. By doing this, you are effectively changing what part ###
+;### of the RAM will be used as Video Memory and, therefore, what is  ###
+;### to be displayed from now on. With this you can affectively imple-###
+;### ment double and triple buffer using hardware instead of copying. ###
+;###                                                                  ###
+;### This routine achieves this by changing Register R12 from CRTC.   ###
+;### This register is the responsible for holding the 6 MSb of the    ###
+;### place where Video Memory starts (its page). However, this regis- ###
+;### ter stores this 6 bits as its 6 LSb (--bbbbbb). We have to take  ###
+;### this into account to correctly set the page we want.             ###
+;###                                                                  ###
+;### Useful example:                                                  ###
+;###  1. You want your Video Memory to start at 0x8000                ###
+;###    > Then, your Video Memory Page is 0x80 (10000000).            ###
+;###    > You call this routine with 0x20 as parameter (00100000)     ###
+;###    > Note that 0x20 (00100000) is 0x80 (10000000) shifted twice  ###
+;###      to the right. Your 6 MSb are to be passed as the 6 LSb.     ###
+;########################################################################
+;### INPUTS (1 Byte)                                                  ###
+;###  * (1B) New starting page for Video Memory (Only 6 LSb are used) ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: F, BC, DE                            ###
+;########################################################################
+;### MEASURED TIME: 90 cycles                                         ###
+;########################################################################
+;
+.globl _cpct_setVideoMemoryPage
+_cpct_setVideoMemoryPage::
+   POP BC            ;; [10c] Get Call Return Address
+   POP DE            ;; [10c] Get Parameter (A = New starting page...)
+   PUSH DE           ;; [11c] Restore Stack status
+   PUSH BC           ;; [11c]
+
+   ;; Select R12 Register from the CRTC and Write there the selected Video Memory Page
+   LD  BC, #0xBC0C   ;; [10c] 0xBC = Port for selecting CRTC Register, 0x0C = Selecting R12
+   OUT (C), C        ;; [12c] Select the R12 Register (0x0C to port 0xBC)
+   INC B             ;; [ 4c] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
+   OUT (C), E        ;; [12c] Write Selected Video Memory Page to R12 (A to port 0xBD)
+
+   RET               ;; [10c] Return
+
+;
+;########################################################################
+;### FUNCTION: cpct_setVideoMemoryOffset                              ###
+;########################################################################
+;### Changes part of the address where video memory starts. Video me- ###
+;### mory starts at an address that can be defined in binary as:      ###
+;###    Start Addres = ppppppoooooooo00                               ###
+;### where you have 6 bits that define the Page, and 8 bits that defi-###
+;### ne the offset. The 2 Least Significant Bits (LSb) are allways 0. ###
+;### This funcion changes the 8 bits that define the offset. This 8   ###
+;### bits are controlled by Register R13 from the CRTC. If you wanted ###
+;### to change the 6 Most Significant bits (MSb), aka the Page, you   ###
+;### should call _cpct_setVideoMemoryPage.                            ###
+;###                                                                  ###
+;### Changing this effectively changes the place where your Video Me- ###
+;### mory will be located in RAM, and it will change what is displa-  ###
+;### yed. This could be used to produce scrolling effects or to make  ###
+;### a fine grained control of double/triple buffers by hardware.     ###
+;########################################################################
+;### INPUTS (1 Byte)                                                  ###
+;###  * (1B) New starting offset for Video Memory                     ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: F, BC, DE                            ###
+;########################################################################
+;### MEASURED TIME: 90 cycles                                         ###
+;########################################################################
+;
+.globl _cpct_setVideoMemoryOffset
+_cpct_setVideoMemoryOffset::
+   POP BC            ;; [10c] Get Call Return Address
+   POP DE            ;; [10c] Get Parameter (A = New starting offset...)
+   PUSH DE           ;; [11c] Restore Stack status
+   PUSH BC           ;; [11c]
+
+   ;; Select R13 Register from the CRTC and Write there the selected Video Memory Offset
+   LD  BC, #0xBC0D   ;; [10c] 0xBC = Port for selecting CRTC Register, 0x0D = Selecting R13
+   OUT (C), C        ;; [12c] Select the R13 Register (0x0D to port 0xBC)
+   INC B             ;; [ 4c] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
+   OUT (C), E        ;; [12c] Write Selected Video Memory Offset to R13 (A to port 0xBD)
+
+   RET               ;; [10c] Return 
+ 
+ 
  
  ;; This piece of code could be useful later
  

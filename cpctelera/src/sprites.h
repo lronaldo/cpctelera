@@ -22,5 +22,7 @@
 extern void cpct_drawSprite2x8_aligned(char *sprite, char* memory);
 extern void cpct_drawSprite4x8_aligned(char *sprite, char* memory);
 extern void cpct_drawSprite(char *sprite, char* memory, unsigned char width, unsigned char height);
+extern void cpct_setVideoMemoryPage(char page_codified_in_6LSb);
+extern void cpct_setVideoMemoryOffset(char offset);
 
 #endif

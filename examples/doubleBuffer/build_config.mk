@@ -17,7 +17,8 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##     CPCTELERA ENGINE: Example of use of cpct_drawSprite               ##
+##     CPCTELERA ENGINE: Example of use of cpct_setVideoMemoryPage       ##
+##                       to create a hardware double buffer              ##
 ##                     Build configuration file                          ##
 ##-----------------------------------------------------------------------##
 ## This file is intendend for you to be able to config the way in which  ##

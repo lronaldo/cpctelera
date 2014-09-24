@@ -21,7 +21,7 @@
 // Newton's sprite taken from OpenGameArt (http://opengameart.org/content/newton)
 // Original author: devnewton
 // Shared as CC-BY-SA 3.0
-const char G_newton_sprite[512] = {
+const unsigned char G_newton_sprite[512] = {
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
  0x00, 0x00, 0x00, 0x00, 0x50, 0xF0, 0xF0, 0x30, 0x70, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
  0x00, 0x00, 0x00, 0x00, 0xB0, 0x35, 0x3A, 0x30, 0x3F, 0x30, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -56,20 +56,32 @@ const char G_newton_sprite[512] = {
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+// Struct defining data needed to access a RAM Video Buffer (Screen) 
+// and switching to it whenever needed (using its page)
+typedef struct { 
+   unsigned char *p;       // Pointer to the start of the screen buffer in RAM
+   unsigned char page;     // Page of the screen buffer in RAM: required to switch from/to it
+} SScreen;
+
 void main(void) {
-   unsigned char x=0, y=0;
-   char*dest = (char*)0xC000;
+   SScreen scr[2] = { { (unsigned char*)0xC000, (unsigned char)0b00110000 },    // 0xC0 = 0b1100000 ->>2-> 0b00110000
+                      { (unsigned char*)0x8000, (unsigned char)0b00100000 }, }; // 0x80 = 0b1000000 ->>2-> 0b00100000
 
    cpct_disableFirmware();
    cpct_setVideoMode(0);
 
+   // Lets Draw 1 Sprite on Buffer 0 and 2 sprites on Buffer 1
+   cpct_drawSprite(G_newton_sprite, scr[0].p +  912, 16, 32);
+   cpct_drawSprite(G_newton_sprite, scr[1].p +  662, 16, 32);
+   cpct_drawSprite(G_newton_sprite, scr[1].p + 1240, 16, 32);
+
    while(1) {
       cpct_scanKeyboardFast();
-      if      (cpct_isKeyPressed(Key_CursorRight) && x < 64 ) { x++; dest++; }
-      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
-      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
-      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 168) { dest += (++y & 7) ? 0x0800 : 0xC850; }
 
-      cpct_drawSprite(G_newton_sprite, dest, 16, 32);
+      if (cpct_isKeyPressed(Key_1)) { 
+         cpct_setVideoMemoryPage(scr[0].page);
+      } else if (cpct_isKeyPressed(Key_2)) { 
+         cpct_setVideoMemoryPage(scr[1].page);
+      }
    }
 }
