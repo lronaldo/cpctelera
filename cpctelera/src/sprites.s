@@ -275,6 +275,74 @@ ds_drawSpriteWidth:
    LD  BC, #0xC050         ;; [10c] B850h = C050h - 800h
    ADD HL, BC              ;; [11c] We advance destination pointer to next line
    JP ds_drawSpriteWidth_next ;; [10c] and then continue copying
+;
+;########################################################################
+;### FUNCTION: cpct_drawMaskedSprite                                  ###
+;########################################################################
+;### This function copies a generic NxM bytes sprite from memory to a ###
+;### video-memory location (either present video-memory or hardware   ###
+;### backbuffer). The original sprite must be stored as an array (i.e.###
+;### with all of its pixels stored as consecutive bytes in memory).   ###
+;### Moreover, the sprite must contain mask information in the format ###
+;### [BCBC...BC], being C a byte with color information and B a byte  ###
+;### with mask information related to next C-byte.                    ###
+;########################################################################
+;### INPUTS (6 Bytes)                                                 ###
+;###  * (2B) Source Sprite Pointer (array with pixel and mask data)   ###
+;###  * (2B) Destination video memory pointer                         ###
+;###  * (1B) Sprite Width in bytes (without counting mask bytes)      ###
+;###  * (1B) Sprite Height in bytes                                   ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;########################################################################
+;
+.globl _cpct_drawMaskedSprite
+_cpct_drawMaskedSprite::
+   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   POP  AF                 ;; [10c] AF = Return Address
+   POP  HL                 ;; [10c] HL = Source Address (Sprite data array)
+   POP  DE                 ;; [10c] DE = Destination address (Video memory location)
+   POP  BC                 ;; [10c] BC = Height/Width
+   PUSH BC                 ;; [11c] Leave the stack as it was
+   PUSH DE                 ;; [11c] 
+   PUSH HL                 ;; [11c] 
+   PUSH AF                 ;; [11c] 
+
+   ;; B = Width, C = Height
+   
+sprite_width_loop:
+   LD A, (DE)              ;; [] Get next background byte into A
+   AND (HL)                ;; [] Erase background part that is to be overwritten (Mask step 1)
+   INC HL                  ;; [] HL += 1 => Point HL to Sprite Colour information
+   OR (HL)                 ;; [] Add up background and sprite information in one byte (Mask step 2)
+   LD (DE), A              ;; [] Save modified background + sprite data information into memory
+   INC DE                  ;; [] Next bytes (sprite and memory)
+   INC HL
+    
+   DEC C                   ;; [] C holds sprite width. Decrease it until 0
+   JP NZ, sprite_width_loop 
+  
+   DEC B                   ;; [] B holds sprite height. Decrease it until 0
+   RET Z ;;, sprite_copy_ended
+   
+   LD  A, D 
+   AND #0x38
+   JP Z, sprite_8bit_boundary_crossed
+   LD  A, D
+   ADD #0x08
+   LD  D, A
+   JP  sprite_width_loop
+sprite_8bit_boundary_crossed:
+   PUSH HL
+   EX  DE, HL
+   LD  DE, #0xC050
+   ADD HL, DE
+   EX  DE, HL
+   POP HL
+   JP  sprite_width_loop
 
 ;
 ;########################################################################
