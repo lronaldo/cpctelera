@@ -20,5 +20,6 @@
 #define CPCT_VIDEOMODE_H
 
 extern void cpct_setVideoMode(char videoMode);
+extern void cpct_setVideoPalette(unsigned char* ink_array, unsigned char ink_array_size);
 
 #endif
