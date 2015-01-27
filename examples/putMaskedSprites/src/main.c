@@ -78,9 +78,15 @@ const char G_newton_sprite[512] = {
  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+char* videoMem (unsigned char x, unsigned char y) {
+   const char* videoMemoryStart = (const char*)0xC000;
+   return (char *)(videoMemoryStart + (y >> 3) * 0x50 + (y & 7) * 0x800 + x);
+}
+
 void main(void) {
    unsigned char x=0, y=0;
-   char*dest = (char*)0xC000;
+   char *charlies[4] = { videoMem(  0,   0), videoMem( 32,  40),
+                         videoMem(100,  16), videoMem(132, 100) };
 
    cpct_disableFirmware();
    cpct_setVideoMode(0);
@@ -88,18 +94,13 @@ void main(void) {
    // Make a background full of Newtons
    for (x=0; x < 5; x++) {
       for(y=0; y < 6; y++) {
-         cpct_drawSprite(G_newton_sprite, dest + 80*4*y + 16*x, 16, 32);
+         cpct_drawSprite(G_newton_sprite, videoMem(x << 4, y << 5), 16, 32);
       }
    }
 
-   // Let us move Charlie
-   while(1) {
-      cpct_scanKeyboardFast();
-      if      (cpct_isKeyPressed(Key_CursorRight) && x < 64 ) { x++; dest++; }
-      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
-      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
-      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 168) { dest += (++y & 7) ? 0x0800 : 0xC850; }
-
-      cpct_drawMaskedSprite(G_charlie_sprite, dest, 4, 16);
-   }
+   // Paint an array of charlies
+   for (x=0; x < 4; x++) 
+      cpct_drawMaskedSprite(G_charlie_sprite, charlies[x], 4, 16);
+   
+   while(1) {}
 }

@@ -146,10 +146,10 @@ dsa48_first_line:
 ;### only works for solid, rectangular sprites, with 1-63 bytes width ###
 ;########################################################################
 ;### INPUTS (6 Bytes)                                                 ###
-;###  * (2B) Source Sprite Pointer (array with pixel data)            ###
-;###  * (2B) Destination video memory pointer                         ###
-;###  * (1B) Sprite Width in bytes (Max.63)                           ###
-;###  * (1B) Sprite Height in bytes                                   ###
+;###  * (2B HL) Source Sprite Pointer (array with pixel data)         ###
+;###  * (2B DE) Destination video memory pointer                      ###
+;###  * (1B B) Sprite Height in bytes                                 ###
+;###  * (1B C) Sprite Width in bytes (Max.63)                         ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
@@ -157,8 +157,8 @@ dsa48_first_line:
 ;### MEASURED TIME                                                    ###
 ;### [82 + (79 + 16w)h + 31c] cycles; w=width,h=height,c=8linecrosses ###
 ;### Examples:                                                        ###
-;### 2x16 byte sprite = 1920/1889 cycles                              ###
-;### 4x32 byte sprite = 4782/4751 cycles                              ###
+;### 2x16 byte sprite = 1920/1889 cycles (~0.48 ms)                   ###
+;### 4x32 byte sprite = 4782/4751 cycles (~1.20 ms)                   ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite
@@ -167,13 +167,11 @@ _cpct_drawSprite::
    POP  AF                 ;; [10c] AF = Return Address
    POP  HL                 ;; [10c] HL = Source address
    POP  DE                 ;; [10c] DE = Destination address
-   POP  BC                 ;; [10c] BC = Height/Width
+   POP  BC                 ;; [10c] BC = Height/Width (B = Height, C = Width)
    PUSH BC                 ;; [11c] Leave the stack as it was
    PUSH DE                 ;; [11c] 
    PUSH HL                 ;; [11c] 
    PUSH AF                 ;; [11c] 
-
-   ;; B = Width, C = Height
 
    ;; Modify code using width to jump in drawSpriteWidth
    LD  A, #126                   ;; [ 7c] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite*2 (2B)
@@ -288,62 +286,79 @@ ds_drawSpriteWidth:
 ;### with mask information related to next C-byte.                    ###
 ;########################################################################
 ;### INPUTS (6 Bytes)                                                 ###
-;###  * (2B) Source Sprite Pointer (array with pixel and mask data)   ###
-;###  * (2B) Destination video memory pointer                         ###
-;###  * (1B) Sprite Width in bytes (without counting mask bytes)      ###
-;###  * (1B) Sprite Height in bytes                                   ###
+;###  * (2B HL) Source Sprite Pointer (array with pixel and mask data)###
+;###  * (2B DE) Destination video memory pointer                      ###
+;###  * (1B B) Sprite Height in bytes                                 ###
+;###  * (1B C) Sprite Width in bytes (without counting mask bytes)    ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
+;###  Best  Case: 107 + 53(W)(H) + 54(H-1) + 60(|H/8|) + 49           ###
+;###  Worst Case: (Best Case) + 60                                    ###
+;### Examples:                                                        ###
+;###  2x16 sprite = 2782 / 2842 (~0.71 ms)                            ###
+;###  4x32 sprite = 8734 / 8794 (~2.20 ms)                            ###
 ;########################################################################
 ;
 .globl _cpct_drawMaskedSprite
 _cpct_drawMaskedSprite::
    ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   POP  AF                 ;; [10c] AF = Return Address
-   POP  HL                 ;; [10c] HL = Source Address (Sprite data array)
-   POP  DE                 ;; [10c] DE = Destination address (Video memory location)
-   POP  BC                 ;; [10c] BC = Height/Width
-   PUSH BC                 ;; [11c] Leave the stack as it was
-   PUSH DE                 ;; [11c] 
-   PUSH HL                 ;; [11c] 
-   PUSH AF                 ;; [11c] 
+   POP  AF                    ;; [10] AF = Return Address
+   POP  HL                    ;; [10] HL = Source Address (Sprite data array)
+   POP  DE                    ;; [10] DE = Destination address (Video memory location)
+   POP  BC                    ;; [10] BC = Height/Width (B = Height, C = Width)
+   PUSH BC                    ;; [11] Leave the stack as it was
+   PUSH DE                    ;; [11] 
+   PUSH HL                    ;; [11] 
+   PUSH AF                    ;; [11] 
 
-   ;; B = Width, C = Height
+   PUSH IX                    ;; [15] Save IX regiter before using it as temporal var
+   .DW #0x69DD                ;; [ 8] LD IXL, C ; Save Sprite Width into IXL for later use
    
-sprite_width_loop:
-   LD A, (DE)              ;; [] Get next background byte into A
-   AND (HL)                ;; [] Erase background part that is to be overwritten (Mask step 1)
-   INC HL                  ;; [] HL += 1 => Point HL to Sprite Colour information
-   OR (HL)                 ;; [] Add up background and sprite information in one byte (Mask step 2)
-   LD (DE), A              ;; [] Save modified background + sprite data information into memory
-   INC DE                  ;; [] Next bytes (sprite and memory)
+dms_sprite_height_loop:
+   PUSH DE                    ;; [11] Save DE for later use (jump to next screen line)
+
+dms_sprite_width_loop:
+   LD A, (DE)                 ;; [ 7] Get next background byte into A
+   AND (HL)                   ;; [ 7] Erase background part that is to be overwritten (Mask step 1)
+   INC HL                     ;; [ 6] HL += 1 => Point HL to Sprite Colour information
+   OR (HL)                    ;; [ 7] Add up background and sprite information in one byte (Mask step 2)
+   LD (DE), A                 ;; [ 6] Save modified background + sprite data information into memory
+   INC DE                     ;; [ 6] Next bytes (sprite and memory)
    INC HL
     
-   DEC C                   ;; [] C holds sprite width. Decrease it until 0
-   JP NZ, sprite_width_loop 
-  
-   DEC B                   ;; [] B holds sprite height. Decrease it until 0
-   RET Z ;;, sprite_copy_ended
+   DEC C                      ;; [ 4] C holds sprite width, we decrease it to count pixels in this line.
+   JP NZ,dms_sprite_width_loop;; [10] While not 0, we are still painting this sprite line 
+                              ;;      - When 0, we have to jump to next pixel line
    
-   LD  A, D 
-   AND #0x38
-   JP Z, sprite_8bit_boundary_crossed
-   LD  A, D
-   ADD #0x08
-   LD  D, A
-   JP  sprite_width_loop
-sprite_8bit_boundary_crossed:
-   PUSH HL
-   EX  DE, HL
-   LD  DE, #0xC050
-   ADD HL, DE
-   EX  DE, HL
-   POP HL
-   JP  sprite_width_loop
+   POP DE                     ;; [10] Recover DE from stack. We use it to calculate start of next pixel line on screen
+  
+   DEC B                      ;; [ 4] B holds sprite height. We decrease it to count another pixel line finished
+   JP Z, dms_sprite_copy_ended;; [10] If 0, we have finished the last sprite line.
+                              ;;      - If not 0, we have to move pointers to the next pixel line
+    
+   .DW #0x4DDD                ;; [ 8] LD C, IXL ; Restore Sprite Width into C
+   
+   LD  A, D                   ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
+   ADD #0x08                  ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
+   LD  D, A                   ;; [ 4]
+   AND #0x38                  ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
+   JP NZ, dms_sprite_height_loop ;;   by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
+dms_sprite_8bit_boundary_crossed:
+   PUSH HL                    ;; [11] Save HL, as we need it for calculations to increment DE pointer to memory
+   EX  DE, HL                 ;; [ 4] HL = DE : We are going to increment DE, but we can only do it with HL
+   LD  DE, #0xC050            ;; [10] DE = 0xC050 : Increment 3 memory banks (4000*3) + 50 bytes to jump to 50 bytes away from the start of the line where the sprite is
+   ADD HL, DE                 ;; [11] HL += 0xC050 
+   EX  DE, HL                 ;; [ 4] DE = HL => DE += 0xC050
+   POP HL                     ;; [10] Restore HL
+   JP  dms_sprite_height_loop ;; [10] Jump to continue with next pixel line
 
+dms_sprite_copy_ended:
+   POP IX                     ;; [14] Restore IX before returning
+   RET                        ;; [11] Return to caller
+   
 ;
 ;########################################################################
 ;### FUNCTION: cpct_setVideoMemoryPage                                ###
