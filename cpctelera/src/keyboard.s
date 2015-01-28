@@ -219,6 +219,7 @@ _cpct_scanKeyboardFast::
 
     LD  HL,  #keyboardStatusBuffer  ;; [10c] HL Points to the start of the keyboardBuffer, where scanned data will be stored
 
+    
     ;; Configure PPI: Select Register 14 (the one connected with keyboard status) and set it for reading
     ;;
     LD  BC,  #0xF782                ;; [10c] Configure PPI 8255: Set Both Port A and Port C as Output. 
@@ -329,34 +330,35 @@ _cpct_scanKeyboardFast::
 ;### using this routine or it won't work.                             ###
 ;########################################################################
 ;### INPUTS (2B)                                                      ###
-;###   -> KeyID, which contains Matrix Line(1B) and Bit Mask(1B)      ### 
+;###   -> KeyID, which contains Matrix Line(1B, C) and Bit Mask(1B, A)### 
 ;########################################################################
 ;### OUTPUTS (1B)                                                     ###
 ;###   -> True if the selected key is pressed, False otherwise.       ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;###  Destroyed Register values: A, BC, HL                            ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  109/113 cyles (27,25/28,25 us)                                  ###
+;###  97/100 cyles (24.25/25.00 us)                                   ###
 ;########################################################################
 ;
 
 .globl _cpct_isKeyPressed
 _cpct_isKeyPressed::
-   POP  AF                          ;; [10c] Get the return address from stack
-   POP  BC                          ;; [10c] Get the KeyID parameter from stack
-   PUSH BC                          ;; [11c] Restore stack status
-   PUSH AF                          ;; [11c]
+   ;; Get Parameters from stack
+   LD  HL, #2                       ;; [10] HL = SP + 2 (Place where parameters start) 
+   LD   B,  H                       ;; [ 4] B = 0 (We need B to be 0 later, and here we save 3 cycles against a LD B, #0)
+   ADD HL, SP                       ;; [11]
+   LD   C, (HL)                     ;; [ 7] C = First Parameter (KeyID - Matrix Line)
+   INC HL                           ;; [ 6] 
+   LD   A, (HL)                     ;; [ 7] A = Second Parameter (KeyID - Bit Mask)
   
-   LD  A,  B                        ;; [ 4c] Save Key's Bit Mask into A 
-   LD  B,  #0                       ;; [ 7c] B = 0 to leave BC with the contents of C (Matrix Line)
-   LD  HL, #keyboardStatusBuffer    ;; [10c] Make HL Point to &keyboardStatusBuffer
-   ADD HL, BC                       ;; [11c] Make HL Point to &keyboardStatusBuffer + Matrix Line (C)
-   AND (HL)                         ;; [ 7c] A = AND operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
-   LD  H,  B                        ;; [ 4c] H = 0, prepare for returning value in L
-   LD  L,  B                        ;; [ 4c] L = 0
-   JP NZ,  ikp_returnFalse          ;; [10c] If AND resulted non-zero, Key's bit was 1, what means key was not pressed (return false = 0)
-   INC L                            ;; [ 4c] Else, Key's bit was 0, what means key was pressed (return true = 1)
+   LD  HL, #keyboardStatusBuffer    ;; [10] Make HL Point to &keyboardStatusBuffer
+   ADD HL, BC                       ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) (As B is already 0, so BC = C)
+   AND (HL)                         ;; [ 7] A = AND operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
+   JP  NZ,  ikp_returnFalse         ;; [10] If AND resulted non-zero, Key's bit was 1, what means key was not pressed (return false = 0)
+   LD   L, #0x01                    ;; [ 7] Else, Key's bit was 0, what means key was pressed (return true, L = 1)
+   RET                              ;; [10] Return
 ikp_returnFalse:
-   RET                              ;; [10c]
+   LD   L,  B                       ;; [ 4] Return false (L = 0)
+   RET                              ;; [10] Return
