@@ -58,7 +58,7 @@ RM=rm -f
 MKDIR=mkdir
 
 # BINARY CONFIG
-PROJNAME=example1
+PROJNAME=basicTiles
 VPATH=$(SRCDIR)
 TARGET=$(PROJNAME).dsk
 

@@ -19,7 +19,12 @@
 #ifndef CPCT_VIDEOMODE_H
 #define CPCT_VIDEOMODE_H
 
-extern void cpct_setVideoMode(char videoMode);
-extern void cpct_setVideoPalette(unsigned char* ink_array, unsigned char ink_array_size);
+#define cpct_setVideoBorder(A) cpct_setVideoINK(16, (A))
+
+typedef unsigned char byte;
+
+extern void cpct_setVideoMode(byte videoMode);
+extern void cpct_setVideoPalette(byte* ink_array, byte ink_array_size);
+extern void cpct_setVideoINK(byte pen, byte ink);
 
 #endif
