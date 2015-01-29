@@ -52,7 +52,7 @@ _cpct_disableFirmware::
    LD HL,(#0x38)              ;; [16c] Obtain firmware ROM code pointer and store it for restoring it later
    LD (firmware_address),HL   ;; [16c]
 
-   IM 1                       ;; [ 8c] Set Interrupt Mode 1 (CPU will jump to &0038 when a interrupt occrs)
+   IM 1                       ;; [ 8c] Set Interrupt Mode 1 (CPU will jump to &0038 when a interrupt occurs)
    LD HL,#0xC9FB              ;; [10c] FB C9 (take into account little endian) => EI : RET
 
    LD (#0x38), HL             ;; [16c] Setup new "interrupt handler" and enable interrupts again

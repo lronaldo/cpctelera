@@ -26,5 +26,9 @@ typedef unsigned char byte;
 extern void cpct_setVideoMode(byte videoMode);
 extern void cpct_setVideoPalette(byte* ink_array, byte ink_array_size);
 extern void cpct_setVideoINK(byte pen, byte ink);
+extern void cpct_enableLowerROM();
+extern void cpct_enableUpperROM();
+extern void cpct_disableLowerROM();
+extern void cpct_disableUpperROM();
 
 #endif

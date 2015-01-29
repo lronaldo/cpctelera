@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 .equ GA_port_byte, 0x7F ;; 8-bit Port of the Gate Array
 .equ PAL_PENR, 0x00     ;; Command to select a PEN register in the PAL chip
 .equ PAL_INKR, 0x40     ;; Command to set the INK of a previously selected PEN register in the PAL chip
+
 ;
 ;########################################################################
 ;## FUNCTION: _cpct_setVideoMode                                     ###
@@ -50,7 +51,7 @@
 ;###  Destroyed Register values: AF, BC, HL                           ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  64 cycles (0.016 ms)                                            ###
+;###  64 cycles (16 us)                                               ###
 ;########################################################################
 ;### CREDITS:                                                         ###
 ;###  This function was coded copying and modifying cpc_setMode from  ###
@@ -59,17 +60,76 @@
 ;
 .globl _cpct_setVideoMode
 _cpct_setVideoMode::
-   LD  HL, #2              ;; [10] HL = SP + 2 (Place where parameters are in the stack)
-   ADD HL, SP              ;; [11]
-   LD   A, (HL)            ;; [ 7] A = First Paramter (Video Mode to be selected)
+   ;; Get Parameter (Mode to select) from stack
+   LD   HL, #2               ;; [10] HL = SP + 2 (Place where parameters are in the stack)
+   ADD  HL, SP               ;; [11]
+   LD   A, (HL)              ;; [ 7] A = First Paramter (Video Mode to be selected)
 
-   OR   #0x8C              ;; [ 7] A = (GGGIRRnn) Mix 4 things into A: GGG=Command for video mode selection (100),
-                           ;;   0x8C = (10001100) I = Interrupt Generation Disabled (0), RR=Upper and lower ROM disabled (11),
-                           ;;                     nn= Video mode wanted (user parameter, A) 
-   LD   B, #GA_port_byte   ;; [ 7] B = Gate Array Port (0x7F)
-   OUT (C), A              ;; [12] GA Command: Set Video Mode
+   LD   HL, #mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
+   OR  (HL)                  ;; [ 7] A = (GGGIRRnn) Mixes video mode selected (xxxxxxnn) with current ROM and INT.GEN seletion
+   LD   B,  #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
+   OUT (C), A                ;; [12] GA Command: Set Video Mode
 
-   RET                     ;; [10] Return
+   LD (HL), A                ;; [ 7] Save new Mode and ROM status for later use if required
+
+   RET                       ;; [10] Return
+
+   ;; Store the last selection of MODE, INT.GENERATOR and ROM status 
+   ;;  Default: 0x9C = (10011100) == (GGGIRRnn)
+   ;;  GGG=Command for video mode and ROM selection (100)
+   ;;  I=Interrupt Generation Enabled (1)
+   ;;  RR=Reading from Lower and Upper ROM Disabled (11) (a 0 value means ROM enabled)
+   ;;  nn=Video Mode 0 (00)
+mode_rom_status: .db #0x9C
+
+;
+;########################################################################
+;## FUNCTIONs: _cpct_enableLowerROM, _cpct_disableLowerROM,           ###
+;##            _cpct_enableUpperROM, _cpct_disableUpperROM            ###
+;########################################################################
+;### ###
+;########################################################################
+;### INPUTS (~)                                                       ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, HL                           ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  86/96 cycles (22.5/24 us)                                       ###
+;########################################################################
+;
+.globl _cpct_enableLowerROM
+_cpct_enableLowerROM::
+   LD  HL, #0xFBE6            ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
+   JP  _cpct_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+
+.globl _cpct_disableLowerROM
+_cpct_disableLowerROM::
+   LD  HL, #0x04F6            ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
+   JP  _cpct_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+
+.globl _cpct_enableUpperROM
+_cpct_enableUpperROM::
+   LD  HL, #0xF7E6            ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
+   JP  _cpct_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+
+.globl _cpct_disableUpperROM
+_cpct_disableUpperROM::
+   LD  HL, #0x08F6            ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
+   ;JP  _cpct_modifyROMstatus ;; [10] Jump to ROM-Modification Code
+
+_cpct_modifyROMstatus::
+   LD  (mrs_operation), HL   ;; [16] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
+   LD   HL, #mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
+   LD   A,  (HL)             ;; [ 7] A = mode_rom_status (present value)
+mrs_operation:
+   AND  #0b11111011          ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
+   LD   B,  #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
+   OUT (C), A                ;; [12] GA Command: Set Video Mode and ROM status (100)
+
+   LD (HL), A                ;; [ 7] Save new Mode and ROM status for later use if required
+
+   RET                       ;; [10] Return
 
 ;
 ;########################################################################
@@ -95,7 +155,7 @@ _cpct_setVideoMode::
 ;### MEASURED TIME                                                    ###
 ;### 101 + 78*C (C = number of colours to be set, 2nd parameter)      ###
 ;### Example:                                                         ###
-;###  16 colours = 1349 cycles (0.337 ms)                             ###
+;###  16 colours = 1349 cycles (337.25 ns)                            ###
 ;########################################################################
 ;### CREDITS:                                                         ###
 ;###   This function has been constructed with great help from the    ###
@@ -156,7 +216,7 @@ svp_setPens_loop:
 ;###  Destroyed Register values: AF, BC, HL                           ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###   95 cycles (0.023 ms)                                           ###
+;###   95 cycles (23.75 ns)                                           ###
 ;########################################################################
 ;### CREDITS:                                                         ###
 ;###   This function has been constructed with great help from the    ###
@@ -178,5 +238,5 @@ _cpct_setVideoINK::
 
    OR   #PAL_INKR           ;; [ 7] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for INKR number (n). 
    OUT (C), A               ;; [11] GA command: Set INKR. A = Command + Parameter (INKR + INK to be set for selected PEN number)
- 
+
    RET                      ;; [10] Return
