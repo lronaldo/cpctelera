@@ -87,7 +87,24 @@ mode_rom_status: .db #0x9C
 ;## FUNCTIONs: _cpct_enableLowerROM, _cpct_disableLowerROM,           ###
 ;##            _cpct_enableUpperROM, _cpct_disableUpperROM            ###
 ;########################################################################
-;### ###
+;### This 4 functions enable/disable low or upper ROMs. By default,   ###
+;### cpctelera sets both ROMS as disabled at the first event of video ###
+;### mode change. Enabling one of them means changing the way the cpu ###
+;### gets information from memory: on the places where ROM is enabled,###
+;### cpu gets values from ROM whenever it tries to read from memory.  ###
+;### If ROM is disabled, these memory reads get values from RAM. ROMs ###
+;### are mapped in this address space:                                ###
+;###  - Lower ROM: 0000h - 3FFFh                                      ###
+;###  - Upper ROM: C000h - FFFFh                                      ###
+;### CPU Requests to write to memory are always mapped to RAM, so     ###
+;### there is no need to worry about that. Also, Gate Array always    ###
+;### gets video memory values from RAM (it never reads from ROM), so  ###
+;### enabling Upper ROM does not have any impact on the screen.       ###
+;### WARNING: If the execution of your program if going through some  ###
+;### of these 2 ROM spaces and you enable ROM, cpu will be unable to  ###
+;### get machine code of your program, as it will start reading from  ###
+;### ROM instead of RAM (where your program is placed). This will re- ###
+;### sult in unexpected behaviour.                                    ###
 ;########################################################################
 ;### INPUTS (~)                                                       ###
 ;########################################################################
@@ -100,25 +117,25 @@ mode_rom_status: .db #0x9C
 ;
 .globl _cpct_enableLowerROM
 _cpct_enableLowerROM::
-   LD  HL, #0xFBE6            ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
-   JP  _cpct_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+   LD  HL, #0xFBE6           ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
+   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
 
 .globl _cpct_disableLowerROM
 _cpct_disableLowerROM::
-   LD  HL, #0x04F6            ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
-   JP  _cpct_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+   LD  HL, #0x04F6           ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
+   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
 
 .globl _cpct_enableUpperROM
 _cpct_enableUpperROM::
-   LD  HL, #0xF7E6            ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
-   JP  _cpct_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+   LD  HL, #0xF7E6           ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
+   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
 
 .globl _cpct_disableUpperROM
 _cpct_disableUpperROM::
-   LD  HL, #0x08F6            ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
-   ;JP  _cpct_modifyROMstatus ;; [10] Jump to ROM-Modification Code
+   LD  HL, #0x08F6           ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
+   ;JP  mrs_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
 
-_cpct_modifyROMstatus::
+mrs_modifyROMstatus::
    LD  (mrs_operation), HL   ;; [16] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
    LD   HL, #mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
    LD   A,  (HL)             ;; [ 7] A = mode_rom_status (present value)
