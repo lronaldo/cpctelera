@@ -21,6 +21,7 @@
 ;### Routines to establish and control video modes                 ###
 ;#####################################################################
 ;
+.module cpct_videomode
 
 ;;
 ;; Constant values
@@ -29,6 +30,11 @@
 .equ GA_port_byte, 0x7F ;; 8-bit Port of the Gate Array
 .equ PAL_PENR, 0x00     ;; Command to select a PEN register in the PAL chip
 .equ PAL_INKR, 0x40     ;; Command to set the INK of a previously selected PEN register in the PAL chip
+
+;;
+;; External values
+;;
+.globl gfw_mode_rom_status ;; defined in firmware_ed.s
 
 ;
 ;########################################################################
@@ -51,7 +57,7 @@
 ;###  Destroyed Register values: AF, BC, HL                           ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  64 cycles (16 us)                                               ###
+;###  71 cycles (17.75 us)                                            ###
 ;########################################################################
 ;### CREDITS:                                                         ###
 ;###  This function was coded copying and modifying cpc_setMode from  ###
@@ -63,10 +69,12 @@ _cpct_setVideoMode::
    ;; Get Parameter (Mode to select) from stack
    LD   HL, #2               ;; [10] HL = SP + 2 (Place where parameters are in the stack)
    ADD  HL, SP               ;; [11]
-   LD   A, (HL)              ;; [ 7] A = First Paramter (Video Mode to be selected)
+   LD   C, (HL)              ;; [ 7] A = First Paramter (Video Mode to be selected)
 
-   LD   HL, #mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
-   OR  (HL)                  ;; [ 7] A = (GGGIRRnn) Mixes video mode selected (xxxxxxnn) with current ROM and INT.GEN seletion
+   LD   HL, #gfw_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
+   LD   A, (HL)              ;; [ 7] A = Present values for MODE, INT.GEN and ROM selection. (See mode_rom_status)
+   AND #0xFC                 ;; [ 7] A = (xxxxxx00) set bits 1,0 to 0, to prepare them for inserting the mode parameter
+   OR   C                    ;; [ 4] A = Mixes previously selected ING.GEN and ROM values with user selected MODE (last 2 bits)
    LD   B,  #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
    OUT (C), A                ;; [12] GA Command: Set Video Mode
 
@@ -74,79 +82,6 @@ _cpct_setVideoMode::
 
    RET                       ;; [10] Return
 
-   ;; Store the last selection of MODE, INT.GENERATOR and ROM status 
-   ;;  Default: 0x9C = (10011100) == (GGGIRRnn)
-   ;;  GGG=Command for video mode and ROM selection (100)
-   ;;  I=Interrupt Generation Enabled (1)
-   ;;  RR=Reading from Lower and Upper ROM Disabled (11) (a 0 value means ROM enabled)
-   ;;  nn=Video Mode 0 (00)
-mode_rom_status: .db #0x9C
-
-;
-;########################################################################
-;## FUNCTIONs: _cpct_enableLowerROM, _cpct_disableLowerROM,           ###
-;##            _cpct_enableUpperROM, _cpct_disableUpperROM            ###
-;########################################################################
-;### This 4 functions enable/disable low or upper ROMs. By default,   ###
-;### cpctelera sets both ROMS as disabled at the first event of video ###
-;### mode change. Enabling one of them means changing the way the cpu ###
-;### gets information from memory: on the places where ROM is enabled,###
-;### cpu gets values from ROM whenever it tries to read from memory.  ###
-;### If ROM is disabled, these memory reads get values from RAM. ROMs ###
-;### are mapped in this address space:                                ###
-;###  - Lower ROM: 0000h - 3FFFh                                      ###
-;###  - Upper ROM: C000h - FFFFh                                      ###
-;### CPU Requests to write to memory are always mapped to RAM, so     ###
-;### there is no need to worry about that. Also, Gate Array always    ###
-;### gets video memory values from RAM (it never reads from ROM), so  ###
-;### enabling Upper ROM does not have any impact on the screen.       ###
-;### WARNING: If the execution of your program if going through some  ###
-;### of these 2 ROM spaces and you enable ROM, cpu will be unable to  ###
-;### get machine code of your program, as it will start reading from  ###
-;### ROM instead of RAM (where your program is placed). This will re- ###
-;### sult in unexpected behaviour.                                    ###
-;########################################################################
-;### INPUTS (~)                                                       ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, HL                           ###
-;########################################################################
-;### MEASURED TIME                                                    ###
-;###  86/96 cycles (22.5/24 us)                                       ###
-;########################################################################
-;
-.globl _cpct_enableLowerROM
-_cpct_enableLowerROM::
-   LD  HL, #0xFBE6           ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
-   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
-
-.globl _cpct_disableLowerROM
-_cpct_disableLowerROM::
-   LD  HL, #0x04F6           ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
-   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
-
-.globl _cpct_enableUpperROM
-_cpct_enableUpperROM::
-   LD  HL, #0xF7E6           ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
-   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
-
-.globl _cpct_disableUpperROM
-_cpct_disableUpperROM::
-   LD  HL, #0x08F6           ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
-   ;JP  mrs_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
-
-mrs_modifyROMstatus::
-   LD  (mrs_operation), HL   ;; [16] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
-   LD   HL, #mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
-   LD   A,  (HL)             ;; [ 7] A = mode_rom_status (present value)
-mrs_operation:
-   AND  #0b11111011          ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
-   LD   B,  #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
-   OUT (C), A                ;; [12] GA Command: Set Video Mode and ROM status (100)
-
-   LD (HL), A                ;; [ 7] Save new Mode and ROM status for later use if required
-
-   RET                       ;; [10] Return
 
 ;
 ;########################################################################

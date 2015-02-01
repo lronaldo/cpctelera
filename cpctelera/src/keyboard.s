@@ -84,6 +84,7 @@
 ;###          to leave it in this state.                           ###
 ;#####################################################################
 ;
+.module cpct_keyboard
 
 ; (Table1) MAPPING OF KEYBOARD LINES TO CONCRETE KEYS/SWITCHES
 ;=========================================================================================================
@@ -136,7 +137,7 @@ keyboardStatusBuffer: .ds 10
 
 .globl _cpct_scanKeyboard
 _cpct_scanKeyboard:: 
-    
+
     DI                              ;; [ 4c] Disable interrupts
 
     LD  HL,  #keyboardStatusBuffer  ;; [10c] HL Points to the start of the keyboardBuffer, where scanned data will be stored
@@ -146,11 +147,11 @@ _cpct_scanKeyboard::
     LD  BC,  #0xF782                ;; [10c] Configure PPI 8255: Set Both Port A and Port C as Output. 
     OUT (C), C                      ;; [12c] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
                                     ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
-    
+
     LD  BC,  #0xF40E                ;; [10c] Write (0Eh = 14) on PPI 8255 Port A (F4h): the register we want to select on AY-3-8912  
     LD  E,   B                      ;; [ 4c] Save F4h into E to use it later in the loop
     OUT (C), C                      ;; [12c] 
-    
+
     LD  BC,  #0xF6C0                ;; [10c] Write (C0h = 11 000000b) on PPI Port C (F6h): operation > select register 
     LD  D,   B                      ;; [ 4c] Save F6h into D to use it later in the loop
     OUT (C), C                      ;; [12c]
@@ -159,7 +160,7 @@ _cpct_scanKeyboard::
     LD  BC,  #0xF792                ;; [10c] Configure PPI 8255: Set Port A = Input, Port C = Output. 
     OUT (C), C                      ;; [12c] 92h= 1001 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=1)=> Port A=Input, 
                                     ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
-    
+
     ;; Read Loop: We read the 10-bytes that define the pressed/not pressed status
     ;;
     LD  A,   #0x40                  ;; [ 7c] A refers to the next keyboard line to be read (40h to 49h)

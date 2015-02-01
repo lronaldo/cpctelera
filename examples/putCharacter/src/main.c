@@ -14,15 +14,30 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
+#include <cpctelera_all.h>
 
-#include "firmware_ed.h"
-#include "videomode.h"
-#include "sprites.h"
-#include "keyboard.h"
-#include "strings.h"
+void main(void) {
+   unsigned char *video_pos = (unsigned char*)0xC000, charnum, color=0;
 
-#endif
+   cpct_disableFirmware();
+   cpct_setVideoMode(2);
+
+   while(1) {
+      // Alternate color between 0 and 1 (XOR)
+      color ^= 0x01;
+
+      // Print all characters from 32 to 255
+      for(charnum=1; charnum != 0; charnum++) {
+         cpct_drawROMCharM2(charnum, color, video_pos);
+
+         // Increment video_pos (characters are 1 byte wide, and
+         //   there are 80x25 = 2000 (7D0h) total characters on one mode 2 screen)
+         if (video_pos == (unsigned char*)0xC7CF) 
+            video_pos = (unsigned char*)0xC000;
+         else 
+            video_pos++;
+      }
+   }
+}

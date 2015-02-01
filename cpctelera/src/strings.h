@@ -16,13 +16,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
+#ifndef CPCT_CHARACTERS_H
+#define CPCT_CHARACTERS_H
 
-#include "firmware_ed.h"
-#include "videomode.h"
-#include "sprites.h"
-#include "keyboard.h"
-#include "strings.h"
+extern void cpct_drawROMCharM2(char ascii, unsigned char colour, unsigned char* video_memory);
 
 #endif

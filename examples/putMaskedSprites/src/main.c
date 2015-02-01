@@ -80,13 +80,15 @@ const char G_newton_sprite[512] = {
 
 char* videoMem (unsigned char x, unsigned char y) {
    const char* videoMemoryStart = (const char*)0xC000;
-   return (char *)(videoMemoryStart + (y >> 3) * 0x50 + (y & 7) * 0x800 + x);
+   return (char *)(videoMemoryStart + (y >> 3) * 0x50 + (y & 7) * 0x800 + (x >> 1));
 }
 
 void main(void) {
    unsigned char x=0, y=0;
-   char *charlies[4] = { videoMem(  0,   0), videoMem( 32,  40),
-                         videoMem(100,  16), videoMem(132, 100) };
+   char *charlies[8] = { videoMem(  0,   0), videoMem( 32,  40),
+                         videoMem(100,  16), videoMem(132, 100),
+                         videoMem( 64, 160), videoMem(150,  80),
+                         videoMem( 48,  20), videoMem( 80,   8) };
 
    cpct_disableFirmware();
    cpct_setVideoMode(0);
@@ -94,13 +96,13 @@ void main(void) {
    // Make a background full of Newtons
    for (x=0; x < 5; x++) {
       for(y=0; y < 6; y++) {
-         cpct_drawSprite(G_newton_sprite, videoMem(x << 4, y << 5), 16, 32);
+         cpct_drawSprite(G_newton_sprite, videoMem(x << 5, y << 5), 16, 32);
       }
    }
 
    // Paint an array of charlies
-   for (x=0; x < 4; x++) 
+   for (x=0; x < 8; x++) 
       cpct_drawMaskedSprite(G_charlie_sprite, charlies[x], 4, 16);
-   
+
    while(1) {}
 }

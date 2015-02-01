@@ -22,6 +22,7 @@
 ;### sprites and video memory in an Amstrad CPC environment.       ###
 ;#####################################################################
 ;
+.module cpct_sprites
 
 ;
 ;########################################################################
@@ -295,11 +296,11 @@ ds_drawSpriteWidth:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  Best  Case: 107 + 53(W)(H) + 54(H-1) + 60(|H/8|) + 49           ###
-;###  Worst Case: (Best Case) + 60                                    ###
+;###  Best  Case: 156 + 53(W)(H) + 54(H-1) + 40(|H/8|-1)              ###
+;###  Worst Case: (Best Case) + 40                                    ###
 ;### Examples:                                                        ###
-;###  2x16 sprite = 2782 / 2842 (~0.71 ms)                            ###
-;###  4x32 sprite = 8734 / 8794 (~2.20 ms)                            ###
+;###  2x16 sprite = 2702 / 2742 ( 675.5 /  685.5 us)                  ###
+;###  4x32 sprite = 8734 / 8774 (2183.5 / 2193.5 us)                  ###
 ;########################################################################
 ;
 .globl _cpct_drawMaskedSprite
@@ -316,7 +317,7 @@ _cpct_drawMaskedSprite::
 
    PUSH IX                    ;; [15] Save IX regiter before using it as temporal var
    .DW #0x69DD                ;; [ 8] LD IXL, C ; Save Sprite Width into IXL for later use
-   
+
 dms_sprite_height_loop:
    PUSH DE                    ;; [11] Save DE for later use (jump to next screen line)
 
@@ -328,37 +329,38 @@ dms_sprite_width_loop:
    LD (DE), A                 ;; [ 6] Save modified background + sprite data information into memory
    INC DE                     ;; [ 6] Next bytes (sprite and memory)
    INC HL
-    
+
    DEC C                      ;; [ 4] C holds sprite width, we decrease it to count pixels in this line.
    JP NZ,dms_sprite_width_loop;; [10] While not 0, we are still painting this sprite line 
                               ;;      - When 0, we have to jump to next pixel line
-   
+
    POP DE                     ;; [10] Recover DE from stack. We use it to calculate start of next pixel line on screen
-  
+
    DEC B                      ;; [ 4] B holds sprite height. We decrease it to count another pixel line finished
    JP Z, dms_sprite_copy_ended;; [10] If 0, we have finished the last sprite line.
                               ;;      - If not 0, we have to move pointers to the next pixel line
-    
+
    .DW #0x4DDD                ;; [ 8] LD C, IXL ; Restore Sprite Width into C
-   
+
    LD  A, D                   ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
    ADD #0x08                  ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
    LD  D, A                   ;; [ 4]
    AND #0x38                  ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
    JP NZ, dms_sprite_height_loop ;;   by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
 dms_sprite_8bit_boundary_crossed:
-   PUSH HL                    ;; [11] Save HL, as we need it for calculations to increment DE pointer to memory
-   EX  DE, HL                 ;; [ 4] HL = DE : We are going to increment DE, but we can only do it with HL
-   LD  DE, #0xC050            ;; [10] DE = 0xC050 : Increment 3 memory banks (4000*3) + 50 bytes to jump to 50 bytes away from the start of the line where the sprite is
-   ADD HL, DE                 ;; [11] HL += 0xC050 
-   EX  DE, HL                 ;; [ 4] DE = HL => DE += 0xC050
-   POP HL                     ;; [10] Restore HL
+   LD  A, E                   ;; [ 4] DE = DE + C050h
+   ADD #0x50                  ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line:
+   LD  E, A                   ;; [ 4]   -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
+   LD  A, D                   ;; [ 4]   -- which effectively is the same as moving it 1 bank backwards and then
+   ADC #0xC0                  ;; [ 7]   -- 50 bytes forwards (which is what we want to move it to the next pixel line)
+   LD  D, A                   ;; [ 4]   -- Calculations are made with 8 bit arithmetic as it is faster than other alternaives here
+
    JP  dms_sprite_height_loop ;; [10] Jump to continue with next pixel line
 
 dms_sprite_copy_ended:
    POP IX                     ;; [14] Restore IX before returning
    RET                        ;; [11] Return to caller
-   
+
 ;
 ;########################################################################
 ;### FUNCTION: cpct_setVideoMemoryPage                                ###
