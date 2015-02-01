@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-//  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 
 #include <cpctelera_all.h>
 
-void main(void) {
-    char sprite[16] = {
+const unsigned char sprite[16] = {
         0x00, 0x00,
         0x10, 0x10,
         0x20, 0x20,
@@ -29,8 +28,21 @@ void main(void) {
         0x60, 0x60,
         0x07, 0x07
     };
-    cpct_disableFirmware();
-    cpct_setVideoMode(0);
-    cpct_drawSprite2x8_aligned(sprite, (char*)0xC000);
-    while(1);
+
+
+void main(void) {
+   unsigned char *video_mem = (unsigned char*)0xC000, x, y;
+
+   cpct_disableFirmware();
+   cpct_setVideoMode(0);
+
+   // Cover all the screen with 2x8 tiles
+   for (y=0; y < 25; y++) { 
+      for (x=0; x < 40; x++) {
+         cpct_drawSprite2x8_aligned(sprite, video_mem);
+         video_mem += 2;
+      }
+   }
+
+   while(1);
 }

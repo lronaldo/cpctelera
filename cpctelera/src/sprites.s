@@ -45,38 +45,37 @@
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  93 + 8 * 50 + 7 * 27 = 682 cycles                               ###
+;###  650 cycles (162.50 us)                                          ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite2x8_aligned
 _cpct_drawSprite2x8_aligned::
   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   POP  AF                  ;; [10c] AF = Return Address
-   POP  HL                  ;; [10c] HL = Source address
-   POP  DE                  ;; [10c] DE = Destination address
-   PUSH DE                  ;; [11c] Leave the stack as it was
-   PUSH HL                  ;; [11c] 
-   PUSH AF                  ;; [11c] 
+   POP  AF                  ;; [10] AF = Return Address
+   POP  HL                  ;; [10] HL = Source address
+   POP  DE                  ;; [10] DE = Destination address
+   PUSH DE                  ;; [11] Leave the stack as it was
+   PUSH HL                  ;; [11]
+   PUSH AF                  ;; [11]
 
    ;; Copy 8 lines of 2 bytes width
-   LD   BC, #16             ;; [10c] 16 bytes is the total we have to transfer (2x8)
-   JP   dsa28_first_line    ;; [10c] First line does not need to do math to start transfering data. 
+   LD   BC, #24             ;; [10] 16 bytes (2x8) is the total we have to transfer + 8 DECs more we do (1 each line) to test C
+   JP   dsa28_first_line    ;; [10] First line does not need to do math to start transfering data. 
 
 dsa28_next_line:
-   LD   A, D                ;; [ 4c] Add 800h and Subtract 2h to DE (Jump to next visual line in the video memory)
-   ADD  A, #8               ;; [ 7c]
-   LD   D, A                ;; [ 4c]
-   DEC  DE                  ;; [ 6c]
-   DEC  DE                  ;; [ 6c]
+   LD   A, D                ;; [ 4] Add 800h and Subtract 2h to DE (Jump to next visual line in the video memory)
+   ADD  A, #8               ;; [ 7]
+   LD   D, A                ;; [ 4]
+   DEC  DE                  ;; [ 6]
+   DEC  DE                  ;; [ 6]
 
 dsa28_first_line:
-   LDI                      ;; [16c] Copy 2 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
-   LDI                      ;; [16c]
-   XOR  A                   ;; [ 4c] A = 0
-   XOR  C                   ;; [ 4c] Check if C = 0 using XOR (as A is already 0)
-   JP   NZ,dsa28_next_line  ;; [10c] 
+   LDI                      ;; [16] Copy 2 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
+   LDI                      ;; [16]
+   DEC  C                   ;; [ 4] Doing 1 more DEC is faster than having to check the value of C, which involves using A
+   JP   NZ,dsa28_next_line  ;; [10] While C!=0, continue copying bytes
 
-   RET                      ;; [10c]
+   RET                      ;; [10]
 
 ;
 ;########################################################################
