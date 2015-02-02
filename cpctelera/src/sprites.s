@@ -354,11 +354,14 @@ _cpct_drawSprite4x8Fast_aligned::
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;### [82 + (79 + 16w)h + 31c] cycles; w=width,h=height,c=8linecrosses ###
-;### Examples:                                                        ###
-;### 2x16 byte sprite = 1920/1889 cycles (~0.48 ms)                   ###
-;### 4x32 byte sprite = 4782/4751 cycles (~1.20 ms)                   ###
+;### MEASURES                                                         ###
+;### MEMORY: 186 bytes                                                ###
+;### TIME:                  (w=width, h=height)                       ###
+;###  - Best Case:  82 + (79 + 16w)h + 31(|h/8| - 1) cycles;          ###
+;###  - Worst Case: Best Case + 31 cycles                             ###
+;###  ** EXAMPLES **                                                  ###
+;###   - 2x16 bytes sprite = 1889 / 1920 cycles ( 472.25 /  480.00 us)###
+;###   - 4x32 bytes sprite = 4751 / 4782 cycles (1187.75 / 1195.50 us)###
 ;########################################################################
 ;
 .globl _cpct_drawSprite
@@ -494,12 +497,14 @@ ds_drawSpriteWidth:
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###  Best  Case: 156 + 53(W)(H) + 54(H-1) + 40(|H/8|-1)              ###
-;###  Worst Case: (Best Case) + 40                                    ###
-;### Examples:                                                        ###
-;###  2x16 sprite = 2702 / 2742 ( 675.5 /  685.5 us)                  ###
-;###  4x32 sprite = 8734 / 8774 (2183.5 / 2193.5 us)                  ###
+;### MEASURES                                                         ###
+;### MEMORY: 54 bytes                                                 ###
+;### TIME:                  (W=width, H=height)                       ###
+;###  - Best  Case: 156 + 53(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
+;###  - Worst Case: (Best Case) + 40                                  ###
+;###  ** EXAMPLES **                                                  ###
+;###   - 2x16 bytes sprite = 2702 / 2742 cycles ( 675.5 /  685.5 us)  ###
+;###   - 4x32 bytes sprite = 8734 / 8774 cycles (2183.5 / 2193.5 us)  ###
 ;########################################################################
 ;
 .globl _cpct_drawMaskedSprite
@@ -591,7 +596,9 @@ dms_sprite_copy_ended:
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: F, BC, DE                            ###
 ;########################################################################
-;### MEASURED TIME: 90 cycles                                         ###
+;### MEASURES                                                         ###
+;### MEMORY: 13 bytes                                                 ###
+;### TIME:   90 cycles                                                ###
 ;########################################################################
 ;
 .globl _cpct_setVideoMemoryPage
@@ -634,7 +641,9 @@ _cpct_setVideoMemoryPage::
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: F, BC, DE                            ###
 ;########################################################################
-;### MEASURED TIME: 90 cycles                                         ###
+;### MEASURES                                                         ###
+;### MEMORY: 13 bytes                                                 ###
+;### TIME:   90 cycles                                                ###
 ;########################################################################
 ;
 .globl _cpct_setVideoMemoryOffset
@@ -651,21 +660,4 @@ _cpct_setVideoMemoryOffset::
    OUT (C), E        ;; [12c] Write Selected Video Memory Offset to R13 (A to port 0xBD)
 
    RET               ;; [10c] Return 
- 
- 
- 
- ;; This piece of code could be useful later
- 
-  ;; Get the current pixel-row of the screen where we are painting (there are 8 pixel rows)
-   ;; Pixel row are bits 11-13 of the address pointer (14-15 identify the page 0000/4000/8000/C000)
-   ;;LD  A, D                ;; [ 4c]
-   ;;RRCA                    ;; [ 4c]
-   ;;RRCA                    ;; [ 4c]
-   ;;RRCA                    ;; [ 4c]
-   ;;NEG                     ;; [ 8c] Two's Complement
-   ;;AND #0x07               ;; [ 7c] 07 = 00000111
-
-   ;;LD  B, A                ;; [ 4c]
-   ;;LD  A, C                ;; [ 4c]
-   ;;SUB B                   ;; [ 4c]
-   ;;.DW #0x67DD             ;; [ 8c] LD IXh, A (Save A = C - A)
+   
