@@ -44,8 +44,9 @@
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###  650 cycles (162.50 us)                                          ###
+;### MEASURES                                                         ###
+;###  MEMORY:  26 bytes                                               ###                           
+;###  TIME:   618 cycles (154.50 us)                                  ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite2x8_aligned
@@ -58,8 +59,8 @@ _cpct_drawSprite2x8_aligned::
    PUSH HL                  ;; [11]
    PUSH AF                  ;; [11]
 
-   ;; Copy 8 lines of 2 bytes width
-   LD   BC, #24             ;; [10] 16 bytes (2x8) is the total we have to transfer + 8 DECs more we do (1 each line) to test C
+   ;; Copy 8 lines of 2 bytes width (2x8 = 16 bytes)
+   LD   BC, #16             ;; [10] 16 bytes + 8 DECs more we do (1 each line): DEC lets us test the value of C
    JP   dsa28_first_line    ;; [10] First line does not need to do math to start transfering data. 
 
 dsa28_next_line:
@@ -68,13 +69,104 @@ dsa28_next_line:
    LD   D, A                ;; [ 4]
    DEC  DE                  ;; [ 6]
    DEC  DE                  ;; [ 6]
-
+   
 dsa28_first_line:
    LDI                      ;; [16] Copy 2 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
    LDI                      ;; [16]
-   DEC  C                   ;; [ 4] Doing 1 more DEC is faster than having to check the value of C, which involves using A
-   JP   NZ,dsa28_next_line  ;; [10] While C!=0, continue copying bytes
+   JP   PE, dsa28_next_line ;; [10] While BC!=0, continue copying bytes (When BC=0 LDI resets P/V, otherwise, P/V is set)
 
+   RET                      ;; [10]
+   
+;
+;########################################################################
+;### FUNCTION: cpct_drawSprite2x8Fast_aligned                         ###
+;########################################################################
+;### Does the same as cpct_drawSprite2x8_aligned, but using an unro-  ###
+;### lled version of the loop, which is ~27% faster. The only draw-   ###
+;### back is that this version requires more memory space to store    ###
+;### the code (+173%).                                                ###
+;########################################################################
+;### INPUTS (4 Bytes)                                                 ###
+;###  * (2B) Source Sprite Pointer (16-byte vector with pixel data)   ###
+;###  * (2B) Destiny aligned video memory start location              ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURES                                                         ###
+;###  MEMORY:  71 bytes                                               ###                           
+;###  TIME:   449 cycles (113.25 us)                                  ###
+;########################################################################
+;
+.globl _cpct_drawSprite2x8Fast_aligned
+_cpct_drawSprite2x8Fast_aligned::
+  ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   POP  AF                  ;; [10] AF = Return Address
+   POP  HL                  ;; [10] HL = Source address
+   POP  DE                  ;; [10] DE = Destination address
+   PUSH DE                  ;; [11] Leave the stack as it was
+   PUSH HL                  ;; [11]
+   PUSH AF                  ;; [11]
+
+   ;; Copy 8 lines of 2 bytes width (2x8 = 16 bytes)
+   ;;  (Unrolled version of the loop)
+   LD   A, D                ;; [ 4] First, save DE into A and B, 
+   LD   B, E                ;; [ 4]   to ease the 800h increment step
+   LD   C, #17              ;; [ 7] Ensure that 16 LDIs do not change value of B (as they will decrement BC)
+
+   ;; Sprite Line 1
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A                ;; [ 4]
+   LD   E, B                ;; [ 4]
+   
+   ;; Sprite Line 2
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A                ;; [ 4]
+   LD   E, B                ;; [ 4]
+
+   ;; Sprite Line 3
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A                ;; [ 4]
+   LD   E, B                ;; [ 4]
+
+   ;; Sprite Line 4
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A                ;; [ 4]
+   LD   E, B                ;; [ 4]
+
+   ;; Sprite Line 5
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A                ;; [ 4]
+   LD   E, B                ;; [ 4]
+
+   ;; Sprite Line 6
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A                ;; [ 4]
+   LD   E, B                ;; [ 4]
+
+   ;; Sprite Line 7
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A                ;; [ 4]
+   LD   E, B                ;; [ 4]
+
+   ;; Sprite Line 8
+   LDI                      ;; [16] Copy line (2 bytes)
+   LDI                      ;; [16]
+   
    RET                      ;; [10]
 
 ;
@@ -98,43 +190,151 @@ dsa28_first_line:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  90 + 8 * 88 + 7 * 19 = 927 cycles                               ###
+;###  MEMORY:  30 bytes                                               ###
+;###  TIME:   927 cycles                                              ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite4x8_aligned
 _cpct_drawSprite4x8_aligned::
    ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   POP  AF                 ;; [10c] AF = Return Address
-   POP  HL                 ;; [10c] HL = Source address
-   POP  DE                 ;; [10c] DE = Destination address
-   PUSH DE                 ;; [11c] Leave the stack as it was
-   PUSH HL                 ;; [11c] 
-   PUSH AF                 ;; [11c] 
+   POP  AF                 ;; [10] AF = Return Address
+   POP  HL                 ;; [10] HL = Source address
+   POP  DE                 ;; [10] DE = Destination address
+   PUSH DE                 ;; [11] Leave the stack as it was
+   PUSH HL                 ;; [11] 
+   PUSH AF                 ;; [11] 
 
    ;; Copy 8 lines of 4 bytes width
-   LD   A, #8              ;; [ 7c] We have to draw 8 lines of sprite
-   JP   dsa48_first_line   ;; [10c] First line does not need to do math to start transfering data. 
+   LD   A, #8              ;; [ 7] We have to draw 8 lines of sprite
+   JP   dsa48_first_line   ;; [10] First line does not need to do math to start transfering data. 
 
 dsa48_next_line:
    ;; Move to the start of the next line
-   EX   DE, HL             ;; [ 4c] Make DE point to the start of the next line of pixels in video memory, by adding BC
-   ADD  HL, BC             ;; [11c] (We need to interchange HL and DE because DE does not have ADD)
-   EX   DE, HL             ;; [ 4c]
+   EX   DE, HL             ;; [ 4] Make DE point to the start of the next line of pixels in video memory, by adding BC
+   ADD  HL, BC             ;; [11] (We need to interchange HL and DE because DE does not have ADD)
+   EX   DE, HL             ;; [ 4]
 
 dsa48_first_line:
    ;; Draw a sprite-line of 4 bytes
-   LD   BC, #0x800         ;; [10c] 800h bytes is the distance to the start of the first pixel in the next line in video memory (it will be decremented by 1 by each LDI)
-   LDI                     ;; [16c] <|Copy 4 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c]  |
-   LDI                     ;; [16c] <|
+   LD   BC, #0x800         ;; [10] 800h bytes is the distance to the start of the first pixel in the next line in video memory (it will be decremented by 1 by each LDI)
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
 
    ;; Repeat for all the lines
-   DEC  A                  ;; [ 4c] A = A - 1 (1 more line completed)
-   JP   NZ,dsa48_next_line ;; [10c] 
+   DEC  A                  ;; [ 4] A = A - 1 (1 more line completed)
+   JP   NZ,dsa48_next_line ;; [10] 
 
-   RET                     ;; [10c]
+   RET                     ;; [10]
 
+;
+;########################################################################
+;### FUNCTION: cpct_drawSprite4x8Fast_aligned                         ###
+;########################################################################
+;### Does the same as cpct_drawSprite4x8_aligned, but using an unro-  ###
+;### lled version of the loop, which is (~24%) faster. The only draw- ###
+;### back is that this version requires more memory space to store    ###
+;### the code (+243%).                                                ###
+;########################################################################
+;### INPUTS (4 Bytes)                                                 ###
+;###  * (2B) Source Sprite Pointer (32-byte vector with pixel data)   ###
+;###  * (2B) Destiny aligned video memory start location              ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  MEMORY: 103 bytes                                               ###
+;###  TIME:   705 cycles (176.25 us)                                  ###
+;########################################################################
+;
+.globl _cpct_drawSprite4x8Fast_aligned
+_cpct_drawSprite4x8Fast_aligned::
+   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   POP  AF                 ;; [10] AF = Return Address
+   POP  HL                 ;; [10] HL = Source address
+   POP  DE                 ;; [10] DE = Destination address
+   PUSH DE                 ;; [11] Leave the stack as it was
+   PUSH HL                 ;; [11] 
+   PUSH AF                 ;; [11] 
+
+   ;; Copy 8 lines of 4 bytes each (4x8 = 32 bytes)
+   ;;  (Unrolled version of the loop)
+   LD   A, D               ;; [ 4] First, save DE into A and B, 
+   LD   B, E               ;; [ 4]   to ease the 800h increment step
+   LD   C, #33             ;; [ 7] Ensure that 32 LDIs do not change value of B (as they will decrement BC)
+   
+   ;; Sprite Line 1
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+   ADD  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A               ;; [ 4]
+   LD   E, B               ;; [ 4]
+
+   ;; Sprite Line 2
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+   ADD  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A               ;; [ 4]
+   LD   E, B               ;; [ 4]
+
+   ;; Sprite Line 3
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+   ADD  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A               ;; [ 4]
+   LD   E, B               ;; [ 4]
+
+   ;; Sprite Line 4
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+   ADD  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A               ;; [ 4]
+   LD   E, B               ;; [ 4]
+
+   ;; Sprite Line 5
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+   ADD  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A               ;; [ 4]
+   LD   E, B               ;; [ 4]
+
+   ;; Sprite Line 6
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+   ADD  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A               ;; [ 4]
+   LD   E, B               ;; [ 4]
+
+   ;; Sprite Line 7
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+   ADD  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   LD   D, A               ;; [ 4]
+   LD   E, B               ;; [ 4]
+
+   ;; Sprite Line 8
+   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   LDI                     ;; [16]  |
+   LDI                     ;; [16]  |
+   LDI                     ;; [16] <|
+
+   RET                     ;; [10]
 ;
 ;########################################################################
 ;### FUNCTION: cpct_drawSprite                                        ###

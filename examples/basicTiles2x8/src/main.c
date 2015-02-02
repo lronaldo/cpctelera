@@ -17,32 +17,70 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera_all.h>
+#include "sprite_definitions.inc"
 
-const unsigned char sprite[16] = {
-        0x00, 0x00,
-        0x10, 0x10,
-        0x20, 0x20,
-        0x03, 0x03,
-        0x04, 0x04,
-        0x50, 0x50,
-        0x60, 0x60,
-        0x07, 0x07
-    };
+//
+// Convenient type definitions
+//
+typedef unsigned char Byte;
+// 4 names for our 4 types of drawSprite functions
+typedef enum { _2x8, _4x8, _2x8Fast, _4x8Fast } TDrawFunc;
 
+// Constants used to control length of waiting time
+const unsigned int WAITCLEARED = 20000; 
+const unsigned int WAITPAINTED = 60000; 
 
+// Tables with values for each of the 4 iterations of the main loop
+//  (sprite to use, width of the sprite and draw function to use)
+const Byte* const  sprites[4] = { waves_2x8,     F_2x8, waves_4x8,    FF_4x8 };
+const Byte      spr_widths[4] = {         2,         2,         4,         4 };
+const TDrawFunc  functions[4] = {      _2x8,  _2x8Fast,      _4x8,  _4x8Fast };
+
+//
+// Clears the screen by filling it with 0's
+//
+void clearScreen() {
+   Byte *video_mem = (Byte*)0xC000;
+   do { *video_mem = 0; } while ((unsigned int)(++video_mem) & 0xFFFF);
+}
+
+// 
+// Fills all the screen with sprites using drawSprite_XXX_aligned functions
+//
+void printAllScreen(Byte* sprite, Byte spritewidth, TDrawFunc function) {
+   Byte *video_mem = (Byte*)0xC000, x, y;
+
+   // Cover all the screen (25 lines) with tiles
+   for (y=0; y < 25; y++) { 
+      for (x=0; x < (80/spritewidth); x++) {
+         switch (function) {
+            case _2x8Fast: cpct_drawSprite2x8Fast_aligned(sprite, video_mem); break;
+            case _2x8:     cpct_drawSprite2x8_aligned(sprite, video_mem); break;
+            case _4x8Fast: cpct_drawSprite4x8Fast_aligned(sprite, video_mem); break;
+            case _4x8:     cpct_drawSprite4x8_aligned(sprite, video_mem); break;
+         }
+         video_mem += spritewidth;
+      }
+   }
+}
+           
 void main(void) {
-   unsigned char *video_mem = (unsigned char*)0xC000, x, y;
 
+   // Initialization
    cpct_disableFirmware();
    cpct_setVideoMode(0);
 
-   // Cover all the screen with 2x8 tiles
-   for (y=0; y < 25; y++) { 
-      for (x=0; x < 40; x++) {
-         cpct_drawSprite2x8_aligned(sprite, video_mem);
-         video_mem += 2;
+   // Main loop: filling the screen using the 4 different basic 
+   //            aligned functions in turns.
+   while(1) {
+      Byte i;
+      unsigned int w;
+      
+      for (i=0; i < 4; i++) {
+         clearScreen();
+         for (w=0; w < WAITCLEARED; w++);
+         printAllScreen(sprites[i], spr_widths[i], functions[i]);
+         for (w=0; w < WAITPAINTED; w++);
       }
    }
-
-   while(1);
 }
