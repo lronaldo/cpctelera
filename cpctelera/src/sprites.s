@@ -500,11 +500,11 @@ ds_drawSpriteWidth:
 ;### MEASURES                                                         ###
 ;### MEMORY: 54 bytes                                                 ###
 ;### TIME:                  (W=width, H=height)                       ###
-;###  - Best  Case: 156 + 53(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
+;###  - Best  Case: 156 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
 ;###  - Worst Case: (Best Case) + 40                                  ###
 ;###  ** EXAMPLES **                                                  ###
-;###   - 2x16 bytes sprite = 2702 / 2742 cycles ( 675.5 /  685.5 us)  ###
-;###   - 4x32 bytes sprite = 8734 / 8774 cycles (2183.5 / 2193.5 us)  ###
+;###   - 2x16 bytes sprite = 2894 / 2934 cycles ( 723.5 /  733.5 us)  ###
+;###   - 4x32 bytes sprite = 9422 / 9462 cycles (2355.5 / 2365.5 us)  ###
 ;########################################################################
 ;
 .globl _cpct_drawMaskedSprite
@@ -532,7 +532,7 @@ dms_sprite_width_loop:
    OR (HL)                    ;; [ 7] Add up background and sprite information in one byte (Mask step 2)
    LD (DE), A                 ;; [ 6] Save modified background + sprite data information into memory
    INC DE                     ;; [ 6] Next bytes (sprite and memory)
-   INC HL
+   INC HL                     ;; [ 6] 
 
    DEC C                      ;; [ 4] C holds sprite width, we decrease it to count pixels in this line.
    JP NZ,dms_sprite_width_loop;; [10] While not 0, we are still painting this sprite line 
@@ -591,30 +591,30 @@ dms_sprite_copy_ended:
 ;###      to the right. Your 6 MSb are to be passed as the 6 LSb.     ###
 ;########################################################################
 ;### INPUTS (1 Byte)                                                  ###
-;###  * (1B) New starting page for Video Memory (Only 6 LSb are used) ###
+;###  * (1B A) New starting page for Video Memory (Only 6 LSb used)   ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: F, BC, DE                            ###
+;###  Destroyed Register values: AF, BC, HL                           ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 13 bytes                                                 ###
-;### TIME:   90 cycles                                                ###
+;### MEMORY: 14 bytes                                                 ###
+;### TIME:   76 cycles                                                ###
 ;########################################################################
 ;
 .globl _cpct_setVideoMemoryPage
 _cpct_setVideoMemoryPage::
-   POP BC            ;; [10c] Get Call Return Address
-   POP DE            ;; [10c] Get Parameter (A = New starting page...)
-   PUSH DE           ;; [11c] Restore Stack status
-   PUSH BC           ;; [11c]
+   ;; Get the parameter from the stack
+   LD  HL, #2        ;; [10] HL = SP + 2 (Place where parameter is)
+   ADD HL, SP        ;; [11]
+   LD  A, (HL)       ;; [ 7] A = First Parameter (Video Memory Page to Set)
 
    ;; Select R12 Register from the CRTC and Write there the selected Video Memory Page
-   LD  BC, #0xBC0C   ;; [10c] 0xBC = Port for selecting CRTC Register, 0x0C = Selecting R12
-   OUT (C), C        ;; [12c] Select the R12 Register (0x0C to port 0xBC)
-   INC B             ;; [ 4c] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
-   OUT (C), E        ;; [12c] Write Selected Video Memory Page to R12 (A to port 0xBD)
+   LD  BC, #0xBC0C   ;; [10] 0xBC = Port for selecting CRTC Register, 0x0C = Selecting R12
+   OUT (C), C        ;; [12] Select the R12 Register (0x0C to port 0xBC)
+   INC B             ;; [ 4] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
+   OUT (C), A        ;; [12] Write Selected Video Memory Page to R12 (A to port 0xBD)
 
-   RET               ;; [10c] Return
+   RET               ;; [10] Return
 
 ;
 ;########################################################################
@@ -636,28 +636,28 @@ _cpct_setVideoMemoryPage::
 ;### a fine grained control of double/triple buffers by hardware.     ###
 ;########################################################################
 ;### INPUTS (1 Byte)                                                  ###
-;###  * (1B) New starting offset for Video Memory                     ###
+;###  * (1B A) New starting offset for Video Memory                   ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: F, BC, DE                            ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 13 bytes                                                 ###
-;### TIME:   90 cycles                                                ###
+;### MEMORY: 14 bytes                                                 ###
+;### TIME:   76 cycles                                                ###
 ;########################################################################
 ;
 .globl _cpct_setVideoMemoryOffset
 _cpct_setVideoMemoryOffset::
-   POP BC            ;; [10c] Get Call Return Address
-   POP DE            ;; [10c] Get Parameter (A = New starting offset...)
-   PUSH DE           ;; [11c] Restore Stack status
-   PUSH BC           ;; [11c]
+   ;; Get the parameter from the stack
+   LD  HL, #2        ;; [10] HL = SP + 2 (Place where parameter is)
+   ADD HL, SP        ;; [11]
+   LD  A, (HL)       ;; [ 7] A = First Parameter (Video Memory Offset to Establish)
 
    ;; Select R13 Register from the CRTC and Write there the selected Video Memory Offset
-   LD  BC, #0xBC0D   ;; [10c] 0xBC = Port for selecting CRTC Register, 0x0D = Selecting R13
-   OUT (C), C        ;; [12c] Select the R13 Register (0x0D to port 0xBC)
-   INC B             ;; [ 4c] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
-   OUT (C), E        ;; [12c] Write Selected Video Memory Offset to R13 (A to port 0xBD)
+   LD  BC, #0xBC0D   ;; [10] 0xBC = Port for selecting CRTC Register, 0x0D = Selecting R13
+   OUT (C), C        ;; [12] Select the R13 Register (0x0D to port 0xBC)
+   INC B             ;; [ 4] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
+   OUT (C), A        ;; [12] Write Selected Video Memory Offset to R13 (A to port 0xBD)
 
-   RET               ;; [10c] Return 
+   RET               ;; [10] Return 
    
