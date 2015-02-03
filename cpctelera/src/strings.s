@@ -70,13 +70,13 @@
 
 .globl _cpct_drawROMCharM2
 _cpct_drawROMCharM2::
-   ;; Get Parameters from stack (POP + Restoring SP)
-   LD   HL, #0                 ;; [10] HL = SP (Save SP into HL to be able to restore it fast later on)
-   ADD  HL, SP                 ;; [11]
+   ;; Get Parameters from stack (POP + Push)
    POP  AF                     ;; [10] AF = Return Address
    POP  BC                     ;; [10] B  = Foreground Color, C = Character to be printed (ASCII)
    POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
-   LD   SP, HL                 ;; [ 6] --- Restore Stack status ---
+   PUSH DE                     ;; [11] --- Restore Stack status ---
+   PUSH BC                     ;; [11] 
+   PUSH AF                     ;; [11] 
 
    ;; Set up the color for printing, either foreground or video-inverted
    XOR A                       ;; [ 4] A = 0
@@ -175,14 +175,14 @@ dc_mode1_ct: .db 0x00, 0x08, 0x80, 0x88
 .globl _cpct_drawCharM1
 _cpct_drawCharM1::
    ;; Get Parameters from stack (POP + Restoring SP)
-   LD   HL, #0                 ;; [10] HL = SP (Save SP into HL to be able to restore it fast later on)
-   ADD  HL, SP                 ;; [11]
-   POP  AF                     ;; [10] AF = Return Address
-   POP  BC                     ;; [10] B  = 0, C = Character to be printed (ASCII)
-   LD   A, C                   ;; [ 4] A = Character to be printed
-   POP  BC                     ;; [10] B  = Foreground Color, C = Background color
-   POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
-   LD   SP, HL                 ;; [ 6] --- Restore Stack status ---
+;   LD   HL, #0                 ;; [10] HL = SP (Save SP into HL to be able to restore it fast later on)
+;   ADD  HL, SP                 ;; [11]
+;   POP  AF                     ;; [10] AF = Return Address
+;   POP  BC                     ;; [10] B  = 0, C = Character to be printed (ASCII)
+;   LD   A, C                   ;; [ 4] A = Character to be printed
+;   POP  BC                     ;; [10] B  = Foreground Color, C = Background color
+;   POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
+;   LD   SP, HL                 ;; [ 6] --- Restore Stack status ---
 
    ;; 96 Set up foreground and background colours for printing (getting them from tables)
    PUSH DE                     ;; [11]

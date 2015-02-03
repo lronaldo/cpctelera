@@ -355,25 +355,27 @@ _cpct_drawSprite4x8Fast_aligned::
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 189 bytes                                                ###
+;### MEMORY: 191 bytes                                                ###
 ;### TIME:                  (w=width, h=height)                       ###
-;###  - Best Case:  68 + (79 + 16w)h + 31(|h/8| - 1) cycles;          ###
+;###  - Best Case:  76 + (79 + 16w)h + 31(|h/8| - 1) cycles;          ###
 ;###  - Worst Case: Best Case + 31 cycles                             ###
 ;###  ** EXAMPLES **                                                  ###
-;###   - 2x16 bytes sprite = 1875 / 1906 cycles ( 468.75 /  476.5 us) ###
-;###   - 4x32 bytes sprite = 4737 / 4768 cycles (1184.25 / 1192.0 us) ###
+;###   - 2x16 bytes sprite = 1883 / 1914 cycles ( 470.75 /  478.5 us) ###
+;###   - 4x32 bytes sprite = 4745 / 4776 cycles (1186.25 / 1194.0 us) ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite
 _cpct_drawSprite::
    ;; GET Parameters from the stack (Pop is fastest way)
    LD (ds_restoreSP+1), SP    ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                    ;; [10] AF = Return Address
    POP  HL                    ;; [10] HL = Source Address (Sprite data array)
    POP  DE                    ;; [10] DE = Destination address (Video memory location)
    POP  BC                    ;; [10] BC = Height/Width (B = Height, C = Width)
 ds_restoreSP:
    LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                         ;; [ 4] Enable interrupts again
 
    ;; Modify code using width to jump in drawSpriteWidth
    LD  A, #126                   ;; [ 7] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite*2 (2B)
@@ -497,25 +499,27 @@ ds_drawSpriteWidth:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 57 bytes                                                 ###
+;### MEMORY: 59 bytes                                                 ###
 ;### TIME:                  (W=width, H=height)                       ###
-;###  - Best  Case: 144 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
+;###  - Best  Case: 152 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
 ;###  - Worst Case: (Best Case) + 40                                  ###
 ;###  ** EXAMPLES **                                                  ###
-;###   - 2x16 bytes sprite = 2880 / 2920 cycles ( 720 /  730 us)      ###
-;###   - 4x32 bytes sprite = 9408 / 9448 cycles (2352 / 2362 us)      ###
+;###   - 2x16 bytes sprite = 2888 / 2928 cycles ( 722 /  732 us)      ###
+;###   - 4x32 bytes sprite = 9416 / 9456 cycles (2354 / 2364 us)      ###
 ;########################################################################
 ;
 .globl _cpct_drawMaskedSprite
 _cpct_drawMaskedSprite::
    ;; GET Parameters from the stack (Pop is fastest way)
    LD (dms_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                    ;; [10] AF = Return Address
    POP  HL                    ;; [10] HL = Source Address (Sprite data array)
    POP  DE                    ;; [10] DE = Destination address (Video memory location)
    POP  BC                    ;; [10] BC = Height/Width (B = Height, C = Width)
 dms_restoreSP:
    LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                         ;; [ 4] Enable interrupts again
 
    PUSH IX                    ;; [15] Save IX regiter before using it as temporal var
    .DW #0x69DD                ;; [ 8] LD IXL, C ; Save Sprite Width into IXL for later use
@@ -683,14 +687,15 @@ _cpct_setVideoMemoryOffset::
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY:  18 bytes                                                ###
-;### TIME:    105 + 21*BC cycles (26.25 + 5.25*BC us)                 ###
+;### MEMORY:  20 bytes                                                ###
+;### TIME:    113 + 21*BC cycles (28.25 + 5.25*BC us)                 ###
 ;########################################################################
 ;
 .globl _cpct_memset
 _cpct_memset::
    LD  HL, #0        ;; [10] HL = SP (To quickly restore it later)
    ADD HL, SP        ;; [11]
+   DI                ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP AF            ;; [10] Get return value from stack
    POP DE            ;; [10] (1st param) DE = Starting point in memory
    POP BC            ;; [10] (2nd param) BC = Number of bytes to be set
@@ -698,6 +703,7 @@ _cpct_memset::
    POP AF            ;; [10] (3rd param) A = Value to be set
 ms_restoreSP:
    LD SP, HL         ;; [ 6] -- Restore Stack Pointer --
+   EI                ;; [ 4] Enable interrupts again
       
    ;; Set up HL and DE for a massive copy of the Value to be set
    LD H, D           ;; [ 4] HL = DE (Starting address in memory)
