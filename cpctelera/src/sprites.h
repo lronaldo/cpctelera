@@ -27,5 +27,6 @@ extern void cpct_drawSprite(char *sprite, char* memory, unsigned char width, uns
 extern void cpct_drawMaskedSprite(char *maskedSprite, char* memory, unsigned char width, unsigned char height);
 extern void cpct_setVideoMemoryPage(char page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset(char offset);
+extern void cpct_memset(char *array, unsigned int size, unsigned char value);
 
 #endif

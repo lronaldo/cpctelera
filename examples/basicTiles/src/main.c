@@ -20,6 +20,11 @@
 #include "sprite_definitions.inc"
 
 //
+// Macro for fastly cleaning the screen, filling it up with 0's
+//
+#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0x4000, 0);
+
+//
 // Convenient type definitions
 //
 typedef unsigned char Byte;
@@ -36,13 +41,7 @@ const Byte* const  sprites[4] = { waves_2x8,     F_2x8, waves_4x8,    FF_4x8 };
 const Byte      spr_widths[4] = {         2,         2,         4,         4 };
 const TDrawFunc  functions[4] = {      _2x8,  _2x8Fast,      _4x8,  _4x8Fast };
 
-//
-// Clears the screen by filling it with 0's
-//
-void clearScreen() {
-   Byte *video_mem = (Byte*)0xC000;
-   do { *video_mem = 0; } while ((unsigned int)(++video_mem) & 0xFFFF);
-}
+
 
 // 
 // Fills all the screen with sprites using drawSprite_XXX_aligned functions
@@ -77,7 +76,7 @@ void main(void) {
       unsigned int w;
       
       for (i=0; i < 4; i++) {
-         clearScreen();
+         CLEAR_SCREEN
          for (w=0; w < WAITCLEARED; w++);
          printAllScreen(sprites[i], spr_widths[i], functions[i]);
          for (w=0; w < WAITPAINTED; w++);
