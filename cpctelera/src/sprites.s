@@ -498,26 +498,25 @@ ds_drawSpriteWidth:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 54 bytes                                                 ###
+;### MEMORY: 57 bytes                                                 ###
 ;### TIME:                  (W=width, H=height)                       ###
-;###  - Best  Case: 156 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
+;###  - Best  Case: 144 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
 ;###  - Worst Case: (Best Case) + 40                                  ###
 ;###  ** EXAMPLES **                                                  ###
-;###   - 2x16 bytes sprite = 2894 / 2934 cycles ( 723.5 /  733.5 us)  ###
-;###   - 4x32 bytes sprite = 9422 / 9462 cycles (2355.5 / 2365.5 us)  ###
+;###   - 2x16 bytes sprite = 2880 / 2920 cycles ( 720 /  730 us)      ###
+;###   - 4x32 bytes sprite = 9408 / 9448 cycles (2352 / 2362 us)      ###
 ;########################################################################
 ;
 .globl _cpct_drawMaskedSprite
 _cpct_drawMaskedSprite::
-   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   ;; GET Parameters from the stack (Pop is fastest way)
+   LD (dms_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    POP  AF                    ;; [10] AF = Return Address
    POP  HL                    ;; [10] HL = Source Address (Sprite data array)
    POP  DE                    ;; [10] DE = Destination address (Video memory location)
    POP  BC                    ;; [10] BC = Height/Width (B = Height, C = Width)
-   PUSH BC                    ;; [11] Leave the stack as it was
-   PUSH DE                    ;; [11] 
-   PUSH HL                    ;; [11] 
-   PUSH AF                    ;; [11] 
+dms_restoreSP:
+   LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
 
    PUSH IX                    ;; [15] Save IX regiter before using it as temporal var
    .DW #0x69DD                ;; [ 8] LD IXL, C ; Save Sprite Width into IXL for later use
@@ -698,6 +697,7 @@ _cpct_memset::
    POP BC            ;; [10] (2nd param) BC = Number of bytes to be set
    DEC SP            ;; [ 6] ** 3rd param is byte-size, so need to decrease SP to load it into A when doing POP (otherwise it would go to F)
    POP AF            ;; [10] (3rd param) A = Value to be set
+ms_restoreSP:
    LD SP, HL         ;; [ 6] -- Restore Stack Pointer --
       
    ;; Set up HL and DE for a massive copy of the Value to be set
