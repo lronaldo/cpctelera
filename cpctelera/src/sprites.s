@@ -355,26 +355,25 @@ _cpct_drawSprite4x8Fast_aligned::
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 186 bytes                                                ###
+;### MEMORY: 189 bytes                                                ###
 ;### TIME:                  (w=width, h=height)                       ###
-;###  - Best Case:  82 + (79 + 16w)h + 31(|h/8| - 1) cycles;          ###
+;###  - Best Case:  68 + (79 + 16w)h + 31(|h/8| - 1) cycles;          ###
 ;###  - Worst Case: Best Case + 31 cycles                             ###
 ;###  ** EXAMPLES **                                                  ###
-;###   - 2x16 bytes sprite = 1889 / 1920 cycles ( 472.25 /  480.00 us)###
-;###   - 4x32 bytes sprite = 4751 / 4782 cycles (1187.75 / 1195.50 us)###
+;###   - 2x16 bytes sprite = 1875 / 1906 cycles ( 468.75 /  476.5 us) ###
+;###   - 4x32 bytes sprite = 4737 / 4768 cycles (1184.25 / 1192.0 us) ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite
 _cpct_drawSprite::
-   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   POP  AF                 ;; [10] AF = Return Address
-   POP  HL                 ;; [10] HL = Source address
-   POP  DE                 ;; [10] DE = Destination address
-   POP  BC                 ;; [10] BC = Height/Width (B = Height, C = Width)
-   PUSH BC                 ;; [11] Leave the stack as it was
-   PUSH DE                 ;; [11]
-   PUSH HL                 ;; [11]
-   PUSH AF                 ;; [11]
+   ;; GET Parameters from the stack (Pop is fastest way)
+   LD (ds_restoreSP+1), SP    ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   POP  AF                    ;; [10] AF = Return Address
+   POP  HL                    ;; [10] HL = Source Address (Sprite data array)
+   POP  DE                    ;; [10] DE = Destination address (Video memory location)
+   POP  BC                    ;; [10] BC = Height/Width (B = Height, C = Width)
+ds_restoreSP:
+   LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
 
    ;; Modify code using width to jump in drawSpriteWidth
    LD  A, #126                   ;; [ 7] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite*2 (2B)
