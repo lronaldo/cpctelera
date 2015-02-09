@@ -54,6 +54,8 @@
 ;###     program would hang or crash).                                ###
 ;###  -- This function works well for drawing on double buffers loca- ###
 ;###     ted at whichever memory bank (0000h-FFFFh)                   ###
+;###  -- This function disables interrupts during main loop (charac-  ###
+;###     ter printing). It reenables them at the end.                 ###
 ;########################################################################
 ;### INPUTS (4 Bytes)                                                 ###
 ;###  * (1B C) Character to be printed (ASCII code)                   ###
@@ -64,7 +66,10 @@
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  Best/Worst case = 822/866 (205.50/216.50 us)                    ###
+;### MEMORY: 73 bytes                                                 ###
+;### TIME:                                                            ###
+;###  Best case  = 777 cycles (194.25 us)                             ###
+;###  Worst case = 821 cycles (205.25 us)                             ###
 ;########################################################################
 ;
 
@@ -75,21 +80,22 @@ _cpct_drawROMCharM2::
    POP  BC                     ;; [10] B  = Foreground Color, C = Character to be printed (ASCII)
    POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
    PUSH DE                     ;; [11] --- Restore Stack status ---
-   PUSH BC                     ;; [11] 
-   PUSH AF                     ;; [11] 
+   PUSH BC                     ;; [11]
+   PUSH AF                     ;; [11]
 
    ;; Set up the color for printing, either foreground or video-inverted
-   XOR A                       ;; [ 4] A = 0
-   CP B                        ;; [ 4] Check if B is 0 or not
+   XOR A                       ;; [ 4] A = 0  (NOP code, which will do nothing in the main loop)
+   LD  H, A                    ;; [ 4] H = 0 (We need it later to put ASCII code in HL, by making L = ASCII code)
+   CP  B                       ;; [ 4] Check if B is 0 or not
    JP NZ, dc_print_fg_color    ;; [10] IF B != 0, then continue printing in normal foreground colour
-   DEC A                       ;; [ 4] A = 0xFF (-1)
+   LD  A, #0x2F                ;; [ 7] A = 0x2F (CPL machine code, used to invert bytes in main loop)
 dc_print_fg_color:
-   LD (dc_nextline+2), A       ;; [13] Modify XOR code to be XOR #0xFF or XOR #0, to invert colours on printing or not
+   LD (dc_nextline+1), A       ;; [13] Modify XOR code to be XOR #0xFF or XOR #0, to invert colours on printing or not
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address
    LD   L, C                   ;; [ 4] HL = ASCII code of the character
-   LD   H, #0                  ;; [ 7]
+   ;LD   H, #0                 ;; We did this before, with LD H, A
 
    ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
    ADD  HL, HL                 ;; [11]
@@ -110,7 +116,8 @@ dc_print_fg_color:
    ;; Copy character to Video Memory
 dc_nextline:
    LD A, (HL)                  ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
-   XOR #0                      ;; [ 7]  -- XOR is used to change Foreground/Background colours, if it is requiered
+   NOP                         ;; [ 4]  -- When we paint in Foreground Color, we do nothing, but this byte
+                               ;;       -- gets modified NOP (00h) --> CPL (2Fh) to invert bits when painting Background Color (inverted mode)
    LD (DE), A                  ;; [ 7]
 
    DEC C                       ;; [ 4] C-- (1 Character line less to finish)
@@ -118,7 +125,9 @@ dc_nextline:
 
    ;; Prepare to copy next line 
    ;;  -- Move DE pointer to the next pixel line on the video memory
-   INC HL                      ;; [ 6] HL++ (Make HL point to next character line at ROM memory)
+   INC L                       ;; [ 4] HL++ (Make HL point to next character line at ROM memory)
+                               ;;      As characters are 8 bytes-long and table starts at 3800h, 
+                               ;;      H never gets incremented on an INC HL, so we can use INC L instead (and save 3 cycles)
 
    LD  A, D                    ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
    ADD #0x08                   ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
