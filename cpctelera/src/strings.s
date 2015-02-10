@@ -162,9 +162,9 @@ dc_end_printing:
 ;########################################################################
 ;### INPUTS (5 Bytes)                                                 ###
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
-;###  * (1B B) Foreground color (PEN, 0-3)                            ###
-;###  * (1B C) Background color (PEN, 0-3)                            ###
-;###  * (1B A) Character to be printed (ASCII code)                   ###
+;###  * (1B C) Foreground color (PEN, 0-3)                            ###
+;###  * (1B B) Background color (PEN, 0-3)                            ###
+;###  * (1B L) Character to be printed (ASCII code)                   ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
@@ -182,44 +182,46 @@ dc_mode0_ct: .db 0x00, 0x80, 0x08, 0x88, 0x20, 0xA0, 0x28, 0xA8, 0x02, 0x82, 0x0
 .bndry 4    ;; Make this vector start at a 4-byte aligned address to be able to use 8-bit arithmetic with pointers
 dc_mode1_ct: .db 0x00, 0x08, 0x80, 0x88
 
-.globl _cpct_drawCharM1
-_cpct_drawCharM1::
+.globl _cpct_drawROMCharM1
+_cpct_drawROMCharM1::
    ;; GET Parameters from the stack (Pop + Restoring SP)
-   LD (dcm1_restoreSP+1), SP  ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   DI                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   POP  AF                    ;; [10] AF = Return Address
-   POP  DE                    ;; [10] HL = Source Address (Sprite data array)
-   POP  BC                    ;; [10] DE = Destination address (Video memory location)
-   POP  AF                    ;; [10] BC = Height/Width (B = Height, C = Width)
+   LD (dcm1_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   POP  AF                     ;; [10] AF = Return Address
+   POP  DE                     ;; [10] DE = Destination address (Video memory location where character will be printed)
+   POP  BC                     ;; [10] BC = Colors (B=Background color, C=Foreground color) 
+   POP  HL                     ;; [10] HL = ASCII code of the character (H=0, L=ASCII code)
 dcm1_restoreSP:
-   LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   EI                         ;; [ 4] Enable interrupts again
+   LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                          ;; [ 4] Enable interrupts again
 
-   ;; [96] Set up foreground and background colours for printing (getting them from tables)
-   PUSH DE                     ;; [11]
-   LD   D, B                   ;; [ 4]
-   LD   B, #0                  ;; [ 7]
-   LD  HL, #dc_mode1_ct        ;; [10]
-   ADD HL, BC                  ;; [11]
-   LD   E, (HL)                ;; [ 7]
-   LD   C, D                   ;; [ 4]
-   LD  HL, #dc_mode1_ct        ;; [10]
-   ADD HL, BC                  ;; [11]
-   LD   B, (HL)                ;; [ 7]
-   LD   C, E                   ;; [ 4]
-   POP  DE                     ;; [10]
+   ;; [76] Set up foreground and background colours for printing (getting them from tables)
+   ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
+   PUSH DE                     ;; [11] Save DE to be able to use it as temporal value for calculations
 
+   LD   E, L                   ;; [ 4] E = L (Save ASCII code into E for later use)
+   LD   D, B                   ;; [ 4] D = B (Save Background color PEN temporarily in D)
+   LD   B, H                   ;; [ 4] B = 0 (Set B to 0 to be able to use BC as incrementer of HL: offset in the color table)
+   LD  HL, #dc_mode1_ct        ;; [10] HL points to the start of the color table
+   LD   A, L		       ;; [ 4] A = L (Save L into A, to restore HL later, as table is 16-byte-aligned and H will not be incremented)
+   ADD HL, BC                  ;; [11] HL now points to the foreground color (HL + C), as each color is 1-byte sized (and C is foreground color PEN)
+   LD   C, (HL)                ;; [ 7] C = Foreground color bits 
+   ADD  D                      ;; [ 4] A += D (A contains previous value of L, and we increment it with previous value of B: Background color...
+   LD   L, A                   ;; [ 4] ... and put it into L to make HL point to the Background color bits).
+   LD   B, (HL)                ;; [ 7] B = Foreground color bits
 
    ;; Make HL point to the starting byte of the desired character,
-   ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address
-   LD   L, A                   ;; [ 4] HL = ASCII code of the character
+   ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
+   LD   L, E                   ;; [ 4] L = E (Restore ASCII code into L)
    LD   H, #0                  ;; [ 7]
 
    ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
    ADD  HL, HL                 ;; [11]
    ADD  HL, HL                 ;; [11]
-   LD   BC, #char0_ROM_address ;; [10] BC = 0x3800, Start ROM memory address of Char 0
-   ADD  HL, BC                 ;; [11] HL += BC
+   LD   DE, #char0_ROM_address ;; [10] DE = 0x3800, Start ROM memory address of Char 0
+   ADD  HL, DE                 ;; [11] HL += DE
+
+   POP  DE                     ;; [10] Restore value of DE previously saved
 
    LD  C, #8                   ;; [ 7] C = 8 lines counter (8 character lines to be printed out)
 
@@ -232,9 +234,18 @@ dcm1_restoreSP:
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
 
    ;; Copy character to Video Memory
-dcm1_nextline:
-   LD A, (HL)                  ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
-   XOR #0                      ;; [ 7]  -- XOR is used to change Foreground/Background colours, if it is requiered
+
+   ;; Do this for each 4-pixels (1 byte)
+dcm1_nextbyte:
+   XOR A                       ;; [ 4] A = 0
+   LD B, (HL)                  ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
+   SLA B                       ;; [ 8] Shift B (char pixel line) left to know about next bit (pixel) that will turn on/off the carry flag
+   JP C, dcm1_drawForeground   ;; [10] IF Carry, bit 7 was a 1, what means foreground color
+   OR #0 ;colorfondo           ;; [ 7] Bit7=0, draw next pixel of Background color
+   .db #0x38  ; JR C, xxxx     ;; [ 7] As carry is never set after an OR, this jump will never be done, and next instruction will be 3 bytes from here (effectively jumping over OR xx without a jump) 
+dcm1_drawForeground:
+   OR #0 ;colortexto           ;; [ 7] Bit7=1, draw next pixel of Foreground color
+
    LD (DE), A                  ;; [ 7]
 
    DEC C                       ;; [ 4] C-- (1 Character line less to finish)

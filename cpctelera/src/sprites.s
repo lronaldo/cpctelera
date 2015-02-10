@@ -704,7 +704,7 @@ _cpct_memset::
 ms_restoreSP:
    LD SP, HL         ;; [ 6] -- Restore Stack Pointer --
    EI                ;; [ 4] Enable interrupts again
-      
+
    ;; Set up HL and DE for a massive copy of the Value to be set
    LD H, D           ;; [ 4] HL = DE (Starting address in memory)
    LD L, E           ;; [ 4] 
