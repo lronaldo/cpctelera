@@ -30,7 +30,7 @@ void main(void) {
 
       // Print all characters from 32 to 255
       for(charnum=1; charnum != 0; charnum++) {
-         cpct_drawROMCharM2(charnum, color, video_pos);
+         cpct_drawROMCharM2(video_pos, color, charnum);
 
          // Increment video_pos (characters are 1 byte wide, and
          //   there are 80x25 = 2000 (7D0h) total characters on one mode 2 screen)

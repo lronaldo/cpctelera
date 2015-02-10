@@ -58,9 +58,9 @@
 ;###     ter printing). It reenables them at the end.                 ###
 ;########################################################################
 ;### INPUTS (4 Bytes)                                                 ###
-;###  * (1B C) Character to be printed (ASCII code)                   ###
-;###  * (1B B) Foreground color (0 or 1, Background will be inverted) ###
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
+;###  * (1B B) Foreground color (0 or 1, Background will be inverted) ###
+;###  * (1B C) Character to be printed (ASCII code)                   ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
@@ -77,24 +77,24 @@
 _cpct_drawROMCharM2::
    ;; Get Parameters from stack (POP + Push)
    POP  AF                     ;; [10] AF = Return Address
-   POP  BC                     ;; [10] B  = Foreground Color, C = Character to be printed (ASCII)
    POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
-   PUSH DE                     ;; [11] --- Restore Stack status ---
-   PUSH BC                     ;; [11]
+   POP  BC                     ;; [10] B = Character to be printed (ASCII), C = Foreground Color (0, 1)
+   PUSH BC                     ;; [11] --- Restore Stack status ---
+   PUSH DE                     ;; [11] 
    PUSH AF                     ;; [11]
 
    ;; Set up the color for printing, either foreground or video-inverted
-   XOR A                       ;; [ 4] A = 0  (NOP code, which will do nothing in the main loop)
-   LD  H, A                    ;; [ 4] H = 0 (We need it later to put ASCII code in HL, by making L = ASCII code)
-   CP  B                       ;; [ 4] Check if B is 0 or not
+   XOR A                       ;; [ 4] A = 00h (NOP machine code, which will do nothing in the main loop)
+   LD  H, A                    ;; [ 4] H = 00h (We need it later to put ASCII code in HL, by making L = ASCII code)
+   CP  C                       ;; [ 4] Check if C is 0 or not (C: Character color, 0=Inverted, 1=Foreground color)
    JP NZ, dc_print_fg_color    ;; [10] IF B != 0, then continue printing in normal foreground colour
-   LD  A, #0x2F                ;; [ 7] A = 0x2F (CPL machine code, used to invert bytes in main loop)
+   LD  A, #0x2F                ;; [ 7] A = 2Fh (CPL machine code, used to invert bytes in main loop)
 dc_print_fg_color:
    LD (dc_nextline+1), A       ;; [13] Modify XOR code to be XOR #0xFF or XOR #0, to invert colours on printing or not
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address
-   LD   L, C                   ;; [ 4] HL = ASCII code of the character
+   LD   L, B                   ;; [ 4] HL = ASCII code of the character
    ;LD   H, #0                 ;; We did this before, with LD H, A
 
    ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
@@ -160,10 +160,11 @@ dc_end_printing:
 ;### Draw char for mode 1                                             ###
 ;### Each character is 8 bytes long.                                  ###
 ;########################################################################
-;### INPUTS (4 Bytes)                                                 ###
-;###  * (1B C) Character to be printed (ASCII code)                   ###
-;###  * (1B B) Foreground color (0 or 1, Background will be inverted) ###
+;### INPUTS (5 Bytes)                                                 ###
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
+;###  * (1B B) Foreground color (PEN, 0-3)                            ###
+;###  * (1B C) Background color (PEN, 0-3)                            ###
+;###  * (1B A) Character to be printed (ASCII code)                   ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
@@ -177,23 +178,24 @@ dc_end_printing:
 ;; Color tables
 ;;
 .bndry 16   ;; Make this vector start at a 16-byte aligned address to be able to use 8-bit arithmetic with pointers
-dc_mode2_ct: .db 0x00, 0x80, 0x08, 0x88, 0x20, 0xA0, 0x28, 0xA8, 0x02, 0x82, 0x0A, 0x8A, 0x22, 0xA2, 0x2A, 0xAA
+dc_mode0_ct: .db 0x00, 0x80, 0x08, 0x88, 0x20, 0xA0, 0x28, 0xA8, 0x02, 0x82, 0x0A, 0x8A, 0x22, 0xA2, 0x2A, 0xAA
 .bndry 4    ;; Make this vector start at a 4-byte aligned address to be able to use 8-bit arithmetic with pointers
 dc_mode1_ct: .db 0x00, 0x08, 0x80, 0x88
 
 .globl _cpct_drawCharM1
 _cpct_drawCharM1::
-   ;; Get Parameters from stack (POP + Restoring SP)
-;   LD   HL, #0                 ;; [10] HL = SP (Save SP into HL to be able to restore it fast later on)
-;   ADD  HL, SP                 ;; [11]
-;   POP  AF                     ;; [10] AF = Return Address
-;   POP  BC                     ;; [10] B  = 0, C = Character to be printed (ASCII)
-;   LD   A, C                   ;; [ 4] A = Character to be printed
-;   POP  BC                     ;; [10] B  = Foreground Color, C = Background color
-;   POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
-;   LD   SP, HL                 ;; [ 6] --- Restore Stack status ---
+   ;; GET Parameters from the stack (Pop + Restoring SP)
+   LD (dcm1_restoreSP+1), SP  ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   POP  AF                    ;; [10] AF = Return Address
+   POP  DE                    ;; [10] HL = Source Address (Sprite data array)
+   POP  BC                    ;; [10] DE = Destination address (Video memory location)
+   POP  AF                    ;; [10] BC = Height/Width (B = Height, C = Width)
+dcm1_restoreSP:
+   LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                         ;; [ 4] Enable interrupts again
 
-   ;; 96 Set up foreground and background colours for printing (getting them from tables)
+   ;; [96] Set up foreground and background colours for printing (getting them from tables)
    PUSH DE                     ;; [11]
    LD   D, B                   ;; [ 4]
    LD   B, #0                  ;; [ 7]
@@ -210,7 +212,7 @@ _cpct_drawCharM1::
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address
-   LD   L, C                   ;; [ 4] HL = ASCII code of the character
+   LD   L, A                   ;; [ 4] HL = ASCII code of the character
    LD   H, #0                  ;; [ 7]
 
    ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
