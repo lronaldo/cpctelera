@@ -66,10 +66,10 @@
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;### MEMORY: 73 bytes                                                 ###
+;### MEMORY: 71 bytes                                                 ###
 ;### TIME:                                                            ###
-;###  Best case  = 777 cycles (194.25 us)                             ###
-;###  Worst case = 821 cycles (205.25 us)                             ###
+;###  Best case  = 770 cycles (192.50 us)                             ###
+;###  Worst case = 814 cycles (203.50 us)                             ###
 ;########################################################################
 ;
 
@@ -144,9 +144,9 @@ dc_8bit_boundary_crossed:
    JP  dc_nextline             ;; [10] Jump to continue with next pixel line
 
 dc_end_printing:
-   ;; After finishing character printing, disable Lower ROM again and reenable interrupts
-   LD   A,  (gfw_mode_rom_status) ;; [13] A = mode_rom_status (present value)
-   OR   #0b00000100            ;; [ 7] bit 3 of A = 1 --> Lower ROM disabled (0 means enabled)
+   ;; After finishing character printing, restore ROM and Interrupts status
+   LD   A,  (gfw_mode_rom_status) ;; [13] A = mode_rom_status (present saved value)
+   ;OR   #0b00000100            ;; [ 7] bit 3 of A = 1 --> Lower ROM disabled (0 means enabled)
    ;LD   B,  #GA_port_byte     ;; [ 7] B = Gate Array Port (0x7F)
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
    EI                          ;; [ 4] Enable interrupts
@@ -178,6 +178,7 @@ dc_end_printing:
 ;; Color tables
 ;;
 .bndry 16   ;; Make this vector start at a 16-byte aligned address to be able to use 8-bit arithmetic with pointers
+;; Change!!!
 dc_mode0_ct: .db 0x00, 0x80, 0x08, 0x88, 0x20, 0xA0, 0x28, 0xA8, 0x02, 0x82, 0x0A, 0x8A, 0x22, 0xA2, 0x2A, 0xAA
 .bndry 4    ;; Make this vector start at a 4-byte aligned address to be able to use 8-bit arithmetic with pointers
 dc_mode1_ct: .db 0x00, 0x08, 0x80, 0x88
@@ -208,10 +209,10 @@ dcm1_restoreSP:
    LD  C, (HL)                 ;; [ 7] C = Foreground color bits
    ADD B                       ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
    LD  L, A                    ;; [ 4]
-   LD  A, (HL)                 ;; [ 7] A = Foreground color bits
-   LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
-   LD  A, C                    ;; [ 4] A = Background color bits (Previously stored into C)
-   LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
+   LD  A, (HL)                 ;; [ 7] A = Background color bits
+   LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
+   LD  A, C                    ;; [ 4] A = Foreground color bits (Previously stored into C)
+   LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
@@ -228,21 +229,21 @@ dcm1_asciiHL:
    ;; to prevent firmware messing things up
    LD   A,(gfw_mode_rom_status);; [13] A = mode_rom_status (present value)
    AND  #0b11111011            ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
-   LD   B,  #GA_port_byte      ;; [ 7] B = Gate Array Port (0x7F)
+   LD   B, #GA_port_byte       ;; [ 7] B = Gate Array Port (0x7F)
    DI                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
-
-   ;; Copy character to Video Memory
 
    ;; Do this each pixel line (8-pixels)
 dcm1_nextline:
    LD C, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 0=backgound color, 1=foreground)
+   PUSH HL                     ;; [11] Save HL register to be able to use it as temporal storage
+   LD L, #2                    ;; [ 7] L=2 bytes per line
 
    ;; Do this each video-memory-byte (4-pixels)
 dcm1_next4pixels:
-   LD  A, (dcm1_modifyJP)      ;; [13] Get Opcode of the JP NZ instruction that will be done 2 times per pixel line (1 each 4 bits)
-   XOR #0x04                   ;; [ 7] ... and modify it. This makes the opcode change between C2h (JP NZ) and CAh (JP Z), which makes it
-   LD  (dcm1_modifyJP), A      ;; [13] ... jump the first time, and not jump the second time, creating a pseudo 2-counter.
+;   LD  A, (dcm1_modifyJP)      ;; [13] Get Opcode of the JP PE instruction that will be done 2 times per pixel line (1 each 4 bits)
+;   XOR #0x08                   ;; [ 7] ... and modify it. This makes the opcode change between EAh (JP PE) and E2h (JP PO), which makes it
+;   LD  (dcm1_modifyJP), A      ;; [13] ... jump the first time, and not jump the second time, creating a pseudo 2-counter.
 
    XOR A                       ;; [ 4] A = 0 (A will hold the values of the next 4 pixels in video memory. They will be calculated as Character is read)
    LD  B, #4                   ;; [ 7] B = 4 (4 pixels for each byte)
@@ -260,8 +261,8 @@ dcm1_drawForeground:
 
    LD (DE), A                  ;; [ 7] Save the 4 recently calculated pixels into video memory
 
-dcm1_modifyJP:                 ;;      This jump is modified by previous instructions, make it jump/not jump (it jumps first time, and fails second time)
-   JP Z, dcm1_endpixelline     ;; [10] If it is JP Z, end this pixel line as it will be the 2nd time we pass through here, else do nothing
+   DEC L                       ;; [ 4] L-- (1 byte less to finish this line)
+   JP Z, dcm1_endpixelline     ;; [10] If L=0, we have finished the line
 
    INC DE                      ;; [ 6] ... and point to next 4 pixels in video memory (next byte, DE++)
 
@@ -269,6 +270,7 @@ dcm1_modifyJP:                 ;;      This jump is modified by previous instruc
 
 dcm1_endpixelline:
    ;; Move to next pixel-line definition of the character
+   POP HL                      ;; [10] Restore HL previous value from stack
    INC L                       ;; [ 4] Next pixel Line (characters are 8-byte-aligned in memory, so we only need to increment L, as H will not change)
    LD  A, L                    ;; [ 4] IF next pixel line corresponds to a new character (this is, we have finished drawing our character),
    AND #0x07                   ;; [ 7] ... then L % 8 == 0, as it is 8-byte-aligned. 
@@ -292,10 +294,9 @@ dcm1_8bit_boundary_crossed:
    JP  dcm1_nextline           ;; [10] Jump to continue with next pixel line
 
 dcm1_end_printing:
-   ;; After finishing character printing, disable Lower ROM again and reenable interrupts
-   LD   A,(gfw_mode_rom_status);; [13] A = mode_rom_status (present value)
-   OR   #0b00000100            ;; [ 7] bit 3 of A = 1 --> Lower ROM disabled (0 means enabled)
-   ;LD   B,  #GA_port_byte     ;; [ 7] B = Gate Array Port (0x7F)
+   ;; After finishing character printing, restore previous ROM and Interrupts status
+   LD   A,(gfw_mode_rom_status);; [13] A = mode_rom_status (present saved value)
+   LD   B,  #GA_port_byte      ;; [ 7] B = Gate Array Port (0x7F)
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
    EI                          ;; [ 4] Enable interrupts
 
