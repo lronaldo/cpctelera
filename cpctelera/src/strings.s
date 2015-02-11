@@ -194,43 +194,39 @@ _cpct_drawROMCharM1::
 dcm1_restoreSP:
    LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                          ;; [ 4] Enable interrupts again
-   
+
    ;; Set up foreground and background colours for printing (getting them from tables)
    ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
-   PUSH DE                     ;; [11] Save DE to be able to use it as temporal value for calculations
+   LD  A, L                    ;; [ 4] A = ASCII code of the character
+   LD  (dcm1_asciiHL+1), A     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack
 
-   LD   E, L                   ;; [ 4] E = L (Save ASCII code into E for later use)
-   LD   D, B                   ;; [ 4] D = B (Save Background color PEN temporarily in D)
-   LD   B, H                   ;; [ 4] B = 0 (Set B to 0 to be able to use BC as incrementer of HL: offset in the color table)
    LD  HL, #dc_mode1_ct        ;; [10] HL points to the start of the color table
-   LD   A, L                   ;; [ 4] A = L (Save L into A, to restore HL later, as table is 16-byte-aligned and H will not be incremented)
-   ADD HL, BC                  ;; [11] HL now points to the foreground color (HL + C), as each color is 1-byte sized (and C is foreground color PEN)
-   LD   C, (HL)                ;; [ 7] C = Foreground color bits 
-   ADD  D                      ;; [ 4] A += D (A contains previous value of L, and we increment it with previous value of B: Background color...
-   LD   L, A                   ;; [ 4] ... and put it into L to make HL point to the Background color bits).
-   LD   A, (HL)                ;; [ 7] B = Foreground color bits
+   LD  A, L                    ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
+   ADD C                       ;; [ 4]          which makes HL point to the Foreground color bits we need. This is valid because
+   LD  L, A                    ;; [ 4]          table is 4-bytes aligned and we just need to increment L, as H won't change)
+   SUB C                       ;; [ 4] A = L again (Make A save the original value of L, to use it again later with Background color)
+   LD  C, (HL)                 ;; [ 7] C = Foreground color bits
+   ADD B                       ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
+   LD  L, A                    ;; [ 4]
+   LD  A, (HL)                 ;; [ 7] A = Foreground color bits
    LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
-   LD   A, C                   ;; [ 4] A = Background color bits (Previously stored into C)
+   LD  A, C                    ;; [ 4] A = Background color bits (Previously stored into C)
    LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
-   LD   L, E                   ;; [ 4] L = E (Restore ASCII code into L)
-   LD   H, #0                  ;; [ 7]
+dcm1_asciiHL:
+   LD   HL, #0                 ;; [10] HL = ASCII code (H=0, L=ASCII code). 0 is a placeholder to be filled up with the ASCII code value
 
    ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
    ADD  HL, HL                 ;; [11]
    ADD  HL, HL                 ;; [11]
-   LD   DE, #char0_ROM_address ;; [10] DE = 0x3800, Start ROM memory address of Char 0
-   ADD  HL, DE                 ;; [11] HL += DE
-
-   POP  DE                     ;; [10] Restore value of DE previously saved
-
-   LD  C, #8                   ;; [ 7] C = 8 lines counter (8 character lines to be printed out)
+   LD   BC, #char0_ROM_address ;; [10] BC = 0x3800, Start ROM memory address of Char 0
+   ADD  HL, BC                 ;; [11] HL += BC (Now HL Points to the start of the Character definition in ROM memory)
 
    ;; Enable Lower ROM during char copy operation, with interrupts disabled 
    ;; to prevent firmware messing things up
-   LD   A,  (gfw_mode_rom_status) ;; [13] A = mode_rom_status (present value)
+   LD   A,(gfw_mode_rom_status);; [13] A = mode_rom_status (present value)
    AND  #0b11111011            ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
    LD   B,  #GA_port_byte      ;; [ 7] B = Gate Array Port (0x7F)
    DI                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
@@ -238,31 +234,54 @@ dcm1_restoreSP:
 
    ;; Copy character to Video Memory
 
-   ;; Do this for each 4-pixels (1 byte)
-dcm1_nextbyte:
-   XOR A                       ;; [ 4] A = 0
-   LD B, (HL)                  ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
-   SLA B                       ;; [ 8] Shift B (char pixel line) left to know about Bit7 (next pixel) that will turn on/off the carry flag
+   ;; Do this each pixel line (8-pixels)
+dcm1_nextline:
+   LD C, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 0=backgound color, 1=foreground)
+
+   ;; Do this each video-memory-byte (4-pixels)
+dcm1_next4pixels:
+   LD  A, (dcm1_modifyJP)      ;; [13] Get Opcode of the JP NZ instruction that will be done 2 times per pixel line (1 each 4 bits)
+   XOR #0x04                   ;; [ 7] ... and modify it. This makes the opcode change between C2h (JP NZ) and CAh (JP Z), which makes it
+   LD  (dcm1_modifyJP), A      ;; [13] ... jump the first time, and not jump the second time, creating a pseudo 2-counter.
+
+   XOR A                       ;; [ 4] A = 0 (A will hold the values of the next 4 pixels in video memory. They will be calculated as Character is read)
+   LD  B, #4                   ;; [ 7] B = 4 (4 pixels for each byte)
+
+   ;; Do this each pixel inside a byte (each byte has 4 pixels)
+dcm1_nextpixel:
+   SLA C                       ;; [ 8] Shift C (Char pixel line) left to know about Bit7 (next pixel) that will turn on/off the carry flag
    JP C, dcm1_drawForeground   ;; [10] IF Carry, bit 7 was a 1, what means foreground color
-   OR #0 ;colorfondo           ;; [ 7] Bit7=0, draw next pixel of Background color
+   OR  #00                     ;; [ 7] Bit7=0, draw next pixel of Background color
    .db #0xDA  ; JP C, xxxx     ;; [10] As carry is never set after an OR, this jump will never be done, and next instruction will be 3 bytes from here (effectively jumping over OR xx without a jump) 
 dcm1_drawForeground:
-   OR #0 ;colortexto           ;; [ 7] Bit7=1, draw next pixel of Foreground color
+   OR  #00                     ;; [ 7] Bit7=1, draw next pixel of Foreground color
+   RLCA                        ;; [ 4] Rotate A 1 bit left to prepare it for inserting next pixel color (same 2 bits will be operated but, as long as A is rotated first, we effectively operate on next 2 bits to the right)
+   DJNZ dcm1_nextpixel         ;; [13/8] IF B!=0, continue calculations with next pixel
 
-   LD (DE), A                  ;; [ 7]
+   LD (DE), A                  ;; [ 7] Save the 4 recently calculated pixels into video memory
 
-   DEC C                       ;; [ 4] C-- (1 Character line less to finish)
-   JP Z, dc_end_printing       ;; [10] IF C=0, end up printing (all lines have been copied)
+dcm1_modifyJP:                 ;;      This jump is modified by previous instructions, make it jump/not jump (it jumps first time, and fails second time)
+   JP Z, dcm1_endpixelline     ;; [10] If it is JP Z, end this pixel line as it will be the 2nd time we pass through here, else do nothing
+
+   INC DE                      ;; [ 6] ... and point to next 4 pixels in video memory (next byte, DE++)
+
+   JP dcm1_next4pixels         ;; [10] Continue with next 4 pixels
+
+dcm1_endpixelline:
+   ;; Move to next pixel-line definition of the character
+   INC L                       ;; [ 4] Next pixel Line (characters are 8-byte-aligned in memory, so we only need to increment L, as H will not change)
+   LD  A, L                    ;; [ 4] IF next pixel line corresponds to a new character (this is, we have finished drawing our character),
+   AND #0x07                   ;; [ 7] ... then L % 8 == 0, as it is 8-byte-aligned. 
+   JP Z, dcm1_end_printing     ;; [10] IF L%8 = 0, we have finished drawing the character, else, proceed to next line
 
    ;; Prepare to copy next line 
    ;;  -- Move DE pointer to the next pixel line on the video memory
-   INC HL                      ;; [ 6] HL++ (Make HL point to next character line at ROM memory)
-
+   DEC DE                      ;; [ 6] DE-- : Restore DE to previous position in memory (it has moved 1 byte forward)
    LD  A, D                    ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
    ADD #0x08                   ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
    LD  D, A                    ;; [ 4]
    AND #0x38                   ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
-   JP NZ, dc_nextline          ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
+   JP NZ, dcm1_nextline        ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
 dcm1_8bit_boundary_crossed:
    LD  A, E                    ;; [ 4] DE = DE + C050h 
    ADD #0x50                   ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line 
@@ -270,39 +289,14 @@ dcm1_8bit_boundary_crossed:
    LD  A, D                    ;; [ 4]
    ADC #0xC0                   ;; [ 7]
    LD  D, A                    ;; [ 4]
-   JP  dc_nextline             ;; [10] Jump to continue with next pixel line
+   JP  dcm1_nextline           ;; [10] Jump to continue with next pixel line
 
 dcm1_end_printing:
    ;; After finishing character printing, disable Lower ROM again and reenable interrupts
-   LD   A,  (gfw_mode_rom_status) ;; [13] A = mode_rom_status (present value)
+   LD   A,(gfw_mode_rom_status);; [13] A = mode_rom_status (present value)
    OR   #0b00000100            ;; [ 7] bit 3 of A = 1 --> Lower ROM disabled (0 means enabled)
    ;LD   B,  #GA_port_byte     ;; [ 7] B = Gate Array Port (0x7F)
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
    EI                          ;; [ 4] Enable interrupts
 
    RET                         ;; [10] Return
-
-
-
-;;   XOR A  ; 4
-;;   RRC B  ; 8
-;;   RRA ; 4
-;;   RRA ; 4
-;;   RRA ; 4
-;;   RRA ; 4
-;;   
-;;   JP NC, noset3           ;; [10]
-;;   OR  #0x10               ;; [ 7]
-;;noset3:
-;;   RRC B  ; 8
-;;   
-;;   
-;;   LD A, C                 ;; [ 4]
-;;   RRA                     ;; [ 4]
-;;   JP NC, noset7           ;; [10]
-;;   SET 7, B                ;; [ 8]
-;;noset7:
-;;   RRA                     ;; [ 4]
-;;   JP NC, noset3           ;; [10]
-;;   SET 3, B                ;; [ 8]
-;;noset3:

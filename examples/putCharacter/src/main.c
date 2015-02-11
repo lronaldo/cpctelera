@@ -22,7 +22,7 @@ void main(void) {
    unsigned char *video_pos = (unsigned char*)0xC000, charnum, color=0;
 
    cpct_disableFirmware();
-   cpct_setVideoMode(2);
+   cpct_setVideoMode(1);
 
    while(1) {
       // Alternate color between 0 and 1 (XOR)
@@ -30,7 +30,8 @@ void main(void) {
 
       // Print all characters from 32 to 255
       for(charnum=1; charnum != 0; charnum++) {
-         cpct_drawROMCharM2(video_pos, color, charnum);
+         //cpct_drawROMCharM2(video_pos, color, charnum);
+         cpct_drawROMCharM1(video_pos, color, 0, charnum);
 
          // Increment video_pos (characters are 1 byte wide, and
          //   there are 80x25 = 2000 (7D0h) total characters on one mode 2 screen)
