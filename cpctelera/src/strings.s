@@ -194,8 +194,8 @@ _cpct_drawROMCharM1::
 dcm1_restoreSP:
    LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                          ;; [ 4] Enable interrupts again
-
-   ;; [76] Set up foreground and background colours for printing (getting them from tables)
+   
+   ;; Set up foreground and background colours for printing (getting them from tables)
    ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
    PUSH DE                     ;; [11] Save DE to be able to use it as temporal value for calculations
 
@@ -203,12 +203,15 @@ dcm1_restoreSP:
    LD   D, B                   ;; [ 4] D = B (Save Background color PEN temporarily in D)
    LD   B, H                   ;; [ 4] B = 0 (Set B to 0 to be able to use BC as incrementer of HL: offset in the color table)
    LD  HL, #dc_mode1_ct        ;; [10] HL points to the start of the color table
-   LD   A, L		       ;; [ 4] A = L (Save L into A, to restore HL later, as table is 16-byte-aligned and H will not be incremented)
+   LD   A, L                   ;; [ 4] A = L (Save L into A, to restore HL later, as table is 16-byte-aligned and H will not be incremented)
    ADD HL, BC                  ;; [11] HL now points to the foreground color (HL + C), as each color is 1-byte sized (and C is foreground color PEN)
    LD   C, (HL)                ;; [ 7] C = Foreground color bits 
    ADD  D                      ;; [ 4] A += D (A contains previous value of L, and we increment it with previous value of B: Background color...
    LD   L, A                   ;; [ 4] ... and put it into L to make HL point to the Background color bits).
-   LD   B, (HL)                ;; [ 7] B = Foreground color bits
+   LD   A, (HL)                ;; [ 7] B = Foreground color bits
+   LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
+   LD   A, C                   ;; [ 4] A = Background color bits (Previously stored into C)
+   LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
@@ -239,10 +242,10 @@ dcm1_restoreSP:
 dcm1_nextbyte:
    XOR A                       ;; [ 4] A = 0
    LD B, (HL)                  ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
-   SLA B                       ;; [ 8] Shift B (char pixel line) left to know about next bit (pixel) that will turn on/off the carry flag
+   SLA B                       ;; [ 8] Shift B (char pixel line) left to know about Bit7 (next pixel) that will turn on/off the carry flag
    JP C, dcm1_drawForeground   ;; [10] IF Carry, bit 7 was a 1, what means foreground color
    OR #0 ;colorfondo           ;; [ 7] Bit7=0, draw next pixel of Background color
-   .db #0x38  ; JR C, xxxx     ;; [ 7] As carry is never set after an OR, this jump will never be done, and next instruction will be 3 bytes from here (effectively jumping over OR xx without a jump) 
+   .db #0xDA  ; JP C, xxxx     ;; [10] As carry is never set after an OR, this jump will never be done, and next instruction will be 3 bytes from here (effectively jumping over OR xx without a jump) 
 dcm1_drawForeground:
    OR #0 ;colortexto           ;; [ 7] Bit7=1, draw next pixel of Foreground color
 
@@ -279,13 +282,27 @@ dcm1_end_printing:
 
    RET                         ;; [10] Return
 
-;   B < color transformed
-;   LD A, color                 ;; []
-;   RRA                         ;; [ 4]
-;   JP NC, noset7               ;; [10]
-;   SET 7, B                    ;; [ 8]
-;noset7:
-;   RRA                         ;; [ 4]
-;   JP NC, noset3               ;; [10]
-;   SET 3, B                    ;; [ 8]
-;noset3:
+
+
+;;   XOR A  ; 4
+;;   RRC B  ; 8
+;;   RRA ; 4
+;;   RRA ; 4
+;;   RRA ; 4
+;;   RRA ; 4
+;;   
+;;   JP NC, noset3           ;; [10]
+;;   OR  #0x10               ;; [ 7]
+;;noset3:
+;;   RRC B  ; 8
+;;   
+;;   
+;;   LD A, C                 ;; [ 4]
+;;   RRA                     ;; [ 4]
+;;   JP NC, noset7           ;; [10]
+;;   SET 7, B                ;; [ 8]
+;;noset7:
+;;   RRA                     ;; [ 4]
+;;   JP NC, noset3           ;; [10]
+;;   SET 3, B                ;; [ 8]
+;;noset3:

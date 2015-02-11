@@ -26,10 +26,10 @@
 ;;
 ;; Constant values
 ;;
-.equ GA_port, 0x7F00    ;; 16-bit Port of the Gate Array (for the use with BC register)
-.equ GA_port_byte, 0x7F ;; 8-bit Port of the Gate Array
-.equ PAL_PENR, 0x00     ;; Command to select a PEN register in the PAL chip
-.equ PAL_INKR, 0x40     ;; Command to set the INK of a previously selected PEN register in the PAL chip
+.equ GA_port,      0x7F00  ;; 16-bit Port of the Gate Array (for the use with BC register)
+.equ GA_port_byte, 0x7F    ;; 8-bit Port of the Gate Array
+.equ PAL_PENR,     0x00    ;; Command to select a PEN register in the PAL chip
+.equ PAL_INKR,     0x40    ;; Command to set the INK of a previously selected PEN register in the PAL chip
 
 ;;
 ;; External values
@@ -38,7 +38,7 @@
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_setVideoMode                                     ###
+;## FUNCTION: _cpct_setVideoMode                                      ###
 ;########################################################################
 ;### This function establishes the video mode for the Amstrad CPC.    ###
 ;### Video modes available are:                                       ###
