@@ -65,7 +65,7 @@
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
+;### MEASURES                                                         ###
 ;### MEMORY: 71 bytes                                                 ###
 ;### TIME:                                                            ###
 ;###  Best case  = 770 cycles (192.50 us)                             ###
@@ -155,10 +155,26 @@ dc_end_printing:
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_drawCharM1                                        ###
+;## FUNCTION: _cpct_drawROMCharM1                                     ###
 ;########################################################################
-;### Draw char for mode 1                                             ###
-;### Each character is 8 bytes long.                                  ###
+;### This function reads a character from ROM and draws it at a given ###
+;### point on the video memory (byte-aligned), assumming screen is    ###
+;### configured for MODE 1. It prints the character in 2 colors(PENs) ###
+;### one for foreground, and the other for background.                ###
+;### * Some IMPORTANT things to take into account:                    ###
+;###  -- Do not put this function's code below 4000h in memory. In    ###
+;###     order to read from ROM, this function enables Lower ROM      ###
+;###     (which is located 0000h-3FFFh), so CPU would read from ROM   ###
+;###     instead of RAM in first bank, effectively shadowing this     ###
+;###     piece of code, and producing undefined results (tipically,   ###
+;###     program would hang or crash).                                ###
+;###  -- This function works well for drawing on double buffers loca- ###
+;###     ted at whichever memory bank (0000h-FFFFh)                   ###
+;###  -- This function disables interrupts during main loop (charac-  ###
+;###     ter printing). It reenables them at the end.                 ###
+;###  -- Do not pass numbers greater that 3 as color parameters, as   ###
+;###     they are used as indexes in a color table, and results may   ###
+;###     be unpredictable                                             ###
 ;########################################################################
 ;### INPUTS (5 Bytes)                                                 ###
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
@@ -169,8 +185,11 @@ dc_end_printing:
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###                                                                  ###
+;### MEASURES                                                         ###
+;### MEMORY: 126 bytes (4 table + 122 code)                           ###
+;### TIME:                                                            ###
+;###  Best case  = 1198 cycles (299,50 us)                            ###
+;###  Worst case = 1318 cycles (329,50 us)                            ###
 ;########################################################################
 ;
 
@@ -241,10 +260,6 @@ dcm1_nextline:
 
    ;; Do this each video-memory-byte (4-pixels)
 dcm1_next4pixels:
-;   LD  A, (dcm1_modifyJP)      ;; [13] Get Opcode of the JP PE instruction that will be done 2 times per pixel line (1 each 4 bits)
-;   XOR #0x08                   ;; [ 7] ... and modify it. This makes the opcode change between EAh (JP PE) and E2h (JP PO), which makes it
-;   LD  (dcm1_modifyJP), A      ;; [13] ... jump the first time, and not jump the second time, creating a pseudo 2-counter.
-
    XOR A                       ;; [ 4] A = 0 (A will hold the values of the next 4 pixels in video memory. They will be calculated as Character is read)
    LD  B, #4                   ;; [ 7] B = 4 (4 pixels for each byte)
 

@@ -18,27 +18,56 @@
 
 #include <cpctelera_all.h>
 
+//
+// Macro for fastly cleaning the screen, filling it up with 0's
+//
+#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0x4000, 0);
+
+unsigned char* incrementedVideoPos(unsigned char* video_pos, unsigned char inc) {
+  video_pos += inc;
+  if (video_pos >= (unsigned char*)0xC7CF) 
+    video_pos = (unsigned char*)0xC000;
+
+  return video_pos;
+}
+
 void main(void) {
-   unsigned char *video_pos = (unsigned char*)0xC000, charnum, color=0;
+   unsigned char *video_pos = (unsigned char*)0xC000;
+   unsigned char charnum, times, fcolor, bcolor;
 
    cpct_disableFirmware();
-   cpct_setVideoMode(2);
+   cpct_setVideoMode(1);
 
    while(1) {
-      // Alternate color between 0 and 1 (XOR)
-      color ^= 0x01;
+      // Mode 2
+      CLEAR_SCREEN
+      cpct_setVideoMode(2);
 
-      // Print all characters from 32 to 255
-      for(charnum=1; charnum != 0; charnum++) {
-         cpct_drawROMCharM2(video_pos, color, charnum);
-         //cpct_drawROMCharM1(video_pos, color, 0, charnum);
+      // Print all characters 8 times
+      fcolor=0;
+      for(times=0; times < 16; times++) {
+	 fcolor ^= 0x01;
+         for(charnum=1; charnum != 0; charnum++) {
+            cpct_drawROMCharM2(video_pos, fcolor, charnum);
+            video_pos = incrementedVideoPos(video_pos, 1);
+	 }
+      }
 
-         // Increment video_pos (characters are 1 byte wide, and
-         //   there are 80x25 = 2000 (7D0h) total characters on one mode 2 screen)
-         if (video_pos == (unsigned char*)0xC7CF) 
-            video_pos = (unsigned char*)0xC000;
-         else 
-            video_pos++;
+      // Mode 1
+      CLEAR_SCREEN
+      cpct_setVideoMode(1);
+
+      // Print all characters 12 times
+      for(times=0; times < 12; times++) {
+	// Colors from 0 to 4
+	if (++fcolor > 3) {
+	  fcolor=0;
+	  bcolor = (bcolor + 1) & 0x03;
+	}
+         for(charnum=1; charnum != 0; charnum++) {
+            cpct_drawROMCharM1(video_pos, fcolor, bcolor, charnum);
+            video_pos = incrementedVideoPos(video_pos, 2);
+	 }
       }
    }
 }
