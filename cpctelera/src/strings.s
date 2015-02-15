@@ -263,7 +263,7 @@ dcm1_next4pixels:
    XOR A                       ;; [ 4] A = 0 (A will hold the values of the next 4 pixels in video memory. They will be calculated as Character is read)
    LD  B, #4                   ;; [ 7] B = 4 (4 pixels for each byte)
 
-   ;; Do this each pixel inside a byte (each byte has 4 pixels)
+   ;; Do this each pixel inside a byte (each byte has 4 pixels) 
 dcm1_nextpixel:
    SLA C                       ;; [ 8] Shift C (Char pixel line) left to know about Bit7 (next pixel) that will turn on/off the carry flag
    JP C, dcm1_drawForeground   ;; [10] IF Carry, bit 7 was a 1, what means foreground color
@@ -316,3 +316,254 @@ dcm1_end_printing:
    EI                          ;; [ 4] Enable interrupts
 
    RET                         ;; [10] Return
+
+
+.globl _cpct_drawROMCharM11
+_cpct_drawROMCharM11::
+   ;; GET Parameters from the stack (Pop + Restoring SP)
+   LD (dcm1_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   POP  AF                     ;; [10] AF = Return Address
+   POP  DE                     ;; [10] DE = Destination address (Video memory location where character will be printed)
+   POP  BC                     ;; [10] BC = Colors (B=Background color, C=Foreground color) 
+   POP  HL                     ;; [10] HL = ASCII code of the character (H=0, L=ASCII code)
+dcm1_restoreSP:
+   LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                          ;; [ 4] Enable interrupts again
+
+   ;; Set up foreground and background colours for printing (getting them from tables)
+   ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
+   PUSH HL                     ;; [11] Save ASCII code of the character in the stack
+
+   INC B                       ;; [ 4] Set Background color between 1 and 4
+   DNJZ dcm11_bg01             ;; [13/8] If BGColor=00, do not jump, else, jump to BGColor=01 test
+dcm11_bg00:
+   ;; Background color is 00. Insert Dynamic code into placeholders.
+   LD  A, #0xAF                ;; [ 7] A = AFh    (AF    = XOR A)
+   LD (dmc11_start_b1bg), A    ;; [13]
+   LD (dmc11_start_b2bg), A    ;; [13] 
+   LD  HL, #0518               ;; [10] HL = 0518h (18 05 = JR $+7)
+   LD (dmc11_start_b1bg+1), HL ;; [16]
+   LD (dmc11_start_b2bg+1), HL ;; [16] 
+   JP dcm11_fg_dyncode         ;; [10]
+dcm11_bg01:
+   DNJZ dcm11_bg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
+   ;; Background color is 01. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b1bg), HL   ;; [16]
+   LD (dmc11_start_b1bg+2), HL ;; [16]
+   LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
+   LD (dmc11_start_b2bg), HL   ;; [16]
+   LD (dmc11_start_b1bg+4), HL ;; [16]
+   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
+   LD (dmc11_start_b2bg+2), HL ;; [16]
+   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
+   LD (dmc11_start_b1bg+6), HL ;; [16] 
+   JP dcm11_fg_dyncode         ;; [10]
+dcm11_bg10:
+   DNJZ dcm11_bg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
+   ;; Background color is 10. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b2bg), HL   ;; [16]
+   LD (dmc11_start_b2bg+2), HL ;; [16]
+   LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
+   LD (dmc11_start_b1bg), HL   ;; [16]
+   LD (dmc11_start_b2bg+4), HL ;; [16]
+   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
+   LD (dmc11_start_b1bg+2), HL ;; [16]
+   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
+   LD (dmc11_start_b2bg+6), HL ;; [16] 
+   JP dcm11_fg_dyncode         ;; [10]
+dcm11_bg11:
+   ;; Background color is 11. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b1bg), HL   ;; [16]
+   LD (dmc11_start_b1bg+2), HL ;; [16]
+   LD (dmc11_start_b2bg), HL   ;; [16]
+   LD (dmc11_start_b2bg+2), HL ;; [16]
+   LD  HL, #0xE6A9             ;; [10] HL = E6A9h (A9 = XOR C, E6 = AND xx (value in next byte))
+   LD (dmc11_start_b1bg+4), HL ;; [16]
+   LD (dmc11_start_b2bg+4), HL ;; [16]
+   LD  HL, #0xA9F0             ;; [10] HL = A9F0h (F0 = Value for previous AND, A9 = XOR C)
+   LD (dmc11_start_b1bg+6), HL ;; [16]
+   LD   L, #0x0F               ;; [ 7]  L = 0Fh (0F = Value for previous AND in second byte)
+   LD (dmc11_start_b2bg+6), HL ;; [16] 
+
+dcm11_fg_dyncode:
+
+   LD  HL, #dc_mode1_ct        ;; [10] HL points to the start of the color table
+   LD  A, L                    ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
+   ADD C                       ;; [ 4]          which makes HL point to the Foreground color bits we need. This is valid because
+   LD  L, A                    ;; [ 4]          table is 4-bytes aligned and we just need to increment L, as H won't change)
+   SUB C                       ;; [ 4] A = L again (Make A save the original value of L, to use it again later with Background color)
+   LD  C, (HL)                 ;; [ 7] C = Foreground color bits
+   ADD B                       ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
+   LD  L, A                    ;; [ 4]
+   LD  A, (HL)                 ;; [ 7] A = Background color bits
+   LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
+   LD  A, C                    ;; [ 4] A = Foreground color bits (Previously stored into C)
+   LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
+
+   ;; Make HL point to the starting byte of the desired character,
+   ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
+dcm1_asciiHL:
+   POP HL                      ;; [10] HL = ASCII code (H=0, L=ASCII code)
+
+   ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
+   ADD  HL, HL                 ;; [11]
+   ADD  HL, HL                 ;; [11]
+   LD   BC, #char0_ROM_address ;; [10] BC = 0x3800, Start ROM memory address of Char 0
+   ADD  HL, BC                 ;; [11] HL += BC (Now HL Points to the start of the Character definition in ROM memory)
+
+   ;; Enable Lower ROM during char copy operation, with interrupts disabled 
+   ;; to prevent firmware messing things up
+   LD   A,(gfw_mode_rom_status);; [13] A = mode_rom_status (present value)
+   AND  #0b11111011            ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
+   LD   B, #GA_port_byte       ;; [ 7] B = Gate Array Port (0x7F)
+   DI                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
+   OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
+
+   ;;; Get next pixel-line definition
+dcm11_nextPixelLine: ; ((( 546 vs 338/line worst case )))
+   LD A, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 
+
+   ;; [66] Invert Pixel-line definition
+   LD  B, A  ; a = 76543210
+   RLCA
+   RLCA      ; a = 54321076
+   XOR B
+   AND 0xAA
+   XOR B     ; a = 56341270
+   LD  B, A
+   RLCA
+   RLCA
+   RLCA      ; a = 41270563
+   RRC B     ; b = 05634127
+   XOR B
+   AND 0x66
+   XOR B     ; a = 01234567
+
+dmc11_calculate_two_bytes:
+   LD  C, A    ;  4
+
+;; First Byte FG Color (8 bytes of dynamic code)
+dmc11_start_b1fg:
+   .ds 8
+
+dmc11_end_b1fg:
+   LD  B, A    ; 4
+   LD  A, C    ; 4
+   CPL         ; 4  A = ^A
+
+;; First Byte BG Color (8 bytes of dynamic code)
+dmc11_start_b1bg:
+   .ds 8
+
+dmc11_end_b1bg:
+   ;; Save First Byte
+   OR  B           ; 4
+   LD  (DE), A     ; 7
+   INC DE          ; 6
+
+   ;; Set up values for working with 2nd byte
+   LD  A, C        ; 4
+
+;; Second Byte FG Color (8 bytes of dynamic code)
+dmc11_start_b2fg:
+   .ds 8
+
+dmc11_end_b2fg:
+   LD  B, A    ; 4
+   LD  A, C    ; 4
+   CPL         ; 4  A = ^A
+
+;; Second Byte BG Color (8 bytes of dynamic code)
+dmc11_start_b2bg:
+   .ds 8
+
+dmc11_end_b2bg:
+   ;; Save Second Byte
+   OR  B           ; 4
+   LD  (DE), A     ; 7
+
+;; End of this pixel line, jump to next one or end
+   INC L                       ;; [ 4] Next pixel Line (characters are 8-byte-aligned in memory, so we only need to increment L, as H will not change)
+   LD  A, L                    ;; [ 4] IF next pixel line corresponds to a new character (this is, we have finished drawing our character),
+   AND #0x07                   ;; [ 7] ... then L % 8 == 0, as it is 8-byte-aligned. 
+   JP Z, dcm11_end_printing    ;; [10] IF L%8 = 0, we have finished drawing the character, else, proceed to next line
+
+   ;; Prepare to copy next line 
+   ;;  -- Move DE pointer to the next pixel line on the video memory
+   DEC DE                      ;; [ 6] DE-- : Restore DE to previous position in memory (it has moved 1 byte forward)
+   LD  A, D                    ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
+   ADD #0x08                   ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
+   LD  D, A                    ;; [ 4]
+   AND #0x38                   ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
+   JP NZ, dcm11_nextPixelLine  ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
+dcm1_8bit_boundary_crossed:
+   LD  A, E                    ;; [ 4] DE = DE + C050h 
+   ADD #0x50                   ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line 
+   LD  E, A                    ;; [ 4]   -- in video memory
+   LD  A, D                    ;; [ 4]
+   ADC #0xC0                   ;; [ 7]
+   LD  D, A                    ;; [ 4]
+   JP  dcm11_nextPixelLine     ;; [10] Jump to continue with next pixel line
+
+dcm11_end_printing:
+   ;; After finishing character printing, restore previous ROM and Interrupts status
+   LD   A,(gfw_mode_rom_status);; [13] A = mode_rom_status (present saved value)
+   LD   B,  #GA_port_byte      ;; [ 7] B = Gate Array Port (0x7F)
+   OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
+   EI                          ;; [ 4] Enable interrupts
+
+   RET                         ;; [10] Return
+
+
+;; SECOND BYTE
+;;
+;; 00
+   XOR A       ; 4    [ AF   ]  ==> 3b
+   JR  $+7     ; 12   [ 1805 ]
+;; 01
+   AND #0xF0   ; 7    [ E6F0 ]  ==> 4b
+   JR  $+6     ; 12   [ 1804 ]
+;; 10 
+   RRCA        ; 4    [ 0F   ] ==> 6b
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   AND #0x0F   ; 7    [ E6F0 ]
+   JR C, #0    ; 7    [ 3800 ] ; Never jump is better than 2 nops
+;; 11
+   RRCA        ; 4    [ 0F   ] ==> 8b
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   XOR C       ; 4    [ A9   ]
+   AND #0x0F   ; 7    [ E6F0 ]
+   XOR C       ; 4    [ A9   ]
+
+
+;; FIRST BYTE
+;;
+;; 00
+   XOR A       ; 4    [ AF   ] ==> 3b
+   JR  $+7     ; 12   [ 1802 ]
+;; 01
+   RRCA        ; 4    [ 0F   ] ==> 6b
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   AND #0xF0   ; 7    [ E6F0 ]
+   JR C, #0    ; 7    [ 3800 ] ; Never jump is better than 2 nops
+;; 10 
+   AND #0x0F   ; 7    [ E60F ] ==> 4b
+   JR  $+6     ; 12   [ 1804 ]
+;; 11
+   RRCA        ; 4    [ 0F   ] ==> 8b
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   RRCA        ; 4    [ 0F   ]
+   XOR C       ; 4    [ A9   ]
+   AND #0xF0   ; 7    [ E6F0 ]
+   XOR C       ; 4    [ A9   ]
