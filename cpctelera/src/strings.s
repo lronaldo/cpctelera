@@ -210,7 +210,7 @@ _cpct_drawROMCharM1::
    POP  AF                     ;; [10] AF = Return Address
    POP  DE                     ;; [10] DE = Destination address (Video memory location where character will be printed)
    POP  BC                     ;; [10] BC = Colors (B=Background color, C=Foreground color) 
-   POP  HL                     ;; [10] HL = ASCII code of the character (H=0, L=ASCII code)
+   POP  HL                     ;; [10] HL = ASCII code of the character (H=??, L=ASCII code)
 dcm1_restoreSP:
    LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                          ;; [ 4] Enable interrupts again
@@ -218,7 +218,7 @@ dcm1_restoreSP:
    ;; Set up foreground and background colours for printing (getting them from tables)
    ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
    LD  A, L                    ;; [ 4] A = ASCII code of the character
-   LD  (dcm1_asciiHL+1), A     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack
+   LD  (dcm1_asciiHL+1), A     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    LD  HL, #dc_mode1_ct        ;; [10] HL points to the start of the color table
    LD  A, L                    ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
@@ -333,7 +333,8 @@ dcm11_restoreSP:
 
    ;; Set up foreground and background colours for printing (getting them from tables)
    ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
-   PUSH HL                     ;; [11] Save ASCII code of the character in the stack
+   LD  A, L                    ;; [ 4] A = ASCII code of the character
+   LD  (dcm11_asciiHL+1), A    ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    INC B                       ;; [ 4] Set Background color between 1 and 4
    DJNZ dcm11_bg01             ;; [13/8] If BGColor=00, do not jump, else, jump to BGColor=01 test
@@ -381,12 +382,12 @@ dcm11_bg11:
    LD (dmc11_start_b2bg+2), HL ;; [16]
    LD (dmc11_start_b1bg), HL   ;; [16]
    LD (dmc11_start_b1bg+2), HL ;; [16]
-   LD  HL, #0xE6A9             ;; [10] HL = E6A9h (A9 = XOR C, E6 = AND xx (value in next byte))
+   LD  HL, #0xF6A9             ;; [10] HL = E6A9h (A9 = XOR C, F6 = OR xx (value in next byte))
    LD (dmc11_start_b2bg+4), HL ;; [16]
    LD (dmc11_start_b1bg+4), HL ;; [16]
-   LD  HL, #0xA9F0             ;; [10] HL = A9F0h (F0 = Value for previous AND, A9 = XOR C)
+   LD  HL, #0xA90F             ;; [10] HL = A90Fh (0F = Value for previous OR, A9 = XOR C)
    LD (dmc11_start_b2bg+6), HL ;; [16]
-   LD   L, #0x0F               ;; [ 7]  L = 0Fh (0F = Value for previous AND in second byte)
+   LD   L, #0xF0               ;; [ 7]  L = F0h (F0 = Value for previous OF in second byte)
    LD (dmc11_start_b1bg+6), HL ;; [16] 
 
 dcm11_fg_dyncode:
@@ -448,7 +449,7 @@ dcm11_fg11:
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
 dcm11_asciiHL:
-   POP HL                      ;; [10] HL = ASCII code (H=0, L=ASCII code)
+   LD   HL, #0                 ;; [10] HL = ASCII code (H=0, L=ASCII code). 0 is a placeholder to be filled up with the ASCII code value
 
    ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
    ADD  HL, HL                 ;; [11]
@@ -565,7 +566,8 @@ dcm11_end_printing:
 ;   RRCA        ; 4    [ 0F   ]
 ;   RRCA        ; 4    [ 0F   ]
 ;   XOR C       ; 4    [ A9   ]
-;   AND #0x0F   ; 7    [ E6F0 ]
+; BG-- OR #0xF0   ; 7     [ F6F0 ]
+; FG-- AND #0x0F   ; 7    [ E60F ]
 ;   XOR C       ; 4    [ A9   ]
 ;
 ;
@@ -590,5 +592,6 @@ dcm11_end_printing:
 ;   RRCA        ; 4    [ 0F   ]
 ;   RRCA        ; 4    [ 0F   ]
 ;   XOR C       ; 4    [ A9   ]
-;   AND #0xF0   ; 7    [ E6F0 ]
+; BG-- OR #0x0F   ; 7     [ F60F ]
+; FG-- AND #0xF0   ; 7    [ E6F0 ]
 ;   XOR C       ; 4    [ A9   ]
