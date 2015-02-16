@@ -21,5 +21,5 @@
 
 extern void cpct_drawROMCharM2(unsigned char* video_memory, unsigned char pen, char ascii);
 extern void cpct_drawROMCharM1(unsigned char* video_memory, unsigned char fg_pen, unsigned char bg_pen, char ascii);
-
+extern void cpct_drawROMCharM1_fast(unsigned char* video_memory, unsigned char fg_pen, unsigned char bg_pen, char ascii);
 #endif

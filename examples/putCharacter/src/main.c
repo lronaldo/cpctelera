@@ -36,38 +36,38 @@ void main(void) {
    unsigned char charnum, times, fcolor, bcolor;
 
    cpct_disableFirmware();
-   cpct_setVideoMode(1);
 
    while(1) {
-      // Mode 2
+/*      // Mode 2
       CLEAR_SCREEN
       cpct_setVideoMode(2);
 
       // Print all characters 8 times
       fcolor=0;
       for(times=0; times < 16; times++) {
-	 fcolor ^= 0x01;
+         fcolor ^= 0x01;
          for(charnum=1; charnum != 0; charnum++) {
             cpct_drawROMCharM2(video_pos, fcolor, charnum);
             video_pos = incrementedVideoPos(video_pos, 1);
-	 }
+         }
       }
-
+*/
       // Mode 1
       CLEAR_SCREEN
       cpct_setVideoMode(1);
+      fcolor = bcolor = 0;
 
       // Print all characters 12 times
       for(times=0; times < 12; times++) {
-	// Colors from 0 to 4
-	if (++fcolor > 3) {
-	  fcolor=0;
-	  bcolor = (bcolor + 1) & 0x03;
-	}
+         // Colors from 0 to 4
+         if (++fcolor > 3) {
+            fcolor=0;
+            bcolor = (bcolor + 1) & 0x03;
+         }
          for(charnum=1; charnum != 0; charnum++) {
-            cpct_drawROMCharM1(video_pos, fcolor, bcolor, charnum);
+            cpct_drawROMCharM1_fast(video_pos, fcolor, bcolor, charnum);
             video_pos = incrementedVideoPos(video_pos, 2);
-	 }
+         }
       }
    }
 }

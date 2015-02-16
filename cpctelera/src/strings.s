@@ -318,16 +318,16 @@ dcm1_end_printing:
    RET                         ;; [10] Return
 
 
-.globl _cpct_drawROMCharM11
-_cpct_drawROMCharM11::
+.globl _cpct_drawROMCharM1_fast
+_cpct_drawROMCharM1_fast::
    ;; GET Parameters from the stack (Pop + Restoring SP)
-   LD (dcm1_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   LD (dcm11_restoreSP+1), SP  ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    DI                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                     ;; [10] AF = Return Address
    POP  DE                     ;; [10] DE = Destination address (Video memory location where character will be printed)
    POP  BC                     ;; [10] BC = Colors (B=Background color, C=Foreground color) 
    POP  HL                     ;; [10] HL = ASCII code of the character (H=0, L=ASCII code)
-dcm1_restoreSP:
+dcm11_restoreSP:
    LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                          ;; [ 4] Enable interrupts again
 
@@ -336,18 +336,18 @@ dcm1_restoreSP:
    PUSH HL                     ;; [11] Save ASCII code of the character in the stack
 
    INC B                       ;; [ 4] Set Background color between 1 and 4
-   DNJZ dcm11_bg01             ;; [13/8] If BGColor=00, do not jump, else, jump to BGColor=01 test
+   DJNZ dcm11_bg01             ;; [13/8] If BGColor=00, do not jump, else, jump to BGColor=01 test
 dcm11_bg00:
    ;; Background color is 00. Insert Dynamic code into placeholders.
    LD  A, #0xAF                ;; [ 7] A = AFh    (AF    = XOR A)
    LD (dmc11_start_b1bg), A    ;; [13]
    LD (dmc11_start_b2bg), A    ;; [13] 
-   LD  HL, #0518               ;; [10] HL = 0518h (18 05 = JR $+7)
+   LD  HL, #0x0518             ;; [10] HL = 0518h (18 05 = JR $+7)
    LD (dmc11_start_b1bg+1), HL ;; [16]
    LD (dmc11_start_b2bg+1), HL ;; [16] 
    JP dcm11_fg_dyncode         ;; [10]
 dcm11_bg01:
-   DNJZ dcm11_bg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
+   DJNZ dcm11_bg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
    ;; Background color is 01. Insert Dynamic code into placeholders.
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
    LD (dmc11_start_b1bg), HL   ;; [16]
@@ -361,7 +361,7 @@ dcm11_bg01:
    LD (dmc11_start_b1bg+6), HL ;; [16] 
    JP dcm11_fg_dyncode         ;; [10]
 dcm11_bg10:
-   DNJZ dcm11_bg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
+   DJNZ dcm11_bg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
    ;; Background color is 10. Insert Dynamic code into placeholders.
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
    LD (dmc11_start_b2bg), HL   ;; [16]
@@ -390,23 +390,64 @@ dcm11_bg11:
    LD (dmc11_start_b2bg+6), HL ;; [16] 
 
 dcm11_fg_dyncode:
-
-   LD  HL, #dc_mode1_ct        ;; [10] HL points to the start of the color table
-   LD  A, L                    ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
-   ADD C                       ;; [ 4]          which makes HL point to the Foreground color bits we need. This is valid because
-   LD  L, A                    ;; [ 4]          table is 4-bytes aligned and we just need to increment L, as H won't change)
-   SUB C                       ;; [ 4] A = L again (Make A save the original value of L, to use it again later with Background color)
-   LD  C, (HL)                 ;; [ 7] C = Foreground color bits
-   ADD B                       ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
-   LD  L, A                    ;; [ 4]
-   LD  A, (HL)                 ;; [ 7] A = Background color bits
-   LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
-   LD  A, C                    ;; [ 4] A = Foreground color bits (Previously stored into C)
-   LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
+   LD  B, C                    ;; [ 4] B = Foreground color
+   INC B                       ;; [ 4] Set Foreground color between 1 and 4
+   DJNZ dcm11_fg01             ;; [13/8] If FGColor=00, do not jump, else, jump to BGColor=01 test
+dcm11_fg00:
+   ;; Background color is 00. Insert Dynamic code into placeholders.
+   LD  A, #0xAF                ;; [ 7] A = AFh    (AF    = XOR A)
+   LD (dmc11_start_b1fg), A    ;; [13]
+   LD (dmc11_start_b2fg), A    ;; [13] 
+   LD  HL, #0x0518             ;; [10] HL = 0518h (18 05 = JR $+7)
+   LD (dmc11_start_b1fg+1), HL ;; [16]
+   LD (dmc11_start_b2fg+1), HL ;; [16] 
+   JP dcm11_asciiHL            ;; [10]
+dcm11_fg01:
+   DJNZ dcm11_fg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
+   ;; Background color is 01. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b1fg), HL   ;; [16]
+   LD (dmc11_start_b1fg+2), HL ;; [16]
+   LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
+   LD (dmc11_start_b2fg), HL   ;; [16]
+   LD (dmc11_start_b1fg+4), HL ;; [16]
+   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
+   LD (dmc11_start_b2fg+2), HL ;; [16]
+   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
+   LD (dmc11_start_b1fg+6), HL ;; [16] 
+   JP dcm11_asciiHL            ;; [10]
+dcm11_fg10:
+   DJNZ dcm11_fg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
+   ;; Background color is 10. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b2fg), HL   ;; [16]
+   LD (dmc11_start_b2fg+2), HL ;; [16]
+   LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
+   LD (dmc11_start_b1fg), HL   ;; [16]
+   LD (dmc11_start_b2fg+4), HL ;; [16]
+   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
+   LD (dmc11_start_b1fg+2), HL ;; [16]
+   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
+   LD (dmc11_start_b2fg+6), HL ;; [16] 
+   JP dcm11_asciiHL            ;; [10]
+dcm11_fg11:
+   ;; Background color is 11. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b1fg), HL   ;; [16]
+   LD (dmc11_start_b1fg+2), HL ;; [16]
+   LD (dmc11_start_b2fg), HL   ;; [16]
+   LD (dmc11_start_b2fg+2), HL ;; [16]
+   LD  HL, #0xE6A9             ;; [10] HL = E6A9h (A9 = XOR C, E6 = AND xx (value in next byte))
+   LD (dmc11_start_b1fg+4), HL ;; [16]
+   LD (dmc11_start_b2fg+4), HL ;; [16]
+   LD  HL, #0xA9F0             ;; [10] HL = A9F0h (F0 = Value for previous AND, A9 = XOR C)
+   LD (dmc11_start_b1fg+6), HL ;; [16]
+   LD   L, #0x0F               ;; [ 7]  L = 0Fh (0F = Value for previous AND in second byte)
+   LD (dmc11_start_b2fg+6), HL ;; [16] 
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
-dcm1_asciiHL:
+dcm11_asciiHL:
    POP HL                      ;; [10] HL = ASCII code (H=0, L=ASCII code)
 
    ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
@@ -432,7 +473,7 @@ dcm11_nextPixelLine: ; ((( 546 vs 338/line worst case )))
    RLCA
    RLCA      ; a = 54321076
    XOR B
-   AND 0xAA
+   AND #0xAA
    XOR B     ; a = 56341270
    LD  B, A
    RLCA
@@ -440,7 +481,7 @@ dcm11_nextPixelLine: ; ((( 546 vs 338/line worst case )))
    RLCA      ; a = 41270563
    RRC B     ; b = 05634127
    XOR B
-   AND 0x66
+   AND #0x66
    XOR B     ; a = 01234567
 
 dmc11_calculate_two_bytes:
@@ -500,7 +541,7 @@ dmc11_end_b2bg:
    LD  D, A                    ;; [ 4]
    AND #0x38                   ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
    JP NZ, dcm11_nextPixelLine  ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
-dcm1_8bit_boundary_crossed:
+dcm11_8bit_boundary_crossed:
    LD  A, E                    ;; [ 4] DE = DE + C050h 
    ADD #0x50                   ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line 
    LD  E, A                    ;; [ 4]   -- in video memory
@@ -522,48 +563,48 @@ dcm11_end_printing:
 ;; SECOND BYTE
 ;;
 ;; 00
-   XOR A       ; 4    [ AF   ]  ==> 3b
-   JR  $+7     ; 12   [ 1805 ]
-;; 01
-   AND #0xF0   ; 7    [ E6F0 ]  ==> 4b
-   JR  $+6     ; 12   [ 1804 ]
-;; 10 
-   RRCA        ; 4    [ 0F   ] ==> 6b
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   AND #0x0F   ; 7    [ E6F0 ]
-   JR C, #0    ; 7    [ 3800 ] ; Never jump is better than 2 nops
-;; 11
-   RRCA        ; 4    [ 0F   ] ==> 8b
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   XOR C       ; 4    [ A9   ]
-   AND #0x0F   ; 7    [ E6F0 ]
-   XOR C       ; 4    [ A9   ]
-
-
-;; FIRST BYTE
-;;
-;; 00
-   XOR A       ; 4    [ AF   ] ==> 3b
-   JR  $+7     ; 12   [ 1802 ]
-;; 01
-   RRCA        ; 4    [ 0F   ] ==> 6b
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   AND #0xF0   ; 7    [ E6F0 ]
-   JR C, #0    ; 7    [ 3800 ] ; Never jump is better than 2 nops
-;; 10 
-   AND #0x0F   ; 7    [ E60F ] ==> 4b
-   JR  $+6     ; 12   [ 1804 ]
-;; 11
-   RRCA        ; 4    [ 0F   ] ==> 8b
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   RRCA        ; 4    [ 0F   ]
-   XOR C       ; 4    [ A9   ]
-   AND #0xF0   ; 7    [ E6F0 ]
-   XOR C       ; 4    [ A9   ]
+;   XOR A       ; 4    [ AF   ]  ==> 3b
+;   JR  $+7     ; 12   [ 1805 ]
+;;; 01
+;   AND #0xF0   ; 7    [ E6F0 ]  ==> 4b
+;   JR  $+6     ; 12   [ 1804 ]
+;;; 10 
+;   RRCA        ; 4    [ 0F   ] ==> 6b
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   AND #0x0F   ; 7    [ E6F0 ]
+;   JR C, #0    ; 7    [ 3800 ] ; Never jump is better than 2 nops
+;;; 11
+;   RRCA        ; 4    [ 0F   ] ==> 8b
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   XOR C       ; 4    [ A9   ]
+;   AND #0x0F   ; 7    [ E6F0 ]
+;   XOR C       ; 4    [ A9   ]
+;
+;
+;;; FIRST BYTE
+;;;
+;;; 00
+;   XOR A       ; 4    [ AF   ] ==> 3b
+;   JR  $+7     ; 12   [ 1802 ]
+;;; 01
+;   RRCA        ; 4    [ 0F   ] ==> 6b
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   AND #0xF0   ; 7    [ E6F0 ]
+;   JR C, #0    ; 7    [ 3800 ] ; Never jump is better than 2 nops
+;;; 10 
+;   AND #0x0F   ; 7    [ E60F ] ==> 4b
+;   JR  $+6     ; 12   [ 1804 ]
+;;; 11
+;   RRCA        ; 4    [ 0F   ] ==> 8b
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   RRCA        ; 4    [ 0F   ]
+;   XOR C       ; 4    [ A9   ]
+;   AND #0xF0   ; 7    [ E6F0 ]
+;   XOR C       ; 4    [ A9   ]
