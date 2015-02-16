@@ -368,14 +368,7 @@ dcm1f_restoreSP:
    LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                          ;; [ 4] Enable interrupts again
 
-   ;; Calculate Offset from the start of ROM character table to the start
-   ;; of the definition of the ASCII char we are going to draw, and save it for later use
    ;; Save ASCII code of the character to get it later
-   LD   H,  #0                 ;; [ 7] HL = ASCII code (H=0, L=ASCII code). 
-   ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
-   ADD  HL, HL                 ;; [11]
-   ADD  HL, HL                 ;; [11]
-
    LD  A, L                    ;; [ 4] A = ASCII code of the character
    LD  (dcm1f_asciiHL+1), A    ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
@@ -383,36 +376,78 @@ dcm1f_restoreSP:
    ;; Set up foreground and background code that does the color mixing into bytes for video memory
    ;;---------------------------------------------------------------------------------------------------
 
+   ;;
+   ;; ## PART 1 ## : Insert code for background color generation
+   ;;   This code inserts 2 pieces of dynamic code (Into dcm1f_start_b1bg and dcm1f_start_b2bg) that
+   ;;   insert the background color of each character line into the bytes that will be written to 
+   ;;   video memory. The code inserted depends on the background color: there are 4 possible pieces of
+   ;;   code, so we use register B (background color) to select the piece of code to insert.
+   ;;
    INC B                       ;; [ 4] Set Background color between 1 and 4
    DJNZ dcm1f_bg01             ;; [13/8] If BGColor=00, do not jump, else, jump to BGColor=01 test
-dcm1f_bg00:
+
+dcm1f_bg00: 
    ;; Background color is 00. Insert Dynamic code into placeholders.
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b(1/2)bg (3 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   XOR A       ; [ AF   ]   [ 4] A = 0 (As background is 0, no pixel is to be lightened up)
+   ;;   JR  $+7     ; [ 1805 ]   [12] Jump to the end of the dynamic code section
    LD  A, #0xAF                ;; [ 7] A = AFh    (AF    = XOR A)
-   LD (dcm1f_start_b2bg), A    ;; [13]
-   LD (dcm1f_start_b1bg), A    ;; [13] 
+   LD (dcm1f_start_b2bg), A    ;; [13] <<= Insert XOR A into code for managing byte 2
+   LD (dcm1f_start_b1bg), A    ;; [13] <<= Insert XOR A into code for managing byte 1
    LD  HL, #0x0518             ;; [10] HL = 0518h (18 05 = JR $+7)
-   LD (dcm1f_start_b2bg+1), HL ;; [16]
-   LD (dcm1f_start_b1bg+1), HL ;; [16] 
-   JP dcm1f_fg_dyncode         ;; [10]
+   LD (dcm1f_start_b2bg+1), HL ;; [16] <<= Insert JR $+7 into code for managing byte 2
+   LD (dcm1f_start_b1bg+1), HL ;; [16] <<= Insert JR $+7 into code for managing byte 1
+   JP dcm1f_fg_dyncode         ;; [10] Finish background dynamic code inserting
+
 dcm1f_bg01:
+   ;; Background color is > 00 (so 01 to 11). All this 3 sections of code have at least 4 RRCA's
+   ;; for one of the bytes, so we prepare HL for all of them now, avoiding unuseful repetitions
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
    DJNZ dcm1f_bg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
+
    ;; Background color is 01. Insert Dynamic code into placeholders.
-   LD (dcm1f_start_b2bg), HL   ;; [16]
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b1bg (4 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Only first 4 bits are lightened, as this bits represent the bit 0 of the 4 first pixels (that has to be 1 for pixels activated)
+   ;;   JR  $+6     ; [ 1804 ]    [12] Jump to the end of the dynamic code section
+   ;;  *) And this is the dynamic code that will be inserted into dcm1f_start_b2bg (7 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   RRCA        ; [ 0F   ]    [ 4] Move low nibble of A to high nibble of A rotating bits
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- The 4 bits of the high nibble represent the bit 0 for the 4 pixels
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- And for color 01 the bit 0 is the one that has to be active
+   ;;   RRCA        ; [ 0F   ]    [ 4]
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Set low nibble of A to 0 (as it represents bit 1 for our 4 pixels, an it should be always 0 for color 01)
+   ;;   JR C, $xx   ; [ 38xx ]    [ 7] Create a conditional jump that will never be done (carry is always false). This is only 7 cycles (2 NOP instructions would be 8, and we do not overwritte the last byte)
+   LD (dcm1f_start_b2bg), HL   ;; [16] <<= Insert RRCA;RRCA;RRCA;RRCA into code for managing byte 2
    LD (dcm1f_start_b2bg+2), HL ;; [16]
    LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
-   LD (dcm1f_start_b1bg), HL   ;; [16]
+   LD (dcm1f_start_b1bg), HL   ;; [16] <<= Insert AND #0xF0 into code for managing byte 1 and byte 2
    LD (dcm1f_start_b2bg+4), HL ;; [16]
    LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
-   LD (dcm1f_start_b1bg+2), HL ;; [16]
+   LD (dcm1f_start_b1bg+2), HL ;; [16] <<= Insert JR $+6 into code for managing byte 1
    LD   A, #0x38               ;; [ 7] A = 38h (38 = JR C, xx)
-   LD (dcm1f_start_b2bg+6), A  ;; [13] 
-   JP dcm1f_fg_dyncode         ;; [10]
+   LD (dcm1f_start_b2bg+6), A  ;; [13] <<= Insert JR C, xx into code for managing byte 2
+   JP dcm1f_fg_dyncode         ;; [10] Finish background dynamic code inserting
 dcm1f_bg10:
-   LD (dcm1f_start_b1bg), HL   ;; [16] <<- RRCA * 4
+   ;; Background color is > 01 (so 10 or 11). All this 2 sections of code have at least 4 RRCA's
+   ;; in the management of the first byte. Then we insert it now, to avoid unuseful repetitions
+   LD (dcm1f_start_b1bg), HL   ;; [16] <<= Insert RRCA;RRCA;RRCA;RRCA into code for managing byte 1
    LD (dcm1f_start_b1bg+2), HL ;; [16]
    DJNZ dcm1f_bg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
-   ;; Background color is 10. Insert Dynamic code into placeholders.
+   ;; Background color is 01. Insert Dynamic code into placeholders.
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b1bg (7 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   RRCA        ; [ 0F   ]    [ 4] Move low nibble of A to high nibble of A rotating bits
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- The 4 bits of the high nibble represent the bit 0 for the 4 pixels
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- And for color 01 the bit 0 is the one that has to be active
+   ;;   RRCA        ; [ 0F   ]    [ 4]
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Set low nibble of A to 0 (as it represents bit 1 for our 4 pixels, an it should be always 0 for color 01)
+   ;;   JR C, $xx   ; [ 38xx ]    [ 7] Create a conditional jump that will never be done (carry is always false). This is only 7 cycles (2 NOP instructions would be 8, and we do not overwritte the last byte)
+   ;;  *) And this is the dynamic code that will be inserted into dcm1f_start_b2bg (4 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Only first 4 bits are lightened, as this bits represent the bit 0 of the 4 first pixels (that has to be 1 for pixels activated)
+   ;;   JR  $+6     ; [ 1804 ]    [12] Jump to the end of the dynamic code section
    LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
    LD (dcm1f_start_b2bg), HL   ;; [16]
    LD (dcm1f_start_b1bg+4), HL ;; [16]
@@ -423,15 +458,25 @@ dcm1f_bg10:
    JP dcm1f_fg_dyncode         ;; [10]
 dcm1f_bg11:
    ;; Background color is 11. Insert Dynamic code into placeholders.
-   LD (dcm1f_start_b2bg), HL   ;; [16] <<- RRCA * 4
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b(1/2)bg (8 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   RRCA        ; [ 0F   ]    [ 4] Interchange low and high nibble bits of A
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- We want to duplicate low/high nibble of A (depending on which byte are we processing)
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- We have an invertd copy of A in C. By interchanging nibbles of A we can
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- mix A and C to get in A the same two nibbles, which is same value for bits 0 and 1 of each pixel (color 11)
+   ;;   XOR C       ; [ A9   ]    [ 4] Mix A and C to get the same values at the two nibbles of A
+   ;;     OR #0xF0  ; [ F6F0 ] b1 [ 7]  -- This is only for byte 1 (dcm1f_start_b1bg)
+   ;;     OR #0x0F  ; [ F60F ] b2 [ 7]  -- This is only for byte 2 (dcm1f_start_b2bg)
+   ;;   XOR C       ; [ A9   ]    [ 4] ;; This last piece of code is static, as it never changes, so no need to insert it
+   LD (dcm1f_start_b2bg), HL   ;; [16] <<= Insert RRCA;RRCA;RRCA;RRCA into code for managing byte 2
    LD (dcm1f_start_b2bg+2), HL ;; [16]
    LD  HL, #0xF6A9             ;; [10] HL = E6A9h (A9 = XOR C, F6 = OR xx (value in next byte))
-   LD (dcm1f_start_b2bg+4), HL ;; [16]
+   LD (dcm1f_start_b2bg+4), HL ;; [16] <<= Insert XOR C; OR xx into code for managing bytes 1 and 2
    LD (dcm1f_start_b1bg+4), HL ;; [16]
-   LD   A, #0x0F               ;; [ 7] A = 0Fh (0F = Value for previous OR)
-   LD (dcm1f_start_b2bg+6), A  ;; [13]
+   LD   A, #0x0F               ;; [ 7] A = 0Fh (0F = Value for previous OR in first byte)
+   LD (dcm1f_start_b2bg+6), A  ;; [13] <<= Insert 0F as inmediate value for previous OR
    CPL                         ;; [ 4] A = F0h (F0 = Value for previous OR in second byte)
-   LD (dcm1f_start_b1bg+6), A  ;; [13]
+   LD (dcm1f_start_b1bg+6), A  ;; [13] <<= Insert F0 as inmediate value for previous OR
 
 dcm1f_fg_dyncode:
    LD  B, C                    ;; [ 4] B = Foreground color
@@ -490,7 +535,11 @@ dcm1f_fg11:
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
 dcm1f_asciiHL:
-   LD   HL, #0                 ;; [10] HL = previously calculated Character ROM displacement (0 is a placeholder for entering the value by code modification)
+   LD   HL, #0                 ;; [10] HL = ASCII code (H=0, L=ASCII code). 0 is a placeholder to be filled up with the ASCII code value
+
+   ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
+   ADD  HL, HL                 ;; [11]
+   ADD  HL, HL                 ;; [11]
    LD   BC, #char0_ROM_address ;; [10] BC = 0x3800, Start ROM memory address of Char 0
    ADD  HL, BC                 ;; [11] HL += BC (Now HL Points to the start of the Character definition in ROM memory)
 
@@ -621,8 +670,6 @@ dc_mode0_ct: .db 0x00, 0x80, 0x08, 0x88, 0x20, 0xA0, 0x28, 0xA8, 0x02, 0x82, 0x0
 ;;; SECOND BYTE
 ;;;
 ;;; 00
-;   XOR A       ; 4    [ AF   ] ==> 3b
-;   JR  $+7     ; 12   [ 1802 ]
 ;;; 01
 ;   RRCA        ; 4    [ 0F   ] ==> 6b
 ;   RRCA        ; 4    [ 0F   ]
