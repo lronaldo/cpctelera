@@ -64,7 +64,7 @@ void main(void) {
             fcolor=0;
             bcolor = (bcolor + 1) & 0x03;
          }
-         for(charnum=1; charnum != 0; charnum++) {
+         for(charnum=65; charnum != 0; charnum++) {
             cpct_drawROMCharM1_fast(video_pos, fcolor, bcolor, charnum);
             video_pos = incrementedVideoPos(video_pos, 2);
          }

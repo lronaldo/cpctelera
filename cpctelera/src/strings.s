@@ -340,19 +340,33 @@ dcm11_restoreSP:
 dcm11_bg00:
    ;; Background color is 00. Insert Dynamic code into placeholders.
    LD  A, #0xAF                ;; [ 7] A = AFh    (AF    = XOR A)
-   LD (dmc11_start_b1bg), A    ;; [13]
-   LD (dmc11_start_b2bg), A    ;; [13] 
+   LD (dmc11_start_b2bg), A    ;; [13]
+   LD (dmc11_start_b1bg), A    ;; [13] 
    LD  HL, #0x0518             ;; [10] HL = 0518h (18 05 = JR $+7)
-   LD (dmc11_start_b1bg+1), HL ;; [16]
-   LD (dmc11_start_b2bg+1), HL ;; [16] 
+   LD (dmc11_start_b2bg+1), HL ;; [16]
+   LD (dmc11_start_b1bg+1), HL ;; [16] 
    JP dcm11_fg_dyncode         ;; [10]
 dcm11_bg01:
    DJNZ dcm11_bg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
    ;; Background color is 01. Insert Dynamic code into placeholders.
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b2bg), HL   ;; [16]
+   LD (dmc11_start_b2bg+2), HL ;; [16]
+   LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
+   LD (dmc11_start_b1bg), HL   ;; [16]
+   LD (dmc11_start_b2bg+4), HL ;; [16]
+   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
+   LD (dmc11_start_b1bg+2), HL ;; [16]
+   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
+   LD (dmc11_start_b2bg+6), HL ;; [16] 
+   JP dcm11_fg_dyncode         ;; [10]
+dcm11_bg10:
+   DJNZ dcm11_bg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
+   ;; Background color is 10. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
    LD (dmc11_start_b1bg), HL   ;; [16]
    LD (dmc11_start_b1bg+2), HL ;; [16]
-   LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
+   LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
    LD (dmc11_start_b2bg), HL   ;; [16]
    LD (dmc11_start_b1bg+4), HL ;; [16]
    LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
@@ -360,34 +374,20 @@ dcm11_bg01:
    LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
    LD (dmc11_start_b1bg+6), HL ;; [16] 
    JP dcm11_fg_dyncode         ;; [10]
-dcm11_bg10:
-   DJNZ dcm11_bg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
-   ;; Background color is 10. Insert Dynamic code into placeholders.
-   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
-   LD (dmc11_start_b2bg), HL   ;; [16]
-   LD (dmc11_start_b2bg+2), HL ;; [16]
-   LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
-   LD (dmc11_start_b1bg), HL   ;; [16]
-   LD (dmc11_start_b2bg+4), HL ;; [16]
-   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
-   LD (dmc11_start_b1bg+2), HL ;; [16]
-   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
-   LD (dmc11_start_b2bg+6), HL ;; [16] 
-   JP dcm11_fg_dyncode         ;; [10]
 dcm11_bg11:
    ;; Background color is 11. Insert Dynamic code into placeholders.
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
-   LD (dmc11_start_b1bg), HL   ;; [16]
-   LD (dmc11_start_b1bg+2), HL ;; [16]
    LD (dmc11_start_b2bg), HL   ;; [16]
    LD (dmc11_start_b2bg+2), HL ;; [16]
+   LD (dmc11_start_b1bg), HL   ;; [16]
+   LD (dmc11_start_b1bg+2), HL ;; [16]
    LD  HL, #0xE6A9             ;; [10] HL = E6A9h (A9 = XOR C, E6 = AND xx (value in next byte))
-   LD (dmc11_start_b1bg+4), HL ;; [16]
    LD (dmc11_start_b2bg+4), HL ;; [16]
+   LD (dmc11_start_b1bg+4), HL ;; [16]
    LD  HL, #0xA9F0             ;; [10] HL = A9F0h (F0 = Value for previous AND, A9 = XOR C)
-   LD (dmc11_start_b1bg+6), HL ;; [16]
+   LD (dmc11_start_b2bg+6), HL ;; [16]
    LD   L, #0x0F               ;; [ 7]  L = 0Fh (0F = Value for previous AND in second byte)
-   LD (dmc11_start_b2bg+6), HL ;; [16] 
+   LD (dmc11_start_b1bg+6), HL ;; [16] 
 
 dcm11_fg_dyncode:
    LD  B, C                    ;; [ 4] B = Foreground color
@@ -396,19 +396,33 @@ dcm11_fg_dyncode:
 dcm11_fg00:
    ;; Background color is 00. Insert Dynamic code into placeholders.
    LD  A, #0xAF                ;; [ 7] A = AFh    (AF    = XOR A)
-   LD (dmc11_start_b1fg), A    ;; [13]
-   LD (dmc11_start_b2fg), A    ;; [13] 
+   LD (dmc11_start_b2fg), A    ;; [13]
+   LD (dmc11_start_b1fg), A    ;; [13] 
    LD  HL, #0x0518             ;; [10] HL = 0518h (18 05 = JR $+7)
-   LD (dmc11_start_b1fg+1), HL ;; [16]
-   LD (dmc11_start_b2fg+1), HL ;; [16] 
+   LD (dmc11_start_b2fg+1), HL ;; [16]
+   LD (dmc11_start_b1fg+1), HL ;; [16] 
    JP dcm11_asciiHL            ;; [10]
 dcm11_fg01:
    DJNZ dcm11_fg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
    ;; Background color is 01. Insert Dynamic code into placeholders.
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
+   LD (dmc11_start_b2fg), HL   ;; [16]
+   LD (dmc11_start_b2fg+2), HL ;; [16]
+   LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
+   LD (dmc11_start_b1fg), HL   ;; [16]
+   LD (dmc11_start_b2fg+4), HL ;; [16]
+   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
+   LD (dmc11_start_b1fg+2), HL ;; [16]
+   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
+   LD (dmc11_start_b2fg+6), HL ;; [16] 
+   JP dcm11_asciiHL            ;; [10]
+dcm11_fg10:
+   DJNZ dcm11_fg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
+   ;; Background color is 10. Insert Dynamic code into placeholders.
+   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
    LD (dmc11_start_b1fg), HL   ;; [16]
    LD (dmc11_start_b1fg+2), HL ;; [16]
-   LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
+   LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
    LD (dmc11_start_b2fg), HL   ;; [16]
    LD (dmc11_start_b1fg+4), HL ;; [16]
    LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
@@ -416,34 +430,20 @@ dcm11_fg01:
    LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
    LD (dmc11_start_b1fg+6), HL ;; [16] 
    JP dcm11_asciiHL            ;; [10]
-dcm11_fg10:
-   DJNZ dcm11_fg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
-   ;; Background color is 10. Insert Dynamic code into placeholders.
-   LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
-   LD (dmc11_start_b2fg), HL   ;; [16]
-   LD (dmc11_start_b2fg+2), HL ;; [16]
-   LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
-   LD (dmc11_start_b1fg), HL   ;; [16]
-   LD (dmc11_start_b2fg+4), HL ;; [16]
-   LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
-   LD (dmc11_start_b1fg+2), HL ;; [16]
-   LD  HL, #0x0038             ;; [10] HL = 0038h (38 00 = JR C, 00h)
-   LD (dmc11_start_b2fg+6), HL ;; [16] 
-   JP dcm11_asciiHL            ;; [10]
 dcm11_fg11:
    ;; Background color is 11. Insert Dynamic code into placeholders.
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
-   LD (dmc11_start_b1fg), HL   ;; [16]
-   LD (dmc11_start_b1fg+2), HL ;; [16]
    LD (dmc11_start_b2fg), HL   ;; [16]
    LD (dmc11_start_b2fg+2), HL ;; [16]
+   LD (dmc11_start_b1fg), HL   ;; [16]
+   LD (dmc11_start_b1fg+2), HL ;; [16]
    LD  HL, #0xE6A9             ;; [10] HL = E6A9h (A9 = XOR C, E6 = AND xx (value in next byte))
-   LD (dmc11_start_b1fg+4), HL ;; [16]
    LD (dmc11_start_b2fg+4), HL ;; [16]
+   LD (dmc11_start_b1fg+4), HL ;; [16]
    LD  HL, #0xA9F0             ;; [10] HL = A9F0h (F0 = Value for previous AND, A9 = XOR C)
-   LD (dmc11_start_b1fg+6), HL ;; [16]
+   LD (dmc11_start_b2fg+6), HL ;; [16]
    LD   L, #0x0F               ;; [ 7]  L = 0Fh (0F = Value for previous AND in second byte)
-   LD (dmc11_start_b2fg+6), HL ;; [16] 
+   LD (dmc11_start_b1fg+6), HL ;; [16] 
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
@@ -467,22 +467,6 @@ dcm11_asciiHL:
    ;;; Get next pixel-line definition
 dcm11_nextPixelLine: ; ((( 546 vs 338/line worst case )))
    LD A, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 
-
-   ;; [66] Invert Pixel-line definition
-   LD  B, A  ; a = 76543210
-   RLCA
-   RLCA      ; a = 54321076
-   XOR B
-   AND #0xAA
-   XOR B     ; a = 56341270
-   LD  B, A
-   RLCA
-   RLCA
-   RLCA      ; a = 41270563
-   RRC B     ; b = 05634127
-   XOR B
-   AND #0x66
-   XOR B     ; a = 01234567
 
 dmc11_calculate_two_bytes:
    LD  C, A    ;  4
@@ -560,7 +544,7 @@ dcm11_end_printing:
    RET                         ;; [10] Return
 
 
-;; SECOND BYTE
+;; FIRST BYTE
 ;;
 ;; 00
 ;   XOR A       ; 4    [ AF   ]  ==> 3b
@@ -585,7 +569,7 @@ dcm11_end_printing:
 ;   XOR C       ; 4    [ A9   ]
 ;
 ;
-;;; FIRST BYTE
+;;; SECOND BYTE
 ;;;
 ;;; 00
 ;   XOR A       ; 4    [ AF   ] ==> 3b
