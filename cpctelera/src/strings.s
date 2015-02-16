@@ -435,7 +435,7 @@ dcm1f_bg10:
    LD (dcm1f_start_b1bg), HL   ;; [16] <<= Insert RRCA;RRCA;RRCA;RRCA into code for managing byte 1
    LD (dcm1f_start_b1bg+2), HL ;; [16]
    DJNZ dcm1f_bg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
-   ;; Background color is 01. Insert Dynamic code into placeholders.
+   ;; Background color is 10. Insert Dynamic code into placeholders.
    ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b1bg (7 bytes):
    ;;  Assembler    ; Mach.Code  Cycles
    ;;   RRCA        ; [ 0F   ]    [ 4] Move low nibble of A to high nibble of A rotating bits
@@ -449,13 +449,13 @@ dcm1f_bg10:
    ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Only first 4 bits are lightened, as this bits represent the bit 0 of the 4 first pixels (that has to be 1 for pixels activated)
    ;;   JR  $+6     ; [ 1804 ]    [12] Jump to the end of the dynamic code section
    LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
-   LD (dcm1f_start_b2bg), HL   ;; [16]
+   LD (dcm1f_start_b2bg), HL   ;; [16] <<= Insert AND 0x0F into code for managing bytes 1 and 2
    LD (dcm1f_start_b1bg+4), HL ;; [16]
    LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
-   LD (dcm1f_start_b2bg+2), HL ;; [16]
+   LD (dcm1f_start_b2bg+2), HL ;; [16] <<= Insert JR $+6 into code for managing byte 2
    LD   A, #0x38               ;; [ 7] A = 38h (38 = JR C, xx)
-   LD (dcm1f_start_b1bg+6), A  ;; [13] 
-   JP dcm1f_fg_dyncode         ;; [10]
+   LD (dcm1f_start_b1bg+6), A  ;; [13] <<= Insert JR C, xx into code for managing byte 1
+   JP dcm1f_fg_dyncode         ;; [10] Finish background dynamic code inserting
 dcm1f_bg11:
    ;; Background color is 11. Insert Dynamic code into placeholders.
    ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b(1/2)bg (8 bytes):
@@ -478,40 +478,77 @@ dcm1f_bg11:
    CPL                         ;; [ 4] A = F0h (F0 = Value for previous OR in second byte)
    LD (dcm1f_start_b1bg+6), A  ;; [13] <<= Insert F0 as inmediate value for previous OR
 
+   ;;
+   ;; ## PART 2 ## : Insert code for foreground color generation
+   ;;   This code inserts 2 pieces of dynamic code into "dcm1f_start_b(1/2)fg" that manage the
+   ;;   calculations for creating the foreground color of each character line (2 bytes) from the 
+   ;;   character pixel definition. As in part 1, the code inserted depends on the foreground color,
+   ;;   in register C, so we have 4 possible dynamic code sections to insert.
+   ;;
 dcm1f_fg_dyncode:
    LD  B, C                    ;; [ 4] B = Foreground color
    INC B                       ;; [ 4] Set Foreground color between 1 and 4
-   DJNZ dcm1f_fg01             ;; [13/8] If FGColor=00, do not jump, else, jump to BGColor=01 test
+   DJNZ dcm1f_fg01             ;; [13/8] If FGColor=00, do not jump, else, jump to FGColor=01 test
 dcm1f_fg00:
-   ;; Background color is 00. Insert Dynamic code into placeholders.
+   ;; Foreground color is 00. Insert Dynamic code into placeholders.
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b(1/2)fg (3 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   XOR A       ; [ AF   ]   [ 4] A = 0 (As foreground is 0, no pixel is to be lightened up)
+   ;;   JR  $+7     ; [ 1805 ]   [12] Jump to the end of the dynamic code section
    LD  A, #0xAF                ;; [ 7] A = AFh    (AF    = XOR A)
-   LD (dcm1f_start_b2fg), A    ;; [13]
-   LD (dcm1f_start_b1fg), A    ;; [13]
+   LD (dcm1f_start_b2fg), A    ;; [13] <<= Insert XOR A into code for managing byte 2
+   LD (dcm1f_start_b1fg), A    ;; [13] <<= Insert XOR A into code for managing byte 1
    LD  HL, #0x0518             ;; [10] HL = 0518h (18 05 = JR $+7)
-   LD (dcm1f_start_b2fg+1), HL ;; [16]
-   LD (dcm1f_start_b1fg+1), HL ;; [16]
-   JP dcm1f_asciiHL            ;; [10]
+   LD (dcm1f_start_b2fg+1), HL ;; [16] <<= Insert JR $+7 into code for managing byte 2
+   LD (dcm1f_start_b1fg+1), HL ;; [16] <<= Insert JR $+7 into code for managing byte 1
+   JP dcm1f_asciiHL            ;; [10] Finish foreground dynamic code inserting
 dcm1f_fg01:
+   ;; Foreground color is > 00 (so 01 to 11). All this 3 sections of code have at least 4 RRCA's
+   ;; for one of the bytes, so we prepare HL for all of them now, avoiding unuseful repetitions
    LD  HL, #0x0F0F             ;; [10] HL = 0F0Fh (0F = RRCA)
-   DJNZ dcm1f_fg10             ;; [13/8] If BGColor=01, do not jump, else, jump to BGColor=10 test
-   ;; Background color is 01. Insert Dynamic code into placeholders.
-   LD (dcm1f_start_b2fg), HL   ;; [16]
+   DJNZ dcm1f_fg10             ;; [13/8] If FGColor=01, do not jump, else, jump to FGColor=10 test
+   ;; Foreground color is 01. Insert Dynamic code into placeholders.
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b1fg (4 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Only first 4 bits are lightened, as this bits represent the bit 0 of the 4 first pixels (that has to be 1 for pixels activated)
+   ;;   JR  $+6     ; [ 1804 ]    [12] Jump to the end of the dynamic code section
+   ;;  *) And this is the dynamic code that will be inserted into dcm1f_start_b2bg (7 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   RRCA        ; [ 0F   ]    [ 4] Move low nibble of A to high nibble of A rotating bits
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- The 4 bits of the high nibble represent the bit 0 for the 4 pixels
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- And for color 01 the bit 0 is the one that has to be active
+   ;;   RRCA        ; [ 0F   ]    [ 4]
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Set low nibble of A to 0 (as it represents bit 1 for our 4 pixels, an it should be always 0 for color 01)
+   ;;   JR C, $xx   ; [ 38xx ]    [ 7] Create a conditional jump that will never be done (carry is always false). This is only 7 cycles (2 NOP instructions would be 8, and we do not overwritte the last byte)
+   LD (dcm1f_start_b2fg), HL   ;; [16] <<= Insert RRCA;RRCA;RRCA;RRCA into code for managing byte 2
    LD (dcm1f_start_b2fg+2), HL ;; [16]
    LD  HL, #0xF0E6             ;; [10] HL = F0E6h (E6 F0 = AND F0h)
-   LD (dcm1f_start_b1fg), HL   ;; [16]
+   LD (dcm1f_start_b1fg), HL   ;; [16] <<= Insert AND #0xF0 into code for managing byte 1 and byte 2
    LD (dcm1f_start_b2fg+4), HL ;; [16]
    LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
-   LD (dcm1f_start_b1fg+2), HL ;; [16]
-   LD   A, #0x38               ;; [ 7] HL = 38h (38 = JR C, xx)
-   LD (dcm1f_start_b2fg+6), A  ;; [13]
-   JP dcm1f_asciiHL            ;; [10]
+   LD (dcm1f_start_b1fg+2), HL ;; [16] <<= Insert JR $+6 into code for managing byte 1
+   LD   A, #0x38               ;; [ 7] A = 38h (38 = JR C, xx)
+   LD (dcm1f_start_b2fg+6), A  ;; [13] <<= Insert JR C, xx into code for managing byte 2
+   JP dcm1f_asciiHL            ;; [10] Finish background dynamic code inserting
 dcm1f_fg10:
-   LD (dcm1f_start_b1fg), HL   ;; [16] <<- RRCA * 4
+   ;; Background color is > 01 (so 10 or 11). All this 2 sections of code have at least 4 RRCA's
+   ;; in the management of the first byte. Then we insert it now, to avoid unuseful repetitions
+   LD (dcm1f_start_b1fg), HL   ;; [16] <<= Insert RRCA;RRCA;RRCA;RRCA into code for managing byte 1
    LD (dcm1f_start_b1fg+2), HL ;; [16]
-   DJNZ dcm1f_fg11             ;; [13/8] If BGColor=10, do not jump, else, jump to BGColor=11
-   ;; Background color is 10. Insert Dynamic code into placeholders.
-   LD (dcm1f_start_b1fg), HL   ;; [16]
-   LD (dcm1f_start_b1fg+2), HL ;; [16]
+   DJNZ dcm1f_fg11             ;; [13/8] If FGColor=10, do not jump, else, jump to FGColor=11
+   ;; Foreground color is 10. Insert Dynamic code into placeholders.
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b1fg (7 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   RRCA        ; [ 0F   ]    [ 4] Move low nibble of A to high nibble of A rotating bits
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- The 4 bits of the high nibble represent the bit 0 for the 4 pixels
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- And for color 01 the bit 0 is the one that has to be active
+   ;;   RRCA        ; [ 0F   ]    [ 4]
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Set low nibble of A to 0 (as it represents bit 1 for our 4 pixels, an it should be always 0 for color 01)
+   ;;   JR C, $xx   ; [ 38xx ]    [ 7] Create a conditional jump that will never be done (carry is always false). This is only 7 cycles (2 NOP instructions would be 8, and we do not overwritte the last byte)
+   ;;  *) And this is the dynamic code that will be inserted into dcm1f_start_b2fg (4 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Only first 4 bits are lightened, as this bits represent the bit 0 of the 4 first pixels (that has to be 1 for pixels activated)
+   ;;   JR  $+6     ; [ 1804 ]    [12] Jump to the end of the dynamic code section
    LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
    LD (dcm1f_start_b2fg), HL   ;; [16]
    LD (dcm1f_start_b1fg+4), HL ;; [16]
