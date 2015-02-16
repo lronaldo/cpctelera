@@ -314,29 +314,43 @@ dcm1_end_printing:
 
    RET                         ;; [10] Return
 
-
 ;
 ;########################################################################
 ;## FUNCTION: _cpct_drawROMCharM1_fast                                ###
 ;########################################################################
-;### This function reads a character from ROM and draws it at a given ###
-;### point on the video memory (byte-aligned), assumming screen is    ###
-;### configured for MODE 1. It prints the character in 2 colors(PENs) ###
-;### one for foreground, and the other for background.                ###
-;### * Some IMPORTANT things to take into account:                    ###
-;###  -- Do not put this function's code below 4000h in memory. In    ###
-;###     order to read from ROM, this function enables Lower ROM      ###
-;###     (which is located 0000h-3FFFh), so CPU would read from ROM   ###
-;###     instead of RAM in first bank, effectively shadowing this     ###
-;###     piece of code, and producing undefined results (tipically,   ###
-;###     program would hang or crash).                                ###
-;###  -- This function works well for drawing on double buffers loca- ###
-;###     ted at whichever memory bank (0000h-FFFFh)                   ###
-;###  -- This function disables interrupts during main loop (charac-  ###
-;###     ter printing). It reenables them at the end.                 ###
-;###  -- Do not pass numbers greater that 3 as color parameters, as   ###
-;###     they are used as indexes in a color table, and results may   ###
-;###     be unpredictable                                             ###
+;### This function does the same as _cpct_drawROMCharM1, but as fast  ###
+;### as possible, not taking into account any space constraints. It   ###
+;### is unrolled, which makes it measure a great amount in bytes, but ###
+;### it is 60% faster than _cpct_drawROMCharM1.                       ###
+;### The technique used to be so fast is difficult to understant: it  ###
+;### uses dynamic code placement. I will try to sum up it here, and   ###
+;### you can always read the detailed comments in the source to get a ###
+;### better understanding.                                            ###
+;### Basically, what this function does is what follows:              ###
+;###  1. It gets the 8-byte definitions of a character.               ###
+;###  2. It transforms each byte (a character line) into 2 bytes for  ###
+;###     video memory (8 pixels, 2 bits per pixel).                   ###
+;### The trick is in transforming from 1-byte character-line defini-  ###
+;### tion to 2-bytes video memory colors. As we have only 4 colors    ###
+;### per pixel, we have 4 possible transform operations either for    ###
+;### foreground color or for background. So, we have to do 4 operati- ###
+;### ons for each byte:                                               ###
+;###  1. Foreground color for video byte 1                            ###
+;###  2. Background color for video byte 1                            ###
+;###  3. Foreground color for video byte 2                            ###
+;###  4. Background color for video byte 2                            ###
+;### What we do is,instead of adding banching logic to the inner loop ###
+;### that has to select the operation to do for each byte and type,   ###
+;### we create 4 8-byte holes in the code that we call "dynamic code  ###
+;### sections" (DCS). Then, we use logic at the start of the routine  ###
+;### to select the 4 operations that are required, depending on the   ###
+;### selected foreground/background colors. When we know which opera- ###
+;### tions are to be performed, we fill in the holes (DCS) with the   ###
+;### machine code that performes the required operation. Then, when   ###
+;### the inner loop is executed, it does not have to do any branching ###
+;### operations, being much much faster.                              ###
+;### The resulting code is very difficult to follow, and very big in  ###
+;### size, but when speed is the goal, this is the best approach.     ###
 ;########################################################################
 ;### INPUTS (5 Bytes)                                                 ###
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
@@ -354,7 +368,6 @@ dcm1_end_printing:
 ;###  Worst case = 2678 cycles (669,50 us)                            ###
 ;########################################################################
 ;
-
 .globl _cpct_drawROMCharM1_fast
 _cpct_drawROMCharM1_fast::
    ;; GET Parameters from the stack (Pop + Restoring SP)
