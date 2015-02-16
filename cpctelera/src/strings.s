@@ -251,7 +251,7 @@ dcm1_asciiHL:
 
    ;; Do this each pixel line (8-pixels)
 dcm1_nextline:
-   LD C, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 0=backgound color, 1=foreground)
+   LD C, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 0=background color, 1=foreground)
    PUSH HL                     ;; [11] Save HL register to be able to use it as temporal storage
    LD L, #2                    ;; [ 7] L=2 bytes per line
 
@@ -372,9 +372,9 @@ dcm1f_restoreSP:
    LD  A, L                    ;; [ 4] A = ASCII code of the character
    LD  (dcm1f_asciiHL+1), A    ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
-   ;;---------------------------------------------------------------------------------------------------
+   ;;----------------------------------------------------------------------------------------------
    ;; Set up foreground and background code that does the color mixing into bytes for video memory
-   ;;---------------------------------------------------------------------------------------------------
+   ;;----------------------------------------------------------------------------------------------
 
    ;;
    ;; ## PART 1 ## : Insert code for background color generation
@@ -462,7 +462,7 @@ dcm1f_bg11:
    ;;  Assembler    ; Mach.Code  Cycles
    ;;   RRCA        ; [ 0F   ]    [ 4] Interchange low and high nibble bits of A
    ;;   RRCA        ; [ 0F   ]    [ 4]  -- We want to duplicate low/high nibble of A (depending on which byte are we processing)
-   ;;   RRCA        ; [ 0F   ]    [ 4]  -- We have an invertd copy of A in C. By interchanging nibbles of A we can
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- We have an inverted copy of A in C. By interchanging nibbles of A we can
    ;;   RRCA        ; [ 0F   ]    [ 4]  -- mix A and C to get in A the same two nibbles, which is same value for bits 0 and 1 of each pixel (color 11)
    ;;   XOR C       ; [ A9   ]    [ 4] Mix A and C to get the same values at the two nibbles of A
    ;;     OR #0xF0  ; [ F6F0 ] b1 [ 7]  -- This is only for byte 1 (dcm1f_start_b1bg)
@@ -473,9 +473,9 @@ dcm1f_bg11:
    LD  HL, #0xF6A9             ;; [10] HL = E6A9h (A9 = XOR C, F6 = OR xx (value in next byte))
    LD (dcm1f_start_b2bg+4), HL ;; [16] <<= Insert XOR C; OR xx into code for managing bytes 1 and 2
    LD (dcm1f_start_b1bg+4), HL ;; [16]
-   LD   A, #0x0F               ;; [ 7] A = 0Fh (0F = Value for previous OR in first byte)
+   LD   A, #0x0F               ;; [ 7] A = 0Fh (0F = Value for previous OR in second byte)
    LD (dcm1f_start_b2bg+6), A  ;; [13] <<= Insert 0F as inmediate value for previous OR
-   CPL                         ;; [ 4] A = F0h (F0 = Value for previous OR in second byte)
+   CPL                         ;; [ 4] A = F0h (F0 = Value for previous OR in first byte)
    LD (dcm1f_start_b1bg+6), A  ;; [13] <<= Insert F0 as inmediate value for previous OR
 
    ;;
@@ -550,24 +550,38 @@ dcm1f_fg10:
    ;;   AND #0xF0   ; [ E6F0 ]    [ 7] Only first 4 bits are lightened, as this bits represent the bit 0 of the 4 first pixels (that has to be 1 for pixels activated)
    ;;   JR  $+6     ; [ 1804 ]    [12] Jump to the end of the dynamic code section
    LD  HL, #0x0FE6             ;; [10] HL = 0FE6h (E6 0F = AND 0Fh)
-   LD (dcm1f_start_b2fg), HL   ;; [16]
+   LD (dcm1f_start_b2fg), HL   ;; [16] <<= Insert AND 0x0F into code for managing bytes 1 and 2
    LD (dcm1f_start_b1fg+4), HL ;; [16]
    LD  HL, #0x0418             ;; [10] HL = 0418h (18 04 = JR $+6)
-   LD (dcm1f_start_b2fg+2), HL ;; [16]
+   LD (dcm1f_start_b2fg+2), HL ;; [16] <<= Insert JR $+6 into code for managing byte 2
    LD   A, #0x38               ;; [ 7] A = 38h (38 = JR C, xx)
-   LD (dcm1f_start_b1fg+6), A  ;; [13]
-   JP dcm1f_asciiHL            ;; [10]
+   LD (dcm1f_start_b1fg+6), A  ;; [13] <<= Insert JR C, xx into code for managing byte 1
+   JP dcm1f_asciiHL            ;; [10] Finish background dynamic code inserting
 dcm1f_fg11:
-   ;; Background color is 11. Insert Dynamic code into placeholders.
-   LD (dcm1f_start_b2fg), HL   ;; [16] <<- RRCA * 4
+   ;; Foreground color is 11. Insert Dynamic code into placeholders.
+   ;;  *) This is the dynamic code that will be inserted into dcm1f_start_b(1/2)fg (8 bytes):
+   ;;  Assembler    ; Mach.Code  Cycles
+   ;;   RRCA        ; [ 0F   ]    [ 4] Interchange low and high nibble bits of A
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- We want to duplicate low/high nibble of A (depending on which byte are we processing)
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- We have a copy of A in C. By interchanging nibbles of A we can
+   ;;   RRCA        ; [ 0F   ]    [ 4]  -- mix A and C to get in A the same two nibbles, which is same value for bits 0 and 1 of each pixel (color 11)
+   ;;   XOR C       ; [ A9   ]    [ 4] Mix A and C to get the same values at the two nibbles of A
+   ;;    AND #0x0F  ; [ E60F ] b1 [ 7]  -- This is only for byte 1 (dcm1f_start_b1fg)
+   ;;    AND #0xF0  ; [ E6F0 ] b2 [ 7]  -- This is only for byte 2 (dcm1f_start_b2fg)
+   ;;   XOR C       ; [ A9   ]    [ 4] ;; This last piece of code is static, as it never changes, so no need to insert it
+   LD (dcm1f_start_b2fg), HL   ;; [16] <<= Insert RRCA;RRCA;RRCA;RRCA into code for managing byte 2
    LD (dcm1f_start_b2fg+2), HL ;; [16]
    LD  HL, #0xE6A9             ;; [10] HL = E6A9h (A9 = XOR C, E6 = AND xx (value in next byte))
-   LD (dcm1f_start_b2fg+4), HL ;; [16]
+   LD (dcm1f_start_b2fg+4), HL ;; [16] <<= Insert XOR C; OR xx into code for managing bytes 1 and 2
    LD (dcm1f_start_b1fg+4), HL ;; [16]
-   LD   A, #0xF0               ;; [ 7] A = F0h (F0 = Value for previous AND)
-   LD (dcm1f_start_b2fg+6), A  ;; [13]
-   CPL                         ;; [ 4] A = 0Fh (0F = Value for previous AND in second byte)
-   LD (dcm1f_start_b1fg+6), A  ;; [13]
+   LD   A, #0xF0               ;; [ 7] A = F0h (F0 = Value for previous AND in second byte)
+   LD (dcm1f_start_b2fg+6), A  ;; [13] <<= Insert F0 as inmediate value for previous AND
+   CPL                         ;; [ 4] A = 0Fh (0F = Value for previous AND in first byte)
+   LD (dcm1f_start_b1fg+6), A  ;; [13] <<= Insert 0F as inmediate value for previous AND
+
+   ;;---------------------------------------------------------------------
+   ;; Finished setting up dynamic code. Let's continue with the main task
+   ;;---------------------------------------------------------------------
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
@@ -588,58 +602,70 @@ dcm1f_asciiHL:
    DI                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
 
-   ;;; Get next pixel-line definition
+   ;;
+   ;; Transform character definition into color values for video memory and copy
+   ;; them to the video position given at DE. Each character definition has 8 pixel-lines (8 bytes)
+   ;; and each pixel line is to be transformed into 2 bytes for video memory (8 pixels, 2 bits per pixel)
+   ;;
 dcm1f_nextPixelLine: 
-   LD A, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 
+   LD  A, (HL)                 ;; [ 7] C = Next Character pixel line definition (8 bits defining which pixels are on and off)
 
 dcm1f_calculate_two_bytes:
-   LD  C, A    ;  4
+   ;; Start calculations for the 1st byte
+   ;;
+   LD  C, A                    ;; [ 4] C = A :: C stores a copy of A that will be used to copy A nibbles up and down
 
-;; First Byte FG Color (8 bytes of dynamic code)
+   ;; DYNAMIC CODE SECTION
+   ;;  * Processing foreground color values of the 1st Byte
 dcm1f_start_b1fg:
-   .ds 7
-   XOR C       ; 4
+   .ds 7                       ;; [xx] This 7 bytes are filled up with dynamic code for calculating foreground color value inside 1st byte
+   XOR C                       ;; [ 4] This operation is static, as it never changes no matter what foreground color is picked up
 
 dcm1f_end_b1fg:
-   LD  B, A    ; 4
-   LD  A, C    ; 4
-   CPL         ; 4  A = ^A
+   LD  B, A                    ;; [ 4] Save calculated foreground color value into B, to mix it up later on with background color
+   LD  A, C                    ;; [ 4] Restore pixel-line definition into A
+   CPL                         ;; [ 4] Invert pixel-line definition (light up background pixels instead of foreground ones)
 
-;; First Byte BG Color (8 bytes of dynamic code)
+   ;; DYNAMIC CODE SECTION
+   ;;  * Processing background color values of the 1st Byte
 dcm1f_start_b1bg:
-   .ds 7
-   XOR C       ; 4
+   .ds 7                       ;; [xx] This 7 bytes are filled up with dynamic code for calculating background color value inside 1st byte
+   XOR C                       ;; [ 4] This operation is static, as it never changes no matter what background color is picked up
 
 dcm1f_end_b1bg:
-   ;; Save First Byte
-   OR  B           ; 4
-   LD  (DE), A     ; 7
-   INC DE          ; 6
+   ;; Save 1st Byte
+   OR  B                       ;; [ 4] Mix background and foreground color values into A
+   LD  (DE), A                 ;; [ 7] Store final calculated color values into present video memory byte
+   INC DE                      ;; [ 6] Point to the next video memory byte 
 
-   ;; Set up values for working with 2nd byte
-   LD  A, C        ; 4
+   ;; Start calculations for the 2nd byte
+   ;;
+   LD  A, C                    ;; [ 4] Restore pixel-line definition into A
 
-;; Second Byte FG Color (8 bytes of dynamic code)
+   ;; DYNAMIC CODE SECTION
+   ;;  * Processing foreground color values of the 2nd Byte
 dcm1f_start_b2fg:
-   .ds 7
-   XOR C       ; 4
+   .ds 7                       ;; [xx] This 7 bytes are filled up with dynamic code for calculating foreground color value inside 2nd byte
+   XOR C                       ;; [ 4] This operation is static, as it never changes no matter what foreground color is picked up
 
 dcm1f_end_b2fg:
-   LD  B, A    ; 4
-   LD  A, C    ; 4
-   CPL         ; 4  A = ^A
+   LD  B, A                    ;; [ 4] Save calculated foreground color value into B, to mix it up later on with background color
+   LD  A, C                    ;; [ 4] Restore pixel-line definition into A
+   CPL                         ;; [ 4] Invert pixel-line definition (light up background pixels instead of foreground ones)
 
-;; Second Byte BG Color (8 bytes of dynamic code)
+   ;; DYNAMIC CODE SECTION
+   ;;  * Processing background color values of the 2nd Byte
 dcm1f_start_b2bg:
-   .ds 7
-   XOR C       ; 4
+   .ds 7                       ;; [xx] This 7 bytes are filled up with dynamic code for calculating background color value inside 2nd byte
+   XOR C                       ;; [ 4] This operation is static, as it never changes no matter what background color is picked up
 
 dcm1f_end_b2bg:
-   ;; Save Second Byte
-   OR  B           ; 4
-   LD  (DE), A     ; 7
+   ;; Save 2nd Byte
+   OR  B                       ;; [ 4] Mix background and foreground color values into A
+   LD  (DE), A                 ;; [ 7] Store final calculated color values into present video memory byte
 
-;; End of this pixel line, jump to next one or end
+   ;; We have finished with this pixel-line, check if there are
+   ;; more pixel-lines to continue or end drawing
    INC L                       ;; [ 4] Next pixel Line (characters are 8-byte-aligned in memory, so we only need to increment L, as H will not change)
    LD  A, L                    ;; [ 4] IF next pixel line corresponds to a new character (this is, we have finished drawing our character),
    AND #0x07                   ;; [ 7] ... then L % 8 == 0, as it is 8-byte-aligned. 
@@ -671,58 +697,10 @@ dcm1f_end_printing:
 
    RET                         ;; [10] Return
 
+
 ;;
 ;; This is for next routine to draw a character in mode 0
 ;;
 .bndry 16   ;; Make this vector start at a 16-byte aligned address to be able to use 8-bit arithmetic with pointers
 ;; Change!!!
 dc_mode0_ct: .db 0x00, 0x80, 0x08, 0x88, 0x20, 0xA0, 0x28, 0xA8, 0x02, 0x82, 0x0A, 0x8A, 0x22, 0xA2, 0x2A, 0xAA
-
-;; FIRST BYTE
-;;
-;; 00
-;   XOR A       ; 4    [ AF   ]  ==> 3b
-;   JR  $+7     ; 12   [ 1805 ]
-;;; 01
-;   AND #0xF0   ; 7    [ E6F0 ]  ==> 4b
-;   JR  $+6     ; 12   [ 1804 ]
-;;; 10 
-;   RRCA        ; 4    [ 0F   ] ==> 6b
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   AND #0x0F   ; 7    [ E6F0 ]
-;   JR C, $xx    ; 7   [ 38xx ] ; Never jump is better than 2 nops
-;;; 11
-;   RRCA        ; 4    [ 0F   ] ==> 8b
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   XOR C       ; 4    [ A9   ]
-; BG-- OR #0xF0   ; 7     [ F6F0 ]
-; FG-- AND #0x0F   ; 7    [ E60F ]
-;   XOR C       ; 4    [ A9   ]
-;
-;
-;;; SECOND BYTE
-;;;
-;;; 00
-;;; 01
-;   RRCA        ; 4    [ 0F   ] ==> 6b
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   AND #0xF0   ; 7    [ E6F0 ]
-;   JR C, $xx    ; 7   [ 38xx ] ; Never jump is better than 2 nops
-;;; 10 
-;   AND #0x0F   ; 7    [ E60F ] ==> 4b
-;   JR  $+6     ; 12   [ 1804 ]
-;;; 11
-;   RRCA        ; 4    [ 0F   ] ==> 8b
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   RRCA        ; 4    [ 0F   ]
-;   XOR C       ; 4    [ A9   ]
-; BG-- OR #0x0F   ; 7     [ F60F ]
-; FG-- AND #0xF0   ; 7    [ E6F0 ]
-;   XOR C       ; 4    [ A9   ]
