@@ -23,7 +23,7 @@ if you want to use them do this:
      git clone https://github.com/cpcitor/cpc-dev-tool-chain.git
      git reset --hard 48ca1dd9a1
  
-That version of cpc-dev-tool-chain will work nicely on almost any linux machine, and may also work on Windows
+That version of cpc-dev-tool-chain will work nicely on almost any Linux machine, and may also work on Windows
 with a 32-bit version of Cygwin. If you plan to use it this way (Windows+Cygwin 32), check out 
 [Profesor Retroman's tutorial (ES)](https://www.youtube.com/watch?v=FvAg-xmWZHM). 
 
