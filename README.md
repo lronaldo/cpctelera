@@ -4,10 +4,10 @@ _**Astonishing fast Amstrad CPC game engine for C developers**_
 
 ---------------------------------------------------------------
 
-CPCtelera is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
+_**CPCtelera**_ is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
 routines to aid developers in the creation of games. 
 
-CPCtelera is still under develpment, at a very early stage. Although it is possible to use CPCtelera 
+_**CPCtelera**_ is still under develpment, at a very early stage. Although it is possible to use _**CPCtelera**_ 
 at its present status and do cool things, it will suffer great modifications until 1.0. version is
 released. Moreover, if you wanted to test and use it, you will need these tools:
  
@@ -33,10 +33,10 @@ Current testing makefiles for examples and library work with this directory stru
     --/cpctelera
     --/cpc-dev-tool-chain
 
-Where `/cpc-dev-tool-chain` has SDCC, Hex2Bin and iDSK already compiled 
+where `/cpc-dev-tool-chain` has SDCC, Hex2Bin and iDSK already compiled 
 (see [cpcitor documentation](https://github.com/cpcitor/cpc-dev-tool-chain/blob/master/README.md) for more details)
 
 If you have any questions, please contact me:
  
- * email:    ronaldo (at) cheesetea (dot) com
- * twitter:  @FranGallegoBR
+ * email:    _ronaldo (at) cheesetea (dot) com_
+ * twitter:  _@FranGallegoBR_
