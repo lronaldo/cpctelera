@@ -1,6 +1,8 @@
 # CPCtelera
-======================================================================
-_Astonishing fast Amstrad CPC game engine for C developers_
+
+_**Astonishing fast Amstrad CPC game engine for C developers**_
+
+---------------------------------------------------------------
 
 CPCtelera is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
 routines to aid developers in the creation of games. 
