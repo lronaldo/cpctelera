@@ -1,6 +1,7 @@
 # CPCtelera
-Astonishing fast Amstrad CPC game engine for C developers
 ======================================================================
+_Astonishing fast Amstrad CPC game engine for C developers_
+
 CPCtelera is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
 routines to aid developers in the creation of games. 
 
@@ -34,5 +35,6 @@ Where `/cpc-dev-tool-chain` has SDCC, Hex2Bin and iDSK already compiled
 (see [cpcitor documentation](https://github.com/cpcitor/cpc-dev-tool-chain/blob/master/README.md) for more details)
 
 If you have any questions, please contact me:
-  email:    ronaldo (at) cheesetea (dot) com
-  twitter:  @FranGallegoBR
+ 
+ * email:    ronaldo (at) cheesetea (dot) com
+ * twitter:  @FranGallegoBR
