@@ -46,7 +46,7 @@
 ;########################################################################
 ;### MEASURES                                                         ###
 ;###  MEMORY:  26 bytes                                               ###
-;###  TIME:   618 cycles (154.50 us)                                  ###
+;###  TIME:   566 cycles (141.50 us)                                  ### 
 ;########################################################################
 ;
 .globl _cpct_drawSprite2x8_aligned
@@ -60,15 +60,16 @@ _cpct_drawSprite2x8_aligned::
    PUSH AF                  ;; [11]
 
    ;; Copy 8 lines of 2 bytes width (2x8 = 16 bytes)
+   LD   A, D                ;; [ 4] Save D into A for fastly doing +800h increment of DE
    LD   BC, #16             ;; [10] BC = 16, countdown of the number of bytes remaining
    JP   dsa28_first_line    ;; [10] First line does not need to do math to start transfering data. 
 
 dsa28_next_line:
-   LD   A, D                ;; [ 4] DE = DE + 800h - 2 (Jump to next visual line in the video memory)
-   ADD  A, #8               ;; [ 7]
+   ;; This 4 lines do "DE += 800h - 2h" to move DE pointer to the next pixel line at video memory
+   DEC  E                   ;; [ 4] E -= 2 (We only decrement E because D is saved into A, 
+   DEC  E                   ;; [ 4]         hence, it does not matter if E is 00 and becomes FF, cause we do not have to worry about D)
+   ADD  #8                  ;; [ 7] D += 8 (To add 800h to DE, we increment previous value of D by 8, and move it into D)
    LD   D, A                ;; [ 4]
-   DEC  DE                  ;; [ 6]
-   DEC  DE                  ;; [ 6]
 
 dsa28_first_line:
    LDI                      ;; [16] Copy 2 bytes for (HL) to (DE) and decrement BC 
