@@ -53,7 +53,7 @@
 ;###     piece of code, and producing undefined results (tipically,   ###
 ;###     program would hang or crash).                                ###
 ;###  -- This function works well for drawing on double buffers loca- ###
-;###     ted at whichever memory bank (0000h-FFFFh)                   ###
+;###     ted at whichever memory bank, except 0000h (4000h-FFFFh)     ###
 ;###  -- This function disables interrupts during main loop (charac-  ###
 ;###     ter printing). It reenables them at the end.                 ###
 ;########################################################################
@@ -169,7 +169,7 @@ dc_end_printing:
 ;###     piece of code, and producing undefined results (tipically,   ###
 ;###     program would hang or crash).                                ###
 ;###  -- This function works well for drawing on double buffers loca- ###
-;###     ted at whichever memory bank (0000h-FFFFh)                   ###
+;###     ted at whichever memory bank, except 0000h (4000h-FFFFh)     ###
 ;###  -- This function disables interrupts during main loop (charac-  ###
 ;###     ter printing). It reenables them at the end.                 ###
 ;###  -- Do not pass numbers greater that 3 as color parameters, as   ###
@@ -226,9 +226,9 @@ dcm1_restoreSP:
    ADD B                       ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
    LD  L, A                    ;; [ 4]
    LD  A, (HL)                 ;; [ 7] A = Background color bits
-   LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
+   LD (dcm1_drawForeground-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
    LD  A, C                    ;; [ 4] A = Foreground color bits (Previously stored into C)
-   LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
+   LD (dcm1_drawForeground+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
@@ -713,7 +713,7 @@ dcm1f_end_printing:
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_drawROMCharM1                                     ###
+;## FUNCTION: _cpct_drawROMCharM0                                     ###
 ;########################################################################
 ;### This function reads a character from ROM and draws it at a given ###
 ;### point on the video memory (byte-aligned), assumming screen is    ###
@@ -727,7 +727,7 @@ dcm1f_end_printing:
 ;###     piece of code, and producing undefined results (tipically,   ###
 ;###     program would hang or crash).                                ###
 ;###  -- This function works well for drawing on double buffers loca- ###
-;###     ted at whichever memory bank (0000h-FFFFh)                   ###
+;###     ted at whichever memory bank, except 0000h (4000h-FFFFh)     ###
 ;###  -- This function disables interrupts during main loop (charac-  ###
 ;###     ter printing). It reenables them at the end.                 ###
 ;###  -- Do not pass numbers greater that 3 as color parameters, as   ###
@@ -744,10 +744,10 @@ dcm1f_end_printing:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY:  bytes (16 table +  code)                           ###
+;### MEMORY: 144 bytes (16 table + 128 code)                          ###
 ;### TIME:                                                            ###
-;###  Best case  =  cycles ( us)                           ###
-;###  Worst case =  cycles ( us)                           ###
+;###  Best case  = 3704 cycles ( 926.00 us)                           ###
+;###  Worst case = 4384 cycles (1096.00 us)                           ###
 ;########################################################################
 ;
 
@@ -771,7 +771,7 @@ dcm0_restoreSP:
    EI                          ;; [ 4] Enable interrupts again
 
    ;; Set up foreground and background colours for printing (getting them from tables)
-   ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
+   ;; -- Basically, we need to get values of the 4 bits that should be enabled when the a pixel is present
    LD  A, L                    ;; [ 4] A = ASCII code of the character
    LD  (dcm0_asciiHL+1), A     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
@@ -784,11 +784,11 @@ dcm0_restoreSP:
    ADD B                       ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
    LD  L, A                    ;; [ 4]
    LD  A, (HL)                 ;; [ 7] A = Background color bits
-   LD (dcm0_drawForeground_0-2), A ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
-   LD (dcm0_drawForeground_1-2), A ;; [13]
-   LD  A, C                    ;; [ 4] A = Foreground color bits (Previously stored into C)
-   LD (dcm0_drawForeground_0+1), A ;; [13] Modify Inmediate value of "OR #0" to set it with the background color bits
-   LD (dcm0_drawForeground_1+1), A ;; [13]
+   LD (dcm0_drawForeground_0-2), A ;; [13] <| Modify Inmediate value of "OR #0" to set it with the background color bits
+   LD (dcm0_drawForeground_1-2), A ;; [13] <|  (We do it 2 times, as 2 bits = 2 pixels = 1 byte in video memory)
+   LD  A, C                        ;; [ 4] A = Foreground color bits (Previously stored into C)
+   LD (dcm0_drawForeground_0+1), A ;; [13] <| Modify Inmediate value of "OR #0" to set it with the foreground color bits
+   LD (dcm0_drawForeground_1+1), A ;; [13] <|  (We do it 2 times too)
 
    ;; Make HL point to the starting byte of the desired character,
    ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
@@ -809,17 +809,17 @@ dcm0_asciiHL:
    DI                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
 
-   ;; Do this each pixel line (8-pixels)
+   ;; Do this for each pixel line (8-pixels)
 dcm0_nextline:
    LD C, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 0=background color, 1=foreground)
    LD B, #4                    ;; [ 7] L=4 bytes per line
    PUSH DE                     ;; [11] Save place where DE points now (start of the line) to be able to use it later to jump to next line
 
-   ;; Do this each video-memory-byte (4-pixels)
+   ;; Do this for each video-memory-byte (2-pixels)
 dcm0_next2pixels:
-   XOR A                       ;; [ 4] A = 0 (A will hold the values of the next 4 pixels in video memory. They will be calculated as Character is read)
+   XOR A                       ;; [ 4] A = 0 (A will hold the values of the next 2 pixels in video memory. They will be calculated as Character is read)
 
-   ;; Do this each pixel inside a byte (each byte has 2 pixels) 
+   ;; Transform first pixel
    SLA C                       ;; [ 8] Shift C (Char pixel line) left to know about Bit7 (next pixel) that will turn on/off the carry flag
    JP C, dcm0_drawForeground_0 ;; [10] IF Carry, bit 7 was a 1, what means foreground color
    OR  #00                     ;; [ 7] Bit7=0, draw next pixel of Background color
@@ -828,15 +828,16 @@ dcm0_drawForeground_0:
    OR  #00                     ;; [ 7] Bit7=1, draw next pixel of Foreground color
    RLCA                        ;; [ 4] Rotate A 1 bit left to prepare it for inserting next pixel color (same 2 bits will be operated but, as long as A is rotated first, we effectively operate on next 2 bits to the right)
 
-   SLA C                       ;; [ 8] Shift C (Char pixel line) left to know about Bit7 (next pixel) that will turn on/off the carry flag
-   JP C, dcm0_drawForeground_1 ;; [10] IF Carry, bit 7 was a 1, what means foreground color
-   OR  #00                     ;; [ 7] Bit7=0, draw next pixel of Background color
-   .db #0xDA  ; JP C, xxxx     ;; [10] As carry is never set after an OR, this jump will never be done, and next instruction will be 3 bytes from here (effectively jumping over OR xx without a jump) 
-dcm0_drawForeground_1:
-   OR  #00                     ;; [ 7] Bit7=1, draw next pixel of Foreground color
+   ;; Transform second pixel
+   SLA C                       ;; [ 8] <\ Do the same as first pixel, for second one
+   JP C, dcm0_drawForeground_1 ;; [10]  |
+   OR  #00                     ;; [ 7]  |
+   .db #0xDA  ; JP C, xxxx     ;; [10]  |
+dcm0_drawForeground_1:         ;;       |
+   OR  #00                     ;; [ 7] </
 
-   LD (DE), A                  ;; [ 7] Save the 4 recently calculated pixels into video memory
-   INC DE                      ;; [ 6] ... and point to next 4 pixels in video memory (next byte, DE++)
+   LD (DE), A                  ;; [ 7] Save the 2 recently calculated pixels into video memory
+   INC DE                      ;; [ 6] ... and point to next 2 pixels in video memory (next byte, DE++)
 
    DJNZ dcm0_next2pixels       ;; [13/8] If B!=0, continue with next 2 pixels of this pixel-line
 

@@ -23,31 +23,40 @@
 //
 #define CLEAR_SCREEN cpct_memset((char*)0xC000, 0x4000, 0);
 
+//
+// This function calculates next video memory location, cycling pointer
+// when it exceedes the end of video memory
+//
 unsigned char* incrementedVideoPos(unsigned char* video_pos, unsigned char inc) {
   video_pos += inc;
-  if (video_pos >= (unsigned char*)0xC7CF) 
+  if (video_pos >= (unsigned char*)0xC7CF)
     video_pos = (unsigned char*)0xC000;
 
   return video_pos;
 }
 
+
 void main(void) {
    unsigned char *video_pos = (unsigned char*)0xC000;
-   unsigned char charnum, times, fcolor, bcolor;
+   unsigned char charnum, times;
+   unsigned char colors[5];
 
+   cpct_memset((char*)colors, 5, 0);
    cpct_disableFirmware();
 
+   //
+   // Loop forever showing characters on different modes and colors
+   //
    while(1) {
       // Mode 2
       CLEAR_SCREEN
       cpct_setVideoMode(2);
 
       // Print all characters 16 times
-      fcolor=0;
       for(times=0; times < 16; times++) {
-         fcolor ^= 0x01;
+         colors[0] ^= 0x01;
          for(charnum=1; charnum != 0; charnum++) {
-            cpct_drawROMCharM2(video_pos, fcolor, charnum);
+            cpct_drawROMCharM2(video_pos, colors[0], charnum);
             video_pos = incrementedVideoPos(video_pos, 1);
          }
       }
@@ -55,17 +64,16 @@ void main(void) {
       // Mode 1
       CLEAR_SCREEN
       cpct_setVideoMode(1);
-      fcolor = bcolor = 0;
 
       // Print all characters 16 times
       for(times=0; times < 16; times++) {
          // Colors from 0 to 4
-         if (++fcolor > 3) {
-            fcolor=0;
-            bcolor = (bcolor + 1) & 0x03;
+         if (++colors[1] > 3) {
+            colors[1] = 0;
+            colors[2] = (colors[2] + 1) & 0x03;
          }
          for(charnum=1; charnum != 0; charnum++) {
-            cpct_drawROMCharM1_fast(video_pos, fcolor, bcolor, charnum);
+            cpct_drawROMCharM1_fast(video_pos, colors[1], colors[2], charnum);
             video_pos = incrementedVideoPos(video_pos, 2);
          }
       }
@@ -73,17 +81,17 @@ void main(void) {
       // Mode 0
       CLEAR_SCREEN
       cpct_setVideoMode(0);
-      fcolor = bcolor = 0;
 
       // Print all characters 64 times
-      for(times=0; times < 64; times++) {
+      for(times=0; times < 32; times++) {
          // Colors from 0 to 15
-         if (++fcolor > 15) {
-            fcolor=0;
-            bcolor = (bcolor + 1) & 0x03;
+         if (++colors[3] > 15) {
+            colors[3] = 0;
+            colors[4] = (colors[4] + 1) & 0x07;
          }
          for(charnum=1; charnum != 0; charnum++) {
-            cpct_drawROMCharM0(video_pos, fcolor, bcolor, charnum);
+            //cpct_drawROMCharM0(video_pos, colors[3], colors[4], charnum);
+            cpct_drawROMCharM0(video_pos, 15, 0, charnum);
             video_pos = incrementedVideoPos(video_pos, 4);
          }
       }
