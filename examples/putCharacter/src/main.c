@@ -69,5 +69,23 @@ void main(void) {
             video_pos = incrementedVideoPos(video_pos, 2);
          }
       }
+
+      // Mode 0
+      CLEAR_SCREEN
+      cpct_setVideoMode(0);
+      fcolor = bcolor = 0;
+
+      // Print all characters 64 times
+      for(times=0; times < 64; times++) {
+         // Colors from 0 to 15
+         if (++fcolor > 15) {
+            fcolor=0;
+            bcolor = (bcolor + 1) & 0x03;
+         }
+         for(charnum=1; charnum != 0; charnum++) {
+            cpct_drawROMCharM0(video_pos, fcolor, bcolor, charnum);
+            video_pos = incrementedVideoPos(video_pos, 4);
+         }
+      }
    }
 }
