@@ -760,7 +760,7 @@ dc_mode0_ct: .db 0x00, 0x40, 0x04, 0x44, 0x10, 0x50, 0x14, 0x54, 0x01, 0x41, 0x0
 .globl _cpct_drawROMCharM0
 _cpct_drawROMCharM0::
    ;; GET Parameters from the stack (Pop + Restoring SP)
-   LD (dcm1_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   LD (dcm0_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    DI                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                     ;; [10] AF = Return Address
    POP  DE                     ;; [10] DE = Destination address (Video memory location where character will be printed)
@@ -813,6 +813,7 @@ dcm0_asciiHL:
 dcm0_nextline:
    LD C, (HL)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 0=background color, 1=foreground)
    LD B, #4                    ;; [ 7] L=4 bytes per line
+   PUSH DE                     ;; [11] Save place where DE points now (start of the line) to be able to use it later to jump to next line
 
    ;; Do this each video-memory-byte (4-pixels)
 dcm0_next2pixels:
@@ -835,15 +836,13 @@ dcm0_drawForeground_1:
    OR  #00                     ;; [ 7] Bit7=1, draw next pixel of Foreground color
 
    LD (DE), A                  ;; [ 7] Save the 4 recently calculated pixels into video memory
-
-   DEC B                       ;; [ 4] B-- (1 byte less to finish this line)
-   JP Z, dcm0_endpixelline     ;; [10] If L=0, we have finished the line
-
    INC DE                      ;; [ 6] ... and point to next 4 pixels in video memory (next byte, DE++)
 
-   JP dcm0_next2pixels         ;; [10] Continue with next 4 pixels
+   DJNZ dcm0_next2pixels       ;; [13/8] If B!=0, continue with next 2 pixels of this pixel-line
 
 dcm0_endpixelline:
+   POP DE                      ;; [10] Recover previous DE position, to use it now for jumping to next video memory line
+
    ;; Move to next pixel-line definition of the character
    INC L                       ;; [ 4] Next pixel Line (characters are 8-byte-aligned in memory, so we only need to increment L, as H will not change)
    LD  A, L                    ;; [ 4] IF next pixel line corresponds to a new character (this is, we have finished drawing our character),
@@ -852,7 +851,6 @@ dcm0_endpixelline:
 
    ;; Prepare to copy next line 
    ;;  -- Move DE pointer to the next pixel line on the video memory
-   DEC DE                      ;; [ 6] DE-- : Restore DE to previous position in memory (it has moved 1 byte forward)
    LD  A, D                    ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
    ADD #0x08                   ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
    LD  D, A                    ;; [ 4]
