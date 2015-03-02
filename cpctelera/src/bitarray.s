@@ -273,6 +273,7 @@ g2b_end:                            ; 0:22, 1:54, 2:60 3:42
 ;### also that the given position is not bigger than the number of    ###
 ;### groups of four bits in the array (size of the array multiplied   ###
 ;### by 4). The value to set is also asumed to be lower than 4.       ###
+;### Limitations: Maximum of 65536 2bit-groups, 16384 bytes per array ###
 ;########################################################################
 ;### INPUTS (5 Bytes)                                                 ###
 ;###  * (2B DE) Array Pointer                                         ###
@@ -357,7 +358,7 @@ s2b_end:
 
 ;
 ;########################################################################
-;### FUNCTION: cpct_get4Bits					                            ###
+;### FUNCTION: cpct_get4Bits                                          ###
 ;########################################################################
 ;### Returns an integer from 0 to 15 depending on the value of the    ###
 ;### group of 4 bits at the given position in the specified array.    ###
@@ -365,71 +366,63 @@ s2b_end:
 ;### also that the given position is not bigger than the number of    ###
 ;### groups of four bits in the array (size of the array multiplied   ###
 ;### by 2).                                                           ###
+;### Limitations: Maximum of 65536 4bit-groups, 32768 bytes per array ###
 ;########################################################################
 ;### INPUTS (4 Bytes)                                                 ###
 ;###  * (2B) Array Pointer                                            ###
 ;###  * (2B) Position of the group of four bits in the array          ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  A value from 0 to 15 in HL				                      ###
+;###  L = integer from 0 to 15                                        ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###  Not computed 	                                                  ###
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
+;########################################################################
+;### MEASURES                                                         ###
+;### MEMORY: xx bytes                                                 ###
+;### TIME:                                                            ###
+;###   Best Case  (x) = xxx cycles ( xx.xx us)                        ###
+;###   Worst Case (x) = xxx cycles ( xx,xx us)                        ###
 ;########################################################################
 ;
 .globl _cpct_get4Bits
 _cpct_get4Bits::
 
-	pop 	af
-	pop 	de
-	pop 	hl 
-	push 	hl 
-	push 	de
-	push 	af				;; Stack:
+   ;; Get parameters from the stack
+   POP   AF            ;; [10] AF = Return address
+   POP   DE            ;; [10] DE = Pointer to the array in memory
+   POP   HL            ;; [10] HL = Index of the bit we want to get
+   PUSH  HL            ;; [11] << Restore stack status
+   PUSH  DE            ;; [11]
+   PUSH  AF            ;; [11]
 
-	sla 	l 				;; HL <- pos*2 with one left shift.
-	rl 		h
-
-	ld		c, l 			;; BC = pos*2+1
-	ld		b, h
-	inc		bc
-
-	push	hl 				;; Stack: pos*2
-	push	bc 				;; Stack: pos*2+1 | pos*2
-	push	de 				;; Stack: array | pos*2+1 | pos*2
-
-	call	_cpct_get2Bits	;; HL = bitPair2Val
-
-							;; Stack: array | pos*2+1 | pos*2
-	pop		de 				;; Stack: pos*2+1 | pos*2
-	pop 	bc 				;; Stack: pos*2
-	pop 	bc 				;; Stack:
-	push 	hl 				;; Stack: bitPair2Val
-	push 	bc 				;; Stack: pos*2 | bitPair2Val
-	push 	de 				;; Stack: array | pos*2 | bitPair2Val
-
-	call	_cpct_get2Bits	;; HL = bitPair1Val
-
-							;; Stack: array | pos*2 | bitPair2Val
-	pop		de 				;; Stack: pos*2 | bitPair2Val
-	pop 	de 				;; Stack: bitPair2Val
-	pop 	de 				;; Stack:
-
-	;; DE = bitPair2Val, HL = bitPair1Val
-
-	sla 	l 				;; HL <- bitPair1Val*4 with two left shifts.
-	rl 		h
-	sla 	l 
-	rl 		h
-
-	add 	hl, de 			;; HL <- bitPair1Val*4 + bitPair2Val
-
-	ret
-
+   ;; We need to know how many bytes do we have to
+   ;; jump into the array, to move HL to that point.
+   ;; We advance 1 byte for each 2 index positions (8 bits)
+   ;; So, first, we calculate INDEX/2 (HL/2) to know the target byte, and
+   ;;  the remainder to know the group of 4bits we want [ 0000 1111 ]
+   SRL   H             ;; [ 8]
+   RR    L             ;; [ 8] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
+   JP C, g4b_getGroup1 ;; [10]
+   ADD  HL, DE         ;; [11] HL += DE => HL points to the target byte in the array 
+   LD   A, (HL)        ;; [ 7]
+   RRCA                ;; [ 4]
+   RRCA                ;; [ 4]
+   RRCA                ;; [ 4]
+   RRCA                ;; [ 4]
+   AND  #0x0F          ;; [ 7]
+   LD   L, A           ;; [ 4]
+   RET                 ;; [10]
+g4b_getGroup1:
+   ADD  HL, DE         ;; [11] HL += DE => HL points to the target byte in the array 
+   LD   A, (HL)        ;; [ 7]
+   AND  #0x0F          ;; [ 7]
+   LD   L, A           ;; [ 4]
+   RET                 ;; [10]
 
 ;
 ;########################################################################
-;### FUNCTION: cpct_set4Bits					                      ###
+;### FUNCTION: cpct_set4Bits                                          ###
 ;########################################################################
 ;### Set the the value of the group of 4 bits at the given position   ###
 ;### in the specified array to a given value.                         ###
@@ -437,74 +430,59 @@ _cpct_get4Bits::
 ;### also that the given position is not bigger than the number of    ###
 ;### groups of four bits in the array (size of the array multiplied   ###
 ;### by 2). The value to set is also asumed to be lower than 16.      ###
+;### Limitations: Maximum of 65536 4bit-groups, 32768 bytes per array ###
 ;########################################################################
-;### INPUTS (4 Bytes)                                                 ###
-;###  * (2B) Array Pointer                                            ###
-;###  * (2B) Position of the group of four bits in the array          ###
-;###  * (2B) Value from 0 to 15 to set in the given position          ###
+;### INPUTS (5 Bytes)                                                 ###
+;###  * (2B DE) Array Pointer                                         ###
+;###  * (2B HL) Position of the group of four bits in the array       ###
+;###  * (1B C) Value from 0 to 15 to set in the given position        ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL	                      ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###  Not computed 	                                                  ###
+;### MEASURES                                                         ###
+;### MEMORY: xx bytes                                                 ###
+;### TIME:                                                            ###
+;###   Best Case  (x) = xxx cycles ( xx.xx us)                        ###
+;###   Worst Case (x) = xxx cycles ( xx,xx us)                        ###
 ;########################################################################
 ;
 .globl _cpct_set4Bits
 _cpct_set4Bits::
 
-	pop 	af
-	pop 	de
-	pop 	bc 
-	pop 	hl
-	push 	hl 
-	push 	bc 
-	push 	de
-	push 	af 				;; Stack:
+   ;; GET Parameters from the stack (Pop + Restoring SP)
+   LD (s4b_restoreSP+1), SP ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   POP  AF                  ;; [10] AF = Return Address
+   POP  DE                  ;; [10] DE = Pointer to the bitarray in memory
+   POP  HL                  ;; [10] HL = Index of the bit to be set
+   POP  BC                  ;; [10] BC => C = Set Value (0-15), B = Undefined
+s4b_restoreSP:
+   LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                       ;; [ 4] Enable interrupts again
 
-	push	hl 				;; AF <- value
+   LD  A, #0x0F        ;; [ 7]
+   LD  B, #0xF0        ;; [ 7]
+   AND C               ;; [ 4]
 
-	srl 	h 				;; HL <- value/4 with two rigth shifts.
-	rr 		l
-	srl 	h 
-	rr 		l
-
-	pop		af
-	push 	hl 				;; Stack: value/4
-
-	push 	af 				;; hl <- value 
-	pop		hl
-
-	ld 		a, l 			;; HL = value%4
-	and 	a, #0x03
-	ld 		l, a
-	ld 		h, #0x00
-
-	sla 	c 				;; HL <- pos*2 with one left shift.
-	rl 		b
-
-	push	bc 				;; Stack: pos*2 | value/4
-
-	inc		bc 				;; BC = pos*2+1
-
-	push	hl 				;; Stack: value%4 | pos*2 | value/4
-	push	bc 				;; Stack: pos*2+1 | value%4 | pos*2 | value/4
-	push	de 				;; Stack: array | pos*2+1 | value%4 | pos*2 | value/4
-
-	call	_cpct_set2Bits
-
-							;; Stack: array | pos*2+1 | value%4 | pos*2 | value/4
-	pop		de 				;; Stack: pos*2+1 | value%4 | pos*2 | value/4
-	pop 	bc 				;; Stack: value%4 | pos*2 | value/4
-	pop 	bc 				;; Stack: pos*2 | value/4
-
-	push 	de 				;; Stack: array | pos*2 | value/4
-
-	call	_cpct_set2Bits
-
-							;; Stack: array | pos*2 | value/4
-	pop		de 				;; Stack: pos*2 | value/4
-	pop 	de 				;; Stack: value/4
-	pop 	de 				;; Stack:
-
-	ret
+   ;; We need to know how many bytes do we have to
+   ;; jump into the array, to move HL to that point.
+   ;; We advance 1 byte for each 2 index positions (8 bits)
+   ;; So, first, we calculate INDEX/2 (HL/2) to know the target byte, and
+   ;;  the remainder to know the group of 4bits we want [ 0000 1111 ]
+   SRL   H             ;; [ 8]
+   RR    L             ;; [ 8] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
+   JP C, s4b_setGroup1 ;; [10]
+   RRCA                ;; [ 4]
+   RRCA                ;; [ 4]
+   RRCA                ;; [ 4]
+   RRCA                ;; [ 4]
+   LD  B, #0x0F        ;; [ 7]
+s4b_setGroup1:
+   ADD  HL, DE         ;; [11] HL += DE => HL points to the target byte in the array 
+   LD   C, A           ;; [ 4]
+   LD   A, (HL)        ;; [ 7]
+   AND  B              ;; [ 4]
+   OR   C              ;; [ 4]
+   LD   (HL), A        ;; [ 7]
+   RET                 ;; [10]
