@@ -120,10 +120,10 @@ _cpct_getBit::
 ;###  Destroyed Register values: AF, BC, DE, HL	                      ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 56 bytes (8 table + 48 code)                             ###
+;### MEMORY: 54 bytes (8 table + 46 code)                             ###
 ;### TIME:                                                            ###
-;###   Best Case  (1) = 236 cycles ( 59.00 us)                        ###                                                            ###
-;###   Worst Case (0) = 247 cycles ( 61.75 us)                        ###                                                            ###
+;###   Best Case  (1) = 211 cycles ( 52.75 us)                        ###                                                            ###
+;###   Worst Case (0) = 222 cycles ( 55.50 us)                        ###                                                            ###
 ;########################################################################
 ;
 .globl _cpct_setBit
@@ -139,18 +139,8 @@ sb_restoreSP:
    LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                       ;; [ 4] Enable interrupts again
 
-   PUSH  BC                 ;; [11] Save BC for later use
-
-   ;; We only access bytes at once in memory. We need to calculate which
-   ;; bit will we have to test in the target byte of our array. That will be
-   ;; the remainder of INDEX/8, as INDEX/8 represents the byte to access.
-   LD    BC, #cpct_bitWeights ;; [10] BC = Pointer to the start of the bitWeights array
-   LD    A, L                 ;; [ 4]
-   AND  #0x07                 ;; [ 7] A = L % 8       (bit number to be tested from the target byte of the array) 
-   ADD   C                    ;; [ 4] A += C          (We can do this because we know the vector is 8-byte aligned, and incrementing C by less than 8 will never modify B)
-   LD    C, A                 ;; [ 4] BC = BC + L % 8 (Points to the weight of the bit number that is to be tested in the target byte of the array)
-   LD    A, (BC)              ;; [ 7] A = BC [L % 8]  (bit weight to be tested in the target byte of the array)
-
+   LD  A, L                 ;; [ 4] Save L into A for later use (Knowing which bit to access into the target byte => L % 8)
+   
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 8 index positions (8 bits)
@@ -161,16 +151,26 @@ sb_restoreSP:
    RR   L                  ;; [ 8]
    SRL  H                  ;; [ 8]
    RR   L                  ;; [ 8] HL = HL / 8 (Target byte index into the array pointed by DE)
-
-   ;; Reach the target byte and set/reset the bit using the bit weight stored in A
    ADD  HL, DE             ;; [11] HL += DE => HL points to the target byte in the array 
-   POP  BC                 ;; [10] Recover de value of C, previously saved on the stack
-   BIT  0, C               ;; [ 8] Test bit 0 to know if we are setting (1) or resetting (0)
-   JP NZ, sb_setBitTo1     ;; [10] If Bit=1, We have to set the bit with OR, else we have to reset it with AND
+
+   ;; Calculate which bit will we have to test in the target byte. That will be
+   ;; the remainder of INDEX/8, as INDEX/8 represents the byte to access. 
+   ;; Knowing which bit to access, we transform it into 2^bitnum, to have its bit weight:
+   ;;   a byte with only bitnum bit on, and the rest off. cpct_bitWeights table contains this.
+   LD    DE, #cpct_bitWeights ;; [10] DE = Pointer to the start of the bitWeights array
+   AND  #0x07                 ;; [ 7] A = L % 8       (bit number to be tested from the target byte of the array) 
+   ADD   E                    ;; [ 4] A += E          (We can do this because we know the vector is 8-byte aligned, and incrementing E by less than 8 will never modify D)
+   LD    E, A                 ;; [ 4] DE = DE + L % 8 (Points to the weight of the bit number that is to be tested in the target byte of the array)
+   LD    A, (DE)              ;; [ 7] A = DE [L % 8]  (bit weight to be tested in the target byte of the array)
+
+   ;; Set/reset the bit of the target byte, using the bit weight stored in A
+   BIT 0, C                ;; [ 4] Test bit 0 to know if we are setting (1) or resetting (0)
+   JP NZ, sb_setBit        ;; [10] If Bit=1, We have to set the bit with OR, else we have to reset it with AND
+sb_resetBit:   
    CPL                     ;; [ 4] A = !A (All bits to 1 except the bit we want to reset)
    AND (HL)                ;; [ 7] Reset the bit making and AND with only the selected bit to 0
    .db #0x38   ; JR C, xx  ;; [ 7] Fake jumping over OR(HL). Carry is never set after and AND.
-sb_setBitTo1:
+sb_setBit:
    OR (HL)                 ;; [ 7] Setting the bit with an OR.
 
    LD  (HL), A             ;; [ 7] Saving the new byte in memory, with the bit setted/resetted
@@ -263,6 +263,55 @@ g2b_end:                            ; 0:22, 1:54, 2:60 3:42
 
 ;
 ;########################################################################
+;### FUNCTION: cpct_set2Bits                                          ###
+;########################################################################
+;### Set the the value of the group of 2 bits at the given position   ###
+;### in the specified array to a given value.                         ###
+;### It will asume that the array elements have a size of 8 bits and  ###
+;### also that the given position is not bigger than the number of    ###
+;### groups of four bits in the array (size of the array multiplied   ###
+;### by 4). The value to set is also asumed to be lower than 4.       ###
+;########################################################################
+;### INPUTS (5 Bytes)                                                 ###
+;###  * (2B DE) Array Pointer                                         ###
+;###  * (2B HL) Position of the group of four bits in the array       ###
+;###  * (1B C) Value from 0 to 3  to set in the given position        ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL	                      ###
+;########################################################################
+;### MEASURED TIME                                                    ###
+;###  Not computed 	                                                 ###
+;########################################################################
+;
+.globl _cpct_set2Bits
+_cpct_set2Bits::
+   ;; GET Parameters from the stack (Pop + Restoring SP)
+   LD (s2b_restoreSP+1), SP ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   POP  AF                  ;; [10] AF = Return Address
+   POP  DE                  ;; [10] DE = Pointer to the bitarray in memory
+   POP  HL                  ;; [10] HL = Index of the bit to be set
+   POP  BC                  ;; [10] BC => C = Set Value (0/1), B = Undefined
+s2b_restoreSP:
+   LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                       ;; [ 4] Enable interrupts again
+
+   ;; We need to know how many bytes do we have to 
+   ;; jump into the array, to move HL to that point.
+   ;; We advance 1 byte for each 4 index positions (8 bits)
+   ;; So, first, we calculate INDEX/4 (HL/4) to know the target byte.
+   SRL   H           ;; [ 8]
+   RR    L           ;; [ 8]
+   SRL   H           ;; [ 8]
+   RR    L           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
+   ADD  HL, DE       ;; [11] HL += DE => HL points to the target byte in the array 
+   LD    A, (HL)     ;; [ 7] A = array[index] Get the byte where our 2 target bits are located
+
+   RET                 ;; [10] Return to caller
+
+;
+;########################################################################
 ;### FUNCTION: cpct_get4Bits					                      ###
 ;########################################################################
 ;### Returns an integer from 0 to 15 depending on the value of the    ###
@@ -329,87 +378,6 @@ _cpct_get4Bits::
 	rl 		h
 
 	add 	hl, de 			;; HL <- bitPair1Val*4 + bitPair2Val
-
-	ret
-
-;
-;########################################################################
-;### FUNCTION: cpct_set2Bits					                      ###
-;########################################################################
-;### Set the the value of the group of 2 bits at the given position   ###
-;### in the specified array to a given value.                         ###
-;### It will asume that the array elements have a size of 8 bits and  ###
-;### also that the given position is not bigger than the number of    ###
-;### groups of four bits in the array (size of the array multiplied   ###
-;### by 4). The value to set is also asumed to be lower than 4.       ###
-;########################################################################
-;### INPUTS (4 Bytes)                                                 ###
-;###  * (2B) Array Pointer                                            ###
-;###  * (2B) Position of the group of four bits in the array          ###
-;###  * (2B) Value from 0 to 3  to set in the given position          ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL	                      ###
-;########################################################################
-;### MEASURED TIME                                                    ###
-;###  Not computed 	                                                  ###
-;########################################################################
-;
-.globl _cpct_set2Bits
-_cpct_set2Bits::
-
-	pop 	af
-	pop 	de 				;; DE <- array
-	pop 	bc  			;; BC <- pos
-	pop 	hl 				;; HL <- value
-	push 	hl 
-	push 	bc 
-	push 	de
-	push 	af 				;; Stack:
-
-	push	hl 				;; Stack: value
-
-	srl 	h 				;; HL <- value/2 with one right shift.
-	rr 		l
-
-	pop		af
-	push 	hl 				;; Stack: value/2
-
-	push 	af 				;; HL <- value 
-	pop		hl
-
-	ld 		a, l 			;; HL = value%2
-	and 	a, #0x01
-	ld 		l, a
-	ld 		h, #0x00
-	;;add 	hl, hl
-
-	sla 	c 				;; BC <- pos*2 with one left shift.
-	rl 		b
-
-	push	bc 				;; Stack: pos*2 | value/2
-
-	inc		bc 				;; BC = pos*2+1
-
-	push	hl 				;; Stack: value%2 | pos*2 | value/2
-	push	bc 				;; Stack: pos*2+1 | value%2 | pos*2 | value/2
-	push	de 				;; Stack: array | pos*2+1 | value%2 | pos*2 | value/2
-
-	call	_cpct_setBit
-
-							;; Stack: array | pos*2+1 | value%2 | pos*2 | value/2
-	pop		de 				;; Stack: pos*2+1 | value%2 | pos*2 | value/2
-	pop 	bc 				;; Stack: value%2 | pos*2 | value/2
-	pop 	bc 				;; Stack: pos*2 | value/2
-
-	push 	de 				;; Stack: array | pos*2 | value/2
-
-	call	_cpct_setBit
-
-							;; Stack: array | pos*2 | value/2
-	pop		de 				;; Stack: pos*2 | value/2
-	pop 	de 				;; Stack: value/2
-	pop 	de 				;; Stack:
 
 	ret
 
