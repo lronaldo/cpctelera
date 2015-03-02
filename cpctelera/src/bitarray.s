@@ -272,7 +272,9 @@ g2b_end:                            ; 0:22, 1:54, 2:60 3:42
 ;### It will asume that the array elements have a size of 8 bits and  ###
 ;### also that the given position is not bigger than the number of    ###
 ;### groups of four bits in the array (size of the array multiplied   ###
-;### by 4). The value to set is also asumed to be lower than 4.       ###
+;### by 4).                                                           ###
+;### The function expects a value from 0 to 3. However, if a greater  ###
+;### value is given, it will be cropped (only bits 0 & 1 will be used)###
 ;### Limitations: Maximum of 65536 2bit-groups, 16384 bytes per array ###
 ;########################################################################
 ;### INPUTS (5 Bytes)                                                 ###
@@ -379,10 +381,10 @@ s2b_end:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: xx bytes                                                 ###
+;### MEMORY: 29 bytes                                                 ###
 ;### TIME:                                                            ###
-;###   Best Case  (x) = xxx cycles ( xx.xx us)                        ###
-;###   Worst Case (x) = xxx cycles ( xx,xx us)                        ###
+;###   Best Case  (1) = 128 cycles ( 32.00 us)                        ###
+;###   Worst Case (0) = 151 cycles ( 37.75 us)                        ###
 ;########################################################################
 ;
 .globl _cpct_get4Bits
@@ -400,25 +402,27 @@ _cpct_get4Bits::
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 2 index positions (8 bits)
    ;; So, first, we calculate INDEX/2 (HL/2) to know the target byte, and
-   ;;  the remainder to know the group of 4bits we want [ 0000 1111 ]
+   ;;  the remainder to know the group of 4bits we want [ 0000 1111 ], and 
+   ;;  that will go to the Carry Flag.
    SRL   H             ;; [ 8]
    RR    L             ;; [ 8] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
-   JP C, g4b_getGroup1 ;; [10]
+   JP C, g4b_getGroup1 ;; [10] IF Carry, then we want the 4bits in the group 1, 
+gb4_getGroup0:
    ADD  HL, DE         ;; [11] HL += DE => HL points to the target byte in the array 
-   LD   A, (HL)        ;; [ 7]
-   RRCA                ;; [ 4]
-   RRCA                ;; [ 4]
-   RRCA                ;; [ 4]
-   RRCA                ;; [ 4]
-   AND  #0x0F          ;; [ 7]
-   LD   L, A           ;; [ 4]
-   RET                 ;; [10]
+   LD   A, (HL)        ;; [ 7] A = Target byte
+   RRCA                ;; [ 4] <| As we want the grop 0 (4 most significant bits), we rotate them
+   RRCA                ;; [ 4]  | 4 times and place them in bits 0 to 3. This makes it easier to
+   RRCA                ;; [ 4]  | return the value from 0 to 15, as we only will have to leave this 4
+   RRCA                ;; [ 4] <| bits out with and AND
+   AND  #0x0F          ;; [ 7] Leave out the 4 bits we wanted
+   LD   L, A           ;; [ 4] Move the return value to L
+   RET                 ;; [10] Return to the caller
 g4b_getGroup1:
    ADD  HL, DE         ;; [11] HL += DE => HL points to the target byte in the array 
-   LD   A, (HL)        ;; [ 7]
-   AND  #0x0F          ;; [ 7]
-   LD   L, A           ;; [ 4]
-   RET                 ;; [10]
+   LD   A, (HL)        ;; [ 7] A = Target byte
+   AND  #0x0F          ;; [ 7] As we want group 1 (bits 0 to 3) we just need to leave these 4 bits out with an AND operation
+   LD   L, A           ;; [ 4] Move the return value to L
+   RET                 ;; [10] Return to the caller
 
 ;
 ;########################################################################
@@ -429,7 +433,9 @@ g4b_getGroup1:
 ;### It will asume that the array elements have a size of 8 bits and  ###
 ;### also that the given position is not bigger than the number of    ###
 ;### groups of four bits in the array (size of the array multiplied   ###
-;### by 2). The value to set is also asumed to be lower than 16.      ###
+;### by 2).                                                           ###
+;### The function expects a value in the range 0-15, but any value    ###
+;### greater than that will be cropped (only bits 0-3 will be used)   ###
 ;### Limitations: Maximum of 65536 4bit-groups, 32768 bytes per array ###
 ;########################################################################
 ;### INPUTS (5 Bytes)                                                 ###
@@ -441,10 +447,10 @@ g4b_getGroup1:
 ;###  Destroyed Register values: AF, BC, DE, HL	                      ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: xx bytes                                                 ###
+;### MEMORY: 38 bytes                                                 ###
 ;### TIME:                                                            ###
-;###   Best Case  (x) = xxx cycles ( xx.xx us)                        ###
-;###   Worst Case (x) = xxx cycles ( xx,xx us)                        ###
+;###   Best Case  (1) = 169 cycles ( 42.25 us)                        ###
+;###   Worst Case (0) = 192 cycles ( 48.00 us)                        ###
 ;########################################################################
 ;
 .globl _cpct_set4Bits
@@ -461,28 +467,30 @@ s4b_restoreSP:
    LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                       ;; [ 4] Enable interrupts again
 
-   LD  A, #0x0F        ;; [ 7]
-   LD  B, #0xF0        ;; [ 7]
-   AND C               ;; [ 4]
+   LD  A, #0x0F        ;; [ 7] A = 0F  <| Setting up masks for getting upper or lower nibble (4 bits)
+   LD  B, #0xF0        ;; [ 7] B = F0  <|
+   AND C               ;; [ 4] C = Value to be set (ensure it is in the range 0-15)
 
    ;; We need to know how many bytes do we have to
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 2 index positions (8 bits)
    ;; So, first, we calculate INDEX/2 (HL/2) to know the target byte, and
-   ;;  the remainder to know the group of 4bits we want [ 0000 1111 ]
+   ;;  the remainder to know the group of 4bits we want [ 0000 1111 ], and 
+   ;;  that will go to the Carry Flag.
    SRL   H             ;; [ 8]
    RR    L             ;; [ 8] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
-   JP C, s4b_setGroup1 ;; [10]
-   RRCA                ;; [ 4]
-   RRCA                ;; [ 4]
-   RRCA                ;; [ 4]
-   RRCA                ;; [ 4]
-   LD  B, #0x0F        ;; [ 7]
+   JP C, s4b_setGroup1 ;; [10] IF Carry is set, then last bit of L was 1, we have to set group 1 (bits 0 to 4)
+s4b_setGroup0:
+   RRCA                ;; [ 4] <| As we are goint to set the grop 0 (4 most significant bits), we rotate the
+   RRCA                ;; [ 4]  | value 4 times and place it in bits 4 to 7
+   RRCA                ;; [ 4]  |
+   RRCA                ;; [ 4] <|
+   LD  B, #0x0F        ;; [ 7] We need a diferent mask, as we want to leave out only bits from 0 to 3
 s4b_setGroup1:
    ADD  HL, DE         ;; [11] HL += DE => HL points to the target byte in the array 
-   LD   C, A           ;; [ 4]
-   LD   A, (HL)        ;; [ 7]
-   AND  B              ;; [ 4]
-   OR   C              ;; [ 4]
-   LD   (HL), A        ;; [ 7]
-   RET                 ;; [10]
+   LD   C, A           ;; [ 4] C = Value to be set
+   LD   A, (HL)        ;; [ 7] A = Target Byte
+   AND  B              ;; [ 4] Mask A to reset the bits we want to set
+   OR   C              ;; [ 4] Set our value in the 4 bits previously resetted
+   LD   (HL), A        ;; [ 7] Save the byte again in the array
+   RET                 ;; [10] Return to the caller
