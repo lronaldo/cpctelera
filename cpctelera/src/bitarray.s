@@ -27,16 +27,6 @@
 ;######################################################################
 ;
 
-_cpct_bitWeights:
-	.dw #0x0001
-	.dw #0x0002
-	.dw #0x0004
-	.dw #0x0008
-	.dw #0x0010
-	.dw #0x0020
-	.dw #0x0040
-	.dw #0x0080
-
 ;
 ;########################################################################
 ;### FUNCTION: cpct_getBit                                            ###
@@ -61,7 +51,7 @@ _cpct_bitWeights:
 ;########################################################################
 ;### MEASURES                                                         ###
 ;### MEMORY: 39 bytes (8 table + 31 code)                             ###
-;### TIME: 179 cycles ( 44.75 us)                                     ###                                                            ###
+;### TIME: 179 cycles ( 44.75 us)                                     ###
 ;########################################################################
 ;
 
@@ -139,17 +129,17 @@ _cpct_getBit::
 .globl _cpct_setBit
 _cpct_setBit::
    ;; GET Parameters from the stack (Pop + Restoring SP)
-   LD (sb_restoreSP+1), SP     ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   DI                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   POP  AF                     ;; [10] AF = Return Address
-   POP  DE                     ;; [10] DE = Pointer to the bitarray in memory
-   POP  HL                     ;; [10] HL = Index of the bit to be set
-   POP  BC                     ;; [10] BC => C = Set Value (0/1), B = Undefined
+   LD (sb_restoreSP+1), SP  ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   DI                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   POP  AF                  ;; [10] AF = Return Address
+   POP  DE                  ;; [10] DE = Pointer to the bitarray in memory
+   POP  HL                  ;; [10] HL = Index of the bit to be set
+   POP  BC                  ;; [10] BC => C = Set Value (0/1), B = Undefined
 sb_restoreSP:
-   LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   EI                          ;; [ 4] Enable interrupts again
+   LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   EI                       ;; [ 4] Enable interrupts again
 
-   PUSH  BC                    ;; [11] Save BC for later use
+   PUSH  BC                 ;; [11] Save BC for later use
 
    ;; We only access bytes at once in memory. We need to calculate which
    ;; bit will we have to test in the target byte of our array. That will be
@@ -187,6 +177,7 @@ sb_setBitTo1:
 
    RET                     ;; [10] Return to caller 
 
+
 ;
 ;########################################################################
 ;### FUNCTION: cpct_get2Bits                                          ###
@@ -197,65 +188,78 @@ sb_setBitTo1:
 ;### also that the given position is not bigger than the number of    ###
 ;### groups of two bits in the array (size of the array multiplied    ###
 ;### by four).                                                        ###
+;### Limitations: Maximum of 65536 2bit-groups, 16384 bytes per array ###
 ;########################################################################
 ;### INPUTS (4 Bytes)                                                 ###
-;###  * (2B) Array Pointer                                            ###
-;###  * (2B) Position of the group of two bits in the array           ###
+;###  * (2B DE) Array Pointer                                         ###
+;###  * (2B HL) Position of the bit in the array                      ###
+;########################################################################
+;### RETURN VALUE                                                     ###
+;###  L = {0, 1, 2, 3} Value read from 2bitvector                     ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  0, 1, 2 or 3 in HL     					                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###  Not computed 	                                                  ###
+;### MEASURES                                                         ###
+;### MEMORY: 39 bytes (8 table + 31 code)                             ###
+;### TIME:                                                            ###
+;###   Best Case  (0) = 160 cycles ( 40.00 us)                        ###
+;###   Worst Case (2) = 198 cycles ( 49,50 us)                        ###
 ;########################################################################
 ;
+
 .globl _cpct_get2Bits
 _cpct_get2Bits::
 
-	pop 	af
-	pop 	de
-	pop 	hl 
-	push 	hl 
-	push 	de
-	push 	af				;; Stack:
+   ;; Get parameters from the stack
+   POP   AF          ;; [10] AF = Return address
+   POP   DE          ;; [10] DE = Pointer to the array in memory
+   POP   HL          ;; [10] HL = Index of the bit we want to get
+   PUSH  HL          ;; [11] << Restore stack status
+   PUSH  DE          ;; [11]
+   PUSH  AF          ;; [11]
 
-	sla 	l 				;; HL <- pos*2 with one left shift.
-	rl 		h
+   LD   B, L         ;; [ 4] B = L (Save L into B, to use it later for calculating the required group of 2 bits we are accessing)
 
-	ld		c, l 			;; BC = pos*2+1
-	ld		b, h
-	inc		bc
+   ;; We need to know how many bytes do we have to 
+   ;; jump into the array, to move HL to that point.
+   ;; We advance 1 byte for each 4 index positions (8 bits)
+   ;; So, first, we calculate INDEX/4 (HL/4) to know the target byte.
+   SRL   H           ;; [ 8]
+   RR    L           ;; [ 8]
+   SRL   H           ;; [ 8]
+   RR    L           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
+   ADD  HL, DE       ;; [11] HL += DE => HL points to the target byte in the array 
+   LD    A, (HL)     ;; [ 7] A = array[index] Get the byte where our 2 target bits are located
 
-	push	hl 				;; Stack: pos*2
-	push	bc 				;; Stack: pos*2+1 | pos*2
-	push	de 				;; Stack: array | pos*2+1 | pos*2
+   ;; Move the 2 required bits to the least significant position (bits 0 & 1)
+   ;;   This is done to make easier the opperation of returning a value from 0 to 3 (represented by the 2 bits searched).
+   ;;   Once the bits are at least significant position, we only have to AND them and we are done.
+   ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be returned
+   ;;   inside the target byte [ 0 0 | 1 1 | 2 2 | 3 3 ].
+   DEC B               ;; [ 4] If B=0, B-- is negative, turning on S flag
+   JP M, g2b_B_is_0    ;; [10] IF S flag is on, B was 0
+   DEC B               ;; [ 4] B-- (second time, so B-=2)
+   JP P, g2b_B_is_2or3 ;; [10] If S flag is off, B was > 1, else B was 1
+g2b_B_is_1:
+   RLCA                ;; [ 4] <| Move bits 5 & 4 to positions 0 & 1 with 4 left rotations
+   RLCA                ;; [ 4] <|
+   JP g2b_B_is_0       ;; [10] We have done 2 rotations, and jump to B_is_0, to make another 2 rotations
+g2b_B_is_2or3:
+   DEC B               ;; [ 4] B-- (third time, so B-=3)
+   JP P, g2b_end       ;; [10] IF S flag is off, B was >2 (3), else B was 2
+g2b_B_is_2:
+   RRCA                ;; [ 4] <| Move bits 2 & 3 to positions 0 & 1 with 2 right rotations
+   RRCA                ;; [ 4] <|
+   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is not set. Value XX is got from next 2 bytes, which are RLCA;RLCA. Not jumping leaves us 3 bytes from here, at g2b_end)
+g2b_B_is_0:
+   RLCA                ;; [ 4] <| Move bits 7 & 6 to positions 0 & 1 with 2 left rotations
+   RLCA                ;; [ 4] <|
+g2b_end:                            ; 0:22, 1:54, 2:60 3:42
+   AND #0x03           ;; [ 7] Leave out the 2 required bits (bits 0 & 1, at least significant positions).
+   LD   L, A           ;; [ 4] Set the return value in L 
 
-	call	_cpct_getBit	;; HL = bit2Val
-
-							;; Stack: array | pos*2+1 | pos*2
-	pop		de 				;; Stack: pos*2+1 | pos*2
-	pop 	bc 				;; Stack: pos*2
-	pop 	bc 				;; Stack:
-	push 	hl 				;; Stack: bit2Val
-	push 	bc 				;; Stack: pos*2 | bit2Val
-	push 	de 				;; Stack: array | pos*2 | bit2Val
-
-	call	_cpct_getBit	;; HL = bit1Val
-
-							;; Stack: array | pos*2 | bit2Val
-	pop		de 				;; Stack: pos*2 | bit2Val
-	pop 	de 				;; Stack: bit2Val
-	pop 	de 				;; Stack:
-
-	;; DE = bit2Val, HL = bit1Val
-
-	sla 	l 				;; HL <- bit1Val*2 with one left shift.
-	rl 		h
-
-	add 	hl, de 			;; HL <- bit1Val*2 + bit2Val
-
-	ret
-
+   RET                 ;; [10] Return to caller
 
 ;
 ;########################################################################

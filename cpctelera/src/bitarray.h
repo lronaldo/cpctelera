@@ -1,15 +1,34 @@
+//-----------------------------LICENSE NOTICE------------------------------------
+//  This file is part of CPCtelera: An Amstrad CPC Game Engine
+//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2015 Alberto García García
+//  Copyright (C) 2015 Pablo Martínez González
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//-------------------------------------------------------------------------------
 #ifndef CPCT_BITARRAY_H
 #define CPCT_BITARRAY_H
 
 ///
 /// Function Declarations
 ///
-extern char cpct_getBit(char *array, unsigned int pos);
-extern char cpct_get2Bits(char *array, unsigned int pos);
-extern char cpct_get4Bits(char *array, unsigned int pos);
+extern unsigned char cpct_getBit(void *array, unsigned int pos);
+extern unsigned char cpct_get2Bits(void *array, unsigned int pos);
+extern unsigned char cpct_get4Bits(void *array, unsigned int pos);
 
-extern void cpct_setBit(char *array, unsigned int pos, unsigned char value);
-extern void cpct_set2Bits(char *array, unsigned int pos, unsigned int value);
-extern void cpct_set4Bits(char *array, unsigned int pos, unsigned int value);
+extern void cpct_setBit(void *array, unsigned int pos, unsigned char value);
+extern void cpct_set2Bits(void *array, unsigned int pos, unsigned char value);
+extern void cpct_set4Bits(void *array, unsigned int pos, unsigned char value);
 
 #endif
