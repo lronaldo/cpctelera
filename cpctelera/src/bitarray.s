@@ -201,10 +201,10 @@ sb_setBit:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 39 bytes (8 table + 31 code)                             ###
+;### MEMORY: 42 bytes (8 table + 31 code)                             ###
 ;### TIME:                                                            ###
-;###   Best Case  (0) = 160 cycles ( 40.00 us)                        ###
-;###   Worst Case (2) = 198 cycles ( 49,50 us)                        ###
+;###   Best Case  (0) = 171 cycles ( 42.75 us)                        ###
+;###   Worst Case (2) = 209 cycles ( 52,25 us)                        ###
 ;########################################################################
 ;
 
@@ -219,7 +219,9 @@ _cpct_get2Bits::
    PUSH  DE          ;; [11]
    PUSH  AF          ;; [11]
 
-   LD   B, L         ;; [ 4] B = L (Save L into B, to use it later for calculating the required group of 2 bits we are accessing)
+   LD   A, L         ;; [ 4] A = L 
+   AND  #0x03        ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be getting from the target byte: the remainder of L/4)
+   LD   B, A         ;; [ 4] B = index of the group of 2 bits that we want to get from 0 to 3 ([00 11 22 33])
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
@@ -251,7 +253,7 @@ g2b_B_is_2or3:
 g2b_B_is_2:
    RRCA                ;; [ 4] <| Move bits 2 & 3 to positions 0 & 1 with 2 right rotations
    RRCA                ;; [ 4] <|
-   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is not set. Value XX is got from next 2 bytes, which are RLCA;RLCA. Not jumping leaves us 3 bytes from here, at g2b_end)
+   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from next 2 bytes, which are RLCA;RLCA. Not jumping leaves us 3 bytes from here, at g2b_end)
 g2b_B_is_0:
    RLCA                ;; [ 4] <| Move bits 7 & 6 to positions 0 & 1 with 2 left rotations
    RLCA                ;; [ 4] <|
@@ -292,10 +294,18 @@ _cpct_set2Bits::
    POP  AF                  ;; [10] AF = Return Address
    POP  DE                  ;; [10] DE = Pointer to the bitarray in memory
    POP  HL                  ;; [10] HL = Index of the bit to be set
-   POP  BC                  ;; [10] BC => C = Set Value (0/1), B = Undefined
+   POP  BC                  ;; [10] BC => C = Set Value (0-3), B = Undefined
 s2b_restoreSP:
    LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                       ;; [ 4] Enable interrupts again
+
+   ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be set
+   ;;   inside the target byte ([ 00 11 22 33 ]).
+   LD   A, L                ;; [ 4] A = L (Least significant bits from array index)
+   AND  #0x03               ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be setting from the target byte: the remainder of L/4)
+   LD   B, A                ;; [ 4] B = index of the group of 2 bits that we want to set from 0 to 3 ([00 11 22 33])
+   LD   A, C                ;; [ 4] A = C     (Value to be set)
+   AND  #0x03               ;; [ 7] A = C % 4 (Ensure value to be set is in the range 0-3)
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
@@ -306,13 +316,45 @@ s2b_restoreSP:
    SRL   H           ;; [ 8]
    RR    L           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
    ADD  HL, DE       ;; [11] HL += DE => HL points to the target byte in the array 
-   LD    A, (HL)     ;; [ 7] A = array[index] Get the byte where our 2 target bits are located
+
+   ;; Move the 2 new bits to be set from bits 0 & 1 to their final position in the target byte
+   ;;  and setting up a mask to be used for inserting them in the target byte of the array
+   DEC B               ;; [ 4] If B=0, B-- is negative, turning on S flag
+   JP M, s2b_B_is_0    ;; [10] IF S flag is on, B was 0
+   DEC B               ;; [ 4] B-- (second time, so B-=2)
+   JP P, s2b_B_is_2or3 ;; [10] If S flag is off, B was > 1, else B was 1
+s2b_B_is_1:
+   RRCA                ;; [ 4] <| Move bits to positions 5 & 4 using 4 right rotations
+   RRCA                ;; [ 4] <|
+   LD  C, #0xCF        ;; [ 7] Mask for leaving out bits 5 & 4
+   JP s2b_B_is_0 + 2   ;; [10] We have done 2 rotations, and jump to B_is_0 + 2, to make another 2 rotations
+s2b_B_is_2or3:
+   DEC B               ;; [ 4] B-- (third time, so B-=3)
+   JP P, s2b_B_is_3    ;; [10] IF S flag is off, B was >2 (3), else B was 2
+s2b_B_is_2:
+   RLCA                ;; [ 4] <| Move bits to positions  2 & 3 with 2 left rotations
+   RLCA                ;; [ 4] <|
+   LD  C, #0xF3        ;; [ 7] Mask for leaving out bits 2 & 3
+   JP s2b_end          ;; [10] Done with preparing mask and rotations, continue to setting bits
+s2b_B_is_0:
+   LD  C, #0x3F        ;; [ 7] Mask for leaving out bits 7 & 6
+   RRCA                ;; [ 4] <| Move bits to positions 7 & 6 with 2 right rotations
+   RRCA                ;; [ 4] <|
+   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from next 2 bytes, which are "LD C, #0xFC". Not jumping leaves us 3 bytes from here, at g2b_end)
+s2b_B_is_3:
+   LD  C, #0xFC        ;; [ 7] Mask for leaving out bits 1 & 0
+s2b_end:
+   LD  B, A            ;; [ 4] B = A (Bits to be set)
+   LD  A, (HL)         ;; [ 7] A = target Byte
+   AND C               ;; [ 4] A = target Byte Masked (Set to 0 the 2 bits we are going to set with our new value)
+   OR  B               ;; [ 4] A = final value        (Set the new value for our new bits, ORing them with the other 3 2bit groups)
+   LD  (HL), A         ;; [ 7] Store the final value of the target byte in the array
 
    RET                 ;; [10] Return to caller
 
 ;
 ;########################################################################
-;### FUNCTION: cpct_get4Bits					                      ###
+;### FUNCTION: cpct_get4Bits					                            ###
 ;########################################################################
 ;### Returns an integer from 0 to 15 depending on the value of the    ###
 ;### group of 4 bits at the given position in the specified array.    ###
