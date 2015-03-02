@@ -67,4 +67,3 @@ SRCDIR=src
 OBJDIR=obj
 ASMFILES_ALL=$(foreach file,$(wildcard $(SRCDIR)/*.s),$(subst $(SRCDIR)/,,$(file)))
 OBJFILES=$(ASMFILES_ALL:%.s=%.rel)
-#OBJFILES=sprites.rel firmware_ed.rel videomode.rel

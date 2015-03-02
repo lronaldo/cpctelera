@@ -24,5 +24,6 @@
 #include "sprites.h"
 #include "keyboard.h"
 #include "strings.h"
+#include "bitarray.h"
 
 #endif

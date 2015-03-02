@@ -65,7 +65,7 @@ CPCT_SRC=$(CPCT_PATH)src
 CPCT_LIB=$(CPCT_PATH)cpctelera.lib
 
 # Compilation, linkage and binary generation macros
-Z80CODELOC=0x0100
+Z80CODELOC=0x4000
 Z80CC=$(SDCCBIN_PATH)sdcc
 Z80CCFLAGS= 
 Z80CCINCLUDE=-I$(CPCT_SRC)
