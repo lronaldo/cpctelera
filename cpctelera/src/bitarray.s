@@ -201,7 +201,7 @@ sb_setBit:
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 42 bytes (8 table + 31 code)                             ###
+;### MEMORY: 46 bytes                                                 ###
 ;### TIME:                                                            ###
 ;###   Best Case  (0) = 171 cycles ( 42.75 us)                        ###
 ;###   Worst Case (2) = 209 cycles ( 52,25 us)                        ###
@@ -282,8 +282,11 @@ g2b_end:                            ; 0:22, 1:54, 2:60 3:42
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL	                      ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###  Not computed 	                                                 ###
+;### MEASURES                                                         ###
+;### MEMORY: 68 bytes                                                 ###
+;### TIME:                                                            ###
+;###   Best Case  (0) = 222 cycles ( 55.50 us)                        ###
+;###   Worst Case (1) = 254 cycles ( 63,50 us)                        ###
 ;########################################################################
 ;
 .globl _cpct_set2Bits
