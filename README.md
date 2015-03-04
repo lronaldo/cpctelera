@@ -36,7 +36,24 @@ Current testing makefiles for examples and library work with this directory stru
 where `/cpc-dev-tool-chain` has SDCC, Hex2Bin and iDSK already compiled 
 (see [cpcitor documentation](https://github.com/cpcitor/cpc-dev-tool-chain/blob/master/README.md) for more details)
 
+### Contact information and support
+
 If you have any questions, please contact me:
  
  * email:    _ronaldo (at) cheesetea (dot) com_
- * twitter:  _@FranGallegoBR_
+ * twitter:  *[@FranGallegoBR](http://twitter.com/frangallegobr)*
+ 
+### Authors
+
+ * **Project owner** 
+   * ronaldo / ([Cheesetea](http://www.cheesetea.com), [Fremos](http://fremos.cheesetea.com), [ByteRealms](http://www.byterealms.com))
+ * **Bitarrays idea and original implementation**
+   * Alberto García García (Blitzman, _albertgg93 (at) gmail (dot) com, [@algertgarcia93](http://twitter.com/algertgarcia93)_)
+   * Pablo Martínez González (*pablo2093 (at) gmail (dot) com, [@pablo_2093](http://twitter.com/pablo_2093)*)
+ * **Some makefile code and ideas**
+   * [Cpcitor](http://github.com/cpcitor)
+
+#### Special Thanks
+
+ * [Cpcitor](http://github.com/cpcitor) (for his great help and advice, and for developing [cpc-dev-tool-chain](http://github.com/cpcitor/cpc-dev-tool-chain))
+ * [CPCWiki](http://cpcwiki.eu) & [Grimware](http://grimware.org/) (for providing great technical documentations and examples)
