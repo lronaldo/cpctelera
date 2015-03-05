@@ -58,6 +58,7 @@ Z80LNK=$(SDCCBIN_PATH)sdar
 ##
 ## SRCDIR       >> Directory under which assembly source files are located
 ## OBJDIR       >> Directory where generated intermediate object files will be written to
+## SUBDIRS      >> All first level subdirectories found in $(SRCDIR)/. They are assumed to contain code files.
 ## ASMFILES_ALL >> All .s files to be found under $(SRCDIR)/ (just filenames, without path)
 ## OBJFILES 	>> intermediate .rel files that will be needed for your application (their names
 ##             	   have to correspond to existing source files in the SRCDIR, but with .rel extension)
@@ -65,5 +66,8 @@ Z80LNK=$(SDCCBIN_PATH)sdar
 
 SRCDIR=src
 OBJDIR=obj
-ASMFILES_ALL=$(foreach file,$(wildcard $(SRCDIR)/*.s),$(subst $(SRCDIR)/,,$(file)))
-OBJFILES=$(ASMFILES_ALL:%.s=%.rel)
+SUBDIRS:=$(filter-out ., $(shell find $(SRCDIR) -type d -print))
+OBJSUBDIRS:=$(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))
+#ASMFILES_ALL=$(foreach file,$(wildcard $(SRCDIR)/*.s),$(subst $(SRCDIR)/,,$(file)))
+ASMFILES:=$(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.s))
+OBJFILES:=$(patsubst $(SRCDIR)%, $(OBJDIR)%, $(ASMFILES:%.s=%.rel))
