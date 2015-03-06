@@ -32,6 +32,10 @@ include build_config.mk
 RM=rm -f
 MKDIR=mkdir
 
+# LIBRARY CONFIG
+LIBRARYNAME=cpctelera
+TARGET=$(LIBRARYNAME).lib
+
 # UTILITY FUNCTIONS
 define PRINT
  @echo -ne "\033[1;31;49m"
@@ -48,38 +52,25 @@ define CREATEDIR
 endef
 
 define SUBTARGET
-$(1)/%.rel: $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(1))/%.s
-	$(Z80ASM) $(Z80ASMFLAGS) $@ $<
+$(1): $(2)
+	$(Z80ASM) $(Z80ASMFLAGS) $(1) $(2)
+
 endef
 
-# LIBRARY CONFIG
-LIBRARYNAME=cpctelera
-VPATH=$(SRCDIR)
-TARGET=$(LIBRARYNAME).lib
-
-# CALCULATED VARIABLES
-#OBJ=$(foreach FILE,$(OBJFILES),$(OBJDIR)/$(FILE))
+# TARGETS
 .PHONY: all clean cleanall
 
 # MAIN TARGET
 all: $(OBJDIR) $(TARGET)
-#all: 
-#	@$(call PRINT,"SUBDIRS: \'$(SUBDIRS)\'")
-#	@$(call PRINT,"OBJSUBDIRS: \'$(OBJSUBDIRS)\'")
-#	@$(call PRINT,"ASMFILES: \'$(ASMFILES)\'")
-#	@$(call PRINT,"OBJFILES: \'$(OBJFILES)\'")
-	
+
 $(TARGET): $(OBJFILES)
 	@$(call PRINT,"Linking library file")
 	$(Z80LNK) rc $@ $^
 	@$(call PRINT,"Successfully created $(TARGET)")
 
 # SUBTARGETS
-$(foreach DIR, $(OBJSUBDIRS), $(eval $(call SUBTARGET $(DIR))))
-#$(OBJFILES): %.s
-#	$(Z80ASM) $(Z80ASMFLAGS) $@ $<
+$(foreach OF, $(OBJFILES), $(eval $(call SUBTARGET, $(OF) $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.rel=%.s)))))
 
-	
 # CLEANING TARGETS
 cleanall: clean
 	@$(call PRINT,"Deleting $(TARGET)")
@@ -88,8 +79,8 @@ cleanall: clean
 clean: 
 	@$(call PRINT,"Deleting folder: $(OBJDIR)/")
 	$(RM) -r $(OBJDIR)
-	
+
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
 $(OBJDIR):
-	@$(call PRINT,"Creating tree structure for object files")
-	$(foreach DIR, $(SUBDIRS), $(call CREATEDIR, $(OBJSUBDIRS)))
+	$(call PRINT,"Creating tree structure for object files")
+	$(foreach DIR, $(OBJSUBDIRS), $(call CREATEDIR, $(DIR)))
