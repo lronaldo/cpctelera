@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,17 +16,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCT_SPRITES_H
-#define CPCT_SPRITES_H
+#ifndef CPCTELERA_ALL_H
+#define CPCTELERA_ALL_H
 
-extern void cpct_drawSprite2x8_aligned(char *sprite, char* memory);
-extern void cpct_drawSprite2x8Fast_aligned(char *sprite, char* memory);
-extern void cpct_drawSprite4x8_aligned(char *sprite, char* memory);
-extern void cpct_drawSprite4x8Fast_aligned(char *sprite, char* memory);
-extern void cpct_drawSprite(char *sprite, char* memory, unsigned char width, unsigned char height);
-extern void cpct_drawMaskedSprite(char *maskedSprite, char* memory, unsigned char width, unsigned char height);
-extern void cpct_setVideoMemoryPage(char page_codified_in_6LSb);
-extern void cpct_setVideoMemoryOffset(char offset);
-extern void cpct_memset(char *array, unsigned int size, unsigned char value);
+#include "firmware_ed.h"
+#include "videomode.h"
+#include "sprites/sprites.h"
+#include "keyboard.h"
+#include "strings.h"
+#include "bitarray.h"
 
 #endif
