@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,9 +26,5 @@ typedef unsigned char byte;
 extern void cpct_setVideoMode(byte videoMode);
 extern void cpct_setVideoPalette(byte* ink_array, byte ink_array_size);
 extern void cpct_setVideoINK(byte pen, byte ink);
-extern void cpct_enableLowerROM();
-extern void cpct_enableUpperROM();
-extern void cpct_disableLowerROM();
-extern void cpct_disableUpperROM();
 
 #endif
