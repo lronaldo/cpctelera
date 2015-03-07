@@ -19,15 +19,6 @@
 
 .include /firmware.s/
 
-;;================== cpct_mode_rom_status ===================================
-;; Store the last selection of MODE, INT.GENERATOR and ROM status 
-;;  Default: 0x9C = (10011100) == (GGGIRRnn)
-;;  GGG=Command for video mode and ROM selection (100)
-;;  I=Interrupt Generation Enabled (1)
-;;  RR=Reading from Lower and Upper ROM Disabled (11) (a 0 value means ROM enabled)
-;;  nn=Video Mode 1 (01)
-cpct_mode_rom_status:: .db #0x9D
-
 ;
 ;########################################################################
 ;## FUNCTIONs: _cpct_enableLowerROM, _cpct_disableLowerROM,           ###
