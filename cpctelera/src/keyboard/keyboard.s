@@ -15,10 +15,13 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module cpct_keyboard
 
 ;; 10-byte buffer storing keyboard status data (pressed/not pressed keys)
 ;;   16-byte aligned in memory to let functions use 8-bit math for pointing
+;;   (alignment not working on user linking)
 .globl cpct_keyboardStatusBuffer
+
 .bndry 16
 cpct_keyboardStatusBuffer: .ds 10
 

@@ -16,8 +16,7 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 ;
-.module _cpct_isKeyPressed
-
+.module cpct_keyboard
 ;
 ;########################################################################
 ;### FUNCTION: _cpct_isKeyPressed                                     ###

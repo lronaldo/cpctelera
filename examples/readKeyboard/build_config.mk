@@ -40,7 +40,7 @@
 CPCT_PATH=../../cpctelera/
 
 # SDCC Compiler binary path (/path/to/sdcc/bin)
-SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.3.0.installtree/bin/
+SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
 
 # HEX2BIN binary path (/path/to/HexToBin/)
 HEX2BIN_PATH=../../../cpc-dev-tool-chain/tool/hex2bin/Hex2bin-1.0.10/
