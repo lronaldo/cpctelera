@@ -17,6 +17,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
+//######################################################################
+//### MODULE: Bit Array                                              ###
+//### Developed by Alberto García García and Pablo Martínez González ###
+//### Reviewed and optimized by ronaldo / Cheesetea                  ###
+//######################################################################
+//### This module contains functions to get and set groups of 1, 2   ###
+//### and 4 bit in a char array. So data in arrays can be compressed ###
+//### in a transparent way to the programmer.                        ###
+//######################################################################
+//
 #ifndef CPCT_BITARRAY_H
 #define CPCT_BITARRAY_H
 
