@@ -23,7 +23,7 @@
 #include "videomode.h"
 #include "sprites/sprites.h"
 #include "keyboard/keyboard.h"
-#include "strings.h"
+#include "strings/strings.h"
 #include "bitarray.h"
 
 #endif
