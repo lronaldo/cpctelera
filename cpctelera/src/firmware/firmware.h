@@ -15,11 +15,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
-
+//#####################################################################
+//### MODULE: Firmware and ROM routines                             ###
+//#####################################################################
+//### Routines to disable CPC Firmware and reenable it when needed, ###
+//### and managing Upper and Lower ROMs.                            ###
+//#####################################################################
+//
 #ifndef CPCT_FIRMWARE_ED_H
 #define CPCT_FIRMWARE_ED_H
 
 extern void cpct_reenableFirmware();
 extern void cpct_disableFirmware();
+extern void cpct_enableLowerROM();
+extern void cpct_disableLowerROM();
+extern void cpct_enableUpperROM();
+extern void cpct_disableUpperROM();
 
 #endif

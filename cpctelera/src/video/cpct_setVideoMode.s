@@ -59,7 +59,7 @@ _cpct_setVideoMode::
    ADD  HL, SP               ;; [11]
    LD   C, (HL)              ;; [ 7] A = First Paramter (Video Mode to be selected)
 
-   LD   HL, #gfw_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
+   LD   HL, #cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
    LD   A, (HL)              ;; [ 7] A = Present values for MODE, INT.GEN and ROM selection. (See mode_rom_status)
    AND #0xFC                 ;; [ 7] A = (xxxxxx00) set bits 1,0 to 0, to prepare them for inserting the mode parameter
    OR   C                    ;; [ 4] A = Mixes previously selected ING.GEN and ROM values with user selected MODE (last 2 bits)

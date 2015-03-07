@@ -19,7 +19,7 @@
 #ifndef CPCTELERA_ALL_H
 #define CPCTELERA_ALL_H
 
-#include "firmware_ed.h"
+#include "firmware/firmware.h"
 #include "video/videomode.h"
 #include "sprites/sprites.h"
 #include "keyboard/keyboard.h"

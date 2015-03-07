@@ -90,8 +90,7 @@ void main(void) {
             colors[4] = (colors[4] + 1) & 0x07;
          }
          for(charnum=1; charnum != 0; charnum++) {
-            //cpct_drawROMCharM0(video_pos, colors[3], colors[4], charnum);
-            cpct_drawROMCharM0(video_pos, 15, 0, charnum);
+            cpct_drawROMCharM0(video_pos, colors[3], colors[4], charnum);
             video_pos = incrementedVideoPos(video_pos, 4);
          }
       }

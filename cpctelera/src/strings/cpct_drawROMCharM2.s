@@ -100,7 +100,7 @@ dc_print_fg_color:
 
    ;; Enable Lower ROM during char copy operation, with interrupts disabled 
    ;; to prevent firmware messing things up
-   LD   A,  (gfw_mode_rom_status) ;; [13] A = mode_rom_status (present value)
+   LD   A,  (cpct_mode_rom_status) ;; [13] A = mode_rom_status (present value)
    AND  #0b11111011            ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
    LD   B,  #GA_port_byte      ;; [ 7] B = Gate Array Port (0x7F)
    DI                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
@@ -138,7 +138,7 @@ dc_8bit_boundary_crossed:
 
 dc_end_printing:
    ;; After finishing character printing, restore ROM and Interrupts status
-   LD   A,  (gfw_mode_rom_status) ;; [13] A = mode_rom_status (present saved value)
+   LD   A,  (cpct_mode_rom_status) ;; [13] A = mode_rom_status (present saved value)
    ;OR   #0b00000100            ;; [ 7] bit 3 of A = 1 --> Lower ROM disabled (0 means enabled)
    ;LD   B,  #GA_port_byte     ;; [ 7] B = Gate Array Port (0x7F)
    OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
