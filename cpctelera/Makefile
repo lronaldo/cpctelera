@@ -45,16 +45,14 @@ define PRINT
 
 endef
 
-define CREATEDIR
- @$(call PRINT,"folder: $(1)")
- @$(MKDIR) -p $(1)
-
-endef
-
 define SUBTARGET
 $(1): $(2)
 	$(Z80ASM) $(Z80ASMFLAGS) $(1) $(2)
+endef
 
+define MKOBJDIR
+$(1):
+	@$(MKDIR) -p $(1)
 endef
 
 # TARGETS
@@ -68,8 +66,15 @@ $(TARGET): $(OBJFILES)
 	$(Z80LNK) rc $@ $^
 	@$(call PRINT,"Successfully created $(TARGET)")
 
-# SUBTARGETS
+# SUBTARGETS 
+## CREATING SUBDIRS OF THE OBJDIR
+$(foreach OSD, $(filter-out $(OBJDIR), $(OBJSUBDIRS)), $(eval $(call MKOBJDIR, $(OSD))))
+## COMPILING SOURCEFILES AND SAVE OBJFILES IN THEIR CORRESPONDENT SUBDIRS
 $(foreach OF, $(OBJFILES), $(eval $(call SUBTARGET, $(OF) $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.rel=%.s)))))
+
+# CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
+$(OBJDIR): $(filter-out $(OBJDIR), $(OBJSUBDIRS))
+	$(call PRINT,"Tree structure for obj files created")
 
 # CLEANING TARGETS
 cleanall: clean
@@ -79,8 +84,3 @@ cleanall: clean
 clean: 
 	@$(call PRINT,"Deleting folder: $(OBJDIR)/")
 	$(RM) -r $(OBJDIR)
-
-# CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
-$(OBJDIR):
-	$(call PRINT,"Creating tree structure for object files")
-	$(foreach DIR, $(OBJSUBDIRS), $(call CREATEDIR, $(DIR)))
