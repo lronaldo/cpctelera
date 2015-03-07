@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#include <cpctelera_all.h>
+#include <cpctelera.h>
 
 void main(void) {
     char sprite_pressed[16] = {

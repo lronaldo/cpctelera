@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#include <cpctelera_all.h>
+#include <cpctelera.h>
 
 //
 // Macro for fastly cleaning the screen, filling it up with 0's

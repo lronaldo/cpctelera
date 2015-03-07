@@ -1,4 +1,4 @@
-#include "cpctelera_all.h"
+#include "cpctelera.h"
 
 typedef enum {
    f_getbit,

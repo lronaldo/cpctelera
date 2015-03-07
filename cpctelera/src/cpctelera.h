@@ -22,7 +22,7 @@
 #include "firmware_ed.h"
 #include "videomode.h"
 #include "sprites/sprites.h"
-#include "keyboard.h"
+#include "keyboard/keyboard.h"
 #include "strings.h"
 #include "bitarray.h"
 
