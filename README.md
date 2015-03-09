@@ -50,6 +50,8 @@ If you have any questions, please contact me:
  * **Bitarrays idea and original implementation**
    * Alberto García García (Blitzman, _albertgg93 (at) gmail (dot) com, [@algertgarcia93](http://twitter.com/algertgarcia93)_)
    * Pablo Martínez González (*pablo2093 (at) gmail (dot) com, [@pablo_2093](http://twitter.com/pablo_2093)*)
+ * **Some original code and ideas for sprite drawing and firmware enabling/disabling**
+   * Raúl Simarro (Artaburu / ESP Soft)
  * **Some makefile code and ideas**
    * [Cpcitor](http://github.com/cpcitor)
 
