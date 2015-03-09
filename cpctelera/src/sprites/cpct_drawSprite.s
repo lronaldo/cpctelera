@@ -26,6 +26,9 @@
 ;### backbuffer. The original sprite must be stored as an array (i.e. ###
 ;### with all of its pixels stored as consecutive bytes in memory) It ###
 ;### only works for solid, rectangular sprites, with 1-63 bytes width ###
+;###------------------------------------------------------------------###
+;### WARNING: Do not draw sprites wider than 63 bytes with this routi-###
+;### ne: width will be considered negative yielding unexpected results###
 ;########################################################################
 ;### INPUTS (6 Bytes)                                                 ###
 ;###  * (2B HL) Source Sprite Pointer (array with pixel data)         ###
@@ -44,6 +47,9 @@
 ;###  ** EXAMPLES **                                                  ###
 ;###   - 2x16 bytes sprite = 1883 / 1914 cycles ( 470.75 /  478.5 us) ###
 ;###   - 4x32 bytes sprite = 4745 / 4776 cycles (1186.25 / 1194.0 us) ###
+;########################################################################
+;### This routine was inspired in the original cpc_PutSprite from     ###
+;### cpcrslib by Raul Simarro.                                        ###
 ;########################################################################
 ;
 .globl _cpct_drawSprite
@@ -65,12 +71,12 @@ ds_restoreSP:
    SUB C                         ;; [ 4]
    LD (ds_drawSpriteWidth+#4), A ;; [13] Modify JR data to create the jump we need
 
-   LD   A, B                 ;; [ 4] A = Height (used as counter for the number of lines we have to copy)
-   EX   DE, HL               ;; [ 4] Instead of jumping over the next line, we do the inverse operation because it is only 4 cycles and not 10, as a JP would be)
+   LD   A, B                  ;; [ 4] A = Height (used as counter for the number of lines we have to copy)
+   EX   DE, HL                ;; [ 4] Instead of jumping over the next line, we do the inverse operation because it is only 4 cycles and not 10, as a JP would be)
 
 ds_drawSpriteWidth_next:
    ;; NEXT LINE
-   EX   DE, HL             ;; [ 4] HL and DE are exchanged every line to do 16bit math with DE. This line reverses it before proceeding to copy the next line.
+   EX   DE, HL                ;; [ 4] HL and DE are exchanged every line to do 16bit math with DE. This line reverses it before proceeding to copy the next line.
 
 ds_drawSpriteWidth:
    ;; Draw a sprite-line of n bytes
@@ -156,6 +162,6 @@ ds_drawSpriteWidth:
    ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
    ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
    ;; and our 16bit pointers cycle over it
-   LD  BC, #0xC050         ;; [10] B850h = C050h - 800h
-   ADD HL, BC              ;; [11] We advance destination pointer to next line
-   JP ds_drawSpriteWidth_next ;; [10] and then continue copying
+   LD  BC, #0xC050            ;; [10] We advance destination pointer to next line
+   ADD HL, BC                 ;; [11]  HL += 0xC050
+   JP ds_drawSpriteWidth_next ;; [10] Continue copying
