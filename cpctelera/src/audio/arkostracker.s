@@ -322,37 +322,37 @@ PLY_Linker_PT:
 PLY_SongNotOver:
    rra
    jr  nc, PLY_NoNewTransposition1
-   ld  de, PLY_Transposition1 + 1
+   ld  de, #PLY_Transposition1 + 1
    ldi
 
 PLY_NoNewTransposition1:
    rra
    jr  nc, PLY_NoNewTransposition2
-   ld  de, PLY_Transposition2 + 1
+   ld  de, #PLY_Transposition2 + 1
    ldi 
 
 PLY_NoNewTransposition2:
    rra
    jr  nc, PLY_NoNewTransposition3
-   ld  de, PLY_Transposition3 + 1
+   ld  de, #PLY_Transposition3 + 1
    ldi
 
 PLY_NoNewTransposition3:
    ;Get the Tracks addresses.
-   ld  de, PLY_Track1_PT + 1
+   ld  de, #PLY_Track1_PT + 1
    ldi
    ldi
-   ld  de, PLY_Track2_PT + 1
+   ld  de, #PLY_Track2_PT + 1
    ldi
    ldi
-   ld  de, PLY_Track3_PT + 1
+   ld  de, #PLY_Track3_PT + 1
    ldi
    ldi
 
    ;Get the Special Track address, if it has changed.
    rra
    jr  nc, PLY_NoNewHeight
-   ld  de, PLY_Height + 1
+   ld  de, #PLY_Height + 1
    ldi
 
 PLY_NoNewHeight:
@@ -690,7 +690,7 @@ PLY_SpeedEnd:
 ;Plays the sound on each frame, but only save the forwarded Instrument pointer when Instrument Speed is reached.
 ;This is needed because TrackPitch is involved in the Software Frequency/Hardware Frequency calculation, and is calculated every frame.
 
-   ld  iy, PLY_PSGRegistersArray + 4
+   ld  iy, #PLY_PSGRegistersArray + 4
 
 PLY_Track3_Pitch: 
    ld  hl, #0
@@ -780,7 +780,7 @@ PLY_Track3_PlayNoForward:
 
 ;Play the Sound on Track 2
 ;-------------------------
-   ld  iy, PLY_PSGRegistersArray + 2
+   ld  iy, #PLY_PSGRegistersArray + 2
 
 PLY_Track2_Pitch:
    ld  hl, #0
@@ -873,7 +873,7 @@ PLY_Track2_PlayNoForward:
 ;Play the Sound on Track 1
 ;-------------------------
 
-   ld  iy, PLY_PSGRegistersArray
+   ld  iy, #PLY_PSGRegistersArray
 
 PLY_Track1_Pitch:
    ld  hl, #0
@@ -1131,7 +1131,7 @@ PLY_SendRegisters:
       ld   b, #0xF6
       out (c),d   ;#f6c0
       exx
-      ld  hl, PLY_PSGRegistersArray
+      ld  hl, #PLY_PSGRegistersArray
       ld   e, #0xF6
       ld  bc, #0xF401
 
@@ -1445,7 +1445,7 @@ PLY_PlaySound:
 
    ;Null Volume. It means no Sound. We stop the Sound, the Noise, and it's over.
    ;We have to make the volume to 0, because if a bass Hard was activated before, we have to stop it.
-   ld  (iy + 7), a
+   ld (IY+7),a
    .db #0xDD, #0x2E, #0b1001 ; ld ixl,%1001
 
    ret
