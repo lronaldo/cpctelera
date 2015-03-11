@@ -145,7 +145,7 @@
 ;;------------------------------------------------------------------------------------------------------
 
 ;Indicates what frequency table and output code to use.
-.equ PLY_UseCPCMachine, 1      
+.equ PLY_UseCPCMachine, 1
 .equ PLY_UseMSXMachine, 0
 
 ;Set to 1 if you want to use Sound Effects in your player. Both CPU and memory consuming.
@@ -158,12 +158,12 @@
 ;Set to 1 if you want to save the Registers used by AMSDOS (AF', BC', IX, IY)
 ;(which allows you to call this player in BASIC)
 ;As this option is system-friendly, it cuts the interruption, and restore them ONLY IF NECESSARY.
-.equ PLY_SystemFriendly, 0   
+.equ PLY_SystemFriendly, 0
 
 ;Set to 1 to use a Player under interruption. Only works on CPC, as it uses the CPC Firmware.
 ;WARNING, PLY_SystemFriendly must be set to 1 if you use the Player under interruption !
 ;SECOND WARNING, make sure the player is above #3fff, else it won't be played (system limitation).
-.equ PLY_UseFirmwareInterruptions, 0 
+.equ PLY_UseFirmwareInterruptions, 0
 
 ; Set to 1 if you want a little interface to be added if you are a BASIC programmer who wants
 ; to use sound effects. Of course, you must also set PLY_UseSoundEffects to 1.
@@ -1445,7 +1445,7 @@ PLY_PlaySound:
 
    ;Null Volume. It means no Sound. We stop the Sound, the Noise, and it's over.
    ;We have to make the volume to 0, because if a bass Hard was activated before, we have to stop it.
-   ld (IY+7),a
+   ld  7(iy), a
    .db #0xDD, #0x2E, #0b1001 ; ld ixl,%1001
 
    ret
@@ -1458,12 +1458,12 @@ PLY_PS_S_SoundOn:
    sub  d                  ;Code Volume.
    jr  nc, .+3
    xor  a
-   ld  (iy + 7), a
+   ld  7(iy), a
 
    rr   b                  ;Needed for the subroutine to get the good flags.
    call PLY_PS_CalculateFrequency
-   ld  (iy + 0), l         ;Code Frequency.
-   ld  (iy + 1), h
+   ld  0(iy), l            ;Code Frequency.
+   ld  1(iy), h
    exx
 
    ret
@@ -1489,7 +1489,7 @@ PLY_PS_S_SBN_NoNoise:
    sub  d                    ;Code Volume.
    jr  nc, .+3
    xor  a
-   ld  (iy + 7), a
+   ld  7(iy), a
 
    ;Sound ?
    bit  5, c
@@ -1504,8 +1504,8 @@ PLY_PS_S_SBN_Sound:
    rr   b                    ;Needed for the subroutine to get the good flags.
    bit  6, c
    call PLY_PS_CalculateFrequency_TestManualFrequency
-   ld  (iy + 0), l           ;Code Frequency.
-   ld  (iy + 1), h
+   ld  0(iy), l              ;Code Frequency.
+   ld  1(iy), h
    exx
 
    ret
@@ -1522,7 +1522,7 @@ PLY_PS_Hard:
    ld   a, (PLY_Track1_InstrumentSpeed + 1)
    cp   c
    jr  nz, PLY_PS_Hard_NoRetrig
-   ld   a, PLY_RetrigValue
+   ld   a, #PLY_RetrigValue
    ld  (PLY_PSGReg13_Retrig + 1), a
 
 PLY_PS_Hard_NoRetrig:
@@ -1531,7 +1531,7 @@ PLY_PS_Hard_NoRetrig:
    jp  nz, PLY_PS_Hard_LoopOrIndependent
 
    ;Hardware Sound.
-   ld  (iy + 7), #16                            ;Set Volume
+   ld  7(iy), #16                               ;Set Volume
    .db #0xDD, #0x2E, #0b1000 ; ld ixl,%1000     ;Sound is always On here (only Independence mode can switch it off).
 
    ;This code is common to both Software and Hardware Dependent.
@@ -1551,8 +1551,8 @@ PLY_PS_Hard_NoRetrig:
    ;Calculate the Software frequency
    bit  4-2, b                                  ;Manual Frequency ? -2 Because the byte has been shifted previously.
    call PLY_PS_CalculateFrequency_TestManualFrequency
-   ld  (iy + 0), l                              ;Code Software Frequency.
-   ld  (iy + 1), h
+   ld  0(iy), l                                 ;Code Software Frequency.
+   ld  1(iy), h
    exx
 
    ;Shift the Frequency.
@@ -1669,8 +1669,8 @@ PLY_PS_HD_Shift:
    ld   h, a
 
 PLY_PS_HD_NoSoftwarePitch:
-   ld  (iy + 0), l                              ;Code Frequency.
-   ld  (iy + 1), h
+   ld  0(iy), l                                  ;Code Frequency.
+   ld  1(iy), h
    exx
 
    ;Go to manage Noise, common to Software Dependent.
@@ -1707,7 +1707,7 @@ PLY_PS_Hard_LoopOrIndependent:
 ;Independent
 ;***********
 PLY_PS_Independent:
-   ld  (iy + 7), #16                           ;Set Volume
+   ld  7(iy), #16                             ;Set Volume
 
    ;Sound ?
    bit 7-2, b                                  ;-2 Because the byte has been shifted previously.
@@ -1724,8 +1724,8 @@ PLY_PS_I_SoundOn:
    ;Calculate the Software frequency
    bit 4-2, b                                  ;Manual Frequency ? -2 Because the byte has been shifted previously.
    call PLY_PS_CalculateFrequency_TestManualFrequency
-   ld  (iy + 0), l                             ;Code Software Frequency.
-   ld  (iy + 1), h
+   ld  0(iy), l                                ;Code Software Frequency.
+   ld  1(iy), h
    exx
 
    .dw #0x5CDD               ; ld  e, ixh
@@ -1826,7 +1826,7 @@ PLY_PS_S_SoundOn_ArpeggioEnd:
    ld   h, #0
    add hl, hl
 
-   ld  bc, PLY_FrequencyTable
+   ld  bc, #PLY_FrequencyTable
    add hl, bc
 
    ld   a, (hl)
@@ -1958,7 +1958,7 @@ PLY_Init:
 
 .endif
 
-   ld  de, PLY_Speed + 1
+   ld  de, #PLY_Speed + 1
    ldi                                 ;Copy Speed.
    ld   c, (hl)                        ;Get Instruments chunk size.
    inc hl
@@ -1971,15 +1971,15 @@ PLY_Init:
    add hl, bc                          ;Skip Instruments to go to the Linker address.
 
    ;Get the pre-Linker information of the first pattern.
-   ld  de, PLY_Height + 1
+   ld  de, #PLY_Height + 1
    ldi
-   ld  de, PLY_Transposition1 + 1
+   ld  de, #PLY_Transposition1 + 1
    ldi
-   ld  de, PLY_Transposition2 + 1
+   ld  de, #PLY_Transposition2 + 1
    ldi
-   ld  de ,PLY_Transposition3 + 1
+   ld  de, #PLY_Transposition3 + 1
    ldi
-   ld  de, PLY_SaveSpecialTrack + 1
+   ld  de, #PLY_SaveSpecialTrack + 1
    ldi
    ldi
    ld  (PLY_Linker_PT + 1), hl        ;Get the Linker address.
@@ -2018,7 +2018,7 @@ PLY_Stop:
       push iy
    .endif
 
-   ld  hl, PLY_PSGReg8
+   ld  hl, #PLY_PSGReg8
    ld  bc, #0x0300
    ld  (hl), c
    inc hl
@@ -2059,22 +2059,22 @@ PLY_Stop:
       ;D = Speed (0 = As original, 1...255 = new Speed (1 is fastest))
       ;BC = Inverted Pitch (-#FFFF -> FFFF). 0 is no pitch. The higher the pitch, the lower the sound.
       PLY_SFX_Play:
-         ld  ix, PLY_SFX_Track1_Pitch
+         ld  ix, #PLY_SFX_Track1_Pitch
          or   a
-         jr   z, PLY_SFX_Play_Selected
-         ld  ix, PLY_SFX_Track2_Pitch
+         jr   z, #PLY_SFX_Play_Selected
+         ld  ix, #PLY_SFX_Track2_Pitch
          dec  a
-         jr   z, PLY_SFX_Play_Selected
-         ld  ix, PLY_SFX_Track3_Pitch
+         jr   z, #PLY_SFX_Play_Selected
+         ld  ix, #PLY_SFX_Track3_Pitch
 
       PLY_SFX_Play_Selected:
-         ld  (ix + PLY_SFX_OffsetPitch + 1), c     ;Set Pitch
-         ld  (ix + PLY_SFX_OffsetPitch + 2), b
+         ld  PLY_SFX_OffsetPitch + 1(ix), c        ;Set Pitch
+         ld  PLY_SFX_OffsetPitch + 2(ix), b
          ld   a, e                                 ;Set Note
-         ld  (ix + PLY_SFX_OffsetNote), a
+         ld  PLY_SFX_OffsetNote (ix), a
          ld   a, #15                               ;Set Volume
          sub  h
-         ld  (ix + PLY_SFX_OffsetVolume), a
+         ld  PLY_SFX_OffsetVolume (ix), a
          ld   h, #0                                ;Set Instrument Address
          add hl, hl
 
@@ -2091,12 +2091,12 @@ PLY_Stop:
          ld   a, (hl)                              ;Get Speed
 
       PLY_SFX_Play_UserSpeed:
-         ld  (ix + PLY_SFX_OffsetSpeed + 1), a
-         ld  (ix + PLY_SFX_OffsetSpeedCpt + 1), a
+         ld  PLY_SFX_OffsetSpeed + 1 (ix), a
+         ld  PLY_SFX_OffsetSpeedCpt + 1 (ix), a
          inc hl                                    ;Skip Retrig
          inc hl
-         ld  (ix + PLY_SFX_OffsetInstrument + 1), l
-         ld  (ix + PLY_SFX_OffsetInstrument + 2), h
+         ld  PLY_SFX_OffsetInstrument + 1 (ix), l
+         ld  PLY_SFX_OffsetInstrument + 2 (ix), h
 
          ret
 
@@ -2105,13 +2105,13 @@ PLY_Stop:
       ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+15, value).
       PLY_SFX_Stop:
          ld   a, e
-         ld  hl, PLY_SFX_Track1_Instrument + 1
+         ld  hl, #PLY_SFX_Track1_Instrument + 1
          or   a
          jr   z, PLY_SFX_Stop_ChannelFound
-         ld  hl, PLY_SFX_Track2_Instrument + 1
+         ld  hl, #PLY_SFX_Track2_Instrument + 1
          dec  a
          jr   z, PLY_SFX_Stop_ChannelFound
-         ld  hl, PLY_SFX_Track3_Instrument + 1
+         ld  hl, #PLY_SFX_Track3_Instrument + 1
          dec  a
 
       PLY_SFX_Stop_ChannelFound:
