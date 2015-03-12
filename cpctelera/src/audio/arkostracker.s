@@ -176,7 +176,15 @@
 ;;--- PLAYER CODE START
 ;;------------------------------------------------------------------------------------------------------
 
-cpct_arkosPlayer::
+;; INPUT: (2B DE) Song address
+_cpct_arkosPlayer_init::
+   LD  HL, #2  ;; [10]
+   ADD HL, SP  ;; [11]
+   LD E, (HL)  ;; [ 7]
+   INC HL      ;; [ 6]
+   LD D, (HL)  ;; [ 7]
+   JP PLY_Init
+
 
 ;******* Interruption Player ********
 .if PLY_UseFirmwareInterruptions
@@ -272,6 +280,7 @@ cpct_arkosPlayer::
 ;Read here to know if a Digidrum has been played (0=no).
 PLY_Digidrum: .db #0
 
+_cpct_arkosPlayer_play::
 PLY_Play:
 
 ;***** Player System Friendly has to restore registers *****
@@ -775,7 +784,7 @@ PLY_Track3_PlayNoForward:
 ;******************************************
 
 
-   .dw #0xD7DD  ; ld  a, ixl          ;Save the Register 7 of the Track 3.
+   .dw #0x7DDD  ; ld  a, ixl          ;Save the Register 7 of the Track 3.
    ex  af, af'
 
 ;Play the Sound on Track 2
@@ -2006,6 +2015,7 @@ PLY_Init:
 
 
 ;Stop the music, cut the channels.
+_cpct_arkosPlayer_stop::
 PLY_Stop:
 
    .if PLY_SystemFriendly

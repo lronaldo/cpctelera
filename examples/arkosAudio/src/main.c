@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -14,17 +14,27 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
+#include <cpctelera.h>
+#include "demo.song"
 
-#include "firmware/firmware.h"
-#include "video/videomode.h"
-#include "sprites/sprites.h"
-#include "keyboard/keyboard.h"
-#include "strings/strings.h"
-#include "bitarray/bitarray.h"
-#include "audio/audio.h"
+void main(void) {
+   unsigned char playing = 1;
 
-#endif
+   cpct_disableFirmware();
+   cpct_setVideoMode(0);
+
+   cpct_arkosPlayer_init(molusk_song);
+   while (1) {
+      if (playing)
+         cpct_arkosPlayer_play();
+
+      cpct_scanKeyboardFast();
+      if (cpct_isKeyPressed(Key_Space)) {
+         if (playing)
+            cpct_arkosPlayer_stop();
+         playing ^= 1;
+      }
+   }
+}

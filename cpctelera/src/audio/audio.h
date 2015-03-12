@@ -1,6 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2009 Targhan / Arkos
+//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,16 +16,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
+//######################################################################
+//### MODULE: Audio                                                  ###
+//######################################################################
+//### This module contains code for music and SFX players and other  ###
+//### audio routines.                                                ###
+//######################################################################
+//
+#ifndef CPCT_AUDIO_H
+#define CPCT_AUDIO_H
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
-
-#include "firmware/firmware.h"
-#include "video/videomode.h"
-#include "sprites/sprites.h"
-#include "keyboard/keyboard.h"
-#include "strings/strings.h"
-#include "bitarray/bitarray.h"
-#include "audio/audio.h"
+void cpct_arkosPlayer_init(void* songdata);
+void cpct_arkosPlayer_play();
+void cpct_arkosPlayer_stop();
 
 #endif
