@@ -252,7 +252,7 @@ _cpct_arkosPlayer_init::
       jp  PLY_Play
 
       ;Table to convert PLY_ReplayFrequency into a Frequency value for the AMSDOS.
-   PLY_Interruption_Convert: .db #17, #11, #5, #2, #1, #0
+   PLY_Interruption_Convert: .db 17, 11, 5, 2, 1, 0
 
 .else
 
@@ -290,9 +290,12 @@ PLY_Play:
    exx
    push af
    push bc
-   push ix
-   push iy
+   ;;push ix
+   ;;push iy
 .endif
+
+   push ix        ;; MOD to save IX and IY used by SDCC
+   push iy
 
    xor  a
    ld   (PLY_Digidrum), a     ;Reset the Digidrum flag.
@@ -2181,12 +2184,12 @@ PLY_Stop:
 ;A little convient interface for BASIC user, to allow them to use Sound Effects in Basic.
    .if PLY_UseBasicSoundEffectInterface
       PLY_BasicSoundEffectInterface_PlaySound:
-         ld   c, (ix+0)    ;Get Pitch
-         ld   b, (ix+1)
-         ld   d, (ix+2)    ;Get Speed
-         ld   e, (ix+4)    ;Get Note
-         ld   h, (ix+6)    ;Get Volume
-         ld   l, (ix+8)    ;Get SFX number
-         ld   a, (ix+10)   ;Get Channel
+         ld   c, 0(ix)    ;Get Pitch
+         ld   b, 1(ix)
+         ld   d, 2(ix)    ;Get Speed
+         ld   e, 4(ix)    ;Get Note
+         ld   h, 6(ix)    ;Get Volume
+         ld   l, 8(ix)    ;Get SFX number
+         ld   a, 10(ix)   ;Get Channel
          jp  PLY_SFX_Play
    .endif
