@@ -28,10 +28,12 @@ void main(void) {
 
    cpct_arkosPlayer_init(molusk_song);
    while (1) {
-      //__asm
-      //   halt
-      //   halt
-      //__endasm;
+      __asm
+            ld   b, #0xF5
+            in   a,(c)
+            rra
+            jr  nc, .-3
+      __endasm;
 
       if (playing) {
          cpct_arkosPlayer_play();

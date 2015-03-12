@@ -306,7 +306,7 @@ PLY_SpeedCpt:
 ;Moving forward in the Pattern. Test if it is not over.
 PLY_HeightCpt: 
    ld   a, #1
-   dec  A
+   dec  a
    jr  nz, PLY_HeightEnd
 
 ;Pattern Over. We have to read the Linker.
@@ -834,7 +834,7 @@ PLY_Track2_PlayNoForward:
    PLY_SFX_Track2_Pitch:
       ld  de, #0
       exx
-   
+
    .equ PLY_SFX_Track2_Volume, .+2
    .equ PLY_SFX_Track2_Note,   .+1
 
@@ -1357,13 +1357,16 @@ PLY_SendRegisters:
       inc  c
 
    ;Register 13
+      pop iy            ;; MOD to restore IX and IY, that SDCC uses
+      pop ix
+
       .if PLY_SystemFriendly
 
             call PLY_PSGReg13_Code
 
          PLY_PSGREG13_RecoverSystemRegisters:
-            pop iy
-            pop ix
+            ;;pop iy
+            ;;;pop ix
             pop bc
             pop af
             exx
@@ -1957,7 +1960,7 @@ PLY_Init:
 
    ld  hl, #8                          ;Skip Header, SampleChannel, YM Clock (DB*3). The Replay Frequency is used in Interruption mode.
    add hl, de
-   ld  de, PLY_ReplayFrequency + 1
+   ld  de, #PLY_ReplayFrequency + 1
    ldi
 
 .else
@@ -1997,7 +2000,7 @@ PLY_Init:
    ld  (PLY_SpeedCpt + 1), a
    ld  (PLY_HeightCpt + 1), a
 
-   ld  a, #0xff
+   ld  a, #0xFF
    ld  (PLY_PSGReg13), a
 
    ;Set the Instruments pointers to Instrument 0 data (Header has to be skipped).
@@ -2024,9 +2027,12 @@ PLY_Stop:
       exx
       push af
       push bc
-      push ix
-      push iy
+      ;;push ix
+      ;;push iy
    .endif
+
+   push ix           ;; MOD to save IX and IY that SDCC uses
+   push iy
 
    ld  hl, #PLY_PSGReg8
    ld  bc, #0x0300
