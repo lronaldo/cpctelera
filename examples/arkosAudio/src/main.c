@@ -20,15 +20,27 @@
 #include "demo.song"
 
 void main(void) {
-   unsigned char playing = 1;
+   unsigned char playing = 1, color = 1;
+   char* video_pos = (char*) 0xC000;
 
    cpct_disableFirmware();
-   cpct_setVideoMode(0);
+   cpct_setVideoMode(2);
 
    cpct_arkosPlayer_init(molusk_song);
    while (1) {
-      if (playing)
+      //__asm
+      //   halt
+      //   halt
+      //__endasm;
+
+      if (playing) {
          cpct_arkosPlayer_play();
+         cpct_drawROMCharM2(video_pos, color, '#');
+         if (++video_pos >= (char*)0xC7CF) {
+            video_pos = (char*)0xC000;
+            color ^= 1;
+         }
+      }
 
       cpct_scanKeyboardFast();
       if (cpct_isKeyPressed(Key_Space)) {
