@@ -30,6 +30,7 @@
 .equ GA_port_byte, 0x7F    ;; 8-bit Port of the Gate Array
 .equ PAL_PENR,     0x00    ;; Command to select a PEN register in the PAL chip
 .equ PAL_INKR,     0x40    ;; Command to set the INK of a previously selected PEN register in the PAL chip
+.equ PPI_PORT_B,   0xF5    ;; Port B of the PPI, used to read Vsync/Jumpers/PrinterBusy/CasIn/Exp information
 
 ;;
 ;; External values

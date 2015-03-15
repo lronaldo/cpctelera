@@ -158,7 +158,7 @@
 ;Set to 1 if you want to save the Registers used by AMSDOS (AF', BC', IX, IY)
 ;(which allows you to call this player in BASIC)
 ;As this option is system-friendly, it cuts the interruption, and restore them ONLY IF NECESSARY.
-.equ PLY_SystemFriendly, 0
+.equ PLY_SystemFriendly, 1
 
 ;Set to 1 to use a Player under interruption. Only works on CPC, as it uses the CPC Firmware.
 ;WARNING, PLY_SystemFriendly must be set to 1 if you use the Player under interruption !
@@ -170,7 +170,7 @@
 .equ PLY_UseBasicSoundEffectInterface, 0
 
 ;Value used to trigger the Retrig of Register 13. #FE corresponds to cp xx. Do not change it !
-.equ PLY_RetrigValue, #0xfe
+.equ PLY_RetrigValue, #0xFE
 
 ;;------------------------------------------------------------------------------------------------------
 ;;--- PLAYER CODE START
@@ -203,7 +203,6 @@ _cpct_arkosPlayer_init::
       .if PLY_UseFades
          jp PLY_SetFadeValue                          ;Call Player + 9 or + 18 to set Fades values.
       .endif
-
 
 
    PLY_InterruptionOn:
@@ -278,9 +277,9 @@ _cpct_arkosPlayer_init::
 .endif
 
 ;Read here to know if a Digidrum has been played (0=no).
-PLY_Digidrum: .db #0
+PLY_Digidrum: .db 0
 
-_cpct_arkosPlayer_play::
+_cpct_arkosPlayer_play:: 
 PLY_Play:
 
 ;***** Player System Friendly has to restore registers *****
@@ -290,12 +289,9 @@ PLY_Play:
    exx
    push af
    push bc
-   ;;push ix
-   ;;push iy
-.endif
-
-   push ix        ;; MOD to save IX and IY used by SDCC
+   push ix
    push iy
+.endif
 
    xor  a
    ld   (PLY_Digidrum), a     ;Reset the Digidrum flag.
@@ -1360,16 +1356,13 @@ PLY_SendRegisters:
       inc  c
 
    ;Register 13
-      pop iy            ;; MOD to restore IX and IY, that SDCC uses
-      pop ix
-
       .if PLY_SystemFriendly
 
             call PLY_PSGReg13_Code
 
          PLY_PSGREG13_RecoverSystemRegisters:
-            ;;pop iy
-            ;;;pop ix
+            pop iy
+            pop ix
             pop bc
             pop af
             exx
@@ -2030,12 +2023,9 @@ PLY_Stop:
       exx
       push af
       push bc
-      ;;push ix
-      ;;push iy
+      push ix
+      push iy
    .endif
-
-   push ix           ;; MOD to save IX and IY that SDCC uses
-   push iy
 
    ld  hl, #PLY_PSGReg8
    ld  bc, #0x0300

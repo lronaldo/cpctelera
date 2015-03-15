@@ -26,5 +26,6 @@ typedef unsigned char byte;
 extern void cpct_setVideoMode(byte videoMode);
 extern void cpct_setVideoPalette(byte* ink_array, byte ink_array_size);
 extern void cpct_setVideoINK(byte pen, byte ink);
+extern void cpct_waitVSYNC();
 
 #endif
