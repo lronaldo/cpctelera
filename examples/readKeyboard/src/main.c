@@ -17,29 +17,10 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
+#include "newton_sprite.def"
 
 void main(void) {
-    char sprite_pressed[16] = {
-        0x00, 0x00,
-        0x10, 0x10,
-        0x20, 0x20,
-        0x03, 0x03,
-        0x04, 0x04,
-        0x50, 0x50,
-        0x60, 0x60,
-        0x07, 0x07
-    };
-    char sprite_notpressed[16] = {
-        0x00, 0x00,
-        0x00, 0x00,
-        0x00, 0x00,
-        0x00, 0x00,
-        0x00, 0x00,
-        0x00, 0x00,
-        0x00, 0x00,
-        0x00, 0x00
-    };
-    char *sprite = sprite_notpressed;
+    const unsigned char *sprite = G_void_sprite;
 
     cpct_disableFirmware();
     cpct_setVideoMode(0);
@@ -47,10 +28,10 @@ void main(void) {
         cpct_scanKeyboardFast();
 
         if (cpct_isKeyPressed(Key_Space))
-            sprite = sprite_pressed;
+            sprite = G_newton_sprite;
         else
-            sprite = sprite_notpressed;
+            sprite = G_void_sprite;
 
-        cpct_drawSprite2x8_aligned(sprite, (char*)0xC000);
+        cpct_drawSprite(sprite, (void*)0xC000, 16, 32);
     }
 }

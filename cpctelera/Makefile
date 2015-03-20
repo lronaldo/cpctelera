@@ -70,7 +70,7 @@ $(TARGET): $(OBJFILES)
 ## CREATING SUBDIRS OF THE OBJDIR
 $(foreach OSD, $(filter-out $(OBJDIR), $(OBJSUBDIRS)), $(eval $(call MKOBJDIR, $(OSD))))
 ## COMPILING SOURCEFILES AND SAVE OBJFILES IN THEIR CORRESPONDENT SUBDIRS
-$(foreach OF, $(OBJFILES), $(eval $(call SUBTARGET, $(OF) $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.rel=%.s)))))
+$(foreach OF, $(OBJFILES), $(eval $(call SUBTARGET, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.rel=%.s)))))
 
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
 $(OBJDIR): $(filter-out $(OBJDIR), $(OBJSUBDIRS))

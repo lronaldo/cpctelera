@@ -17,7 +17,7 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##     CPCTELERA ENGINE: Example of use of cpct_drawSprite               ##
+##     CPCTELERA ENGINE: Example of use of putCharacter routines         ##
 ##                       Main Building Makefile                          ##
 ##-----------------------------------------------------------------------##
 ## This file contains the rules for building an example of use of the    ##
@@ -28,7 +28,9 @@
 # INCLUDES
 include build_config.mk
 
-# UTILITY FUNCTIONS
+#### UTILITY FUNCTIONS
+
+# Print a nice and colorful message
 define PRINT
  echo -ne "\033[1;31;49m"
  echo -ne "[$(PROJNAME)]>"
@@ -36,6 +38,7 @@ define PRINT
  echo -e  "\033[0;39;49m"
 endef
 
+# Create a DSK file from with a BINARY added to it and converted to AMSDOS BINARY
 define CREATEDSK
  (LOADADDR=$$( sed -n 's/^Lowest address  = 0000\([0-9]*\).*$$/\1/p' <$(1).log ) ; \
   RUNADDR=$$( sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' <$(1:.bin=.map) ) ; \
@@ -52,44 +55,50 @@ define CREATEDSK
  )
 endef
 
+# Compile a C file for Z80
+define COMPILECFILE
+$(1): $(2)
+	$(Z80CC) $(Z80CCINCLUDE) -mz80 $(Z80CCFLAGS) -c $(2) -o $(1)
+endef
 
 # TOOLS CONFIG
 RM=rm -f
 MKDIR=mkdir
 
 # BINARY CONFIG
-PROJNAME=putCharacter
-VPATH=$(SRCDIR)
+BINFILE=$(OBJDIR)/$(PROJNAME).bin
+IHXFILE=$(OBJDIR)/$(PROJNAME).ihx
 TARGET=$(PROJNAME).dsk
-
-# CALCULATED VARIABLES
-OBJ=$(foreach FILE,$(OBJFILES),$(OBJDIR)/$(FILE))
 
 .PHONY: all clean cleanall
 
 # MAIN TARGET
-all: $(OBJDIR) $(TARGET)
+all: $(OBJSUBDIRS) $(TARGET)
+
+## COMPILING SOURCEFILES AND SAVE OBJFILES IN THEIR CORRESPONDENT SUBDIRS
+$(foreach OF, $(OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJEXT)=%.$(SRCEXT))))))
 
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
-$(OBJDIR)/$(PROJNAME).ihx: $(OBJ)
+$(IHXFILE): $(OBJFILES)
 	@$(call PRINT,"Linking binary file")
-	@$(call PRINT,$(CSRCFILES))
 	$(Z80CC) $(Z80CCLINKARGS) $^ -o "$@"
 
-# COMPILE C FILES => GENERATE RELOCATABLE (.REL) MACHINE CODE FILES
-$(OBJDIR)/%.rel: %.c
-	$(Z80CC) $(Z80CCINCLUDE) -mz80 $(Z80CCFLAGS) -c $< -o $(OBJDIR)/
-
-# GENERATE AMSDOS BINARY FILE (.BIN) FROM INTEL HEX BINARY (.IHX)
-$(OBJDIR)/%.bin.log $(OBJDIR)/%.bin: $(OBJDIR)/%.ihx
+# GENERATE BINARY FILE (.BIN) FROM INTEL HEX BINARY (.IHX)
+## FIX: Binary file gets deleted magically when compilation ends. We make a copy of it for other uses.
+%.bin: %.ihx
 	@$(call PRINT,"Creating Amsdos binary file $@")
-	$(HEX2BIN) -e "bin" -p 00 "$<" | tee "$(patsubst %.ihx,%.bin,$<).log"
+	$(HEX2BIN) -p 00 "$<" | tee $@.log
+	@cp $@ $@.bin
 
 # GENERATE A DISK FILE (.DSK) AND INCLUDE BINARY FILE (.BIN) INTO IT
-%.dsk: $(OBJDIR)/%.bin
+%.dsk: $(BINFILE)
 	@$(call PRINT,"Creating Disk File $@")
 	@$(call CREATEDSK,$<,$@)
 	@$(call PRINT,"Successfully created $@")
+
+# CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
+$(OBJSUBDIRS): 
+	@$(MKDIR) -p $@
 
 # CLEANING TARGETS
 cleanall: clean
@@ -99,8 +108,3 @@ cleanall: clean
 clean: 
 	@$(call PRINT,"Deleting folder: $(OBJDIR)/")
 	$(RM) -r $(OBJDIR)
-	
-# CREATE OBJDIR IF IT DOES NOT EXIST
-$(OBJDIR):
-	@$(call PRINT,"Creating object folder: $@/")
-	$(MKDIR) $(OBJDIR)

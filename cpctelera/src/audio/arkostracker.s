@@ -2028,7 +2028,7 @@ PLY_Stop:
    .endif
 
    ld  hl, #PLY_PSGReg8
-   ld  bc, #0x0300
+   ld  bc, #0x0500
    ld  (hl), c
    inc hl
    djnz .-2

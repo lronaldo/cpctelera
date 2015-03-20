@@ -28,6 +28,9 @@
 #ifndef CPCT_SPRITES_H
 #define CPCT_SPRITES_H
 
+// Calculate mem page value for cpct_setVideoMemoryPage
+#define cpct_memPage6(A) ((A) >> 2)
+
 extern void cpct_drawSprite2x8_aligned(void *sprite, void* memory);
 extern void cpct_drawSprite2x8Fast_aligned(void *sprite, void* memory);
 extern void cpct_drawSprite4x8_aligned(void *sprite, void* memory);

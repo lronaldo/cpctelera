@@ -29,19 +29,46 @@
 ###########################################################################
 
 ####
-## SECTION 1: TOOL PATH CONFIGURATION
+## SECTION 1: Project configuration 
+##
+## This section establishes source and object subfolders and the binary objects to
+## be built. Normally, you want to change the OBJ files you want to be built, selecting
+## only the ones that contain the actual code that will be used by you in your application.
+#####
+
+# Name of the project (without spaces, as it will be used as filename)
+PROJNAME=doubleBuffer
+# Memory location for code generated
+Z80CODELOC=0x0100
+
+# Folders and file extensions
+SRCDIR=src
+OBJDIR=obj
+SRCEXT=c
+OBJEXT=rel
+
+# Subfolders and source/object files
+SUBDIRS:=$(filter-out ., $(shell find $(SRCDIR) -type d -print))
+OBJSUBDIRS:=$(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))
+SRCFILES:=$(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(SRCEXT)))
+OBJFILES:=$(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(SRCEXT), %.$(OBJEXT), $(SRCFILES)))
+
+####
+## SECTION 2: TOOL PATH CONFIGURATION
 ##
 ## Macros in this section take care of the absolute paths where compilation tools
 ## are located. If your compilation tools (like SDCC, HEX2BIN, etc) are not 
 ## located in standard paths, you should configure the exact paths of the 
-## binary directory of each tool.
+## binary directory of each tool. If you have this compilation tools installed in
+## your system, and they are in the global path, you can comment this variables
+## and your installed binaries will be used
 ####
 
 # CPCtelera library root path
 CPCT_PATH=../../cpctelera/
 
 # SDCC Compiler binary path (/path/to/sdcc/bin)
-SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.3.0.installtree/bin/
+SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
 
 # HEX2BIN binary path (/path/to/HexToBin/)
 HEX2BIN_PATH=../../../cpc-dev-tool-chain/tool/hex2bin/Hex2bin-1.0.10/
@@ -50,7 +77,7 @@ HEX2BIN_PATH=../../../cpc-dev-tool-chain/tool/hex2bin/Hex2bin-1.0.10/
 IDSK_PATH=../../../cpc-dev-tool-chain/tool/idsk/iDSK.0.13/iDSK/src/
 
 ####
-## SECTION 2: COMPILATION CONFIGURATION
+## SECTION 3: COMPILATION CONFIGURATION
 ##
 ## Under this section you find the macros that set up the compiler executables
 ## that will be used for code compilation. Under Linux systems you would normally
@@ -64,9 +91,8 @@ CPCT_SRC=$(CPCT_PATH)src
 CPCT_LIB=$(CPCT_PATH)cpctelera.lib
 
 # Compilation, linkage and binary generation macros
-Z80CODELOC=0x0100
 Z80CC=$(SDCCBIN_PATH)sdcc
-Z80CCFLAGS= 
+Z80CCFLAGS=
 Z80CCINCLUDE=-I$(CPCT_SRC)
 Z80CCLINKARGS=-mz80 --no-std-crt0 -Wl-u --code-loc $(Z80CODELOC) --data-loc 0 -l$(CPCT_LIB)
 
@@ -80,18 +106,3 @@ HEX2BIN=$(HEX2BIN_PATH)hex2bin
 
 # iDSK interface to generate DSK files
 IDSK=$(IDSK_PATH)iDSK
-
-####
-## SECTION 3: Project configuration 
-##
-## This section establishes source and object subfolders and the binary objects to
-## be built. Normally, you want to change the OBJ files you want to be built, selecting
-## only the ones that contain the actual code that will be used by you in your application.
-#####
-
-SRCDIR=src
-OBJDIR=obj
-CSRCFILES=$(foreach file,$(wildcard $(SRCDIR)/*.c),$(subst $(SRCDIR)/,,$(file)))
-OBJFILES=$(CSRCFILES:.c=.rel)
-#CSRCFILES=$(wildcard *.c)
-#OBJFILES=main.rel
