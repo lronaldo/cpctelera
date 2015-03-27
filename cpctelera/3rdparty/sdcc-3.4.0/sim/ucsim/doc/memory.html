@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>Memory simulation in &micro;Csim</title>
+</head>
+
+<body>
+
+<h1>Memory simulation in &micro;Csim</h1>
+
+Typical microprocessor system can look like this:
+ 
+<p><img src="cpu-mem.gif" border="0" alt="[CPU-memory connection]">
+
+
+<a name="address_space"><h3>Address space</h3></a>
+
+In our terminilogy "<b>address space</b>" means a set of:
+
+<ul><li>address bus lines
+
+<li>data bus lines
+
+<li>control (read/write) lines</ul>
+
+Bus lines can be shared by address spaces, in this case number of
+control line sets specifies the address spaces.
+
+<p>Microcontrollers usually have more address spaces. Some is used
+inside only, some can be used for external memories.
+
+<p>Address space does not store any value. It just specifies range of
+addresses by <i>start address</i> (which is not necessarily zero) and
+<i>size</i> which the CPU can provide when it tries to access a memory
+location.
+
+
+<a name="chip"><h3>Memory chip</h3></a>
+
+"<b>Memory chip</b>" is a circuit which can hold values in
+cells. Cells are indexed from 0 up to size-1. Each cell stores some
+(usually 8) bits.
+
+<p><img src="chip.gif" border="0" alt="[Memory chip]">
+
+
+<a name="address_decoder"><h3>Address decoder</h3></a>
+
+Addresses coming from an address space via address bus must be routed
+to memory and translated to cell indexes. This is done by the
+"<b>address decoder</b>". It listens addresses on the bus and control
+lines and enables exactly one memory chip. This way cells of the
+memory chip appear in the address space.
+
+<p><img src="decoded.gif" boder="0" alt="[Decoded addresses]">
+
+<p>It is possible that some addresses are not decoded. Writing to such
+an address results data to be lost. Reading of a non-decoded address
+results random value. Pullup or pulldown resistors can be applied to
+data bus lines to provide a specific value for read operations.
+
+<p>As it shown above, it is also possible that some cells of a chip is
+not mapped to any address.
+
+
+<h3>Mixed address spaces (shared chips)</h3>
+
+Decoder connects an address of an address space to a cell of a memory
+chip. Only one cell can be connected to each addresses but same cell
+can be connected to more than one address spaces. This is done by
+routing different control lines to the same chip through logic <b>L</b>:
+
+<p><img src="share-chip.gif" border="0" alt="[Sharing memchip]">
+
+<p>Because each cell of a memory chip uses same read/write control, in
+real world it is not possible to share individual cells of a chip
+between address spaces. In &micro;Csim simulator we can define as many
+address decoders as we want so it is possible to map any cell to any
+address.
+
+<hr>
+
+</body>
+</html>

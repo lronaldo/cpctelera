@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{a79ae3fe-4665-451f-9794-5d3c74e69f7e}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0cb331ec-ba78-49f3-ba51-cc6e8c09a18c}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Custom Build">
+      <UniqueIdentifier>{89ad5f5a-fe40-4b1d-81af-ac5fda0e57b3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="peep.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ralloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="support.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ralloc2.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="peep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ralloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="support.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="z80.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDCCralloc.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SDCCtree_dec.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="peeph-gbz80.def">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="peeph-z80.def">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="peeph.def">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="peeph-r2k.def">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="peeph-tlcs90.def">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

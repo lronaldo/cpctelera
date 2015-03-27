@@ -1,0 +1,4 @@
+// there should be at least one newline in the def file
+// to keep MSC compiler satisfied; so don't remove the
+// following empty line!
+

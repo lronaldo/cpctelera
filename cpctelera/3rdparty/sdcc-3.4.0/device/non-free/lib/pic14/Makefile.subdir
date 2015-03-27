@@ -1,0 +1,71 @@
+###########################################################
+### Makefile.subdir for the SDCC/PIC14 Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider AT web.de>
+###
+### The library is currently maintained by
+###	Raphael Neider <rneider AT web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See GPL for details.
+###
+### $Id: Makefile.subdir 4555 2007-01-03 21:19:58Z bernhardheld $
+###
+
+include $(top_builddir)/Makefile.common
+
+SUBDIRS ?= 
+MKLIB	?= 
+
+# fallback: if builddir is not specified via the command line...
+builddir ?= build/$(patsubst $(shell cd $(top_srcdir); pwd)/%,%,$(CURDIR))
+
+C_SRC	?= $(notdir $(wildcard $(srcdir)/*.c))
+S_SRC	?= $(notdir $(wildcard $(srcdir)/*.S))
+OBJS	?= $(addprefix $(top_builddir)/$(builddir)/,$(C_SRC:%.c=%.o) $(S_SRC:%.S=%.o))
+
+LIB_O	?= $(OBJS)
+
+ifneq (,$(strip $(MKLIB)))
+LIB_LIB = $(top_builddir)/$(builddir)/$(MKLIB)
+TARGETS ?= $(LIB_LIB)
+else
+LIB_LIB = 
+#TARGETS ?= $(OBJS)
+endif
+
+.PHONY : all install clean clean-intermediate
+
+all : install
+
+ifneq (,$(strip $(TARGETS)))
+# usually install $(LIB_LIB) or $(OBJS), race condition in "[ -d x ] || mkdir x"
+install : recurse $(OBJS) $(LIB_LIB)
+	-@$(MKDIR) "$(top_builddir)/$(installdir)"
+ifndef SILENT
+	@echo "[INSTALL] $(patsubst $(top_builddir)/$(builddir)/%,%,$(TARGETS))"
+endif
+	$(Q)$(CP) $(TARGETS) "$(top_builddir)/$(installdir)"
+else
+# used in subdirs like libc/ctype whose files
+# are contained in a parent's library
+install : recurse $(OBJS) $(LIB_LIB)
+endif
+
+clean : recurse
+	@-echo "dummy" > .dummy
+	$(Q)-$(RM) .dummy $(foreach suf,asm d p lst hex cod sym,$(OBJS:.o=.$(suf)))
+	@-echo "dummy" > .dummy
+	$(Q)-$(RM) .dummy $(OBJS) $(LIB_LIB)
+	$(Q)-$(RM) $(TARGETS)
+	$(Q)-$(RM) $(addprefix $(top_builddir)/$(installdir)/,$(notdir $(TARGETS)))
+	$(Q)-[ ! -d "$(top_builddir)/$(builddir)" ] || $(RMDIR) "$(top_builddir)/$(builddir)"
+
+distclean : clean
+	$(Q)-$(RM) Makefile
+
+clean-intermediate : recurse
+	@-echo "dummy" > .dummy
+	$(Q)-$(RM) .dummy $(foreach suf,p lst hex cod sym,$(OBJS:.o=.$(suf)))
+	
+include $(top_srcdir)/Makefile.rules

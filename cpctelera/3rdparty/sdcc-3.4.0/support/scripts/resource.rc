@@ -1,0 +1,121 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#elif defined(_WIN32) && !defined(__MINGW32__)
+# include "sdcc_vc.h"
+#else
+# include "sdccconf.h"
+#endif
+
+#include "src/version.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winresrc.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE
+BEGIN
+    "#include ""winresrc.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION    SDCC_VERSION_HI,SDCC_VERSION_LO,SDCC_VERSION_P,SDCC_BUILD_NR
+ PRODUCTVERSION SDCC_VERSION_HI,SDCC_VERSION_LO,SDCC_VERSION_P,SDCC_BUILD_NR
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "http://sdcc.sourceforge.net/"
+            VALUE "CompanyName", "SDCC"
+            VALUE "FileDescription", "Small Device C Compiler"
+            VALUE "FileVersion", SDCC_VERSION_STR "." SDCC_BUILD_NUMBER
+            VALUE "InternalName", "sdcc"
+            VALUE "LegalCopyright", "Copyright (C) 1995-2011, License GPL"
+            VALUE "License", "GNU Public License (GPL)"
+            VALUE "OriginalFilename", "sdcc.exe"
+            VALUE "ProductName", "Small Device C Compiler"
+            VALUE "ProductVersion", SDCC_VERSION_STR "." SDCC_BUILD_NUMBER
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SDCC                ICON    DISCARDABLE     "sdcc.ico"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

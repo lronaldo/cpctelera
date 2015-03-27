@@ -1,0 +1,2 @@
+This works on a TINIm400. The resulting "hello.hex" can be loaded uaing
+JavaKit's 'Load hex as TBIN' option.

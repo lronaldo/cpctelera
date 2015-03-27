@@ -1,0 +1,54 @@
+###########################################################
+### Makefile for the SDCC/PIC14 Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider AT web.de>
+###
+### The library is currently maintained by
+###	Raphael Neider <rneider AT web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See GPL for details.
+###
+### $Id: Makefile.in 8897 2013-11-16 16:53:35Z maartenbrock $
+###
+
+top_builddir = @top_builddir@
+top_srcdir   = @top_srcdir@
+
+VPATH  = @srcdir@
+srcdir = @srcdir@
+
+include $(top_builddir)/Makefile.common
+
+.PHONY: all clean clean-intermediate install
+
+
+ifeq (:,$(findstring :,$(LD) $(AS) $(LIB)))
+all:
+	@echo "gputils not found -- PIC14 library not built!"
+else
+all : install
+install : recurse
+endif
+
+
+SUBDIRS	   = libdev
+builddir   = build
+installdir = bin
+export installdir
+
+C_SRC = $(notdir $(wildcard $(srcdir)/*.c))
+S_SRC = $(notdir $(wildcard $(srcdir)/*.S))
+OBJS = $(C_SRC:.c=.o) $(S_SRC:.S=.o)
+
+clean: recurse
+	$(Q)-$(RMDIR) "$(top_builddir)/$(builddir)"
+	-if [ -d bin ]; then $(RMDIR) bin; fi
+
+distclean: clean
+	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common
+	-if [ -d bin ]; then $(RMDIR) bin; fi
+
+clean-intermediate: recurse
+
+include $(top_srcdir)/Makefile.rules

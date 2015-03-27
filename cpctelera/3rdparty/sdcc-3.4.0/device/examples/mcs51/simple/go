@@ -1,0 +1,2 @@
+#!/bin/sh
+sdcc hi.c

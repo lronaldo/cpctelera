@@ -1,0 +1,15 @@
+# Create gpsim script file
+# 
+
+USAGE="Usage: `basename $0` COD_FILE GPSIM_SCRIPT"
+
+if [ $# -lt 2 ] ; then
+  echo "$USAGE"
+  exit 1
+fi
+
+
+echo "load $1" > $2
+echo "run" >> $2
+echo "symbol _failures" >> $2
+echo "quit" >> $2
