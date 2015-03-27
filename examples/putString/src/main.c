@@ -51,5 +51,16 @@ void main(void) {
          wait_frames(25);
          video_pos += 0x50;
       }
+
+      // Print string on mode 2 and wait
+      CLEAR_SCREEN;
+      cpct_setVideoMode(2);
+      video_pos = (unsigned char*)0xC000;
+      for (times=0; times < 24; times++) {
+         colors[1] ^= 1;
+         cpct_drawROMStringM2("Cadena en modo 2", video_pos, colors[1]);
+         wait_frames(25);
+         video_pos += 0x50;
+      }
    }
 }

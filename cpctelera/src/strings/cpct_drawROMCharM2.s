@@ -52,8 +52,8 @@
 ;########################################################################
 ;### INPUTS (4 Bytes)                                                 ###
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
-;###  * (1B B) Foreground color (0 or 1, Background will be inverted) ###
-;###  * (1B C) Character to be printed (ASCII code)                   ###
+;###  * (1B C) Foreground color (0 or 1, Background will be inverted) ###
+;###  * (1B B) Character to be printed (ASCII code)                   ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
@@ -75,6 +75,8 @@ _cpct_drawROMCharM2::
    PUSH BC                     ;; [11] --- Restore Stack status ---
    PUSH DE                     ;; [11] 
    PUSH AF                     ;; [11]
+
+_cpct_drawROMCharM2_asm::
 
    ;; Set up the color for printing, either foreground or video-inverted
    XOR A                       ;; [ 4] A = 00h (NOP machine code, which will do nothing in the main loop)
