@@ -84,6 +84,8 @@ dcm0_restoreSP:
    ;; Set up foreground and background colours for printing (getting them from tables)
    ;; -- Basically, we need to get values of the 4 bits that should be enabled when the a pixel is present
    LD  A, L                    ;; [ 4] A = ASCII code of the character
+
+_cpct_drawROMCharM0_asm::
    LD  (dcm0_asciiHL+1), A     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    LD  HL, #dc_mode0_ct        ;; [10] HL points to the start of the color table
