@@ -1,0 +1,6 @@
+27/03/2015 : - Changed build system for an easier one 
+             - Added some includes 
+	     - Cleaned up some warnings
+
+01/06/2008 : Uses getopt_pp for more flexible args handling
+
