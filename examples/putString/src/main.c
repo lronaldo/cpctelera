@@ -46,8 +46,22 @@ void main(void) {
       cpct_setVideoMode(0);
       video_pos = (unsigned char*)0xC000;
       for (times=0; times < 24; times++) {
-         if (++colors[0] > 15) colors[0] = 1;
-         cpct_drawROMStringM0("Cadena en modo 0", video_pos, colors[0], 0);
+         colors[0] = ++colors[0] & 15;
+         cpct_drawROMStringM0("$ Mode 0 string $", video_pos, colors[0], 0);
+         wait_frames(25);
+         video_pos += 0x50;
+      }
+
+      // Print string on mode 1 and wait
+      CLEAR_SCREEN;
+      cpct_setVideoMode(1);
+      video_pos = (unsigned char*)0xC000;
+      for (times=0; times < 24; times++) {
+         colors[1] = ++colors[1] & 3;
+         cpct_drawROMStringM1("Mode 1 string :D", video_pos, colors[1], 0);
+         colors[1] = ++colors[1] & 3;
+         cpct_drawROMStringM1_fast("Mode 1 string (Fast)", video_pos + 38, colors[1], 0);
+         colors[1] = ++colors[1] & 3;
          wait_frames(25);
          video_pos += 0x50;
       }
@@ -57,8 +71,8 @@ void main(void) {
       cpct_setVideoMode(2);
       video_pos = (unsigned char*)0xC000;
       for (times=0; times < 24; times++) {
-         colors[1] ^= 1;
-         cpct_drawROMStringM2("Cadena en modo 2", video_pos, colors[1]);
+         colors[2] ^= 1;
+         cpct_drawROMStringM2("And, finally, this is a long mode 2 string!!", video_pos, colors[2]);
          wait_frames(25);
          video_pos += 0x50;
       }

@@ -75,16 +75,19 @@
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 351 bytes                                                ###
+;### MEASURES (Way 2 for parameter retrieval from stack)              ###
+;### MEMORY: 347 bytes                                                ###
 ;### TIME:                                                            ###
-;###  Best case  = 1960 cycles (490,00 us)                            ###
-;###  Worst case = 2678 cycles (669,50 us)                            ###
+;###  Best case  = 1966 cycles (491,50 us)                            ###
+;###  Worst case = 2684 cycles (672,00 us)                            ###
 ;########################################################################
 ;
+
 .globl _cpct_drawROMCharM1_fast
 _cpct_drawROMCharM1_fast::
-   ;; GET Parameters from the stack (Pop + Restoring SP)
+   ;; GET Parameters from the stack 
+.if let_disable_interrupts_for_function_parameters
+   ;; Way 1: Pop + Restoring SP. Faster, but consumes 7 bytes more, and requires disabling interrupts
    LD (dcm1f_restoreSP+1), SP  ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    DI                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                     ;; [10] AF = Return Address
@@ -94,9 +97,22 @@ _cpct_drawROMCharM1_fast::
 dcm1f_restoreSP:
    LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                          ;; [ 4] Enable interrupts again
+.else 
+   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
+   pop  af                     ;; [10] AF = Return Address
+   pop  de                     ;; [10] DE = Destination address (Video memory location where character will be printed)
+   pop  bc                     ;; [10] BC = Colors (B=Background color, C=Foreground color) 
+   pop  hl                     ;; [10] HL = ASCII code of the character (H=0, L=ASCII code)
+   push hl                     ;; [11] Restore Stack status pushing values again
+   push bc                     ;; [11] (Interrupt safe way, 6 cycles more)
+   push de                     ;; [11]
+   push af                     ;; [11]
+.endif
 
    ;; Save ASCII code of the character to get it later
    LD  A, L                    ;; [ 4] A = ASCII code of the character
+
+_cpct_drawROMCharM1_fast_asm::
    LD  (dcm1f_asciiHL+1), A    ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    ;;----------------------------------------------------------------------------------------------

@@ -24,6 +24,11 @@
 .module cpct_strings
 
 ;;
+;; Compilation control directives
+;;
+.equ let_disable_interrupts_for_function_parameters, 0  ;; If true, interrupts can be disabled to get function parameters faster
+
+;;
 ;; Constant values
 ;;
 .equ char0_ROM_address, 0x3800   ;; Address where definition of character 0 starts in ROM
