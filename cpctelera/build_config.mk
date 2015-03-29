@@ -43,7 +43,7 @@
 #####
 
 # SDCC Compiler binary directory path
-#SDCCBIN_PATH=../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
+SDCCBIN_PATH=../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
 
 Z80ASM=$(SDCCBIN_PATH)sdasz80
 Z80ASMFLAGS=-l -o -s

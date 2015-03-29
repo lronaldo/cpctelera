@@ -55,17 +55,18 @@
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 141 bytes (16 table + 125 code)                          ###
+;### MEMORY: 136 bytes (16 table + 120 code)                          ###
 ;### TIME:                                                            ###
-;###  Best case  = 3710 cycles ( 927.50 us)                           ###
-;###  Worst case = 4390 cycles (1097.50 us)                           ###
+;###  Best case  = 3744 cycles ( 936.00 us)                           ###
+;###  Worst case = 4424 cycles (1106.00 us)                           ###
 ;########################################################################
 ;
 
 ;;
 ;; Color table
 ;;
-.bndry 16   ;; Make this vector start at a 16-byte aligned address to be able to use 8-bit arithmetic with pointers
+;; Bndry does not work when file is linked after being compiled.
+;;.bndry 16   ;; Make this vector start at a 16-byte aligned address to be able to use 8-bit arithmetic with pointers
 dc_mode0_ct: .db 0x00, 0x40, 0x04, 0x44, 0x10, 0x50, 0x14, 0x54, 0x01, 0x41, 0x05, 0x45, 0x11, 0x51, 0x15, 0x55
 
 .globl _cpct_drawROMCharM0
@@ -73,15 +74,15 @@ _cpct_drawROMCharM0::
    ;; GET Parameters from the stack 
 .if let_disable_interrupts_for_function_parameters
    ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   LD (dcm0_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   DI                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   POP  AF                     ;; [10] AF = Return Address
-   POP  DE                     ;; [10] DE = Destination address (Video memory location where character will be printed)
-   POP  BC                     ;; [10] BC = Colors (B=Background color, C=Foreground color) 
-   POP  HL                     ;; [10] HL = ASCII code of the character (H=??, L=ASCII code)
+   ld (dcm0_restoreSP+1), sp   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   di                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   pop  af                     ;; [10] AF = Return Address
+   pop  de                     ;; [10] DE = Destination address (Video memory location where character will be printed)
+   pop  bc                     ;; [10] BC = Colors (B=Background color, C=Foreground color) 
+   pop  hl                     ;; [10] HL = ASCII code of the character (H=??, L=ASCII code)
 dcm0_restoreSP:
-   LD SP, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   EI                          ;; [ 4] Enable interrupts again
+   ld sp, #0                   ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   ei                          ;; [ 4] Enable interrupts again
 .else 
    ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
    pop  af                     ;; [10] AF = Return Address
@@ -102,13 +103,32 @@ _cpct_drawROMCharM0_asm::
    LD  (dcm0_asciiHL+1), A     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    LD  HL, #dc_mode0_ct        ;; [10] HL points to the start of the color table
-   LD  A, L                    ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
-   ADD C                       ;; [ 4]          which makes HL point to the Foreground color bits we need. This is valid because
-   LD  L, A                    ;; [ 4]          table is 4-bytes aligned and we just need to increment L, as H won't change)
-   SUB C                       ;; [ 4] A = L again (Make A save the original value of L, to use it again later with Background color)
-   LD  C, (HL)                 ;; [ 7] C = Foreground color bits
-   ADD B                       ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
-   LD  L, A                    ;; [ 4]
+
+   ; This code only works if color table is 16-byte aligned and saves up to 34 cycles
+   ;LD  A, L                   ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
+   ;ADD C                      ;; [ 4]          which makes HL point to the Foreground color bits we need. This is valid because
+   ;LD  L, A                   ;; [ 4]          table is 16-bytes aligned and we just need to increment L, as H won't change)
+   ;SUB C                      ;; [ 4] A = L again (Make A save the original value of L, to use it again later with Background color)
+   ;LD  C, (HL)                ;; [ 7] C = Foreground color bits
+   ;ADD B                      ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
+   ;LD  L, A                   ;; [ 4]
+
+   ld  a, l                    ;; [ 4] HL += C (Let HL point to the concrete color in the table:
+   add c                       ;; [ 4]          HL points initial to the start of the table and C is the Foreground PEN number,
+   ld  l, a                    ;; [ 4]          so HL+C is the memory location of the color bits we need).
+   adc h                       ;; [ 4]
+   sub l                       ;; [ 4]
+   ld  h, a                    ;; [ 4]
+
+   ld  c, (hl)                 ;; [ 7] C = Foreground color bits
+   ld  hl, #dc_mode0_ct        ;; [10] HL points again to the start of the color table
+   ld  a, l                    ;; [ 4] HL += B (Let HL point to the concrete color in the table:
+   add b                       ;; [ 4]          HL points initial to the start of the table and B is the Background PEN number,
+   ld  l, a                    ;; [ 4]          so HL+B is the memory location of the color bits we need).
+   adc h                       ;; [ 4]
+   sub l                       ;; [ 4]
+   ld  h, a                    ;; [ 4]
+
    LD  A, (HL)                 ;; [ 7] A = Background color bits
    LD (dcm0_drawForeground_0-2), A ;; [13] <| Modify Inmediate value of "OR #0" to set it with the background color bits
    LD (dcm0_drawForeground_1-2), A ;; [13] <|  (We do it 2 times, as 2 bits = 2 pixels = 1 byte in video memory)

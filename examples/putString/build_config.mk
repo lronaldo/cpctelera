@@ -67,13 +67,13 @@ OBJFILES:=$(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(SRCEXT), %.$(OBJEXT)
 CPCT_PATH=../../cpctelera/
 
 # SDCC Compiler binary path (/path/to/sdcc/bin)
-#SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
+SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
 
 # HEX2BIN binary path (/path/to/HexToBin/)
-#HEX2BIN_PATH=../../../cpc-dev-tool-chain/tool/hex2bin/Hex2bin-1.0.10/
+HEX2BIN_PATH=../../../cpc-dev-tool-chain/tool/hex2bin/Hex2bin-1.0.10/
 
 # iDSK binary path (/path/to/iDSK/)
-#IDSK_PATH=../../../cpc-dev-tool-chain/tool/idsk/iDSK.0.13/iDSK/src/
+IDSK_PATH=../../../cpc-dev-tool-chain/tool/idsk/iDSK.0.13/iDSK/src/
 
 ####
 ## SECTION 3: COMPILATION CONFIGURATION
