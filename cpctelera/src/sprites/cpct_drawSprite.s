@@ -17,6 +17,8 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
+.include /sprites.s/
+
 ;
 ;########################################################################
 ;### FUNCTION: cpct_drawSprite                                        ###
@@ -39,22 +41,25 @@
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 191 bytes                                                ###
+;### MEASURES (Way 2 for parameter retrieval from stack)              ###
+;### MEMORY: 168 bytes                                                ###
 ;### TIME:                  (w=width, h=height)                       ###
-;###  - Best Case:  76 + (79 + 16w)h + 31(|h/8| - 1) cycles;          ###
+;###  - Best Case:  82 + (79 + 16w)h + 31(|h/8| - 1) cycles;          ###
 ;###  - Worst Case: Best Case + 31 cycles                             ###
 ;###  ** EXAMPLES **                                                  ###
-;###   - 2x16 bytes sprite = 1883 / 1914 cycles ( 470.75 /  478.5 us) ###
-;###   - 4x32 bytes sprite = 4745 / 4776 cycles (1186.25 / 1194.0 us) ###
+;###   - 2x16 bytes sprite = 1889 / 1920 cycles ( 472.25 /  480.0 us) ###
+;###   - 4x32 bytes sprite = 4751 / 4782 cycles (1187.75 / 1195.5 us) ###
 ;########################################################################
 ;### This routine was inspired in the original cpc_PutSprite from     ###
 ;### cpcrslib by Raul Simarro.                                        ###
 ;########################################################################
 ;
+
 .globl _cpct_drawSprite
 _cpct_drawSprite::
-   ;; GET Parameters from the stack (Pop is fastest way)
+   ;; GET Parameters from the stack 
+.if let_disable_interrupts_for_function_parameters
+   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
    LD (ds_restoreSP+1), SP    ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    DI                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                    ;; [10] AF = Return Address
@@ -64,6 +69,17 @@ _cpct_drawSprite::
 ds_restoreSP:
    LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                         ;; [ 4] Enable interrupts again
+.else 
+   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
+   pop  af                    ;; [10] AF = Return Address
+   pop  hl                    ;; [10] HL = Source Address (Sprite data array)
+   pop  de                    ;; [10] DE = Destination address (Video memory location)
+   pop  bc                    ;; [10] BC = Height/Width (B = Height, C = Width)
+   push bc                    ;; [11] Restore Stack status pushing values again
+   push de                    ;; [11] (Interrupt safe way, 6 cycles more)
+   push hl                    ;; [11]
+   push af                    ;; [11]
+.endif
 
    ;; Modify code using width to jump in drawSpriteWidth
    LD  A, #126                   ;; [ 7] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite*2 (2B)
