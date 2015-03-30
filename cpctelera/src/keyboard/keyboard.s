@@ -22,6 +22,7 @@
 ;;   (alignment not working on user linking)
 .globl cpct_keyboardStatusBuffer
 
-.bndry 16
+;; bndry directive does not work when linking previously compiled files
+;.bndry 16
 cpct_keyboardStatusBuffer: .ds 10
 

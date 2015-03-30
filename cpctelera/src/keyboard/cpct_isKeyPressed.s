@@ -51,7 +51,7 @@ _cpct_isKeyPressed::
    LD   C, (HL)                     ;; [ 7] C = First Parameter (KeyID - Matrix Line)
    INC HL                           ;; [ 6] 
    LD   A, (HL)                     ;; [ 7] A = Second Parameter (KeyID - Bit Mask)
-  
+
    LD  HL,#cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer
    ADD HL, BC                       ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) (As B is already 0, so BC = C)
    AND (HL)                         ;; [ 7] A = AND operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
