@@ -41,13 +41,13 @@
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 59 bytes                                                 ###
+;### MEMORY: 54 bytes                                                 ###
 ;### TIME:                  (W=width, H=height)                       ###
-;###  - Best  Case: 152 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
+;###  - Best  Case: 158 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
 ;###  - Worst Case: (Best Case) + 40                                  ###
 ;###  ** EXAMPLES **                                                  ###
-;###   - 2x16 bytes sprite = 2888 / 2928 cycles ( 722 /  732 us)      ###
-;###   - 4x32 bytes sprite = 9416 / 9456 cycles (2354 / 2364 us)      ###
+;###   - 2x16 bytes sprite = 2894 / 2934 cycles ( 723,5 /  733,5 us)  ###
+;###   - 4x32 bytes sprite = 9422 / 9462 cycles (2355,5 / 2365,5 us)  ###
 ;########################################################################
 ;
 
