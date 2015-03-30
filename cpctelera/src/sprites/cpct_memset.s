@@ -17,6 +17,8 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_memset
 
+.include /sprites.s/
+
 ;
 ;########################################################################
 ;### FUNCTION: cpct_memset                                            ###
@@ -40,13 +42,17 @@
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY:  20 bytes                                                ###
-;### TIME:    113 + 21*BC cycles (28.25 + 5.25*BC us)                 ###
+;### MEASURES (Way 2 for parameter retrieval from stack)              ###
+;### MEMORY:  17 bytes                                                ###
+;### TIME:    120 + 21*BC cycles (28.25 + 5.25*BC us)                 ###
 ;########################################################################
 ;
+
 .globl _cpct_memset
 _cpct_memset::
+
+.if let_disable_interrupts_for_function_parameters
+   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
    LD  HL, #0        ;; [10] HL = SP (To quickly restore it later)
    ADD HL, SP        ;; [11]
    DI                ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
@@ -58,6 +64,18 @@ _cpct_memset::
 ms_restoreSP:
    LD SP, HL         ;; [ 6] -- Restore Stack Pointer --
    EI                ;; [ 4] Enable interrupts again
+.else 
+   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
+   pop  af           ;; [10] Get return value from stack
+   pop  de           ;; [10] (1st param) DE = Starting point in memory
+   pop  bc           ;; [10] (2nd param) BC = Number of bytes to be set
+   pop  hl           ;; [10] (3rd param) L = Value to be set (H=random)
+   push hl           ;; [11] Restore Stack status pushing values again
+   push bc           ;; [11] (Interrupt safe way, 7 cycles more)
+   push de           ;; [11]
+   push af           ;; [11]
+   ld   a, l         ;; [ 4] A = L (Value to be set)
+.endif
 
    ;; Set up HL and DE for a massive copy of the Value to be set
    LD H, D           ;; [ 4] HL = DE (Starting address in memory)
