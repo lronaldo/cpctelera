@@ -19,6 +19,8 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_bitarray
 
+.include /bitarray.s/
+
 .globl cpct_bitWeights
 
 ;
@@ -41,17 +43,20 @@
 ;###  * (1B C)  Value from 0 to 1 to set in the given position        ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL	                      ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 54 bytes (8 table + 46 code)                             ###
+;### MEASURES (Way 2 for parameter retrieval from stack)              ###
+;### MEMORY: 49 bytes (8 table + 41 code)                             ###
 ;### TIME:                                                            ###
-;###   Best Case  (1) = 211 cycles ( 52.75 us)                        ###                                                            ###
-;###   Worst Case (0) = 222 cycles ( 55.50 us)                        ###                                                            ###
+;###   Best Case  (1) = 217 cycles ( 54.25 us)                        ###
+;###   Worst Case (0) = 228 cycles ( 57.00 us)                        ###
 ;########################################################################
 ;
+
 _cpct_setBit::
-   ;; GET Parameters from the stack (Pop + Restoring SP)
+   ;; GET Parameters from the stack
+.if let_disable_interrupts_for_function_parameters
+   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
    LD (sb_restoreSP+1), SP  ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    DI                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                  ;; [10] AF = Return Address
@@ -61,6 +66,17 @@ _cpct_setBit::
 sb_restoreSP:
    LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                       ;; [ 4] Enable interrupts again
+.else 
+   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
+   pop  af                  ;; [10] AF = Return Address
+   pop  de                  ;; [10] DE = Pointer to the bitarray in memory
+   pop  hl                  ;; [10] HL = Index of the bit to be set
+   pop  bc                  ;; [10] BC => C = Set Value (0/1), B = Undefined
+   push bc                  ;; [11] Restore Stack status pushing values again
+   push hl                  ;; [11] (Interrupt safe way, 6 cycles more)
+   push de                  ;; [11]
+   push af                  ;; [11]
+.endif
 
    LD  A, L                 ;; [ 4] Save L into A for later use (Knowing which bit to access into the target byte => L % 8)
 
