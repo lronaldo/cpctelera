@@ -17,6 +17,8 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
+.include /sprites.s/
+
 ;
 ;########################################################################
 ;### FUNCTION: cpct_drawMaskedSprite                                  ###
@@ -38,7 +40,7 @@
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURES                                                         ###
+;### MEASURES (Way 2 for parameter retrieval from stack)              ###
 ;### MEMORY: 59 bytes                                                 ###
 ;### TIME:                  (W=width, H=height)                       ###
 ;###  - Best  Case: 152 + 59(W)(H) + 54(H-1) + 40(|H/8|-1)            ###
@@ -48,9 +50,12 @@
 ;###   - 4x32 bytes sprite = 9416 / 9456 cycles (2354 / 2364 us)      ###
 ;########################################################################
 ;
+
 .globl _cpct_drawMaskedSprite
 _cpct_drawMaskedSprite::
-   ;; GET Parameters from the stack (Pop is fastest way)
+   ;; GET Parameters from the stack 
+.if let_disable_interrupts_for_function_parameters
+   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
    LD (dms_restoreSP+1), SP   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    DI                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    POP  AF                    ;; [10] AF = Return Address
@@ -60,6 +65,17 @@ _cpct_drawMaskedSprite::
 dms_restoreSP:
    LD SP, #0                  ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    EI                         ;; [ 4] Enable interrupts again
+.else 
+   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
+   pop  af                    ;; [10] AF = Return Address
+   pop  hl                    ;; [10] HL = Source Address (Sprite data array)
+   pop  de                    ;; [10] DE = Destination address (Video memory location)
+   pop  bc                    ;; [10] BC = Height/Width (B = Height, C = Width)
+   push bc                    ;; [11] Restore Stack status pushing values again
+   push de                    ;; [11] (Interrupt safe way, 6 cycles more)
+   push hl                    ;; [11]
+   push af                    ;; [11]
+.endif
 
    PUSH IX                    ;; [15] Save IX regiter before using it as temporal var
    .DW #0x69DD                ;; [ 8] LD IXL, C ; Save Sprite Width into IXL for later use
