@@ -18,17 +18,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_audio
 
-;
-;   This code is an modification of the original code was developed by Targhan / Arkos.
-;   This modification maintains the original spirit of Arkos Tracker and has just done changes
-;   to easily integrate it within the framework and filosofy of CPCtelera. Also, original code
-;   was configurable to run either on CPC or on MSX, but specific MSX code has been removed in this
-;   version. The same was done with CPC-BASIC version. This version does not make use of interrupts,
-;   requiering to be called manually at the correct framerate to reproduce the song.
-;   Original comments from Targhan / Arkos have been kept unmodified, removing those referred to
-;   MSX / BASIC players or the original way to use this player (that has changed).
-;
-
 ;   Arkos Tracker Player V1.01 - CPC & MSX version.
 ;   21/09/09
 
@@ -41,13 +30,64 @@
 ;   - Small (but not useless !) optimisations by Grim/Arkos at the PLY_Track1_WaitCounter / PLY_Track2_WaitCounter / PLY_Track3_WaitCounter labels.
 ;   - Optimisation of the R13 management by Grim/Arkos.
 
-;   This player can adapt to the following machines = Amstrad CPC 
+;   This player can adapt to the following machines =
+;   Amstrad CPC and MSX.
 ;   Output codes are specific, as well as the frequency tables.
 
 ;   This player modifies all these registers = hl, de, bc, AF, hl', dE', BC', AF', IX, IY.
 ;   The Stack is used in conventionnal manners (Call, Ret, Push, Pop) so integration with any of your code should be seamless.
 ;   The player does NOT modifies the Interruption state, unless you use the PLY_SystemFriendly flag, which will cut the
 ;   interruptions at the beginning, and will restore them ONLY IF NEEDED.
+
+;   Basically, there are three kind of players.
+
+;   ASM
+;   ---
+;   Used in your Asm productions. You call the Player by yourself, you don't care if all the registers are modified.
+
+;   Set PLY_SystemFriendly and PLY_UseFirmwareInterruptions to 0.
+
+;   In Assembler =
+;   ld de,MusicAddress
+;   call Player / PLY_Init      to initialise the player with your song.
+;   then
+;   call Player + 3 / PLY_Play   whenever you want to play/continue the song.
+;   call Player + 6 / PLY_Stop   to stop the song.
+
+;   BASIC
+;   -----
+;   Used in Basic (on CPC), or under the helm of any OS. Interruptions will be cut by the player, but restored ONLY IF NECESSARY.
+;   Also, some registers are saved (AF', BC', IX and IY), as they are used by the CPC Firmware.
+;   If you need to add/remove more registers, take care to do it at PLY_Play, but also at PLY_Stop.
+;   Registers are restored at PLY_PSGREG13_RecoverSystemRegisters.
+
+;   Set PLY_SystemFriendly to 1 and PLY_UseFirmwareInterruptions to 0.
+;   The Calls in Assembler are the same as above.
+
+;   In Basic =
+;   call Player, MusicAddress   to initialise the player with your song.
+;   then
+;   call Player + 3         whenever you want to play/continue the song.
+;   call Player + 6         to stop the song.
+
+
+;   INTERRUPTIONS
+;   -------------
+;   CPC Only ! Uses the Firmware Interruptions to put the Player on interruption. Very useful in Basic.
+;   Set PLY_SystemFriendly and PLY_UseFirmwareInterruptions to 1.
+
+;   In Assembler =
+;   ld de,MusicAddress
+;   call Player / PLY_InterruptionOn      to play the song from start.
+;   call Player + 3 / PLY_InterruptionOff      to stop the song.
+;   call Player + 6 / PLY_InterruptionContinue   to continue the song once it's been stopped.
+
+;   In Basic=
+;   call Player, MusicAddress   to play the song from start.
+;   call Player + 3         to stop the song.
+;   call Player + 6         to continue the song once it's been stopped.
+
+
 
 ;   FADES IN/OUT
 ;   ------------
@@ -57,13 +97,21 @@
 ;   ld e,Volume (0=full volume, 16 or more=no volume)
 ;   call PLY_SetFadeValue
 
+;   In Basic =
+;   call Player + 9 (or + 18, see just below), Volume (0=full volume, 16 or more=no volume)
+;   WARNING ! You must call Player + 18 if PLY_UseBasicSoundEffectInterface is set to 1.
+
+
+
 ;   SOUND EFFECTS
 ;   -------------
 ;   The player manages Sound Effects. They must be defined in another song, generated as a "SFX Music" in the Arkos Tracker.
-;   Set the PLY_UseSoundEffects to 1. 
+;   Set the PLY_UseSoundEffects to 1. If you want to use sound effects in Basic, set PLY_UseBasicSoundEffectInterface to 1.
+
 ;   In Assembler =
 ;   ld de,SFXMusicAddress
 ;   call PLY_SFX_Init      to initialise the SFX Song.
+
 ;   Then initialise and play the "music" song normally.
 
 ;   To play a sound effect =
@@ -80,12 +128,25 @@
 ;   To stop the sound effects on all the channels =
 ;   call PLY_SFX_StopAll
 
+;   In Basic =
+;   call Player + 9, SFXMusicAddress   to initialise the SFX Song.
+;   To play a sound effect =
+;   call Player + 12, No Channel, SFX Number, Volume, Note, Speed, Inverted Pitch. No parameter should be ommited !
+;   To stop a sound effect =
+;   call Player + 15, No Channel (0,1,2)
+
+
 ;   For more information, check the manual.
+
 ;   Any question, complaint, a need to reward ? Write to contact@julien-nevo.com
 
 ;;------------------------------------------------------------------------------------------------------
 ;;--- PLAYER CONFIGURATION CONSTANTS
 ;;------------------------------------------------------------------------------------------------------
+
+;Indicates what frequency table and output code to use.
+.equ PLY_UseCPCMachine, 1
+.equ PLY_UseMSXMachine, 0
 
 ;Set to 1 if you want to use Sound Effects in your player. Both CPU and memory consuming.
 .equ PLY_UseSoundEffects, 1
@@ -99,6 +160,15 @@
 ;As this option is system-friendly, it cuts the interruption, and restore them ONLY IF NECESSARY.
 .equ PLY_SystemFriendly, 1
 
+;Set to 1 to use a Player under interruption. Only works on CPC, as it uses the CPC Firmware.
+;WARNING, PLY_SystemFriendly must be set to 1 if you use the Player under interruption !
+;SECOND WARNING, make sure the player is above #3fff, else it won't be played (system limitation).
+.equ PLY_UseFirmwareInterruptions, 0
+
+; Set to 1 if you want a little interface to be added if you are a BASIC programmer who wants
+; to use sound effects. Of course, you must also set PLY_UseSoundEffects to 1.
+.equ PLY_UseBasicSoundEffectInterface, 0
+
 ;Value used to trigger the Retrig of Register 13. #FE corresponds to cp xx. Do not change it !
 .equ PLY_RetrigValue, #0xFE
 
@@ -106,11 +176,109 @@
 ;;--- PLAYER CODE START
 ;;------------------------------------------------------------------------------------------------------
 
-;Read here to know if a Digidrum has been played (0=no).
-PLY_Digidrum: .db 0
+;; INPUT: (2B DE) Song address
+_cpct_arkosPlayer_init::
+   LD  HL, #2  ;; [10]
+   ADD HL, SP  ;; [11]
+   LD E, (HL)  ;; [ 7]
+   INC HL      ;; [ 6]
+   LD D, (HL)  ;; [ 7]
+   JP PLY_Init
+
+
+;******* Interruption Player ********
+.if PLY_UseFirmwareInterruptions
+
+      ;You can remove these JPs if using the sub-routines directly.
+      jp PLY_InterruptionOn                           ;Call Player = Start Music.
+      jp PLY_InterruptionOff                          ;Call Player + 3 = Stop Music.
+      jp PLY_InterruptionContinue                     ;Call Player + 6 = Continue (after stopping).
+
+      .if PLY_UseBasicSoundEffectInterface
+         jp PLY_SFX_Init                              ;Call Player + 9 to initialise the sound effect music.
+         jp PLY_BasicSoundEffectInterface_PlaySound   ;Call Player + 12 to add sound effect in BASIC.
+         jp PLY_SFX_Stop                              ;Call Player + 15 to stop a sound effect.
+      .endif
+
+      .if PLY_UseFades
+         jp PLY_SetFadeValue                          ;Call Player + 9 or + 18 to set Fades values.
+      .endif
+
+
+   PLY_InterruptionOn:
+      call  PLY_Init
+      ld    hl, PLY_Interruption_Convert
+
+   PLY_ReplayFrequency:
+      ld  de, #0
+      ld   a, d
+      ld  (PLY_Interruption_Cpt + 1), A
+      ADD hl, de
+      ld   a, (hl)                        ;Chope nbinter wait
+      ld  (PLY_Interruption_Value + 1), A
+
+   PLY_InterruptionContinue:
+      ld  hl, PLY_Interruption_ControlBloc
+      ld  bc, #0b10000001 * 256 + 0
+      ld  de, PLY_Interruption_Play
+      jp  #0xBCE0
+
+   PLY_InterruptionOff:
+      ld    hl, PLY_Interruption_ControlBloc
+      call  #0xBCE6
+      jp    PLY_Stop
+
+   PLY_Interruption_ControlBloc:
+      .dw #0x0000, #0x0000, #0x0000, #0x0000, #0x0000  ; 10-byte buffer used by the OS.
+
+   ;Code run by the OS on each interruption.
+   PLY_Interruption_Play:
+      di
+
+   PLY_Interruption_Cpt:
+      ld  a, #0                  ;Run the player only if it has to, according to the music frequency.
+
+   PLY_Interruption_Value:
+      cp  #5
+      jr  z, PLY_Interruption_NoWait
+      inc a
+      ld  (PLY_Interruption_Cpt + 1), a
+      ret
+
+   PLY_Interruption_NoWait:
+      xor a
+      ld  (PLY_Interruption_Cpt + 1), a
+      jp  PLY_Play
+
+      ;Table to convert PLY_ReplayFrequency into a Frequency value for the AMSDOS.
+   PLY_Interruption_Convert: .db 17, 11, 5, 2, 1, 0
+
+.else
 
 ;***** Normal Player *****
 ;To be called when you want.
+
+;You can remove these following JPs if using the sub-routines directly.
+   jp PLY_Init                                     ;Call Player = Initialise song (DE = Song address).
+   jp PLY_Play                                     ;Call Player + 3 = Play song.
+   jp PLY_Stop                                     ;Call Player + 6 = Stop song.
+.endif
+
+;***** BASIC Sound Effects Interface *****
+.if PLY_UseBasicSoundEffectInterface
+   jp PLY_SFX_Init                                 ;Call Player + 9 to initialise the sound effect music.
+   jp PLY_BasicSoundEffectInterface_PlaySound      ;Call Player + 12 to add sound effect in BASIC.
+   jp PLY_SFX_Stop                                 ;Call Player + 15 to stop a sound effect.
+.endif
+
+;***** FADES *****
+.if PLY_UseFades
+   jp PLY_SetFadeValue                             ;Call Player + 9 or + 18 to set Fades values.
+.endif
+
+;Read here to know if a Digidrum has been played (0=no).
+PLY_Digidrum: .db 0
+
 _cpct_arkosPlayer_play:: 
 PLY_Play:
 
@@ -803,265 +971,431 @@ PLY_Track1_PlayNoForward:
 PLY_SendRegisters:
    ;A=Register 7
 
-   ld  de, #0xC080
-   ld   b, #0xF6
-   out (c),d   ;#f6c0
-   exx
-   ld  hl, #PLY_PSGRegistersArray
-   ld   e, #0xF6
-   ld  bc, #0xF401
+.if PLY_UseMSXMachine
 
-;Register 0
-   .dw #0x71ED  ;out(c), 0    ; #0xF400+Register
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0    ; #0xF600
-   dec  b
-   outi                       ; #0xF400+value
-   exx
-   out (c), e                 ; #0xF680
-   out (c), d                 ; #0xF6C0
-   exx
+      ld   b, a
+      ld  hl, PLY_PSGRegistersArray
 
-;Register 1
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 0
+      xor  a
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 2
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 1
+      ld   a, #1
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 3
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 2
+      ld   a, #2
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 4
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 3
+      ld   a, #3
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 5
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 4
+      ld   a, #4
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 6
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 5
+      ld   a, #5
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 7
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   dec  b
-   out (c), a         ;Read A register instead of the list.
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 6
+      ld   a, #6
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 8
-   out (c), c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec b
+   ;Register 7
+      ld   a, #7
+      out  (#0xa0), a
+      ld   a, b         ;Use the stored Register 7.
+      out  (#0xa1), a
 
-   .if PLY_UseFades
-         dec  b
-         ld   a, (hl)
+   ;Register 8
+      ld   a, #8
+      out  (#0xa0), a
+      ld   a, (hl)
 
-      PLY_Channel1_FadeValue:
-         sub  0               ;Set a value from 0 (full volume) to 16 or more (volume to 0).
-         jr  nc, .+6
-         .dw #0x71ED  ;out(c), 0
-         jr  .+4
-         out (c), a
-         inc hl
+      .if PLY_UseFades
 
-   .else
+         PLY_Channel1_FadeValue:
+            sub   0      ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+            jr   nc, .+3
+            xor   a
 
-         outi
+      .endif
 
-   .endif
+      out  (#0xa1), a
+      inc  hl
+      inc  hl            ;Skip unused byte.
 
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
-   inc hl            ;Skip unused byte.
+   ;Register 9
+      ld   a, #9
+      out  (#0xa0), a
+      ld   a, (hl)
 
-;Register 9
-   out (c), c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec b
+      .if PLY_UseFades
 
-   .if PLY_UseFades         ;If PLY_UseFades is set to 1, we manage the volume fade.
-         dec  b
-         ld   a, (hl)
+         PLY_Channel2_FadeValue: 
+            sub   0      ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+            jr   nc, .+3
+            xor   a
 
-      PLY_Channel2_FadeValue:
-         sub  0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
-         jr  nc, .+6
-         .dw #0x71ED  ;out(c), 0
-         jr  .+4
-         out (c), a
-         inc hl
+      .endif
 
-   .else
+      out  (#0xa1), a
+      inc  hl
+      inc  hl            ;Skip unused byte.
 
-         outi
+   ;Register 10
+      ld   a, #9
+      out  (#0xa0), a
+      ld   a, (hl)
 
-   .endif
-
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
-   inc hl            ;Skip unused byte.
-
-;Register 10
-   out (c), c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-
-   .if PLY_UseFades
-         dec  b
-         ld   a, (hl)
+      .if PLY_UseFades
 
          PLY_Channel3_FadeValue:
-         sub  0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
-         jr  nc, .+6
-         .dw #0x71ED  ;out(c), 0
-         jr  .+4
-         out (c), a
-         inc hl
+            sub   0      ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+            jr   nc, .+3
+            xor   a
 
-   .else
+      .endif
 
-         outi
+      out  (#0xa1), a
+      inc  hl
 
-   .endif
+   ;Register 11
+      ld   a, #11
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 12
+      ld   a, #12
+      out  (#0xa0), a
+      ld   a, (hl)
+      out  (#0xa1), a
+      inc hl
 
-;Register 11
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+   ;Register 13
+      .if PLY_SystemFriendly
 
-;Register 12
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
-   exx
-   inc  c
+            call PLY_PSGReg13_Code
 
-;Register 13
-   .if PLY_SystemFriendly
+         PLY_PSGREG13_RecoverSystemRegisters:
+            pop iy
+            pop ix
+            pop bc
+            pop af
+            exx
+            ex af,af'
+      ;Restore Interrupt status
+         PLY_RestoreInterruption:
+            nop            ;Will be automodified to an DI/EI.
+            ret
 
-         call PLY_PSGReg13_Code
-
-      PLY_PSGREG13_RecoverSystemRegisters:
-         pop iy
-         pop ix
-         pop bc
-         pop af
-         exx
-         ex  af, af'
-
-         ;Restore Interrupt status
-      PLY_RestoreInterruption:
-         nop            ;Will be automodified to an DI/EI.
-         ret
-
-   .endif
+      .endif
 
 
-PLY_PSGReg13_Code:
-   ld  a, (hl)
+   PLY_PSGReg13_Code:
+      ld   a, #13
+      out  (#0xa0), a
+      ld   a, (hl)
 
-PLY_PSGReg13_Retrig:
-   cp  #255            ;If IsRetrig?, force the R13 to be triggered.
-   ret z
+   PLY_PSGReg13_Retrig:
+      cp  #255            ;If IsRetrig?, force the R13 to be triggered.
+      ret  z
 
-   ld  (PLY_PSGReg13_Retrig + 1), a
-   out (c),c
-   ld   b, e
-   .dw #0x71ED  ;out(c), 0
-   dec  b
-   outi
-   exx
-   out (c), e
-   out (c), d
+      out  (#0xa1), a
+      ld  (PLY_PSGReg13_Retrig + 1), a
+      ret
 
-   ret
+.endif
+
+.if PLY_UseCPCMachine
+
+      ld  de, #0xC080
+      ld   b, #0xF6
+      out (c),d   ;#f6c0
+      exx
+      ld  hl, #PLY_PSGRegistersArray
+      ld   e, #0xF6
+      ld  bc, #0xF401
+
+   ;Register 0
+      .dw #0x71ED  ;out(c), 0    ; #0xF400+Register
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0    ; #0xF600
+      dec  b
+      outi                       ; #0xF400+value
+      exx
+      out (c), e                 ; #0xF680
+      out (c), d                 ; #0xF6C0
+      exx
+
+   ;Register 1
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 2
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 3
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 4
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 5
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 6
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 7
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      dec  b
+      out (c), a         ;Read A register instead of the list.
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 8
+      out (c), c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec b
+
+      .if PLY_UseFades
+            dec  b
+            ld   a, (hl)
+
+         PLY_Channel1_FadeValue:
+            sub  0               ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+            jr  nc, .+6
+            .dw #0x71ED  ;out(c), 0
+            jr  .+4
+            out (c), a
+            inc hl
+
+      .else
+
+            outi
+
+      .endif
+
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+      inc hl            ;Skip unused byte.
+
+   ;Register 9
+      out (c), c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec b
+
+      .if PLY_UseFades         ;If PLY_UseFades is set to 1, we manage the volume fade.
+            dec  b
+            ld   a, (hl)
+
+         PLY_Channel2_FadeValue:
+            sub  0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+            jr  nc, .+6
+            .dw #0x71ED  ;out(c), 0
+            jr  .+4
+            out (c), a
+            inc hl
+
+      .else
+
+            outi
+
+      .endif
+
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+      inc hl            ;Skip unused byte.
+
+   ;Register 10
+      out (c), c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+
+      .if PLY_UseFades
+            dec  b
+            ld   a, (hl)
+
+            PLY_Channel3_FadeValue:
+            sub  0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+            jr  nc, .+6
+            .dw #0x71ED  ;out(c), 0
+            jr  .+4
+            out (c), a
+            inc hl
+
+      .else
+
+            outi
+
+      .endif
+
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 11
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 12
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+      exx
+      inc  c
+
+   ;Register 13
+      .if PLY_SystemFriendly
+
+            call PLY_PSGReg13_Code
+
+         PLY_PSGREG13_RecoverSystemRegisters:
+            pop iy
+            pop ix
+            pop bc
+            pop af
+            exx
+            ex  af, af'
+
+            ;Restore Interrupt status
+         PLY_RestoreInterruption:
+            nop            ;Will be automodified to an DI/EI.
+            ret
+
+      .endif
+
+
+   PLY_PSGReg13_Code:
+      ld  a, (hl)
+
+   PLY_PSGReg13_Retrig:
+      cp  #255            ;If IsRetrig?, force the R13 to be triggered.
+      ret z
+
+      ld  (PLY_PSGReg13_Retrig + 1), a
+      out (c),c
+      ld   b, e
+      .dw #0x71ED  ;out(c), 0
+      dec  b
+      outi
+      exx
+      out (c), e
+      out (c), d
+
+      ret
+
+.endif
 
 ;There are two holes in the list, because the Volume registers are set relatively to the Frequency of the same Channel (+7, always).
 ;Also, the Reg7 is passed as a register, so is not kept in the memory.
@@ -1288,6 +1622,7 @@ PLY_PS_SD_Noise:
    ld  (PLY_PSGReg6), a
    .db #0xDD, #0x2E, #0b0000 ; ld ixl,%0000  
    ret
+
 
 ;******************
 ;Hardware Dependent
@@ -1580,32 +1915,56 @@ PLY_ReadTrack_Wait:
    add  a, #32
    ret
 
+
 PLY_FrequencyTable:
-.dw 3822,3608,3405,3214,3034,2863,2703,2551,2408,2273,2145,2025
-.dw 1911,1804,1703,1607,1517,1432,1351,1276,1204,1136,1073,1012
-.dw 956,902,851,804,758,716,676,638,602,568,536,506
-.dw 478,451,426,402,379,358,338,319,301,284,268,253
-.dw 239,225,213,201,190,179,169,159,150,142,134,127
-.dw 119,113,106,100,95,89,84,80,75,71,67,63
-.dw 60,56,53,50,47,45,42,40,38,36,34,32
-.dw 30,28,27,25,24,22,21,20,19,18,17,16
-.dw 15,14,13,13,12,11,11,10,9,9,8,8
-.dw 7,7,7,6,6,6,5,5,5,4,4,4
-.dw 4,4,3,3,3,3,3,2,2,2,2,2
-.dw 2,2,2,2,1,1,1,1,1,1,1,1
+
+.if PLY_UseCPCMachine
+   .dw 3822,3608,3405,3214,3034,2863,2703,2551,2408,2273,2145,2025
+   .dw 1911,1804,1703,1607,1517,1432,1351,1276,1204,1136,1073,1012
+   .dw 956,902,851,804,758,716,676,638,602,568,536,506
+   .dw 478,451,426,402,379,358,338,319,301,284,268,253
+   .dw 239,225,213,201,190,179,169,159,150,142,134,127
+   .dw 119,113,106,100,95,89,84,80,75,71,67,63
+   .dw 60,56,53,50,47,45,42,40,38,36,34,32
+   .dw 30,28,27,25,24,22,21,20,19,18,17,16
+   .dw 15,14,13,13,12,11,11,10,9,9,8,8
+   .dw 7,7,7,6,6,6,5,5,5,4,4,4
+   .dw 4,4,3,3,3,3,3,2,2,2,2,2
+   .dw 2,2,2,2,1,1,1,1,1,1,1,1
+.endif
+
+.if PLY_UseMSXMachine
+   .dw 4095,4095,4095,4095,4095,4095,4095,4095,4095,4030,3804,3591
+   .dw 3389,3199,3019,2850,2690,2539,2397,2262,2135,2015,1902,1795
+   .dw 1695,1599,1510,1425,1345,1270,1198,1131,1068,1008,951,898
+   .dw 847,800,755,712,673,635,599,566,534,504,476,449
+   .dw 424,400,377,356,336,317,300,283,267,252,238,224
+   .dw 212,200,189,178,168,159,150,141,133,126,119,112
+   .dw 106,100,94,89,84,79,75,71,67,63,59,56
+   .dw 53,50,47,45,42,40,37,35,33,31,30,28
+   .dw 26,25,24,22,21,20,19,18,17,16,15,14
+   .dw 13,12,12,11,11,10,9,9,8,8,7,7
+   .dw 7,6,6,6,5,5,5,4,4,4,4,4
+   .dw 3,3,3,3,3,2,2,2,2,2,2,2
+.endif
+
 
 ;DE = Music
-;; INPUT: (2B DE) Song address
-_cpct_arkosPlayer_init::
-   ld  hl, #2    ;; [10] Retrieve parameters from stack
-   add hl, sp    ;; [11]
-   ld  e, (HL)   ;; [ 7] DE = Pointer to the start of music
-   inc hl        ;; [ 6]
-   ld  d, (HL)   ;; [ 7]
-
 PLY_Init:
+
+.if PLY_UseFirmwareInterruptions
+
+   ld  hl, #8                          ;Skip Header, SampleChannel, YM Clock (DB*3). The Replay Frequency is used in Interruption mode.
+   add hl, de
+   ld  de, #PLY_ReplayFrequency + 1
+   ldi
+
+.else
+
    ld  hl, #9                          ;Skip Header, SampleChannel, YM Clock (DB*3), and Replay Frequency.
    add hl, de
+
+.endif
 
    ld  de, #PLY_Speed + 1
    ldi                                 ;Copy Speed.
@@ -1677,6 +2036,7 @@ PLY_Stop:
    jp  PLY_SendRegisters
 
    .if PLY_UseSoundEffects
+
       ;Initialize the Sound Effects.
       ;DE = SFX Music.
       PLY_SFX_Init:
@@ -1768,9 +2128,12 @@ PLY_Stop:
          inc hl
          ld  (hl), a
          ret
+
    .endif
 
+
    .if PLY_UseFades
+
       ;Sets the Fade value.
       ;E = Fade value (0 = full volume, 16 or more = no volume).
       ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+9/+18, value).
@@ -1780,9 +2143,14 @@ PLY_Stop:
          ld  (PLY_Channel2_FadeValue + 1), a
          ld  (PLY_Channel3_FadeValue + 1), a
          ret
+
    .endif
 
+
+
+
    .if PLY_SystemFriendly
+
       ;Save Interrupt status and Disable Interruptions
       PLY_DisableInterruptions:
          ld   a, i
@@ -1799,4 +2167,19 @@ PLY_Stop:
       PLY_DisableInterruptions_Set_Opcode:
          ld  (PLY_RestoreInterruption), a
          ret
+
+   .endif
+
+
+;A little convient interface for BASIC user, to allow them to use Sound Effects in Basic.
+   .if PLY_UseBasicSoundEffectInterface
+      PLY_BasicSoundEffectInterface_PlaySound:
+         ld   c, 0(ix)    ;Get Pitch
+         ld   b, 1(ix)
+         ld   d, 2(ix)    ;Get Speed
+         ld   e, 4(ix)    ;Get Note
+         ld   h, 6(ix)    ;Get Volume
+         ld   l, 8(ix)    ;Get SFX number
+         ld   a, 10(ix)   ;Get Channel
+         jp  PLY_SFX_Play
    .endif
