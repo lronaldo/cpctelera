@@ -109,9 +109,27 @@
 ;Read here to know if a Digidrum has been played (0=no).
 PLY_Digidrum: .db 0
 
-;***** Normal Player *****
-;To be called when you want.
-_cpct_arkosPlayer_play:: 
+;
+;########################################################################
+;## FUNCTION: _cpct_arkosPlayer_play                                  ###
+;########################################################################
+;### This function is to be called to start and continue playing the  ###
+;### song. Depending on the frequency at which the song were created, ###
+;### this function should be called 12, 25, 50, 100, 200 or 300 times ###
+;### per second. It is recommended to try to call this function with  ###
+;### the most accurate timming possible, to get best sound results.   ###
+;########################################################################
+;### INPUTS (0 Bytes)                                                 ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL, IX, IY, AF'          ###
+;########################################################################
+;### MEASURES (Including SystemFriendly and PLY_UseSoundEffects code) ###
+;### MEMORY: 1021 bytes                                               ###
+;### TIME: (Not measured)                                             ###
+;########################################################################
+;
+_cpct_arkosPlayer_play::
 PLY_Play:
 
 ;***** Player System Friendly has to restore registers *****
@@ -1594,8 +1612,25 @@ PLY_FrequencyTable:
 .dw 4,4,3,3,3,3,3,2,2,2,2,2
 .dw 2,2,2,2,1,1,1,1,1,1,1,1
 
-;DE = Music
-;; INPUT: (2B DE) Song address
+;
+;########################################################################
+;## FUNCTION: _cpct_arkosPlayer_init                                  ###
+;########################################################################
+;### This function should be called fist to initialize the song that  ###
+;### is to be played. The function reads the song header and prepares ###
+;### the player to start playing it.                                  ###
+;########################################################################
+;### INPUTS (2 Bytes)                                                 ###
+;### (2B DE) Song address                                             ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL, IX, IY, AF'          ###
+;########################################################################
+;### MEASURES                                                         ###
+;### MEMORY:  381 bytes (289 freq. table + 92 code)                   ###
+;### TIME: (Not measured)                                             ###
+;########################################################################
+;
 _cpct_arkosPlayer_init::
    ld  hl, #2    ;; [10] Retrieve parameters from stack
    add hl, sp    ;; [11]
@@ -1653,11 +1688,27 @@ PLY_Init:
    ld  (PLY_Track3_Instrument + 1), hl
    ret
 
+;
+;########################################################################
+;## FUNCTION: _cpct_arkosPlayer_stop                                  ###
+;########################################################################
+;### This function stops the music and sound effects playing in the   ###
+;### 3 channels. It can be later continued calling play.              ###
+;########################################################################
+;### INPUTS (0 Bytes)                                                 ###
+;########################################################################
+;### EXIT STATUS                                                      ###
+;###  Destroyed Register values: AF, BC, DE, HL, IX, IY, AF'          ###
+;########################################################################
+;### MEASURES                                                         ###
+;### MEMORY: 146 bytes                                                ###
+;### TIME: (Not measured)                                             ###
+;########################################################################
+;
 
 ;Stop the music, cut the channels.
 _cpct_arkosPlayer_stop::
 PLY_Stop:
-
    .if PLY_SystemFriendly
       call PLY_DisableInterruptions
       ex  af, af'
