@@ -26,8 +26,10 @@
 #ifndef CPCT_AUDIO_H
 #define CPCT_AUDIO_H
 
-void cpct_arkosPlayer_init(void* songdata);
-void cpct_arkosPlayer_play();
-void cpct_arkosPlayer_stop();
+void cpct_arkosPlayer_songInit(void* songdata);
+void cpct_arkosPlayer_songPlay();
+void cpct_arkosPlayer_songStop();
+void cpct_arkosPlayer_enableSFX (unsigned char enable_bitmask);
+void cpct_arkosPlayer_disableSFX(unsigned char disable_bitmask);
 
 #endif

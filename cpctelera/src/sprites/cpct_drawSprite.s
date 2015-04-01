@@ -98,10 +98,10 @@ ds_drawSpriteWidth:
    ;; Draw a sprite-line of n bytes
    LD BC, #0x800           ;; [10] 0x800 bytes is the distance in memory from one pixel line to the next within every 8 pixel lines. Each LDI performed will decrease this by 1, as we progress through memory copying the present line
    .DW #0x0018  ;; JR 0    ;; [12] Self modifying instruction: the '00' will be substituted by the required jump forward. (Note: Writting JR 0 compiles but later it gives odd linking errors)
-   LDI                     ;; [16] <| 80 LDIs, which are able to copy up to 80 bytes each time.
-   LDI                     ;; [16]  | That means that each Sprite line should be 80 bytes width at most.
+   LDI                     ;; [16] <| 63 LDIs, which are able to copy up to 63 bytes each time.
+   LDI                     ;; [16]  | That means that each Sprite line should be 63 bytes width at most.
    LDI                     ;; [16]  | The JR instruction at the start makes us ingnore the LDIs we dont need (jumping over them)
-   LDI                     ;; [16] <| That ensures we will be doing only as much LDIs as bytes our sprit is wide
+   LDI                     ;; [16] <| That ensures we will be doing only as much LDIs as bytes our sprite is wide
    LDI                     ;; [16] <|
    LDI                     ;; [16]  |
    LDI                     ;; [16]  |
@@ -157,7 +157,7 @@ ds_drawSpriteWidth:
    LDI                     ;; [16] <|
    LDI                     ;; [16]  |
    LDI                     ;; [16]  |
-   LDI                     ;; [16] <|   
+   LDI                     ;; [16] <|
    LDI                     ;; [16] <|
    LDI                     ;; [16]  |
    LDI                     ;; [16]  |

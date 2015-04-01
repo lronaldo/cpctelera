@@ -129,7 +129,7 @@ PLY_Digidrum: .db 0
 ;### TIME: (Not measured)                                             ###
 ;########################################################################
 ;
-_cpct_arkosPlayer_play::
+_cpct_arkosPlayer_songPlay::
 PLY_Play:
 
 ;***** Player System Friendly has to restore registers *****
@@ -586,9 +586,12 @@ PLY_Track3_PlayNoForward:
    ld  (PLY_Track3_InstrumentSpeedCpt + 1), a
 
 ;***************************************
-;Play Sound Effects on Track 3 (only assembled used if PLY_UseSoundEffects is set to one)
+;Play Sound Effects on Track 3 (If activated)
 ;***************************************
 .if PLY_UseSoundEffects
+
+   PLY_SFX_Track3_Activation:          ; This jump is modified by 2 NOPs when we want sound effects activated
+      jr PLY_SFX_Track3_End            ; [12] Jump to end of play-effect section (Deactivated by default)
 
    PLY_SFX_Track3_Pitch: 
       ld  de, #0
@@ -676,9 +679,12 @@ PLY_Track2_PlayNoForward:
    ld  (PLY_Track2_InstrumentSpeedCpt + 1), a
 
 ;***************************************
-;Play Sound Effects on Track 2 (only assembled used if PLY_UseSoundEffects is set to one)
+;Play Sound Effects on Track 2 (If activated)
 ;***************************************
 .if PLY_UseSoundEffects
+
+   PLY_SFX_Track2_Activation:          ; This jump is modified by 2 NOPs when we want sound effects activated
+      jr PLY_SFX_Track2_End            ; [12] Jump to end of play-effect section (Deactivated by default)
 
    PLY_SFX_Track2_Pitch:
       ld  de, #0
@@ -769,9 +775,12 @@ PLY_Track1_PlayNoForward:
    ld (PLY_Track1_InstrumentSpeedCpt + 1), a
 
 ;***************************************
-;Play Sound Effects on Track 1 (only assembled used if PLY_UseSoundEffects is set to one)
+;Play Sound Effects on Track 1 (If activated)
 ;***************************************
 .if PLY_UseSoundEffects
+
+   PLY_SFX_Track1_Activation:          ; This jump is modified by 2 NOPs when we want sound effects activated
+      jr PLY_SFX_Track1_End            ; [12] Jump to end of play-effect section (Deactivated by default)
 
    PLY_SFX_Track1_Pitch:
       ld  de, #0
@@ -1631,7 +1640,7 @@ PLY_FrequencyTable:
 ;### TIME: (Not measured)                                             ###
 ;########################################################################
 ;
-_cpct_arkosPlayer_init::
+_cpct_arkosPlayer_songInit::
    ld  hl, #2    ;; [10] Retrieve parameters from stack
    add hl, sp    ;; [11]
    ld  e, (HL)   ;; [ 7] DE = Pointer to the start of music
@@ -1707,8 +1716,9 @@ PLY_Init:
 ;
 
 ;Stop the music, cut the channels.
-_cpct_arkosPlayer_stop::
+_cpct_arkosPlayer_songStop::
 PLY_Stop:
+
    .if PLY_SystemFriendly
       call PLY_DisableInterruptions
       ex  af, af'
@@ -1727,127 +1737,207 @@ PLY_Stop:
    ld   a, #0b00111111
    jp  PLY_SendRegisters
 
-   .if PLY_UseSoundEffects
-      ;Initialize the Sound Effects.
-      ;DE = SFX Music.
-      PLY_SFX_Init:
-         ;Find the Instrument Table.
-         ld  hl, #12
-         add hl, de
-         ld  (PLY_SFX_Play_InstrumentTable + 1), hl
+.if PLY_UseSoundEffects
+   ;Initialize the Sound Effects.
+   ;DE = SFX Music.
+   PLY_SFX_Init:
+      ;Find the Instrument Table.
+      ld  hl, #12
+      add hl, de
+      ld  (PLY_SFX_Play_InstrumentTable + 1), hl
 
-      ;Clear the three channels of any sound effect.
-      PLY_SFX_StopAll:
-         ld  hl, #0
-         ld  (PLY_SFX_Track1_Instrument + 1), hl
-         ld  (PLY_SFX_Track2_Instrument + 1), hl
-         ld  (PLY_SFX_Track3_Instrument + 1), hl
-         ret
+   ;Clear the three channels of any sound effect.
+   PLY_SFX_StopAll:
+      ld  hl, #0
+      ld  (PLY_SFX_Track1_Instrument + 1), hl
+      ld  (PLY_SFX_Track2_Instrument + 1), hl
+      ld  (PLY_SFX_Track3_Instrument + 1), hl
+      ret
 
-      .equ PLY_SFX_OffsetPitch,        0
-      .equ PLY_SFX_OffsetVolume,       PLY_SFX_Track1_Volume - PLY_SFX_Track1_Pitch
-      .equ PLY_SFX_OffsetNote,         PLY_SFX_Track1_Note - PLY_SFX_Track1_Pitch
-      .equ PLY_SFX_OffsetInstrument,   PLY_SFX_Track1_Instrument - PLY_SFX_Track1_Pitch
-      .equ PLY_SFX_OffsetSpeed,        PLY_SFX_Track1_InstrumentSpeed - PLY_SFX_Track1_Pitch
-      .equ PLY_SFX_OffsetSpeedCpt,     PLY_SFX_Track1_InstrumentSpeedCpt - PLY_SFX_Track1_Pitch
+   .equ PLY_SFX_OffsetPitch,        0
+   .equ PLY_SFX_OffsetVolume,       PLY_SFX_Track1_Volume - PLY_SFX_Track1_Pitch
+   .equ PLY_SFX_OffsetNote,         PLY_SFX_Track1_Note - PLY_SFX_Track1_Pitch
+   .equ PLY_SFX_OffsetInstrument,   PLY_SFX_Track1_Instrument - PLY_SFX_Track1_Pitch
+   .equ PLY_SFX_OffsetSpeed,        PLY_SFX_Track1_InstrumentSpeed - PLY_SFX_Track1_Pitch
+   .equ PLY_SFX_OffsetSpeedCpt,     PLY_SFX_Track1_InstrumentSpeedCpt - PLY_SFX_Track1_Pitch
 
-      ;Plays a Sound Effects along with the music.
-      ;A = No Channel (0,1,2)
-      ;L = SFX Number (>0)
-      ;H = Volume (0...F)
-      ;E = Note (0...143)
-      ;D = Speed (0 = As original, 1...255 = new Speed (1 is fastest))
-      ;BC = Inverted Pitch (-#FFFF -> FFFF). 0 is no pitch. The higher the pitch, the lower the sound.
-      PLY_SFX_Play:
-         ld  ix, #PLY_SFX_Track1_Pitch
-         or   a
-         jr   z, #PLY_SFX_Play_Selected
-         ld  ix, #PLY_SFX_Track2_Pitch
-         dec  a
-         jr   z, #PLY_SFX_Play_Selected
-         ld  ix, #PLY_SFX_Track3_Pitch
+   ;Plays a Sound Effects along with the music.
+   ;A = No Channel (0,1,2)
+   ;L = SFX Number (>0)
+   ;H = Volume (0...F)
+   ;E = Note (0...143)
+   ;D = Speed (0 = As original, 1...255 = new Speed (1 is fastest))
+   ;BC = Inverted Pitch (-#FFFF -> FFFF). 0 is no pitch. The higher the pitch, the lower the sound.
+   PLY_SFX_Play:
+      ld  ix, #PLY_SFX_Track1_Pitch
+      or   a
+      jr   z, #PLY_SFX_Play_Selected
+      ld  ix, #PLY_SFX_Track2_Pitch
+      dec  a
+      jr   z, #PLY_SFX_Play_Selected
+      ld  ix, #PLY_SFX_Track3_Pitch
 
-      PLY_SFX_Play_Selected:
-         ld  PLY_SFX_OffsetPitch + 1(ix), c        ;Set Pitch
-         ld  PLY_SFX_OffsetPitch + 2(ix), b
-         ld   a, e                                 ;Set Note
-         ld  PLY_SFX_OffsetNote (ix), a
-         ld   a, #15                               ;Set Volume
-         sub  h
-         ld  PLY_SFX_OffsetVolume (ix), a
-         ld   h, #0                                ;Set Instrument Address
-         add hl, hl
+   PLY_SFX_Play_Selected:
+      ld  PLY_SFX_OffsetPitch + 1(ix), c        ;Set Pitch
+      ld  PLY_SFX_OffsetPitch + 2(ix), b
+      ld   a, e                                 ;Set Note
+      ld  PLY_SFX_OffsetNote (ix), a
+      ld   a, #15                               ;Set Volume
+      sub  h
+      ld  PLY_SFX_OffsetVolume (ix), a
+      ld   h, #0                                ;Set Instrument Address
+      add hl, hl
 
-      PLY_SFX_Play_InstrumentTable: 
-         ld  bc, #0
-         add hl, bc
-         ld   a, (hl)
-         inc hl
-         ld   h, (hl)
-         ld   l, a
-         ld   a, d                                 ;Read Speed or use the user's one ?
-         or   a
-         jr  nz, PLY_SFX_Play_UserSpeed
-         ld   a, (hl)                              ;Get Speed
+   PLY_SFX_Play_InstrumentTable: 
+      ld  bc, #0
+      add hl, bc
+      ld   a, (hl)
+      inc hl
+      ld   h, (hl)
+      ld   l, a
+      ld   a, d                                 ;Read Speed or use the user's one ?
+      or   a
+      jr  nz, PLY_SFX_Play_UserSpeed
+      ld   a, (hl)                              ;Get Speed
 
-      PLY_SFX_Play_UserSpeed:
-         ld  PLY_SFX_OffsetSpeed + 1 (ix), a
-         ld  PLY_SFX_OffsetSpeedCpt + 1 (ix), a
-         inc hl                                    ;Skip Retrig
-         inc hl
-         ld  PLY_SFX_OffsetInstrument + 1 (ix), l
-         ld  PLY_SFX_OffsetInstrument + 2 (ix), h
+   PLY_SFX_Play_UserSpeed:
+      ld  PLY_SFX_OffsetSpeed + 1 (ix), a
+      ld  PLY_SFX_OffsetSpeedCpt + 1 (ix), a
+      inc hl                                    ;Skip Retrig
+      inc hl
+      ld  PLY_SFX_OffsetInstrument + 1 (ix), l
+      ld  PLY_SFX_OffsetInstrument + 2 (ix), h
 
-         ret
+      ret
 
-      ;Stops a sound effect on the selected channel
-      ;E = No Channel (0,1,2)
-      ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+15, value).
-      PLY_SFX_Stop:
-         ld   a, e
-         ld  hl, #PLY_SFX_Track1_Instrument + 1
-         or   a
-         jr   z, PLY_SFX_Stop_ChannelFound
-         ld  hl, #PLY_SFX_Track2_Instrument + 1
-         dec  a
-         jr   z, PLY_SFX_Stop_ChannelFound
-         ld  hl, #PLY_SFX_Track3_Instrument + 1
-         dec  a
+   ;Stops a sound effect on the selected channel
+   ;E = No Channel (0,1,2)
+   ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+15, value).
+   PLY_SFX_Stop:
+      ld   a, e
+      ld  hl, #PLY_SFX_Track1_Instrument + 1
+      or   a
+      jr   z, PLY_SFX_Stop_ChannelFound
+      ld  hl, #PLY_SFX_Track2_Instrument + 1
+      dec  a
+      jr   z, PLY_SFX_Stop_ChannelFound
+      ld  hl, #PLY_SFX_Track3_Instrument + 1
+      dec  a
 
-      PLY_SFX_Stop_ChannelFound:
-         ld  (hl), a
-         inc hl
-         ld  (hl), a
-         ret
-   .endif
+   PLY_SFX_Stop_ChannelFound:
+      ld  (hl), a
+      inc hl
+      ld  (hl), a
+      ret
 
-   .if PLY_UseFades
-      ;Sets the Fade value.
-      ;E = Fade value (0 = full volume, 16 or more = no volume).
-      ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+9/+18, value).
-      PLY_SetFadeValue:
-         ld   a, e
-         ld  (PLY_Channel1_FadeValue + 1), a
-         ld  (PLY_Channel2_FadeValue + 1), a
-         ld  (PLY_Channel3_FadeValue + 1), a
-         ret
-   .endif
+   ;
+   ;########################################################################
+   ;## FUNCTION: _cpct_arkosPlayer_enableSFX                             ###
+   ;########################################################################
+   ;### This function enables the reproduction of SFX sound on given cha-###
+   ;### nnels. The user passes desired channels as a bitmask, and the    ###
+   ;### function reads it and deactivate desired channels.               ###
+   ;########################################################################
+   ;### INPUTS (1 Bytes)                                                 ###
+   ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
+   ;###         1 and 0. Enabled bits stand for channel to be enabled    ###
+   ;########################################################################
+   ;### EXIT STATUS                                                      ###
+   ;###  Destroyed Register values: AF, HL                               ###
+   ;########################################################################
+   ;### MEASURES                                                         ###
+   ;### MEMORY: bytes                                                    ###
+   ;### TIME: (Not measured)                                             ###
+   ;########################################################################
+   ;
+   _cpct_arkosPlayer_enableSFX::
+      ld hl, #2                           ;; [10] Get parameter from stack
+      add hl, sp                          ;; [11]
+      ld  a, (hl)                         ;; [ 7] A = Channel bitmask
 
-   .if PLY_SystemFriendly
-      ;Save Interrupt status and Disable Interruptions
-      PLY_DisableInterruptions:
-         ld   a, i
-         di
+      ld hl, #0                           ;; [10] 0000h = NOP; NOP (To eliminate JR jump at the start of the channel)
 
-         ;IFF in P/V flag.
-         ;Prepare opcode for DI.
-         ld   a, #0xF3
-         jp  po, PLY_DisableInterruptions_Set_Opcode
+   PLY_EFX_do:
+      and #0x04                           ;; [ 7] Test bit 2 (00000100) to know if channel 2 has to be enabled
+      jp  z, PLY_EFX_no3                  ;; [10] If bit2=0, channel 2 is left as is.
+      ld (PLY_SFX_Track3_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 2 play code
 
-         ;Opcode for EI.
-         ld   a, #0xFB
+   PLY_EFX_no3:
+      and #0x02                           ;; [ 7] Test bit 1 (00000010) to know if channel 1 has to be enabled
+      jp  z, PLY_EFX_no2                  ;; [10] If bit1=0, channel 1 is left as is.
+      ld (PLY_SFX_Track2_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 1 play code
 
-      PLY_DisableInterruptions_Set_Opcode:
-         ld  (PLY_RestoreInterruption), a
-         ret
-   .endif
+   PLY_EFX_no2:
+      and #0x01                           ;; [ 7] Test bit 0 (00000001) to know if channel 0 has to be enabled
+      jp  z, PLY_EFX_no1                  ;; [10] If bit0=0, channel 0 is left as is.
+      ld (PLY_SFX_Track2_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 0 play code
+
+   PLY_EFX_no1:
+      ret                                 ;; [10] Return
+
+   ;
+   ;########################################################################
+   ;## FUNCTION: _cpct_arkosPlayer_disableSFX                            ###
+   ;########################################################################
+   ;### This function disables the reproduction of SFX sound on given    ###
+   ;### channels. The user passes desired channels as a bitmask, and the ###
+   ;### function reads it and disables desired channels.                 ###
+   ;### Warning: Function shares code with _cpct_arkosPlayer_enableSFX   ###
+   ;########################################################################
+   ;### INPUTS (1 Bytes)                                                 ###
+   ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
+   ;###         1 and 0. Enabled bits stand for channel to be disabled   ###
+   ;########################################################################
+   ;### EXIT STATUS                                                      ###
+   ;###  Destroyed Register values: AF, HL                               ###
+   ;########################################################################
+   ;### MEASURES                                                         ###
+   ;### MEMORY: bytes                                                    ###
+   ;### TIME: (Not measured)                                             ###
+   ;########################################################################
+   ;
+   ;; Constants defining code for JR xx required for disabling SFX code for each channel
+   ;; JR xx = 18xxh (Little endian!, so HL = xx18h = (xxh - 2)* 100h + 0x18 ) 
+   ;; (Beware: We assume code for all 3 channels occupies the same ammount of bytes)
+   .equ PLY_SFX_JumpDisableTrack1, 0x18 + 0x100 * (PLY_SFX_Track1_End - PLY_SFX_Track1_Activation - 2)
+
+   _cpct_arkosPlayer_disableSFX::
+      ld hl, #2                           ;; [10] Get parameter from stack
+      add hl, sp                          ;; [11]
+      ld  a, (hl)                         ;; [ 7] A = Channel bitmask
+
+      ld hl, #PLY_SFX_JumpDisableTrack1   ;; [10] HL = code for JR xx, jump to the end of channel play-sfx code
+      jp PLY_EFX_do                       ;; [10] Do the disabling, using the same code as enableSFX
+
+.endif
+
+.if PLY_UseFades
+   ;Sets the Fade value.
+   ;E = Fade value (0 = full volume, 16 or more = no volume).
+   ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+9/+18, value).
+   PLY_SetFadeValue:
+      ld   a, e
+      ld  (PLY_Channel1_FadeValue + 1), a
+      ld  (PLY_Channel2_FadeValue + 1), a
+      ld  (PLY_Channel3_FadeValue + 1), a
+      ret
+.endif
+
+.if PLY_SystemFriendly
+   ;Save Interrupt status and Disable Interruptions
+   PLY_DisableInterruptions:
+      ld   a, i
+      di
+
+      ;IFF in P/V flag.
+      ;Prepare opcode for DI.
+      ld   a, #0xF3
+      jp  po, PLY_DisableInterruptions_Set_Opcode
+
+      ;Opcode for EI.
+      ld   a, #0xFB
+
+   PLY_DisableInterruptions_Set_Opcode:
+      ld  (PLY_RestoreInterruption), a
+      ret
+.endif
