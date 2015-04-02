@@ -31,7 +31,9 @@ void main(void) {
    cpct_setVideoMode(2);
 
    // Initialize the song to be played
-   cpct_arkosPlayer_init(molusk_song);
+   cpct_arkosPlayer_songInit(molusk_song);
+   cpct_arkosPlayer_SFXInit(molusk_song);
+   cpct_arkosPlayer_enableSFX(7);
 
    while (1) {
       // We have to call the play function 50 times per second (because the song is 
@@ -40,7 +42,7 @@ void main(void) {
       cpct_waitVSYNC();
 
       if (playing) {
-         cpct_arkosPlayer_play();
+         cpct_arkosPlayer_songPlay();
 
          // Write a new dash to the screen to see something while playing
          cpct_drawROMCharM2(video_pos, color, '#');
@@ -57,11 +59,15 @@ void main(void) {
          if ( !cpct_isKeyPressed(Key_Space) ) {
             space_bar = K_RELEASED;
             if (playing)
-               cpct_arkosPlayer_stop();
+               cpct_arkosPlayer_songStop();
             playing ^= 1;
          }
       } else if (cpct_isKeyPressed(Key_Space)) {
          space_bar = K_PRESSED;
+      } else if (cpct_isKeyPressed(Key_0)) {
+         cpct_arkosPlayer_SFXPlay(13, 15, 36, 20, 0, 1);
+      } else if (cpct_isKeyPressed(Key_1)) {
+         cpct_arkosPlayer_SFXPlay(3, 15, 60, 0, 40, 2);
       }
    }
 }

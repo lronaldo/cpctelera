@@ -1738,21 +1738,62 @@ PLY_Stop:
    jp  PLY_SendRegisters
 
 .if PLY_UseSoundEffects
-   ;Initialize the Sound Effects.
-   ;DE = SFX Music.
+   ;
+   ;########################################################################
+   ;## FUNCTION: _cpct_arkosPlayer_SFXInit                               ###
+   ;########################################################################
+   ;### Initialize a sound effect. Receives a pointer to a sound effect  ###
+   ;### "song" and initializes it.                                       ###
+   ;########################################################################
+   ;### INPUTS (2 Bytes)                                                 ###
+   ;###  (2B DE) Pointer to the start of the SFX "song"                  ###
+   ;########################################################################
+   ;### EXIT STATUS                                                      ###
+   ;###  Destroyed Register values: AF, DE, HL                           ###
+   ;########################################################################
+   ;### MEASURES                                                         ###
+   ;### MEMORY: 27 bytes                                                 ###
+   ;### TIME: 146 cycles (36,5 us)                                       ###
+   ;########################################################################
+   ;
    PLY_SFX_Init:
-      ;Find the Instrument Table.
-      ld  hl, #12
-      add hl, de
-      ld  (PLY_SFX_Play_InstrumentTable + 1), hl
+   _cpct_arkosPlayer_SFXInit::
+      ld  hl, #2                                   ;; [10] Get Parameter from Stack
+      add hl, sp                                   ;; [11]
+      ld  e, (hl)                                  ;; [ 7]
+      inc hl                                       ;; [ 6]
+      ld  d, (hl)                                  ;; [ 7] DE = Pointer to the SFX "Song"
 
-   ;Clear the three channels of any sound effect.
+      ;Find the Instrument Table.
+      ld  hl, #12                                  ;; [10]
+      add hl, de                                   ;; [11]
+      ld  (PLY_SFX_Play_InstrumentTable + 1), hl   ;; [16]
+
+      ;; Initialization continues clearing sound effects from the 3 channels
+   ;
+   ;########################################################################
+   ;### FUNCTION: _cpct_arkosPlayer_StopAll                              ###
+   ;########################################################################
+   ;### Stops the reproduction of any sound effect in the 3 channels     ###
+   ;########################################################################
+   ;### INPUTS (0 Bytes)                                                 ###
+   ;########################################################################
+   ;### EXIT STATUS                                                      ###
+   ;###  Destroyed Register values: HL                                   ###
+   ;########################################################################
+   ;### MEASURES                                                         ###
+   ;### MEMORY: 13 bytes                                                 ###
+   ;### TIME: 68 cycles (14,5 us)                                        ###
+   ;########################################################################
+   ;
+   _cpct_arkosPlayer_SFXStopAll::
    PLY_SFX_StopAll:
-      ld  hl, #0
-      ld  (PLY_SFX_Track1_Instrument + 1), hl
-      ld  (PLY_SFX_Track2_Instrument + 1), hl
-      ld  (PLY_SFX_Track3_Instrument + 1), hl
-      ret
+      ;Clear the three channels of any sound effect.
+      ld  hl, #0                                   ;; [10]
+      ld  (PLY_SFX_Track1_Instrument + 1), hl      ;; [16]
+      ld  (PLY_SFX_Track2_Instrument + 1), hl      ;; [16]
+      ld  (PLY_SFX_Track3_Instrument + 1), hl      ;; [16]
+      ret                                          ;; [10]
 
    .equ PLY_SFX_OffsetPitch,        0
    .equ PLY_SFX_OffsetVolume,       PLY_SFX_Track1_Volume - PLY_SFX_Track1_Pitch
@@ -1761,14 +1802,46 @@ PLY_Stop:
    .equ PLY_SFX_OffsetSpeed,        PLY_SFX_Track1_InstrumentSpeed - PLY_SFX_Track1_Pitch
    .equ PLY_SFX_OffsetSpeedCpt,     PLY_SFX_Track1_InstrumentSpeedCpt - PLY_SFX_Track1_Pitch
 
-   ;Plays a Sound Effects along with the music.
+   ;
+   ;########################################################################
+   ;### FUNCTION: _cpct_arkosPlayer_SFXPlay                              ###
+   ;########################################################################
+   ;### Plays a given sound effect, along with the music, in a concrete  ###
+   ;### channel and with some parameters (Volume, Note, Speed, Inverted  ###
+   ;### Pitch).                                                          ###
+   ;########################################################################
+   ;### INPUTS (0 Bytes)                                                 ###
    ;A = No Channel (0,1,2)
    ;L = SFX Number (>0)
    ;H = Volume (0...F)
    ;E = Note (0...143)
    ;D = Speed (0 = As original, 1...255 = new Speed (1 is fastest))
    ;BC = Inverted Pitch (-#FFFF -> FFFF). 0 is no pitch. The higher the pitch, the lower the sound.
+   ;########################################################################
+   ;### EXIT STATUS                                                      ###
+   ;###  Destroyed Register values: HL                                   ###
+   ;########################################################################
+   ;### MEASURES                                                         ###
+   ;### MEMORY:  bytes                                                   ###
+   ;### TIME:  cycles ( us)                                              ###
+   ;########################################################################
+   ;
+   _cpct_arkosPlayer_SFXPlay::
    PLY_SFX_Play:
+      ld  (PLY_SFX_Recover_IX+2), ix            ;; [20] Save IX value (cannot use push as parameters are on the stack)
+      pop  af                                   ;; [10]
+      pop  hl                                   ;; [10]
+      pop  de                                   ;; [10]
+      pop  bc                                   ;; [10]
+      pop  ix                                   ;; [14]
+      push ix                                   ;; [15]
+      push bc                                   ;; [11]
+      push de                                   ;; [11]
+      push hl                                   ;; [11]
+      push af                                   ;; [11]
+
+      .dw #0x7DDD  ; ld a, ixl                  ;; [ 8] A = Channel number
+
       ld  ix, #PLY_SFX_Track1_Pitch
       or   a
       jr   z, #PLY_SFX_Play_Selected
@@ -1808,27 +1881,73 @@ PLY_Stop:
       ld  PLY_SFX_OffsetInstrument + 1 (ix), l
       ld  PLY_SFX_OffsetInstrument + 2 (ix), h
 
+   PLY_SFX_Recover_IX:
+      ld  ix, #0                                ; [14] 0 is a placeholder to save the previous value of IX
+
       ret
 
-   ;Stops a sound effect on the selected channel
-   ;E = No Channel (0,1,2)
-   ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+15, value).
+   ;
+   ;########################################################################
+   ;### FUNCTION: _cpct_arkosPlayer_SFXStop                              ###
+   ;########################################################################
+   ;### Stops the reproduction of any sound effect in the selected       ###
+   ;### channels. Channels are passed as a bitmask, with 1 for channels  ###
+   ;### that should be stopped and 0 for those that should continue      ###
+   ;### playing.                                                         ###
+   ;########################################################################
+   ;### INPUTS (1 Byte)                                                  ###
+   ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
+   ;###         1 and 0. Enabled bits stand for channel to be stopped    ###
+   ;########################################################################
+   ;### EXIT STATUS                                                      ###
+   ;###  Destroyed Register values: AF, HL                               ###
+   ;########################################################################
+   ;### MEASURES                                                         ###
+   ;### MEMORY:  bytes                                                   ###
+   ;### TIME:  cycles (us)                                               ###
+   ;########################################################################
+   ;
+   _cpct_arkosPlayer_SFXStop::
    PLY_SFX_Stop:
-      ld   a, e
-      ld  hl, #PLY_SFX_Track1_Instrument + 1
-      or   a
-      jr   z, PLY_SFX_Stop_ChannelFound
-      ld  hl, #PLY_SFX_Track2_Instrument + 1
-      dec  a
-      jr   z, PLY_SFX_Stop_ChannelFound
-      ld  hl, #PLY_SFX_Track3_Instrument + 1
-      dec  a
+      ld  hl, #2                              ;; [10] Get Parameter from Stack
+      add hl, sp                              ;; [11]
+      ld  a, (hl)                             ;; [ 7] A = Channel number to be stopped
+
+      ld hl, #0                               ;; [10] Value 0 to stop SFX in a channel
+
+      bit 2, a                                ;; [ 8] Test bit 2 (00000100) to know if channel 2 has to be stopped
+      jp  z, PLY_SFSStop_no3                  ;; [10] If bit2=0, channel 2 is left as is.
+      ld (PLY_SFX_Track3_Instrument + 1), hl  ;; [16] Stop Channel 2 
+
+   PLY_SFSStop_no3:
+      bit 1, a                                ;; [ 8] Test bit 1 (00000010) to know if channel 1 has to be stopped
+      jp  z, PLY_SFSStop_no2                  ;; [10] If bit1=0, channel 1 is left as is.
+      ld (PLY_SFX_Track2_Instrument + 1), hl  ;; [16] Stop Channel 1
+
+   PLY_SFSStop_no2:
+      and #0x01                               ;; [ 7] Test bit 0 (00000001) to know if channel 0 has to be stopped
+      jp  z, PLY_SFSStop_no1                  ;; [10] If bit0=0, channel 0 is left as is.
+      ld (PLY_SFX_Track1_Instrument + 1), hl  ;; [16] Stop Channel 0
+
+   PLY_SFSStop_no1:
+      ret                                     ;; [10] Return
+
+      ;ld   a, e
+      ;ld  hl, #PLY_SFX_Track1_Instrument + 1
+      ;or   a
+      ;jr   z, PLY_SFX_Stop_ChannelFound
+      ;ld  hl, #PLY_SFX_Track2_Instrument + 1
+      ;dec  a
+      ;jr   z, PLY_SFX_Stop_ChannelFound
+      ;ld  hl, #PLY_SFX_Track3_Instrument + 1
+      ;dec  a
 
    PLY_SFX_Stop_ChannelFound:
-      ld  (hl), a
-      inc hl
-      ld  (hl), a
-      ret
+      ;ld  (hl), a
+      ;inc hl
+      ;ld  (hl), a
+      ;ret
+
 
    ;
    ;########################################################################
@@ -1858,12 +1977,12 @@ PLY_Stop:
       ld hl, #0                           ;; [10] 0000h = NOP; NOP (To eliminate JR jump at the start of the channel)
 
    PLY_EFX_do:
-      and #0x04                           ;; [ 7] Test bit 2 (00000100) to know if channel 2 has to be enabled
+      bit 2, a                            ;; [ 8] Test bit 2 (00000100) to know if channel 2 has to be enabled
       jp  z, PLY_EFX_no3                  ;; [10] If bit2=0, channel 2 is left as is.
       ld (PLY_SFX_Track3_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 2 play code
 
    PLY_EFX_no3:
-      and #0x02                           ;; [ 7] Test bit 1 (00000010) to know if channel 1 has to be enabled
+      bit 1, a                            ;; [ 8] Test bit 1 (00000010) to know if channel 1 has to be enabled
       jp  z, PLY_EFX_no2                  ;; [10] If bit1=0, channel 1 is left as is.
       ld (PLY_SFX_Track2_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 1 play code
 
@@ -1884,7 +2003,7 @@ PLY_Stop:
    ;### function reads it and disables desired channels.                 ###
    ;### Warning: Function shares code with _cpct_arkosPlayer_enableSFX   ###
    ;########################################################################
-   ;### INPUTS (1 Bytes)                                                 ###
+   ;### INPUTS (1 Byte)                                                  ###
    ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
    ;###         1 and 0. Enabled bits stand for channel to be disabled   ###
    ;########################################################################

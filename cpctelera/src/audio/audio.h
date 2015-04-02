@@ -31,5 +31,9 @@ void cpct_arkosPlayer_songPlay();
 void cpct_arkosPlayer_songStop();
 void cpct_arkosPlayer_enableSFX (unsigned char enable_bitmask);
 void cpct_arkosPlayer_disableSFX(unsigned char disable_bitmask);
+void cpct_arkosPlayer_SFXInit(void* sfx_song_data);
+void cpct_arkosPlayer_SFXStopAll();
+void cpct_arkosPlayer_SFXStop(unsigned char stop_bitmask);
+void cpct_arkosPlayer_SFXPlay(unsigned char sfx_num, unsigned char volume, unsigned char note, unsigned char speed, unsigned int inverted_pitch, unsigned char channel_num);
 
 #endif
