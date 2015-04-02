@@ -68,13 +68,16 @@ OBJFILES:=$(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(SRCEXT), %.$(OBJEXT)
 CPCT_PATH=../../cpctelera/
 
 # SDCC Compiler binary path (/path/to/sdcc/bin)
-SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
+#SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
 
 # HEX2BIN binary path (/path/to/HexToBin/)
-HEX2BIN_PATH=../../../cpc-dev-tool-chain/tool/hex2bin/Hex2bin-1.0.10/
+HEX2BIN_PATH=$(CPCT_PATH)/3rdparty/hex2bin-2.0/bin/
 
 # iDSK binary path (/path/to/iDSK/)
-IDSK_PATH=../../../cpc-dev-tool-chain/tool/idsk/iDSK.0.13/iDSK/src/
+IDSK_PATH=$(CPCT_PATH)/3rdparty/iDSK.0.13/bin/
+
+# 2CDT binary path (/path/to/2CDT/)
+2CDT_PATH=$(CPCT_PATH)/3rdparty/2cdt/bin/
 
 ####
 ## SECTION 3: COMPILATION CONFIGURATION
@@ -106,3 +109,6 @@ HEX2BIN=$(HEX2BIN_PATH)hex2bin
 
 # iDSK interface to generate DSK files
 IDSK=$(IDSK_PATH)iDSK
+
+# 2CDT interface to generate CDT files
+2CDT=$(2CDT_PATH)2cdt
