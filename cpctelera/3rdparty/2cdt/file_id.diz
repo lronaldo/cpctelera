@@ -1,0 +1,16 @@
+2CDT
+Copyright (C) Kevin Thacker, 2000-2002
+
+23-February-2002
+
+2CDT is a tool to create a ".CDT"
+tape image from a file in the Amstrad
+operating system cassette format.
+It can be used to test support
+for ".TZX" in Amstrad emulators
+and a starting point for a Amstrad
+".CDT" tool.
+
+Source included.
+
+makefile included for UNIX
