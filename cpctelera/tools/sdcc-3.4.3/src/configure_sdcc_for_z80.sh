@@ -8,7 +8,7 @@
 ## Setup SDCC for building, with support for Z80 only
 INSTALL_DIR=${PWD}/../bin
 SRC_DIR=${PWD}
-${SRC_DIR}/configure --prefix="${INSTALLDIR}" \
+${SRC_DIR}/configure --prefix="${INSTALL_DIR}" \
         --disable-mcs51-port \
         --disable-z180-port \
         --disable-r2k-port \
