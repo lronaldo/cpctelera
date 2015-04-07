@@ -19,7 +19,8 @@
         --disable-hc08-port \
         --disable-s08-port \
         --disable-tlcs90-port \
-        --disable-stm8-port 
+        --disable-stm8-port \
+        --disable-ucsim 
 
 
 ## Check if SDCC is configured

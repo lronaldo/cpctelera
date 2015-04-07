@@ -3429,7 +3429,7 @@ else
   ac_save_c_werror_flag=$ac_c_werror_flag
    ac_c_werror_flag=yes
    ac_cv_prog_cc_g=no
-   CFLAGS="-g"
+#   CFLAGS="-g"
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3488,9 +3488,11 @@ if test "$ac_test_CFLAGS" = set; then
   CFLAGS=$ac_save_CFLAGS
 elif test $ac_cv_prog_cc_g = yes; then
   if test "$GCC" = yes; then
-    CFLAGS="-g -O2"
+    #CFLAGS="-g -O2"
+    CFLAGS="-O2"
   else
-    CFLAGS="-g"
+    CFLAGS=""
+    #CFLAGS="-g"
   fi
 else
   if test "$GCC" = yes; then
@@ -3972,9 +3974,11 @@ if test "$ac_test_CXXFLAGS" = set; then
   CXXFLAGS=$ac_save_CXXFLAGS
 elif test $ac_cv_prog_cxx_g = yes; then
   if test "$GXX" = yes; then
-    CXXFLAGS="-g -O2"
+    #CXXFLAGS="-g -O2"
+    CXXFLAGS="-O2"
   else
-    CXXFLAGS="-g"
+    CXXFLAGS=""
+    #CXXFLAGS="-g"
   fi
 else
   if test "$GXX" = yes; then
@@ -5130,7 +5134,7 @@ else
   sdcc_save_c_werror_flag=$ac_c_werror_flag
    ac_c_werror_flag=yes
 
-   CFLAGS="-ggdb"
+#   CFLAGS="-ggdb"
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -5156,8 +5160,10 @@ $as_echo "$ac_res" >&6; }
    CFLAGS=$sdcc_save_CFLAGS
 
   if test "$sdcc_cv_c_ggdb" = "yes"; then
-    CFLAGS="-ggdb ${CFLAGS}"
-    CXXFLAGS="-ggdb ${CXXFLAGS}"
+    CFLAGS="${CFLAGS}"
+    CXXFLAGS="${CXXFLAGS}"
+    #CFLAGS="-ggdb ${CFLAGS}"
+    #CXXFLAGS="-ggdb ${CXXFLAGS}"
   fi
 
   arg1=`echo -pipe | sed -e"s/^-*//" -e"s/-/_/"`

@@ -382,11 +382,11 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
   rm -f _test_.*)
 
   # This is the first time when CFLAGS are set/modified!!
-  sdcc_IS_VALID_OPTION(-ggdb)
-  if test "$sdcc_cv_c_ggdb" = "yes"; then
-    CFLAGS="-ggdb ${CFLAGS}"
-    CXXFLAGS="-ggdb ${CXXFLAGS}"
-  fi
+  #sdcc_IS_VALID_OPTION(-ggdb)
+  #if test "$sdcc_cv_c_ggdb" = "yes"; then
+  #  CFLAGS="-ggdb ${CFLAGS}"
+  #  CXXFLAGS="-ggdb ${CXXFLAGS}"
+  #fi
 
   sdcc_IS_VALID_OPTION(-pipe)
   if test "$sdcc_cv_c_pipe" = "yes"; then
