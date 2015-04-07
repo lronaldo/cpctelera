@@ -4373,9 +4373,11 @@ if test "$ac_test_CFLAGS" = set; then
   CFLAGS=$ac_save_CFLAGS
 elif test $ac_cv_prog_cc_g = yes; then
   if test "$GCC" = yes; then
-    CFLAGS="-g -O2"
+    #CFLAGS="-g -O2"
+    CFLAGS="-O2"
   else
-    CFLAGS="-g"
+    #CFLAGS="-g"
+    CFLAGS=""
   fi
 else
   if test "$GCC" = yes; then
@@ -4721,9 +4723,11 @@ if test "$ac_test_CXXFLAGS" = set; then
   CXXFLAGS=$ac_save_CXXFLAGS
 elif test $ac_cv_prog_cxx_g = yes; then
   if test "$GXX" = yes; then
-    CXXFLAGS="-g -O2"
+    CXXFLAGS="-O2"
+    #CXXFLAGS="-g -O2"
   else
-    CXXFLAGS="-g"
+    #CXXFLAGS="-g"
+    CXXFLAGS=""
   fi
 else
   if test "$GXX" = yes; then
@@ -6671,7 +6675,8 @@ if test "x$CFLAGS_FOR_TARGET" = x; then
   esac
   case " $CFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CFLAGS_FOR_TARGET="-g $CFLAGS_FOR_TARGET" ;;
+    *) CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET" ;;
+    #*) CFLAGS_FOR_TARGET="-g $CFLAGS_FOR_TARGET" ;;
   esac
 fi
 
@@ -6684,7 +6689,8 @@ if test "x$CXXFLAGS_FOR_TARGET" = x; then
   esac
   case " $CXXFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS_FOR_TARGET" ;;
+    *) CXXFLAGS_FOR_TARGET="$CXXFLAGS_FOR_TARGET" ;;
+    #*) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS_FOR_TARGET" ;;
   esac
 fi
 
@@ -7026,7 +7032,8 @@ else
     if echo "int f (void) { return 0; }" > conftest.c &&
        ${CC} -c conftest.c &&
        mv conftest.o conftest.o.g0 &&
-       ${CC} -c -g conftest.c &&
+       #${CC} -c -g conftest.c &&
+       ${CC} -c conftest.c &&
        mv conftest.o conftest.o.g &&
        ${srcdir}/contrib/compare-debug conftest.o.g0 conftest.o.g > /dev/null 2>&1; then
       :
@@ -14369,8 +14376,10 @@ stage1_cflags="-g"
 case $build in
   vax-*-*)
     case ${GCC} in
-      yes) stage1_cflags="-g -Wa,-J" ;;
-      *) stage1_cflags="-g -J" ;;
+      yes) stage1_cflags="-Wa,-J" ;;
+      *) stage1_cflags="-J" ;;
+#     yes) stage1_cflags="-g -Wa,-J" ;;
+#     *) stage1_cflags="-g -J" ;;
     esac ;;
 esac
 

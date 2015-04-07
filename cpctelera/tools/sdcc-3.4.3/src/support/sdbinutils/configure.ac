@@ -2129,7 +2129,8 @@ if test "x$CFLAGS_FOR_TARGET" = x; then
   esac
   case " $CFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CFLAGS_FOR_TARGET="-g $CFLAGS_FOR_TARGET" ;;
+#   *) CFLAGS_FOR_TARGET="-g $CFLAGS_FOR_TARGET" ;;
+    *) CFLAGS_FOR_TARGET="$CFLAGS_FOR_TARGET" ;;
   esac
 fi
 AC_SUBST(CFLAGS_FOR_TARGET)
@@ -2142,7 +2143,8 @@ if test "x$CXXFLAGS_FOR_TARGET" = x; then
   esac
   case " $CXXFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS_FOR_TARGET" ;;
+    *) CXXFLAGS_FOR_TARGET="$CXXFLAGS_FOR_TARGET" ;;
+#   *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS_FOR_TARGET" ;;
   esac
 fi
 AC_SUBST(CXXFLAGS_FOR_TARGET)
@@ -2481,7 +2483,8 @@ else
     if echo "int f (void) { return 0; }" > conftest.c &&
        ${CC} -c conftest.c &&
        mv conftest.o conftest.o.g0 &&
-       ${CC} -c -g conftest.c &&
+       ${CC} -c conftest.c &&
+#      ${CC} -c -g conftest.c &&
        mv conftest.o conftest.o.g &&
        ${srcdir}/contrib/compare-debug conftest.o.g0 conftest.o.g > /dev/null 2>&1; then
       :
@@ -3177,8 +3180,10 @@ stage1_cflags="-g"
 case $build in
   vax-*-*)
     case ${GCC} in
-      yes) stage1_cflags="-g -Wa,-J" ;;
-      *) stage1_cflags="-g -J" ;;
+#      yes) stage1_cflags="-g -Wa,-J" ;;
+#      *) stage1_cflags="-g -J" ;;
+      yes) stage1_cflags="-Wa,-J" ;;
+      *) stage1_cflags="-J" ;;
     esac ;;
 esac
 
