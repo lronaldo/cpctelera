@@ -1,0 +1,432 @@
+Arkos Tracker 1.0 Player Format
+-------------------------------
+By Targhan/Arkos.
+
+This document talks about the format of the generated binary music. NOT the ones saved as AKS file.
+
+These files are very optimised :
+- One used Tracks and Special Tracks are encoded.
+- Once necessary parts of the Tracks are encoded (if Track1 has data till the 127th line, but the Linker only uses 64 lines among them, only 64 lines will be encoded).
+- Only used Instruments are encoded (so their number varies from the ones in the AKS format. First one found is the first one encoded).
+- All strings information is lost (song name, author, instruments names...).
+- The binary format used is optimised in both room and speed for the player.
+
+Note that there is always at least one Track, one Special Track, and one Instrument (the 0th, system reserved) coded.
+The 0th Instrument represents the empty sound, which is used by RST, but also by sounds when they stop.
+
+
+All Pitches are signed, coded on 16 bits.
+All Pitches are Period based. Which means that the lower they are, the higher the sound. Positive Pitch = Portamento down.
+All Arpeggios are signed, coded on 8 bits. Note based. Higher arpeggio means higher note.
+
+All address are ABSOLUTE, not relative. This is done to increase the speed of the player. This also means that a song generated in &4000 won't work if loaded in any other address.
+
+
+
+
+
+
+
+About the Instruments
+---------------------
+
+An Instrument is composed of a list of "sounds". A Sound can be considered Non-Hard (with no use of Hardware Envelope) and Hard.
+To stop an Instrument, we consider it Hard, and there's a flag inside to make the Instrument stop. In fact it never really "stops". Either we redirect the Instrument pointer to an empty Instrument (the 0 is reserved, especially used for that), or we point inside the Instrument to make it loop from any Sound.
+
+Hard Sounds can mean : Stop/Loop, Software Dependent, Hardware Dependent, or Independent.
+
+Software Dependent is the STarKos (on CPC) primary way of working. It uses the note of the score (=Auto mode), which give him a Software Frequency (PSG Register 0/1, 2/3 or 4/5). An Arpeggio is added, as well as a Pitch (both optional). A Shift value (called "Ratio" in Arkos Tracker) is then applied to it to get the Hardware Frequency. Hardware Frequency = Software Frequency / 2^shift. Easy and fast to calculate. A Hardware Pitch can then be applied on the Hardware Frequency before it is send to the PSG. Special effects may use this.
+The Software Frequency can also be manual (contrary to Auto mode), in which case the user enters the Frequency. It this case, Arpeggio and Pitch are not authorised. The Hardware Frequency is however calculated from the Software Frequency given.
+On top of that, can be added Noise.
+Note that the Sound Channel is always open in Software Dependent mode.
+
+
+Hardware Dependent is quite new. It is the exact opposite to the Software Dependent. The note read in the scroll defines the Hardware Frequency (Arpeggio and Pitch, or Manual Hardware Frequency are here too), which is multiplied by 2^shift to get the Software Frequency, to which is added a Software Pitch (optional). This is the "HardSync" option of STarKos, Software Pitch being the "Finetune". The particularity of this mode is that the Software Frequency is a multiple of the Hardware Frequency, resulting in very "stable", sync sound. Adding a little Software Pitch allows the user to master the desync he wants.
+Once again, the Sound is always On.
+
+
+Independent mode is new. Both Software and Hardware frequency are independent (hence the name). Both read the note from the score, or can be manually setted. This is most useful to have one note in Software, and have one note five half-note higher in Hardware for example (or the opposite !), which can result in two sounds blent in one. It is also the only Hard mode in which you can cut the Sound, and thus using the Hardware Frequency only.
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------
+
+
+
+Header
+------
+DB "AT10"
+DB SampleChannel (1,2,3)
+DB*3 YM Clock (little endian. 1000000=CPC, 1750000=Pentagon 128K, 1773400=ZX Spectrum/MSX, 2000000=Atari ST, or any other in case of custom frequency).
+
+DB ReplayFrequency(0=13hz,1=25hz,2=50hz,3=100hz,4=150hz,5=300hz)
+DB Speed (>=1)
+
+
+Instruments Table
+-----------------
+dw Instruments Chunk Size (not including this Word)
+
+{
+dw Pointers on Instruments
+} * nbInstruments
+
+{
+ds InstrumentData (see the Instrument structure below)
+} * nbInstruments
+
+
+Instrument0 is ALWAYS coded. It represents the empty sound, which is used by RST, but also by sounds when they stop.
+
+
+
+
+
+
+Pre-Linker
+----------
+First comes a unique bloc, just before the real Linker, and only used at the initialisation of the song. It is used to optimise the Looping of the song.
+
+DB First Height
+DB Transposition1
+DB Transposition2
+DB Transposition3
+DW Special Track
+
+
+
+Linker
+------
+
+{
+DB PatternState :
+
+	b5 = New Special Track ?
+	b4 = New Height ?
+	b3 = New Transposition 3 ?
+	b2 = New Transposition 2 ?
+	b1 = New Transposition 1 ?
+	b0 = Song over ?
+
+if b0 = 1 :
+dw Pointeur on Linker to loop. Restart reading.
+
+if b0 = 0 :
+
+DB Transposition 1 if Transposition1?
+DB Transposition 2 if Transposition2?
+DB Transposition 3 if Transposition3?
+DW Track1
+DW Track2
+DW Track3
+DB Height if New Height?.
+DW Special Track if New Special Track?
+
+} * Length + 1		(+1 because the Loop item has to be added to the list).
+
+
+
+SpecialTracks
+-------------
+
+DB Data
+	b0 = Data (1) or Wait (0)
+	If Wait :
+	b7-b1 = Wait b7-b1 lines. (1=1 line, 0=128 lines)
+	If Data :
+	b1 = Speed (0) or Digidrum (1) ?
+	b7-b2 = Value. If value = 0, escape code : read next byte to know value.
+
+If Escape Code :
+{
+	DB Value
+}
+
+
+Note : 7 bits are enough to cover the whole track. Warning, 0 possible (1=1 line, 0=128 lines).
+Note : Speed and digidrum > 0. 0 = Escape code, used to encode number > #3f, which are rare, but allowed by the software.
+
+
+
+
+
+
+Tracks
+------
+Possible cases :
+
+Wait
+Note + New/Same Instrument
+Note + New/Same Instrument + Volume
+Note + New/Same Instrument + Pitch
+Note + New/Same Instrument + Volume + Pitch
+Volume
+Pitch
+Volume + Pitch
+RST
+
+DB Data
+	b0 = Full Optimisation ? (Note only (Escape code possible), Pitch to 0, no Volume, same Instrument). Parameters = 0.
+	Si b0=1 :
+	b7-b1 = 0=Escape Code. 1-127 = Note (0-126). Parameters = 0.
+
+	Si b0=0:
+	b7-b1 = 
+		0-31 = Wait Lines. 0=End Patt (not tested, =128) 1=1 line... Parameters = 0.
+
+		32 (after decrease : 0) = Escape Code for Note. Parameters = 1.
+		33-127 (after decrease : 0-94) = Note. Parameters = 1.
+		If No Note, but Volume/Pitch, Note = any value (0 by convention, so 33 here). Parameters = 1 (and flag Note? below = 0).
+		RST = any Note (0 by convention, so 33 here) with NewInstrument? = 1 and Instrument = 0 (empty Instrument).
+
+If Escape Code :
+DB Note (0->143).
+
+If Parameters = 1 :
+76543210
+pnivvvvo
+
+DB Parameters
+p = New Pitch ?
+n = Note ?
+i = New Instrument ? Only tested if Note? = 1.
+v = Inverted Volume if Volume?=1. %0000 if Volume? is off.
+o = Volume ?
+
+
+DW Pitch if Pitch=1.
+DB Instrument if NewInstrument=1.
+	If Instrument = 0 -> RST
+
+
+
+
+
+
+
+Instruments
+-----------
+Header
+------
+DB Speed (1-256(=0)). Warning, the editor must increase the value when generating.
+DB Retrig? (0 for No, #FE for Yes. #FE is used to convert a NOP/RET Z into CP #C8, so DO NOT CHANGE THIS VALUE).
+
+
+Data
+----
+The following corresponds to ONE Sound of the Instrument. An Instrument can be composed of virtually infinite of these, though most sounds will just have a few :).
+
+
+
+
+DB FirstByte
+
+if b0=0, NON-HARD sound. If b0=1, HARD Sound.
+
+NON HARD Sound
+--------------
+76543210
+pavvvvn0
+
+p = Pitch?
+a = Arpeggio?
+v = Volume
+n = Second Byte needed? Needed when Noise, or Manual frequency, or noise with no sound.
+
+If (Second Byte needed? = 0) and (Volume > 0) : It means : Sound? = 1, Noise? = 0, Manual Frequency = 0. So, a normal sound can be coded in 1 byte.
+However, If Pitch and arpeggio are present, we have to read them !
+
+If (Second Byte needed? = 0) and (Volume = 0) : No need to read anything else. It means : Sound? = 0, Noise? = 0. To optimise, useless to set Volume to 0, just cut the channel.
+
+
+If (Second Byte needed? = 1) :
+{
+76543210
+-dsnnnnn
+
+d = Manual Frequency? (if 1, Arpeggio and Pitch not coded).
+s = Sound? If 0, just manage Noise and that's it.
+n = Noise (0=no noise. >0=noise)
+}
+
+
+
+If Manual Frequency? = 1 : read Manual Frequency WORD (0 to #FFF). Do not read the Arpeggio and Pitch.
+else
+{
+	If Pitch? = 1 : read Pitch WORD (-#FFF to #FFF).
+	If Arpeggio? = 1 : read Arpeggio BYTE (-#5F to #5F).
+}
+
+
+
+
+
+
+HARD Sound
+----------
+76543210
+    iir1
+
+ii = Dependency : 00=Hardware Dependent  01=Software Dependent  10=Independent  11=LOOP SOUND
+
+r = Retrig?
+
+If LOOP SOUND : DW Loop Pointer. Goto Loop Pointer (after the header), read once again.
+If the sound is over, we loop on the 0th sound (of several iterations to optimise).
+If the sound loops, we loop where it has to loop.
+
+
+
+
+Software Dependent
+------------------
+76543210
+qpam01r1
+
+After shifting (done twice):
+76543210
+--qpam01
+
+The Sound? is always 1.
+
+q = Hardware Pitch?
+p = Pitch?
+a = Arpeggio?
+m = Manual Frequency? (if 1, Arpeggio and Pitch not read).
+r = Retrig?
+
+
+Second Byte :
+76543210
+nssscccc
+
+n = Noise ?
+s = Inverted Shift (7 - Editor Shift)
+c = Hardware Enveloppe
+
+
+If Manual Frequency? : DW Manual Frequency
+else
+{
+	If Pitch? : DW Pitch
+	If Arpeggio? : DB Arpeggio
+
+}
+
+
+If Hardware Pitch? : DW Hardware Pitch
+
+If Noise? = 1 : DB Noise
+
+
+
+
+
+
+
+Hardware Independent
+--------------------
+Basically, exactly the same as Software Dependent, just switch every Software term to Hardware, and the opposite. The structure IS and SHOULD be the same, as they share some code.
+
+76543210
+qpam00r1
+
+After shifting (done twice):
+76543210
+--qpam00
+
+The Sound? is always 1.
+
+q = Software Pitch?
+p = Hardware Pitch?
+a = Hardware Arpeggio?
+m = Manual Hardware Frequency? (if 1, Arpeggio and Pitch not read).
+r = Retrig?
+
+Second Byte :
+76543210
+nssscccc
+
+n = Noise ?
+s = Inverted Shift (7 - Editor Shift)
+c = Hardware Enveloppe
+
+
+If Manual Hardware Frequency? : DW Manual Hardware Frequency
+else
+{
+	If Pitch? : DW Pitch
+	If Arpeggio? : DB Arpeggio
+}
+
+
+
+If Software Pitch? : DW Software Pitch
+
+If Noise? = 1 : DB Noise
+
+
+
+
+
+
+Independent
+------------------
+76543210
+spam10r1
+
+After shifting (done twice):
+76543210
+--spam10		(spam, ahah).
+
+
+s = Sound ? If Sound? = 0, no need to take care of Software Manual Frequency, Pitch and Arpeggio.
+m = Manual Frequency? (if 1, Arpeggio and Pitch not read). Manual Frequency can only be present if Sound? = 1.
+a = Arpeggio?
+p = Pitch?
+r = Retrig?
+
+If Sound?
+{
+	If Manual Frequency? : DW Manual Frequency
+	else
+	{
+		If Pitch? : DW Pitch
+		If Arpeggio? : DB Arpeggio
+	}
+}
+
+
+
+76543210
+npamcccc
+
+n = Noise ?
+p = Hardware Pitch?
+a = Hardware Arpeggio?
+m = Manual Hardware Frequency? (if 1, Arpeggio and Pitch not read).
+c = Hardware Enveloppe
+
+If Manual Hardware Frequency? : DW Manual Hardware Frequency
+else
+{
+	If Hardware Pitch? : DW Hardware Pitch
+	If Hardware Arpeggio? : DB Hardware Arpeggio
+}
+
+If Noise? = 1 : DB Noise
+
+
+
+
+
+

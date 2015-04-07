@@ -10,8 +10,6 @@ CPFLAGS = -O2 -Wall -pedantic
 # Compile
 all: objectdir $(OBJFILES) Makefile
 	$(COMP) $(CPFLAGS) -o $(TARGET) $(OBJFILES)
-#all:
-#	@echo $(OBJFILES)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(COMP) -c $(CPFLAGS) $< -o $@
@@ -21,7 +19,9 @@ objectdir:
 	@mkdir -p $(OBJDIR)
 
 clean:
+	@echo "Removing object directory $(OBJDIR)/..."
 	@rm -rf $(OBJDIR)
 
 cleanall: clean
+	@echo "Removing binaries from $(BINDIR)/..."
 	@rm -rf $(BINDIR)/*

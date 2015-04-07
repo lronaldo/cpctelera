@@ -1,0 +1,220 @@
+ARKOS TRACKER - How to use the Player
+-------------------------------------
+
+So you've got a great song ready, and you want to use it on CPC. Or you have converted a STarKos song into a Arkos Tracker (AT) song, in order to use the new player. How clever you are.
+
+
+This player will allow you to :
+- Play any exported song on CPC, Spectrum, Pentagon 128K or MSX.
+- Play Sound Effects along with any music. Or Sound Effects only !
+- Play music and sound effects in Assembler, or from Basic (Amstrad CPC. By CALLing the player. You can also use the Interruption mode, so that you only make one CALL, and the music plays on its own !).
+- Fade in/out the music.
+
+On the Sound Effects side, you'll be able to :
+- Play any of your Sound Effects on any, or all of the 3 channels.
+- Play a SFX on the note you want.
+- Add Pitch if you want (it's great if you want to add a little randomness to the sound).
+- Play a SFX with the volume you want.
+- Play a SFX at the speed it has been created, or faster or slower.
+- Stop any SFX that has been triggered.
+- Up to 255 SFXs available !
+
+Also, the player is the fastest ever (25 scanlines max on a CPC, on a Spectrum : max TM is 5300t, average is 2400t using the "Molusk" song !), the music are light, so why wait ?
+
+
+
+HOW TO CREATE USEABLE FILES ?
+-----------------------------
+First of all, export any AKS or SKS (STarKos) song with the Arkos Tracker "Export as binary" option in File->Export as binary. Export it at the address you want (from 0 to #FFFF). Warning ! On CPC, if you want to use the Interruption mode, your song HAS TO BE generated above #3FFF, due to system limitations. If you don't intend to export a SFX music, you can skip the next chapter. Disable the "Export SFX only" option before clicking on "OK".
+
+
+SOUND EFFECTS MUSIC
+-------------------
+So you want to use sound effects in your production. These, of course, are made with AT, and it must be done in one single song dedicated to Sound Effects. In the "Export as binary" panel is a tickbox called "Export SFX only". Enable it, and export the song. Such songs will contains only the Instruments it is composed of. All your Tracks will be cleared so that the song only contains what's necessary (i.e. the sound effects !).
+
+So as you've guess, if you want music + sound effects, you'll need two files (one "music" file, and one "SFX" file). Why did I do that ? Because "Music" files are very optimised, sounds are reorganised, so you'd lost track with where you put your sounds. But most importantly, it's very flexible this way. Imagine you're working on a game with 5 levels, each having a different song. Do you want to include also all the SFXs inside these 5 songs ? Of course not !
+
+The Instruments become your sound effects in your game/demo. So note their number well ! 
+
+
+What if I want to use only Sound effects, and no music ?
+--------------------------------------------------------
+It is possible ! This shall be explained a bit later when focusing on calling the player.
+
+
+USING THE MUSIC FILE
+--------------------
+Once a binary file has been exported, you can use the player kindly given with this software. You can either use the binary versions on the Player.dsk (CPC only. The filename provide the address on which to load the file : PLAY4000 must be loaded in &4000), or assemble the player by yourself. Here's the procedure for CPCists, with the integrated assembler of WinAPE :
+- Open the Assembler (F3), and load the Player.asm.
+- Find the "Org #xxxx" mnemonic at the beginning of the program. change this address if you need to.
+- CTRL+F9 to assemble it. You can see in the assembler output window where the player ends. Modify the "ORG" address if you think the player gets too high in memory.
+- When you're done, simply save the player in a DSK, in Basic. Let's say the ORG is set to &1000, and that the code ends in &1900. Type this in Basic : SAVE"PLAYER",b,&1000,&1900-&1000,&1000. And you're ready to go !
+
+Warning, as the player has some cool features, be sure to read the text at the beginning. If you want to use this player in Basic (CPC), or use the Interruption System (CPC), or use it in ASM, some short manipulations must be performed. Of course, each time you modify a value, you have to assemble the player again, and save it this way.
+
+
+
+USING THE PLAYER
+----------------
+Though there is just one player, it can be used in three different mode :
+- Your production is done in Assembler. You don't mind if the player modifies all the registers. If you need some registers to be saved, you will do it by yourself. This is called the "ASM" mode.
+- Your production is in Basic (on CPC), or under any OS, and you want some registers to be saved (by default, only the ones used by AMSDos will be saved, but you can modify that in the source). In order to secure the call, the player stops the interruptions, but restore them if needed. This is called the "BASIC" mode, or "system-friendly".
+- Your production is on CPC only, most likely in Basic, and you just don't want to mess with any kind of code. A simple CALL will put the music into interruption. This is called the "INTERRUPTION" mode, and is very nice to Basic users.
+
+You can switch from one mode to another by setting the constants PLY_SystemFriendly and PLY_UseFirmwareInterruptions to 0 or 1, like said in the player. An example : in the ASM mode, both must be turned to 0, so find the two constants and :
+PLY_SystemFriendly equ 0
+PLY_UseFirmwareInterruptions equ 0
+
+Then assemble the player (like said above), save it, and use it.
+
+For ASM and BASIC players, these three functions are always available :
+PLY_Init : This one is needed once before playing the song. Without it, nothing will be heard. (DE = song address)
+PLY_Play : Play one frame of the song. It can also resume the song if it had been stopped (with the function just after).
+PLY_Stop : Stop the song, cut the sound.
+
+Basic users can call these functions easily. If you have loaded your player in &4000 and your song in &5000 :
+CALL &4000, &5000 : Initialize the song.
+CALL &4000 + 3 : Play/resume the song.
+CALL &4000 + 6 : Stop the song.
+
+
+INTERRUPTION players don't exactly work this way :
+PLY_InterruptionOn : Play the song (no need to initialize it). (DE = song address)
+PLY_InterruptionOff : Stop the song.
+PLY_InterruptionContinue : Resume the song.
+
+Or in Basic :
+CALL &4000, &5000 : Start the song.
+CALL &4000 + 3 : Stop the song.
+CALL &4000 + 6 : Resume the song.
+
+
+
+FADE IN/OUT
+-----------
+The player allows the volume to be modified. It provides the interface, but you'll have to set the volume by yourself. This is more flexible and powerful this way.
+Set PLY_UseFades to 1.
+In Assembler =
+ld e,Volume (0=full volume, 16 or more=no volume)
+call PLY_SetFadeValue
+
+In Basic, if your player is loaded in &4000 =
+call &4000 + 9 (or + 18, see just below), Volume (0=full volume, 16 or more=no volume)
+WARNING ! You must call Player + 18 if PLY_UseBasicSoundEffectInterface is set to 1. That is if you're using Sound Effects in Basic.
+
+
+SOUND EFFECTS
+-------------
+Sound Effects are defined in another song (which we will be refered as "SFX Music"), exported as a "SFX Music" in the Arkos Tracker.
+Set the PLY_UseSoundEffects to 1. If you want to use sound effects in Basic, set PLY_UseBasicSoundEffectInterface to 1.
+
+Like any song, the SFX Music must be initialized, but with a specific function :
+
+In Assembler :
+ld de,SFXMusicAddress
+call PLY_SFX_Init
+
+You must also initialize the "real" music :
+ld de,Music
+CALL PLY_Init
+
+To play a sound effect, you must call the PLY_SFX_Play function. It has a lot of parameters :
+A = No Channel (0,1,2)
+L = SFX Number (>0)
+H = Volume (0...F)
+E = Note (0...143) (0 is the lowest, 143 the highest)
+D = Speed (0 = As original, 1...255 = new Speed (1 is the fastest))
+BC = Inverted Pitch (-&FFFF -> &FFFF). 0 is no pitch (=the original sound). The higher the pitch, the lower the sound.
+Then : call PLY_SFX_Play
+
+To stop a sound effect :
+ld e,No Channel (0,1,2)
+call PLY_SFX_Stop
+To stop the sound effects on all the channels :
+call PLY_SFX_StopAll
+
+
+In Basic :
+call Player + 9, SFXMusicAddress	to initialise the SFX Song.
+call Player, Music			to initialise the "real" music.
+To play a sound effect =
+call Player + 12, No Channel, SFX Number, Volume, Note, Speed, Inverted Pitch. No parameter should be ommited !
+To stop a sound effect =
+call Player + 15, No Channel (0,1,2)
+
+
+Obviously, SFXs are "added" to the music. So you need to play the song to actually hear them ! Also, as they are adding another layer of sound to the player, they are consuming more CPU, especially if you're playing SFXs on the three channels at once.
+
+Also, note that triggering a sound over another one will cut this last one.
+
+
+What if I don't want any music, and only SFXs ?
+-----------------------------------------------
+This is possible, and you don't have to create an empty "real music" plus the "SFX music". The SFX Music already contains an empty Pattern inside, so when initialising the "real music", simply use the address of the "SFX Music" :
+ld de,SFXMusicAddress
+call PLY_SFX_Init
+ld de,SFXMusicAddress
+CALL PLY_Init
+
+
+How to test a sound effect is over ?
+------------------------------------
+There is no function for that, but it's easy to code by yourself. Simply test if the word on the following address is 0 :
+PLY_SFX_Track1_Instrument + 1		to test if no sound effect is present on Channel 1.
+PLY_SFX_Track2_Instrument + 1		to test if no sound effect is present on Channel 2.
+PLY_SFX_Track3_Instrument + 1		to test if no sound effect is present on Channel 3.
+
+
+
+How to test a priority of a sound effect over another ?
+-------------------------------------------------------
+AT provides a "low level" sound effects player, but it's up to you to manage how to trigger them. If a "bang" explosion shouldn't be cut by a "jump" sound, then you have to manage a priority list of your sound effects. It's quite easy to code. If many people ask for it, I may provide an interface to do that.
+
+
+
+
+
+
+
+DIGIDRUMS
+---------
+Digidrums are in fact only "events" sent by the player, for you to know you must trigger something. For more flexibility, and as there are countless ways to play samples according to how to manage them, I chose not to include any code for playing sample. It's up to you.
+
+After the song is played, simply read the PLY_Digidrum value. If it's 0, nothing happened. Any other value means that a digidrum must be played. The digidrum number is of course entered by the musician inside the song, so take care to communicate well how to designate the samples (for example 1=kick drum, 2=snare, ...).
+
+One variation of the use of Digidrums if Events. Imagine you want to synchronize your production with the music. You can set "markers" in your song thanks to this. For example, if the Digidrum "255" if played, it means that your next effect must appear.
+
+
+
+RANDOM QUESTIONS
+----------------
+
+How to detect the song is over ?
+--------------------------------
+There is no flag made for that, but as you have the source file, it's easy to add. Once a song is over, it reaches the code just below the PLY_Linker_PT label, with a comment "Song over !". Simply add your code here, like setting a flag, or jumping to a code of your own.
+
+
+How to relocate the player and songs ?
+-------------------------------------
+I provided such tools with the STarKos, but didn't here.
+
+Relocating the player isn't complicated, but I didn't provide a way to do it because the player will change a lot according to who's using it. How to do it : Assemble two players in two different address (&4000 and &8000 for example). Then compare the bytes and find the addresses that have changed. With that, build a relocation table.
+
+Relocating a song is however much more complicated. The values are all absolute, and the format of the Instrument is not that simple. I may provide a code to do that if many people request it.
+
+
+Can I remove parts of the code if I need memory ?
+-------------------------------------------------
+Well, as long as it won't crash it, why not ? :) Don't forget that a lot of code is actually only assembled with conditions. You don't have to remove the SFX code part if PLY_UseSoundEffects is set to 0. But :
+- You can remove the jp PLY_Init / jp PLY_Play / jp PLY_Stop at the beginning of the code if you're directly jumping to the functions they're pointing.
+- You can remove all the references to PLY_Digidrum if you don't use/need digidrums/events in your song.
+- You can remove all the management of the Special Tracks if the song has no Speed change/Digidrums (from PLY_SpecialTrack_WaitCounter to PLY_SpecialTrack_Wait).
+- You can remove the PLY_Stop function if you don't intend to stop the song !
+
+
+
+
+That's it ! If you have any questions regarding this software or any suggestions, write here : contact@julien-nevo.com
+
+
+

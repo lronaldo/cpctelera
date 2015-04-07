@@ -1,0 +1,448 @@
+ARKOS TRACKER V1.0
+------------------
+
+Arkos Tracker is freeware. You are free to distribute, copy it, as long as you don't sell it.
+
+Contact me (Julien Nevo aka Targhan/Arkos) for anything related to this software (bug report, suggestions...) : contact@julien-nevo.com
+Check our website for more information : http://arkostracker.cpcscene.com
+If you're interested in the CPCBooster : http://dirtyminds.dxm.gr
+This software relies on the .Net framework, which you can download here : http://msdn.microsoft.com/fr-fr/netframework/aa569263.aspx
+However, the command line tools (SKSToAKS, AKSToBIN, AKSToYM) work with Mono, so you can use them on any system that supports it.
+
+
+Credits
+-------
+On PC side :
+Tool designed and coded by Targhan/Arkos.
+Graphics and additional design by SuperSylvestre/Les Sucres En Morceaux.
+Thanks to Augusto Ruiz Garcia (THANKS FOR YOUR AWESOME SUPPORT !!).
+Thanks to Grim for the AY volume measurements.
+Thanks to Lachlan Keown and Ramlaid/Arkos for their technical advice.
+Thanks to UltraSyd and No Recess for their tests.
+Thanks to Syx for pointing out that the command line tools were working with Mono !
+
+On CPC side :
+Player coded by Targhan/Arkos, some optimisations provided by Grim/Arkos.
+CPC PSG access based on Madram/Overlanders' trick.
+Speccy port and Interruption state save/restore snippet by Grim/Arkos.
+Player adapted to Spectrum/Pentagon by Grim/Arkos.
+MSX Player Test source and MSX player test by WYZ.
+MSX Player debugged by Syx.
+
+
+You will find in this package :
+- ArkosTracker.exe : The software itself.
+
+- Formats Folder : Files inside describe the various formats used by the Arkos Tracker.
+- Instruments Folder : AKI Instruments to use in your songs. These instruments are provided freely for you to use them in your song, as-is or modified.
+- Manuals Folder : Manuals of the software, and how to use the player.
+- SKS Songs Folder : SKS files made on STarKos (Amstrad CPC) you can load to learn how to use Arkos Tracker. Also to listen to good AY tunes ! These music were already used on other production. Please contact the author if you want to use them.
+- Songs Folder : Provides songs made with Arkos Tracker.
+- Sources Folder : Sources of the Z80 players you can run on 8-bit computers (Amstrad CPC, Spectrum, Pentagon 128, MSX...).
+- Tools Folder :
+	- AKSToBIN : a command line software to converts any AKS song into a binary to use on hardware (warning, you still need .Net to use it, but works with Mono !).
+	- STKToAKS : a command line software to converts any STarKos songs into an AKS song (same remark as above).
+	- AKSToYM : a command line software to converts any AKS song into an interleaved or non-interleaved YM6 format (same remark as above).
+	- A DSK containing the CPCBooster Client to run on your CPC. See the section about the CPCBooster at the end of this file.
+
+
+
+What is Arkos Tracker ?
+-----------------------
+Arkos Tracker is a freeware music software dedicated to the AY soundchip, which can be found in 8-bit machines like Amstrad CPC, MSX, Spectrum, Pentagon 128K and Atari ST.
+
+It runs on any Windows with the .Net 3.5 framework installed. No plan to converting it to MacOsX and Linux are schemed.
+
+Arkos Tracker is born from the CPC tracker called "STarKos", which I also coded. It retains most of its features, extends some, and will improve them in future versions.
+
+
+
+
+I already compose on "*Insert here a PC Tracker for AY*", why should I use Arkos Tracker ?
+------------------------------------------------------------------------------------------
+- Arkos Tracker is more powerful. Yes it is.
+- The player is the fastest. Really.
+- The player is dedicated to run on Amstrad, MSX, Spectrum, or Pentagon.
+- The music are light.
+- It supports sound effects in a very powerful way.
+- The interface is intuitive, and the software documented.
+- The format of the songs and source of the player are provided.
+
+I already compose on CPC with STarKos ! I don't need no stinkin' PC tool !
+--------------------------------------------------------------------------
+Well, you don't have to if you don't want to, but :
+- You can listen in real time to your song on a REAL CPC while composing on PC, if you connect each other with the CPC Booster (http://dirtyminds.dxm.gr) ! 
+- You can import any STarKos song (SKS files) in Arkos Tracker, and save them as binaries, so that you can use the new player.
+
+
+
+
+
+
+
+
+What's new in 1.0 ?
+-------------------
+- The "Load Song" dialog can now load both AKS and SKS files at the same time.
+- You use use the command line to load a song.
+- Drag'n'drop possible to the Arkos Tracker executable file to load a song.
+- Bug corrected : Could not close the application with the top-right cross when the player was active.
+
+
+What's new in 1.0 Beta 4 ?
+--------------------------
+- Ability to drag'n'drop AKS, AKI, SKS files into the Arkos Tracker.
+- Ability to limit the Pattern Viewer refresh rate in order to improve performance.
+- Load Song and Import SKS options are now mixed into one single option.
+- Corrected a bug that could make the Pattern Viewer not refreshed after having entered a volume, pitch or instrument.
+- Corrected a bug that would make the player use a wrong frequency when changing the replay frequency.
+- Corrected a bug that would make sounds not evolve on Speed 1 while adding them in the Pattern Viewer.
+- Slight improvement of the replay routine (shouldn't be noticeable in 16 bits, but should in 8), after Dadman noticed a bug in the 8 bits replay.
+- A few cycles optimisations of the player (thanks to Grim/Arkos).
+- Spectrum player redesigned, corrected, and optimised by Grim/Arkos (using the "Molusk" song, max TM is 5300t, average is 2400t).
+- MSX player test debugged by Syx. MSX DSK updated by Syx.
+- Source of the CPCBooster client and management now included (Sources/CPCBooster).
+
+
+What's new in 1.0 Beta 3 ?
+--------------------------
+- AKSToYM to convert an AKS Song into an YM6 format.
+- A MSX2 compatible test program thanks to WYZ.
+ 
+
+What's new in 1.0 Beta 2 ?
+--------------------------
+- Complete coding of the sound generating and outputing by myself. The emulation is more accurate, and will allow the implementation of samples and Sids in the future.
+- Plug in your best MIDI Keyboard or any MIDI-In device, play and record your music with it !
+- 150hz and 300hz replay modes are now available. They are very slightly slower than on a real CPC. Nothing you should notice...
+- CPCBooster output is now very accurate.
+- Ability to save Interleaved/non-Interleaved YM6 format.
+- AKStoBin : a command line software to converts any AKS song into a binary to use on hardware (warning, you still need .Net to use it, but it works with Mono !).
+- STKtoAKS : a command line software to converts any STarKos songs into an AKS song (same remark).
+
+
+
+
+
+
+
+
+
+Features
+--------
+- 256 Patterns available.
+- Each Pattern is composed of 3 tracks, one par channel.
+- Manages 512 tracks, each one being reusable several times in different positions OR in the same position, why not. Memory saving !
+- A Track can have a height from 0 to 127.
+- Each Track can be be transposed independently.
+- Each Pattern has its own height, from 0 to 127, independently of the height of the Tracks.
+- 255 instruments free to use.
+- Each PSG registers can be modified while creating instruments.
+- Big news : instruments are divised into two channels : a Software, and Hardware one. These channels can be independant or dependent from each other. Allows using two waves at the same time !
+- Frequency replay of 13, 25, 50, 100, 150 or 300 Hz.
+- Digidrums are supported : it is possible to enter digidrum numbers in the "Special Tracks" (I'll explain later their use) that can be read through the external player while playing the song. However, you can't load/hear a sample inside the editor.
+- It's easy to synchronise your production to the music, as your music can send "messages" through the player.
+
+
+KNOWN ISSUES AND LIMITATIONS
+----------------------------
+- Digidrums aren't supported as they should. You can insert them, but not hear them.
+- BUG : In the Instrument Editor, when right clicking on the Enveloppe diagram, a context menu appears. Do not try to select the desired option with the keyboard (cursor up/down), it will prevent you from choosing the right item unless you restart the application ! I suspect a bug in .Net, but...
+
+
+Future plans
+------------
+- A better samples support : ability to use any sample inside the Pattern like any other instrument.
+- Sid sound, Sync buzz, and stuff like that may be supported.
+- A better Instrument List handling.
+- Undo/Redo support.
+- ... Whatever you feel would be useful !
+
+
+
+
+
+
+
+
+Lexicon
+-------
+Arkos Tracker (AT) works the way STarKos does. It is slightly different from conventional 8-bit trackers, but the way it works is also from where come its power and efficiency (yeah). Here is how things works.
+
+Tracks : They represent the basis of your compositions. All the notes are entered there, and you've got 512 of them. Each track is identified by its number. One Track can be up to 128 notes long.
+Important note for STarKos users : Contrary to STarKos, it is NOT possible anymore to add Digidrums to Tracks, only in the Special tracks. Why ? It is needed to make the transitions with the future versions, and the way it will handle samples. Imported SKS songs using SPL will see them replaced by RST.
+
+Patterns : This term is known to all Trackerers. A Pattern is a little sequence of a height between 1 and 128 notes. In AT, a Pattern is composed of 3 Tracks. Each Track is independant from the others, and can be used in any other Pattern. It is also possible to have two, or even three same Tracks in the same Pattern ! Modifying one Track will change the others. Along with the transpositions - one per Channel -, it is possible for example, to use one Track on Channel 1, and the exact same Track on Channel 2, transposed of an octave. If the tracks included are bigger than the Pattern height, then they'll be truncated INSIDE THIS PATTERN ONLY, which means that the 'overflowed' data aren't erased from the memory at all, they're simply not used in this Pattern. So it's possible to use half of a track in a Pattern, and the whole in another. On the opposite, a Pattern can be bigger than the Tracks inside. In this case, there's no problem, you'll find empty notes at the end of the Tracks.
+
+Instruments : You know or guess what Instruments are, so I won't dwell on that. You have 255 instruments, from 1 to 255.
+
+Special Tracks : These ones are new. They allow to set digidrums, and speed changes. Each Pattern has a Special Track, on top of the 3 "normal" Tracks. You have 256 Special Tracks available.
+
+
+
+----------------
+General Handling
+----------------
+Once you've started Arkos Tracker, you will see the main page. Let's examine each components :
+
+
+The Menus
+---------
+
+File
+----
+- New/Open/Save Song/Save as : Pretty self-explanatory. Arkos Tracker songs are saved in AKS format, but you can also load SKS songs, which are STarKos (CPC) song. Due to the differences in the way sounds are handled, the imported SKS songs may sound a little different, but most will be converted successfully. Check the "Format" folder for more information about the AKS format.
+
+- Open/Save Instrument : First select the Instrument to save or to be replaced by the one you want to load, and then Open/Save Instrument. Instruments are saved as AKI, and use the exact same description as in the AKS format.
+
+- Export as WAV : Allows you to create a WAV file of your song, according to the Sample rate, Bit rate and Number of channels you want.
+
+- Export as YM : Exports the song as an unpacked YM6, that you can load and listen to with ST Sound By Leonard/Oxygen. An option box will ask whether you want to use Interleaved or non-interleaved format. The first is preferably used if you intend to spread your music on the net, as LHA will pack it more efficiently. The second is especially used because some converters may only treat linearly stored register streams.
+
+- Export as binary : When your song is finished, you may want to export it to use it on the real hardware in your production. First select the address where to generate the song (in hexadecimal). The length and end address are automatically calculated according to what you type. The "Export SFX only" is used to make a SFX song. These songs don't contain any musical items (save for one empty Track, and one empty Special Track). For more information, please read the "Player" file in the "Manuals".
+
+- Setup : Useful to... set the application up. Two tabs :
+"General" :
+- Displays Rows In Hex : By defaut, the line index in the Pattern Viewer are displayed in Hexadecimal. You may want to see the Decimal value by unchecking this item.
+- Font size in Pattern Viewer : Allows you to change the font size in the Pattern Viewer.
+- Pattern Viewer refresh rate in Play mode : Slider that allows you to limit the refresh rate of the Pattern Viewer while a song is played. This is especially useful for 300hz songs on slower computer.
+
+"Audio" :
+- You can select the Sample rate, Bit rate, the number of channels used by your sound card, as well as the number of buffers used. The default is 32, which should be fine on all computers. If you hear glitches, increase this number. You can also reduce latency by decreasing it. You can select the CPCBooster as an output if your CPC has one, and the client has been run on it. Don't forget to select the right COM port ! For more information, read the paragraph about linking your PC to the CPCBooster.
+
+
+Edit
+----
+- Song Information : You'll find here the information related the song. Most are self-explanatory, but for those which aren't :
+	- The DOS Name is the name used by default when generating your song. Most of you may want to use a name that the hardware DOS will be able to recognize (8 chars long, no lower case). 
+	- SPL Channel is here to maintain the legacy of STarKos, but will disappear quite soon. As you can trigger digidrum in the Special Track, there's a question : on which channel to play them ? The musician will be able to tell the coder that information with SPL Channel (1,2 or 3).
+	- Initial Speed is here to maintain the legacy of STarKos, too. When you play the song from start, the Speed will take this value automatically.
+	- Highlight : Indicates the lines to highlight in the Pattern Viewer. According to the time measure of your song, you may want to set it to 3 or 6 for example. It is also possible to disable it.
+
+
+
+Let's now take a look at the main windows :
+
+Instruments List
+----------------
+This one is seen on the top left part of the window. In this field, you can have a list of all the Instruments you have in your song. A first tiny Instrument is always here. The selected Instrument is the one that will be used when entering notes in the Pattern, or the one being edited and played with the keyboard. You will notice three icons just below to it :
+- Create a new Instrument. Quite obvious. A new Instrument is added at the end of the list.
+- Duplicate : the current Instrument is duplicated into a new Instrument, added at the end of the list.
+- Clear : the current Instrument is emptied (but not destroyed).
+*For now*, it is not possible to completely kill an Instrument, or order them once they are created. It is also not possible to reorder the Instruments.
+
+
+Equalizer
+---------
+Just right to the Instuments List is a volume equalizer. A blue bar means "no volume". An orange bar means that an hardware sound is used in this channel. It is quite handy to know if Hardware envelope are overlapping this way. Below each channel volume equaliser is a little light turning red if noise is used in this channel.
+
+Below, are three buttons, corresponding to the activity of the channels. Right-click to mute the channel, left-click to solo/unsolo.
+Just left to them is a little Icon called "Polyphony". More on that later.
+
+
+Octave
+------
+It represents the base octave used when putting a note in your music, or when playing with your sound. AT octaves go from 0 to 12, but this componant only goes to 11, as the keyboard allows you to reach the next octave.
+
+
+Speed
+-----
+Represents the current Speed of the song. You can modify it in real-time, but any Speed command inside the song (in the Special Tracks) will reset it, so use these instead.
+
+
+Steps
+-----
+Indicates how many lines to jump after a note has been added to a Track.
+
+
+Replay
+------
+Represents the rate at which the song is being played. Most productions will use 50hz music (which means that the music will be played 50 times per second), but you may also use 13hz or 25hz song as well, or up to 300 hz. This information is saved in your song.
+
+
+
+Linker
+------
+The beast is on the bottom left corner. This one is very important : it will allow you to link each Track into each Pattern. Understand the main philosophy of AT : the content of a Pattern is independant to the Pattern itself. Each channel of a Pattern is linked to three Tracks.
+For example, you could have the first Pattern linked to the Track 1 (the bass), 2 (the drums), 3 (the melody). For the second Pattern, you could use the same Drum Tracks, and a new Bass line and Melody. So you'd use new Tracks for them. The second Pattern will thus be linked to Track 4 (new bass), Track 2 (the drums, the same), and Track 5 (new melody).
+
+On top of that, each Track in each Pattern has its own Transposition setting, which you can see by clicking on the "Switch View" button (the magnifier) just above the Linker. You can then transpose the whole Pattern of up to 15 semi-tones, or just the bass line if you want. So a single Track could be reused many times by just transposing it ! Musician will like this feature because it's handy, and coder because it saves a lot of memory.
+
+Also, each Pattern has its own height, independently from the Tracks height. Like said earlier, if the tracks included are bigger than the Pattern height, then they'll be truncated INSIDE THIS PATTERN ONLY, which means that the 'overflowed' data aren't erased from the memory at all, they're simply not used in this Pattern. So it's possible to use half of a track in a Pattern, and the whole in another. On the opposite, a Pattern can be bigger than the Tracks inside. In this case, there's no problem, you'll find empty notes at the end of the Tracks.
+
+Finally, the last column is reserved to Special Tracks, which can only contains Digidrum messages and Speed changes. It is possible to ignore them for a whole song if you don't need speed change !
+
+
+To change a Track number, simply click on it, then enter a number between 0 and 1FF. Only hexadecimal values are accepted !
+The buttons just above perform the following actions :
+- Switch View : like said earlier, switches between Pattern Height + Special Track view to Transpositions view.
+- Add Pattern : Duplicate the current Pattern into another one.
+- Delete Pattern : Delete one Pattern. Don't worry, the Tracks it contains aren't erased from the memory, even if there's not used anymore !
+- New Pattern : Will find empty and unused Tracks, and link them to a new Pattern. Very useful to create a Pattern from scratch !
+- Move Pattern up : Move the pattern one rank above.
+- Move Pattern down : Move the pattern one rank below.
+
+Each Track has a name and a color, as you will see in the Pattern Editor. Its color also sets the background of the Track of the linker, and if the Track upon which is hovering your mouse has a name, it will appear as a tooltip.
+
+
+
+
+
+
+Pattern Editor
+--------------
+The big stuff on the right part of the screen is the Pattern Editor. You'll be able to compose with it (yes, really). You can reach it by pressing F2 (but since the software displays it from the start, pressing F2 won't do a thing).
+
+It works like in any conventional Trackers. You can move your cursor using the arrows of your keyboard, or by clicking once where you want your cursor to move. You can also select a part of the Pattern with the mouse and perform editing operations by right-clicking on it, or with the keyboard shortcuts (see below).
+
+By pressing the Space bar, you can switch the Edit mode to on, and thus put your notes using the keyboard (WSXDC... and AÈZ"... to use the next octave). Once a note is written, and cursor moves downward according to the "Steps" value we've seen before. Also, the base octave uses the value "Octave" you can see on the left corner of the screen.
+
+You can see four columns. The first three are the Tracks for channel 1, 2 and 3, according to the Linker. Just above is a field to name the Track, and a Color box to define how beautiful your Track is. Identifying your Track by both a name and color can be very handy, especially as both these information are reported into the Linker (visually for the color, and as a tooltip for the name).
+
+Each Track has four columns in itself. Let's take an example :
+C#4 5F F +465
+
+- The first column is the note with the octave. To reach all the notes given by the AY, AT allows you to use 12 octaves (from 0 to B). Also, a special note called "RST" (ReSeT) can be entered through the "$" key. Such note will stop all sound on the Track. Also, volume and pitch (see below) can't be entered along a RST.
+- The second column is the Instrument. Unlike most limited tracker (hehe), AT gives you up to 255 Instruments, from 1 to FF. An Instrument is always linked to a note, so you can't delete one without deleting the other.
+- The third column is the volume from F (full volume) to 0 (no sound). It is possible to delete Volume when you don't want to change the volume of a note. Simply put your cursor on a volume, and press Backspace. Also, note than Hardware envelope can't be modified by this volume. If your Instrument is composed of both software and hardware envelope, only the software will be decreased by your volume change.
+- The fourth column is the Pitch, or Portamento. It goes from -FFF to FFF. It allows notes to slide upwards or downwards. Each note triggered resets the Pitch value of a Track.
+
+
+Besides the three Tracks is a... fourth one, the Special Track, in which you can only enter in the first column :
+- "D" to enter a Digidrum. These samples are numbered from 1 to FF (on the second and third column). Digidrums aren't supported for now with the editor currently, but you can intercept these values thanks to the player, and play the sample accordingly. More on this in the Player section.
+- "S" to change Speed, numbered from 1 (fastest) to FF (slowest).
+
+
+Plenty of shortcuts allow you to do plenty of stuff, so you HAVE to have a look at them, it will make your life better. Check the Keyboard manual.
+
+
+
+
+
+
+
+The AY
+------
+We must here have a little talk about the AY capabilities, for you to be able to create great sounds. You can of course use the "factory" presets you can find on the "Instruments" folder of the Arkos Tracker, but creating them is really more cool. If you know everything about the AY, you can skip this part, as we won't fathom all its secrets here... though the terminology might be important for later.
+
+The AY can generate one square sound on each of its three channels, each with a volume (4 bits : from 0 to 15) and a frequency (12 bits : from 0 to 4095). So if you want to have a fading-out sound, you have to give the AY all the volume it has to change (15,14,13,12,...0). That's what I will refer to as "Software envelope". The coder/musician has to tell the player what to change, when to.
+
+It also has one (and one only) Noise generator (5 bits : from 0 to 31), which is used mostly for drums and sound effects. It can be mixed to any, or all, of the channels, but remember that at a given moment, the same noise value will be used by all the channels using the noise, as you only have one Noise generator.
+
+But the AY also has a Hardware envelope generator. It is made to provide a little ease when programming the AY, however, it is VERY limited for its former use :
+- Its job is to modify the volume of a channel, using a period given by the musician.
+- The Hardware volume curve has to be chosen among 8 curves, half of which loops.
+- The curve always start at an extreme value (0 or 15) to reach the other extreme (15 or 0). So you can't create transitions between given volumes.
+- There is only ONE generator. So if two sounds use it, they WILL share the same Hardware envelope. Most of the time, no one uses the hardware generator on more that one channel.
+
+So a musician will either choose to use the Software envelope, in which case he will enter all the volumes he wants to hear, OR use the Hardware envelope. Once you have activated the Hardware envelope on one Channel, you CAN NOT use the Software volume anymore, unless you deactivate the Hardware envelope of course. It is an important note.
+
+For all these reasons, no musician uses the Hardware envelope in its former context. But there's a special trick that allow to hear what we know as "Hard sound", or "Hard bass", as they are especially efficient with low sounds.
+
+What we do is synchronise the Software and Hardware envelope, so that the Hardware modulates the Software one... Let's say we have a note at 440hz. So our Software frequency is 440hz. To have a nice sounding "hard bass", the Hardware frequency should be a multiple of the Software frequency. Fortunately for us, multiplying by a power of 2 the Software frequency to get the Hardware frequency is something our beloved Z80 is able to do quickly.
+
+Another nice trick is to force the Hardware software to a very high frequency. Ben Daglish used to do that a lot.
+
+But another point remains : what Hardware curve to use ? You will probably use a looping curve, so that you just have to trigger it once. Four curves are really used a lot : the sawtooth, the triangle, and their inverted. Not a lot of option, but enough to have nice sounds.
+
+What is the use of the remaining Hardware curves ? These will mostly be used if you want a smooth fade-out/in of a sound, but can't have it with a Software curve... Imagine your song replay-rate is at 13hz. Using a Software sound, you will only be able to modify the volume of your sound 13 times per second, which is not as smooth as it seems to be. By using an Hardware sound, all you will have to do is trigger the fade-out curve with the right frequency, and the job is done.
+
+Another important note is about the Register 13 of the AY. It contains the Hardware envelope curve used. Whenever you use a new curve, the R13 is resetted, and the curve is retriggered. So if your sound always use curve, the R13 will be set only once, because triggering the R13 result in a trigger of the curve itself, which can sound quite harsh, so AT prevents that from happening by testing first if the R13 doesn't already contains the value you want to use. Is it however possible to force the Retrig whenever you want. Why ? To give a better attack of a bass for instance. Also, imagine you are using one note multiple times in a row. If you are always using the same note with the same curve, you won't hear the notes being triggered, because the R13 hasn't been modified, so the Hardware envelope hasn't been triggered (except for the first note). In that case, you will put a "retrig" at the beginning of your sound.
+
+
+
+
+The Instrument Editor
+---------------------
+This is the other big stuff. Access it by pressing F3. Don't be afraid. It's simple. And friggin' powerful.
+
+The Instrument being edited is chosen through the list on the left corner of the screen. Select one of them and have a look at the Instrument Editor.
+
+On the top is the Instrument name. Pretty self-explanatory. "Speed" just besides is the speed at which the CPU will proceed in your sound. 0 is the fastest speed (your sound is read each frame), 255 the slowest.
+
+The little button besides is here to hear and have fun with your sound. If you click on it, you'll hear your sound using the note written in the button ("C-3" is the default). Now that this button has focus, play with the keyboard to hear your sound on various tonalities (/ and * of the numpad to change Octave, Esc to stop the sound).
+
+Now if you push the little "Polyphony" button near the equalisers we talked about earlier, you activate the "Polyphony" mode, in which your sound is played on every activated channel alternatively, as you play a note ! That's really a nice feature to hear your sound on two, three channels like you would have done if you were editing your song. Except that it's faster and doesn't mess with your song.
+
+Another way to test your sound when you are editing the sounds (with your cursor inside one of the composants below) is by pressing Shift + one note of the Keyboard, and Esc to stop the sound.
+
+
+Now let's have an overview of what is below.
+
+An Arkos Tracker Instument is composed of what I will refer to "Lines", which represents each "frame" of a sound, each component if you will. An Instrument is composed of up to 256 Lines, each having a column below (yes, it's rather illogical to have lines being set in columns, but STarKos displayed Instruments in lines, not column).
+
+
+
+
+
+So just below the scrollbar, we have :
+
+- Lines : This indicator shows what Line is below. A Sound has at least one Line, the "00". A blue bracket-like symbol surrounds some Lines. It is actually the begin/end loop marker. As it is blue, it means that the Loop is off. Click once on it to switch it to On, showed by the green color. You can also drag'n'drop the left and right part of the marker in order to extend the looping area. A right-click on a Line number also provides a context-menu to do the same.
+The End marker is actually used whether the Instrument is looping or not : it shows the End Line of the sound. So even if the Instrument seems 150 Lines long, only the part between and Line 00 and the End marker is played.
+
+- Sound : Indicates if the Software envelope is used. If is it off and on top of that no Hardware envelope is used, will no sound be heard ? Exactly. Unless you use a Noise effect ! When the sound is off, you can still have a Hardware envelope, resulting in a very soft and still sound.
+
+What follows concerns the Software envelope :
+- Period : Well, it's the period of the Software envelope (a Period is 1/Frequency, so the higher the note, the lower the Period). On "Auto" mode (=0), the frequency is linked to what is played in the song (ie. your music !), or what note is played by yourself with the keyboard. By entering a number here (from 1 to #fff, 0=Auto), you force the period. This can be useful for special effects (like Ben Daglish's high pitched sound). If you force the period, the two following features (Arpeggio and Pitch) become disabled.
+- Arpeggio : An Arpeggio is a shift in the note range. If your note is a C#3, an Arpeggio of 1 will result in a D3. Very useful to color your sound ! Values from -#7F to #7F.
+- Pitch : A Pitch is a shift in the period, AFTER the Arpeggio has been performed. It is especially useful to create vibrato, or slides in your sound. Values from -#FFF to #FFF.
+
+Let's skip the "Link" and "Ratio" for now. Just below are :
+- Hardware Period, Arpeggio and Pitch. They look a lot like the features above, don't they ? Yes they are exactly the same, except that they concern the Hardware envelope, and not the Software. And as much as the Software options won't be available is the "Sound" is off, the Hardware envelope won't be available if no Hardware curve is used ! They will be triggered just below...
+
+- Envelope : This is were you draw either your Software volume curve OR your Hardware curve. The default mode is "Volume". Left-click on a bar to draw your curve. If you want to use an Hardware curve, simply left-click and select an Hardware curve, or right-click once on a bar.
+
+- Noise : If you want to add a white noise to your sound, simply draw your noise curve by left-clicking on a bar. Noise can be added to any Software or Hardware line, whether Sound is on or off. Actually, the only thing that can prevent a Noise from being played is putting the Volume to 0 (whether it be Software or Hardware).
+
+And now let's look a bit higher. What follows is the most important feature of the Editor :
+- Link. Each sound in Arkos Tracker can be seen as a mix of 2 envelopes : one Software, one Hardware. Most trackers will let you play with the Software one, a bit with the Hardware, but that's it. AT will allow you to play with both in three different ways :
+
+- Link = Independant (two keyboards) : This is the default mode. In this mode, both Software and Hardware are independent (hence the two keyboards, representing the two "streams" of sound). The notes from the keyboard or the music are played independently by both "channels". In this mode, the most obvious process is to put a high Hardware Arpeggio, multiple to 12 (#C), which represents an octave. But you can also have an arpeggio of 5 (+ x*12), which will sound as if you had two notes playing at the same time ! One drawback of this mode is that the Pitch inside a pattern won't work well : the same Pitch will be used for both Software and Hardware envelope, but as they will most likely use different periods (if one of them uses Arpeggio and not the other), the periods won't be synced anymore, resulting in interference. The Independent mode is also the only mode that accepts having Sound set to Off. In this case, you can have an Hardware curve and no Software envelope (this results in a soft and "still" hard bass). Or you can have no Hardware curve, and a Noise. Drums often use this mode, as you sometimes want to have no Sound, and only Noise.
+
+- Link = Software dependent (one keyboard above, an arrow downwards below) : This mode is the most used to make classical "Hard Bass" sound. The Hardware envelope is dependant to the Software. Software is the master, Hardware the slave. When using this mode, the "Ratio" line becomes active. What is it ? The ratio is how much the Software Period will be divised to get the Hardware period (remember : in this mode, the Hardware is dependent from the Software). To sum up : Hardware Period = Software Period / (2^ratio). Remember bis : the lower the period, the higher the note. Most of Hard Bass uses a ratio of 4 or 5. For this mode to be enabled, you MUST have an Hardware curve selected, and Sound MUST be On. One can't related to another if one is missing ! Also, note that since there is a division, precision will be lost. That's why having a high ratio gives most of the time very harsh sounds. Also, the loss of precision will result is "mwaaaaaawwwww" sound, which is wanted most the time. You will note that the Hardware Pitch is enabled : it will allow you to have a desync to the Hardware period, if you want to (so that you can control the "mwaaaww" even further).
+
+- Link = Hardware dependent (one keyboard below, an arrow upwards above) : This mode was called "Sync" in STarKos, but is performed in Arkos Tracker in a mode straightforward way. The note you play (with the keyboard or in the music) is only given to the Hardware envelope. Then the Ratio indicates how to calcule the Software period : Software Period = Hardware Period * (2^ratio). Note here that since the Software period is a multiple of the Hardware period, there is no loss of data ! So the Software period is an exact multiple of the Software period. Which results in a perfectly "still" sound, very nice. But of course you can simulate your own desynchronization ("mwaaaah" sound) by setting a value to the Software pitch ! Note : this mode really works the best with higher notes.
+
+Important : if there is inconsistency in your sound, then the Link is colored in red. This means that the tracker will use Independant mode instead of the mode you choose. What is an inconsistency ? It means that you asked for a specific sound, but you can't have it. For example, you wanted a Software Dependent sound, but have no Hardware curve selected ! The same if true for Hardware Dependent sound. Also, whenever you set Sound to Off, you HAVE to use Independent mode.
+
+
+- Retrig : The Retrig has no effect at all if your sound doesn't use Hardware envelope ! This is an option to retrig the Hardware envelope at the beginning of the sound. This can provoke a nice sounding attack when triggering an Hardware sound several times in a row. Also, this is most useful when using a very slow Hardware envelope (for instance, a "Down" hardware curve with a period to 1000, like the sound "Hardware Volume" in the "Instruments/FXs" folder). If you want such sound to be heard more than once, you HAVE to retrig it, else the curve will continue to decrease and stay down even if you enter another note. Alternatively, you can also use the Force Retrig option, which is discussed just below... 
+
+
+The Hardware curve and the Retrig
+---------------------------------
+Now let's get into the Hardware curve that you can draw. Have some fun and try to draw a dozen of "Triangle 1" curves in a row. As you can see, the first one has a black outline. Why ? Let's experiment more : in the middle of all these curves, draw a "Saw 1" curve. It appears also with a black outline, and if right to it was a "Triangle 1" (which wasn't outlined), it is now outlined ! Whhhyyyy ??
+
+Quite simple... Once you understand. Like I said before, the AY uses the Register 13 to know what Hardware curve to use. If you always use the same curve, you must not set the R13 each frame, because setting the R13 resets the Hardware curve (it's a behaviour of the AY, specific to this register), which is not the expected result, and will sound crappy if you're using a high Hardware frequency. So AT tests each VBL : is the current R13 the same as before ? If yes, do not set R13 again. If no, set R13 with the new value. This is what happens with the black outline : it simply means that the R13 is set here. That's what we call "Natural retrig". Whatever you want to do, this retrig will happen because it it needed. We consider the first line as a Natural Retrig, because we don't know what is the value of R13 before. However, R13 may not have actually changed if some previous sound used the same R13 value !
+
+So that's why the "Saw 1" you added was outlined : the R13 had to be changed. And the "Triangle 1" just to the right, which was no retriggered before you put "Saw 1", is now a Natural Retrig, once again because R13 has to change.
+
+Ready ? There's a feature above this : the Retrig itself. You can FORCE it. Like I said earlier, a Retrig can be useful if you want to "feel" the Hardware curve being triggered. It is needed for example if you intend to play the same notes with the same Hardware curve in a row.
+
+Also, like said earlier, this is mandatory when using a very slow Hardware envelope (for instance, a "Down" hardware curve with a period to 1000, like the sound "Hardware Volume" in the "Instruments/FXs" folder). If you want such sound to be heard more than once, you HAVE to retrig it, else the curve will continue to decrease and stay down even if you enter another note.
+
+So how to do that ? Simply left-click on the curve whose R13 you want to force, and click on "Force Retrig". This option will be written next to the curve drawing corresponding to the curve you clicked on. What happens ? The curve below appears outlined in red. Quite self-explanatory, isn't it ? If you want to remove the Retrig, left click on it and select the same curve.
+
+
+
+
+
+
+
+
+
+How to use the CPCBooster
+-------------------------
+In order to hear your song in real-time on a CPC while composing with Arkos Tracker, you have to fit your CPC with a CPCBooster (http://dirtyminds.dxm.gr). Transfer the "Arkos TrackerTools.DSK" on a disc, and run the "client" file. The CPC should inform you that it is ready to receive data for the PC. Now go to the Setup, and choose the "CPCBooster" as an output. Don't forget to choose the right COM port ! Then, press OK and whatever sound you produce will be heard on the CPC. How fun !
+
+
+
+
+
+
+
+
+
+
+
+

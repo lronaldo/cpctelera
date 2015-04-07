@@ -29,4 +29,9 @@ $(TGTDIR)/mot2bin: $(M_OBJFILES)
 	gcc $(CPFLAGS) -o $(TGTDIR)/mot2bin $(M_OBJFILES)
 
 clean:
-	rm -rf $(OBJDIR)
+	@echo "Removing objects directory $(OBJDIR)/ ..."
+	@rm -rf $(OBJDIR)
+
+cleanall: clean
+	@echo "Removing binary files in $(BINDIR)/ ..."
+	@rm -f $(BINDIR)/*

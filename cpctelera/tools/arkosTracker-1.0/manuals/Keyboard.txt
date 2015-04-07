@@ -1,0 +1,81 @@
+Arkos Tracker V1.0 Keyboard Layout
+---------------------------------------
+
+Layout is in French. If you can't reach some keys, please contact me.
+
+
+Common to PatternViewer, Instrument Editor and Instrument List
+--------------------------------------------------------------
+0-9 (numpad and central keyboard) et A-F = numbers.
+F2/F3 = Goto PatternViewer / Instrument Editor.
+Escape = Stop Sound/Music.
+F5 = Play Song .
+F6 = Play Song From Start.
+F7 = Play Pattern.
+F8 = Play Pattern From Start.
+/ = Decrease Octave.
+* = Increase Octave.
+Ctrl + + = Next instrument.
+Ctrl + - = Previous instrument.
+
+
+PatternViewer
+-------------
+Central Keyboard = Play notes.
+Space = Switch Edit mode.
+* (near right-shift) = Write a RST.
+Scroll Lock = Switch Follow mode on/off.
+Cursor = Move your cursor.
+Ctrl + Left/Right = Move to Previous/Next channel.
+Ctrl + Up/Down = Move to Previous/Next Pattern.
+Page Up/Down = Scroll vertically.
+Home/End = Jump at the beginning/end of the Pattern.
++ (chiffres du haut !) = Increase Editstep.
+Shift + + (chiffres du haut !) = Decrease Editstep.
+Insert/Delete = Insert/Delete a note in the current Track.
++ / - = Set the sign to +/- in the pitch.
+Back = Clear note.
+Shift + back = Clear whole cell.
+Enter = Capture instrument under the cursor.
+Ctrl + Enter = Play line under cursor.
+Ctrl + C/X/V = Cut/Copy/Paste.
+Ctrl + P = Paste continuously.
+Ctrl + A/Q = Transpose selection up/down.
+Ctrl + Shift + A/Q = Transpose selection up/down of an octave.
+Ctrl + E/D = Increase/decrease selected volume.
+Ctrl + T = Select current track.
+Ctrl + Numpad0 = Solo/unsolo current channel.
+Ctrl + Numpad1 = Mute/unmute current channel.
+
+
+Instruments
+-----------
+Mouse + Drag up/down = Add/Subtract 1 to the value.
+Mouse + Drag left/right = Duplicate value to the neighbour.
+
+Shift + Central Keyboard = Play notes.
+Insert = Insert duplicated column.
+Delete = Delete column.
+Shift + Insert = insert duplicated item.
+Shift + Delete = delete item.
+Space = Duplicate Item.
+Shift + Space = Spread item.
+Tab = Next component.
+Shift + Tab = Previous component.
+Home/End = Move cursor to the next page.
+Backspace = Set value to 0.
+Q = Invert sign.
+
+Cursor Left/Right = Goto next item.
+Cursor Up/Down = Next/Previous component.
+
+Page Up/Down = Add/Subtract 1 to the value.
+Shift + Page Up/Down = Add/Subtract large value.
+
+Ctrl + E = Set Loop Start where cursor is.
+Ctrl + R = Set Loop End where cursor is.
+Ctrl + T = Set Loop On/Off.
+
+Numpad . = In the Enveloppe component (before last one), switches between Volume and Hardware Envelope.
+
+
