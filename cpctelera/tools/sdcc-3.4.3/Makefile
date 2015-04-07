@@ -27,6 +27,7 @@
 # LOCATIONS
 BINDIR=bin
 SRCDIR=src
+SDCCBINDIR=$(SRCDIR)/bin
 CONFIG=configure_sdcc_for_z80.sh
 TARGET=sdcc
 
@@ -42,6 +43,8 @@ sdcc:
 	cd $(SRCDIR) && ./$(CONFIG)
 	@echo "Compiling SDCC for z80..."
 	$(MAKE) -C $(SRCDIR)
+	@echo "Moving files to bin directory..."
+	@mv $(SDCCBINDIR)/* -t $(BINDIR)/
 
 # CLEANING TARGETS
 cleanall: 
