@@ -28,7 +28,7 @@
 # INCLUDES
 #include build_config.mk
 
-TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.4.0
+TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.4.3
 TOOLSYSTEM=ToolMaker
 
 # TOOLS CONFIG
@@ -37,17 +37,22 @@ MKDIR=mkdir
 
 # UTILITY FUNCTIONS
 define PRINT
- @echo -ne "\033[1;31;49m"
- @echo -ne "[$(TOOLSYSTEM)]>"
- @echo -ne "\033[1;33;49m $(1)"
- @echo -e  "\033[0;39;49m"
+	@echo -ne "\033[1;31;49m"
+	@echo -ne "[$(TOOLSYSTEM)]>"
+	@echo -ne "\033[1;33;49m $(1)"
+	@echo -e  "\033[0;39;49m"
+endef
 
+define MAKERULE
+$(1): $(1)/Makefile
+	$(call PRINT, "Building $(1)...")
+	#@echo "Building $(1)..."
+	@$(MAKE) -C $(1)
 endef
 
 define MAKETOOL
-$(1): $(1)/Makefile
-	@$(eval $(call PRINT, "Building tool $(1)..."))
-	@$(MAKE) -C $(1)
+	@$(MAKE) -C $(1) $(2)
+
 endef
 
 # TARGETS
@@ -57,10 +62,8 @@ endef
 all: $(TOOLS)
 
 ## RULES TO MAKE ALL THE TOOLS
-$(foreach T, $(TOOLS), $(eval $(call MAKETOOL, $(T))))
+$(foreach T, $(TOOLS), $(eval $(call MAKERULE, $(T))))
 
 # CLEANING TARGETS
-cleanall: 
-	$(foreach T, $(TOOLS), $(eval $(MAKE) -C $(T) cleanall))
-clean: 
-	$(foreach T, $(TOOLS), $(eval $(MAKE) -C $(T) clean))
+clean cleanall: 
+	$(foreach T, $(TOOLS), $(call MAKETOOL, $(T), $@))
