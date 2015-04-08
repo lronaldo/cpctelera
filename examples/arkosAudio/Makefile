@@ -17,30 +17,19 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##     CPCTELERA ENGINE: Example of use of arkos tracker player routines ##
+##                          CPCTELERA ENGINE                             ##
 ##                       Main Building Makefile                          ##
 ##-----------------------------------------------------------------------##
-## This file contains the rules for building an example of use of the    ##
-## CPCtelera engine.                                                     ##
-## Usually, this file should be left unchanged. To configure your build  ##
-## you should change the build.conf file.                                ##
+## This file contains the rules for building a CPCTelera project. These  ##
+## These rules work generically for every CPCTelera project.             ##
+## Usually, this file should be left unchanged:                          ##
+##  * Project's build configuration is to be found in build_config.mk    ##
+##  * Global paths and tool configuration is located at $(CPCT_PATH)/cfg/##
 ###########################################################################
 # INCLUDES
 include cfg/build_config.mk
-include cfg/functions.mk
 
-# TOOLS CONFIG
-RM=rm -f
-MKDIR=mkdir
-
-# BINARY CONFIG
-BINFILE=$(OBJDIR)/$(PROJNAME).bin
-IHXFILE=$(OBJDIR)/$(PROJNAME).ihx
-CDT=$(PROJNAME).cdt
-DSK=$(PROJNAME).dsk
-TARGET=$(CDT) $(DSK)
-
-.PHONY: all clean cleanall
+.PHONY: all clean cleanall 
 
 # MAIN TARGET
 all: $(OBJSUBDIRS) $(TARGET)
@@ -57,7 +46,7 @@ $(IHXFILE): $(OBJFILES)
 ## FIX: Binary file gets deleted magically when compilation ends. We make a copy of it for other uses.
 %.bin: %.ihx
 	@$(call PRINT,"Creating Amsdos binary file $@")
-	$(HEX2BIN) -p 00 "$<" | tee $@.log
+	$(HEX2BIN) -p 00 "$<" | $(TEE) $@.log
 	@cp $@ $@.bin
 
 # GENERATE A DISK FILE (.DSK) AND INCLUDE BINARY FILE (.BIN) INTO IT
@@ -76,7 +65,7 @@ $(IHXFILE): $(OBJFILES)
 
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
 $(OBJSUBDIRS): 
-	@$(MKDIR) -p $@
+	@$(MKDIR) $@
 
 # CLEANING TARGETS
 cleanall: clean

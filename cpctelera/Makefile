@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 ## Instead, you should modify build.conf to set up your building config. ##
 ###########################################################################
 # INCLUDES
-include build_config.mk
+include cfg/build_config.mk
 
 # TOOLS CONFIG
 RM=rm -f

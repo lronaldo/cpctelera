@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
@@ -28,26 +28,20 @@
 ## the code that will be actually executed.                              ##
 ###########################################################################
 
+# Get directory path of this file at the momment of including it
+THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+
+# Get the global path configuration of tools
+include $(THIS_DIR)/global_paths.mk
+
 ####
 ## SECTION 1: COMPILER CONFIGURATION
 ##
-## Under this section you find the macros that set up the compiler executables
-## that will be used for code compilation. Under Linux systems you would normally
-## have your compiler installed in a directory that is added to the path (like
-## /usr/bin, for instance). If this is not the case, or you are running under
-## Windows, or Cygwin, try to put the executables with full path.
+##  Setting assembler flags for compilation of CPCTelera library
 ##
-## Z80ASM      >> Assembler source compiler. Used to compile .s files written in Z80 Assembler.
-## Z80ASMFLAGS >> Flags to be used for compilation with SDASZ80
-## Z80LNK      >> Z80 Linker, used to link togheter .rel files into a library module
 #####
 
-# SDCC Compiler binary directory path
-SDCCBIN_PATH=../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
-
-Z80ASM=$(SDCCBIN_PATH)sdasz80
 Z80ASMFLAGS=-l -o -s
-Z80LNK=$(SDCCBIN_PATH)sdar
 
 ####
 ## SECTION 2: LIBRARY CONFIG

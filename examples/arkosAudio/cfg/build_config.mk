@@ -27,6 +27,13 @@
 ## help you understand what they do. Please, change everything you want. ##
 ###########################################################################
 
+## CPCTELERA MAIN PATH
+##   Sets CPCTelera main path for accessing tools and configuration. If you
+##   change folder structure, change CPCT_PATH value for its absolute path.
+##
+THIS_FILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+CPCT_PATH      := $(THIS_FILE_PATH)../../../cpctelera/
+
 ####
 ## SECTION 1: Project configuration 
 ##
@@ -36,79 +43,57 @@
 #####
 
 # Name of the project (without spaces, as it will be used as filename)
-PROJNAME=arkosAudio
-# Memory location for code generated
-Z80CODELOC=0x4000
+#   and Z80 memory location where code will start in the generated binary
+PROJNAME   := arkosAudio
+Z80CODELOC := 0x4000
 
 # Folders and file extensions
-SRCDIR=src
-OBJDIR=obj
-SRCEXT=c
-OBJEXT=rel
+SRCDIR  := src
+OBJDIR  := obj
+SRCEXT  := c
+OBJEXT  := rel
 
-# Subfolders and source/object files
-SUBDIRS:=$(filter-out ., $(shell find $(SRCDIR) -type d -print))
-OBJSUBDIRS:=$(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))
-SRCFILES:=$(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(SRCEXT)))
-OBJFILES:=$(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(SRCEXT), %.$(OBJEXT), $(SRCFILES)))
+# BINARY CONFIG
+BINFILE := $(OBJDIR)/$(PROJNAME).bin
+IHXFILE := $(OBJDIR)/$(PROJNAME).ihx
+CDT     := $(PROJNAME).cdt
+DSK     := $(PROJNAME).dsk
+
+# TARGETs for compilation (if you only want one of them, remove the other)
+TARGET  := $(CDT) $(DSK)
 
 ####
 ## SECTION 2: TOOL PATH CONFIGURATION
 ##
-## Macros in this section take care of the absolute paths where compilation tools
-## are located. If your compilation tools (like SDCC, HEX2BIN, etc) are not 
-## located in standard paths, you should configure the exact paths of the 
-## binary directory of each tool. If you have this compilation tools installed in
-## your system, and they are in the global path, you can comment this variables
-## and your installed binaries will be used
-##
+## Paths are configured in the global_paths.mk configuration file included 
+## here. You may overwrite the values of path variables after the include 
+## if you wanted specific configuration for this project.
 ####
-
-# CPCtelera library root path
-CPCT_PATH=../../cpctelera/
-
-# SDCC Compiler binary path (/path/to/sdcc/bin)
-#SDCCBIN_PATH=../../../cpc-dev-tool-chain/tool/sdcc/sdcc-3.4.0.installtree/bin/
-
-# HEX2BIN binary path (/path/to/HexToBin/)
-HEX2BIN_PATH=$(CPCT_PATH)/3rdparty/hex2bin-2.0/bin/
-
-# iDSK binary path (/path/to/iDSK/)
-IDSK_PATH=$(CPCT_PATH)/3rdparty/iDSK.0.13/bin/
-
-# 2CDT binary path (/path/to/2CDT/)
-2CDT_PATH=$(CPCT_PATH)/3rdparty/2cdt/bin/
+include $(CPCT_PATH)cfg/global_paths.mk
 
 ####
 ## SECTION 3: COMPILATION CONFIGURATION
 ##
-## Under this section you find the macros that set up the compiler executables
-## that will be used for code compilation. Under Linux systems you would normally
-## have your compiler installed in a directory that is added to the path (like
-## /usr/bin, for instance). If this is not the case, or you are running under
-## Windows, or Cygwin, try to put the executables with full path.
+##   Flags used to configure the compilation of your code. They are usually 
+##   fine for most of the projects, but you may change them for special uses.
 #####
+Z80CCFLAGS    :=
+Z80ASMFLAGS   := -l -o -s
+Z80CCINCLUDE  := -I$(CPCT_SRC)
+Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
+                 --code-loc $(Z80CODELOC) \
+                 --data-loc 0 -l$(CPCT_LIB)
+####
+## SECTION 4: CALCULATED FOLDERS, SUBFOLDERS AND FILES
+##
+##  These macros calculate code subfolders, get all the source files and generate
+##  the corresponding subfolders and files in the object directory. All subfolders
+##  and files with source extension found are added, up to 1 level of depth in
+##  folder structure inside the main source directory.
+####
+include $(CPCT_PATH)cfg/global_functions.mk
 
-# CPCtelera
-CPCT_SRC=$(CPCT_PATH)src
-CPCT_LIB=$(CPCT_PATH)cpctelera.lib
-
-# Compilation, linkage and binary generation macros
-Z80CC=$(SDCCBIN_PATH)sdcc
-Z80CCFLAGS=
-Z80CCINCLUDE=-I$(CPCT_SRC)
-Z80CCLINKARGS=-mz80 --no-std-crt0 -Wl-u --code-loc $(Z80CODELOC) --data-loc 0 -l$(CPCT_LIB)
-
-# Compiler tools and flags
-Z80ASM=$(SDCCBIN_PATH)sdasz80
-Z80ASMFLAGS=-l -o -s
-Z80LNK=$(SDCCBIN_PATH)/sdar
-
-# Amsdos binary generation tool
-HEX2BIN=$(HEX2BIN_PATH)hex2bin
-
-# iDSK interface to generate DSK files
-IDSK=$(IDSK_PATH)iDSK
-
-# 2CDT interface to generate CDT files
-2CDT=$(2CDT_PATH)2cdt
+SUBDIRS    := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
+OBJSUBDIRS := $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))
+SRCFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(SRCEXT)))
+OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(SRCEXT), %.$(OBJEXT), $(SRCFILES)))
