@@ -25,9 +25,9 @@
 ###########################################################################
 
 # LOCATIONS
-BINDIR=bin
+INSTALLDIRS=bin share
 SRCDIR=src
-SDCCBINDIR=$(SRCDIR)/bin
+OBJDIR=obj
 CONFIG=configure_sdcc_for_z80.sh
 TARGET=sdcc
 
@@ -42,14 +42,14 @@ sdcc:
 	@echo "Configuring SDCC for z80..."
 	cd $(SRCDIR) && ./$(CONFIG)
 	@echo "Compiling SDCC for z80..."
-	$(MAKE) -C $(SRCDIR)
-	@echo "Moving files to bin directory..."
-	@mv $(SDCCBINDIR)/* -t $(BINDIR)/
+	$(MAKE) -C $(OBJDIR)
+	$(MAKE) -C $(OBJDIR) install
 
 # CLEANING TARGETS
-cleanall: 
-	@echo "Removing binary files in $(BINDIR)/ directory..."
-	@rm -f bin/*
+cleanall: clean
+	@echo "Removing install directories ($(INSTALLDIRS))..."
+	@rm -rf $(INSTALLDIRS)
 clean:
 	@echo "Removing all object files..."
-	-@$(MAKE) -C $(SRCDIR) clean
+	-@$(MAKE) -C $(OBJDIR) distclean
+	@rm -rf $(OBJDIR)

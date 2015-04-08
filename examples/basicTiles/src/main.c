@@ -41,9 +41,7 @@ const Byte* const  sprites[4] = { waves_2x8,     F_2x8, waves_4x8,    FF_4x8 };
 const Byte      spr_widths[4] = {         2,         2,         4,         4 };
 const TDrawFunc  functions[4] = {      _2x8,  _2x8Fast,      _4x8,  _4x8Fast };
 
-
-
-// 
+//
 // Fills all the screen with sprites using drawSprite_XXX_aligned functions
 //
 void printAllScreen(Byte* sprite, Byte spritewidth, TDrawFunc function) {
@@ -62,7 +60,7 @@ void printAllScreen(Byte* sprite, Byte spritewidth, TDrawFunc function) {
       }
    }
 }
-           
+
 void main(void) {
 
    // Initialization
@@ -74,7 +72,7 @@ void main(void) {
    while(1) {
       Byte i;
       unsigned int w;
-      
+
       for (i=0; i < 4; i++) {
          CLEAR_SCREEN
          for (w=0; w < WAITCLEARED; w++);

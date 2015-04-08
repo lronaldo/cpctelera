@@ -18,7 +18,7 @@
 
 ###########################################################################
 ##                          CPCTELERA ENGINE                             ##
-##                       Main Building Makefile                          ##
+##                  Main Building Makefile for Projects                  ##
 ##-----------------------------------------------------------------------##
 ## This file contains the rules for building a CPCTelera project. These  ##
 ## These rules work generically for every CPCTelera project.             ##
