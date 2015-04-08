@@ -24,7 +24,11 @@ on the PC */
 #include <stdlib.h>
 #include <string.h>
 #ifdef UNIX
-#include <sys/io.h>
+#ifdef __APPLE__
+        #include <sys/uio.h>
+#else
+        #include <sys/io.h>
+#endif
 #else
 #include <io.h>
 #endif
