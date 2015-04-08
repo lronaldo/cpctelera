@@ -17,8 +17,8 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##                        CPCTELERA ENGINE                               ##
-##                     Build configuration file                          ##
+##                          CPCTELERA ENGINE                             ##
+##                      Build configuration file                         ##
 ##-----------------------------------------------------------------------##
 ## This file is intendend for you to be able to config the way in which  ##
 ## you would like to build this example of use of the CPCtelera Engine.  ##
@@ -44,7 +44,7 @@ CPCT_PATH      := $(THIS_FILE_PATH)../../../cpctelera/
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := arkosAudio
+PROJNAME   := bitArrays
 Z80CODELOC := 0x4000
 
 # Folders and file extensions
