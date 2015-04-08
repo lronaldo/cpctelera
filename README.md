@@ -46,7 +46,10 @@ If you have any questions, please contact me:
 ### Authors
 
  * **Project owner** 
-   * ronaldo / ([Cheesetea](http://www.cheesetea.com), [Fremos](http://fremos.cheesetea.com), [ByteRealms](http://www.byterealms.com))
+   * [ronaldo](http://twitter.com/frangallegobr) / ([Cheesetea](http://www.cheesetea.com), [Fremos](http://fremos.cheesetea.com),  [ByteRealms](http://www.byterealms.com))
+ * **Awesome collaborators**
+   * [Fran Fernández](https://twitter.com/ronsonmaria) / [Pensando como Pollos](http://www.pensandocomopollos.com/)
+   * [Diego Freniche](http://blog.freniche.com) ([@dfreniche](https://twitter.com/dfreniche))
  * **Bitarrays idea and original implementation**
    * Alberto García García (Blitzman, _albertgg93 (at) gmail (dot) com, [@algertgarcia93](http://twitter.com/algertgarcia93)_)
    * Pablo Martínez González (*pablo2093 (at) gmail (dot) com, [@pablo_2093](http://twitter.com/pablo_2093)*)
@@ -54,6 +57,20 @@ If you have any questions, please contact me:
    * Raúl Simarro (Artaburu / ESP Soft)
  * **Some makefile code and ideas**
    * [Cpcitor](http://github.com/cpcitor)
+
+### 3rdparty software authors
+ 
+ * **[Arkos Tracker](http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start)**
+   * [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos)
+ * **[Small Devices C Compiler (SDCC)](http://sdcc.sourceforge.net/)**
+   * [SDCC Team](http://sdcc.sourceforge.net/index.php#Who)
+ * **iDSK**
+   * Sid / IMPACT 
+   * [Pulkomandy](http://www.pushnpop.net/profile-47.html) / [Shinra Team](http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml)
+ * **Hex2bin**
+   * [Jaques Pelletier](https://www.linkedin.com/pub/jacques-pelletier/a/668/309)
+ * **2CDT**
+   * [Kevin Thacker](http://www.cpctech.org.uk/about.html) / [CPCTech](http://www.cpctech.org.uk/) 
 
 #### Special Thanks
 
