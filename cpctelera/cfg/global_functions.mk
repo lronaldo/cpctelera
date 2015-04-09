@@ -26,47 +26,88 @@
 ## you should change the build_config.mk                                 ##
 ###########################################################################
 
-# Print a nice and colorful message
+# ANSI Sequences for terminal colored printing
+COLOR_RED="\033[1;31;49m"
+COLOR_YELLOW="\033[1;33;49m"
+COLOR_NORMAL="\033[0;39;49m"
+
+#################
+# PRINT: Print a nice and colorful message
+#
+# $(1): Message to print
+#
 define PRINT
- echo -ne "\033[1;31;49m"
- echo -ne "[$(PROJNAME)]>"
- echo -ne "\033[1;33;49m $(1)"
- echo -e  "\033[0;39;49m"
+ @echo -e $(COLOR_RED)[$(PROJNAME)]$(COLOR_YELLOW) $(1)$(COLOR_NORMAL)
 endef
 
-# Get Load and Run Addresses from a created binary file
-# $(1) File.bin that has been compiled (and has .bin.log and .map files associated)
-define GETBINADDRESSES
-  $(eval LOADADDR = $(shell sed -n 's/^Binary file start = 0000\([0-9]*\).*$$/\1/p'      < $(1).log;))
-  $(eval RUNADDR  = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' < $(1:.bin=.map);))
-  $(eval RUNADDR1 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *init  *.*$$/\1/p'            < $(1:.bin=.map);))
-  $(eval RUNADDR2 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *_main  *.*$$/\1/p'           < $(1:.bin=.map);))
-  $(eval RUNADDR  = $(shell if [ -z "$(RUNADDR)" ]; then echo "$(RUNADDR1)"; fi;))
-  $(eval RUNADDR  = $(shell if [ -z "$(RUNADDR)" ]; then echo "$(RUNADDR2)"; fi;))
-  ( if [ -z "$(RUNADDR)" ]; then echo "**!!ERROR!!**: Cannot figure out run address for file $(1). Aborting."; exit 1; fi; )
+#################
+# GETLOADADDRESS: Get load address from a created binary file (parsing hex2bin's log)
+#
+# $(1): Variable where to store the address 
+# $(2): Hex2bin log file to parse 
+#
+define GETLOADADDRESS
+  $(eval $(1):=$(shell sed -n 's/^Binary file start = 0000\([0-9]*\).*$$/\1/p' < $(2)))
 endef
 
-# Create a DSK file with the BINARY added to it and converted to AMSDOS BINARY
-# * It requires to have RUNADDR & LOADADDR previously set with the addresses required to include the binary file
+#################
+# GETRUNADDRESS: Get run addresses from a created binary file (parsing SDCC generated symbol map in .map file)
+#
+# $(1): Variable where to store the address
+# $(2): File.map that has been compiled (and has .bin.log and .map files associated)
+#
+define GETRUNADDRESS
+  $(eval $(1)   = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' < $(2);))
+  $(eval $(1)_1 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *init  *.*$$/\1/p'            < $(2);))
+  $(eval $(1)_2 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *_main  *.*$$/\1/p'           < $(2);))
+  $(eval $(1)   = $(shell if [ -z "$($(1))" ]; then echo "$($(1)_1)"; fi; ) )
+  $(eval $(1)   = $(shell if [ -z "$($(1))" ]; then echo "$($(1)_2)"; fi; ) )
+endef
+
+#################
+# CHECKVARIABLEISSET: Checks if a given variable is set. If not, it prints out an error message and aborts generation
+#
+# $(1): Variable to check 
+#
+define CHECKVARIABLEISSET
+  if [ "$($(1))" == "" ]; then \
+    echo "**!!ERROR!!**: $(1) is not set. Aborting."; \
+    exit 1; \
+  fi
+endef
+
+#################
+# CREATEDSK: Create a DSK file with the BINARY added to it and converted to AMSDOS BINARY
+#
 # $(1): DSK file to be created
 # $(2): Binary file to be included in the DSK file
+# $(3): Memory address where binary will be loaded (LOAD ADDRESS)
+# $(4): Memory address where main program starts (RUN ADDRESS)
+#
 define CREATEDSK
-  @$(IDSK) $2.tmp -n -i $1 -e $(RUNADDR) -c $(LOADADDR) -t 1 
-  @mv -vf  $2.tmp $2;
+  @$(IDSK) $(2).tmp -n -i $(1) -e $(4) -c $(3) -t 1 
+  @mv -vf  $(2).tmp $(2);
 endef
 
-# Create a CDT file with the BINARY added to it and converted to AMSDOS BINARY
-# * It requires to have RUNADDR & LOADADDR previously set with the addresses required to include the binary file
+#################
+# CREATECDT: Create a CDT file with the BINARY added to it and converted to AMSDOS BINARY
+#
 # $(1): Binary file to be inserted in the CDT
 # $(2): Name (up to 16 chars) that the file will have inside the CDT (displayed when loading)
 # $(3): CDT file to be created
+# $(4): Memory address where binary will be loaded (LOAD ADDRESS)
+# $(5): Memory address where main program starts (RUN ADDRESS)
+#
 define CREATECDT
-  @$(2CDT) -n -X 0x$(RUNADDR) -L 0x$(LOADADDR) -r $(2) $(1) $(3) > /dev/null
+  @$(2CDT) -n -X 0x$(5) -L 0x$(4) -r $(2) $(1) $(3) > /dev/null
 endef
 
-# General rule to compile a C file for Z80, having source file and object file in different places
+#################
+# COMPILECFILE: General rule to compile a C file for Z80, having source file and object file in different places
+#
 # $(1): Object file to be created  (with its relative path)
 # $(2): Source file to be compiled (with its relative path)
+#
 define COMPILECFILE
 $(1): $(2)
 	$(Z80CC) $(Z80CCINCLUDE) -mz80 $(Z80CCFLAGS) -c $(2) -o $(1)

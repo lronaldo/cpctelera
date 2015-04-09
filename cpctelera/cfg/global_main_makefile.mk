@@ -26,7 +26,7 @@
 ##  * Project's build configuration is to be found in build_config.mk    ##
 ##  * Global paths and tool configuration is located at $(CPCT_PATH)/cfg/##
 ###########################################################################
-.PHONY: all clean cleanall 
+.PHONY: all clean cleanall binaddress
 
 # MAIN TARGET
 all: $(OBJSUBDIRS) $(TARGET)
@@ -46,18 +46,23 @@ $(IHXFILE): $(OBJFILES)
 	$(HEX2BIN) -p 00 "$<" | $(TEE) $@.log
 	@cp $@ $@.bin
 
+# CREATE BINARY AND GET LOAD AND RUN ADDRESS FROM LOGFILE AND MAPFILE
+binaddress: $(BINFILE)
+	@$(call GETLOADADDRESS,LOADADDR,$<.log)
+	@$(call GETRUNADDRESS,RUNADDR,$(<:.bin=.map))
+	@$(call CHECKVARIABLEISSET,LOADADDR)
+	@$(call CHECKVARIABLEISSET,RUNADDR)
+
 # GENERATE A DISK FILE (.DSK) AND INCLUDE BINARY FILE (.BIN) INTO IT
-%.dsk: $(BINFILE)
+%.dsk: $(BINFILE) binaddress
 	@$(call PRINT,"Creating Disk File $@")
-	@$(call GETBINADDRESSES,$<)
-	@$(call CREATEDSK,$<,$@)
+	@$(call CREATEDSK,$<,$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,"Successfully created $@")
 
 # GENERATE A CASSETTE FILE (.CDT) AND INCLUDE BINARY FILE (.BIN) INTO IT
-%.cdt: $(BINFILE)
+%.cdt: $(BINFILE) binaddress
 	@$(call PRINT,"Creating Cassette File $@")
-	@$(call GETBINADDRESSES,$<)
-	@$(call CREATECDT,$<,$(notdir $<),$@)
+	@$(call CREATECDT,$<,$(notdir $<),$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,"Successfully created $@")
 
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
