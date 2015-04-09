@@ -26,21 +26,26 @@
 ###########################################################################
 
 ## Colors for ANSI terminal
-COLOR_LIGHT_RED="\033[1;31;49m"
-COLOR_LIGHT_GREEN="\033[1;32;49m"
-COLOR_LIGHT_YELLOW="\033[1;33;49m"
-COLOR_LIGHT_BLUE="\033[1;34;49m"
-COLOR_LIGHT_MAGENTA="\033[1;35;49m"
-COLOR_MAGENTA="\033[0;35;49m"
-COLOR_NORMAL="\033[0;39;49m"
+COLOR_LIGHT_RED=$'\033[1;31;49m'
+COLOR_LIGHT_GREEN=$'\033[1;32;49m'
+COLOR_LIGHT_YELLOW=$'\033[1;33;49m'
+COLOR_LIGHT_BLUE=$'\033[1;34;49m'
+COLOR_LIGHT_MAGENTA=$'\033[1;35;49m'
+COLOR_LIGHT_CYAN=$'\033[1;36;49m'
+COLOR_LIGHT_WHITE=$'\033[1;36;49m'
+COLOR_CYAN=$'\033[0;36;49m'
+COLOR_MAGENTA=$'\033[0;35;49m'
+COLOR_NORMAL=$'\033[0;39;49m'
+
 ## $1: Error Message
 ## $2: Number of error that will be returned to shell
 function Error {
-   echo -e ${COLOR_LIGHT_RED}
+   echo
+   echo ${COLOR_LIGHT_RED}
    echo "#########################"
    echo "## UNRECOVERABLE ERROR ##"
    echo "#########################"
-   echo -e "##> ${COLOR_LIGHT_YELLOW}${1}${COLOR_LIGHT_NORMAL}"
+   echo "##> ${COLOR_LIGHT_YELLOW}${1}${COLOR_NORMAL}"
    echo
    exit $2
 }
@@ -48,10 +53,10 @@ function Error {
 ## $1: Stage
 ## $2: Message
 function stageMessage {
-   echo -e ${COLOR_LIGHT_BLUE}
+   echo ${COLOR_LIGHT_BLUE}
    echo "==========================================="
-   echo -e "== ${COLOR_LIGHT_MAGENTA}${1}: ${COLOR_MAGENTA}${2}${COLOR_LIGHT_BLUE}"
-   echo -e "==========================================="${COLOR_NORMAL}
+   echo "== ${COLOR_LIGHT_MAGENTA}${1}: ${COLOR_MAGENTA}${2}${COLOR_LIGHT_BLUE}"
+   echo "==========================================="${COLOR_NORMAL}
 }
 
 ## Clears the screen
@@ -64,32 +69,40 @@ function clearScreen {
 function machineEcho {
    local i
    for i in $(seq 0 ${#2}); do
-      echo -ne "${2:${i}:1}"
+      echo -n "${2:${i}:1}"
       sleep "$1"
    done
-   echo
 }
 
+## $1: Color ANSI sequence
+## $2: Seconds between characters
+## $3: Message to write
+function coloredMachineEcho {
+   echo -n "$1"
+   machineEcho $2 "$3"
+}
+
+## Welcome to CPCtelera
+##
 function welcomeMessage {
-   echo -ne "${COLOR_LIGHT_BLUE}"
-   machineEcho 0.04 "Welcome to..."
-   echo -ne "${COLOR_LIGHT_YELLOW}"
-   machineEcho 0.005 " ____     ____     ____     __            ___"
-   machineEcho 0.005 "/\\  _\`\\  /\\  _\`\\  /\\  _\`\\  /\\ \\__        /\\_ \\"
-   machineEcho 0.005 "\\ \\ \\/\\_\\\\ \\ \\L\\ \\\\ \\ \\/\\_\\\\ \\ ,_\\     __\\//\\ \\       __   _ __    __"
-   machineEcho 0.005 " \\ \\ \\/_/_\\ \\ ,__/ \\ \\ \\/_/_\\ \\ \\/   /'__\`\\\\ \\ \\    /'__\`\\/\\\`'__\\/'__\`\\"
-   machineEcho 0.005 "  \\ \\ \\L\\ \\\\ \\ \\/   \\ \\ \\L\\ \\\\ \\ \\_ /\\  __/ \\_\\ \\_ /\\  __/\\ \\ \\//\\ \\L\\.\\_"
-   machineEcho 0.005 "   \\ \\____/ \\ \\_\\    \\ \\____/ \\ \\__\\\\ \\____\\/\\____\\\\ \\____\\\\ \\_\\\\ \\__/.\\_\\"
-   machineEcho 0.005 "    \\/___/   \\/_/     \\/___/   \\/__/ \\/____/\\/____/ \\/____/ \\/_/ \\/__/\\/_/"
-   echo -e ${COLOR_LIGHT_BLUE}
-   machineEcho 0.02 "This setup script will help you configure CPCtelera in your system."
-   echo
-}
+   local DLY_T1=0.04
+   local DLY_3D=0.002
+   local DLY_T2=0.01
 
-## $1: ANSI color string
-## $2: Message
-function colorMessage {
-   echo -e ${1}${2}${COLOR_NORMAL}
+   echo -n "${COLOR_LIGHT_BLUE}"
+   machineEcho $DLY_T1 "Welcome to..."$'\n'
+   sleep 0.4
+   echo -n "${COLOR_LIGHT_YELLOW}"
+   machineEcho $DLY_3D " ____     ____     ____     __            ___"$'\n'
+   machineEcho $DLY_3D "/\\  _\`\\  /\\  _\`\\  /\\  _\`\\  /\\ \\__        /\\_ \\"$'\n'
+   machineEcho $DLY_3D "\\ \\ \\/\\_\\\\ \\ \\L\\ \\\\ \\ \\/\\_\\\\ \\ ,_\\     __\\//\\ \\       __   _ __    __"$'\n'
+   machineEcho $DLY_3D " \\ \\ \\/_/_\\ \\ ,__/ \\ \\ \\/_/_\\ \\ \\/   /'__\`\\\\ \\ \\    /'__\`\\/\\\`'__\\/'__\`\\"$'\n'
+   machineEcho $DLY_3D "  \\ \\ \\L\\ \\\\ \\ \\/   \\ \\ \\L\\ \\\\ \\ \\_ /\\  __/ \\_\\ \\_ /\\  __/\\ \\ \\//\\ \\L\\.\\_"$'\n'
+   machineEcho $DLY_3D "   \\ \\____/ \\ \\_\\    \\ \\____/ \\ \\__\\\\ \\____\\/\\____\\\\ \\____\\\\ \\_\\\\ \\__/.\\_\\"$'\n'
+   machineEcho $DLY_3D "    \\/___/   \\/_/     \\/___/   \\/__/ \\/____/\\/____/ \\/____/ \\/_/ \\/__/\\/_/"$'\n'
+   echo ${COLOR_LIGHT_BLUE}
+   machineEcho $DLY_T2 "This setup script will help you configure CPCtelera in your system."
+   echo
 }
 
 ## $1: Type of file (file, directory)
@@ -111,6 +124,14 @@ function EnsureExists {
    fi
 }
 
+## $1: Command to check for in the system
+##
+function EnsureCommandAvailable {
+   if ! command -v "$1" >/dev/null 2>&1; then
+      Error "'$1' is required to build CPCtelera, but it's not installed. Please, install it in your system and launch setup again."
+   fi
+}
+
 ## Main Paths
 SETUP_PATH="${PWD}"
 CPCT_MAIN_DIR=${SETUP_PATH}/cpctelera
@@ -126,14 +147,27 @@ CPCT_TOOLS_MAKEFILE=${CPCT_TOOLS_DIR}/Makefile
 CPCT_LIB_MAKEFILE=${CPCT_MAIN_DIR}/Makefile
 CPCT_FILES=${CPCT_TOOLS_MAKEFILE}\ ${CPCT_LIB_MAKEFILE}
 
+## Required stuff for running CPCtelera
+REQUIRED_COMMANDS=gcc\ g++\ bison\ flex
+
 # Check CPCTelera directory structure
 clearScreen
 welcomeMessage
-stageMessage "1" "Checking Directory Structure..."
+stageMessage "1" "CPCtelera initial tests"
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking directory structure..."
 for DIR in ${CPCT_DIRS}; do
    EnsureExists directory "$DIR"
 done
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking important files..."
 for FILE in ${CPCT_FILES}; do
    EnsureExists file "$FILE"
 done
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required commands..."$'\n'
+for C in ${REQUIRED_COMMANDS}; do
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '$C'..."
+   EnsureCommandAvailable ${C}
+   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+done
