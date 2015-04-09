@@ -132,6 +132,20 @@ function EnsureCommandAvailable {
    fi
 }
 
+## $1: header file name
+##
+function EnsureCPPHeaderAvailable {
+   local ERRTMP=$(mktemp).err
+   local OUTTMP=$(mktemp).out
+   local SRCTMP=$(mktemp).cpp
+   echo "#include <${1}>" > "$SRCTMP"
+   echo "int main(void) { return 0; }" >> "$SRCTMP"
+   g++ -o "$OUTTMP" -c "$SRCTMP" 2> "$ERRTMP"
+   if [ -s "$ERRTMP" ]; then
+      Error "Header file '$1' is not found in the system, and it is required for building CPCTelera tools. Please, install it and launch setup again."
+   fi 
+}
+
 ## Main Paths
 SETUP_PATH="${PWD}"
 CPCT_MAIN_DIR=${SETUP_PATH}/cpctelera
@@ -149,6 +163,7 @@ CPCT_FILES=${CPCT_TOOLS_MAKEFILE}\ ${CPCT_LIB_MAKEFILE}
 
 ## Required stuff for running CPCtelera
 REQUIRED_COMMANDS=gcc\ g++\ bison\ flex
+REQUIRED_LIBRARIES=boost/graph/adjacency_list.hpp
 
 # Check CPCTelera directory structure
 clearScreen
@@ -171,3 +186,10 @@ for C in ${REQUIRED_COMMANDS}; do
    EnsureCommandAvailable ${C}
    coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 done
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
+for C in ${REQUIRED_LIBRARIES}; do
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '$C'..."
+   EnsureCPPHeaderAvailable ${C}
+   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+done
+
