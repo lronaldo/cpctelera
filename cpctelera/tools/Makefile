@@ -26,7 +26,7 @@
 ## In general, there is no need to make changes to this file.            ##
 ###########################################################################
 # INCLUDES
-#include build_config.mk
+include ../cfg/global_functions.mk
 
 TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.4.3
 TOOLSYSTEM=ToolMaker
@@ -35,18 +35,9 @@ TOOLSYSTEM=ToolMaker
 RM=rm -f
 MKDIR=mkdir
 
-# UTILITY FUNCTIONS
-define PRINT
-	@echo -ne "\033[1;31;49m"
-	@echo -ne "[$(TOOLSYSTEM)]>"
-	@echo -ne "\033[1;33;49m $(1)"
-	@echo -e  "\033[0;39;49m"
-endef
-
 define MAKERULE
 $(1): $(1)/Makefile
-	$(call PRINT, "Building $(1)...")
-	#@echo "Building $(1)..."
+	$(call PRINT,$(TOOLSYSTEM),"Building $(1)...")
 	@$(MAKE) -C $(1)
 endef
 

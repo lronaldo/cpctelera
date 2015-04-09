@@ -27,6 +27,7 @@
 ###########################################################################
 # INCLUDES
 include cfg/build_config.mk
+include cfg/global_functions.mk
 
 # TOOLS CONFIG
 RM=rm -f
@@ -35,15 +36,6 @@ MKDIR=mkdir
 # LIBRARY CONFIG
 LIBRARYNAME=cpctelera
 TARGET=$(LIBRARYNAME).lib
-
-# UTILITY FUNCTIONS
-define PRINT
- @echo -ne "\033[1;31;49m"
- @echo -ne "[$(LIBRARYNAME)]>"
- @echo -ne "\033[1;33;49m $(1)"
- @echo -e  "\033[0;39;49m"
-
-endef
 
 define SUBTARGET
 $(1): $(2)
@@ -62,9 +54,9 @@ endef
 all: $(OBJDIR) $(TARGET)
 
 $(TARGET): $(OBJFILES)
-	@$(call PRINT,"Linking library file")
+	@$(call PRINT,$(LIBRARYNAME),"Linking library file")
 	$(Z80LNK) rc $@ $^
-	@$(call PRINT,"Successfully created $(TARGET)")
+	@$(call PRINT,$(LIBRARYNAME),"Successfully created $(TARGET)")
 
 # SUBTARGETS 
 ## CREATING SUBDIRS OF THE OBJDIR
@@ -74,13 +66,13 @@ $(foreach OF, $(OBJFILES), $(eval $(call SUBTARGET, $(OF), $(patsubst $(OBJDIR)%
 
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
 $(OBJDIR): $(filter-out $(OBJDIR), $(OBJSUBDIRS))
-	$(call PRINT,"Tree structure for obj files created")
+	$(call PRINT,$(LIBRARYNAME),"Tree structure for obj files created")
 
 # CLEANING TARGETS
 cleanall: clean
-	@$(call PRINT,"Deleting $(TARGET)")
+	@$(call PRINT,$(LIBRARYNAME),"Deleting $(TARGET)")
 	$(RM) $(TARGET)
 
 clean: 
-	@$(call PRINT,"Deleting folder: $(OBJDIR)/")
+	@$(call PRINT,$(LIBRARYNAME),"Deleting folder: $(OBJDIR)/")
 	$(RM) -r $(OBJDIR)

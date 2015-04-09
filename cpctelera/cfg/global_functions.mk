@@ -27,17 +27,18 @@
 ###########################################################################
 
 # ANSI Sequences for terminal colored printing
-COLOR_RED="\033[1;31;49m"
-COLOR_YELLOW="\033[1;33;49m"
-COLOR_NORMAL="\033[0;39;49m"
+COLOR_RED    ="$'\033[1;31;49m"
+COLOR_YELLOW ="$'\033[1;33;49m"
+COLOR_NORMAL ="$'\033[0;39;49m"
 
 #################
 # PRINT: Print a nice and colorful message
 #
-# $(1): Message to print
+# $(1): Subsystem that shows the message
+# $(2): Message to print
 #
 define PRINT
- @echo -e $(COLOR_RED)[$(PROJNAME)]$(COLOR_YELLOW) $(1)$(COLOR_NORMAL)
+ @echo $(COLOR_RED)[$(1)]$(COLOR_YELLOW) $(2)$(COLOR_NORMAL)
 endef
 
 #################
@@ -70,7 +71,7 @@ endef
 # $(1): Variable to check 
 #
 define CHECKVARIABLEISSET
-  if [ "$($(1))" == "" ]; then \
+  if [ "$($(1))" = "" ]; then \
     echo "**!!ERROR!!**: $(1) is not set. Aborting."; \
     exit 1; \
   fi
