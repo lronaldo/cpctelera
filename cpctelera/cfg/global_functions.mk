@@ -27,9 +27,12 @@
 ###########################################################################
 
 # ANSI Sequences for terminal colored printing
-COLOR_RED=$$'\033[1;31;49m'
-COLOR_YELLOW=$$'\033[1;33;49m'
-COLOR_NORMAL=$$'\033[0;39;49m'
+#COLOR_RED=$$'\033[1;31;49m'
+#COLOR_YELLOW=$$'\033[1;33;49m'
+#COLOR_NORMAL=$$'\033[0;39;49m'
+COLOR_RED=\033[1;31;49m
+COLOR_YELLOW=\033[1;33;49m
+COLOR_NORMAL=\033[0;39;49m
 
 #################
 # PRINT: Print a nice and colorful message
@@ -38,7 +41,12 @@ COLOR_NORMAL=$$'\033[0;39;49m'
 # $(2): Message to print
 #
 define PRINT
- @echo $(COLOR_RED)[$(1)]$(COLOR_YELLOW) $(2)$(COLOR_NORMAL)
+#  @echo $(COLOR_RED)[$(1)]$(COLOR_YELLOW) $(2)$(COLOR_NORMAL)
+	@printf "$(COLOR_RED)["
+	@printf $(1)
+	@printf "]$(COLOR_YELLOW) "
+	@printf $(2)
+	@printf "$(COLOR_NORMAL)\n"
 endef
 
 #################
