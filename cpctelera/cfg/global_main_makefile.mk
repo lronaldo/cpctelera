@@ -28,6 +28,9 @@
 ###########################################################################
 .PHONY: all clean cleanall
 
+# Logfile where load and run addresses for the generated binary will be logged
+BINADDRLOG=$(OBJDIR)/binaryAddresses.log
+
 # MAIN TARGET
 all: $(OBJSUBDIRS) $(TARGET)
 
@@ -40,29 +43,28 @@ $(IHXFILE): $(OBJFILES)
 	$(Z80CC) $(Z80CCLINKARGS) $^ -o "$@"
 
 # GENERATE BINARY FILE (.BIN) FROM INTEL HEX BINARY (.IHX)
-## FIX: Binary file gets deleted magically when compilation ends. We make a copy of it for other uses.
 %.bin: %.ihx
 	@$(call PRINT,$(PROJNAME),"Creating Amsdos binary file $@")
 	$(HEX2BIN) -p 00 "$<" | $(TEE) $@.log
-	@cp $@ $@.bin
 
 # CREATE BINARY AND GET LOAD AND RUN ADDRESS FROM LOGFILE AND MAPFILE
-$(OBJDIR)/binAddresses.log: $(BINFILE)
+$(BINADDRLOG): $(BINFILE)
 	@$(call GETLOADADDRESS,LOADADDR,$(<).log)
 	@$(call GETRUNADDRESS,RUNADDR,$(<:.bin=.map))
 	@$(call CHECKVARIABLEISSET,LOADADDR)
 	@$(call CHECKVARIABLEISSET,RUNADDR)
-	@echo "Load Address = $(LOADADDR)" > $(OBJDIR)/binAddresses.log
-	@echo "Run  Address = $(RUNADDR)" >> $(OBJDIR)/binAddresses.log
+	@echo "Generated Binary File $(BINFILE):" > $(BINADDRLOG)
+	@echo "Load Address = $(LOADADDR)"       >> $(BINADDRLOG)
+	@echo "Run  Address = $(RUNADDR)"        >> $(BINADDRLOG)
 
 # GENERATE A DISK FILE (.DSK) AND INCLUDE BINARY FILE (.BIN) INTO IT
-%.dsk: $(BINFILE) $(OBJDIR)/binAddresses.log
+%.dsk: $(BINFILE) $(BINADDRLOG)
 	@$(call PRINT,$(PROJNAME),"Creating Disk File $@")
 	@$(call CREATEDSK,$<,$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,$(PROJNAME),"Successfully created $@")
 
 # GENERATE A CASSETTE FILE (.CDT) AND INCLUDE BINARY FILE (.BIN) INTO IT
-%.cdt: $(BINFILE) $(OBJDIR)/binAddresses.log
+%.cdt: $(BINFILE) $(BINADDRLOG)
 	@$(call PRINT,$(PROJNAME),"Creating Cassette File $@")
 	@$(call CREATECDT,$<,$(notdir $<),$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,$(PROJNAME),"Successfully created $@")
