@@ -124,6 +124,54 @@ function EnsureExists {
    fi
 }
 
+## $1: X
+## $2: Y
+##
+function setCursorXY {
+   echo $'\033[${2};${1}H'
+}
+
+## Saves Cursor Position
+function saveCursorPos {
+   echo -n $'\033[s'
+}
+
+## Restores Cursor Position
+function restoreCursorPos {
+   echo -n $'\033[u'
+}
+
+## $1: Number of characters to move cursor left
+##
+function cursorLeft {
+   for i in $(seq 1 ${1}); do
+      echo -n $'\033[D'
+   done
+}
+
+
+## $1: Size (in characters, without brackets)
+## $2: Percentage
+## $3: ANSI color sequence for BARS
+## $4: ANSI color sequence for Spaces
+##
+function drawProgressBar {
+   local NUMBARS=$(($1 * $2 / 100))
+   if (( NUMBARS > $1 )); then
+      NUMBARS=$1
+   fi
+   local NUMSPACES=$(($1 - NUMBARS))
+   echo -n ${3}[
+   if ((NUMBARS > 0)); then
+      printf '#%.0s' $(seq 1 ${NUMBARS})
+   fi
+   if ((NUMSPACES > 0)); then
+      echo -n ${4}
+      printf '.%.0s' $(seq 1 ${NUMSPACES})
+   fi
+   echo -n ${3}]${COLOR_NORMAL}
+}
+
 ## $1: Command to check for in the system
 ##
 function EnsureCommandAvailable {
@@ -149,53 +197,96 @@ function EnsureCPPHeaderAvailable {
 ## Main Paths
 SETUP_PATH="${PWD}"
 CPCT_MAIN_DIR=${SETUP_PATH}/cpctelera
+CPCT_EXAMPLES_DIR=${SETUP_PATH}/examples
 CPCT_TOOLS_DIR=${CPCT_MAIN_DIR}/tools
 CPCT_SRC_DIR=${CPCT_MAIN_DIR}/src
 CPCT_CFG_DIR=${CPCT_MAIN_DIR}/cfg
+CPCT_LOGS_DIR=${CPCT_MAIN_DIR}/logs
 CPCT_TOOLS_2CDT_DIR=${CPCT_TOOLS_DIR}/2cdt
 CPCT_TOOLS_HEX2BIN_DIR=${CPCT_TOOLS_DIR}/hex2bin-2.0
 CPCT_TOOLS_IDSK_DIR=${CPCT_TOOLS_DIR}/iDSK-0.13
 CPCT_TOOLS_SDCC_DIR=${CPCT_TOOLS_DIR}/sdcc-3.4.3
-CPCT_DIRS=${CPCT_MAIN_DIR}\ ${CPCT_TOOLS_DIR}\ ${CPCT_SRC_DIR}\ ${CPCT_CFG_DIR}\ ${CPCT_TOOLS_2CDT_DIR}\ ${CPCT_TOOLS_HEX2BIN_DIR}\ ${CPCT_TOOLS_IDSK_DIR}\ ${CPCT_TOOLS_SDCC_DIR}
+
+## Main Makefiles
 CPCT_TOOLS_MAKEFILE=${CPCT_TOOLS_DIR}/Makefile
 CPCT_LIB_MAKEFILE=${CPCT_MAIN_DIR}/Makefile
-CPCT_FILES=${CPCT_TOOLS_MAKEFILE}\ ${CPCT_LIB_MAKEFILE}
+CPCT_EXAMPLES_MAKEFILE=${CPCT_EXAMPLES_DIR}/Makefile
+
+## All directories and files
+CPCT_DIRS=${CPCT_MAIN_DIR}\ ${CPCT_LOGS_DIR}\ ${CPCT_EXAMPLES_DIR}\ ${CPCT_TOOLS_DIR}\ ${CPCT_SRC_DIR}\ ${CPCT_CFG_DIR}\ ${CPCT_TOOLS_2CDT_DIR}\ ${CPCT_TOOLS_HEX2BIN_DIR}\ ${CPCT_TOOLS_IDSK_DIR}\ ${CPCT_TOOLS_SDCC_DIR}
+CPCT_FILES=${CPCT_TOOLS_MAKEFILE}\ ${CPCT_LIB_MAKEFILE}\ ${CPCT_EXAMPLES_MAKEFILE}
+
+## Generated files
+CPCT_TOOLS_BUILD_LOG=${CPCT_LOGS_DIR}/tool_building.log
 
 ## Required stuff for running CPCtelera
 REQUIRED_COMMANDS=gcc\ g++\ bison\ flex
 REQUIRED_LIBRARIES=boost/graph/adjacency_list.hpp
 
-# Check CPCTelera directory structure
+
+########################################
+## Perform CPCtelera requirements tests
+##   - Check directory structure
+##   - Check required commands installed
+##   - Check required libraries installed
+##
 clearScreen
 welcomeMessage
 stageMessage "1" "CPCtelera initial tests"
+
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> This is a simulated progressBar:"
+for i in $(seq 1 100); do
+   saveCursorPos
+   drawProgressBar 20 ${i} ${COLOR_LIGHT_MAGENTA} ${COLOR_CYAN}
+   sleep 0.05
+   restoreCursorPos
+done
+echo
+
+
+# Check directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking directory structure..."
 for DIR in ${CPCT_DIRS}; do
    EnsureExists directory "$DIR"
 done
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+
+# Check file structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking important files..."
 for FILE in ${CPCT_FILES}; do
    EnsureExists file "$FILE"
 done
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 
+# Check installed commands
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required commands..."$'\n'
 for C in ${REQUIRED_COMMANDS}; do
    coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '$C'..."
    EnsureCommandAvailable ${C}
    coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 done
+
+# Check installed libraries
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
 for C in ${REQUIRED_LIBRARIES}; do
    coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '$C'..."
    EnsureCPPHeaderAvailable ${C}
    coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 done
-   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
 
-# Build tools 
+########################################
+## Build CPCtelera tools and library
+##
 stageMessage "2" "Building CPCtelera tools"
-   coloredMachineEcho "${COLOR_CYAN}" 0.05 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC..."
-   sleep 1
-   make -C ${CPCT_TOOLS_DIR}
+coloredMachineEcho "${COLOR_CYAN}" 0.05 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC..."
+sleep 1
+drawProgressVar 10 50 ${COLOR_LIGHT_GREEN} ${COLOR_CYAN}
+#if ! make -C "${CPCT_TOOLS_DIR}" | tee "${CPCT_TOOLS_BUILD_LOG}"; then
+#   Error "Something went wrong building CPCtelera tools. Check '${CPCT_TOOLS_BUILD_LOG}' for details. Aborting."
+#fi
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. All tools are now ready to be used on your system."$'\n'
+
+########################################
+## Build code samples if required
+##
