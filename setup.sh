@@ -192,4 +192,10 @@ for C in ${REQUIRED_LIBRARIES}; do
    EnsureCPPHeaderAvailable ${C}
    coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 done
+   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
 
+# Build tools 
+stageMessage "2" "Building CPCtelera tools"
+   coloredMachineEcho "${COLOR_CYAN}" 0.05 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC..."
+   sleep 1
+   make -C ${CPCT_TOOLS_DIR}
