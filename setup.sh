@@ -72,6 +72,8 @@ COMMAND_EXPLANATION[3]="flex is required to compile SDCC. Please, install it an 
 REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
 LIBRARIES_EXPLANATION[0]="libboost is required for building SDCC. Please, install libboost-dev / libboost-devel or similar in your system and run setup again."
 
+if false; then
+
 ###############################################################
 ###############################################################
 ## Perform CPCtelera requirements tests
@@ -142,11 +144,13 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. "$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library are now ready to be used on your system."$'\n'
 
+fi
+
 ###############################################################
 ###############################################################
 ## Build code samples if required
 ##
-stageMessage "3" "Building CPCtelera examples and creating aliases"
+stageMessage "3" "Building CPCtelera examples"
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Would you like to build all CPCtelera examples now (y/n)?"
 askSimpleQuestion y n Y N "" ANS
 if [[ $ANS =~ [yY] ]]; then
@@ -160,3 +164,18 @@ if [[ $ANS =~ [yY] ]]; then
 else
    echo
 fi
+echo
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "CPCtelera is now ready to be used on your system."$'\n'
+
+LITTLE_INTRO="You may now go to the examples folder and play around with the included example projects. \
+Inside any project's folder, just type make to create CDT and DSK files for Amstrad CPC. In the src/ folder \
+you will find C source code for each example. The cfg/ folder contains the building configuration for your \
+project. Change everything as you like. If you wanted to create your own project, just copy a complete \
+example project folder and start modifying it."
+
+coloredMachineEcho ${COLOR_CYAN} 0.001 "$LITTLE_INTRO"$'\n'
+echo
+coloredMachineEcho ${COLOR_CYAN} 0.001 "If you have any comments, please go https://github.com/lronaldo/cpctelera \
+or send an email cpctelera@cheesetea.com. We hope you enjoy the library and expect to see your games comming out \
+soon :)."$'\n'
+echo ${COLOR_NORMAL}
