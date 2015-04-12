@@ -194,14 +194,16 @@ function drawProgressBar {
 }
 
 ## $1: Command to check for in the system
+## $2: Error Message
 ##
 function EnsureCommandAvailable {
    if ! command -v "$1" >/dev/null 2>&1; then
-      Error "'$1' is required to build CPCtelera, but it's not installed. Please, install it in your system and launch setup again."
+      Error "$2"
    fi
 }
 
-## $1: header file name
+## $1: Header file name
+## $2: Error message
 ##
 function EnsureCPPHeaderAvailable {
    local ERRTMP=$(mktemp).err
@@ -211,7 +213,7 @@ function EnsureCPPHeaderAvailable {
    echo "int main(void) { return 0; }" >> "$SRCTMP"
    g++ -o "$OUTTMP" -c "$SRCTMP" 2> "$ERRTMP"
    if [ -s "$ERRTMP" ]; then
-      Error "Header file '$1' is not found in the system, and it is required for building CPCTelera tools. Please, install it and launch setup again."
+      Error "$2"
    fi 
 }
 
@@ -245,4 +247,53 @@ function superviseBackgroundProcess {
       drawProgressBar "${BARSIZE}" "${PCT}" ${COLOR_INVERTED_LIGHT_RED} ${COLOR_INVERTED_WHITE}
    fi
    return $EXIT_STATUS
+}
+
+## $1..$n-1: Array values
+## $n: value to find in the array
+##
+function contains() {
+    local n=$#
+    local value=${!n}
+    for ((i=1;i < $#;i++)) {
+        if [ "${!i}" == "${value}" ]; then
+            return 0
+        fi
+    }
+    return 1
+}
+
+## $1..n-2: Array containing acceptable keys as reply
+## $n-1:    Message Question
+## $n:      Return variable
+##
+function askSimpleQuestion {
+   local REPLY
+   local n=$#
+   local RETURNVAL=${!n}
+   n=$((n-1))
+   local QUESTION=${!n}
+   local BADREPLY=1
+   n=$((n-1))
+   declare -a VALIDREPLIES=("${@:1:n}")
+
+   ## Check that stdin is a terminal
+   if [ -t 0 ]; then
+      stty -echo -icanon time 0 min 0
+   fi;
+
+   echo -n "$QUESTION"
+   while (( BADREPLY )); do
+      read -s -n 1 REPLY
+      if contains ${VALIDREPLIES[@]} $REPLY; then
+         BADREPLY=0
+      fi
+   done
+
+   ## Check that stdin is a terminal
+   if [ -t 0 ]; then
+      stty sane
+   fi;
+
+   eval $RETURNVAL=$REPLY
 }

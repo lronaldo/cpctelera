@@ -25,14 +25,17 @@
 ## first time, before using it.                                          ##
 ###########################################################################
 
-## Include files
-source $(dirname $0)/cpctelera/tools/scripts/bash_library.sh
-
 ## Main Paths
 SETUP_PATH="${PWD}"
 CPCT_MAIN_DIR=${SETUP_PATH}/cpctelera
-CPCT_EXAMPLES_DIR=${SETUP_PATH}/examples
 CPCT_TOOLS_DIR=${CPCT_MAIN_DIR}/tools
+CPCT_SCRIPTS_DIR=${CPCT_TOOLS_DIR}/scripts
+
+## Bash Include files
+source ${CPCT_SCRIPTS_DIR}/bash_library.sh
+
+## More paths defined
+CPCT_EXAMPLES_DIR=${SETUP_PATH}/examples
 CPCT_SRC_DIR=${CPCT_MAIN_DIR}/src
 CPCT_CFG_DIR=${CPCT_MAIN_DIR}/cfg
 CPCT_LOGS_DIR=${CPCT_MAIN_DIR}/logs
@@ -47,8 +50,10 @@ CPCT_LIB_MAKEFILE=${CPCT_MAIN_DIR}/Makefile
 CPCT_EXAMPLES_MAKEFILE=${CPCT_EXAMPLES_DIR}/Makefile
 
 ## All directories and files
-CPCT_DIRS=${CPCT_MAIN_DIR}\ ${CPCT_LOGS_DIR}\ ${CPCT_EXAMPLES_DIR}\ ${CPCT_TOOLS_DIR}\ ${CPCT_SRC_DIR}\ ${CPCT_CFG_DIR}\ ${CPCT_TOOLS_2CDT_DIR}\ ${CPCT_TOOLS_HEX2BIN_DIR}\ ${CPCT_TOOLS_IDSK_DIR}\ ${CPCT_TOOLS_SDCC_DIR}
-CPCT_FILES=${CPCT_TOOLS_MAKEFILE}\ ${CPCT_LIB_MAKEFILE}\ ${CPCT_EXAMPLES_MAKEFILE}
+CPCT_DIRS=("${CPCT_MAIN_DIR}" "${CPCT_LOGS_DIR}" "${CPCT_EXAMPLES_DIR}" "${CPCT_TOOLS_DIR}"
+           "${CPCT_SRC_DIR}" "${CPCT_CFG_DIR}" "${CPCT_TOOLS_2CDT_DIR}" "${CPCT_TOOLS_HEX2BIN_DIR}" 
+           "${CPCT_TOOLS_IDSK_DIR}" "${CPCT_TOOLS_SDCC_DIR}")
+CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAKEFILE}")
 
 ## Generated files
 CPCT_TOOLS_BUILD_LOG=${CPCT_LOGS_DIR}/tool_building.log
@@ -57,11 +62,17 @@ CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES=369073
 CPCT_LIB_BUILD_LOG_TOTAL_BYTES=8133
 
 ## Required stuff for running CPCtelera
-REQUIRED_COMMANDS=gcc\ g++\ bison\ flex
-REQUIRED_LIBRARIES=boost/graph/adjacency_list.hpp
+REQUIRED_COMMANDS=(gcc g++ bison flex)
+COMMAND_EXPLANATION[0]="gcc compiler is required to compile tools. Please install it or build-essentials and run setup again."
+COMMAND_EXPLANATION[1]="g++ compiler is required to compile tools. Please install it or build-essentials and run setup again."
+COMMAND_EXPLANATION[2]="bison is required to compile SDCC. Please, install it an run setup again."
+COMMAND_EXPLANATION[3]="flex is required to compile SDCC. Please, install it an run setup again."
+REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
+LIBRARIES_EXPLANATION[0]="libboost is required for building SDCC. Please, install libboost-dev / libboost-devel or similar in your system and run setup again."
 
 
-########################################
+###############################################################
+###############################################################
 ## Perform CPCtelera requirements tests
 ##   - Check directory structure
 ##   - Check required commands installed
@@ -73,36 +84,39 @@ stageMessage "1" "CPCtelera initial tests"
 
 # Check directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking directory structure..."
-for DIR in ${CPCT_DIRS}; do
+for DIR in ${CPCT_DIRS[*]}; do
    EnsureExists directory "$DIR"
 done
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 
 # Check file structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking important files......."
-for FILE in ${CPCT_FILES}; do
+for FILE in ${CPCT_FILES[*]}; do
    EnsureExists file "$FILE"
 done
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 
 # Check installed commands
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required commands..."$'\n'
-for C in ${REQUIRED_COMMANDS}; do
-   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '$C'..."
-   EnsureCommandAvailable ${C}
+for C in $(seq 0 $((${#REQUIRED_COMMANDS[@]}-1))); do
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_COMMANDS[$C]}'..."
+   EnsureCommandAvailable ${REQUIRED_COMMANDS[$C]} "Command '${REQUIRED_COMMANDS[$C]}' not found installed in the system. ${COMMAND_EXPLANATION[$C]}"
    coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 done
 
 # Check installed libraries
+#      Error ""
+
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
-for C in ${REQUIRED_LIBRARIES}; do
-   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '$C'..."
-   EnsureCPPHeaderAvailable ${C}
+for C in $(seq 0 $((${#REQUIRED_LIBRARIES[@]}-1))); do
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_LIBRARIES[$C]}'..."
+   EnsureCPPHeaderAvailable ${REQUIRED_LIBRARIES[$C]} "Header file '${REQUIRED_LIBRARIES[$C]}' not found in the system. ${LIBRARIES_EXPLANATION[$C]}"
    coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
 done
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
 
-########################################
+###############################################################
+###############################################################
 ## Build CPCtelera tools and library
 ##
 stageMessage "2" "Building CPCtelera tools and z80 library"
@@ -127,6 +141,10 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. "$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library are now ready to be used on your system."$'\n'
 
-########################################
+###############################################################
+###############################################################
 ## Build code samples if required
 ##
+#askSimpleQuestion y n "Reply y/n" retval
+#echo "RETORNO=$retval"
+#exit
