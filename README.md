@@ -9,7 +9,7 @@ routines to aid developers in the creation of games. The main aims of _**CPCtele
 
 _**CPCtelera**_ is still under develpment, at a very early stage. However, it is only few steps back from 1.0. release. Right now, it is completely usable.
 
-**Installing and using _CPCtelera**_ is very easy:
+**Installing and using** _**CPCtelera**_ is very easy:
  1. Open a terminal (under Windows, you will have to install [Cygwin](https://cygwin.com/) previously)
  2. Clone _**CPCtelera**_ repository
    * `git clone https://github.com/lronaldo/cpctelera`
