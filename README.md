@@ -5,36 +5,27 @@ _**Astonishing fast Amstrad CPC game engine for C developers**_
 ---------------------------------------------------------------
 
 _**CPCtelera**_ is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
-routines to aid developers in the creation of games. 
+routines to aid developers in the creation of games. The main aims of _**CPCtelera**_ are producing the fastest possible code, being very easy to install and use in every modern platform and having an extensively commented code, to aid those wanting to learn from code.
 
-_**CPCtelera**_ is still under develpment, at a very early stage. Although it is possible to use _**CPCtelera**_ 
-at its present status and do cool things, it will suffer great modifications until 1.0. version is
-released. Moreover, if you wanted to test and use it, you will need these tools:
- 
- * SDCC 3.4 or greater compiler
- * Hex2Bin 1.0.10 or greater
- * iDSK 0.13 or greater
+_**CPCtelera**_ is still under develpment, at a very early stage. However, it is only few steps back from 1.0. release. Right now, it is completely usable.
 
-For having all this tools i personally recommend using 
-[cpc-dev-tool-chain by cpcitor](https://github.com/cpcitor/cpc-dev-tool-chain/), as it integrates all of them
-(and more) in a nice and easy to use fashion. For testing purposes, it is enough to use commit 48ca1dd9a1 so,
-if you want to use them do this:
- 
-     git clone https://github.com/cpcitor/cpc-dev-tool-chain.git
-     git reset --hard 48ca1dd9a1
- 
-That version of cpc-dev-tool-chain will work nicely on almost any Linux machine, and may also work on Windows
-with a 32-bit version of Cygwin. If you plan to use it this way (Windows+Cygwin 32), check out 
-[Profesor Retroman's tutorial (ES)](https://www.youtube.com/watch?v=FvAg-xmWZHM). 
+**Installing and using** _**CPCtelera**_ is very easy:
+ 1. Open a terminal (under Windows, you will have to install [Cygwin](https://cygwin.com/) previously)
+ 2. Clone _**CPCtelera**_ repository
+   * `git clone https://github.com/lronaldo/cpctelera`
+ 3. Enter _**CPCtelera**_ folder
+   * `cd cpctelera/`
+ 4. Launch `setup.sh`
+   * `sh setup.sh`
 
-Current testing makefiles for examples and library work with this directory structure:
+Follow setup instructions. Setup checks that required software is previously installed, and shows messages if some prerrequisite is missing. If that were the case, install required software and launch setup again. Currenly, _**CPCtelera**_ requires this software to be installed:
+ * Compilers: `gcc`, `g++`
+ * Parsers: `bison`, `flex`
+ * Libraries: `libboost`
 
-    /
-    --/cpctelera
-    --/cpc-dev-tool-chain
+Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. Just enter `examples/` folder, go to the any one of them and type `make` to generate CDT and DSK files. You may use `examples/` as a starting point to build your own projects.
 
-where `/cpc-dev-tool-chain` has SDCC, Hex2Bin and iDSK already compiled 
-(see [cpcitor documentation](https://github.com/cpcitor/cpc-dev-tool-chain/blob/master/README.md) for more details)
+_**CPCtelera**_ is actually being tested under Windows (with Cygwin), Mac and Linux (Ubuntu/Debian, and Arch). It is almost fully usable. If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
 
 ### Contact information and support
 
@@ -48,7 +39,7 @@ If you have any questions, please contact me:
  * **Project owner** 
    * [ronaldo](http://twitter.com/frangallegobr) / ([Cheesetea](http://www.cheesetea.com), [Fremos](http://fremos.cheesetea.com),  [ByteRealms](http://www.byterealms.com))
  * **Awesome collaborators**
-   * [Fran Fernández](https://twitter.com/ronsonmaria) / [Pensando como Pollos](http://www.pensandocomopollos.com/)
+   * [Fran Fernández](https://twitter.com/ronsonmaria) / [Pensando como Pollos](http://www.pensandocomopollos.com/) ([@ronsonmaria](https://twitter.com/ronsonmaria))
    * [Diego Freniche](http://blog.freniche.com) ([@dfreniche](https://twitter.com/dfreniche))
  * **Bitarrays idea and original implementation**
    * Alberto García García (Blitzman, _albertgg93 (at) gmail (dot) com, [@algertgarcia93](http://twitter.com/algertgarcia93)_)
