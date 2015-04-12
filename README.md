@@ -29,9 +29,9 @@ _**CPCtelera**_ is actually being tested under Windows (with Cygwin), Mac and Li
 
 ### Contact information and support
 
-If you have any questions, please contact me:
+If you have any questions, please contact us:
  
- * email:    _ronaldo (at) cheesetea (dot) com_
+ * email:    _cpctelera (at) cheesetea (dot) com_
  * twitter:  *[@FranGallegoBR](http://twitter.com/frangallegobr)*
  
 ### Authors
