@@ -56,8 +56,10 @@ CPCT_DIRS=("${CPCT_MAIN_DIR}" "${CPCT_LOGS_DIR}" "${CPCT_EXAMPLES_DIR}" "${CPCT_
 CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAKEFILE}")
 
 ## Generated files
+CPCT_EXAMPLES_BUILD_LOG=${CPCT_LOGS_DIR}/examples_building.log
 CPCT_TOOLS_BUILD_LOG=${CPCT_LOGS_DIR}/tool_building.log
 CPCT_LIB_BUILD_LOG=${CPCT_LOGS_DIR}/library_building.log
+CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES=16707
 CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES=369073
 CPCT_LIB_BUILD_LOG_TOTAL_BYTES=8133
 
@@ -69,7 +71,6 @@ COMMAND_EXPLANATION[2]="bison is required to compile SDCC. Please, install it an
 COMMAND_EXPLANATION[3]="flex is required to compile SDCC. Please, install it an run setup again."
 REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
 LIBRARIES_EXPLANATION[0]="libboost is required for building SDCC. Please, install libboost-dev / libboost-devel or similar in your system and run setup again."
-
 
 ###############################################################
 ###############################################################
@@ -145,6 +146,17 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library a
 ###############################################################
 ## Build code samples if required
 ##
-#askSimpleQuestion y n "Reply y/n" retval
-#echo "RETORNO=$retval"
-#exit
+stageMessage "3" "Building CPCtelera examples and creating aliases"
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Would you like to build all CPCtelera examples now (y/n)?"
+askSimpleQuestion y n Y N "" ANS
+if [[ $ANS =~ [yY] ]]; then
+   # Build examples in subshell process, then go monitoring until it finishes
+   coloredMachineEcho $'\n'"${COLOR_CYAN}" 0.005 ">>> Building cpctelera examples:"
+   ( make -C "${CPCT_EXAMPLES_DIR}" &> "${CPCT_EXAMPLES_BUILD_LOG}" ; exit $? ) &
+   if ! superviseBackgroundProcess "$!" "${CPCT_EXAMPLES_BUILD_LOG}" "${CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES}" 35 0.1; then
+      Error "There was an error building CPCtelera examples. Please, check '${CPCT_EXAMPLES_BUILD_LOG}' for details. Aborting. "
+   fi
+   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+else
+   echo
+fi

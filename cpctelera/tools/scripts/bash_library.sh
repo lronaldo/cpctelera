@@ -60,9 +60,9 @@ function Error {
 ## $2: Message
 function stageMessage {
    echo ${COLOR_LIGHT_BLUE}
-   echo "====================================================="
+   echo "==============================================================="
    echo "== ${COLOR_LIGHT_MAGENTA}${1}: ${COLOR_MAGENTA}${2}${COLOR_LIGHT_BLUE}"
-   echo "====================================================="${COLOR_NORMAL}
+   echo "==============================================================="${COLOR_NORMAL}
 }
 
 ## Clears the screen
