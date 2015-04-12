@@ -72,8 +72,6 @@ COMMAND_EXPLANATION[3]="flex is required to compile SDCC. Please, install it an 
 REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
 LIBRARIES_EXPLANATION[0]="libboost is required for building SDCC. Please, install libboost-dev / libboost-devel or similar in your system and run setup again."
 
-if false; then
-
 ###############################################################
 ###############################################################
 ## Perform CPCtelera requirements tests
@@ -143,8 +141,6 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
 
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. "$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library are now ready to be used on your system."$'\n'
-
-fi
 
 ###############################################################
 ###############################################################
