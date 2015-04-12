@@ -32,9 +32,15 @@ COLOR_LIGHT_YELLOW=$'\033[1;33;49m'
 COLOR_LIGHT_BLUE=$'\033[1;34;49m'
 COLOR_LIGHT_MAGENTA=$'\033[1;35;49m'
 COLOR_LIGHT_CYAN=$'\033[1;36;49m'
-COLOR_LIGHT_WHITE=$'\033[1;36;49m'
-COLOR_CYAN=$'\033[0;36;49m'
+COLOR_LIGHT_WHITE=$'\033[1;37;49m'
+COLOR_INVERTED_LIGHT_RED=$'\033[1;39;41m'
+COLOR_INVERTED_LIGHT_GREEN=$'\033[1;39;42m'
+COLOR_INVERTED_GREEN=$'\033[0;39;42m'
+COLOR_INVERTED_CYAN=$'\033[0;39;46m'
+COLOR_INVERTED_WHITE=$'\033[0;39;47m'
+COLOR_GREEN=$'\033[0;32;49m'
 COLOR_MAGENTA=$'\033[0;35;49m'
+COLOR_CYAN=$'\033[0;36;49m'
 COLOR_NORMAL=$'\033[0;39;49m'
 
 ## $1: Error Message
@@ -149,6 +155,13 @@ function cursorLeft {
    done
 }
 
+## $1: PID of the process
+## Returns 0 if running, error otherwise
+function processRunning {
+   kill -s 0 "$1" &> /dev/null
+   return $?
+}
+
 
 ## $1: Size (in characters, without brackets)
 ## $2: Percentage
@@ -156,20 +169,28 @@ function cursorLeft {
 ## $4: ANSI color sequence for Spaces
 ##
 function drawProgressBar {
-   local NUMBARS=$(($1 * $2 / 100))
+   local PCT
+   if (( $2 > 100 )); then
+      PCT=100
+   elif (( $2 < 0 )); then
+      PCT=0
+   else
+      PCT=$2
+   fi
+   local NUMBARS=$(($1 * PCT / 100))
    if (( NUMBARS > $1 )); then
       NUMBARS=$1
    fi
    local NUMSPACES=$(($1 - NUMBARS))
-   echo -n ${3}[
+   echo -n ${3}
    if ((NUMBARS > 0)); then
-      printf '#%.0s' $(seq 1 ${NUMBARS})
+      printf ' %.0s' $(seq 1 ${NUMBARS})
    fi
    if ((NUMSPACES > 0)); then
       echo -n ${4}
-      printf '.%.0s' $(seq 1 ${NUMSPACES})
+      printf ' %.0s' $(seq 1 ${NUMSPACES})
    fi
-   echo -n ${3}]${COLOR_NORMAL}
+   echo -n ${COLOR_NORMAL} ${PCT}%
 }
 
 ## $1: Command to check for in the system
@@ -218,6 +239,7 @@ CPCT_FILES=${CPCT_TOOLS_MAKEFILE}\ ${CPCT_LIB_MAKEFILE}\ ${CPCT_EXAMPLES_MAKEFIL
 
 ## Generated files
 CPCT_TOOLS_BUILD_LOG=${CPCT_LOGS_DIR}/tool_building.log
+CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES=369073
 
 ## Required stuff for running CPCtelera
 REQUIRED_COMMANDS=gcc\ g++\ bison\ flex
@@ -233,16 +255,6 @@ REQUIRED_LIBRARIES=boost/graph/adjacency_list.hpp
 clearScreen
 welcomeMessage
 stageMessage "1" "CPCtelera initial tests"
-
-coloredMachineEcho "${COLOR_CYAN}" 0.005 "> This is a simulated progressBar:"
-for i in $(seq 1 100); do
-   saveCursorPos
-   drawProgressBar 20 ${i} ${COLOR_LIGHT_MAGENTA} ${COLOR_CYAN}
-   sleep 0.05
-   restoreCursorPos
-done
-echo
-
 
 # Check directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking directory structure..."
@@ -279,12 +291,33 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
 ## Build CPCtelera tools and library
 ##
 stageMessage "2" "Building CPCtelera tools"
-coloredMachineEcho "${COLOR_CYAN}" 0.05 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC..."
-sleep 1
-drawProgressVar 10 50 ${COLOR_LIGHT_GREEN} ${COLOR_CYAN}
-#if ! make -C "${CPCT_TOOLS_DIR}" | tee "${CPCT_TOOLS_BUILD_LOG}"; then
-#   Error "Something went wrong building CPCtelera tools. Check '${CPCT_TOOLS_BUILD_LOG}' for details. Aborting."
-#fi
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC..."$'\n'
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building compilation tools: "
+
+# Launch building as subshell process
+(
+   make -C "${CPCT_TOOLS_DIR}" &> "${CPCT_TOOLS_BUILD_LOG}"
+   exit $?
+) &
+MAKEPID=$!
+
+# Go checking the build process until it finishes
+BARSIZE=35
+while processRunning "$MAKEPID"; do
+   BYTES=$(wc -c ${CPCT_TOOLS_BUILD_LOG} | sed -r 's/([^0-9]*)//g')
+   PCT=$((BYTES * 100 / CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES))
+   saveCursorPos
+   drawProgressBar "${BARSIZE}" "${PCT}" ${COLOR_INVERTED_GREEN} ${COLOR_INVERTED_WHITE}
+   sleep 0.3
+   restoreCursorPos
+done
+if wait "$MAKEPID"; then
+   drawProgressBar "${BARSIZE}" 100 ${COLOR_INVERTED_LIGHT_GREEN} ${COLOR_INVERTED_WHITE}
+   echo
+else
+   drawProgressBar "${BARSIZE}" "${PCT}" ${COLOR_INVERTED_LIGHT_RED} ${COLOR_INVERTED_WHITE}
+   Error "There was an error building CPCtelera tools. Please, check '${CPCT_TOOLS_BUILD_LOG}' for details. Aborting. "
+fi
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. All tools are now ready to be used on your system."$'\n'
 
 ########################################
