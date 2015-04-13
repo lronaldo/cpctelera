@@ -195,11 +195,16 @@ echo
 coloredMachineEcho ${COLOR_CYAN} 0.001 "You may now go to the examples folder and play around with the included \
 example projects. Inside any project's folder, just type make to create CDT and DSK files for Amstrad CPC. In the \
 ${COLOR_WHITE}src/${COLOR_CYAN} folder you will find C source code for each example. The ${COLOR_WHITE}cfg/\
-${COLOR_CYAN} folder contains the building configuration for your project. Change everything as you like. \
-If you wanted to create your own project, just copy a complete example project folder and start modifying it."$'\n'
+${COLOR_CYAN} folder contains the building configuration for your project. Change everything as you like."$'\n'
+echo
+coloredMachineEcho ${COLOR_CYAN} 0.001 "If you wanted to create a new project, you may use \
+${COLOR_WHITE}cpct_mkproject <project_folder>${COLOR_CYAN}. This is a script that automates the creation \
+of new projects. For convenience, it has been included in your ${COLOR_WHITE}\$PATH${COLOR_CYAN} environment \
+variable (you need to open a new shell for this to take effect). You may create projects anywhere, provided \
+you do not change CPCtelera's main folder location. "$'\n'
 echo
 coloredMachineEcho ${COLOR_CYAN} 0.001 "If you have any comments, please go to \
-${COLOR_WHITE}https://github.com/lronaldo/cpctelera ${COLOR_CYAN} or send an email \
+${COLOR_WHITE}https://github.com/lronaldo/cpctelera${COLOR_CYAN} or send an email \
 ${COLOR_WHITE}cpctelera@cheesetea.com${COLOR_CYAN}. We hope you enjoy the library and expect to see your \
 games comming out soon :)."$'\n'
 echo ${COLOR_NORMAL}
