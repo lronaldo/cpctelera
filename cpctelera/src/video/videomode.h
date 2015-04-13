@@ -21,12 +21,12 @@
 
 #define cpct_setVideoBorderHW(A) cpct_setVideoINKHW(16, (A))
 
-
 typedef unsigned char byte;
 
 extern void cpct_setVideoMode(byte videoMode);
 extern void cpct_setVideoPaletteHW(byte* ink_array, byte ink_array_size);
 extern void cpct_setVideoINKHW(byte pen, byte ink);
 extern void cpct_waitVSYNC();
+extern byte cpct_getHWColour(byte firmware_colour);
 
 #endif
