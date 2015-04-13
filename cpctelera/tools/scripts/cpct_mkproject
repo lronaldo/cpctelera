@@ -26,7 +26,7 @@
 ###########################################################################
 
 ## Bash Include files
-source $(dirname $0)/bash_library.sh
+source $(dirname $0)/lib/bash_library.sh
 
 ## Initial parameters
 PROJECTNAME=
@@ -67,11 +67,6 @@ inside Amstrad CPC's memory."
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
    exit 1
-}
-
-## Draws an OK checkmark
-function drawOK {
-   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
 }
 
 ###############################################################

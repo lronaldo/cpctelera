@@ -377,3 +377,8 @@ function getFullPath {
    eval $2=${PWD}
    popd &> /dev/null
 }
+
+## Draws an OK checkmark
+function drawOK {
+   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+}

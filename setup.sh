@@ -32,7 +32,7 @@ CPCT_TOOLS_DIR=${CPCT_MAIN_DIR}/tools
 CPCT_SCRIPTS_DIR=${CPCT_TOOLS_DIR}/scripts
 
 ## Bash Include files
-source ${CPCT_SCRIPTS_DIR}/bash_library.sh
+source ${CPCT_SCRIPTS_DIR}/lib/bash_library.sh
 
 ## More paths defined
 CPCT_EXAMPLES_DIR=${SETUP_PATH}/examples
@@ -52,6 +52,7 @@ CPCT_EXAMPLES_MAKEFILE=${CPCT_EXAMPLES_DIR}/Makefile
 CPCT_TEMPLATES_MAKEFILE=${CPCT_TEMPLATES_DIR}/Makefile
 CPCT_TEMPLATES_CFG=${CPCT_TEMPLATES_DIR}/build_config.mk
 CPCT_TEMPLATES_MAIN=${CPCT_TEMPLATES_DIR}/main.c
+CPCT_TEMPLATES_BASHRC=${CPCT_TEMPLATES_DIR}/bashrc.tmpl
 
 ## All directories and files
 CPCT_DIRS=("${CPCT_MAIN_DIR}" "${CPCT_LOGS_DIR}" "${CPCT_EXAMPLES_DIR}" "${CPCT_TOOLS_DIR}"
@@ -96,21 +97,21 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking directory structure..."
 for DIR in ${CPCT_DIRS[*]}; do
    EnsureExists directory "$DIR"
 done
-coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+drawOK
 
 # Check file structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking important files......."
 for FILE in ${CPCT_FILES[*]}; do
    EnsureExists file "$FILE"
 done
-coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+drawOK
 
 # Check installed commands
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required commands..."$'\n'
 for C in $(seq 0 $((${#REQUIRED_COMMANDS[@]}-1))); do
    coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_COMMANDS[$C]}'..."
    EnsureCommandAvailable ${REQUIRED_COMMANDS[$C]} "Command '${REQUIRED_COMMANDS[$C]}' not found installed in the system. ${COMMAND_EXPLANATION[$C]}"
-   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+   drawOK
 done
 
 # Check installed libraries
@@ -118,7 +119,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
 for C in $(seq 0 $((${#REQUIRED_LIBRARIES[@]}-1))); do
    coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_LIBRARIES[$C]}'..."
    EnsureCPPHeaderAvailable ${REQUIRED_LIBRARIES[$C]} "Header file '${REQUIRED_LIBRARIES[$C]}' not found in the system. ${LIBRARIES_EXPLANATION[$C]}"
-   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 "[ OK ]"$'\n'
+   drawOK
 done
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
 
@@ -135,7 +136,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building compilation tools: "
 if ! superviseBackgroundProcess "$!" "${CPCT_TOOLS_BUILD_LOG}" "${CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES}" 35 0.3; then
    Error "There was an error building CPCtelera tools. Please, check '${CPCT_TOOLS_BUILD_LOG}' for details. Aborting. "
 fi
-coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+drawOK
 
 # Build library in subshell process, then go monitoring until it finishes
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building cpctelera z80 lib: "
@@ -143,7 +144,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building cpctelera z80 lib: "
 if ! superviseBackgroundProcess "$!" "${CPCT_LIB_BUILD_LOG}" "${CPCT_LIB_BUILD_LOG_TOTAL_BYTES}" 35 0.05; then
    Error "There was an error building CPCtelera tools. Please, check '${CPCT_LIB_BUILD_LOG}' for details. Aborting. "
 fi
-coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+drawOK
 
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. "$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library are now ready to be used on your system."$'\n'
@@ -154,7 +155,7 @@ coloredMachineEcho $'\n'"${COLOR_CYAN}" 0.005 ">>> Building cpctelera examples:"
 if ! superviseBackgroundProcess "$!" "${CPCT_EXAMPLES_BUILD_LOG}" "${CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES}" 35 0.1; then
    Error "There was an error building CPCtelera examples. Please, check '${CPCT_EXAMPLES_BUILD_LOG}' for details. Aborting. "
 fi
-coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+drawOK
 
 ###############################################################
 ###############################################################
@@ -167,13 +168,19 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Setting up present CPCtelera folder 
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera full path: ${COLOR_WHITE}${CPCT_MAIN_DIR}"$'\n'
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Inserting full path into build config template..."
 sed -i "/${CPCT_TAG_MAINPATH}/c\CPCT_PATH := ${CPCT_MAIN_DIR}#${CPCT_TAG_MAINPATH}" ${CPCT_TEMPLATES_CFG}
-coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+drawOK
 
-#askSimpleQuestion y n Y N "" ANS
-#if [[ $ANS =~ [yY] ]]; then
-#else
-#   echo
-#fi
+# Configuring PATH to use CPCTelera scripts in the system
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera scripts path: ${COLOR_WHITE}${CPCT_SCRIPTS_DIR}"$'\n'
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to \$PATH variable in ~/.bashrc..."
+
+# First, eliminate previous instances of CPCTelera into bashrc, then add new
+BASHRC=~/.bashrc
+touch $BASHRC
+sed -i '/###CPCTELERA_START/,/###CPCTELERA_END/d' ${BASHRC}
+cat ${CPCT_TEMPLATES_BASHRC} >> ${BASHRC}
+sed -i "s#${CPCT_TAG_MAINPATH}#${CPCT_SCRIPTS_DIR}#" ${BASHRC}
+drawOK
 
 ###############################################################
 ###############################################################
@@ -186,18 +193,13 @@ coloredMachineEcho ${COLOR_LIGHT_WHITE} 0.002 "%%%"$'\n'"%%%%%%%%%%%%%%%%%%%%%%%
 echo
 
 coloredMachineEcho ${COLOR_CYAN} 0.001 "You may now go to the examples folder and play around with the included \
-example projects. Inside any project's folder, just type make to create CDT and DSK files for Amstrad CPC. In the "
-coloredMachineEcho ${COLOR_WHITE} 0.001 "src/ "
-coloredMachineEcho ${COLOR_CYAN} 0.001 "folder you will find C source code for each example. The "
-coloredMachineEcho ${COLOR_WHITE} 0.001 "cfg/ "
-coloredMachineEcho ${COLOR_CYAN} 0.001 "folder contains the building configuration for your project. Change \
-everything as you like. If you wanted to create your own project, just copy a complete example project folder \
-and start modifying it."$'\n'
+example projects. Inside any project's folder, just type make to create CDT and DSK files for Amstrad CPC. In the \
+${COLOR_WHITE}src/${COLOR_CYAN} folder you will find C source code for each example. The ${COLOR_WHITE}cfg/\
+${COLOR_CYAN} folder contains the building configuration for your project. Change everything as you like. \
+If you wanted to create your own project, just copy a complete example project folder and start modifying it."$'\n'
 echo
-coloredMachineEcho ${COLOR_CYAN} 0.001 "If you have any comments, please go to "
-coloredMachineEcho ${COLOR_WHITE} 0.001 "https://github.com/lronaldo/cpctelera "
-coloredMachineEcho ${COLOR_CYAN} 0.001 "or send an email "
-coloredMachineEcho ${COLOR_WHITE} 0.001 "cpctelera@cheesetea.com. "
-coloredMachineEcho ${COLOR_CYAN} 0.001 "We hope you enjoy the library and expect to see your games comming out \
-soon :)."$'\n'
+coloredMachineEcho ${COLOR_CYAN} 0.001 "If you have any comments, please go to \
+${COLOR_WHITE}https://github.com/lronaldo/cpctelera ${COLOR_CYAN} or send an email \
+${COLOR_WHITE}cpctelera@cheesetea.com${COLOR_CYAN}. We hope you enjoy the library and expect to see your \
+games comming out soon :)."$'\n'
 echo ${COLOR_NORMAL}
