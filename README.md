@@ -7,7 +7,7 @@ _**Astonishing fast Amstrad CPC game engine for C developers**_
 _**CPCtelera**_ is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
 routines to aid developers in the creation of games. The main aims of _**CPCtelera**_ are producing the fastest possible code, being very easy to install and use in every modern platform and having an extensively commented code, to aid those wanting to learn from code.
 
-_**CPCtelera**_ is still under develpment, at a very early stage. However, it is only few steps back from 1.0. release. Right now, it is completely usable.
+_**CPCtelera**_ is still under develpment, at a very early stage. However, it is completely usable at the moment.
 
 **Installing and using** _**CPCtelera**_ is very easy:
  1. Open a terminal (under Windows, you will have to install [Cygwin](https://cygwin.com/) previously)
@@ -18,14 +18,16 @@ _**CPCtelera**_ is still under develpment, at a very early stage. However, it is
  4. Launch `setup.sh`
    * `sh setup.sh`
 
-Follow setup instructions. Setup checks that required software is previously installed, and shows messages if some prerrequisite is missing. If that were the case, install required software and launch setup again. Currenly, _**CPCtelera**_ requires this software to be installed:
+Follow setup instructions. Setup checks that required software is previously installed, and shows messages if some prerrequisite is missing. If that were the case, install required software and launch setup again. Currenly, _**CPCtelera**_ requires these software to be installed:
  * Compilers: `gcc`, `g++`
  * Parsers: `bison`, `flex`
  * Libraries: `libboost`
 
 Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. Just enter `examples/` folder, go to the any one of them and type `make` to generate CDT and DSK files. You may use `examples/` as a starting point to build your own projects.
 
-_**CPCtelera**_ is actually being tested under Windows (with Cygwin), Mac and Linux (Ubuntu/Debian, and Arch). It is almost fully usable. If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
+If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) from [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
+
+_**CPCtelera**_ is actually being tested under Windows (with Cygwin), OS X and Linux (Ubuntu/Debian, and Arch). It is almost fully usable. If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
 
 ### Contact information and support
 
