@@ -27,7 +27,7 @@
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_setVideoPalette                                   ###
+;## FUNCTION: _cpct_setVideoPaletteHW                                 ###
 ;########################################################################
 ;### This function modifies video palette registers to set the INKs   ###
 ;### colours to use. Palette registers are contained inside the PAL   ###
@@ -35,12 +35,14 @@
 ;### access PAL chip, the same port (&7F) as Gate Array is used.      ###
 ;### The function is not thought to be optimal, but secure. If a more ###
 ;### optimal one is required, it can be derived from this code.       ###
+;### The array of color values passed to this routine must have       ###
+;### hardware color values (0-31) and not firmware ones.              ###
 ;###                                                                  ###
 ;### Known limitations: this function cannot set blinking colors, as  ###
 ;### blinking colours are managed by the firmware (not by hardware)   ###
 ;########################################################################
 ;### INPUTS (3 Bytes)                                                 ###
-;###  * (2B DE) Pointer to an array of bytes containing colour numbers### 
+;###  * (2B DE) Pointer to a byte array containing hardware colours   ### 
 ;###  * (1B A) Number of colours to set (up to 16)                    ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
@@ -57,7 +59,7 @@
 ;### http://www.grimware.org/doku.php/documentations/devices/gatearray###
 ;########################################################################
 ;
-_cpct_setVideoPalette::
+_cpct_setVideoPaletteHW::
    ;; Getting parameters from stack
    LD  HL, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
    ADD HL, SP               ;; [11]

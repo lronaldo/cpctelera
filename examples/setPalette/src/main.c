@@ -43,7 +43,7 @@ void main(void) {
 
    cpct_disableFirmware();
    cpct_setVideoMode(0);
-   cpct_setVideoPalette(palette, 16);
+   cpct_setVideoPaletteHW(palette, 16);
 
    while(1) {
       if (t) t--;
@@ -55,16 +55,16 @@ void main(void) {
       else if (cpct_isKeyPressed(Key_CursorDown)  && y < 168) { dest += (++y & 7) ? 0x0800 : 0xC850; }
       if      (cpct_isKeyPressed(Key_Space) && !t) {
           rotatePalette(palette, 16);
-          cpct_setVideoPalette(palette, 16);
+          cpct_setVideoPaletteHW(palette, 16);
           t=50;
       } else if (cpct_isKeyPressed(Key_Enter) && !t) {
-          cpct_setVideoBorder(++border);
+          cpct_setVideoBorderHW(++border);
           t=25;
       } else {
          for (k=0; k<16; k++) {
             if (cpct_isKeyPressed(c_palkeys[k]) && !t) {
                palette[k] = (palette[k] + 1) & 0x1F;
-               cpct_setVideoINK(k, palette[k]);
+               cpct_setVideoINKHW(k, palette[k]);
                t=25;
             }
          }

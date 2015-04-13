@@ -27,16 +27,17 @@
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_setVideoINK                                       ###
+;## FUNCTION: _cpct_setVideoINKHW                                     ###
 ;########################################################################
 ;### This function modifies video palette registers to set the INK    ###
 ;### of one of the available PENs of the Amstrad CPC. Through the     ###
 ;### Gate Array Port (&7F) it accesses the PAL chip and changes the   ###
-;### required INK colour register.                                    ###
+;### required INK colour register. The parameter color value must be  ###
+;### one of the valid hardware color numbers (not firmware ones).     ###
 ;########################################################################
 ;### INPUTS (3 Bytes)                                                 ###
 ;###  * (1B C) Number of the PEN colour to change (0-16)              ### 
-;###  * (1B A) foreground INK colour to be set (INKR)                 ###
+;###  * (1B A) foreground INK hardware colour to be set (INKR)        ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, HL                           ###
@@ -50,7 +51,7 @@
 ;### http://www.grimware.org/doku.php/documentations/devices/gatearray###
 ;########################################################################
 ;
-_cpct_setVideoINK::
+_cpct_setVideoINKHW::
    LD  HL, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
    ADD HL, SP               ;; [11]
    LD   C, (HL)             ;; [ 7] C = First Parameter (PEN)
