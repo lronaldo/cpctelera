@@ -106,8 +106,6 @@ for C in $(seq 0 $((${#REQUIRED_COMMANDS[@]}-1))); do
 done
 
 # Check installed libraries
-#      Error ""
-
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
 for C in $(seq 0 $((${#REQUIRED_LIBRARIES[@]}-1))); do
    coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_LIBRARIES[$C]}'..."

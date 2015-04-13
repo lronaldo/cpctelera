@@ -38,11 +38,13 @@ COLOR_INVERTED_LIGHT_GREEN=$'\033[1;39;42m'
 COLOR_INVERTED_GREEN=$'\033[0;39;42m'
 COLOR_INVERTED_CYAN=$'\033[0;39;46m'
 COLOR_INVERTED_WHITE=$'\033[0;39;47m'
+COLOR_RED=$'\033[0;31;49m'
 COLOR_GREEN=$'\033[0;32;49m'
 COLOR_MAGENTA=$'\033[0;35;49m'
 COLOR_CYAN=$'\033[0;36;49m'
 COLOR_NORMAL=$'\033[0;39;49m'
 
+## Show a big error message for an unrecoverable error and exit
 ## $1: Error Message
 ## $2: Number of error that will be returned to shell
 function Error {
@@ -52,6 +54,15 @@ function Error {
    echo "## UNRECOVERABLE ERROR ##"
    echo "#########################"
    echo "##> ${COLOR_LIGHT_YELLOW}${1}${COLOR_NORMAL}"
+   echo
+   exit $2
+}
+
+## Show a normal error message for a badly given command line parameter and exit
+## $1: Error Message
+## $2: Number of error that will be returned to shell
+function paramError {
+   echo ${COLOR_LIGHT_RED}[ ERROR ]: ${COLOR_RED}${1}${COLOR_NORMAL}
    echo
    exit $2
 }
@@ -111,22 +122,25 @@ function welcomeMessage {
    echo
 }
 
+## Ensures that a file of a given type exists and is readable by the user. Otherwise, it throws an unrecoverable error
 ## $1: Type of file (file, directory)
 ## $2: File/Directory to check for existance
+## $3: Aditional error message, used when file does not exist or is not readable
+##
 function EnsureExists {
    local MOD
    case "$1" in
-      file)  
+      file)
          MOD="-f";;
-      directory) 
+      directory)
          MOD="-d" ;;
       *)
          Error "Filetype '$1' unrecognized while testing file '$2'."
    esac
    if [ ! $MOD "$2" ]; then
-      Error "$1 '$2' does not exist, and it is required for CPCTelera framework to work propperly."
+      Error "$1 '$2' does not exist, and it is required for CPCTelera framework to work propperly. $3"
    elif [ ! -r "$2" ]; then
-      Error "$1 '$2' is not readable (check for permissions)."
+      Error "$1 '$2' exists, but it is not readable (check for permissions). $3"
    fi
 }
 
@@ -249,20 +263,6 @@ function superviseBackgroundProcess {
    return $EXIT_STATUS
 }
 
-## $1..$n-1: Array values
-## $n: value to find in the array
-##
-function contains() {
-    local n=$#
-    local value=${!n}
-    for ((i=1;i < $#;i++)) {
-        if [ "${!i}" == "${value}" ]; then
-            return 0
-        fi
-    }
-    return 1
-}
-
 ## $1..n-2: Array containing acceptable keys as reply
 ## $n-1:    Message Question
 ## $n:      Return variable
@@ -296,4 +296,76 @@ function askSimpleQuestion {
    fi;
 
    eval $RETURNVAL=$REPLY
+}
+
+## Check if an array contains a given value
+## $1..$n-1: Array values
+## $n: value to find in the array
+##
+function contains {
+    local n=$#
+    local value=${!n}
+    for ((i=1;i < $#;i++)) {
+        if [ "${!i}" == "${value}" ]; then
+            return 0
+        fi
+    }
+    return 1
+}
+
+## Check if a given value is an integer or not
+## $1: value to be tested
+##
+function isInt {
+   return $(test "$1" -eq "$1" > /dev/null 2>&1);
+}
+
+## Check if a given value is an hexadecimal value or not
+## $1: value to be tested
+##
+function isHex {
+   if [[ $1 =~ ^[0-9A-Fa-f]+$ ]]; then
+      return 0
+   fi
+   return 1
+}
+
+## Check if a given value is empty
+## $1: Value to check
+##
+function isEmpty {
+   if [ "$1" == "" ]; then
+      return 0
+   fi
+   return 1
+}
+
+## Check if a given value is a command line option (starts with -)
+## $1: Value to check
+##
+function isCommandLineOption {
+   if [ "${1:0:1}" == "-" ]; then 
+      return 0
+   fi
+   return 1
+}
+
+## Check if a file exists and is readable (only files, not directories)
+## $1: File to check 
+##
+function isFileReadable {
+   if [ -f "$1" ] && [ -r "$1" ]; then
+      return 0
+   fi
+   return 1
+}
+
+## Gets the full path of a given file, from its relative path
+## $1: File
+## $2: Return variable where to store the real path
+##
+function getFullPath {
+   pushd $(dirname $1) &> /dev/null
+   eval $2=${PWD}
+   popd &> /dev/null
 }
