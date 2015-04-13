@@ -31,7 +31,7 @@
 ##   Sets CPCTelera main path for accessing tools and configuration. If you
 ##   change folder structure, change CPCT_PATH value for its absolute path.
 ##
-CPCT_PATH := %%%CPCTELERA_PATH%%%
+CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
 
 ####
 ## SECTION 1: Project configuration 
@@ -43,8 +43,8 @@ CPCT_PATH := %%%CPCTELERA_PATH%%%
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := %%%PROJECT_NAME%%%
-Z80CODELOC := 0x%%%CODE_LOAD_ADDRESS%%%
+PROJNAME   := name#%%%PROJECT_NAME%%%
+Z80CODELOC := 0x0000#%%%CODE_LOAD_ADDRESS%%%
 
 # Folders and file extensions
 SRCDIR  := src
@@ -68,7 +68,7 @@ TARGET  := $(CDT) $(DSK)
 ## here. You may overwrite the values of path variables after the include 
 ## if you wanted specific configuration for this project.
 ####
-include $(CPCT_PATH)cfg/global_paths.mk
+include $(CPCT_PATH)/cfg/global_paths.mk
 
 ####
 ## SECTION 3: COMPILATION CONFIGURATION
@@ -90,7 +90,7 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ##  and files with source extension found are added, up to 1 level of depth in
 ##  folder structure inside the main source directory.
 ####
-include $(CPCT_PATH)cfg/global_functions.mk
+include $(CPCT_PATH)/cfg/global_functions.mk
 
 SUBDIRS    := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
 OBJSUBDIRS := $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))

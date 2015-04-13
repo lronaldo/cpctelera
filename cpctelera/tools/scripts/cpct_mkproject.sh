@@ -41,6 +41,10 @@ MAKE_TEMPLATE=${TEMPLATE_DIRECTORY}/Makefile
 CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/build_config.mk
 ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE})
 
+## Replacement tags
+TAG_PROJECTNAME="%%%PROJECT_NAME%%%"
+TAG_LOADADDRESS="%%%CODE_LOAD_ADDRESS%%%"
+
 ## Show how this script is to be used and exit
 ##
 function usage() {
@@ -63,6 +67,11 @@ inside Amstrad CPC's memory."
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
    exit 1
+}
+
+## Draws an OK checkmark
+function drawOK {
+   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
 }
 
 ###############################################################
@@ -126,5 +135,48 @@ done
 
 ###############################################################
 ###############################################################
+## Some checks
+##
+if isEmpty "$PROJECTNAME"; then
+   PROJECTNAME="$PROJECTDIR"
+fi
+
+###############################################################
+###############################################################
 ## Create new project
 ##
+
+## Objective directory structure
+SOURCE_DIR=${PROJECTDIR}/src
+CONFIG_DIR=${PROJECTDIR}/cfg
+NEW_MAIN=${SOURCE_DIR}/main.c
+NEW_BUILD=${CONFIG_DIR}/build_config.mk
+NEW_MAKE=${PROJECTDIR}/Makefile
+
+# Welcome message
+stageMessage "CPCtelera" "Creating new project in ${COLOR_WHITE}${PROJECTDIR}/"
+
+## Create directory structure
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Creating project folder structure..."
+mkdir -p ${SOURCE_DIR}
+mkdir -p ${CONFIG_DIR}
+drawOK
+
+## Copy templates substituting tags
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Copying files from project templates..."
+cp ${SRC_TEMPLATE} ${NEW_MAIN}
+cp ${CFG_TEMPLATE} ${NEW_BUILD}
+cp ${MAKE_TEMPLATE} ${NEW_MAKE}
+drawOK
+
+# Configuring project values into CFG_TEMPLATE
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring project name to: ${COLOR_WHITE}${PROJECTNAME}"
+sed -i "/${TAG_PROJECTNAME}/c\PROJNAME   := ${PROJECTNAME}#${TAG_PROJECTNAME}" ${NEW_BUILD}
+drawOK
+
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring z80 code load address: ${COLOR_WHITE}${LOADADDRESS}"
+sed -i "/${TAG_LOADADDRESS}/c\Z80CODELOC := 0x${LOADADDRESS}#${TAG_LOADADDRESS}" ${NEW_BUILD}
+drawOK
+
+# Bye Message
+stageMessage "CPCtelera" "New project created in ${COLOR_WHITE}${PROJECTDIR}/"

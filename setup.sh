@@ -43,17 +43,22 @@ CPCT_TOOLS_2CDT_DIR=${CPCT_TOOLS_DIR}/2cdt
 CPCT_TOOLS_HEX2BIN_DIR=${CPCT_TOOLS_DIR}/hex2bin-2.0
 CPCT_TOOLS_IDSK_DIR=${CPCT_TOOLS_DIR}/iDSK-0.13
 CPCT_TOOLS_SDCC_DIR=${CPCT_TOOLS_DIR}/sdcc-3.4.3
+CPCT_TEMPLATES_DIR=${CPCT_SCRIPTS_DIR}/templates
 
-## Main Makefiles
+## Main Makefiles and other files
 CPCT_TOOLS_MAKEFILE=${CPCT_TOOLS_DIR}/Makefile
 CPCT_LIB_MAKEFILE=${CPCT_MAIN_DIR}/Makefile
 CPCT_EXAMPLES_MAKEFILE=${CPCT_EXAMPLES_DIR}/Makefile
+CPCT_TEMPLATES_MAKEFILE=${CPCT_TEMPLATES_DIR}/Makefile
+CPCT_TEMPLATES_CFG=${CPCT_TEMPLATES_DIR}/build_config.mk
+CPCT_TEMPLATES_MAIN=${CPCT_TEMPLATES_DIR}/main.c
 
 ## All directories and files
 CPCT_DIRS=("${CPCT_MAIN_DIR}" "${CPCT_LOGS_DIR}" "${CPCT_EXAMPLES_DIR}" "${CPCT_TOOLS_DIR}"
            "${CPCT_SRC_DIR}" "${CPCT_CFG_DIR}" "${CPCT_TOOLS_2CDT_DIR}" "${CPCT_TOOLS_HEX2BIN_DIR}" 
-           "${CPCT_TOOLS_IDSK_DIR}" "${CPCT_TOOLS_SDCC_DIR}")
-CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAKEFILE}")
+           "${CPCT_TOOLS_IDSK_DIR}" "${CPCT_TOOLS_SDCC_DIR}" "${CPCT_TEMPLATES_DIR}")
+CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAKEFILE}" 
+            "${CPCT_TEMPLATES_CFG}" "${CPCT_TEMPLATES_MAKEFILE}" "${CPCT_TEMPLATES_MAIN}")
 
 ## Generated files
 CPCT_EXAMPLES_BUILD_LOG=${CPCT_LOGS_DIR}/examples_building.log
@@ -62,6 +67,9 @@ CPCT_LIB_BUILD_LOG=${CPCT_LOGS_DIR}/library_building.log
 CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES=16707
 CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES=369073
 CPCT_LIB_BUILD_LOG_TOTAL_BYTES=8133
+
+## Substitution tags
+CPCT_TAG_MAINPATH="%%%CPCTELERA_PATH%%%"
 
 ## Required stuff for running CPCtelera
 REQUIRED_COMMANDS=(gcc g++ bison flex)
@@ -116,9 +124,9 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
 
 ###############################################################
 ###############################################################
-## Build CPCtelera tools and library
+## Build CPCtelera tools, library and examples
 ##
-stageMessage "2" "Building CPCtelera tools and z80 library"
+stageMessage "2" "Building CPCtelera tools, z80 library and examples"
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC (This might take a while, depending on your system):"$'\n'
 
 # Build tools in subshell process, then go monitoring until it finishes
@@ -140,36 +148,56 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. "$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library are now ready to be used on your system."$'\n'
 
-###############################################################
-###############################################################
-## Build code samples if required
-##
-stageMessage "3" "Building CPCtelera examples"
-coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Would you like to build all CPCtelera examples now (y/n)?"
-askSimpleQuestion y n Y N "" ANS
-if [[ $ANS =~ [yY] ]]; then
-   # Build examples in subshell process, then go monitoring until it finishes
-   coloredMachineEcho $'\n'"${COLOR_CYAN}" 0.005 ">>> Building cpctelera examples:"
-   ( make -C "${CPCT_EXAMPLES_DIR}" &> "${CPCT_EXAMPLES_BUILD_LOG}" ; exit $? ) &
-   if ! superviseBackgroundProcess "$!" "${CPCT_EXAMPLES_BUILD_LOG}" "${CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES}" 35 0.1; then
-      Error "There was an error building CPCtelera examples. Please, check '${CPCT_EXAMPLES_BUILD_LOG}' for details. Aborting. "
-   fi
-   coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
-else
-   echo
+# Build examples in subshell process, then go monitoring until it finishes
+coloredMachineEcho $'\n'"${COLOR_CYAN}" 0.005 ">>> Building cpctelera examples:"
+( make -C "${CPCT_EXAMPLES_DIR}" &> "${CPCT_EXAMPLES_BUILD_LOG}" ; exit $? ) &
+if ! superviseBackgroundProcess "$!" "${CPCT_EXAMPLES_BUILD_LOG}" "${CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES}" 35 0.1; then
+   Error "There was an error building CPCtelera examples. Please, check '${CPCT_EXAMPLES_BUILD_LOG}' for details. Aborting. "
 fi
-echo
-coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "CPCtelera is now ready to be used on your system."$'\n'
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
 
-LITTLE_INTRO="You may now go to the examples folder and play around with the included example projects. \
-Inside any project's folder, just type make to create CDT and DSK files for Amstrad CPC. In the src/ folder \
-you will find C source code for each example. The cfg/ folder contains the building configuration for your \
-project. Change everything as you like. If you wanted to create your own project, just copy a complete \
-example project folder and start modifying it."
+###############################################################
+###############################################################
+## Configuring environment and project templates
+##
+stageMessage "3" "Configuring CPCtelera environment"
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Setting up present CPCtelera folder as install directory and configuring routes and templates..."$'\n'
 
-coloredMachineEcho ${COLOR_CYAN} 0.001 "$LITTLE_INTRO"$'\n'
+# Configuring CPCTelera global path in templates
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera full path: ${COLOR_WHITE}${CPCT_MAIN_DIR}"$'\n'
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Inserting full path into build config template..."
+sed -i "/${CPCT_TAG_MAINPATH}/c\CPCT_PATH := ${CPCT_MAIN_DIR}#${CPCT_TAG_MAINPATH}" ${CPCT_TEMPLATES_CFG}
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+
+#askSimpleQuestion y n Y N "" ANS
+#if [[ $ANS =~ [yY] ]]; then
+#else
+#   echo
+#fi
+
+###############################################################
+###############################################################
+## Final message to the user
+##
 echo
-coloredMachineEcho ${COLOR_CYAN} 0.001 "If you have any comments, please go https://github.com/lronaldo/cpctelera \
-or send an email cpctelera@cheesetea.com. We hope you enjoy the library and expect to see your games comming out \
+coloredMachineEcho ${COLOR_LIGHT_WHITE} 0.002 "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"$'\n'"%%%"
+coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 " CPCtelera is now ready to be used on your system. "
+coloredMachineEcho ${COLOR_LIGHT_WHITE} 0.002 "%%%"$'\n'"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"$'\n'
+echo
+
+coloredMachineEcho ${COLOR_CYAN} 0.001 "You may now go to the examples folder and play around with the included \
+example projects. Inside any project's folder, just type make to create CDT and DSK files for Amstrad CPC. In the "
+coloredMachineEcho ${COLOR_WHITE} 0.001 "src/ "
+coloredMachineEcho ${COLOR_CYAN} 0.001 "folder you will find C source code for each example. The "
+coloredMachineEcho ${COLOR_WHITE} 0.001 "cfg/ "
+coloredMachineEcho ${COLOR_CYAN} 0.001 "folder contains the building configuration for your project. Change \
+everything as you like. If you wanted to create your own project, just copy a complete example project folder \
+and start modifying it."$'\n'
+echo
+coloredMachineEcho ${COLOR_CYAN} 0.001 "If you have any comments, please go to "
+coloredMachineEcho ${COLOR_WHITE} 0.001 "https://github.com/lronaldo/cpctelera "
+coloredMachineEcho ${COLOR_CYAN} 0.001 "or send an email "
+coloredMachineEcho ${COLOR_WHITE} 0.001 "cpctelera@cheesetea.com. "
+coloredMachineEcho ${COLOR_CYAN} 0.001 "We hope you enjoy the library and expect to see your games comming out \
 soon :)."$'\n'
 echo ${COLOR_NORMAL}

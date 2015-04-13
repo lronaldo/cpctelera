@@ -42,7 +42,15 @@ COLOR_RED=$'\033[0;31;49m'
 COLOR_GREEN=$'\033[0;32;49m'
 COLOR_MAGENTA=$'\033[0;35;49m'
 COLOR_CYAN=$'\033[0;36;49m'
+COLOR_WHITE=$'\033[0;37;49m'
 COLOR_NORMAL=$'\033[0;39;49m'
+
+## Echoes the full path of the library folder
+##   >> Throws an error if full path is not found
+##
+#function echoCPCteleraFullPath {
+#   getFullPath $0 SCRIPT_FULL_PATH
+#}
 
 ## Show a big error message for an unrecoverable error and exit
 ## $1: Error Message
