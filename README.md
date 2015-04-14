@@ -10,7 +10,7 @@ routines to aid developers in the creation of games. The main aims of _**CPCtele
 _**CPCtelera**_ is still under develpment, at a very early stage. However, it is completely usable at the moment.
 
 **Installing and using** _**CPCtelera**_ is very easy:
- 1. Open a terminal (under Windows, you will have to install [Cygwin](https://cygwin.com/) previously)
+ 1. Open a terminal (under Windows, you will have to install [Cygwin x86 (32 bits)](https://cygwin.com/) previously)
  2. Clone _**CPCtelera**_ repository
    * `git clone https://github.com/lronaldo/cpctelera`
  3. Enter _**CPCtelera**_ folder
@@ -33,7 +33,8 @@ Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. 
 
 For creating your own projects, _**CPCtelera**_ includes the `cpct_mkproject` script. `setup.sh` configures your system's $PATH variable so that you have direct access to `cpct_mkproject` anywhere on your system (you should close and open your terminal again after `setup.sh` finishes). Creating a new project is as easy as typing this:
  * `cpct_mkproject <project_folder>`
-If you want to specify a project name (different than the folder name) and/or a concrete binary load address, you should check options with `cpct_mkproject --help`.
+
+ If you wanted to specify a project name (different than the folder name) and/or a concrete binary load address, you should check options with `cpct_mkproject --help`.
 
 If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) from [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
 
