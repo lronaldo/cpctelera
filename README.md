@@ -20,8 +20,8 @@ _**CPCtelera**_ is still under develpment, at a very early stage. However, it is
 
 Follow setup instructions. Setup checks that required software is previously installed, and shows messages if some prerrequisite is missing. If that were the case, install required software and launch setup again. Currenly, _**CPCtelera**_ requires these software to be installed:
  * Compilers: `gcc`, `g++`
- * Parsers: `bison`, `flex`
- * Libraries: `libboost`
+ * Parsers: `make`, `bison`, `flex`
+ * Libraries: `libboost-dev`, `ioperm`
 
 Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. Just enter `examples/` folder, go to the any one of them and type `make` to generate CDT and DSK files. You may use `examples/` as a starting point to build your own projects.
 
