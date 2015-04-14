@@ -255,14 +255,15 @@ function superviseBackgroundProcess {
    local PCT
    local EXIT_STATUS
    while processRunning "$PROCPID"; do
-      BYTES=$(wc -c ${LOGFILE} | sed -r 's/([^0-9]*)//g')
+      BYTES=$(wc -c ${LOGFILE} | grep -Eo '[0-9]+ ')
       PCT=$((BYTES * 100 / MAXBYTES))
       saveCursorPos
       drawProgressBar "${BARSIZE}" "${PCT}" ${COLOR_INVERTED_GREEN} ${COLOR_INVERTED_WHITE}
       sleep ${SLEEPTIME}
       restoreCursorPos
    done
-   wait "$PROCPID" && EXIT_STATUS=$?
+   wait "$PROCPID" 
+   EXIT_STATUS=$?
    if [[ "$EXIT_STATUS" == 0 ]]; then
       drawProgressBar "${BARSIZE}" 100 ${COLOR_INVERTED_LIGHT_GREEN} ${COLOR_INVERTED_WHITE}
    else
@@ -381,4 +382,52 @@ function getFullPath {
 ## Draws an OK checkmark
 function drawOK {
    coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.05 " [ OK ]"$'\n'
+}
+
+## Replaces a complete line in a file which contains a given tag 
+## $1: Tag to be searched
+## $2: New line to replace the one that contains the tag
+## $3: File to modify
+## $4: sed deliminer (optional)
+##
+function replaceTaggedLine {
+  local TMP=$(mktemp -t replacetmp)
+  local D=';'
+  if [ "$4" != "" ]; then
+    D=$4
+  fi
+  cat "$3" |sed "s${D}.*${1}.*${D}${2}${D}g" > $TMP
+  mv "$TMP" "$3"
+}
+
+## Removes a group of lines inside a file identified by start and end tags
+## $1: Start tag
+## $2: End tag
+## $3: File
+## $4: sed deliminer (optional)
+##
+function removeLinesBetween {
+  local TMP=$(mktemp -t replacetmp)
+  local D=';'
+  if [ "$4" != "" ]; then
+    D=$4
+  fi
+  cat "$3" |sed "${D}${1}${D},${D}${2}${D}d" > $TMP
+  mv "$TMP" "$3"
+}
+
+## Replaces all ocurrences of a given tag in a file for another string
+## $1: Tag to be searched
+## $2: New string that replaces the tag
+## $3: File to modify
+## $4: sed deliminer (optional)
+##
+function replaceTag {
+  local TMP=$(mktemp -t replacetmp)
+  local D=';'
+  if [ "$4" != "" ]; then
+    D=$4
+  fi
+  cat "$3" |sed "s${D}${1}${D}${2}${D}g" > $TMP
+  mv "$TMP" "$3"
 }

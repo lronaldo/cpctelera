@@ -166,11 +166,11 @@ drawOK
 
 # Configuring project values into CFG_TEMPLATE
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring project name to: ${COLOR_WHITE}${PROJECTNAME}"
-sed -i "/${TAG_PROJECTNAME}/c\PROJNAME   := ${PROJECTNAME}#${TAG_PROJECTNAME}" ${NEW_BUILD}
+replaceTag "$TAG_PROJECTNAME" "$PROJECTNAME" "$NEW_BUILD"
 drawOK
 
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring z80 code load address: ${COLOR_WHITE}${LOADADDRESS}"
-sed -i "/${TAG_LOADADDRESS}/c\Z80CODELOC := 0x${LOADADDRESS}#${TAG_LOADADDRESS}" ${NEW_BUILD}
+replaceTag "$TAG_LOADADDRESS" "$LOADADDRESS" "$NEW_BUILD"
 drawOK
 
 # Bye Message

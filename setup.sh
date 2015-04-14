@@ -167,7 +167,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Setting up present CPCtelera folder 
 # Configuring CPCTelera global path in templates
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera full path: ${COLOR_WHITE}${CPCT_MAIN_DIR}"$'\n'
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Inserting full path into build config template..."
-sed -i "/${CPCT_TAG_MAINPATH}/c\CPCT_PATH := ${CPCT_MAIN_DIR}#${CPCT_TAG_MAINPATH}" ${CPCT_TEMPLATES_CFG}
+replaceTaggedLine "${CPCT_TAG_MAINPATH}" "CPCT_PATH := ${CPCT_MAIN_DIR}#${CPCT_TAG_MAINPATH}" "${CPCT_TEMPLATES_CFG}"
 drawOK
 
 # Configuring PATH to use CPCTelera scripts in the system
@@ -177,9 +177,9 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to \$PATH vari
 # First, eliminate previous instances of CPCTelera into bashrc, then add new
 BASHRC=~/.bashrc
 touch $BASHRC
-sed -i '/###CPCTELERA_START/,/###CPCTELERA_END/d' ${BASHRC}
-cat ${CPCT_TEMPLATES_BASHRC} >> ${BASHRC}
-sed -i "s#${CPCT_TAG_MAINPATH}#${CPCT_SCRIPTS_DIR}#" ${BASHRC}
+removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" $BASHRC
+cat "$CPCT_TEMPLATES_BASHRC" >> "$BASHRC"
+replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" $BASHRC '#'
 drawOK
 
 ###############################################################
