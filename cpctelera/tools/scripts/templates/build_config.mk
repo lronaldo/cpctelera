@@ -31,7 +31,7 @@
 ##   Sets CPCTelera main path for accessing tools and configuration. If you
 ##   change folder structure, change CPCT_PATH value for its absolute path.
 ##
-CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
+CPCT_PATH := %%%CPCTELERA_PATH%%%
 
 ####
 ## SECTION 1: Project configuration 
@@ -43,8 +43,8 @@ CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := name#%%%PROJECT_NAME%%%
-Z80CODELOC := 0x0000#%%%CODE_LOAD_ADDRESS%%%
+PROJNAME   := %%%PROJECT_NAME%%%
+Z80CODELOC := 0x%%%CODE_LOAD_ADDRESS%%%
 
 # Folders and file extensions
 SRCDIR  := src
