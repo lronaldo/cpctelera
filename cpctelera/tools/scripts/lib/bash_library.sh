@@ -228,9 +228,9 @@ function EnsureCommandAvailable {
 ## $2: Error message
 ##
 function EnsureCPPHeaderAvailable {
-   local ERRTMP=$(mktemp).err
-   local OUTTMP=$(mktemp).out
-   local SRCTMP=$(mktemp).cpp
+   local ERRTMP=$(createTempFile).err
+   local OUTTMP=$(createTempFile).out
+   local SRCTMP=$(createTempFile).cpp
    echo "#include <${1}>" > "$SRCTMP"
    echo "int main(void) { return 0; }" >> "$SRCTMP"
    g++ -o "$OUTTMP" -c "$SRCTMP" 2> "$ERRTMP"
@@ -391,8 +391,8 @@ function drawOK {
 ## $4: sed deliminer (optional)
 ##
 function replaceTaggedLine {
-  local TMP=$(mktemp -t replacetmp)
-  local D=';'
+  local TMP=$(createTempFile)
+  local D='/'
   if [ "$4" != "" ]; then
     D=$4
   fi
@@ -407,8 +407,8 @@ function replaceTaggedLine {
 ## $4: sed deliminer (optional)
 ##
 function removeLinesBetween {
-  local TMP=$(mktemp -t replacetmp)
-  local D=';'
+  local TMP=$(createTempFile)
+  local D='/'
   if [ "$4" != "" ]; then
     D=$4
   fi
@@ -423,11 +423,25 @@ function removeLinesBetween {
 ## $4: sed deliminer (optional)
 ##
 function replaceTag {
-  local TMP=$(mktemp -t replacetmp)
-  local D=';'
+  local TMP=$(createTempFile)
+  local D='/'
   if [ "$4" != "" ]; then
     D=$4
   fi
   cat "$3" |sed "s${D}${1}${D}${2}${D}g" > $TMP
   mv "$TMP" "$3"
+}
+
+## Creates a temporary file reliably, on Linux or Mac OSX, and echoes the file name 
+## 
+function createTempFile {
+   local FILE=$(mktemp || mktemp -t tmp)
+   echo $FILE
+}
+
+## Removes trailing blank lines from a file
+## $1: filename
+##
+function removeTrailingBlankLines {
+   echo "$(echo "$(tac "$1")" | tac)" > "$1"
 }

@@ -73,7 +73,7 @@ CPCT_LIB_BUILD_LOG_TOTAL_BYTES=8133
 CPCT_TAG_MAINPATH="%%%CPCTELERA_PATH%%%"
 
 ## Required stuff for running CPCtelera
-REQUIRED_COMMANDS=(gcc g++ bison flex)
+REQUIRED_COMMANDS=(gcc g++ make bison flex)
 COMMAND_EXPLANATION[0]="gcc compiler is required to compile tools. Please install it or build-essentials and run setup again."
 COMMAND_EXPLANATION[1]="g++ compiler is required to compile tools. Please install it or build-essentials and run setup again."
 COMMAND_EXPLANATION[2]="bison is required to compile SDCC. Please, install it an run setup again."
@@ -167,7 +167,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Setting up present CPCtelera folder 
 # Configuring CPCTelera global path in templates
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera full path: ${COLOR_WHITE}${CPCT_MAIN_DIR}"$'\n'
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Inserting full path into build config template..."
-replaceTaggedLine "${CPCT_TAG_MAINPATH}" "CPCT_PATH := ${CPCT_MAIN_DIR}#${CPCT_TAG_MAINPATH}" "${CPCT_TEMPLATES_CFG}"
+replaceTaggedLine "${CPCT_TAG_MAINPATH}" "CPCT_PATH := ${CPCT_MAIN_DIR}\#${CPCT_TAG_MAINPATH}" "${CPCT_TEMPLATES_CFG}" '#'
 drawOK
 
 # Configuring PATH to use CPCTelera scripts in the system
@@ -177,7 +177,8 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to \$PATH vari
 # First, eliminate previous instances of CPCTelera into bashrc, then add new
 BASHRC=~/.bashrc
 touch $BASHRC
-removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" $BASHRC
+removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" "$BASHRC"
+removeTrailingBlankLines "$BASHRC"
 cat "$CPCT_TEMPLATES_BASHRC" >> "$BASHRC"
 replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" $BASHRC '#'
 drawOK
