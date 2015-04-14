@@ -16,18 +16,28 @@ _**CPCtelera**_ is still under develpment, at a very early stage. However, it is
  3. Enter _**CPCtelera**_ folder
    * `cd cpctelera/`
  4. Launch `setup.sh`
-   * `sh setup.sh`
+   * `./setup.sh`
 
 Follow setup instructions. Setup checks that required software is previously installed, and shows messages if some prerrequisite is missing. If that were the case, install required software and launch setup again. Currenly, _**CPCtelera**_ requires these software to be installed:
  * Compilers: `gcc`, `g++`
  * Parsers: `make`, `bison`, `flex`
  * Libraries: `libboost-dev`, `ioperm`
 
-Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. Just enter `examples/` folder, go to the any one of them and type `make` to generate CDT and DSK files. You may use `examples/` as a starting point to build your own projects.
+**Mac OSX**, previously to these requirements, needs to have installed: 
+ * [Homebrew](http://brew.sh/)
+ * [XCode](https://itunes.apple.com/es/app/xcode/id497799835?mt=12)
+ * XCode Command Line tools (that can be installed with `xcode-select --install`)
+ * Libboost from Homebrew (`brew install boost`)
+
+Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. To have a quick glance about what CPCtelera offers, you may enter `examples/` folder and check all the examples included. You can build any one of them just by typing `make` inside the example folder, then CDT and DSK files will be automatically generated.
+
+For creating your own projects, _**CPCtelera**_ includes the `cpct_mkproject` script. `setup.sh` configures your system's $PATH variable so that you have direct access to `cpct_mkproject` anywhere on your system (you should close and open your terminal again after `setup.sh` finishes). Creating a new project is as easy as typing this:
+ * `cpct_mkproject <project_folder>`
+If you want to specify a project name (different than the folder name) and/or a concrete binary load address, you should check options with `cpct_mkproject --help`.
 
 If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) from [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
 
-_**CPCtelera**_ is actually being tested under Windows (with Cygwin), OS X and Linux (Ubuntu/Debian, and Arch). It is almost fully usable. If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
+_**CPCtelera**_ is actually being tested under Windows (with Cygwin x86, 32 bits), OS X and Linux (Ubuntu/Debian, and Arch). It is almost fully usable. If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
 
 ### Contact information and support
 
@@ -74,3 +84,4 @@ If you have any questions, please contact us:
  * Raúl Simarro (for developing [CPCRSLib](http://sourceforge.net/projects/cpcrslib/) game creation library)
  * [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos) (for developing Arkos Traker&Player and giving great support on adding it to CPCtelera. Also for giving general advice during development of CPCtelera)
  * [Pulkomandy](http://www.pushnpop.net/profile-47.html) / [Shinra Team](http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml) (for maintaining [cpcsdk](https://github.com/cpcsdk), with tools like [iDSK](https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z&can=2&q=) or [cpcfs](https://code.google.com/p/cpcsdk/wiki/cpcfs), among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
+ * José Ángel Rodriguez ([@rvjose](http://twitter.com/rvjose)) (for early testing, bug reporting and giving great ideas)
