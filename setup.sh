@@ -76,10 +76,20 @@ CPCT_TAG_MAINPATH="%%%CPCTELERA_PATH%%%"
 REQUIRED_COMMANDS=(gcc g++ make bison flex)
 COMMAND_EXPLANATION[0]="gcc compiler is required to compile tools. Please install it or build-essentials and run setup again."
 COMMAND_EXPLANATION[1]="g++ compiler is required to compile tools. Please install it or build-essentials and run setup again."
-COMMAND_EXPLANATION[2]="bison is required to compile SDCC. Please, install it an run setup again."
-COMMAND_EXPLANATION[3]="flex is required to compile SDCC. Please, install it an run setup again."
-REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
-LIBRARIES_EXPLANATION[0]="libboost is required for building SDCC. Please, install libboost-dev / libboost-devel or similar in your system and run setup again."
+COMMAND_EXPLANATION[2]="make is required for all CPCtelera's build systems. Please, install it an run setup again."
+COMMAND_EXPLANATION[3]="bison is required to compile SDCC. Please, install it an run setup again."
+COMMAND_EXPLANATION[4]="flex is required to compile SDCC. Please, install it an run setup again."
+
+## System-dependent libraries
+if checkSystem "osx"; then
+   LIBRARY2="sys/uio.h"
+else
+   LIBRARY2="sys/io.h"
+fi
+
+REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp" "$LIBRARY2")
+LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
+LIBRARIES_EXPLANATION[1]="$LIBRARY2 is included in ioperm package, which is required for building 2CDT. Please, install ioperm or similar in your system and run setup again."
 
 ###############################################################
 ###############################################################

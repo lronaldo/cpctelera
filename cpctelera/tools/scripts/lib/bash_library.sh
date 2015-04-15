@@ -86,7 +86,7 @@ function stageMessage {
 
 ## Clears the screen
 function clearScreen {
-   echo -e "\033[H\033[J"
+   printf "\033[H\033[J"
 }
 
 ## $1: Seconds between characters
@@ -156,25 +156,23 @@ function EnsureExists {
 ## $2: Y
 ##
 function setCursorXY {
-   echo $'\033[${2};${1}H'
+   printf "\033[%s;%sH" $2 $1
 }
 
 ## Saves Cursor Position
 function saveCursorPos {
-   echo -n $'\033[s'
+   printf "\033[s"
 }
 
 ## Restores Cursor Position
 function restoreCursorPos {
-   echo -n $'\033[u'
+   printf "\033[u"
 }
 
 ## $1: Number of characters to move cursor left
 ##
 function cursorLeft {
-   for i in $(seq 1 ${1}); do
-      echo -n $'\033[D'
-   done
+   printf "\033[%sD" $1
 }
 
 ## $1: PID of the process
@@ -253,14 +251,17 @@ function superviseBackgroundProcess {
    local SLEEPTIME=$5
    local BYTES
    local PCT
+   local LEFT
    local EXIT_STATUS
    while processRunning "$PROCPID"; do
       BYTES=$(wc -c ${LOGFILE} | grep -Eo '[0-9]+ ')
       PCT=$((BYTES * 100 / MAXBYTES))
-      saveCursorPos
+      LEFT=$((BARSIZE + 2 + ${#PCT}))
+      #saveCursorPos
       drawProgressBar "${BARSIZE}" "${PCT}" ${COLOR_INVERTED_GREEN} ${COLOR_INVERTED_WHITE}
       sleep ${SLEEPTIME}
-      restoreCursorPos
+      #restoreCursorPos
+      cursorLeft $LEFT
    done
    wait "$PROCPID" 
    EXIT_STATUS=$?
@@ -444,4 +445,33 @@ function createTempFile {
 ##
 function removeTrailingBlankLines {
    echo "$(echo "$(tac "$1")" | tac)" > "$1"
+}
+
+## Checks if the present system is one of the given in the parameters
+## Valid system strings are: "osx", "linux", "cygwin"
+## $n: systems to check
+##
+function checkSystem {
+   local SYS=$(uname)
+   while (( $# >= 1 )); do
+      case "$1" in
+         "osx")
+            if [[ "$SYS" =~ "Darwin" ]]; then
+               return 0
+            fi
+         ;;
+         "linux") 
+            if [[ "$SYS" =~ "Linux" ]] || [[ "$SYS" =~ "GNU" ]]; then
+               return 0
+            fi
+         ;;
+         "cygwin") 
+            if [[ "$SYS" =~ "CYGWIN" ]]; then
+               return 0
+            fi
+         ;;
+      esac
+      shift
+   done
+   return 1
 }
