@@ -26,7 +26,7 @@ Follow setup instructions. Setup checks that required software is previously ins
 **Mac OSX**, previously to these requirements, needs to have installed: 
  * [Homebrew](http://brew.sh/)
  * [XCode](https://itunes.apple.com/es/app/xcode/id497799835?mt=12)
- * XCode Command Line tools (that can be installed with `xcode-select --install`)
+ * XCode Command Line tools (`xcode-select --install`)
  * Libboost from Homebrew (`brew install boost`)
 
 Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. To have a quick glance about what CPCtelera offers, you may enter `examples/` folder and check all the examples included. You can build any one of them just by typing `make` inside the example folder, then CDT and DSK files will be automatically generated.
@@ -34,9 +34,9 @@ Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. 
 For creating your own projects, _**CPCtelera**_ includes the `cpct_mkproject` script. `setup.sh` configures your system's $PATH variable so that you have direct access to `cpct_mkproject` anywhere on your system (you should close and open your terminal again after `setup.sh` finishes). Creating a new project is as easy as typing this:
  * `cpct_mkproject <project_folder>`
 
- If you wanted to specify a project name (different than the folder name) and/or a concrete binary load address, you should check options with `cpct_mkproject --help`.
+ If you wanted to specify a project name (different than the folder name) and/or a concrete binary load address, you may check options with `cpct_mkproject --help`.
 
-If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) from [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
+If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
 
 _**CPCtelera**_ is actually being tested under Windows (with Cygwin x86, 32 bits), OS X and Linux (Ubuntu/Debian, and Arch). It is almost fully usable. If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
 
