@@ -174,6 +174,13 @@ drawOK
 stageMessage "3" "Configuring CPCtelera environment"
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Setting up present CPCtelera folder as install directory and configuring routes and templates..."$'\n'
 
+## Select System-dependent profile script
+if checkSystem "osx"; then
+   PROFILE=~/.profile
+else
+   PROFILE=~/.bashrc
+fi
+
 # Configuring CPCTelera global path in templates
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera full path: ${COLOR_WHITE}${CPCT_MAIN_DIR}"$'\n'
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Inserting full path into build config template..."
@@ -182,15 +189,14 @@ drawOK
 
 # Configuring PATH to use CPCTelera scripts in the system
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera scripts path: ${COLOR_WHITE}${CPCT_SCRIPTS_DIR}"$'\n'
-coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to \$PATH variable in ~/.bashrc..."
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to \$PATH variable in ${PROFILE}..."
 
-# First, eliminate previous instances of CPCTelera into bashrc, then add new
-BASHRC=~/.bashrc
-touch $BASHRC
-removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" "$BASHRC"
-removeTrailingBlankLines "$BASHRC"
-cat "$CPCT_TEMPLATES_BASHRC" >> "$BASHRC"
-replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" $BASHRC '#'
+# First, eliminate previous instances of CPCTelera into PROFILE, then add new
+touch $PROFILE
+removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" "$PROFILE"
+removeTrailingBlankLines "$PROFILE"
+cat "$CPCT_TEMPLATES_BASHRC" >> "$PROFILE"
+replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" $PROFILE '#'
 drawOK
 
 ###############################################################
