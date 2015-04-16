@@ -35,7 +35,7 @@ EXEEXT          = @EXEEXT@
 VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -DSDCDB -DNOICE -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/util
-CFLAGS          = @CFLAGS@ @WALL_FLAG@ $(CPPFLAGS)
+CFLAGS          = @CFLAGS@ @WALL_FLAG@ $(CPPFLAGS) -fsigned-char
 LDFLAGS         = @LDFLAGS@
 LIBS            = -lm
 

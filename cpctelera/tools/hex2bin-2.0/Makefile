@@ -8,7 +8,7 @@ B_OBJFILES= $(foreach F, hex2bin.o common.o libcrc.o binary.o, $(OBJDIR)/$(F))
 M_SRCFILES= $(foreach F, mot2bin.c common.c libcrc.c binary.c, $(SRCDIR)/$(F))
 M_OBJFILES= $(foreach F, mot2bin.o common.o libcrc.o binary.o, $(OBJDIR)/$(F))
 TGT_FILES = $(foreach F, hex2bin mot2bin hex2bin.1, $(TGTDIR)/$(F))
-CPFLAGS = -std=gnu99 -O2 -Wall -pedantic
+CPFLAGS = -std=gnu99 -O3 -fsigned-char -Wall -pedantic
 # Compile
 all: objectdir $(TGT_FILES)
 

@@ -5,7 +5,7 @@ COMP    = g++
 TARGET  = $(BINDIR)/iDSK
 SRCFILES= $(wildcard $(SRCDIR)/*.cpp)
 OBJFILES= $(foreach F, $(SRCFILES), $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(F:%.cpp=%.o)))
-CPFLAGS = -O2 -Wall -pedantic
+CPFLAGS = -O3 -Wall -pedantic -fsigned-char
 
 # Compile
 all: objectdir $(OBJFILES) Makefile

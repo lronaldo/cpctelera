@@ -3489,14 +3489,14 @@ if test "$ac_test_CFLAGS" = set; then
 elif test $ac_cv_prog_cc_g = yes; then
   if test "$GCC" = yes; then
     #CFLAGS="-g -O2"
-    CFLAGS="-O2"
+    CFLAGS="-O3 -fsigned-char"
   else
     CFLAGS=""
     #CFLAGS="-g"
   fi
 else
   if test "$GCC" = yes; then
-    CFLAGS="-O2"
+    CFLAGS="-O3 -fsigned-char"
   else
     CFLAGS=
   fi
