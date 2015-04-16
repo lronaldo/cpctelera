@@ -35,4 +35,5 @@
 ;;
 ;; External values
 ;;
-.globl cpct_mode_rom_status ;; defined in firmware_ed.s
+.globl cpct_mode_rom_status    ;; defined in firmware_ed.s
+.globl cpct_firmware2hw_colour ;; colour conversion table defined in cpct_getHWColour.s

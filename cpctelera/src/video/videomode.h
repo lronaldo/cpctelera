@@ -28,5 +28,6 @@ extern void cpct_setVideoPaletteHW(byte* ink_array, byte ink_array_size);
 extern void cpct_setVideoINKHW(byte pen, byte ink);
 extern void cpct_waitVSYNC();
 extern byte cpct_getHWColour(byte firmware_colour);
+extern void cpct_fw2hw(void *fw_colour_array, byte size);
 
 #endif

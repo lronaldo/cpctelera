@@ -48,10 +48,11 @@
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;### 101 + 78*C (C = number of colours to be set, 2nd parameter)      ###
+;### MEASURES                                                         ###
+;### MEMORY:  35 bytes                                                ###
+;### TIME:    101 + 78*NumColours Cycles (25.25 + 19.50*NC us)        ###
 ;### Example:                                                         ###
-;###  16 colours = 1349 cycles (337.25 ns)                            ###
+;###  16 colours = 1349 cycles (337.25 us)                            ###
 ;########################################################################
 ;### CREDITS:                                                         ###
 ;###   This function has been constructed with great help from the    ###

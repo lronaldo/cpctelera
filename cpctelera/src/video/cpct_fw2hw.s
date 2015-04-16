@@ -27,44 +27,46 @@
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_getHWColor                                        ###
+;## FUNCTION: _cpct_fw2hw                                             ###
 ;########################################################################
-;### Returns the hardware colour value (0-31) for a given firmware    ###
-;### colour value (0-26). The colour value returned can be used by    ###
-;### other palette functions requiring hardware colour values.        ###
+;### Converts an array of firmware colour values into their equivalent###
+;### hardware colour values. It directly modifies the array passed to ###
+;### the function.                                                    ###
 ;########################################################################
-;### INPUTS (1 Byte)                                                  ###
-;###  * (1B C) Firmware INK colour value to convert (0-26)            ### 
-;########################################################################
-;### RETURN VALUE                                                     ###
-;###  Returns a byte value, 0-31, with the hardware colour value      ###
+;### INPUTS (3 Bytes)                                                 ###
+;###  * (2B DE) Array of firmware colour values (0-26 each)           ###
+;###  * (1B A)  Number of colour values in the array                  ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: BC, HL                               ###
+;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;###  MEMORY: 40 bytes (13 code + 27 colour table)                    ###
-;###  TIME: 63 cycles (16.00 ns)                                      ###
+;###  MEMORY: 59 bytes (32 code + 27 colour table)                    ###
+;###  TIME: 68 + 65*NumColours cycles (17.00 + 16.25*NC us)           ###
+;### Example:                                                         ###
+;###  16 colours, 1108 cycles (277,00 us)                             ###
 ;########################################################################
 ;
-
-;; Colour table
-cpct_firmware2hw_colour:: 
-  .db 0x14, 0x04, 0x15, 0x1C, 0x18, 0x1D, 0x0C, 0x05, 0x0D
-  .db 0x16, 0x06, 0x17, 0x1E, 0x00, 0x1F, 0x0E, 0x07, 0x0F
-  .db 0x12, 0x02, 0x13, 0x1A, 0x19, 0x1B, 0x0A, 0x03, 0x0B
-
-_cpct_getHWColour::
+   
+_cpct_fw2hw::
    LD  HL, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
-   LD   B, H                ;; [ 4] B = 0, to be able to use C as an incremente for HL (adding BC)
+   LD   B, H                ;; [ 4] B = 0, (BC = C) so that we can use BC as counter
    ADD HL, SP               ;; [11]
-   LD   C, (HL)             ;; [ 7] A = Firmware INK colour value 
+   LD   E, (HL)             ;; [ 7] DE = Pointer to colour array
+   INC HL                   ;; [ 6]
+   LD   D, (HL)             ;; [ 7]
+   INC HL                   ;; [ 6]
+   LD   C, (HL)             ;; [ 7] C = Number of colours to convert 
+
+f2h_colour_loop:
+   LD  HL, #cpct_firmware2hw_colour ;; [10] HL points to the start of the firmware2hw_colour array
+   LD   A, (DE)             ;; [ 7] A = Next colour to convert
+   ADD  L                   ;; [ 4] HL += C (HL Points to the table value correspondant to A)
+   LD   L, A                ;; [ 4] |  
+   JP  NC, f2h_ncarry       ;; [10] |   (8-bits sum: only when L+C generates carry, H must be incremented)
+   INC  H                   ;; [ 4] \
+f2h_ncarry:
+   LDI                      ;; [16] (DE) = (HL) overwrite firmware colour value with hardware colour (and HL++, DE++)
+   JP  PE, f2h_colour_loop  ;; [10] IF BC != 0, continue converting, else end
    
-   LD  HL, #cpct_firmware2hw_colour ;; [10] HL points to the start of the colour table
-   ADD HL, BC               ;; [11] HL += C (as B=0), HL points to the exact hardware color value to return
-
-   LD   L, (HL)             ;; [ 7] L = Return value (hardware colour for firmware colour supplied)
-   LD   H, B                ;; [ 4] H = 0, to leave HL just with the value of L
-
    RET                      ;; [10] Return
-   

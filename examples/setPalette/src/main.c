@@ -19,9 +19,14 @@
 #include <cpctelera.h>
 #include "newton_sprite.def"
 
-// Standard CPC Palette (16 colours for mode 0)
-const unsigned char c_palette[16] = { 0x04, 0x0A, 0x13, 0x0C, 0x0B, 0x14, 0x15, 0x0D,
-                                      0x06, 0x1E, 0x1F, 0x07, 0x12, 0x19, 0x0A, 0x07 };
+// Standard CPC Palette (16 firmware colour values for mode 0, same as BASIC's INK values)
+const unsigned char c_palette[16] = {  1, 24, 20,  6, 26,  0,  2,  8,
+                                      10, 12, 14, 16, 18, 22, 24, 16};
+
+// Correspondant hardware colour values, used by CRTC registers. This may be used
+// directly to the cpct_setVideoPaletteHW function, without previous conversion.
+//const unsigned char c_palette[16] = { 0x04, 0x0A, 0x13, 0x0C, 0x0B, 0x14, 0x15, 0x0D,
+//                                      0x06, 0x1E, 0x1F, 0x07, 0x12, 0x19, 0x0A, 0x07 };
 
 // Keys used to modify individual palette colors
 const cpct_keyID c_palkeys[16] = { Key_0, Key_1, Key_2, Key_3, Key_4, Key_5, Key_6, Key_7,
@@ -43,7 +48,8 @@ void main(void) {
 
    cpct_disableFirmware();
    cpct_setVideoMode(0);
-   cpct_setVideoPaletteHW(palette, 16);
+   cpct_fw2hw(palette, 16);               // Converts colours from firmware values (BASIC INKs) to hardware values
+   cpct_setVideoPaletteHW(palette, 16);   // Uses hardware colours to set up the video palette
 
    while(1) {
       if (t) t--;
