@@ -45,13 +45,6 @@ COLOR_CYAN=$'\033[0;36;49m'
 COLOR_WHITE=$'\033[0;37;49m'
 COLOR_NORMAL=$'\033[0;39;49m'
 
-## Echoes the full path of the library folder
-##   >> Throws an error if full path is not found
-##
-#function echoCPCteleraFullPath {
-#   getFullPath $0 SCRIPT_FULL_PATH
-#}
-
 ## Show a big error message for an unrecoverable error and exit
 ## $1: Error Message
 ## $2: Number of error that will be returned to shell
@@ -436,15 +429,22 @@ function replaceTag {
 ## Creates a temporary file reliably, on Linux or Mac OSX, and echoes the file name 
 ## 
 function createTempFile {
-   local FILE=$(mktemp || mktemp -t tmp)
-   echo $FILE
+  if checkSystem "osx"; then
+    mktemp -t tmp
+  else
+    mktemp 
+  fi
 }
 
 ## Removes trailing blank lines from a file
 ## $1: filename
 ##
 function removeTrailingBlankLines {
-   echo "$(echo "$(tac "$1")" | tac)" > "$1"
+  if checkSystem "osx"; then
+    echo "$(echo "$(tail -r "$1")" | tail -r)" > "$1"
+  else
+    echo "$(echo "$(tac "$1")" | tac)" > "$1"
+  fi
 }
 
 ## Checks if the present system is one of the given in the parameters
