@@ -3915,7 +3915,8 @@ else
   ac_save_cxx_werror_flag=$ac_cxx_werror_flag
    ac_cxx_werror_flag=yes
    ac_cv_prog_cxx_g=no
-   CXXFLAGS="-g"
+   #CXXFLAGS="-g"
+   CXXFLAGS=""
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3975,14 +3976,14 @@ if test "$ac_test_CXXFLAGS" = set; then
 elif test $ac_cv_prog_cxx_g = yes; then
   if test "$GXX" = yes; then
     #CXXFLAGS="-g -O2"
-    CXXFLAGS="-O2"
+    CXXFLAGS="-O3"
   else
     CXXFLAGS=""
     #CXXFLAGS="-g"
   fi
 else
   if test "$GXX" = yes; then
-    CXXFLAGS="-O2"
+    CXXFLAGS="-O3"
   else
     CXXFLAGS=
   fi

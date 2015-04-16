@@ -38,15 +38,20 @@ For creating your own projects, _**CPCtelera**_ includes the `cpct_mkproject` sc
 
 If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
 
-_**CPCtelera**_ is actually being tested under Windows (with Cygwin x86, 32 bits), OS X and Linux (Ubuntu/Debian, and Arch). It is almost fully usable. If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
+_**CPCtelera**_ is fully usable and has been tested under these platforms:
+ * Windows (with Cygwin x86, 32 bits)
+ * OS X
+ * Linux (Ubuntu/Debian, Raspbian, Arch and Manjaro)
+
+If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
 
 ### Contact information and support
 
 If you have any questions, please contact us:
- 
+
  * email:    _cpctelera (at) cheesetea (dot) com_
  * twitter:  *[@FranGallegoBR](http://twitter.com/frangallegobr)*
- 
+
 ### Authors
 
  * **Project owner** 
