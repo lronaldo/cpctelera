@@ -10,7 +10,7 @@ routines to aid developers in the creation of games. The main aims of _**CPCtele
 _**CPCtelera**_ is still under develpment, at a very early stage. However, it is completely usable at the moment.
 
 **Installing and using** _**CPCtelera**_ is very easy:
- 1. Open a terminal (under Windows, you will have to install [Cygwin x86 (32 bits)](https://cygwin.com/) previously)
+ 1. Open a terminal (under Windows, you will have to install [Cygwin](https://cygwin.com/) previously)
  2. Clone _**CPCtelera**_ repository
    * `git clone https://github.com/lronaldo/cpctelera`
  3. Enter _**CPCtelera**_ folder
@@ -21,7 +21,10 @@ _**CPCtelera**_ is still under develpment, at a very early stage. However, it is
 Follow setup instructions. Setup checks that required software is previously installed, and shows messages if some prerrequisite is missing. If that were the case, install required software and launch setup again. Currenly, _**CPCtelera**_ requires these software to be installed:
  * Compilers: `gcc`, `g++`
  * Parsers: `make`, `bison`, `flex`
- * Libraries: `libboost-dev`, `ioperm`
+ * Utilities: `git`
+ * Libraries (OS X): `boost`
+ * Libraries (Linux): `libboost-dev`
+ * Libraries (Cygwin): `libboost-devel`,`libintl-devel`
 
 **Mac OSX**, previously to these requirements, needs to have installed: 
  * [Homebrew](http://brew.sh/)
@@ -39,7 +42,7 @@ For creating your own projects, _**CPCtelera**_ includes the `cpct_mkproject` sc
 If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
 
 _**CPCtelera**_ is fully usable and has been tested under these platforms:
- * Windows (with Cygwin x86, 32 bits)
+ * Windows (with Cygwin 32/64 bits)
  * OS X
  * Linux (Ubuntu/Debian, Raspbian, Arch and Manjaro)
 
