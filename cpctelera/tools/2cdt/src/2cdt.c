@@ -23,15 +23,6 @@ on the PC */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef UNIX
-#ifdef __APPLE__
-        #include <sys/uio.h>
-#else
-        #include <sys/io.h>
-#endif
-#else
-#include <io.h>
-#endif
 #include "defs.h"
 #include "tzxfile.h"
 #include "getopt.h"
