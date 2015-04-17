@@ -227,7 +227,7 @@ function EnsureCPPHeaderAvailable {
    g++ -o "$OUTTMP" -c "$SRCTMP" 2> "$ERRTMP"
    if [ -s "$ERRTMP" ]; then
       Error "$2"
-   fi 
+   fi
 }
 
 ## $1: PID of the process to monitor
