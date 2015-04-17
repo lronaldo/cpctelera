@@ -31,6 +31,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <assert.h>
 
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif
+
 #include "aslink.h"
 #include "lklibr.h"
 #include "lkrel.h"
@@ -923,8 +927,10 @@ loadfile_ar (struct lbfile *lbfh)
 
 #ifdef __CYGWIN__
   char posix_path[PATH_MAX];
-  void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
-  cygwin_conv_to_full_posix_path (lbfh->libspc, posix_path);
+  //void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
+  //cygwin_conv_to_full_posix_path (lbfh->libspc, posix_path);
+  cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, lbfh->libspc, posix_path, PATH_MAX);
+
   fp = fopen (posix_path, "rb");
 #else
   fp = fopen (lbfh->libspc, "rb");

@@ -44,6 +44,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif
+
 /* REMOVE ME!!! */
 extern int yyparse (void);
 
@@ -1738,9 +1742,11 @@ linkEdit (char **envp)
                           /* The CYGWIN version of the z80-gbz80 linker is getting confused with
                              windows paths, so convert them to the CYGWIN format */
                           char posix_path[PATH_MAX];
-                          void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
+                          //void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
+						  //ssize_t cygwin_conv_path(	cygwin_conv_path_t what; const void * from, void* to, size_t size);	
 
-                          cygwin_conv_to_full_posix_path ((char *) dbuf_c_str (&crtpath), posix_path);
+                          //cygwin_conv_to_full_posix_path ((char *) dbuf_c_str (&crtpath), posix_path);
+						  cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, (char *) dbuf_c_str (&crtpath), posix_path, PATH_MAX);
                           dbuf_set_length (&crtpath, 0);
                           dbuf_append_str (&crtpath, posix_path);
 #endif
@@ -1766,9 +1772,11 @@ linkEdit (char **envp)
                               /* The CYGWIN version of the z80-gbz80 linker is getting confused with
                                  windows paths, so convert them to the CYGWIN format */
                               char posix_path[PATH_MAX];
-                              void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
+                              //void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
 
-                              cygwin_conv_to_full_posix_path ((char *) dbuf_c_str (&crtpath), posix_path);
+                              //cygwin_conv_to_full_posix_path ((char *) dbuf_c_str (&crtpath), posix_path);
+							  cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, (char *) dbuf_c_str (&crtpath), posix_path, PATH_MAX);
+
                               dbuf_set_length (&crtpath, 0);
                               dbuf_append_str (&crtpath, posix_path);
 #endif
