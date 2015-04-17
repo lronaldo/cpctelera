@@ -475,3 +475,19 @@ function checkSystem {
    done
    return 1
 }
+
+## Echoes the bash profile initialization script file name
+##
+function bashProfileFilename {
+   FILES=($HOME/.bashrc $HOME/.bash_profile $HOME/.profile)
+   for F in ${FILES[*]}; do
+      if isFileReadable $F; then
+         echo $F
+         return 0
+      fi
+   done
+   ## Creates bash_profile, by default
+   touch $HOME/.bash_profile
+   echo $HOME/.bash_profile
+   return 0
+}

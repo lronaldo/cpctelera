@@ -89,6 +89,8 @@ REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp" "$LIBRARY2")
 LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
 LIBRARIES_EXPLANATION[1]="${REQUIRED_LIBRARIES[1]} is required to build SDCC, which makes use of internationalization. Please, install intltool / libintl-dev / libint-devel or similar in your system and run setup again."
 
+if false; then
+
 ###############################################################
 ###############################################################
 ## Perform CPCtelera requirements tests
@@ -165,6 +167,8 @@ if ! superviseBackgroundProcess "$!" "${CPCT_EXAMPLES_BUILD_LOG}" "${CPCT_EXAMPL
 fi
 drawOK
 
+fi
+
 ###############################################################
 ###############################################################
 ## Configuring environment and project templates
@@ -173,11 +177,7 @@ stageMessage "3" "Configuring CPCtelera environment"
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Setting up present CPCtelera folder as install directory and configuring routes and templates..."$'\n'
 
 ## Select System-dependent profile script
-if checkSystem "osx"; then
-   PROFILE=~/.profile
-else
-   PROFILE=~/.bashrc
-fi
+PROFILE=$(bashProfileFilename)
 
 # Configuring CPCTelera global path in templates
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera full path: ${COLOR_WHITE}${CPCT_MAIN_DIR}"$'\n'
@@ -187,7 +187,7 @@ drawOK
 
 # Configuring PATH to use CPCTelera scripts in the system
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera scripts path: ${COLOR_WHITE}${CPCT_SCRIPTS_DIR}"$'\n'
-coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to \$PATH variable in ${PROFILE}..."
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to ${COLOR_WHITE}\$PATH${COLOR_CYAN} variable in ${COLOR_WHITE}${PROFILE}${COLOR_CYAN}..."
 
 # First, eliminate previous instances of CPCTelera into PROFILE, then add new
 touch $PROFILE
