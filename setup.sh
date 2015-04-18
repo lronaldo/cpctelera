@@ -89,8 +89,6 @@ REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp" "$LIBRARY2")
 LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
 LIBRARIES_EXPLANATION[1]="${REQUIRED_LIBRARIES[1]} is required to build SDCC, which makes use of internationalization. Please, install intltool / libintl-dev / libint-devel or similar in your system and run setup again."
 
-if false; then
-
 ###############################################################
 ###############################################################
 ## Perform CPCtelera requirements tests
@@ -166,8 +164,6 @@ if ! superviseBackgroundProcess "$!" "${CPCT_EXAMPLES_BUILD_LOG}" "${CPCT_EXAMPL
    Error "There was an error building CPCtelera examples. Please, check '${CPCT_EXAMPLES_BUILD_LOG}' for details. Aborting. "
 fi
 drawOK
-
-fi
 
 ###############################################################
 ###############################################################
