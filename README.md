@@ -60,6 +60,7 @@ If you have any questions, please contact us:
  * **Project owner** 
    * [ronaldo](http://twitter.com/frangallegobr) / ([Cheesetea](http://www.cheesetea.com), [Fremos](http://fremos.cheesetea.com),  [ByteRealms](http://www.byterealms.com))
  * **Awesome collaborators**
+   * [Dardalorth](http://lalunadedardalorth.blogspot.com.es/) / [Fremos](http://fremos.cheesetea.com) / [Carlio](http://carlio.es)
    * [Fran Fernández](https://twitter.com/ronsonmaria) / [Pensando como Pollos](http://www.pensandocomopollos.com/) ([@ronsonmaria](https://twitter.com/ronsonmaria))
    * [Diego Freniche](http://blog.freniche.com) ([@dfreniche](https://twitter.com/dfreniche))
  * **Bitarrays idea and original implementation**
