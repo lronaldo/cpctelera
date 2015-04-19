@@ -247,14 +247,18 @@ function superviseBackgroundProcess {
    local LEFT
    local EXIT_STATUS
    while processRunning "$PROCPID"; do
-      BYTES=$(wc -c ${LOGFILE} | grep -Eo '[0-9]+ ')
-      PCT=$((BYTES * 100 / MAXBYTES))
-      LEFT=$((BARSIZE + 2 + ${#PCT}))
-      #saveCursorPos
-      drawProgressBar "${BARSIZE}" "${PCT}" ${COLOR_INVERTED_GREEN} ${COLOR_INVERTED_WHITE}
-      sleep ${SLEEPTIME}
-      #restoreCursorPos
-      cursorLeft $LEFT
+      if isFileReadable "$LOGFILE"; then
+         BYTES=$(wc -c ${LOGFILE} | grep -Eo '[0-9]+ ')
+         PCT=$((BYTES * 100 / MAXBYTES))
+         LEFT=$((BARSIZE + 2 + ${#PCT}))
+         #saveCursorPos
+         drawProgressBar "${BARSIZE}" "${PCT}" ${COLOR_INVERTED_GREEN} ${COLOR_INVERTED_WHITE}
+         sleep ${SLEEPTIME}
+         #restoreCursorPos
+         cursorLeft $LEFT
+      else
+         sleep ${SLEEPTIME}
+      fi
    done
    wait "$PROCPID" 
    EXIT_STATUS=$?
