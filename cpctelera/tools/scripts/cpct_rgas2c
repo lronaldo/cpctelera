@@ -1,0 +1,136 @@
+#!/bin/bash
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+##                        CPCTELERA ENGINE                               ##
+##          Script for converting rgas sprite output to C arrays         ##
+##-----------------------------------------------------------------------##
+## This script converts the RGAS sprite definition output in CPCRSLib    ##
+## format to C arrays, ready to be included in a project                 ##
+###########################################################################
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<filename>"
+   echo
+   echo "${COLOR_CYAN}  Converts a file containing sprite definitions in assembler (CPCRSLib format) \
+into C arrays."
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+##############################################################
+###############################################################
+## Check command line parameters
+##
+FILENAME=
+
+if (( $# < 1 )); then
+   usage
+fi
+
+while (( $# >= 1 )); do
+   case $1 in
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Get main parameter (ProjectDir)
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         elif ! isEmpty "$FILENAME"; then
+            paramError "Unrecognized parameter '$1'. Have you already provided a <filename> parameter?" 6
+         else
+            EnsureExists file "$1"
+         fi
+         FILENAME="$1"
+      ;;
+   esac
+   shift
+done
+
+###############################################################
+###############################################################
+## Read and convert file
+##
+STATUS=free
+SPRITENAME=
+LSIZE=$((15*5))
+while read LINE; do
+   TOKENS=( $LINE )
+   case $STATUS in
+      ## Looking for next sprite
+      free)
+         # If this is the start of a sprite, get name and initialize values
+         if [[ "${TOKENS[0]:0:2}" == "._" ]]; then
+            SPRITENAME=${TOKENS[0]:2}
+            SPRITENAME=${SPRITENAME//[^a-zA-Z0-9_-]/}
+            SPRITEDATA=
+            STATUS=sprite
+         fi
+      ;;
+      ## Parsing an Sprite
+      sprite)
+         # Sprite lines start with defb
+         if [[ "${TOKENS[0]}" == "defb" ]]; then
+            # Remove defb
+            if (( ${#SPRITEDATA} > 0 )); then
+               LINE=${LINE//defb /,}
+            else
+               LINE=${LINE//defb /}
+            fi
+            # Leave alone hexadecimal values, commas and dollars, and
+            #  then convert dollars into 0x
+            LINE=${LINE//[^0-9A-Fa-f,$]/}
+            LINE=${LINE//$/0x}
+
+            # Add this line to Sprite data
+            SPRITEDATA=${SPRITEDATA}${LINE}
+
+         # When no more defb is found, sprite has ended
+         else
+            ## Count bytes as number of commas + 1
+            BYTES=${SPRITEDATA//[^,]}
+            BYTES=$((${#BYTES} + 1))
+
+            # Print out sprite in C format
+            printf "const unsigned char G_%s[%s] = {\n" "$SPRITENAME" "$BYTES"
+            I=0
+            while (( I < ${#SPRITEDATA} )); do
+               echo "   ${SPRITEDATA:$I:$LSIZE}"
+               I=$((I+LSIZE))
+            done
+            echo "};"
+
+            STATUS=free
+         fi
+      ;;
+   esac
+done < $FILENAME
