@@ -91,7 +91,8 @@ while read LINE; do
          # If this is the start of a sprite, get name and initialize values
          if [[ "${TOKENS[0]:0:2}" == "._" ]]; then
             SPRITENAME=${TOKENS[0]:2}
-            SPRITENAME=${SPRITENAME//[^a-zA-Z0-9_-]/}
+            SPRITENAME=${SPRITENAME//[^a-zA-Z0-9_]/}
+            SPRITENAME=${SPRITENAME//[ñÑ]/ny}
             SPRITEDATA=
             STATUS=sprite
          fi
