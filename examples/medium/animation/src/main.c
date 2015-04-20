@@ -18,6 +18,7 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
+#include "entities.h"
 #include "sprites.h"
 
 //
@@ -40,18 +41,15 @@ void initializeCPC() {
 // MAIN EXAMPLE CODE
 //
 void main(void) {
-   unsigned char x=0, y=0;
-   char* dest = (char*)0xC000;
+   TEntity* persea;
 
    initializeCPC();
+   persea = getPersea();
 
    while(1) {
       cpct_scanKeyboardFast();
-      if      (cpct_isKeyPressed(Key_CursorRight) && x < 64 ) { x++; dest++; }
-      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
-      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
-      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 168) { dest += (++y & 7) ? 0x0800 : 0xC850; }
-
-      cpct_drawSprite(gc_PerseaWalk13, dest, 8, 24);
+      if      (cpct_isKeyPressed(Key_CursorRight) ) { moveEntityX(persea,  1); }
+      else if (cpct_isKeyPressed(Key_CursorLeft)  ) { moveEntityX(persea, -1); }
+      drawEntity(persea);
    }
 }
