@@ -80,12 +80,11 @@ COMMAND_EXPLANATION[2]="make is required for all CPCtelera's build systems. Plea
 COMMAND_EXPLANATION[3]="bison is required to compile SDCC. Please, install it an run setup again."
 COMMAND_EXPLANATION[4]="flex is required to compile SDCC. Please, install it an run setup again."
 
+REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
 ## libintl.h is not required in Mac OSX
 if ! checkSystem "osx"; then
-   LIBRARY2="libintl.h"
+   REQUIRED_LIBRARIES+=( "libintl.h" )
 fi
-
-REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp" "$LIBRARY2")
 LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
 LIBRARIES_EXPLANATION[1]="${REQUIRED_LIBRARIES[1]} is required to build SDCC, which makes use of internationalization. Please, install intltool / libintl-dev / libint-devel or similar in your system and run setup again."
 
