@@ -39,6 +39,9 @@ into C arrays."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo 
+   echo "${COLOR_LIGHT_BLUE}  -b | --bytes-per-line <numbytes>"
+   echo "${COLOR_CYAN}       Establishes the number of bytes to write at each array line in C. 16 by default."
+   echo ${COLOR_NORMAL}
    echo "${COLOR_LIGHT_BLUE}  -h | --help"
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
@@ -50,6 +53,7 @@ into C arrays."
 ## Check command line parameters
 ##
 FILENAME=
+BYTESPERLINE=16
 
 if (( $# < 1 )); then
    usage
@@ -57,6 +61,14 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Get number of bytes
+      "-b" | "--bytes-per-line")
+         if ! isInt "$2"; then
+            paramError "Parameter -b must be followed by an integer representing the number of bytes to write at each C line."
+         fi
+         BYTESPERLINE=$((10#$2))
+         shift
+      ;;
       ## Show Help
       "-h" | "--help")
          usage
@@ -82,7 +94,7 @@ done
 ##
 STATUS=free
 SPRITENAME=
-LSIZE=$((15*5))
+LSIZE=$(( BYTESPERLINE * 5 ))
 while read LINE; do
    TOKENS=( $LINE )
    case $STATUS in
