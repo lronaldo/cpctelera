@@ -28,10 +28,10 @@
 // Possible statuses of an animation
 //
 typedef enum {
-   as_stop,    // Not playing. Waiting for initialization
-   as_cycle,   // Playing continuosly
    as_play,    // Playing till the last frame
-   as_pause    // Paused, waiting to continue
+   as_cycle,   // Playing continuosly
+   as_pause,   // Paused, waiting to continue
+   as_end      // Animation has ended
 } TAnimStatus;
 
 //
@@ -61,7 +61,8 @@ typedef struct {
 typedef enum {
    es_dead,       // Entity dead
    es_stop,       // Entity stopped, not moving
-   es_walk,       // Entity walking
+   es_walk_right, // Entity walking
+   es_walk_left,  // Entity walking
    es_fist,       // Entity fisting
    es_kick,       // Entity kicking
    es_hit         // Entity is being hit
@@ -87,6 +88,8 @@ typedef struct {
 
 unsigned char *getScreenPointer(unsigned char y);
 TEntity* getPersea();
+void updateEntity(TEntity *ent);
+void setAnimation(TEntity *ent, TEntityStatus newstatus);
 char moveEntityX (TEntity* ent, char mx);
 char moveEntityY (TEntity* ent, char my);
 void drawEntity  (TEntity* ent);

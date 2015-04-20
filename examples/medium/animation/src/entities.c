@@ -33,18 +33,18 @@
 //
 const TAnimFrame g_allAnimFrames[11] = {
    // Walk Right Frames
-   { gc_PerseaWalk2,  8, 24, 0, 0, 2 }, // 0// Persea Walk Right 1,   change sprite, 2 cycles time
-   { gc_PerseaWalk13, 8, 24, 1, 0, 2 }, // 1// Persea Walk Right 2/4, moving 1 step forward, 2 cycles time
-   { gc_PerseaWalk4,  8, 24, 0, 0, 2 }, // 2// Persea Walk Right 3,   change sprite, 2 cycles time
+   { gc_PerseaWalk2,  8, 24, 2, 0, 4 }, // 0// Persea Walk Right 1,   change sprite, 2 cycles time
+   { gc_PerseaWalk13, 8, 24, 2, 0, 4 }, // 1// Persea Walk Right 2/4, moving 1 step forward, 2 cycles time
+   { gc_PerseaWalk4,  8, 24, 2, 0, 4 }, // 2// Persea Walk Right 3,   change sprite, 2 cycles time
    // Stay / Walk Left Frames
-   { gc_PerseaWalk4,  8, 24,-1, 0, 2 }, // 3// Persea Walk Left 1, 1 step backwards, 2 cycles time
-   { gc_PerseaWalk13, 8, 24, 0, 0, 2 }, // 4// Persea Stay / Walk left 2/4, change sprite
-   { gc_PerseaWalk2,  8, 24,-1, 0, 2 }, // 5// Persea Walk Left 3, 1 step backwards, 2 cycles time
+   { gc_PerseaWalk4,  8, 24,-2, 0, 4 }, // 3// Persea Walk Left 1, 1 step backwards, 2 cycles time
+   { gc_PerseaWalk13, 8, 24,-2, 0, 4 }, // 4// Persea Stay / Walk left 2/4, change sprite
+   { gc_PerseaWalk2,  8, 24,-2, 0, 4 }, // 5// Persea Walk Left 3, 1 step backwards, 2 cycles time
    // Fisting and Kicking animations
-   { gc_PerseaFist,   9, 24, 0, 0, 4 }, // 6// Persea Fist,   change sprite, 4 cycles time
-   { gc_PerseaKick,   9, 24, 0, 0, 5 }, // 7// Persea Fist,   change sprite, 5 cycles time
+   { gc_PerseaFist,   9, 24, 0, 0,15 }, // 6// Persea Fist,   change sprite, 4 cycles time
+   { gc_PerseaKick,   9, 24, 0, 0,20 }, // 7// Persea Fist,   change sprite, 5 cycles time
    // Receiving a Hit
-   { gc_PerseaHit,    8, 24, 0, 0, 3 }, // 8// Persea Hit,    change sprite, 3 cycles time
+   { gc_PerseaHit,    8, 24, 0, 0,20 }, // 8// Persea Hit,    change sprite, 3 cycles time
    // KO and winning
    { gc_PerseaKO,    12,  8,-4,16, 0 }, // 9// Persea Dies, move down, static
    { gc_PerseaWins,   8, 24, 0, 0, 0 }  //10// Persea Wins, change sprite, static
@@ -57,21 +57,21 @@ const TAnimFrame g_allAnimFrames[11] = {
 //
 // All complete animations used in this example (NULL terminated, to know the end of the array)
 //
-const TAnimFrame* g_animStay[2]      = { &FF[4], 0 };
-const TAnimFrame* g_animWalkRight[5] = { &FF[0], &FF[1], &FF[2], &FF[1], 0 };
-const TAnimFrame* g_animWalkLeft[5]  = { &FF[3], &FF[4], &FF[5], &FF[4], 0 };
-const TAnimFrame* g_animFist[3]      = { &FF[6], &FF[4], 0 };
-const TAnimFrame* g_animKick[3]      = { &FF[7], &FF[4], 0 };
-const TAnimFrame* g_animHit[3]       = { &FF[8], &FF[4], 0 };
-const TAnimFrame* g_animWin[2]       = { &FF[10], 0 };
-const TAnimFrame* g_animDie[2]       = { &FF[9], 0 };
+TAnimFrame* const g_animStay[2]      = { &FF[4], 0 };
+TAnimFrame* const g_animWalkRight[5] = { &FF[0], &FF[1], &FF[2], &FF[1], 0 };
+TAnimFrame* const g_animWalkLeft[5]  = { &FF[3], &FF[4], &FF[5], &FF[4], 0 };
+TAnimFrame* const g_animFist[3]      = { &FF[6], &FF[4], 0 };
+TAnimFrame* const g_animKick[3]      = { &FF[7], &FF[4], 0 };
+TAnimFrame* const g_animHit[3]       = { &FF[8], &FF[4], 0 };
+TAnimFrame* const g_animWin[2]       = { &FF[10], 0 };
+TAnimFrame* const g_animDie[2]       = { &FF[9], 0 };
 
 #undef FF
 
 //
 // Animation data that will use our main character, Persea, with its initial values
 //
-const TAnimation g_perseaAnimation = { g_animStay, 0, 0, as_stop };
+const TAnimation g_perseaAnimation = { g_animStay, 0, 0, as_pause };
 
 //
 // Persea main entity definition, with its initial values
@@ -213,6 +213,87 @@ char moveEntityY (TEntity* ent, char my) {
 
    // Report moved
    return moved;
+}
+
+//
+// Updates an animation
+//   Returns 1 when a new frame is reached, and 0 otherwise
+//
+char updateAnimation(TAnimation* anim) {
+   char newframe = 0;
+   
+   // Update only if animation is not paused or finished
+   if (anim->status != as_pause && anim->status != as_end) {
+      
+      // Update time and, If time has finished for this frame, get next
+      if ( ! --anim->time ) {
+         TAnimFrame* frame;
+         
+         // Next frame
+         newframe = 1;
+         frame = anim->frames[ ++anim->frame_id ];
+
+         // If frame is not null, we have a new frame, else animation may have ended or may recycle
+         if (frame) {
+            // New frame values
+            anim->time = frame->time;
+         } else if ( anim->status == as_cycle ) {
+            // Recycle to first frame
+            anim->frame_id = 0;
+            anim->time     = anim->frames[0]->time;
+         } else {
+            // End animation
+            anim->status = as_end;
+         }
+      }           
+   }  
+   
+   // Report if a new frame has started
+   return newframe;
+}
+
+//
+// Update an entity (do animation, move it, etc)
+//
+void updateEntity(TEntity *ent) {
+   TAnimation* anim = ent->anim;
+   
+   if ( updateAnimation(anim) ) {
+      if ( anim->status != as_end ) {
+         TAnimFrame* frame = anim->frames[anim->frame_id];
+         
+         // Move on X and Y if required
+         if (frame->mx) moveEntityX(ent, frame->mx);
+         if (frame->my) moveEntityY(ent, frame->my);
+      } else {
+         ent->status = es_stop;
+      }  
+   }
+}
+
+//
+// Set a new animation status to the entity, if follows
+//
+void setAnimation(TEntity *ent, TEntityStatus newstatus) {
+   TAnimation* anim = ent->anim;
+   
+   // Only set new status if different from previous one
+   if ( newstatus != ent->status || anim->status == as_end ) {
+      ent->status = newstatus;
+      
+      // Initialize new status
+      switch (newstatus) {
+         case es_dead:        { anim->frames = (TAnimFrame**)g_animDie;       anim->status=as_pause; break;  }
+         case es_stop:        { anim->frames = (TAnimFrame**)g_animStay;      anim->status=as_pause; break;  }
+         case es_walk_right:  { anim->frames = (TAnimFrame**)g_animWalkRight; anim->status=as_play;  break;  }
+         case es_walk_left:   { anim->frames = (TAnimFrame**)g_animWalkLeft;  anim->status=as_play;  break;  }
+         case es_fist:        { anim->frames = (TAnimFrame**)g_animFist;      anim->status=as_play;  break;  }
+         case es_kick:        { anim->frames = (TAnimFrame**)g_animKick;      anim->status=as_play;  break;  }
+         case es_hit:         { anim->frames = (TAnimFrame**)g_animHit;       anim->status=as_play;  break;  }
+      }
+      anim->frame_id = 0xFF;
+      anim->time = 1; //anim->frames[0]->time;
+   }
 }
 
 //

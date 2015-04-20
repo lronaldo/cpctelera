@@ -47,9 +47,23 @@ void main(void) {
    persea = getPersea();
 
    while(1) {
+      char spc = 0;
+      
       cpct_scanKeyboardFast();
-      if      (cpct_isKeyPressed(Key_CursorRight) ) { moveEntityX(persea,  1); }
-      else if (cpct_isKeyPressed(Key_CursorLeft)  ) { moveEntityX(persea, -1); }
-      drawEntity(persea);
+      if (cpct_isKeyPressed(Key_Space) ) spc = 1;
+      
+      if (cpct_isKeyPressed(Key_CursorRight) ) {
+         if (spc) setAnimation(persea, es_kick);
+             else setAnimation(persea, es_walk_right);
+      } else if (cpct_isKeyPressed(Key_CursorLeft)) { 
+         if (spc) setAnimation(persea, es_kick);
+             else setAnimation(persea, es_walk_left);         
+      } else if (spc) {
+         setAnimation(persea, es_fist);
+      }
+      updateEntity(persea);
+
+      cpct_waitVSYNC();
+      drawEntity(persea);      
    }
 }
