@@ -293,8 +293,10 @@ void setAnimation(TEntity *ent, TEntityStatus newstatus) {
          case es_kick:        { anim->frames = (TAnimFrame**)g_animKick;      anim->status=as_play;  break;  }
          case es_hit:         { anim->frames = (TAnimFrame**)g_animHit;       anim->status=as_play;  break;  }
       }
+      // Set values as if this was -1 frame (previous to initial 0 frame)
+      // This will make updateAnimation jump to frame 0 on first update, executing frame 0 moves on enter.
       anim->frame_id = 0xFF;
-      anim->time = 1; //anim->frames[0]->time;
+      anim->time = 1;
    }
 }
 
