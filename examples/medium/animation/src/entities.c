@@ -31,14 +31,14 @@
 //
 // All the animation frames to be used in this example
 //
-const TAnimFrame g_allAnimFrames[11] = {
+const TAnimFrame g_allAnimFrames[12] = {
    // Walk Right Frames
    { gc_PerseaWalk2,  8, 24, 2, 0, 4 }, // 0// Persea Walk Right 1,   change sprite, 2 cycles time
    { gc_PerseaWalk13, 8, 24, 2, 0, 4 }, // 1// Persea Walk Right 2/4, moving 1 step forward, 2 cycles time
    { gc_PerseaWalk4,  8, 24, 2, 0, 4 }, // 2// Persea Walk Right 3,   change sprite, 2 cycles time
-   // Stay / Walk Left Frames
+   // Walk Left Frames
    { gc_PerseaWalk4,  8, 24,-2, 0, 4 }, // 3// Persea Walk Left 1, 1 step backwards, 2 cycles time
-   { gc_PerseaWalk13, 8, 24,-2, 0, 4 }, // 4// Persea Stay / Walk left 2/4, change sprite
+   { gc_PerseaWalk13, 8, 24,-2, 0, 4 }, // 4// Persea Walk left 2/4, change sprite
    { gc_PerseaWalk2,  8, 24,-2, 0, 4 }, // 5// Persea Walk Left 3, 1 step backwards, 2 cycles time
    // Fisting and Kicking animations
    { gc_PerseaFist,   9, 24, 0, 0,15 }, // 6// Persea Fist,   change sprite, 4 cycles time
@@ -47,7 +47,9 @@ const TAnimFrame g_allAnimFrames[11] = {
    { gc_PerseaHit,    8, 24, 0, 0,20 }, // 8// Persea Hit,    change sprite, 3 cycles time
    // KO and winning
    { gc_PerseaKO,    12,  8,-4,16, 0 }, // 9// Persea Dies, move down, static
-   { gc_PerseaWins,   8, 24, 0, 0, 0 }  //10// Persea Wins, change sprite, static
+   { gc_PerseaWins,   8, 24, 0, 0, 0 }, //10// Persea Wins, change sprite, static
+   // Stay 
+   { gc_PerseaWalk13, 8, 24, 0, 0, 0 }  //11// Persea Stays, change frame, static
 };
 
 
@@ -60,9 +62,9 @@ const TAnimFrame g_allAnimFrames[11] = {
 TAnimFrame* const g_animStay[2]      = { &FF[4], 0 };
 TAnimFrame* const g_animWalkRight[5] = { &FF[0], &FF[1], &FF[2], &FF[1], 0 };
 TAnimFrame* const g_animWalkLeft[5]  = { &FF[3], &FF[4], &FF[5], &FF[4], 0 };
-TAnimFrame* const g_animFist[3]      = { &FF[6], &FF[4], 0 };
-TAnimFrame* const g_animKick[3]      = { &FF[7], &FF[4], 0 };
-TAnimFrame* const g_animHit[3]       = { &FF[8], &FF[4], 0 };
+TAnimFrame* const g_animFist[3]      = { &FF[6], &FF[11], 0 };
+TAnimFrame* const g_animKick[3]      = { &FF[7], &FF[11], 0 };
+TAnimFrame* const g_animHit[3]       = { &FF[8], &FF[11], 0 };
 TAnimFrame* const g_animWin[2]       = { &FF[10], 0 };
 TAnimFrame* const g_animDie[2]       = { &FF[9], 0 };
 
