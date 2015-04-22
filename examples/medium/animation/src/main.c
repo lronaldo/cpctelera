@@ -35,6 +35,43 @@ void initializeCPC() {
 
    // Change to Mode 0 (160x200, 16 colours)
    cpct_setVideoMode(0);
+
+   // Draw Sky and Fremos Logo
+   cpct_drawSolidBox((void*)0xC000, 0xCC, 40, 60);
+   cpct_drawSolidBox((void*)0xC028, 0xCC, 40, 60);
+   cpct_drawSprite(gc_LogoFremos, (void*)0xC0FC, 55, 20);
+
+   // Draw Floor
+   cpct_drawSolidBox((void*)0xC3C0, 0xFF, 40, 8);
+   cpct_drawSolidBox((void*)0xC3E8, 0xFF, 40, 8);
+
+   // Draw Underfloor
+   cpct_drawSolidBox((void*)0xC410, 0xCC, 40, 96);
+   cpct_drawSolidBox((void*)0xC438, 0xCC, 40, 96);
+}
+
+//
+// Scan Keyboard and do user actions as requested
+//
+void updateUser(TEntity* user) {
+   // Animation Request (new entity status to promote)
+   TEntityStatus animrequest = es_stop;
+
+   // Scan Keyboard
+   cpct_scanKeyboardFast();
+
+   // Check possible keys to press, and do actions
+   if      ( cpct_isKeyPressed(Key_Space)       ) animrequest = es_hit;
+   else if ( cpct_isKeyPressed(Key_CursorUp)    ) animrequest = es_kick;
+   else if ( cpct_isKeyPressed(Key_CursorDown)  ) animrequest = es_fist;
+   else if ( cpct_isKeyPressed(Key_CursorRight) ) animrequest = es_walk_right;
+   else if ( cpct_isKeyPressed(Key_CursorLeft)  ) animrequest = es_walk_left;
+   else if ( cpct_isKeyPressed(Key_1)           ) animrequest = es_dead;
+   else if ( cpct_isKeyPressed(Key_2)           ) animrequest = es_win;
+
+   // Set new animation, based on action requested
+   if (animrequest != es_stop)
+      setAnimation(user, animrequest);
 }
 
 //
@@ -43,27 +80,15 @@ void initializeCPC() {
 void main(void) {
    TEntity* persea;
 
+   // Initialize game
    initializeCPC();
    persea = getPersea();
 
+   // Main Game Loop
    while(1) {
-      char spc = 0;
-
-      cpct_scanKeyboardFast();
-      if (cpct_isKeyPressed(Key_Space) ) spc = 1;
-
-      if (cpct_isKeyPressed(Key_CursorRight) ) {
-         if (spc) setAnimation(persea, es_kick);
-            else  setAnimation(persea, es_walk_right);
-      } else if (cpct_isKeyPressed(Key_CursorLeft)) { 
-         if (spc) setAnimation(persea, es_kick);
-            else  setAnimation(persea, es_walk_left);
-      } else if (spc) {
-         setAnimation(persea, es_fist);
-      }
-      updateEntity(persea);
-
+      updateUser(persea);
       cpct_waitVSYNC();
+      updateEntity(persea);
       drawEntity(persea);
    }
 }

@@ -41,6 +41,7 @@ typedef struct {
    unsigned char* sprite;        // Sprite associated to this frame
    unsigned char  width, height; // Sprite dimensions in bytes
             char  mx, my;        // Pixel movements, in bytes, to be executed at the start of this Frame
+            char  ex, ew, eh;    // Pixel bytes to erase (ew, eh=width and height of box to be eliminated, ex=X displacement, in bytes, from the top-left corner)
    unsigned char  time;          // Time that the sprite should be shown
 } TAnimFrame;
 
@@ -65,6 +66,7 @@ typedef enum {
    es_walk_left,  // Entity walking
    es_fist,       // Entity fisting
    es_kick,       // Entity kicking
+   es_win,        // Entity Winning
    es_hit         // Entity is being hit
 } TEntityStatus;
 

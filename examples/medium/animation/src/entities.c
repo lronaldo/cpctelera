@@ -31,25 +31,27 @@
 //
 // All the animation frames to be used in this example
 //
-const TAnimFrame g_allAnimFrames[12] = {
+const TAnimFrame g_allAnimFrames[14] = {
    // Walk Right Frames
-   { gc_PerseaWalk2,  8, 24, 2, 0, 4 }, // 0// Persea Walk Right 1,   change sprite, 2 cycles time
-   { gc_PerseaWalk13, 8, 24, 2, 0, 4 }, // 1// Persea Walk Right 2/4, moving 1 step forward, 2 cycles time
-   { gc_PerseaWalk4,  8, 24, 2, 0, 4 }, // 2// Persea Walk Right 3,   change sprite, 2 cycles time
+   { gc_PerseaWalk2,  8, 24, 2,  0,  0,  0,  0,  4 }, // 0// Persea Walk Right 1,   change sprite, 2 cycles time
+   { gc_PerseaWalk13, 8, 24, 2,  0,  0,  3, 24,  4 }, // 1// Persea Walk Right 2/4, moving 1 step forward, 2 cycles time
+   { gc_PerseaWalk4,  8, 24, 2,  0,  0,  0,  0,  4 }, // 2// Persea Walk Right 3,   change sprite, 2 cycles time
    // Walk Left Frames
-   { gc_PerseaWalk4,  8, 24,-2, 0, 4 }, // 3// Persea Walk Left 1, 1 step backwards, 2 cycles time
-   { gc_PerseaWalk13, 8, 24,-2, 0, 4 }, // 4// Persea Walk left 2/4, change sprite
-   { gc_PerseaWalk2,  8, 24,-2, 0, 4 }, // 5// Persea Walk Left 3, 1 step backwards, 2 cycles time
+   { gc_PerseaWalk4,  8, 24,-2,  0,  0,  0,  0,  4 }, // 3// Persea Walk Left 1, 1 step backwards, 2 cycles time
+   { gc_PerseaWalk13, 8, 24,-2,  0,  6,  3, 24,  4 }, // 4// Persea Walk left 2/4, change sprite
+   { gc_PerseaWalk2,  8, 24,-2,  0,  0,  0,  0,  4 }, // 5// Persea Walk Left 3, 1 step backwards, 2 cycles time
    // Fisting and Kicking animations
-   { gc_PerseaFist,   9, 24, 0, 0,15 }, // 6// Persea Fist,   change sprite, 4 cycles time
-   { gc_PerseaKick,   9, 24, 0, 0,20 }, // 7// Persea Fist,   change sprite, 5 cycles time
+   { gc_PerseaFist,   9, 24, 0,  0,  6,  3,  6, 15 }, // 6// Persea Fist,   change sprite, 4 cycles time
+   { gc_PerseaKick,   9, 24, 0,  0,  6,  3, 12, 25 }, // 7// Persea Fist,   change sprite, 5 cycles time
    // Receiving a Hit
-   { gc_PerseaHit,    8, 24, 0, 0,20 }, // 8// Persea Hit,    change sprite, 3 cycles time
+   { gc_PerseaHit,    8, 24, 0,  0,  0,  0,  0, 25 }, // 8// Persea Hit,    change sprite, 3 cycles time
    // KO and winning
-   { gc_PerseaKO,    12,  8,-4,16, 0 }, // 9// Persea Dies, move down, static
-   { gc_PerseaWins,   8, 24, 0, 0, 0 }, //10// Persea Wins, change sprite, static
+   { gc_PerseaKO,    12,  8,-4, 16,  2,  4, 16, 50 }, // 9// Persea Dies, move down, static
+   { gc_PerseaWins,   8, 24, 0,  0,  0,  0,  0, 50 }, //10// Persea Wins, change sprite, static
    // Stay 
-   { gc_PerseaWalk13, 8, 24, 0, 0, 0 }  //11// Persea Stays, change frame, static
+   { gc_PerseaWalk13, 8, 24, 0,  0,  6,  3, 24,  1 }, //11// Persea Stays after kick or fist, change frame, static
+   { gc_PerseaWalk13, 8, 24, 0,  0,  0,  0,  0,  1 }, //12// Persea Stays after hit, change frame, static
+   { gc_PerseaWalk13, 8, 24, 4,-16,  0, 12,  8,  1 }  //13// Persea Stays after dead, change frame, static
 };
 
 
@@ -64,21 +66,21 @@ TAnimFrame* const g_animWalkRight[5] = { &FF[0], &FF[1], &FF[2], &FF[1], 0 };
 TAnimFrame* const g_animWalkLeft[5]  = { &FF[3], &FF[4], &FF[5], &FF[4], 0 };
 TAnimFrame* const g_animFist[3]      = { &FF[6], &FF[11], 0 };
 TAnimFrame* const g_animKick[3]      = { &FF[7], &FF[11], 0 };
-TAnimFrame* const g_animHit[3]       = { &FF[8], &FF[11], 0 };
-TAnimFrame* const g_animWin[2]       = { &FF[10], 0 };
-TAnimFrame* const g_animDie[2]       = { &FF[9], 0 };
+TAnimFrame* const g_animHit[3]       = { &FF[8], &FF[12], 0 };
+TAnimFrame* const g_animWin[3]       = { &FF[10],&FF[11], 0 };
+TAnimFrame* const g_animDie[3]       = { &FF[9], &FF[13], 0 };
 
 #undef FF
 
 //
 // Animation data that will use our main character, Persea, with its initial values
 //
-const TAnimation g_perseaAnimation = { g_animStay, 0, 0, as_pause };
+const TAnimation g_perseaAnimation = { g_animStay, 0, 0, as_end };
 
 //
 // Persea main entity definition, with its initial values
 //
-const TEntity g_persea = { &g_perseaAnimation, 0xC000, 0, 0, es_stop };
+const TEntity g_persea = { &g_perseaAnimation, 0xC2D0, 0, 72, es_stop };
 
 //
 // Some global constants defining our world
@@ -113,10 +115,10 @@ unsigned char *getScreenPointer(unsigned char y) {
 // moved 'mx' pixels, taking into account that the entity cannot go beyond
 // limits (0 and 'Screen width'). 
 // If the entity tries to pass the limits, it is stopped at them.
-// This function returns 1 when entity has been moved, 0 otherwise
+// This function returns NumMovedBytes when entity has been moved, 0 otherwise
 //
 char moveEntityX (TEntity* ent, char mx) {
-   unsigned char moved = 0;// Tells us if the entity has been moved or not
+   unsigned char moved = 0;// Tells us how many bytes the entity has moved
    unsigned char umx;      // Holds the value of mx without sign (always positive)
 
    // Case 1: Moving to the left (negative ammount of pixels)
@@ -127,12 +129,12 @@ char moveEntityX (TEntity* ent, char mx) {
       if (umx <= ent->x) {
          ent->x        -= umx;
          ent->videopos -= umx;
-         moved          = 1;
+         moved          = mx;
       } else if (ent->x) {
          // movement tryied to pass 0 limit, adjusting to 0
          ent->videopos -= ent->x;
+         moved          = -ent->x;
          ent->x         = 0;
-         moved          = 1;
       }
    // Case 2: Moving to the right (positive amount of pixels)
    } else if (mx) {
@@ -149,12 +151,12 @@ char moveEntityX (TEntity* ent, char mx) {
       if (umx <= space_left) {
          ent->x        += umx;
          ent->videopos += umx;
-         moved         = 1;
+         moved         = umx;
       } else if (space_left) {
          // Moving more than available space: adjusting to available space bounce
          ent->x        += space_left;
          ent->videopos += space_left;
-         moved         = 1;
+         moved         = space_left;
       }
    }
 
@@ -167,11 +169,11 @@ char moveEntityX (TEntity* ent, char mx) {
 // moved 'my' pixels, taking into account that the entity cannot go beyond
 // limits (0 and 'Screen Height'). 
 // If the entity is stopped from passing limits, it will be stopped at them.
-// This function returns 1 when entity has been moved, 0 otherwise
+// This function returns NumMovedBytes when entity has been moved, 0 otherwise
 //
 char moveEntityY (TEntity* ent, char my) {
-   char moved = 0;
-   unsigned char umy;
+   char moved = 0;      // Number of bytes the entity has moved 
+   unsigned char umy;   // Holds the value of my without sign (always positive)
 
    // Case 1: Moving up (negative ammount of pixels)
    if (my < 0) {
@@ -181,12 +183,12 @@ char moveEntityY (TEntity* ent, char my) {
       if (umy <= ent->y) {
          ent->y        -= umy;
          ent->videopos  = getScreenPointer(ent->y) + ent->x;
-         moved          = 1;
+         moved          = my;
       } else if ( ent->y ) {
          // movement tryied to pass 0 limit, adjusting to 0 
          ent->videopos  = (unsigned char*)0xC000 + ent->x;
+         moved          = -ent->y;
          ent->y         = 0;
-         moved          = 1;
       }
    // Case 1: Moving down (positive ammount of pixels)
    } else if (my) {
@@ -201,11 +203,11 @@ char moveEntityY (TEntity* ent, char my) {
       // Check if we are trying to move more than the available space or not
       if (umy <= space_left) {
          ent->y  += umy;
-         moved    = 1;
+         moved    = umy;
       } else if (space_left) {
          // Moving more than available space: adjusting to available space 
          ent->y  += space_left;
-         moved    = 1;
+         moved    = space_left;
       }
       if (moved) {
          // Recalculating video pos when y has been changed
@@ -213,7 +215,7 @@ char moveEntityY (TEntity* ent, char my) {
       }
    }
 
-   // Report moved
+   // Report moved bytes
    return moved;
 }
 
@@ -223,14 +225,14 @@ char moveEntityY (TEntity* ent, char my) {
 //
 char updateAnimation(TAnimation* anim) {
    char newframe = 0;
-   
+
    // Update only if animation is not paused or finished
    if (anim->status != as_pause && anim->status != as_end) {
-      
+
       // Update time and, If time has finished for this frame, get next
       if ( ! --anim->time ) {
          TAnimFrame* frame;
-         
+
          // Next frame
          newframe = 1;
          frame = anim->frames[ ++anim->frame_id ];
@@ -247,29 +249,35 @@ char updateAnimation(TAnimation* anim) {
             // End animation
             anim->status = as_end;
          }
-      }           
-   }  
-   
+      }
+   }
+
    // Report if a new frame has started
    return newframe;
 }
 
 //
-// Update an entity (do animation, move it, etc)
+// Update an entity (do animation, move it, clear screen left-out pixels, etc)
 //
 void updateEntity(TEntity *ent) {
    TAnimation* anim = ent->anim;
-   
+
    if ( updateAnimation(anim) ) {
       if ( anim->status != as_end ) {
          TAnimFrame* frame = anim->frames[anim->frame_id];
-         
+
          // Move on X and Y if required
+         if (frame->ew) cpct_drawSolidBox(ent->videopos + (int)frame->ex, 0x00, frame->ew, frame->eh);
          if (frame->mx) moveEntityX(ent, frame->mx);
          if (frame->my) moveEntityY(ent, frame->my);
+
+         // Check for available screen space on animation frame change
+         if (frame->width + ent->x > g_SCR_WIDTH) {
+            moveEntityX(ent, -1);
+         }
       } else {
          ent->status = es_stop;
-      }  
+      }
    }
 }
 
@@ -278,23 +286,25 @@ void updateEntity(TEntity *ent) {
 //
 void setAnimation(TEntity *ent, TEntityStatus newstatus) {
    TAnimation* anim = ent->anim;
-   
-   // Only set new status if different from previous one
-   if ( newstatus != ent->status || anim->status == as_end ) {
+
+   // Only set new status if previous one has already ended
+   if ( anim->status == as_end ) {
       ent->status = newstatus;
-      
+
       // Initialize new status
       switch (newstatus) {
-         case es_dead:        { anim->frames = (TAnimFrame**)g_animDie;       anim->status=as_pause; break;  }
-         case es_stop:        { anim->frames = (TAnimFrame**)g_animStay;      anim->status=as_pause; break;  }
-         case es_walk_right:  { anim->frames = (TAnimFrame**)g_animWalkRight; anim->status=as_play;  break;  }
-         case es_walk_left:   { anim->frames = (TAnimFrame**)g_animWalkLeft;  anim->status=as_play;  break;  }
-         case es_fist:        { anim->frames = (TAnimFrame**)g_animFist;      anim->status=as_play;  break;  }
-         case es_kick:        { anim->frames = (TAnimFrame**)g_animKick;      anim->status=as_play;  break;  }
-         case es_hit:         { anim->frames = (TAnimFrame**)g_animHit;       anim->status=as_play;  break;  }
+         case es_dead:        { anim->frames = (TAnimFrame**)g_animDie;       break;  }
+         case es_stop:        { anim->frames = (TAnimFrame**)g_animStay;      break;  }
+         case es_walk_right:  { anim->frames = (TAnimFrame**)g_animWalkRight; break;  }
+         case es_walk_left:   { anim->frames = (TAnimFrame**)g_animWalkLeft;  break;  }
+         case es_fist:        { anim->frames = (TAnimFrame**)g_animFist;      break;  }
+         case es_kick:        { anim->frames = (TAnimFrame**)g_animKick;      break;  }
+         case es_win:         { anim->frames = (TAnimFrame**)g_animWin;       break;  }
+         case es_hit:         { anim->frames = (TAnimFrame**)g_animHit;       break;  }
       }
       // Set values as if this was -1 frame (previous to initial 0 frame)
       // This will make updateAnimation jump to frame 0 on first update, executing frame 0 moves on enter.
+      anim->status=as_play;
       anim->frame_id = 0xFF;
       anim->time = 1;
    }
