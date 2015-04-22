@@ -37,8 +37,10 @@ extern void cpct_drawSprite4x8_aligned(void *sprite, void* memory);
 extern void cpct_drawSprite4x8Fast_aligned(void *sprite, void* memory);
 extern void cpct_drawSprite(void *sprite, void* memory, unsigned char width, unsigned char height);
 extern void cpct_drawMaskedSprite(void *maskedSprite, void* memory, unsigned char width, unsigned char height);
+extern void cpct_drawSolidBox(void *memory, unsigned char colour_pattern, unsigned char width, unsigned char height);
 extern void cpct_setVideoMemoryPage(char page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset(char offset);
 extern void cpct_memset(void *array, unsigned int size, unsigned char value);
+
 
 #endif
