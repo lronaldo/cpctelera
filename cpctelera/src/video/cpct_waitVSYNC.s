@@ -19,42 +19,49 @@
 
 .include /videomode.s/
 
-;
-;########################################################################
-;## FUNCTION: _cpct_waitVSYNC                                         ###
-;########################################################################
-;### This function waits for the VSYNC signal from the CRTC. This     ###
-;### signal means that the monitor has finished drawing the last frame###
-;### and it is returning to the top left of the screen to start draw- ###
-;### ing the next one. This is useful to synchronize routines to the  ###
-;### 50Hz drawing display.                                            ###
-;### This function reads bytes from PPI Port B, whose bits mean:      ###
-;### BIT  NAME     DESCRIPTION                                        ###
-;### ---------------------------------------------------------------- ###
-;### 7    CAS.IN   Cassette data input                                ###
-;### 6    RN.BUSY  Parallel/Printer port signal, "0"=ready,"1"= Not R.###
-;### 5    /EXP     Expansion Port /EXP pin                            ###
-;### 4    LK4      Screen Refresh Rate ("1"=50Hz, "0"=60Hz)           ###
-;### 3    LK3      3bit Distributor ID. Usually set to 4=Awa,         ###
-;### 2    LK2        5=Schneider, or 7=Amstrad, see LK-selectable     ###
-;### 1    LK1        Brand Names for details.                         ###
-;### 0    CRTC     Vertical Sync ("1"=VSYNC active, "0"=inactive)     ###
-;########################################################################
-;### INPUTS (0 Bytes)                                                 ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC                               ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 8 bytes                                                  ###
-;### TIME:                                                            ###
-;###  Best Case:  43 cycles        (10,75 us)                         ###
-;###  Worst Case: 17 + 26*L cycles ()                                 ###
-;### NOTE: As this is an active wait loop, it does not actually mind  ###
-;###       at all the time needed to process. It will vary depending  ###
-;###       on how much time has passed since the last VSYNC.          ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function: void cpct_waitVSYNC()
+;;
+;; This function waits for the VSYNC signal from the CRTC. This
+;; signal means that the monitor has finished drawing the last frame
+;; and it is returning to the top left of the screen to start draw-
+;; ing the next one. This is useful to synchronize routines to the
+;; 50Hz drawing display.
+;; 
+;; This function reads bytes from PPI Port B, whose bits mean...
+;; (start code)
+;; BIT  NAME     DESCRIPTION
+;; ---------------------------------------------------------------- 
+;; 7    CAS.IN   Cassette data input
+;; 6    RN.BUSY  Parallel/Printer port signal, "0"=ready,"1"= Not R.
+;; 5    /EXP     Expansion Port /EXP pin
+;; 4    LK4      Screen Refresh Rate ("1"=50Hz, "0"=60Hz)
+;; 3    LK3      3bit Distributor ID. Usually set to 4=Awa,
+;; 2    LK2        5=Schneider, or 7=Amstrad, see LK-selectable
+;; 1    LK1        Brand Names for details.
+;; 0    CRTC     Vertical Sync ("1"=VSYNC active, "0"=inactive)
+;; (end)
+;;
+;; Destroyed Register values: 
+;;   AF, BC
+;;
+;; Required memory:
+;;   8 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case  | Cycles    | microSecs (us)
+;; ----------------------------------
+;; Best  | 43        |  10,75
+;; Worst | 17 + 26*L |  xx,xx
+;; (end code)
+;;
+;; NOTE:
+;;  As this is an active wait loop, it does not actually mind
+;;  at all the time needed to process. It will vary depending
+;;  on how much time has passed since the last VSYNC.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _cpct_waitVSYNC::
    ld  b, #PPI_PORT_B;; [ 7] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
 
