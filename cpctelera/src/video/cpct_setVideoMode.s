@@ -25,47 +25,73 @@
 
 .include /videomode.s/
 
-;
-;########################################################################
-;## FUNCTION: _cpct_setVideoMode                                      ###
-;########################################################################
-;### This function establishes the video mode for the Amstrad CPC.    ###
-;### Video modes available are:                                       ###
-;###  0: 160x200, 16 colours                                          ###
-;###  1: 320x200,  4 colours                                          ###
-;###  2: 640x200,  2 colours                                          ###
-;###  3: 160x200,  4 colours (undocumented)                           ###
-;### Important: Do not use this method when the firmware is up and    ###
-;###    running, as it modifies Upper and Lower ROM paging.           ###
-;########################################################################
-;### INPUTS (1 Byte)                                                  ###
-;###  * (1B A) Video mode to set (0-3:only lowest 2 bits will be used)###
-;###   WARNING: If parameter is >3, unexpected results my happen.     ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, HL                           ###
-;########################################################################
-;### MEASURED TIME                                                    ###
-;###  71 cycles (17.75 us)                                            ###
-;########################################################################
-;### CREDITS:                                                         ###
-;###  This function was coded copying and modifying cpc_setMode from  ###
-;### cpcrslib by Raul Simarro.                                        ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function: cpct_setVideoMode
+;;
+;; Brief:
+;;    Sets the video mode of the CPC Screen, changing resolution and palette size.
+;;
+;; C Definition:
+;;    void *cpct_setVideoMode* (u8 *videoMode*)
+;;
+;; Input Parameters (1 Byte):
+;;    (1B A) videoMode - [0-3] Video mode to set
+;;
+;; Parameter Restrictions: 
+;;  - *videomode* must be < 3, otherwise unexpected results may happen. Namely,
+;; ROM/RAM pagination and Interrupt Status may get altered, typically yielding
+;; erratic behaviour and/or crashes.
+;;
+;; Requirements:
+;;    This function requires the CPC *firmware* to be *DISABLED*. Otherwise, it
+;; may not work, as firmware tends to restore video mode to its own selection.
+;;
+;; Details:
+;;    This function changes the video mode for the Amstrad CPC into one of the
+;; 4 standard modes available. This 4 standard video modes are:
+;; (start code)
+;; Mode | Resolution | # of colours
+;; -----|------------|-------------------
+;;  0   |  160x200   |   16
+;;  1   |  320x200   |    4
+;;  2   |  640x200   |    2
+;;  3   |  160x200   |    4 (undocumented)
+;; (end)
+;;    The way this function works is by sending a SET_VIDEO_MODE command directly
+;; to the Gate Array (GA), through the 0x7F port. The 2 least significant bits from
+;; the byte sent to the GA contain the desired videomode.
+;;
+;; Destroyed Register values:
+;;    AF, BC, HL
+;;
+;; Required memory:
+;;    18 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case  | Cycles | microSecs (us)
+;; -------------------------------
+;; Any   |  71    |  17.75
+;; (end code)
+;;
+;; Credits:
+;;    This function was coded copying and modifying cpc_setMode from
+;; cpcrslib by Raul Simarro.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _cpct_setVideoMode::
-   ;; Get Parameter (Mode to select) from stack
-   LD   HL, #2               ;; [10] HL = SP + 2 (Place where parameters are in the stack)
-   ADD  HL, SP               ;; [11]
-   LD   C, (HL)              ;; [ 7] A = First Paramter (Video Mode to be selected)
+   ;; Get Parameter from stack
+   ld   hl, #2               ;; [10] HL = SP + 2 (Place where parameters are in the stack)
+   add  hl, sp               ;; [11]
+   ld    c, (hl)             ;; [ 7] A = First Paramter (Video Mode to be selected)
 
-   LD   HL, #cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
-   LD   A, (HL)              ;; [ 7] A = Present values for MODE, INT.GEN and ROM selection. (See mode_rom_status)
-   AND #0xFC                 ;; [ 7] A = (xxxxxx00) set bits 1,0 to 0, to prepare them for inserting the mode parameter
-   OR   C                    ;; [ 4] A = Mixes previously selected ING.GEN and ROM values with user selected MODE (last 2 bits)
-   LD   B,  #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
-   OUT (C), A                ;; [12] GA Command: Set Video Mode
+   ld   hl, #cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
+   ld    a, (hl)             ;; [ 7] A = Present values for MODE, INT.GEN and ROM selection. (See mode_rom_status)
+   and #0xFC                 ;; [ 7] A = (xxxxxx00) set bits 1,0 to 0, to prepare them for inserting the mode parameter
+   or    c                   ;; [ 4] A = Mixes previously selected ING.GEN and ROM values with user selected MODE (last 2 bits)
+   ld    b, #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
+   out (c), a                ;; [12] GA Command: Set Video Mode
 
-   LD (HL), A                ;; [ 7] Save new Mode and ROM status for later use if required
+   ld (hl), a                ;; [ 7] Save new Mode and ROM status for later use if required
 
-   RET                       ;; [10] Return
+   ret                       ;; [10] Return
