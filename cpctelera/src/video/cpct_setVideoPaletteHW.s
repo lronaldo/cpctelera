@@ -39,15 +39,16 @@
 ;;  (1B A ) size          - [1 - 16] Number of colours to change
 ;;
 ;; Parameter Restrictions:
-;;  * *colour_array* must be an array of unsigned 8-bit values (u8), each one 
+;;  * *colour_array* must be an array of unsigned 8-bit values (u8), each one
 ;; in the [0-31] range.
-;;  * *size* must be between 1 and 16. A size of 0 will be treated as 16, and any 
-;; value greater than 16 will be modularized into [1-16] range (using only least 
+;;  * *size* must be between 1 and 16. A size of 0 will be treated as 16, and any
+;; value greater than 16 will be modularized into [1-16] range (using only least
 ;; significant 4 bits)
 ;;
 ;; Requirements:
 ;;    This function requires the CPC *firmware* to be *DISABLED*. Otherwise, it
-;; may not work, as firmware tends to restore video mode to its own selection.
+;; may not work, as firmware tends to restore palette colour values to its own
+;; selection.
 ;;
 ;; Details:
 ;;    This function modifies hardware palette registers to set new colours to

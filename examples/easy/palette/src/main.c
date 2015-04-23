@@ -24,7 +24,7 @@ const unsigned char c_palette[16] = {  1, 24, 20,  6, 26,  0,  2,  8,
                                       10, 12, 14, 16, 18, 22, 24, 16};
 
 // Correspondant hardware colour values, used by CRTC registers. This may be used
-// directly to the cpct_setVideoPaletteHW function, without previous conversion.
+// directly to the cpct_setPalette function, without previous conversion.
 //const unsigned char c_palette[16] = { 0x04, 0x0A, 0x13, 0x0C, 0x0B, 0x14, 0x15, 0x0D,
 //                                      0x06, 0x1E, 0x1F, 0x07, 0x12, 0x19, 0x0A, 0x07 };
 
