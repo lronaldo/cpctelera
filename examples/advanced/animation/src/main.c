@@ -31,7 +31,7 @@ void initializeCPC() {
 
    // Set the hardware palette (convert firmware colour values to hardware ones and set the palette)
    cpct_fw2hw(gc_palette, 16);
-   cpct_setVideoPaletteHW(gc_palette, 16);
+   cpct_setPalette(gc_palette, 16);
 
    // Change to Mode 0 (160x200, 16 colours)
    cpct_setVideoMode(0);

@@ -26,14 +26,28 @@
 .include /videomode.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Function: void cpct_setVideoPaletteHW(byte* colour_array, byte size);
+;; Function: cpct_setPalette
 ;;
 ;; Brief:
-;;    Changes the hardware palette colour values (selecting new ones). 
+;;    Changes the hardware palette colour values (selecting new ones).
+;;
+;; C Definition:
+;;    void *cpct_setPalette* (u8* *colour_array*, u8 *size*)
 ;;
 ;; Input Parameters (3 Bytes):
 ;;  (2B DE) colour_array  - Pointer to a byte array containing new hardware colour values [0 - 31]
-;;  (1B A ) size          - [1 - 16] Number of colours to change   
+;;  (1B A ) size          - [1 - 16] Number of colours to change
+;;
+;; Parameter Restrictions:
+;;  * *colour_array* must be an array of unsigned 8-bit values (u8), each one 
+;; in the [0-31] range.
+;;  * *size* must be between 1 and 16. A size of 0 will be treated as 16, and any 
+;; value greater than 16 will be modularized into [1-16] range (using only least 
+;; significant 4 bits)
+;;
+;; Requirements:
+;;    This function requires the CPC *firmware* to be *DISABLED*. Otherwise, it
+;; may not work, as firmware tends to restore video mode to its own selection.
 ;;
 ;; Details:
 ;;    This function modifies hardware palette registers to set new colours to
@@ -119,7 +133,7 @@
 ;; http://www.grimware.org/doku.php/documentations/devices/gatearray
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_setVideoPaletteHW::
+_cpct_setPalette::
    ;; Getting parameters from stack
    ld  hl, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
    add hl, sp               ;; [11]

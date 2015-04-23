@@ -76,9 +76,9 @@ void main(void) {
    cpct_disableFirmware();
 
    // Set up palette and border 
-   cpct_fw2hw(gc_palette, 16);             // Convert firmware color values to hardware values
-   cpct_setVideoBorderHW(gc_palette[2]);   // Set the border
-   cpct_setVideoPaletteHW(gc_palette, 16); // Set the palette
+   cpct_fw2hw(gc_palette, 16);           // Convert firmware color values to hardware values
+   cpct_setVideoBorderHW(gc_palette[2]); // Set the border
+   cpct_setPalette(gc_palette, 16);      // Set the palette
 
    // Set video mode to 0 (160x200, 16 colours)
    cpct_setVideoMode(0);
