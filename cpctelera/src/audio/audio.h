@@ -26,14 +26,14 @@
 #ifndef CPCT_AUDIO_H
 #define CPCT_AUDIO_H
 
-void cpct_arkosPlayer_songInit(void* songdata);
-void cpct_arkosPlayer_songPlay();
-void cpct_arkosPlayer_songStop();
-void cpct_arkosPlayer_enableSFX (unsigned char enable_bitmask);
-void cpct_arkosPlayer_disableSFX(unsigned char disable_bitmask);
-void cpct_arkosPlayer_SFXInit(void* sfx_song_data);
-void cpct_arkosPlayer_SFXStopAll();
-void cpct_arkosPlayer_SFXStop(unsigned char stop_bitmask);
-void cpct_arkosPlayer_SFXPlay(unsigned char sfx_num, unsigned char volume, unsigned char note, unsigned char speed, unsigned int inverted_pitch, unsigned char channel_num);
+extern void cpct_arkosPlayer_songInit   (void* songdata);
+extern void cpct_arkosPlayer_songPlay   ();
+extern void cpct_arkosPlayer_songStop   ();
+extern void cpct_arkosPlayer_enableSFX  (u8 enable_bitmask);
+extern void cpct_arkosPlayer_disableSFX (u8 disable_bitmask);
+extern void cpct_arkosPlayer_SFXInit    (void* sfx_song_data);
+extern void cpct_arkosPlayer_SFXStopAll ();
+extern void cpct_arkosPlayer_SFXStop    (u8 stop_bitmask);
+extern void cpct_arkosPlayer_SFXPlay    (u8 sfx_num, u8 volume, u8 note, u8 speed, u16 inverted_pitch, u8 channel_num);
 
 #endif

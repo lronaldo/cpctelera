@@ -19,15 +19,15 @@
 #ifndef CPCT_VIDEOMODE_H
 #define CPCT_VIDEOMODE_H
 
+#include <types.h>
+
 #define cpct_setVideoBorderHW(A) cpct_setVideoINKHW(16, (A))
 
-typedef unsigned char byte;
-
-extern void cpct_setVideoMode(byte videoMode);
-extern void cpct_setVideoPaletteHW(byte* ink_array, byte ink_array_size);
-extern void cpct_setVideoINKHW(byte pen, byte ink);
+extern void cpct_setVideoMode(u8 videoMode);
+extern void cpct_setVideoPaletteHW(u8* ink_array, u8 ink_array_size);
+extern void cpct_setVideoINKHW(u8 pen, u8 ink);
 extern void cpct_waitVSYNC();
-extern byte cpct_getHWColour(byte firmware_colour);
-extern void cpct_fw2hw(void *fw_colour_array, byte size);
+extern   u8 cpct_getHWColour(u8 firmware_colour);
+extern void cpct_fw2hw(void *fw_colour_array, u8 size);
 
 #endif

@@ -30,15 +30,17 @@
 #ifndef CPCT_BITARRAY_H
 #define CPCT_BITARRAY_H
 
+#include <types.h>
+
 ///
 /// Function Declarations
 ///
-extern unsigned char cpct_getBit(void *array, unsigned int pos);
-extern unsigned char cpct_get2Bits(void *array, unsigned int pos);
-extern unsigned char cpct_get4Bits(void *array, unsigned int pos);
+extern   u8 cpct_getBit  (void *array, u16 pos);
+extern   u8 cpct_get2Bits(void *array, u16 pos);
+extern   u8 cpct_get4Bits(void *array, u16 pos);
 
-extern void cpct_setBit(void *array, unsigned int pos, unsigned char value);
-extern void cpct_set2Bits(void *array, unsigned int pos, unsigned char value);
-extern void cpct_set4Bits(void *array, unsigned int pos, unsigned char value);
+extern void cpct_setBit  (void *array, u16 pos, u8 value);
+extern void cpct_set2Bits(void *array, u16 pos, u8 value);
+extern void cpct_set4Bits(void *array, u16 pos, u8 value);
 
 #endif

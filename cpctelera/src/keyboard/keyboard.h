@@ -111,18 +111,26 @@
 #ifndef CPCT_KEYBOARD_H
 #define CPCT_KEYBOARD_H
 
+#include <types.h>
+
+///
+/// Declare type for CPC keys
+///
+enum cpct_e_keyID;
+typedef enum cpct_e_keyID cpct_keyID;
+
 ///
 /// Function Declarations
 ///
-extern void cpct_scanKeyboard();
-extern void cpct_scanKeyboardFast();
-extern unsigned char cpct_isKeyPressed(unsigned int key);
+extern void cpct_scanKeyboard     ();
+extern void cpct_scanKeyboardFast ();
+extern   u8 cpct_isKeyPressed     (cpct_keyID key);
 
 ///
 /// KEY DEFINITIONS
 /// Enumerated value with symbols for all the 80 possible Key/Joy definitions
 ///
-typedef enum cpct_keyID
+enum cpct_e_keyID
 {
   // Matrix Line 00h
   Key_CursorUp     = 0x0100,  // Bit 0 (01h) => | 0000 0001 |
@@ -230,5 +238,6 @@ typedef enum cpct_keyID
   Key_Joy0Fire2    = 0x2009,
   Key_Joy0Fire3    = 0x4009,
   Key_Del          = 0x8009
-} cpct_keyID;
+};
+
 #endif
