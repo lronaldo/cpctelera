@@ -19,21 +19,26 @@
 
 .include /videomode.s/
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: void cpct_waitVSYNC()
 ;;
-;; This function waits for the VSYNC signal from the CRTC. This
-;; signal means that the monitor has finished drawing the last frame
-;; and it is returning to the top left of the screen to start draw-
-;; ing the next one. This is useful to synchronize routines to the
+;; Brief:
+;;    Waits until CRTC produces vertical synchronization signal (VSYNC) and returns.
+;;
+;; Details:
+;;    This function implements a wait loop that exists only when VSYNC signal 
+;; from the CRTC is detected. This signal means that the monitor has finished 
+;; drawing the last frame and it is returning to the top left of the screen 
+;; to start drawing the next one. This is useful to synchronize routines with the
 ;; 50Hz drawing display.
 ;; 
-;; This function reads bytes from PPI Port B, whose bits mean...
+;; To detect VSYNC signal status, function reads bytes from PPI Port B. 
+;; Every byte read the port has this information:
 ;; (start code)
 ;; BIT  NAME     DESCRIPTION
 ;; ---------------------------------------------------------------- 
 ;; 7    CAS.IN   Cassette data input
-;; 6    RN.BUSY  Parallel/Printer port signal, "0"=ready,"1"= Not R.
+;; 6    RN.BUSY  Parallel/Printer port signal, "0"=ready,"1"= Not Ready
 ;; 5    /EXP     Expansion Port /EXP pin
 ;; 4    LK4      Screen Refresh Rate ("1"=50Hz, "0"=60Hz)
 ;; 3    LK3      3bit Distributor ID. Usually set to 4=Awa,
@@ -41,6 +46,11 @@
 ;; 1    LK1        Brand Names for details.
 ;; 0    CRTC     Vertical Sync ("1"=VSYNC active, "0"=inactive)
 ;; (end)
+;; So, checking the bit 0 of a byte comming from PPI Port B tells us if
+;; VSYNC is active or not.
+;; This function is optimized for size (instead of space) as it is a wait loop
+;; and does not make sense making it faster. It will stop when VSYNC is detected
+;; no matter how fast the loop is.
 ;;
 ;; Destroyed Register values: 
 ;;   AF, BC
@@ -52,15 +62,16 @@
 ;; (start code)
 ;; Case  | Cycles    | microSecs (us)
 ;; ----------------------------------
-;; Best  | 43        |  10,75
-;; Worst | 17 + 26*L |  xx,xx
+;; Best  | 40        |  10,00
+;; Any   | 17 + 28*L |  3,00 + 7,00*L
 ;; (end code)
+;;    L=Number of times loop is executed
 ;;
 ;; NOTE:
 ;;  As this is an active wait loop, it does not actually mind
 ;;  at all the time needed to process. It will vary depending
 ;;  on how much time has passed since the last VSYNC.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_waitVSYNC::
    ld  b, #PPI_PORT_B;; [ 7] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
@@ -68,6 +79,6 @@ _cpct_waitVSYNC::
 wvs_wait:
    in  a,(c)         ;; [12] A = Status register got from PPI port B
    rra               ;; [ 4] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
-   jr  nc, wvs_wait  ;; [10] No Carry means No VSYNC, so loop While No Carry
+   jr  nc, wvs_wait  ;; [12/7] No Carry means No VSYNC, so loop While No Carry
 
    ret               ;; [10] Carry Set, VSYNC Active, Return
