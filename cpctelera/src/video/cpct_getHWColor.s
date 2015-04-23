@@ -24,6 +24,7 @@
 .module cpct_videomode
 
 .include /videomode.s/
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_getHWColour
 ;;
