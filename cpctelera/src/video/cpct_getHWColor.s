@@ -24,29 +24,40 @@
 .module cpct_videomode
 
 .include /videomode.s/
-
-;
-;########################################################################
-;## FUNCTION: _cpct_getHWColor                                        ###
-;########################################################################
-;### Returns the hardware colour value (0-31) for a given firmware    ###
-;### colour value (0-26). The colour value returned can be used by    ###
-;### other palette functions requiring hardware colour values.        ###
-;########################################################################
-;### INPUTS (1 Byte)                                                  ###
-;###  * (1B C) Firmware INK colour value to convert (0-26)            ### 
-;########################################################################
-;### RETURN VALUE                                                     ###
-;###  Returns a byte value, 0-31, with the hardware colour value      ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: BC, HL                               ###
-;########################################################################
-;### MEASURES                                                         ###
-;###  MEMORY: 40 bytes (13 code + 27 colour table)                    ###
-;###  TIME: 63 cycles (16.00 ns)                                      ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function: cpct_getHWColour
+;;
+;;    Converts a firmware colour value into its equivalent hardware one.
+;;
+;; C Definition:
+;;    u8 *cpct_getHWColour* (u8 *firmware_colour*)
+;;
+;; Input Parameters (1 Bytes):
+;;    (1B C) firmware_colour - [0-26] Firmware colour value to be converted (Similar to BASIC's INK value)
+;;
+;; Parameter Restrictions:
+;;    * *firmware_colour* must be in the range [0-26], otherwise, return value will be unexpected.
+;;
+;; Return Value:
+;;    u8 - [0-31] Hardware colour value corresponding to *firmware_colour* provided.
+;;
+;; Details:
+;;    Uses the *firmware_colour* as index in a conversion table to get its equivalent hardware
+;; value. You can find this equivalences in the table 1 of the <cpct_setPalette> explanation.
+;;
+;; Destroyed Register values:
+;;    BC, HL
+;;
+;; Required memory:
+;;    40 bytes (13 bytes code, 27 bytes colour conversion table)
+;;
+;; Time Measures:
+;; (start code)
+;; Case  | Cycles | microSecs (us)
+;; -------------------------------
+;; Any   |  63    |  15.75
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Colour table
 cpct_firmware2hw_colour:: 

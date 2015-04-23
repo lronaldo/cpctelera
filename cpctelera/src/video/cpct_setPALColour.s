@@ -28,7 +28,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_setPALColour
 ;;
-;; Brief:
 ;;   Changes one colour value of the Palette, similarly to BASIC's INK instruction.
 ;;
 ;; C Definition:

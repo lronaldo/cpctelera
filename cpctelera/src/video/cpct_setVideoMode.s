@@ -28,7 +28,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_setVideoMode
 ;;
-;; Brief:
 ;;    Sets the video mode of the CPC Screen, changing resolution and palette size.
 ;;
 ;; C Definition:
