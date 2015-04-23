@@ -20,10 +20,13 @@
 .include /videomode.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Function: void cpct_waitVSYNC()
+;; Function: cpct_waitVSYNC
 ;;
 ;; Brief:
 ;;    Waits until CRTC produces vertical synchronization signal (VSYNC) and returns.
+;;
+;; C Definition:
+;;    void *cpct_waitVSYNC* ()
 ;;
 ;; Details:
 ;;    This function implements a wait loop that exists only when VSYNC signal 

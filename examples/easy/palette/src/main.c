@@ -48,8 +48,8 @@ void main(void) {
 
    cpct_disableFirmware();
    cpct_setVideoMode(0);
-   cpct_fw2hw(palette, 16);               // Converts colours from firmware values (BASIC INKs) to hardware values
-   cpct_setVideoPaletteHW(palette, 16);   // Uses hardware colours to set up the video palette
+   cpct_fw2hw(palette, 16);      // Converts colours from firmware values (BASIC INKs) to hardware values
+   cpct_setPalette(palette, 16); // Uses hardware colours to set up the video palette
 
    while(1) {
       if (t) t--;
@@ -61,7 +61,7 @@ void main(void) {
       else if (cpct_isKeyPressed(Key_CursorDown)  && y < 168) { dest += (++y & 7) ? 0x0800 : 0xC850; }
       if      (cpct_isKeyPressed(Key_Space) && !t) {
           rotatePalette(palette, 16);
-          cpct_setVideoPaletteHW(palette, 16);
+          cpct_setPalette(palette, 16);
           t=50;
       } else if (cpct_isKeyPressed(Key_Enter) && !t) {
           cpct_setVideoBorderHW(++border);
