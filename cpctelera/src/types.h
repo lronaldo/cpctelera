@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,16 +16,24 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
+#ifndef CPCTELERA_TYPES_H
+#define CPCTELERA_TYPES_H
 
-#include "types.h"
-#include "firmware/firmware.h"
-#include "video/videomode.h"
-#include "sprites/sprites.h"
-#include "keyboard/keyboard.h"
-#include "strings/strings.h"
-#include "bitarray/bitarray.h"
-#include "audio/audio.h"
+///
+/// Short useful aliases for standard SDCC built-in types
+///  * u = unsigned
+///  * i = integer (signed)
+///  * f = float
+///  * Type is followed by number of bits (8, 16, 32, 64)
+///
+typedef unsigned char       u8; 
+typedef char                i8;
+typedef unsigned int       u16;
+typedef int                i16;
+typedef unsigned long      u32;
+typedef long               i32;
+typedef unsigned long long u64;
+typedef long long          i64;
+typedef float              f32;
 
 #endif
