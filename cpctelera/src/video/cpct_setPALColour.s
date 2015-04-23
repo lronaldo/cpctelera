@@ -26,13 +26,13 @@
 .include /videomode.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Function: cpct_setVideoINKHW
+;; Function: cpct_setPALColour
 ;;
 ;; Brief:
 ;;   Changes one colour value of the Palette, similarly to BASIC's INK instruction.
 ;;
 ;; C Definition:
-;;    void *cpct_setVideoINKHW* (u8 *pen*, u8 *hw_ink*)
+;;    void *cpct_setPALColour* (u8 *pen*, u8 *hw_ink*)
 ;;
 ;; Input Parameters (2 Bytes):
 ;;    (1B C) pen    - [0-16] Index of the palette colour to change. Similar to PEN Number in BASIC.
@@ -83,7 +83,7 @@
 ;; http://www.grimware.org/doku.php/documentations/devices/gatearray
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_setVideoINKHW::
+_cpct_setPALColour::
    ld    hl, #2            ;; [10] HL = SP + 2 (Place where parameters start) 
    add   hl, sp            ;; [11]
    ld     c, (hl)          ;; [ 7] C = First Parameter (PEN)
@@ -95,6 +95,6 @@ _cpct_setVideoINKHW::
    out  (c), c             ;; [12] GA command: Select PENR. C = Command + Parameter (PENR + PEN number to select)
 
    or  #PAL_INKR           ;; [ 7] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for INKR number (n). 
-   out   (c), a            ;; [11] GA command: Set INKR. A = Command + Parameter (INKR + INK to be set for selected PEN number)
+   out  (c), a             ;; [11] GA command: Set INKR. A = Command + Parameter (INKR + INK to be set for selected PEN number)
 
    ret                     ;; [10] Return

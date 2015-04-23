@@ -22,7 +22,7 @@
 #include <types.h>
 
 // Changing the border is the same as changing PEN 16
-#define cpct_setVideoBorderHW(A) cpct_setVideoINKHW(16, (A))
+#define cpct_setVideoBorderHW(A) cpct_setPALColour(16, (A))
 
 // Setting Video Mode
 extern void cpct_setVideoMode  (u8 videoMode);
@@ -31,9 +31,9 @@ extern void cpct_setVideoMode  (u8 videoMode);
 extern void cpct_waitVSYNC     ();
 
 // Palette functions
-extern void cpct_fw2hw         (void *fw_colour_array, u8 size);
-extern void cpct_setPalette    (u8* ink_array, u8 ink_array_size);
-extern   u8 cpct_getHWColour   (u8 firmware_colour);
-extern void cpct_setVideoINKHW (u8 pen, u8 hw_ink);
+extern void cpct_fw2hw        (void *fw_colour_array, u8 size);
+extern void cpct_setPalette   (u8* ink_array, u8 ink_array_size);
+extern   u8 cpct_getHWColour  (u8 firmware_colour);
+extern void cpct_setPALColour (u8 pen, u8 hw_ink);
 
 #endif

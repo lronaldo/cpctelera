@@ -70,7 +70,7 @@ void main(void) {
          for (k=0; k<16; k++) {
             if (cpct_isKeyPressed(c_palkeys[k]) && !t) {
                palette[k] = (palette[k] + 1) & 0x1F;
-               cpct_setVideoINKHW(k, palette[k]);
+               cpct_setPALColour(k, palette[k]);
                t=25;
             }
          }
