@@ -64,7 +64,7 @@ void main(void) {
           cpct_setPalette(palette, 16);
           t=50;
       } else if (cpct_isKeyPressed(Key_Enter) && !t) {
-          cpct_setVideoBorderHW(++border);
+          cpct_setBorderColour(++border);
           t=25;
       } else {
          for (k=0; k<16; k++) {

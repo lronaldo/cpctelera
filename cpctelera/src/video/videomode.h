@@ -21,9 +21,6 @@
 
 #include <types.h>
 
-// Changing the border is the same as changing PEN 16
-#define cpct_setVideoBorderHW(A) cpct_setPALColour(16, (A))
-
 // Setting Video Mode
 extern void cpct_setVideoMode  (u8 videoMode);
 
@@ -35,5 +32,29 @@ extern void cpct_fw2hw        (void *fw_colour_array, u8 size);
 extern void cpct_setPalette   (u8* ink_array, u8 ink_array_size);
 extern   u8 cpct_getHWColour  (u8 firmware_colour);
 extern void cpct_setPALColour (u8 pen, u8 hw_ink);
+
+///
+/// Function: cpct_setBorderColour
+///
+/// Brief:
+///   Changes the colour of the screen border.
+///
+/// C Definition:
+///   #define *cpct_setBorderColour* (HW_C)  <cpct_setPALColour> (16, (HW_C))
+///
+/// Input Parameters (1 Byte):
+///   *HW_C* - Hardware colour value for the screen border.
+///
+/// More information:
+///   This is not a real function, but a C macro. Beware of using it along
+/// with complex expressions or calculations, as it may expand in non-desired
+/// ways.
+///
+///   For more information, check the real function <cpct_setPALColour>, which
+/// is called when using *cpct_setBorderColour* (It is called using 16 as *pen*
+/// argument, which identifies the border).
+///
+#define cpct_setBorderColour(HW_C) cpct_setPALColour(16, (HW_C))
+
 
 #endif
