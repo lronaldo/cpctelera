@@ -67,16 +67,15 @@ cpct_firmware2hw_colour::
   .db 0x12, 0x02, 0x13, 0x1A, 0x19, 0x1B, 0x0A, 0x03, 0x0B
 
 _cpct_getHWColour::
-   LD  HL, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
-   LD   B, H                ;; [ 4] B = 0, to be able to use C as an incremente for HL (adding BC)
-   ADD HL, SP               ;; [11]
-   LD   C, (HL)             ;; [ 7] A = Firmware INK colour value 
-   
-   LD  HL, #cpct_firmware2hw_colour ;; [10] HL points to the start of the colour table
-   ADD HL, BC               ;; [11] HL += C (as B=0), HL points to the exact hardware color value to return
+   ld   hl, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
+   ld    b, h                ;; [ 4] B = 0, to be able to use C as an incremente for HL (adding BC)
+   add  hl, sp               ;; [11]
+   ld    c, (hl)             ;; [ 7] A = Firmware INK colour value 
 
-   LD   L, (HL)             ;; [ 7] L = Return value (hardware colour for firmware colour supplied)
-   LD   H, B                ;; [ 4] H = 0, to leave HL just with the value of L
+   ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the colour table
+   add  hl, bc               ;; [11] HL += C (as B=0), HL points to the exact hardware color value to return
 
-   RET                      ;; [10] Return
-   
+   ld    l, (hl)             ;; [ 7] L = Return value (hardware colour for firmware colour supplied)
+   ld    h, b                ;; [ 4] H = 0, to leave HL just with the value of L
+
+   ret                      ;; [10] Return
