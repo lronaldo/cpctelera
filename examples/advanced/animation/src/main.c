@@ -37,8 +37,8 @@ void initializeCPC() {
    cpct_setVideoMode(0);
 
    // Draw Sky and Fremos Logo
-   cpct_drawSolidBox((void*)0xC000, 0xCC, 40, 60);
-   cpct_drawSolidBox((void*)0xC028, 0xCC, 40, 60);
+   cpct_drawSolidBox((void*)0xC000, 0x30, 40, 60);
+   cpct_drawSolidBox((void*)0xC028, 0x30, 40, 60);
    cpct_drawSprite(gc_LogoFremos, (void*)0xC0FC, 55, 20);
 
    // Draw Floor
@@ -46,8 +46,8 @@ void initializeCPC() {
    cpct_drawSolidBox((void*)0xC3E8, 0xFF, 40, 8);
 
    // Draw Underfloor
-   cpct_drawSolidBox((void*)0xC410, 0xCC, 40, 96);
-   cpct_drawSolidBox((void*)0xC438, 0xCC, 40, 96);
+   cpct_drawSolidBox((void*)0xC410, 0x30, 40, 96);
+   cpct_drawSolidBox((void*)0xC438, 0x30, 40, 96);
 }
 
 //
