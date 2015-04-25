@@ -56,7 +56,7 @@ void main(void) {
       for(times=0; times < 16; times++) {
          colors[0] ^= 0x01;
          for(charnum=1; charnum != 0; charnum++) {
-            cpct_drawROMCharM2(video_pos, colors[0], charnum);
+            cpct_drawCharM2(video_pos, colors[0], charnum);
             video_pos = incrementedVideoPos(video_pos, 1);
          }
       }
@@ -73,7 +73,7 @@ void main(void) {
             colors[2] = (colors[2] + 1) & 0x03;
          }
          for(charnum=1; charnum != 0; charnum++) {
-            cpct_drawROMCharM1_fast(video_pos, colors[1], colors[2], charnum);
+            cpct_drawCharM1_f(video_pos, colors[1], colors[2], charnum);
             video_pos = incrementedVideoPos(video_pos, 2);
          }
       }
@@ -90,7 +90,7 @@ void main(void) {
             colors[4] = (colors[4] + 1) & 0x07;
          }
          for(charnum=1; charnum != 0; charnum++) {
-            cpct_drawROMCharM0(video_pos, colors[3], colors[4], charnum);
+            cpct_drawCharM0(video_pos, colors[3], colors[4], charnum);
             video_pos = incrementedVideoPos(video_pos, 4);
          }
       }

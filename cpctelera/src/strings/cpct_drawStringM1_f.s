@@ -21,14 +21,14 @@
 ;; Include constants and general values
 ;;
 .include /strings.s/
-.globl _cpct_drawROMCharM2_asm
+.globl _cpct_drawCharM1_f_asm
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_drawROMStringM2                                   ###
+;## FUNCTION: _cpct_drawROMStringM1_fast                              ###
 ;########################################################################
 ;### This function receives a null terminated string and draws it to  ###
-;### the screen in mode 2, using _cpct_drawROMCharM2 to draw every    ###
+;### the screen in mode 1, using _cpct_drawROMCharM1_fast to draw each###
 ;### character.                                                       ###
 ;### * Some IMPORTANT things to take into account:                    ###
 ;###  -- This routine does not check for boundaries. If you draw too  ###
@@ -44,59 +44,75 @@
 ;###     ted at whichever memory bank, except 0000h (4000h-FFFFh)     ###
 ;###  -- This function disables interrupts during main loop (charac-  ###
 ;###     ter printing). It reenables them at the end.                 ###
-;###  -- Do not pass numbers greater that 15 as color parameters, as  ###
+;###  -- Do not pass numbers greater that 3 as color parameters, as   ###
 ;###     they are used as indexes in a color table, and results may   ###
 ;###     be unpredictable                                             ###
 ;########################################################################
 ;### INPUTS (5 Bytes)                                                 ###
 ;###  * (2B HL) Pointer to the null terminated string being drawn     ### 
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
-;###  * (1B B) Foreground color (PEN, 0-1)                            ###
+;###  * (1B C) Foreground color (PEN, 0-3)                            ###
+;###  * (1B B) Background color (PEN, 0-3)                            ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY:  41 bytes (+ 144 bytes drawROMCharM0)                    ###
+;### MEASURES (Way 2 for parameter retrieval from stack)              ###
+;### MEMORY:  34 bytes (+351 bytes drawROMCharM1_fast)                ###
 ;### TIME:                                                            ###
-;###  Best case  = 179 + (120+3704)*len cycles                        ###
-;###  Worst case = 179 + (120+4384)*len cycles                        ###
+;###  Best case  = 145 + (108+1878)*length cycles                     ###
+;###  Worst case = 145 + (108+2596)*length cycles                     ###
+;### EXAMPLES:                                                        ###
+;###  10 character string = [20005-27187]cycles [5001,25- 6796,75]us  ###
+;###  20 character string = [39865-54225]cycles [9966,25-13556,25]us  ###
 ;########################################################################
 ;
 
-_cpct_drawROMStringM2::
-   ;; GET Parameters from the stack (Pop + Restoring SP)
-   ld (drsm2_restoreSP+1), sp          ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+_cpct_drawStringM1_f::
+   ;; Get parameters form stack
+.if let_disable_interrupts_for_function_parameters
+   ;; Way 1: Pop + Restoring SP. Faster, but consumes 7 bytes more, and requires disabling interrupts
+   ld (drsm1f_restoreSP+1), sp         ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    di                                  ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    pop  af                             ;; [10] AF = Return Address
    pop  hl                             ;; [10] HL = Pointer to the null terminated string
    pop  de                             ;; [10] DE = Destination address (Video memory location where character will be printed)
-   pop  bc                             ;; [10] C = Foreground color (0 / 1, Background inverted) 
-drsm2_restoreSP:
+   pop  bc                             ;; [10] BC = Colors (B=Background color, C=Foreground color) 
+drsm1f_restoreSP:
    ld sp, #0                           ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    ei                                  ;; [ 4] Enable interrupts again
+.else 
+   ;; Way 2: Pop + Push. Just 8 cycles more, but does not require disabling interrupts
+   pop  af                             ;; [10] AF = Return Address
+   pop  hl                             ;; [10] HL = Pointer to the null terminated string
+   pop  de                             ;; [10] DE = Destination address (Video memory location where character will be printed)
+   pop  bc                             ;; [10] BC = Colors (B=Background color, C=Foreground color) 
+   push bc                             ;; [11] Restore Stack status pushing values again
+   push de                             ;; [11] (Interrupt safe way, 8 cycles more)
+   push hl                             ;; [11]
+   push af                             ;; [11]
+.endif
 
-   ld a, c                             ;; [ 4] A = Foreground color
-   ld (drsm2_firstChar+1), a           ;; [ 7] Save foreground color in its placeholder to be restored at every step in the loop
-   jp drsm2_firstChar                  ;; [10] Jump to first char
+   ld (drsm1f_values+1), bc            ;; [20] Save BC as LD direct value to be read later for saving color values (Foreground and Background)
+   jp drsm1f_firstChar                 ;; [10] Jump to first char
 
-drsm2_nextChar:
+drsm1f_nextChar:
    push hl                             ;; [11] Save HL and DE to the stack befor calling draw char
    push de                             ;; [11]
-   ld  b, a                            ;; [ 4] B = Next character to be drawn
-   call _cpct_drawROMCharM2_asm        ;; [17] Draw next char
+   call _cpct_drawCharM1_f_asm         ;; [17] Draw next char
    pop  de                             ;; [10] Recover HL and DE from the stack
    pop  hl                             ;; [10]
 
-   ;; Increment pointer values
-   inc  de                             ;; [ 6] DE += 1 (point to next position in video memory, 8 pixels to the right)
+drsm1f_values:
+   ld   bc, #00                        ;; [10] Restore BC value (Foreground and Background colors)
+   inc  de                             ;; [ 6] DE += 2 (point to next position in video memory, 8 pixels to the right)
+   inc  de                             ;; [ 6]
    inc  hl                             ;; [ 6] HL += 1 (point to next character in the string)
 
-drsm2_firstChar:
-   ld  c, #0                           ;; [ 7] Restore C value (Foreground color)
+drsm1f_firstChar:
    ld  a, (hl)                         ;; [ 7] A = next character from the string
    or  a                               ;; [ 4] Check if A = 0
-   jp  nz, drsm2_nextChar              ;; [10] if A != 0, A is next character, draw it, else end
+   jp  nz, drsm1f_nextChar             ;; [10] if A != 0, A is next character, draw it, else end
 
-drsm2_endString:
+drsm1f_endString:
    ret                                 ;; [10] Return

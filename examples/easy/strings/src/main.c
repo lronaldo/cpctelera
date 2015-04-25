@@ -47,7 +47,7 @@ void main(void) {
       video_pos = (unsigned char*)0xC000;
       for (times=0; times < 24; times++) {
          colors[0] = ++colors[0] & 15;
-         cpct_drawROMStringM0("$ Mode 0 string $", video_pos, colors[0], colors[3]);
+         cpct_drawStringM0("$ Mode 0 string $", video_pos, colors[0], colors[3]);
          wait_frames(25);
          video_pos += 0x50;
       }
@@ -59,9 +59,9 @@ void main(void) {
       video_pos = (unsigned char*)0xC000;
       for (times=0; times < 24; times++) {
          colors[1] = ++colors[1] & 3;
-         cpct_drawROMStringM1("Mode 1 string :D", video_pos, colors[1], colors[4]);
+         cpct_drawStringM1("Mode 1 string :D", video_pos, colors[1], colors[4]);
          colors[1] = ++colors[1] & 3;
-         cpct_drawROMStringM1_fast("Mode 1 string (Fast)", video_pos + 38, colors[1], colors[4]);
+         cpct_drawStringM1_f("Mode 1 string (Fast)", video_pos + 38, colors[1], colors[4]);
          colors[1] = ++colors[1] & 3;
          wait_frames(25);
          video_pos += 0x50;
@@ -74,7 +74,7 @@ void main(void) {
       video_pos = (unsigned char*)0xC000;
       for (times=0; times < 24; times++) {
          colors[2] ^= 1;
-         cpct_drawROMStringM2("And, finally, this is a long mode 2 string!!", video_pos, colors[2]);
+         cpct_drawStringM2("And, finally, this is a long mode 2 string!!", video_pos, colors[2]);
          wait_frames(25);
          video_pos += 0x50;
       }

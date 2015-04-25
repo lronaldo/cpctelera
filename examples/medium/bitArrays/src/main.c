@@ -35,7 +35,7 @@ void printArray(unsigned char* video, void *array, unsigned char numelems, TFunc
           case f_get2bits: c = (out = cpct_get2Bits(array, i)) ? '0' + out : '_';  break;
           case f_get4bits: c = (out = cpct_get4Bits(array, i)) ? '0' + out : '_';  break;
        }
-       cpct_drawROMCharM2(video, 1, c);
+       cpct_drawCharM2(video, 1, c);
        video++;
     }
 }
