@@ -50,9 +50,3 @@ printer.txt
 *.binamsdos
 *.binamsdos.log
 cpctelera/tools/sdcc-3.4.3/share
-cpctelera/tools/sdcc-3.4.3/src/debugger/mcs51/Makefile
-cpctelera/tools/sdcc-3.4.3/src/debugger/mcs51/config.h
-cpctelera/tools/sdcc-3.4.3/src/support/sdbinutils/binutils/arlex.c
-cpctelera/tools/sdcc-3.4.3/src/support/sdbinutils/binutils/arparse.c
-cpctelera/tools/sdcc-3.4.3/src/support/sdbinutils/binutils/arparse.h
-

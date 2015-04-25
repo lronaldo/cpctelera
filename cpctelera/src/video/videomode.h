@@ -39,10 +39,10 @@ extern void cpct_setPALColour (u8 pen, u8 hw_ink);
 ///   Changes the colour of the screen border.
 ///
 /// C Definition:
-///   #define *cpct_setBorderColour* (HW_C)  <cpct_setPALColour> (16, (HW_C))
+///   #define *cpct_setBorderColour* (HWC)  <cpct_setPALColour> (16, (HWC))
 ///
 /// Input Parameters (1 Byte):
-///   *HW_C* - Hardware colour value for the screen border.
+///   *HWC* - Hardware colour value for the screen border.
 ///
 /// More information:
 ///   This is not a real function, but a C macro. Beware of using it along
