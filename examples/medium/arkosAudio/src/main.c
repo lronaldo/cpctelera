@@ -45,7 +45,7 @@ void main(void) {
          cpct_arkosPlayer_songPlay();
 
          // Write a new dash to the screen to see something while playing
-         cpct_drawROMCharM2(video_pos, color, '#');
+         cpct_drawCharM2(video_pos, color, '#');
          if (++video_pos >= (char*)0xC7D0) {
             video_pos = (char*)0xC000;
             color ^= 1;

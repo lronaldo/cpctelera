@@ -75,8 +75,7 @@
 ;.bndry 4    ;; Make this vector start at a 4-byte aligned address to be able to use 8-bit arithmetic with pointers
 dc_mode1_ct: .db 0x00, 0x08, 0x80, 0x88
 
-.globl _cpct_drawROMCharM1
-_cpct_drawROMCharM1::
+_cpct_drawCharM1::
    ;; GET Parameters from the stack 
 .if let_disable_interrupts_for_function_parameters
    ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
@@ -105,7 +104,7 @@ dcm1_restoreSP:
    ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present
    LD  A, L                    ;; [ 4] A = ASCII code of the character
 
-_cpct_drawROMCharM1_asm::
+_cpct_drawCharM1_asm::
    LD  (dcm1_asciiHL+1), A     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    LD  HL, #dc_mode1_ct        ;; [10] HL points to the start of the color table

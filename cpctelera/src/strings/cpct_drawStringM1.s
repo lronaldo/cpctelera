@@ -21,7 +21,7 @@
 ;; Include constants and general values
 ;;
 .include /strings.s/
-.globl _cpct_drawROMCharM1_asm
+.globl _cpct_drawCharM1_asm
 
 ;
 ;########################################################################
@@ -65,7 +65,7 @@
 ;########################################################################
 ;
 
-_cpct_drawROMStringM1::
+_cpct_drawStringM1::
    ;; GET Parameters from the stack (Pop + Restoring SP)
    ld (drsm1_restoreSP+1), sp          ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    di                                  ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
@@ -83,7 +83,7 @@ drsm1_restoreSP:
 drsm1_nextChar:
    push hl                             ;; [11] Save HL and DE to the stack befor calling draw char
    push de                             ;; [11]
-   call _cpct_drawROMCharM1_asm        ;; [17] Draw next char
+   call _cpct_drawCharM1_asm           ;; [17] Draw next char
    pop  de                             ;; [10] Recover HL and DE from the stack
    pop  hl                             ;; [10]
 

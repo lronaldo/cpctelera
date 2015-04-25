@@ -83,8 +83,7 @@
 ;########################################################################
 ;
 
-.globl _cpct_drawROMCharM1_fast
-_cpct_drawROMCharM1_fast::
+_cpct_drawCharM1_f::
    ;; GET Parameters from the stack 
 .if let_disable_interrupts_for_function_parameters
    ;; Way 1: Pop + Restoring SP. Faster, but consumes 7 bytes more, and requires disabling interrupts
@@ -112,7 +111,7 @@ dcm1f_restoreSP:
    ;; Save ASCII code of the character to get it later
    LD  A, L                    ;; [ 4] A = ASCII code of the character
 
-_cpct_drawROMCharM1_fast_asm::
+_cpct_drawCharM1_f_asm::
    LD  (dcm1f_asciiHL+1), A    ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    ;;----------------------------------------------------------------------------------------------

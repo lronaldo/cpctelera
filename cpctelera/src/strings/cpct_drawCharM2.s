@@ -66,8 +66,7 @@
 ;########################################################################
 ;
 
-.globl _cpct_drawROMCharM2
-_cpct_drawROMCharM2::
+_cpct_drawCharM2::
    ;; Get Parameters from stack (POP + Push)
    POP  AF                     ;; [10] AF = Return Address
    POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
@@ -76,7 +75,7 @@ _cpct_drawROMCharM2::
    PUSH DE                     ;; [11] 
    PUSH AF                     ;; [11]
 
-_cpct_drawROMCharM2_asm::
+_cpct_drawCharM2_asm::
 
    ;; Set up the color for printing, either foreground or video-inverted
    XOR A                       ;; [ 4] A = 00h (NOP machine code, which will do nothing in the main loop)
