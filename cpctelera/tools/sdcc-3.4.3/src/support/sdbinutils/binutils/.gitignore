@@ -1,1 +1,5 @@
 /Makefile
+/config.h
+/arparse.h
+/arlex.c
+/arparse.c
