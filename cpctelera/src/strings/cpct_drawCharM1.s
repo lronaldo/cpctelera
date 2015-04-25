@@ -61,10 +61,10 @@
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 126 bytes (4 table + 122 code)                           ###
+;### MEMORY: 135 bytes (4 table + 131 code)                           ###
 ;### TIME:                                                            ###
-;###  Best case  = 4392 cycles (1098,00 us)                           ###
-;###  Worst case = 5072 cycles (1268,00 us)                           ###
+;###  Best case  = 4386 cycles (1096,50 us)                           ###
+;###  Worst case = 5066 cycles (1266,50 us)                           ###
 ;########################################################################
 ;
 
@@ -105,7 +105,7 @@ dcm1_restoreSP:
    ld  a, l                    ;; [ 4] A = ASCII code of the character
 
 _cpct_drawCharM1_asm::
-   ld  (dcm1_asciiHL+1), a     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
+   ld  (dcm1_asciiHL+2), a     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
 
    ld  hl, #dc_mode1_ct        ;; [10] HL points to the start of the color table
    ;LD  A, L                   ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
@@ -138,16 +138,21 @@ _cpct_drawCharM1_asm::
    ld (dcm1_drawForeground+1), a ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
 
    ;; Make HL point to the starting byte of the desired character,
-   ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address 
+   ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address (0x3800)
 dcm1_asciiHL:
-   ld   hl, #0                 ;; [10] HL = ASCII code (H=0, L=ASCII code). 0 is a placeholder to be filled up with the ASCII code value
+   xor  a                      ;; [ 4] A = 0
+   or   #0                     ;; [ 7] A = ASCII Value and Resetting carry flag (#0 is a placeholder that will be filled up with ASII value)
+   ld   h, #0x07               ;; [ 7] H = 0x07, because 0x07 * 8 = 0x38, (high byte of 0x3800)
 
-   add  hl, hl                 ;; [11] HL = HL * 8  (8 bytes each character)
-   add  hl, hl                 ;; [11]
-   add  hl, hl                 ;; [11]
-   ld   bc, #char0_ROM_address ;; [10] BC = 0x3800, Start ROM memory address of Char 0
-   add  hl, bc                 ;; [11] HL += BC (Now HL Points to the start of the Character definition in ROM memory)
+   rla                         ;; [ 4] A = 8*A (using 3 rotates left). We use RLA as it passes exceeding bits 
+   rl   h                      ;; [ 8] ... to the carry flag, and we can then pass them on to the 3 lowest bits of H
+   rla                         ;; [ 4] ... using rl h. So H ends up being H = 8*H + A/32, what makes H be in the 
+   rl   h                      ;; [ 8] ... [0x38-0x3F] range, where character definitions are.
+   rla                         ;; [ 4]
+   rl   h                      ;; [ 8] 
 
+   ld   l, a                   ;; [ 4] L = A, so that HL points to the start of the character definition in ROM memory
+   
    ;; Enable Lower ROM during char copy operation, with interrupts disabled 
    ;; to prevent firmware messing things up
    ld   a,(cpct_mode_rom_status);; [13] A = mode_rom_status (present value)
