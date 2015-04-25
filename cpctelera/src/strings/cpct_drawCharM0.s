@@ -22,46 +22,64 @@
 ;;
 .include /strings.s/
 
-;
-;########################################################################
-;## FUNCTION: _cpct_drawROMCharM0                                     ###
-;########################################################################
-;### This function reads a character from ROM and draws it at a given ###
-;### point on the video memory (byte-aligned), assumming screen is    ###
-;### configured for MODE 0. It prints the character in 2 colors(PENs) ###
-;### one for foreground, and the other for background.                ###
-;### * Some IMPORTANT things to take into account:                    ###
-;###  -- Do not put this function's code below 4000h in memory. In    ###
-;###     order to read from ROM, this function enables Lower ROM      ###
-;###     (which is located 0000h-3FFFh), so CPU would read from ROM   ###
-;###     instead of RAM in first bank, effectively shadowing this     ###
-;###     piece of code, and producing undefined results (tipically,   ###
-;###     program would hang or crash).                                ###
-;###  -- This function works well for drawing on double buffers loca- ###
-;###     ted at whichever memory bank, except 0000h (4000h-FFFFh)     ###
-;###  -- This function disables interrupts during main loop (charac-  ###
-;###     ter printing). It reenables them at the end.                 ###
-;###  -- Do not pass numbers greater that 3 as color parameters, as   ###
-;###     they are used as indexes in a color table, and results may   ###
-;###     be unpredictable                                             ###
-;########################################################################
-;### INPUTS (5 Bytes)                                                 ###
-;###  * (2B DE) Video memory location where the char will be printed  ### 
-;###  * (1B C) Foreground color (PEN, 0-3)                            ###
-;###  * (1B B) Background color (PEN, 0-3)                            ###
-;###  * (1B L) Character to be printed (ASCII code)                   ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 136 bytes (16 table + 120 code)                          ###
-;### TIME:                                                            ###
-;###  Best case  = 3744 cycles ( 936.00 us)                           ###
-;###  Worst case = 4424 cycles (1106.00 us)                           ###
-;########################################################################
-;
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: drawCharM0
+;;
+;;    Prints a ROM character on a given even-pixel position (byte-aligned) on the 
+;; screen in Mode 0 (160x200 px, 16 colours).
+;;
+;; C Definition:
+;;    void *cpct_drawCharM0* (void* *video_memory*, u8 *fg_pen*, u8 *bg_pen*, i8 *ascii*)
+;;
+;; Input Parameters (5 Bytes):
+;;  (2B DE) video_memory - Video memory location where the character will be drawn
+;;  (1B C )  fg_pen       - Foreground palette color index (Similar to BASIC's PEN, 0-3)
+;;  (1B B )  bg_pen       - Background palette color index (PEN, 0-3)
+;;  (1B L )  ascii        - Character to be drawn (ASCII code)
+;;
+;; Parameter Restrictions:
+;;  * *video_memory* could theoretically be any 16-bit memory location. It will work
+;; outside current screen memory boundaries, which is useful if you use any kind of
+;; double buffer. However, be careful where you use it, as it does no kind of check
+;; or clipping, and it could overwrite data if you select a wrong place to draw.
+;;  * *fg_pen* must be in the range [0-3]. It is used to access a color mask table and,
+;; so, a value greater than 3 will return a random color mask giving unpredictable 
+;; results (tipically bad character rendering, with odd color bars).
+;;  * *bg_pen* must be in the range [0-3], with identicall reasons to *fg_pen*.
+;;  * *ascii* could be any 8-bit value, as 256 characters are available in ROM.
+;;
+;; Requirements and limitations:
+;;  * *Do not put this function's code below 4000h in memory*. In order to read
+;; characters from ROM, this function enables Lower ROM (which is located 0000h-3FFFh),
+;; so CPU would read code from ROM instead of RAM in first bank, effectively shadowing
+;; this piece of code. This would lead to undefined results (tipically program would
+;; hang or crash).
+;;  * This function requires the CPC *firmware* to be *DISABLED*. Otherwise, random
+;; crashes might happen due to side effects.
+;;  * This function *disables interrupts* during main loop (character printing), and
+;; reenables them at the end.
+;;
+;; Details:
+;;    This function reads a character from ROM and draws it at a given
+;; point on the video memory (byte-aligned), assumming screen is
+;; configured for MODE 0. It prints the character in 2 colors (PENs)
+;; one for foreground, and the other for background.
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    136 bytes (16 bytes conversion table, 120 bytes code)
+;;
+;; Time Measures:
+;; (start code)
+;; Case   | Cycles | microSecs (us)
+;; --------------------------------
+;; Best   |  3744  |   936.00
+;; Worst  |  4424  |  1106.00
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;
 ;; Color table
