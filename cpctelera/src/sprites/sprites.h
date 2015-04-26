@@ -42,5 +42,6 @@ extern void cpct_setVideoMemoryPage(char page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset(char offset);
 extern void cpct_memset(void *array, unsigned int size, unsigned char value);
 
+extern   u8 cpct_px2byteM0(u8 px0, u8 px1);
 
 #endif

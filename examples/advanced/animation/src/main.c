@@ -26,6 +26,8 @@
 //   Sets Palette and Mode, and disables firmware
 //
 void initializeCPC() {
+   u8 c0, c1;  // Variables to hold pairs of pixels in video memory colour pixel format
+
    // Disable firmware: we dont want it to interfere with our code
    cpct_disableFirmware();
 
@@ -37,17 +39,19 @@ void initializeCPC() {
    cpct_setVideoMode(0);
 
    // Draw Sky and Fremos Logo
-   cpct_drawSolidBox((void*)0xC000, 0x30, 40, 60);
-   cpct_drawSolidBox((void*)0xC028, 0x30, 40, 60);
+   c0 = cpct_px2byteM0(4, 4);   // c0 = 2 consecutive pixels of firmware colour 4 (blue)
+   cpct_drawSolidBox((void*)0xC000, c0, 40, 60); // Boxes cannot be wider than 64 bytes,
+   cpct_drawSolidBox((void*)0xC028, c0, 40, 60); // ... so we use 2 boxes of 40 bytes wide.
    cpct_drawSprite(gc_LogoFremos, (void*)0xC0FC, 55, 20);
 
    // Draw Floor
-   cpct_drawSolidBox((void*)0xC3C0, 0xFF, 40, 8);
-   cpct_drawSolidBox((void*)0xC3E8, 0xFF, 40, 8);
+   c1 = cpct_px2byteM0(2, 8);  // c1 = 2 pixels of firmware colours 2(brown) and 8(black)
+   cpct_drawSolidBox((void*)0xC3C0, c1, 40, 8);
+   cpct_drawSolidBox((void*)0xC3E8, c1, 40, 8);
 
    // Draw Underfloor
-   cpct_drawSolidBox((void*)0xC410, 0x30, 40, 96);
-   cpct_drawSolidBox((void*)0xC438, 0x30, 40, 96);
+   cpct_drawSolidBox((void*)0xC410, c0, 40, 96);
+   cpct_drawSolidBox((void*)0xC438, c0, 40, 96);
 }
 
 //
