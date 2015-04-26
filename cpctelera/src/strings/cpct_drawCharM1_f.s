@@ -28,60 +28,102 @@
 ;;
 .include /strings.s/
 
-;
-;########################################################################
-;## FUNCTION: _cpct_drawROMCharM1_fast                                ###
-;########################################################################
-;### This function does the same as _cpct_drawROMCharM1, but as fast  ###
-;### as possible, not taking into account any space constraints. It   ###
-;### is unrolled, which makes it measure a great amount in bytes, but ###
-;### it is 60% faster than _cpct_drawROMCharM1.                       ###
-;### The technique used to be so fast is difficult to understant: it  ###
-;### uses dynamic code placement. I will try to sum up it here, and   ###
-;### you can always read the detailed comments in the source to get a ###
-;### better understanding.                                            ###
-;### Basically, what this function does is what follows:              ###
-;###  1. It gets the 8-byte definitions of a character.               ###
-;###  2. It transforms each byte (a character line) into 2 bytes for  ###
-;###     video memory (8 pixels, 2 bits per pixel).                   ###
-;### The trick is in transforming from 1-byte character-line defini-  ###
-;### tion to 2-bytes video memory colors. As we have only 4 colors    ###
-;### per pixel, we have 4 possible transform operations either for    ###
-;### foreground color or for background. So, we have to do 4 operati- ###
-;### ons for each byte:                                               ###
-;###  1. Foreground color for video byte 1                            ###
-;###  2. Background color for video byte 1                            ###
-;###  3. Foreground color for video byte 2                            ###
-;###  4. Background color for video byte 2                            ###
-;### What we do is,instead of adding banching logic to the inner loop ###
-;### that has to select the operation to do for each byte and type,   ###
-;### we create 4 8-byte holes in the code that we call "dynamic code  ###
-;### sections" (DCS). Then, we use logic at the start of the routine  ###
-;### to select the 4 operations that are required, depending on the   ###
-;### selected foreground/background colors. When we know which opera- ###
-;### tions are to be performed, we fill in the holes (DCS) with the   ###
-;### machine code that performes the required operation. Then, when   ###
-;### the inner loop is executed, it does not have to do any branching ###
-;### operations, being much much faster.                              ###
-;### The resulting code is very difficult to follow, and very big in  ###
-;### size, but when speed is the goal, this is the best approach.     ###
-;########################################################################
-;### INPUTS (5 Bytes)                                                 ###
-;###  * (2B DE) Video memory location where the char will be printed  ### 
-;###  * (1B C) Foreground color (PEN, 0-3)                            ###
-;###  * (1B B) Background color (PEN, 0-3)                            ###
-;###  * (1B L) Character to be printed (ASCII code)                   ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 345 bytes                                                ###
-;### TIME:                                                            ###
-;###  Best case  = 1960 cycles (490,00 us)                            ###
-;###  Worst case = 2678 cycles (670,50 us)                            ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_drawCharM1_f
+;;
+;;    Prints a ROM character on a given byte-aligned position on the screen 
+;; in Mode 1 (320x200 px, 4 colours). It does it ~50% faster than <cpct_drawCharM1>.
+;;
+;; C Definition:
+;;    void *cpct_drawCharM1_f* (void* *video_memory*, u8 *fg_pen*, u8 *bg_pen*, i8 *ascii*)
+;;
+;; Input Parameters (5 Bytes):
+;;  (2B DE) video_memory - Video memory location where the character will be drawn
+;;  (1B C )  fg_pen       - Foreground palette colour index (Similar to BASIC's PEN, 0-3)
+;;  (1B B )  bg_pen       - Background palette colour index (PEN, 0-3)
+;;  (1B A )  ascii        - Character to be drawn (ASCII code)
+;;
+;; Parameter Restrictions:
+;;  * *video_memory* could theoretically be any 16-bit memory location. It will work
+;; outside current screen memory boundaries, which is useful if you use any kind of
+;; double buffer. However, be careful where you use it, as it does no kind of check
+;; or clipping, and it could overwrite data if you select a wrong place to draw.
+;;  * *fg_pen* must be in the range [0-3]. It is used to access a colour mask table and,
+;; so, a value greater than 3 will return a random colour mask giving unpredictable 
+;; results (typically bad character rendering, with odd colour bars).
+;;  * *bg_pen* must be in the range [0-3], with identical reasons to *fg_pen*.
+;;  * *ascii* could be any 8-bit value, as 256 characters are available in ROM.
+;;
+;; Requirements and limitations:
+;;  * *Do not put this function's code below 0x4000 in memory*. In order to read
+;; characters from ROM, this function enables Lower ROM (which is located 0x0000-0x3FFF),
+;; so CPU would read code from ROM instead of RAM in first bank, effectively shadowing
+;; this piece of code. This would lead to undefined results (typically program would
+;; hang or crash).
+;;  * Screen must be configured in Mode 1 (320x200 px, 4 colours)
+;;  * This function requires the CPC *firmware* to be *DISABLED*. Otherwise, random
+;; crashes might happen due to side effects.
+;;  * This function *disables interrupts* during main loop (character printing), and
+;; re-enables them at the end.
+;;
+;; Details:
+;;    This function reads a character from ROM and draws it at a given byte-aligned 
+;; video memory location, that corresponds to the upper-left corner of the 
+;; character. As this function assumes screen is configured for Mode 1
+;; (320x200, 4 colours), it means that the character can only be drawn at module-4 
+;; pixel columns (0, 4, 8, 12...), because each byte contains 4 pixels in Mode 0.
+;; It prints the character in 2 colours (PENs) one for foreground (*fg_pen*), and 
+;; the other for background (*bg_pen*). 
+;;
+;;    This function does the same as <cpct_drawCharM1>, but as fast  as possible, not taking 
+;; into account any space constraints. It is unrolled, which makes it measure a great 
+;; amount in bytes, but it is ~50% faster than <cpct_drawROMCharM1> The technique used 
+;; to be so fast is difficult to understand: it uses dynamic code placement. I will 
+;; try to sum up it here, and you can always read the detailed comments in the source 
+;; to get a better understanding.
+;;
+;;    Basically, what this function does is what follows:
+;;
+;;  1 - It gets the 8-byte definitions of a character.               
+;;  2 - It transforms each byte (a character line) into 2 bytes for video memory (8 pixels, 2 bits per pixel).
+;;
+;;    The trick is in transforming from 1-byte character-line definition to 2-bytes video 
+;; memory colours. As we have only 4 colours per pixel, we have 4 possible transform 
+;; operations either for foreground colour or for background. So, we have to do 4 
+;; operations for each byte:
+;;
+;;  1 - Foreground colour for video byte 1
+;;  2 - Background colour for video byte 1
+;;  3 - Foreground colour for video byte 2
+;;  4 - Background colour for video byte 2
+;;
+;;    What we do is, instead of adding branching logic to the inner loop that has to 
+;; select the operation to do for each byte and type, we create 4 8-byte holes in 
+;; the code that we call "dynamic code sections" (DCS). Then, we use logic at the 
+;; start of the routine to select the 4 operations that are required, depending on
+;; the selected foreground / background colours. When we know which operations are
+;; to be performed, we fill in the holes (DCS) with the machine code that performs
+;; the required operation. Then, when the inner loop is executed, it does not have
+;; to do any branching operations, being much much faster.
+;;
+;;    The resulting code is very difficult to follow, and very big in size, but
+;; when speed is the goal, this is the best approach.
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    345 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case   | Cycles | microSecs (us)
+;; --------------------------------
+;; Best   |  1960  |   490.00
+;; Worst  |  2678  |   670.50
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_drawCharM1_f::
    ;; GET Parameters from the stack 

@@ -24,7 +24,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: drawCharM0
+;; Function: cpct_drawCharM0
 ;;
 ;;    Prints a ROM character on a given even-pixel position (byte-aligned) on the 
 ;; screen in Mode 0 (160x200 px, 16 colours).
@@ -34,8 +34,8 @@
 ;;
 ;; Input Parameters (5 Bytes):
 ;;  (2B DE) video_memory - Video memory location where the character will be drawn
-;;  (1B C )  fg_pen       - Foreground palette colour index (Similar to BASIC's PEN, 0-3)
-;;  (1B B )  bg_pen       - Background palette colour index (PEN, 0-3)
+;;  (1B C )  fg_pen       - Foreground palette colour index (Similar to BASIC's PEN, 0-15)
+;;  (1B B )  bg_pen       - Background palette colour index (PEN, 0-15)
 ;;  (1B A )  ascii        - Character to be drawn (ASCII code)
 ;;
 ;; Parameter Restrictions:
@@ -43,10 +43,10 @@
 ;; outside current screen memory boundaries, which is useful if you use any kind of
 ;; double buffer. However, be careful where you use it, as it does no kind of check
 ;; or clipping, and it could overwrite data if you select a wrong place to draw.
-;;  * *fg_pen* must be in the range [0-3]. It is used to access a colour mask table and,
-;; so, a value greater than 3 will return a random colour mask giving unpredictable 
+;;  * *fg_pen* must be in the range [0-15]. It is used to access a colour mask table and,
+;; so, a value greater than 15 will return a random colour mask giving unpredictable 
 ;; results (typically bad character rendering, with odd colour bars).
-;;  * *bg_pen* must be in the range [0-3], with identical reasons to *fg_pen*.
+;;  * *bg_pen* must be in the range [0-15], with identical reasons to *fg_pen*.
 ;;  * *ascii* could be any 8-bit value, as 256 characters are available in ROM.
 ;;
 ;; Requirements and limitations:
@@ -55,16 +55,20 @@
 ;; so CPU would read code from ROM instead of RAM in first bank, effectively shadowing
 ;; this piece of code. This would lead to undefined results (typically program would
 ;; hang or crash).
+;;  * Screen must be configured in Mode 0 (160x200 px, 16 colours)
 ;;  * This function requires the CPC *firmware* to be *DISABLED*. Otherwise, random
 ;; crashes might happen due to side effects.
 ;;  * This function *disables interrupts* during main loop (character printing), and
 ;; re-enables them at the end.
 ;;
 ;; Details:
-;;    This function reads a character from ROM and draws it at a given
-;; point on the video memory (byte-aligned), assuming screen is
-;; configured for MODE 0. It prints the character in 2 colours (PENs)
-;; one for foreground, and the other for background.
+;;    This function reads a character from ROM and draws it at a given byte-aligned 
+;; video memory location, that corresponds to the upper-left corner of the 
+;; character. As this function assumes screen is configured for Mode 0
+;; (160x200, 16 colours), it means that the character can only be drawn at even 
+;; pixel columns (0, 2, 4, 8...), because each byte contains 2 pixels in Mode 0.
+;; It prints the character in 2 colours (PENs) one for foreground (*fg_pen*), and 
+;; the other for background (*bg_pen*). 
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL

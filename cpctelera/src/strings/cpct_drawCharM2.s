@@ -28,43 +28,66 @@
 ;;
 .include /strings.s/
 
-;
-;########################################################################
-;## FUNCTION: _cpct_drawROMCharM2                                     ###
-;########################################################################
-;### This function reads a character from ROM and draws it at a given ###
-;### point on the video memory (byte-aligned), assumming screen is    ###
-;### configured for MODE 2. It can print the character in 2 different ###
-;### color configurations:                                            ###
-;###   Normal:   PEN 1 over PEN 0 (2nd Parameter [Color] > 0)         ###
-;###   Inverted: PEN 0 over PEN 1 (2nd Parameter [Color] = 0)         ###
-;### * Some IMPORTANT things to take into account:                    ###
-;###  -- Do not put this function's code below 4000h in memory. In    ###
-;###     order to read from ROM, this function enables Lower ROM      ###
-;###     (which is located 0000h-3FFFh), so CPU would read from ROM   ###
-;###     instead of RAM in first bank, effectively shadowing this     ###
-;###     piece of code, and producing undefined results (tipically,   ###
-;###     program would hang or crash).                                ###
-;###  -- This function works well for drawing on double buffers loca- ###
-;###     ted at whichever memory bank, except 0000h (4000h-FFFFh)     ###
-;###  -- This function disables interrupts during main loop (charac-  ###
-;###     ter printing). It reenables them at the end.                 ###
-;########################################################################
-;### INPUTS (4 Bytes)                                                 ###
-;###  * (2B DE) Video memory location where the char will be printed  ### 
-;###  * (1B C) Foreground color (0 or 1, Background will be inverted) ###
-;###  * (1B B) Character to be printed (ASCII code)                   ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 76 bytes                                                 ###
-;### TIME:                                                            ###
-;###  Best case  = 759 cycles (189.75 us)                             ###
-;###  Worst case = 803 cycles (200.75 us)                             ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_drawCharM2
+;;
+;;    Prints a ROM character on a given byte-aligned position on the screen 
+;; in Mode 2 (640x200 px, 2 colours).
+;;
+;; C Definition:
+;;    void *cpct_drawCharM2* (void* *video_memory*, u8 *pen*, i8 *ascii*)
+;;
+;; Input Parameters (5 Bytes):
+;;  (2B DE) video_memory - Video memory location where the character will be drawn
+;;  (1B C ) pen          - Colour configuration (!=0 Normal / =0 Inverted)
+;;  (1B B ) ascii        - Character to be printed (ASCII code)
+;;
+;; Parameter Restrictions:
+;;  * *video_memory* could theoretically be any 16-bit memory location. It will work
+;; outside current screen memory boundaries, which is useful if you use any kind of
+;; double buffer. However, be careful where you use it, as it does no kind of check
+;; or clipping, and it could overwrite data if you select a wrong place to draw.
+;;  * *pen* 0 = Inverted, >0 = Normal. Normal means foreground colour = PEN 1, 
+;; background colour = PEN 0. Inverted means the contrary of normal. 
+;;  * *ascii* could be any 8-bit value, as 256 characters are available in ROM.
+;;
+;; Requirements and limitations:
+;;  * *Do not put this function's code below 0x4000 in memory*. In order to read
+;; characters from ROM, this function enables Lower ROM (which is located 0x0000-0x3FFF),
+;; so CPU would read code from ROM instead of RAM in first bank, effectively shadowing
+;; this piece of code. This would lead to undefined results (typically program would
+;; hang or crash).
+;;  * Screen must be configured in Mode 2 (640x200 px, 2 colours)
+;;  * This function requires the CPC *firmware* to be *DISABLED*. Otherwise, random
+;; crashes might happen due to side effects.
+;;  * This function *disables interrupts* during main loop (character printing), and
+;; re-enables them at the end.
+;;
+;; Details:
+;;    This function reads a character from ROM and draws it at a given byte-aligned 
+;; video memory location, that corresponds to the upper-left corner of the 
+;; character. As this function assumes screen is configured for Mode 2
+;; (640x200, 2 colours), it means that the character can only be drawn at module-8 
+;; pixel columns (0, 8, 16, 24...), because each byte contains 8 pixels in Mode 2.
+;; It can print the character in 2 different colour configurations:
+;;  Normal   - PEN 1 over PEN 0 (*pen* > 0)
+;;  Inverted - PEN 0 over PEN 1 (*pen* = 0)
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    76 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case   | Cycles | microSecs (us)
+;; --------------------------------
+;; Best   |   759  |   189.75
+;; Worst  |   803  |   200.75
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_drawCharM2::
    ;; Get Parameters from stack (POP + Push)
