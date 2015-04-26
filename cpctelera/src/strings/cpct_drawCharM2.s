@@ -38,7 +38,7 @@
 ;; C Definition:
 ;;    void *cpct_drawCharM2* (void* *video_memory*, u8 *pen*, i8 *ascii*)
 ;;
-;; Input Parameters (5 Bytes):
+;; Input Parameters (4 Bytes):
 ;;  (2B DE) video_memory - Video memory location where the character will be drawn
 ;;  (1B C ) pen          - Colour configuration (!=0 Normal / =0 Inverted)
 ;;  (1B B ) ascii        - Character to be printed (ASCII code)
@@ -110,64 +110,64 @@ dc_print_fg_color:
 
    ;; Calculate the memory address where the 8 bytes defining the character appearance 
    ;; ... start (HL = 0x3800 + 8*ASCII value). char0_ROM_address = 0x3800
-   ld   a, b                   ;; [ 4] A = ASCII Value
-   ld   h, #0x07               ;; [ 7] H = 0x07, because 0x07 * 8 = 0x38, (high byte of 0x3800)
+   ld    a, b                  ;; [ 4] A = ASCII Value
+   ld    h, #0x07              ;; [ 7] H = 0x07, because 0x07 * 8 = 0x38, (high byte of 0x3800)
 
    rla                         ;; [ 4] A = 8*A (using 3 rotates left). We use RLA as it passes exceeding bits 
-   rl   h                      ;; [ 8] ... to the carry flag, and we can then pass them on to the 3 lowest bits of H
+   rl    h                     ;; [ 8] ... to the carry flag, and we can then pass them on to the 3 lowest bits of H
    rla                         ;; [ 4] ... using rl h. So H ends up being H = 8*H + A/32, what makes H be in the 
-   rl   h                      ;; [ 8] ... [0x38-0x3F] range, where character definitions are.
+   rl    h                     ;; [ 8] ... [0x38-0x3F] range, where character definitions are.
    rla                         ;; [ 4]
-   rl   h                      ;; [ 8] 
+   rl    h                     ;; [ 8] 
 
-   ld   l, a                   ;; [ 4] L = A, so that HL points to the start of the character definition in ROM memory
+   ld    l, a                  ;; [ 4] L = A, so that HL points to the start of the character definition in ROM memory
 
-   LD  C, #8                   ;; [ 7] C = 8 lines counter (8 character lines to be printed out)
+   ld    c, #8                 ;; [ 7] C = 8 lines counter (8 character lines to be printed out)
 
    ;; Enable Lower ROM during char copy operation, with interrupts disabled 
    ;; to prevent firmware messing things up
-   LD   A,  (cpct_mode_rom_status) ;; [13] A = mode_rom_status (present value)
-   AND  #0b11111011            ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
-   LD   B,  #GA_port_byte      ;; [ 7] B = Gate Array Port (0x7F)
-   DI                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
-   OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
+   ld    a, (cpct_mode_rom_status) ;; [13] A = mode_rom_status (present value)
+   and   #0b11111011           ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
+   ld    b, #GA_port_byte      ;; [ 7] B = Gate Array Port (0x7F)
+   di                          ;; [ 4] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
+   out (c), a                  ;; [12] GA Command: Set Video Mode and ROM status (100)
 
    ;; Copy character to Video Memory
 dc_nextline:
-   LD A, (HL)                  ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
-   NOP                         ;; [ 4]  -- When we paint in Foreground Color, we do nothing, but this byte
+   ld    a, (hl)               ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
+   nop                         ;; [ 4]  -- When we paint in Foreground Color, we do nothing, but this byte
                                ;;       -- gets modified NOP (00h) --> CPL (2Fh) to invert bits when painting Background Color (inverted mode)
-   LD (DE), A                  ;; [ 7]
+   ld (de), a                  ;; [ 7]
 
-   DEC C                       ;; [ 4] C-- (1 Character line less to finish)
-   JP Z, dc_end_printing       ;; [10] IF C=0, end up printing (all lines have been copied)
+   dec   c                     ;; [ 4] C-- (1 Character line less to finish)
+   jp    z, dc_end_printing    ;; [10] IF C=0, end up printing (all lines have been copied)
 
    ;; Prepare to copy next line 
    ;;  -- Move DE pointer to the next pixel line on the video memory
-   INC L                       ;; [ 4] HL++ (Make HL point to next character line at ROM memory)
+   inc   l                     ;; [ 4] HL++ (Make HL point to next character line at ROM memory)
                                ;;      As characters are 8 bytes-long and table starts at 3800h, 
                                ;;      H never gets incremented on an INC HL, so we can use INC L instead (and save 3 cycles)
 
-   LD  A, D                    ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
-   ADD #0x08                   ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
-   LD  D, A                    ;; [ 4]
-   AND #0x38                   ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
-   JP NZ, dc_nextline          ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
+   ld    a, d                  ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
+   add   #0x08                 ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
+   ld    d, a                  ;; [ 4]
+   and   #0x38                 ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
+   jp   nz, dc_nextline        ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
 dc_8bit_boundary_crossed:
-   LD  A, E                    ;; [ 4] DE = DE + C050h 
-   ADD #0x50                   ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line 
-   LD  E, A                    ;; [ 4]   -- in video memory
-   LD  A, D                    ;; [ 4]
-   ADC #0xC0                   ;; [ 7]
-   LD  D, A                    ;; [ 4]
-   JP  dc_nextline             ;; [10] Jump to continue with next pixel line
+   ld    a, e                  ;; [ 4] DE = DE + C050h 
+   add   #0x50                 ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line 
+   ld    e, a                  ;; [ 4]   -- in video memory
+   ld    a, d                  ;; [ 4]
+   adc   #0xC0                 ;; [ 7]
+   ld    d, a                  ;; [ 4]
+   jp    dc_nextline           ;; [10] Jump to continue with next pixel line
 
 dc_end_printing:
    ;; After finishing character printing, restore ROM and Interrupts status
-   LD   A,  (cpct_mode_rom_status) ;; [13] A = mode_rom_status (present saved value)
+   ld    a, (cpct_mode_rom_status) ;; [13] A = mode_rom_status (present saved value)
    ;OR   #0b00000100            ;; [ 7] bit 3 of A = 1 --> Lower ROM disabled (0 means enabled)
    ;LD   B,  #GA_port_byte     ;; [ 7] B = Gate Array Port (0x7F)
-   OUT (C), A                  ;; [12] GA Command: Set Video Mode and ROM status (100)
-   EI                          ;; [ 4] Enable interrupts
+   out (c), a                  ;; [12] GA Command: Set Video Mode and ROM status (100)
+   ei                          ;; [ 4] Enable interrupts
 
-   RET                         ;; [10] Return
+   ret                         ;; [10] Return

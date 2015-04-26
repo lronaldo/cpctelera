@@ -23,47 +23,78 @@
 .include /strings.s/
 .globl _cpct_drawCharM1_asm
 
-;
-;########################################################################
-;## FUNCTION: _cpct_drawROMStringM1                                   ###
-;########################################################################
-;### This function receives a null terminated string and draws it to  ###
-;### the screen in mode 1, using _cpct_drawROMCharM1 to draw every    ###
-;### character.                                                       ###
-;### * Some IMPORTANT things to take into account:                    ###
-;###  -- This routine does not check for boundaries. If you draw too  ###
-;###     long strings or out of the screen, unpredictable resuls will ###
-;###     happen.
-;###  -- Do not put this function's code below 4000h in memory. In    ###
-;###     order to read from ROM, this function enables Lower ROM      ###
-;###     (which is located 0000h-3FFFh), so CPU would read from ROM   ###
-;###     instead of RAM in first bank, effectively shadowing this     ###
-;###     piece of code, and producing undefined results (tipically,   ###
-;###     program would hang or crash).                                ###
-;###  -- This function works well for drawing on double buffers loca- ###
-;###     ted at whichever memory bank, except 0000h (4000h-FFFFh)     ###
-;###  -- This function disables interrupts during main loop (charac-  ###
-;###     ter printing). It reenables them at the end.                 ###
-;###  -- Do not pass numbers greater that 3 as color parameters, as   ###
-;###     they are used as indexes in a color table, and results may   ###
-;###     be unpredictable                                             ###
-;########################################################################
-;### INPUTS (5 Bytes)                                                 ###
-;###  * (2B HL) Pointer to the null terminated string being drawn     ### 
-;###  * (2B DE) Video memory location where the char will be printed  ### 
-;###  * (1B C) Foreground color (PEN, 0-3)                            ###
-;###  * (1B B) Background color (PEN, 0-3)                            ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY:  41 bytes (+ 144 bytes drawROMCharM0)                    ###
-;### TIME:                                                            ###
-;###  Best case  = 179 + (120+3704)*len cycles                        ###
-;###  Worst case = 179 + (120+4384)*len cycles                        ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_drawStringM1
+;;
+;;    Prints a null-terminated string with ROM characters on a given byte-aligned 
+;; position on the screen in Mode 1 (320x200 px, 4 colours).
+;;
+;; C Definition:
+;;    void *cpct_drawStringM1* (void* *string*, void* *video_memory*, u8 *fg_pen*, u8 *bg_pen*)
+;;
+;; Input Parameters (5 Bytes):
+;;  (2B HL) string       - Pointer to the null terminated string being drawn
+;;  (2B DE) video_memory - Video memory location where the string will be drawn
+;;  (1B C ) fg_pen       - Foreground colour (PEN, 0-3)
+;;  (1B B ) bg_pen       - Background colour (PEN, 0-3)
+;;
+;; Parameter Restrictions:
+;;  * *string* must be a null terminated string. It could contain any 8-bit value as 
+;; characters except 0, which will signal the end of the string. Be careful to provide
+;; strings with a 0 (null) at the end of the string. Otherwise, unexpected results may
+;; happen (Typically, rubbish characters printed on screen and, occasionally, memory 
+;; overwrite and even hangs or crashes).
+;;  * *video_memory* could theoretically be any 16-bit memory location. It will work
+;; outside current screen memory boundaries, which is useful if you use any kind of
+;; double buffer. However, be careful where you use it, as it does no kind of check
+;; or clipping, and it could overwrite data if you select a wrong place to draw.
+;;  * *fg_pen* must be in the range [0-3]. It is used to access a colour mask table and,
+;; so, a value greater than 15 will return a random colour mask giving unpredictable 
+;; results (typically bad character rendering, with odd colour bars).
+;;  * *bg_pen* must be in the range [0-3], with identical reasons to *fg_pen*.
+;;
+;; Requirements and limitations:
+;;  * *Do not put this function's code below 0x4000 in memory*. In order to read
+;; characters from ROM, this function enables Lower ROM (which is located 0x0000-0x3FFF),
+;; so CPU would read code from ROM instead of RAM in first bank, effectively shadowing
+;; this piece of code. This would lead to undefined results (typically program would
+;; hang or crash).
+;;  * This routine does not check for boundaries. If you draw too long strings or out 
+;; of the screen, unpredictable results will happen.
+;;  * Screen must be configured in Mode 1 (320x200 px, 4 colours)
+;;  * This function requires the CPC *firmware* to be *DISABLED*. Otherwise, random
+;; crashes might happen due to side effects.
+;;  * This function *disables interrupts* during main loop (character printing), and
+;; re-enables them at the end.
+;;
+;; Details:
+;;    This function receives a null-terminated string and draws it to the screen in 
+;; Mode 1 (320x200, 4 colours). This function calls <cpct_drawCharM1> to draw every    
+;; character. *video_memory* parameter points to the byte where the string will be
+;; drawn. The first pixel of that byte will be the upper-left corner of the string.
+;; As this function uses a byte-pointer to refer to the upper-left corner of the 
+;; string, it can only draw string on module-4-pixel columns (0, 4, 8, 12...), as 
+;; every byte contains 4 pixels in Mode 1.
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    174 bytes (39 bytes this function, 135 bytes <cpct_drawCharM1>)
+;;
+;; Time Measures:
+;; (start code)
+;; Case   |    Cycles    |   microSecs (us)
+;; -------------------------------------------
+;; Best   | 167 + 4406*L | 41.75 + 1101.50*L
+;; Worst  | 167 + 5086*L | 41.75 + 1271.50*L
+;; (end code)
+;;    L = Length of the string (excluding null-terminator character)
+;;
+;; These time measures take into account the time it takes to draw each individual
+;; character (call to <cpct_drawCharM1>, assembly entry point).
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_drawStringM1::
    ;; GET Parameters from the stack (Pop + Restoring SP)
