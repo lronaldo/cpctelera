@@ -19,36 +19,63 @@
 
 .include /sprites.s/
 
-;
-;########################################################################
-;### FUNCTION: cpct_memset                                            ###
-;########################################################################
-;### Sets all the bytes of an array in memory to the same given value ###
-;### This is the technique it uses:                                   ###
-;###  - It first sets up the first byte of the array to the value     ###
-;###  - Makes HL point to the first byte and DE to the second         ###
-;###  - BC has the total bytes to copy minus 1 (the first already set)###
-;###  - LDIR copies first byte into second, then second into third... ###
-;### WARNING: This works only for values of BC > 1. Never use this    ###
-;### function with values 0 or 1 as number of bytes to copy, as it    ###
-;### will have unexpected results (In fact, it could write up the en- ###
-;### tire memory).                                                    ###
-;########################################################################
-;### INPUTS (1 Byte)                                                  ###
-;###  * (2B DE) Starting point in memory                              ###
-;###  * (2B BC) Number of bytes to be set (should be greater than 1!) ###
-;###  * (1B A ) Value to be set                                       ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY:  20 bytes                                                ###
-;### TIME:    108 + 21*NB cycles (27.00 + 5.25*BC us)                 ###
-;########################################################################
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_memset
+;;
+;;    Fills up a complete byte-array in memory with a given 8-bit value (as std memset)
+;;
+;; C Definition:
+;;    void *cpct_memset* (void* *array*, u16 *size*, u8 *value*);
+;;
+;; Input Parameters (5 Bytes):
+;;  (2B DE) array - Pointer to the first byte of the array to be filled up (starting point in memory)
+;;  (2B BC) size  - Number of bytes to be set (>= 2)
+;;  (1B A ) value - 8-bit value to be set
+;;
+;; Parameter Restrictions:
+;;  * *array* could theoretically be any 16-bit memory location. However, take into 
+;; account that this function does no check at all, and you could mistakenly overwrite 
+;; important parts of your program, the screen, the firmware... Use it with care.
+;;  * *size* must be greater than 1. It represents the size of the array, or the number 
+;; of total bytes that will be set to the *value*. As this function starts moving 1 
+;; first byte and then cloning it, the minimum amount *size* should be 2. Beware! 
+;; *Sizes 0 and 1* can cause this to *overwrite the entire memory*. 
+;;  * *value* could be any 8-bit value, without restrictions.
+;;
+;; Details:
+;;    Sets all the bytes of an *array* in memory to the same given *value*. This is the
+;; same operation as std memset, from the standard C library does. However, this function
+;; is much faster than std C memset, so it is recommended for your productions. The 
+;; technique this function uses to be so faster is as follows:
+;;
+;;  1 - Sets up the first byte of the *array* to the *value*
+;;  2 - Makes HL point to the first byte and DE to the second
+;;  3 - BC has the total bytes to copy minus 1 (the first already set)
+;;  4 - LDIR copies first byte into second, then second into third...
+;;
+;;    This function works for array sizes from 2 to 65535 (it does not work for 0 or 1).
+;; However, it is recommended that you use it for values greater than 2. Depending on
+;; your code, using memset for values in the range [2-8] could underperform simple
+;; variable assignments. 
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    20 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case   |   Cycles   | microSecs (us)
+;; -------------------------------------
+;; Any    | 108 + 21*S | 27.00 + 5.25*S
+;; -------------------------------------
+;; (end code)
+;;    S = *size* (Number of total bytes to set)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-.globl _cpct_memset
 _cpct_memset::
    ;; Recover parameters from stack
    ld   hl, #2       ;; [10] Make HL point to the byte where parameters start in the
