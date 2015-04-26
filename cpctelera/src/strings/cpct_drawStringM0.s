@@ -81,14 +81,14 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    194 bytes (41 bytes this function, 153 bytes <cpct_drawCharM0>)
+;;    189 bytes (36 bytes this function, 153 bytes <cpct_drawCharM0>)
 ;;
 ;; Time Measures:
 ;; (start code)
 ;; Case   |    Cycles    |   microSecs (us)
 ;; -------------------------------------------
-;; Best   | 179 + 3774*L | 44.75 +  956.00*L
-;; Worst  | 179 + 4454*L | 44.75 + 1126.00*L
+;; Best   | 185 + 3774*L | 46.25 +  956.00*L
+;; Worst  | 185 + 4454*L | 46.25 + 1126.00*L
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
 ;;
@@ -97,16 +97,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_drawStringM0::
-   ;; GET Parameters from the stack (Pop + Restoring SP)
+   ;; Get parameters form stack
+.if let_disable_interrupts_for_function_parameters
+   ;; Way 1: Pop + Restoring SP. Faster, but consumes 5 bytes more, and requires disabling interrupts
    ld (drsm0_restoreSP+1), sp          ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
    di                                  ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    pop  af                             ;; [10] AF = Return Address
    pop  hl                             ;; [10] HL = Pointer to the null terminated string
    pop  de                             ;; [10] DE = Destination address (Video memory location where character will be printed)
-   pop  bc                             ;; [10] BC = Colours (B=Background colour, C=Foreground colour) 
+   pop  bc                             ;; [10] BC = Colors (B=Background color, C=Foreground color) 
 drsm0_restoreSP:
    ld sp, #0                           ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
    ei                                  ;; [ 4] Enable interrupts again
+.else 
+   ;; Way 2: Pop + Push. Just 8 cycles more, but does not require disabling interrupts
+   pop  af                             ;; [10] AF = Return Address
+   pop  hl                             ;; [10] HL = Pointer to the null terminated string
+   pop  de                             ;; [10] DE = Destination address (Video memory location where character will be printed)
+   pop  bc                             ;; [10] BC = Colors (B=Background color, C=Foreground color) 
+   push bc                             ;; [11] Restore Stack status pushing values again
+   push de                             ;; [11] (Interrupt safe way, 8 cycles more)
+   push hl                             ;; [11]
+   push af                             ;; [11]
+.endif
 
    ld (drsm0_values+1), bc             ;; [20] Save BC as LD direct value to be read later for saving colour values (Foreground and Background)
    jp drsm0_firstChar                  ;; [10] Jump to first char
