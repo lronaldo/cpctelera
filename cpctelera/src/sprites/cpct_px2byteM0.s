@@ -45,11 +45,13 @@
 ;; is the way pixel colour values are encoded in video memory. Concretely, in 
 ;; Mode 0, each byte contains 2 consecutive pixels formatted as follows:
 ;; (start code)
-;;  ----------------------------------------------------------------------
-;;  Screen         => [.....[pixelX][pixelY].....] (2 pixels, consecutive)
-;;  Video Memory   => [........[XYXYXYXY]........] (1  byte, 8 bits)
-;;  Pixel X (3210) => [........[0 2 1 3 ]........] (4  bits)
-;;  Pixel Y (dcba) => [........[ a c b d]........] (4  bits)
+;;  ______________________________________________________________________
+;;                        <---- 1  byte ---->
+;;  Screen         => [...[pixelX ][ pixelY ]...] (2 pixels, consecutive)
+;;  ======================================================================
+;;  Video Memory   => [...[ X Y X Y X Y X Y ]...] (1  byte, 8 bits)
+;;  Pixel X (3210) => [...[ 0 · 2 · 1 · 3 · ]...] (4  bits)
+;;  Pixel Y (dcba) => [...[ · a · c · b · d ]...] (4  bits)
 ;;  ----------------------------------------------------------------------
 ;;        Scheme 1. Screen pixel format and video memory
 ;; (end)

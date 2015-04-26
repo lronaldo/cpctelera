@@ -47,15 +47,17 @@
 ;; is the way pixel colour values are encoded in video memory. Concretely, in 
 ;; Mode 1, each byte contains 4 consecutive pixels formatted as follows:
 ;; (start code)
-;;  -----------------------------------------------------------------------------------
+;;  ___________________________________________________________________________________
+;;                        <----------- 1 byte ----------->
 ;;  Screen         => [...[pixelA][pixelB][pixelC][pixelD]...] (4 pixels, consecutive)
-;;  Video Memory   => [..........[A B C D A B C D]...........] (1  byte, 8 bits)
-;;  Pixel A   (10) => [..........[0       1      ]...........] (2  bits)
-;;  Pixel B   (yx) => [..........[  x       y    ]...........] (2  bits)
-;;  Pixel C   (32) => [..........[    2       3  ]...........] (2  bits)
-;;  Pixel D   (tz) => [..........[      z       t]...........] (2  bits)
-;;  ----------------------------------------------------------------------
-;;        Scheme 1. Screen pixel format and video memory
+;;  ===================================================================================
+;;  Video Memory   => [...[  A   B  C  D   A  B  C   D   ]...] (1  byte, 8 bits)
+;;  Pixel A   (10) => [...[  0   ·  ·  ·   1  ·  ·   ·   ]...] (2  bits)
+;;  Pixel B   (32) => [...[  ·   2  ·  ·   ·  3  ·   ·   ]...] (2  bits)
+;;  Pixel C   (54) => [...[  ·   ·  4  ·   ·  ·  5   ·   ]...] (2  bits)
+;;  Pixel D   (76) => [...[  ·   ·  ·  6   ·  ·  ·   7   ]...] (2  bits)
+;;  -----------------------------------------------------------------------------------
+;;              Scheme 1. Screen pixel format and video memory
 ;; (end)
 ;;   
 ;;    This function uses a 4-byte conversion table to get screen formatted values
