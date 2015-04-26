@@ -22,7 +22,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_waitVSYNC
 ;;
-;; Brief:
 ;;    Waits until CRTC produces vertical synchronization signal (VSYNC) and returns.
 ;;
 ;; C Definition:

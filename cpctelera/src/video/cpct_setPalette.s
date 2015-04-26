@@ -28,7 +28,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_setPalette
 ;;
-;; Brief:
 ;;    Changes the hardware palette colour values (selecting new ones).
 ;;
 ;; C Definition:

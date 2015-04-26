@@ -25,28 +25,40 @@
 
 .include /videomode.s/
 
-;
-;########################################################################
-;## FUNCTION: _cpct_getHWColor                                        ###
-;########################################################################
-;### Returns the hardware colour value (0-31) for a given firmware    ###
-;### colour value (0-26). The colour value returned can be used by    ###
-;### other palette functions requiring hardware colour values.        ###
-;########################################################################
-;### INPUTS (1 Byte)                                                  ###
-;###  * (1B C) Firmware INK colour value to convert (0-26)            ### 
-;########################################################################
-;### RETURN VALUE                                                     ###
-;###  Returns a byte value, 0-31, with the hardware colour value      ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: BC, HL                               ###
-;########################################################################
-;### MEASURES                                                         ###
-;###  MEMORY: 40 bytes (13 code + 27 colour table)                    ###
-;###  TIME: 63 cycles (16.00 ns)                                      ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function: cpct_getHWColour
+;;
+;;    Converts a firmware colour value into its equivalent hardware one.
+;;
+;; C Definition:
+;;    u8 *cpct_getHWColour* (u8 *firmware_colour*)
+;;
+;; Input Parameters (1 Bytes):
+;;    (1B C) firmware_colour - [0-26] Firmware colour value to be converted (Similar to BASIC's INK value)
+;;
+;; Parameter Restrictions:
+;;    * *firmware_colour* must be in the range [0-26], otherwise, return value will be unexpected.
+;;
+;; Return Value:
+;;    u8 - [0-31] Hardware colour value corresponding to *firmware_colour* provided.
+;;
+;; Details:
+;;    Uses the *firmware_colour* as index in a conversion table to get its equivalent hardware
+;; value. You can find this equivalences in the table 1 of the <cpct_setPalette> explanation.
+;;
+;; Destroyed Register values:
+;;    BC, HL
+;;
+;; Required memory:
+;;    40 bytes (13 bytes code, 27 bytes colour conversion table)
+;;
+;; Time Measures:
+;; (start code)
+;; Case  | Cycles | microSecs (us)
+;; -------------------------------
+;; Any   |  63    |  15.75
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Colour table
 cpct_firmware2hw_colour:: 
@@ -55,16 +67,15 @@ cpct_firmware2hw_colour::
   .db 0x12, 0x02, 0x13, 0x1A, 0x19, 0x1B, 0x0A, 0x03, 0x0B
 
 _cpct_getHWColour::
-   LD  HL, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
-   LD   B, H                ;; [ 4] B = 0, to be able to use C as an incremente for HL (adding BC)
-   ADD HL, SP               ;; [11]
-   LD   C, (HL)             ;; [ 7] A = Firmware INK colour value 
-   
-   LD  HL, #cpct_firmware2hw_colour ;; [10] HL points to the start of the colour table
-   ADD HL, BC               ;; [11] HL += C (as B=0), HL points to the exact hardware color value to return
+   ld   hl, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
+   ld    b, h                ;; [ 4] B = 0, to be able to use C as an incremente for HL (adding BC)
+   add  hl, sp               ;; [11]
+   ld    c, (hl)             ;; [ 7] A = Firmware INK colour value 
 
-   LD   L, (HL)             ;; [ 7] L = Return value (hardware colour for firmware colour supplied)
-   LD   H, B                ;; [ 4] H = 0, to leave HL just with the value of L
+   ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the colour table
+   add  hl, bc               ;; [11] HL += C (as B=0), HL points to the exact hardware color value to return
 
-   RET                      ;; [10] Return
-   
+   ld    l, (hl)             ;; [ 7] L = Return value (hardware colour for firmware colour supplied)
+   ld    h, b                ;; [ 4] H = 0, to leave HL just with the value of L
+
+   ret                      ;; [10] Return

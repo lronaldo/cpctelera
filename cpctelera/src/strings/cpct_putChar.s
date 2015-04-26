@@ -24,11 +24,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: void putchar(char c)
+;; Function: putchar
 ;;
-;; Brief:
 ;;    Prints a character on the screen using firmware routines. This function is 
 ;; required by printf when we use C standard library.
+;;
+;; C Definition:
+;;    void putchar(char c)
 ;;
 ;; Details:
 ;;    This function is required by C standard library to be able to use printf.
@@ -36,7 +38,7 @@
 ;; function makes use of firmware to print.
 ;;
 ;; Known limitations:
-;;    Firmware must be activated to be able to use this function.
+;;    *Firmware* must be *ENABLED* to be able to use this function.
 ;; 
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL

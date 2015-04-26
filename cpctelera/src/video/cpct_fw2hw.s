@@ -25,48 +25,67 @@
 
 .include /videomode.s/
 
-;
-;########################################################################
-;## FUNCTION: _cpct_fw2hw                                             ###
-;########################################################################
-;### Converts an array of firmware colour values into their equivalent###
-;### hardware colour values. It directly modifies the array passed to ###
-;### the function.                                                    ###
-;########################################################################
-;### INPUTS (3 Bytes)                                                 ###
-;###  * (2B DE) Array of firmware colour values (0-26 each)           ###
-;###  * (1B A)  Number of colour values in the array                  ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES                                                         ###
-;###  MEMORY: 59 bytes (32 code + 27 colour table)                    ###
-;###  TIME: 68 + 65*NumColours cycles (17.00 + 16.25*NC us)           ###
-;### Example:                                                         ###
-;###  16 colours, 1108 cycles (277,00 us)                             ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function: cpct_fw2hw
+;;
+;;    Converts an array of firmware colour values into their equivalent hardware colour values.
+;;
+;; C Definition:
+;;    void *cpct_fw2hw* (void* *fw_colour_array*, u8 *size*);
+;;
+;; Input Parameters (3 Bytes):
+;;    (2B DE) fw_colour_array - Pointer to an array of firmware colour values (in the range [0-26])
+;;    (1B A)  size            - Number of colour values in the array       
+;;
+;; Parameter Restrictions:
+;;    * *fw_colour_array* must be an array of values in the range [0-26], otherwise, return 
+;; value will be unexpected.
+;;    * *size* must be the number of elements in the array, and must be at least 1. A size of 0 
+;; would make this function overwrite 256 values in memory. Similarly, a value greater than the
+;; actual size of the array would result in some values outside the array being overwritten.
+;;
+;; Details:
+;;    Converts an array of firmware colour values into their equivalent hardware colour values. 
+;; It directly modifies the array passed to the function, overwritting the its values with 
+;; the hardware colour values.
+;;
+;; Destroyed Register values:
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    59 bytes (32 bytes code, 27 bytes colour conversion table)
+;;
+;; Time Measures:
+;; (start code)
+;; Case  |  Cycles    |  microSecs (us)
+;; ---------------------------------------
+;; Any   | 68 + 65*NC |  17.00 + 16.25*NC
+;; ---------------------------------------
+;; NC= 8 |    588     |  147.00
+;; NC=16 |   1108     |  277.00
+;; (end code)
+;;    NC=Number of colours to convert
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
 _cpct_fw2hw::
-   LD  HL, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
-   LD   B, H                ;; [ 4] B = 0, (BC = C) so that we can use BC as counter
-   ADD HL, SP               ;; [11]
-   LD   E, (HL)             ;; [ 7] DE = Pointer to colour array
-   INC HL                   ;; [ 6]
-   LD   D, (HL)             ;; [ 7]
-   INC HL                   ;; [ 6]
-   LD   C, (HL)             ;; [ 7] C = Number of colours to convert 
+   ld   hl, #2              ;; [10] HL = SP + 2 (Place where parameters start) 
+   ld    b, h               ;; [ 4] B = 0, (BC = C) so that we can use BC as counter
+   add  hl, sp              ;; [11]
+   ld    e, (hl)            ;; [ 7] DE = Pointer to colour array
+   inc  hl                  ;; [ 6]
+   ld    d, (hl)            ;; [ 7]
+   inc  hl                  ;; [ 6]
+   ld    c, (hl)            ;; [ 7] C = Number of colours to convert 
 
 f2h_colour_loop:
-   LD  HL, #cpct_firmware2hw_colour ;; [10] HL points to the start of the firmware2hw_colour array
-   LD   A, (DE)             ;; [ 7] A = Next colour to convert
-   ADD  L                   ;; [ 4] HL += C (HL Points to the table value correspondant to A)
-   LD   L, A                ;; [ 4] |  
-   JP  NC, f2h_ncarry       ;; [10] |   (8-bits sum: only when L+C generates carry, H must be incremented)
-   INC  H                   ;; [ 4] \
+   ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the firmware2hw_colour array
+   ld    a, (de)            ;; [ 7] A = Next colour to convert
+   add   l                  ;; [ 4] HL += C (HL Points to the table value correspondant to A)
+   ld    l, a               ;; [ 4] |  
+   jp   nc, f2h_ncarry      ;; [10] |   (8-bits sum: only when L+C generates carry, H must be incremented)
+   inc   h                  ;; [ 4] \
 f2h_ncarry:
-   LDI                      ;; [16] (DE) = (HL) overwrite firmware colour value with hardware colour (and HL++, DE++)
-   JP  PE, f2h_colour_loop  ;; [10] IF BC != 0, continue converting, else end
+   ldi                      ;; [16] (DE) = (HL) overwrite firmware colour value with hardware colour (and HL++, DE++)
+   jp   pe, f2h_colour_loop ;; [10] IF BC != 0, continue converting, else end
    
-   RET                      ;; [10] Return
+   ret                      ;; [10] Return
