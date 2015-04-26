@@ -96,7 +96,7 @@
 ;;
 ;; Bndry does not work when file is linked after being compiled.
 ;.bndry 4    ;; Make this vector start at a 4-byte aligned address to be able to use 8-bit arithmetic with pointers
-dc_mode1_ct: .db 0x00, 0x08, 0x80, 0x88
+dc_mode1_ct:: .db 0x00, 0x08, 0x80, 0x88
 
 _cpct_drawCharM1::
    ;; GET Parameters from the stack 

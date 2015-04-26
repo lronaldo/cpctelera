@@ -43,5 +43,6 @@ extern void cpct_setVideoMemoryOffset(char offset);
 extern void cpct_memset(void *array, unsigned int size, unsigned char value);
 
 extern   u8 cpct_px2byteM0(u8 px0, u8 px1);
+extern   u8 cpct_px2byteM1(u8 px0, u8 px1, u8 px2, u8 px3);
 
 #endif

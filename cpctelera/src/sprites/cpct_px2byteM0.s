@@ -76,7 +76,7 @@
 ;;    NC=Number of colours to convert
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Pixel colour table defined in cpct_drawStringM0
+;; Pixel colour table defined in cpct_drawCharM0
 .globl dc_mode0_ct
 
 _cpct_px2byteM0::
