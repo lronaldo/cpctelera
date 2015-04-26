@@ -55,7 +55,7 @@
 ;###  * (2B DE) Video memory location where the char will be printed  ### 
 ;###  * (1B C) Foreground color (PEN, 0-3)                            ###
 ;###  * (1B B) Background color (PEN, 0-3)                            ###
-;###  * (1B L) Character to be printed (ASCII code)                   ###
+;###  * (1B A) Character to be printed (ASCII code)                   ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
@@ -105,7 +105,8 @@ dcm1_restoreSP:
    ld  a, l                    ;; [ 4] A = ASCII code of the character
 
 _cpct_drawCharM1_asm::
-   ld  (dcm1_asciiHL+2), a     ;; [13] Save ASCII code of the character as data of a later "LD HL, #data" instruction. This is faster than pushing and popping to the stack because H needs to be resetted
+   ld  (dcm1_asciiHL+2), a     ;; [13] Save ASCII code of the character as data of a later "OR #data" instruction. 
+                               ;; .... This is 1-cycle faster than pushing and popping to the stack and resets Carry Flag
 
    ld  hl, #dc_mode1_ct        ;; [10] HL points to the start of the color table
    ;LD  A, L                   ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
@@ -137,8 +138,8 @@ _cpct_drawCharM1_asm::
    ld  a, c                    ;; [ 4] A = Foreground color bits (Previously stored into C)
    ld (dcm1_drawForeground+1), a ;; [13] Modify Inmediate value of "OR #0" to set it with the foreground color bits
 
-   ;; Make HL point to the starting byte of the desired character,
-   ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address (0x3800)
+   ;; Calculate the memory address where the 8 bytes defining the character appearance 
+   ;; ... start (HL = 0x3800 + 8*ASCII value). char0_ROM_address = 0x3800
 dcm1_asciiHL:
    xor  a                      ;; [ 4] A = 0
    or   #0                     ;; [ 7] A = ASCII Value and Resetting carry flag (#0 is a placeholder that will be filled up with ASII value)

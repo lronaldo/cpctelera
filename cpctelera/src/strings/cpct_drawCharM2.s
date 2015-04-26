@@ -59,43 +59,45 @@
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
 ;### MEASURES                                                         ###
-;### MEMORY: 71 bytes                                                 ###
+;### MEMORY: 76 bytes                                                 ###
 ;### TIME:                                                            ###
-;###  Best case  = 770 cycles (192.50 us)                             ###
-;###  Worst case = 814 cycles (203.50 us)                             ###
+;###  Best case  = 759 cycles (189.75 us)                             ###
+;###  Worst case = 803 cycles (200.75 us)                             ###
 ;########################################################################
 ;
 
 _cpct_drawCharM2::
    ;; Get Parameters from stack (POP + Push)
-   POP  AF                     ;; [10] AF = Return Address
-   POP  DE                     ;; [10] DE = Pointer to video memory location where to print character
-   POP  BC                     ;; [10] B = Character to be printed (ASCII), C = Foreground Color (0, 1)
-   PUSH BC                     ;; [11] --- Restore Stack status ---
-   PUSH DE                     ;; [11] 
-   PUSH AF                     ;; [11]
+   pop  af                     ;; [10] AF = Return Address
+   pop  de                     ;; [10] DE = Pointer to video memory location where to print character
+   pop  bc                     ;; [10] B = Character to be printed (ASCII), C = Foreground Color (0, 1)
+   push bc                     ;; [11] --- Restore Stack status ---
+   push de                     ;; [11] 
+   push af                     ;; [11]
 
 _cpct_drawCharM2_asm::
 
    ;; Set up the color for printing, either foreground or video-inverted
-   XOR A                       ;; [ 4] A = 00h (NOP machine code, which will do nothing in the main loop)
-   LD  H, A                    ;; [ 4] H = 00h (We need it later to put ASCII code in HL, by making L = ASCII code)
-   CP  C                       ;; [ 4] Check if C is 0 or not (C: Character color, 0=Inverted, 1=Foreground color)
-   JP NZ, dc_print_fg_color    ;; [10] IF B != 0, then continue printing in normal foreground colour
-   LD  A, #0x2F                ;; [ 7] A = 2Fh (CPL machine code, used to invert bytes in main loop)
+   xor   a                     ;; [ 4] A = 0 + Carry reset (NOP machine code, which will do nothing in the main loop)
+   dec   c                     ;; [ 4] Check if C is 0 or not, preserving Carry Flag status (C: Character color, 0=Inverted, 1=Foreground color)
+   jp    p, dc_print_fg_color  ;; [10] IF B != 0 (C is still positive after dec), then continue printing in normal foreground colour
+   ld    a, #0x2F              ;; [ 7] A = 2Fh (CPL machine code, used to invert bytes in main loop)
 dc_print_fg_color:
-   LD (dc_nextline+1), A       ;; [13] Modify XOR code to be XOR #0xFF or XOR #0, to invert colours on printing or not
+   ld (dc_nextline+1), a       ;; [13] Modify XOR code to be XOR #0xFF or XOR #0, to invert colours on printing or not
 
-   ;; Make HL point to the starting byte of the desired character,
-   ;; That is ==> HL = 8*(ASCII code) + char0_ROM_address
-   LD   L, B                   ;; [ 4] HL = ASCII code of the character
-   ;LD   H, #0                 ;; We did this before, with LD H, A
+   ;; Calculate the memory address where the 8 bytes defining the character appearance 
+   ;; ... start (HL = 0x3800 + 8*ASCII value). char0_ROM_address = 0x3800
+   ld   a, b                   ;; [ 4] A = ASCII Value
+   ld   h, #0x07               ;; [ 7] H = 0x07, because 0x07 * 8 = 0x38, (high byte of 0x3800)
 
-   ADD  HL, HL                 ;; [11] HL = HL * 8  (8 bytes each character)
-   ADD  HL, HL                 ;; [11]
-   ADD  HL, HL                 ;; [11]
-   LD   BC, #char0_ROM_address ;; [10] BC = 0x3800, Start ROM memory address of Char 0
-   ADD  HL, BC                 ;; [11] HL += BC
+   rla                         ;; [ 4] A = 8*A (using 3 rotates left). We use RLA as it passes exceeding bits 
+   rl   h                      ;; [ 8] ... to the carry flag, and we can then pass them on to the 3 lowest bits of H
+   rla                         ;; [ 4] ... using rl h. So H ends up being H = 8*H + A/32, what makes H be in the 
+   rl   h                      ;; [ 8] ... [0x38-0x3F] range, where character definitions are.
+   rla                         ;; [ 4]
+   rl   h                      ;; [ 8] 
+
+   ld   l, a                   ;; [ 4] L = A, so that HL points to the start of the character definition in ROM memory
 
    LD  C, #8                   ;; [ 7] C = 8 lines counter (8 character lines to be printed out)
 
