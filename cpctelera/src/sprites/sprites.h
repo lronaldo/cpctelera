@@ -55,7 +55,26 @@ extern void cpct_setVideoMemoryOffset  (  i8 offset);
 #define cpct_page40	0x10
 #define cpct_page00 0x00
 
-// Calculate mempage value for cpct_setVideoMemoryPage
+//
+// Function: cpct_memPage6
+//
+// 	Macro that encodes a video memory page in the 6 Least Significant bits (LSb)
+// of a byte, required as parameter for <cpct_setVideoMemoryPage>
+//
+// C Definition:
+//	#define *cpct_memPage6* (*PAGE*)
+//
+// Parameters (1 byte):
+//	(1B) PAGE - Video memory page wanted 
+//
+// Returns:
+//	 u8	- Video Memory Page encoded in the 6 LSb of the byte.
+//
+// Details:
+//	 This is just a macro that shifts *PAGE* 2 bits to the right, to leave it
+// with just 6 significant bits. For more information, check functions
+// <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
+//
 #define cpct_memPage6(A) ((A) >> 2)
 
 #endif
