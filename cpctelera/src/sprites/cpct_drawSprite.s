@@ -141,13 +141,13 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case     |           Cycles            | microSecs (us)
+;; Case     |           Cycles              | microSecs (us)
 ;; --------------------------------------------------------------------------
-;; Best     | 51+(79+16*W)*H + 31*[H / 8] | 12.75+(19.79+4*W)*H + 7.75*[H/8]
-;; Worst    | 82+(79+16*W)*H + 31*[H / 8] | 20.50+(19.79+4*W)*H + 7.75*[H/8]
+;; Best     |  70 + (85 + 16W)H + 31[H / 8] | 17.50+(21.25+4*W)*H + 7.75*[H/8]
+;; Worst    | 101 + (85 + 16W)H + 31[H / 8] | 25.25+(21.25+4*W)*H + 7.75*[H/8]
 ;; --------------------------------------------------------------------------
-;; W=2,H=16 |        1889 / 1920          |   472.25 /  480.00
-;; W=4,H=32 |        4751 / 4782          |  1187.75 / 1195.50
+;; W=2,H=16 |        1493 / 1514            |   373.25 /  378.50
+;; W=4,H=32 |        4931 / 4962            |  1232.75 / 1240.50
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes
 ;;
@@ -182,7 +182,7 @@ ds_restoreSP:
    push bc                    ;; [11] Restore Stack status pushing values again
    push de                    ;; [11] (Interrupt safe way, 6 cycles more)
    push hl                    ;; [11]
-   push af                    ;; [11]
+   push af                    ;; [11] 
 .endif
 
    ;; Modify code using width to jump in drawSpriteWidth
