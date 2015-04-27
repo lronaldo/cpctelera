@@ -57,6 +57,14 @@
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
 ;;
+;; Known limitations:
+;;    This function does not do any kind of boundary check or clipping. If you 
+;; try to draw sprites on the frontier of your video memory or screen buffer 
+;; if might potentially overwrite memory locations beyond boundaries. This 
+;; could cause your program to behave erratically, hang or crash. Always 
+;; take the necessary steps to guarantee that you are drawing inside screen
+;; or buffer boundaries.
+;;
 ;; Details:
 ;;    This function copies a generic WxH bytes sprite from memory to a 
 ;; video-memory location (either present video-memory or software / hardware  
