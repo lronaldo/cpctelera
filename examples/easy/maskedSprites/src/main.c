@@ -43,7 +43,7 @@ void main(void) {
 
    // Paint an array of charlies
    for (x=0; x < 8; x++) 
-      cpct_drawMaskedSprite(G_charlie_sprite, charlies[x], 4, 16);
+      cpct_drawSpriteMasked(G_charlie_sprite, charlies[x], 4, 16);
 
    while(1) {}
 }

@@ -42,7 +42,7 @@ extern void cpct_drawSpriteAligned4x8  (void *sprite, void* memory);
 extern void cpct_drawSpriteAligned2x8_f(void *sprite, void* memory);
 extern void cpct_drawSpriteAligned4x8_f(void *sprite, void* memory);
 extern void cpct_drawSprite            (void *sprite, void* memory, u8 width, u8 height);
-extern void cpct_drawMaskedSprite      (void *sprite, void* memory, u8 width, u8 height);
+extern void cpct_drawSpriteMasked      (void *sprite, void* memory, u8 width, u8 height);
 extern void cpct_drawSolidBox          (void *memory, u8 colour_pattern, u8 width, u8 height);
 
 // Functions to modify video memory location
@@ -50,10 +50,10 @@ extern void cpct_setVideoMemoryPage    (  i8 page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset  (  i8 offset);
 
 // Useful constants with some typical video memory pages
-const i8 cpct_pageC0 = 0x30; // 0xC0 >> 2 = 0x40
-const i8 cpct_page80 = 0x20; // 0x80 >> 2 = 0x20
-const i8 cpct_page40 = 0x10; // 0x40 >> 2 = 0x10
-const i8 cpct_page00 = 0x00;
+#define cpct_pageC0 0x30
+#define cpct_page80	0x20
+#define cpct_page40	0x10
+#define cpct_page00 0x00
 
 // Calculate mempage value for cpct_setVideoMemoryPage
 #define cpct_memPage6(A) ((A) >> 2)

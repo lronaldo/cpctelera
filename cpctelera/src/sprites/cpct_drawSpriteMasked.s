@@ -21,13 +21,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_drawMaskedSprite
+;; Function: cpct_drawSpriteMasked
 ;;
 ;;    Copies a masked sprite from an array to video memory (or to a screen buffer),
 ;; using mask as transparency information, to prevent erasing the background.
 ;;
 ;; C Definition:
-;;    void *cpct_drawMaskedSprite* (void* *sprite*, void* *memory*, u8 *width*, u8 *height*);
+;;    void *cpct_drawSpriteMasked* (void* *sprite*, void* *memory*, u8 *width*, u8 *height*);
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel and mask data)
@@ -126,7 +126,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-_cpct_drawMaskedSprite::
+_cpct_drawSpriteMasked::
    ;; GET Parameters from the stack 
 .if let_disable_interrupts_for_function_parameters
    ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
