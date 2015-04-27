@@ -22,7 +22,7 @@
 //
 // Macro for fastly cleaning the screen, filling it up with 0's
 //
-#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0x4000, 0);
+#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0, 0x4000);
 
 //
 // Convenient type definitions

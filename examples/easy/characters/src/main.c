@@ -21,7 +21,7 @@
 //
 // Macro for fastly cleaning the screen, filling it up with 0's
 //
-#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0x4000, 0);
+#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0, 0x4000);
 
 //
 // This function calculates next video memory location, cycling pointer
@@ -41,7 +41,7 @@ void main(void) {
    unsigned char charnum, times;
    unsigned char colors[5];
 
-   cpct_memset((char*)colors, 5, 0);
+   cpct_memset((char*)colors, 0, 5);
    cpct_disableFirmware();
 
    //

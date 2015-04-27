@@ -48,9 +48,9 @@ void main (void)
    cpct_setVideoMode(2);
 
    while(1) {
-      cpct_memset(array,  10, 0);
-      cpct_memset(array2, 20, 0);
-      cpct_memset(array3, 40, 0);
+      cpct_memset(array,  0, 10);
+      cpct_memset(array2, 0, 20);
+      cpct_memset(array3, 0, 40);
 
       for (i = 0; i < 80; ++i) {
          cpct_setBit  (array,  i,     1);

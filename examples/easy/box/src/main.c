@@ -20,7 +20,7 @@
 
 void main(void) {
    // Clear Screen
-   cpct_memset((void*)0xC000, 0x4000, 0);
+   cpct_memset((void*)0xC000, 0, 0x4000);
 
    cpct_drawSolidBox((void*)0xC235, 0x3C, 10, 20); 
    cpct_drawSolidBox((void*)0xC245, 0x92, 10, 20); 

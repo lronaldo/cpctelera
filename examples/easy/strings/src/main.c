@@ -21,7 +21,7 @@
 //
 // Macro for fastly cleaning the screen, filling it up with 0's
 //
-#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0x4000, 0);
+#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0, 0x4000);
 
 //
 // Wait n complete screen frames (1/50)s
@@ -35,7 +35,7 @@ void wait_frames (unsigned int nframes) {
 void main(void) {
    unsigned char *video_pos, times, colors[5];
 
-   cpct_memset((char*)colors, 5, 0);
+   cpct_memset((char*)colors, 0, 5);
    cpct_disableFirmware();
 
    // Loop forever showing characters on different modes and colors

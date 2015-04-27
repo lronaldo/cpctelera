@@ -84,12 +84,12 @@ _cpct_memset::
    inc  hl           ;; [ 6]
    ld    d, (hl)     ;; [ 7] 
    inc  hl           ;; [ 6]
+   ldi               ;; [16] (HL)->(DE) Copy value to the first byte of the memory to be set
+                     ;; .... and, at the same time, do INC HL, INC DE and DEC BC
    ld    c, (hl)     ;; [ 7] BC = Amount of bytes in memory to set to the value of A
    inc  hl           ;; [ 6]
    ld    b, (hl)     ;; [ 7]
-   inc  hl           ;; [ 6] HL finally points to the value to be set
-
-   ldi               ;; [16] (HL)->(DE) Copy value to the first byte of the memory to be set
+   dec   bc          ;; [ 6] BC-- (As 1 byte has alread been copied)
 
    ;; Set up HL and DE for a massive copy of the Value to be set
    ld    h, d        ;; [ 4] HL = DE (2nd byte of the memory array to be filled up)

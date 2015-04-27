@@ -41,7 +41,7 @@ extern void cpct_drawMaskedSprite          (void *sprite, void* memory, u8 width
 extern void cpct_drawSolidBox              (void *memory, u8 colour_pattern, u8 width, u8 height);
 extern void cpct_setVideoMemoryPage        (  i8 page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset      (  i8 offset);
-extern void cpct_memset                    (void *array, u16 size, u8 value);
+extern void cpct_memset                    (void *array, u8 value, u16 size);
 
 extern   u8 cpct_px2byteM0(u8 px0, u8 px1);
 extern   u8 cpct_px2byteM1(u8 px0, u8 px1, u8 px2, u8 px3);
