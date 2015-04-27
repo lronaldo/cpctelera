@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,9 +29,14 @@
 
 #include <types.h>
 
-// Calculate mem page value for cpct_setVideoMemoryPage
-#define cpct_memPage6(A) ((A) >> 2)
+// Standard memory management functions
+extern void cpct_memset    (void *array, u8 value, u16 size);
 
+// Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
+extern   u8 cpct_px2byteM0 (u8 px0, u8 px1);
+extern   u8 cpct_px2byteM1 (u8 px0, u8 px1, u8 px2, u8 px3);
+
+// Sprite and box drawing functions
 extern void cpct_drawSpriteAligned2x8  (void *sprite, void* memory);
 extern void cpct_drawSpriteAligned4x8  (void *sprite, void* memory);
 extern void cpct_drawSpriteAligned2x8_f(void *sprite, void* memory);
@@ -39,11 +44,18 @@ extern void cpct_drawSpriteAligned4x8_f(void *sprite, void* memory);
 extern void cpct_drawSprite            (void *sprite, void* memory, u8 width, u8 height);
 extern void cpct_drawMaskedSprite      (void *sprite, void* memory, u8 width, u8 height);
 extern void cpct_drawSolidBox          (void *memory, u8 colour_pattern, u8 width, u8 height);
+
+// Functions to modify video memory location
 extern void cpct_setVideoMemoryPage    (  i8 page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset  (  i8 offset);
-extern void cpct_memset                (void *array, u8 value, u16 size);
 
-extern   u8 cpct_px2byteM0(u8 px0, u8 px1);
-extern   u8 cpct_px2byteM1(u8 px0, u8 px1, u8 px2, u8 px3);
+// Useful constants with some typical video memory pages
+const i8 cpct_pageC0 = 0x30; // 0xC0 >> 2 = 0x40
+const i8 cpct_page80 = 0x20; // 0x80 >> 2 = 0x20
+const i8 cpct_page40 = 0x10; // 0x40 >> 2 = 0x10
+const i8 cpct_page00 = 0x00;
+
+// Calculate mempage value for cpct_setVideoMemoryPage
+#define cpct_memPage6(A) ((A) >> 2)
 
 #endif

@@ -20,24 +20,25 @@
 #include "newton_sprite.def"
 
 void main(void) {
-   unsigned int scr[2] = { 0xC000, 0x8000 };
-   cpct_keyID   key[2] = { Key_1,  Key_2  };
-
+   // Disable firmware and set Mode 0
    cpct_disableFirmware();
    cpct_setVideoMode(0);
 
-   // Lets Draw 1 Sprite on Buffer 0 and 2 sprites on Buffer 1
-   cpct_drawSprite(G_newton_sprite, (void*)(scr[0] +  912), 16, 32);
-   cpct_drawSprite(G_newton_sprite, (void*)(scr[1] +  662), 16, 32);
-   cpct_drawSprite(G_newton_sprite, (void*)(scr[1] + 1240), 16, 32);
+   // Lets Draw 1 sprite on page C0 (RAM bank 3) and 
+   // ... 2 sprites on page 80 (RAM bank 2)
+   cpct_drawSprite(G_newton_sprite, (void*)(0xC000 +  912), 16, 32);
+   cpct_drawSprite(G_newton_sprite, (void*)(0x8000 +  662), 16, 32);
+   cpct_drawSprite(G_newton_sprite, (void*)(0x8000 + 1240), 16, 32);
 
+   // MAIN Loop
    while(1) {
-      unsigned char i;
+      // Scan keyboard
       cpct_scanKeyboardFast();
 
-      for (i=0; i < 2; i++) {
-         if (cpct_isKeyPressed(key[i]))
-            cpct_setVideoMemoryPage(cpct_memPage6(scr[i] >> 8));
-      }
+      // Change Video Memory Page if we press Key 1 or Key 2
+      if      (cpct_isKeyPressed(Key_1))
+         cpct_setVideoMemoryPage(cpct_pageC0);
+      else if (cpct_isKeyPressed(Key_2))
+         cpct_setVideoMemoryPage(cpct_page80);
    }
 }
