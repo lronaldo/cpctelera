@@ -32,6 +32,9 @@
 ;;    (1B A) px0 - Firmware colour value for left  pixel (pixel 0) [0-15]
 ;;    (1B A) px1 - Firmware colour value for right pixel (pixel 1) [0-15]
 ;;
+;; Returns:
+;;    u8 - byte with *px0* and *px1* colour information in screen pixel format.
+;;
 ;; Parameter Restrictions:
 ;;    * *px0* and *px1* must be firmware colour values in the range [0-15]. If
 ;; any of them is greater than 15, unexpected colours may appear on screen. *px0*

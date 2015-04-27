@@ -34,6 +34,9 @@
 ;;    (1B A) px2 - Firmware colour value for center-right pixel (pixel 2) [0-3]
 ;;    (1B A) px3 - Firmware colour value for right        pixel (pixel 3) [0-3]
 ;;
+;; Returns:
+;;    u8 - byte with *px0*, *px1*, *px2* and *px3* colour information in screen pixel format.
+;;
 ;; Parameter Restrictions:
 ;;    * *px0*, *px1*, *px2* and *px3* must be firmware colour values in the range 
 ;; [0-3]. If any of them is greater than 3, unexpected colours may appear on screen.
