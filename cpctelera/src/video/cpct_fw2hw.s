@@ -57,12 +57,13 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  |  Cycles    |  microSecs (us)
+;; Case  |   Cycles    |  microSecs (us)
 ;; ---------------------------------------
-;; Any   | 68 + 65*NC |  17.00 + 16.25*NC
+;; Best  |  68 + 61*NC |  17.00 + 15.25*NC
+;; Worst |  68 + 65*NC |  17.00 + 16.25*NC
 ;; ---------------------------------------
-;; NC= 8 |    588     |  147.00
-;; NC=16 |   1108     |  277.00
+;; NC= 8 |  556 /  588 |  139.00 / 147.00
+;; NC=16 | 1044 / 1108 |  261.00 / 277.00 
 ;; (end code)
 ;;    NC=Number of colours to convert
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -80,9 +81,9 @@ _cpct_fw2hw::
 f2h_colour_loop:
    ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the firmware2hw_colour array
    ld    a, (de)            ;; [ 7] A = Next colour to convert
-   add   l                  ;; [ 4] HL += C (HL Points to the table value correspondant to A)
+   add   l                  ;; [ 4] HL += A (HL Points to the table value correspondant to A)
    ld    l, a               ;; [ 4] |  
-   jp   nc, f2h_ncarry      ;; [10] |   (8-bits sum: only when L+C generates carry, H must be incremented)
+   jp   nc, f2h_ncarry      ;; [10] |   (8-bits sum: only when L+A generates carry, H must be incremented)
    inc   h                  ;; [ 4] \
 f2h_ncarry:
    ldi                      ;; [16] (DE) = (HL) overwrite firmware colour value with hardware colour (and HL++, DE++)
