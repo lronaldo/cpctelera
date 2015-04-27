@@ -56,7 +56,7 @@
 ;; take the necessary steps to guarantee that you are drawing inside screen
 ;; or buffer boundaries.
 ;;     * As this function receives a byte-pointer to memory, it can only 
-;; draw byte-sized and byte-aligned sprites. This means that the box cannot
+;; draw byte-sized and byte-aligned sprites. This means that the sprite cannot
 ;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
