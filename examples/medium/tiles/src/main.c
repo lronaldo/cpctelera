@@ -51,10 +51,10 @@ void printAllScreen(Byte* sprite, Byte spritewidth, TDrawFunc function) {
    for (y=0; y < 25; y++) { 
       for (x=0; x < (80/spritewidth); x++) {
          switch (function) {
-            case _2x8Fast: cpct_drawSprite2x8Fast_aligned(sprite, video_mem); break;
-            case _2x8:     cpct_drawSprite2x8_aligned(sprite, video_mem); break;
-            case _4x8Fast: cpct_drawSprite4x8Fast_aligned(sprite, video_mem); break;
-            case _4x8:     cpct_drawSprite4x8_aligned(sprite, video_mem); break;
+            case _2x8Fast: cpct_drawSpriteAligned2x8_f(sprite, video_mem); break;
+            case _2x8:     cpct_drawSpriteAligned2x8  (sprite, video_mem); break;
+            case _4x8Fast: cpct_drawSpriteAligned4x8_f(sprite, video_mem); break;
+            case _4x8:     cpct_drawSpriteAligned4x8  (sprite, video_mem); break;
          }
          video_mem += spritewidth;
       }
