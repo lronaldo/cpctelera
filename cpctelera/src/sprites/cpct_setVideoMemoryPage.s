@@ -54,7 +54,8 @@
 ;; as its 6 LSb (--bbbbbb). We have to take this into account to correctly 
 ;; set the page we want.
 ;;                                                                  
-;;    To better explain this, lets show an example:
+;;    To better explain this, lets show an example,
+;;
 ;;    1 - You want your Video Memory to start at 0x8000, instead of 0xC000
 ;;    2 - Then, you should set Video Memory Page to 0x80 (10000000)
 ;;    3 - You call this routine with 0x20 as parameter (00100000)
