@@ -19,27 +19,85 @@
 
 .include /sprites.s/
 
-;
-;########################################################################
-;### FUNCTION: cpct_drawSolidBox                                      ###
-;########################################################################
-;### This function draws a solid 1 colour pattern box (a square full  ###
-;### of a given colour pattern) anywhere at the screen.               ###
-;########################################################################
-;### INPUTS (5 Bytes)                                                 ###
-;###  * (2B DE) Video memory pointer to the upper left box corner byte###
-;###  * (1B)   1-byte colour pattern to fill the box with             ###
-;###  * (1B C) Box Width in bytes                                     ###
-;###  * (1B B) Box Height in bytes (Max. 64 bytes)                    ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY:  bytes                                                   ###
-;### TIME:                  (w=width, h=height)                       ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_drawSolidBox
+;;
+;;    Fills up a rectangle in video memory (or screen buffer) with a given 
+;; colour data byte. Could be used for drawing coloured rectangles as well as
+;; erasing screen rectangles easily.
+;;
+;; C Definition:
+;;    void *cpct_drawSolidBox* (void* *memory*, u8 *colour_pattern*, u8 *width*, u8 *height*);
+;;
+;; Input Parameters (5 bytes):
+;;  (2B DE) memory         - Video memory pointer to the upper left box corner byte
+;;  (1B _ ) colour_pattern - 1-byte colour pattern (in screen pixel format) to fill the box with
+;;  (1B C ) width          - Box width *in bytes* [1-64] (Beware! *not* in pixels!)
+;;  (1B B ) height         - Box height in bytes (>0)
+;;
+;; Parameter Restrictions:
+;;  * *memory* could be any place in memory, inside or outside current video memory. It
+;; will be equally treated as video memory (taking into account CPC's video memory 
+;; disposition). This lets you copy sprites to software or hardware backbuffers, and
+;; not only video memory.
+;;  * *colour_pattern* could be any 8-bit value, and should be in screen pixel format.
+;; Functions <cpct_px2byteM0> and <cpct_px2byteM1> could be used to calculate 
+;; screen pixel formatted bytes out of firmware colours for each pixel in the byte. 
+;; If you wanted to know more about screen pixel formats, check <cpct_px2byteM0> or 
+;; <cpct_px2byteM1>. Screen pixel format for Mode 2 is just a linear 1-pixel = 1-bit.
+;;  * *width* must be the width of the box *in bytes*, and must be in the range [1-64].
+;; A box *width* outside the range [1-64] will probably make the program hang or crash, 
+;; due to the optimization technique used. Always remember that the *width* must be 
+;; expressed in bytes and *not* in pixels. The correspondence is:
+;;    mode 0      - 1 byte = 2 pixels
+;;    modes 1 / 3 - 1 byte = 4 pixels
+;;    mode 2      - 1 byte = 8 pixels
+;;  * *height* must be the height of the box in bytes, and must be greater than 0. 
+;; There is no practical upper limit to this value. Height of a box in
+;; bytes and pixels is the same value, as bytes only group consecutive pixels in
+;; the horizontal space.
+;;
+;; Known limitations:
+;;    * This function does not do any kind of boundary check or clipping. If you 
+;; try to draw boxes on the frontier of your video memory or screen buffer 
+;; if might potentially overwrite memory locations beyond boundaries. This 
+;; could cause your program to behave erratically, hang or crash. Always 
+;; take the necessary steps to guarantee that you are drawing inside screen
+;; or buffer boundaries.
+;;    * As this function receives a byte-pointer to memory, it can only 
+;; draw byte-sized and byte-aligned boxes. This means that the box cannot
+;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
+;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
+;; 8 in mode 2).
+;;
+;; Details:
+;;    This function draws a solid colour-patterned box (a rectangle full
+;; of a given colour pattern) anywhere at the video memory or screen buffer.
+;; It does so by copying the colour pattern byte to the top-left byte 
+;; of the box and then cloning that byte to the next bytes of the box.
+;; As it does so using an unrolled LDIR and a dynamic JR, it is limited 
+;; to 64 LDIs (64 bytes-wide at most). 
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    54 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case     |           Cycles               |      microSecs (us)
+;; ----------------------------------------------------------------------------------
+;; Best     |  81 + (107 + 16W)H + 40[H / 8] | 20.25 + (26.75 + 4W)H + 10*[H / 8]
+;; Worst    | 121 + (107 + 16W)H + 40[H / 8] | 30.25 + (26.75 + 4W)H + 10*[H / 8]
+;; ----------------------------------------------------------------------------------
+;; W=2,H=16 |        2345 / 2385             |     586.25 /  596.25
+;; W=4,H=32 |        5673 / 5713             |    1418.25 / 1428.25
+;; (end code)
+;;    W = *width* in bytes, H = *height* in bytes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 _cpct_drawSolidBox::
    ;; GET Parameters from the stack
@@ -75,11 +133,11 @@ dsb_drawSpriteWidth:
 dsb_drawFirstLine:
    ld c, #0xFF          ;; [ 7] C = 255 to ensure B never gets modified by LDIs (that discount 1 from BC)
    .DW #0x0018  ;; JR 0 ;; [12] Self modifying instruction: the '00' will be substituted by the required jump forward.
-                        ;;      (Note: Writting JR 0 compiles but later it gives odd linking errors)
-   ldi                  ;; [16] <| 63 ldis, which are able to copy up to 63 bytes each time.
+                        ;;      (Note: Writing JR 0 compiles but later it gives odd linking errors)
+   ldi                  ;; [16] <| 63 LDIs, which are able to copy up to 63 bytes each time.
    ldi                  ;; [16]  | That means that each Sprite line should be 63 bytes width at most.
-   ldi                  ;; [16]  | The JR instruction at the start makes us ingnore the ldis we dont need (jumping over them)
-   ldi                  ;; [16] <| That ensures we will be doing only as much ldis as bytes our sprite is wide
+   ldi                  ;; [16]  | The JR instruction at the start makes us ignore the LDIs we don't need (jumping over them)
+   ldi                  ;; [16] <| That ensures we will be doing only as much LDIs as bytes our sprite is wide
    ldi                  ;; [16] <|
    ldi                  ;; [16]  |
    ldi                  ;; [16]  |

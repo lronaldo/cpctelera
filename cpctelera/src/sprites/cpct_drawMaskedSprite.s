@@ -36,7 +36,6 @@
 ;;  (1B C ) height - Sprite Height in bytes (>0)
 ;;
 ;; Parameter Restrictions:
-;; without counting mask bytes
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
 ;; along with mask data. Each mask byte will contain enabled bits as those that should
 ;; be picked from the background (transparent) and disabled bits for those that will
@@ -65,12 +64,17 @@
 ;; the horizontal space.
 ;;
 ;; Known limitations:
-;;    This function does not do any kind of boundary check or clipping. If you 
+;;    * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
 ;; could cause your program to behave erratically, hang or crash. Always 
 ;; take the necessary steps to guarantee that you are drawing inside screen
 ;; or buffer boundaries.
+;;    * As this function receives a byte-pointer to memory, it can only 
+;; draw byte-sized and byte-aligned sprites. This means that the box cannot
+;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
+;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
+;; 8 in mode 2).
 ;;
 ;; Details:
 ;;    This function copies a generic WxH bytes sprite from memory to a 
