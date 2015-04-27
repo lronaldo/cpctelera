@@ -19,9 +19,9 @@
 
 ;
 ;########################################################################
-;### FUNCTION: cpct_drawSprite4x8_aligned                             ###
+;### FUNCTION: cpct_drawSpriteAligned2x8                              ###
 ;########################################################################
-;### Copies a 4x8-bytes sprite from its original memory storage       ###
+;### Copies a 2x8-bytes sprite from its original memory storage       ###
 ;### position to a video memory position (taking into account video   ###
 ;### memory distribution). This function asumes that the destination  ###
 ;### in the video memory will be the starting line of a character.    ###
@@ -31,47 +31,41 @@
 ;### bytes are stored consecutively: they are copied as they are.     ###
 ;########################################################################
 ;### INPUTS (4 Bytes)                                                 ###
-;###  * (2B) Source Sprite Pointer (32-byte vector with pixel data)   ###
+;###  * (2B) Source Sprite Pointer (16-byte vector with pixel data)   ###
 ;###  * (2B) Destiny aligned video memory start location              ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
 ;###  Destroyed Register values: AF, BC, DE, HL                       ###
 ;########################################################################
-;### MEASURED TIME                                                    ###
-;###  MEMORY:  30 bytes                                               ###
-;###  TIME:   927 cycles                                              ###
+;### MEASURES                                                         ###
+;###  MEMORY:  25 bytes                                               ###
+;###  TIME:   566 cycles (141.50 us)                                  ### 
 ;########################################################################
 ;
-.globl _cpct_drawSprite4x8_aligned
-_cpct_drawSprite4x8_aligned::
-   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   POP  AF                 ;; [10] AF = Return Address
-   POP  HL                 ;; [10] HL = Source address
-   POP  DE                 ;; [10] DE = Destination address
-   PUSH DE                 ;; [11] Leave the stack as it was
-   PUSH HL                 ;; [11] 
-   PUSH AF                 ;; [11] 
+_cpct_drawSpriteAligned2x8::
+  ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   pop  af                  ;; [10] AF = Return Address
+   pop  hl                  ;; [10] HL = Source address
+   pop  de                  ;; [10] DE = Destination address
+   push de                  ;; [11] Leave the stack as it was
+   push hl                  ;; [11]
+   push af                  ;; [11]
 
-   ;; Copy 8 lines of 4 bytes width
-   LD   A, #8              ;; [ 7] We have to draw 8 lines of sprite
-   JP   dsa48_first_line   ;; [10] First line does not need to do math to start transfering data. 
+   ;; Copy 8 lines of 2 bytes width (2x8 = 16 bytes)
+   ld    a, d               ;; [ 4] Save D into A for fastly doing +800h increment of DE
+   ld   bc, #16             ;; [10] BC = 16, countdown of the number of bytes remaining
+   jp   dsa28_first_line    ;; [10] First line does not need to do math to start transfering data. 
 
-dsa48_next_line:
-   ;; Move to the start of the next line
-   EX   DE, HL             ;; [ 4] Make DE point to the start of the next line of pixels in video memory, by adding BC
-   ADD  HL, BC             ;; [11] (We need to interchange HL and DE because DE does not have ADD)
-   EX   DE, HL             ;; [ 4]
+dsa28_next_line:
+   ;; This 4 lines do "DE += 800h - 2h" to move DE pointer to the next pixel line at video memory
+   dec   e                  ;; [ 4] E -= 2 (We only decrement E because D is saved into A, 
+   dec   e                  ;; [ 4]         hence, it does not matter if E is 00 and becomes FF, cause we do not have to worry about D)
+   add   #8                 ;; [ 7] D += 8 (To add 800h to DE, we increment previous value of D by 8, and move it into D)
+   ld    d, a               ;; [ 4]
 
-dsa48_first_line:
-   ;; Draw a sprite-line of 4 bytes
-   LD   BC, #0x800         ;; [10] 800h bytes is the distance to the start of the first pixel in the next line in video memory (it will be decremented by 1 by each LDI)
-   LDI                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
-   LDI                     ;; [16]  |
-   LDI                     ;; [16]  |
-   LDI                     ;; [16] <|
+dsa28_first_line:
+   ldi                      ;; [16] Copy 2 bytes for (HL) to (DE) and decrement BC 
+   ldi                      ;; [16]
+   jp   pe, dsa28_next_line ;; [10] While BC!=0, continue copying bytes (When BC=0 LDI resets P/V, otherwise, P/V is set)
 
-   ;; Repeat for all the lines
-   DEC  A                  ;; [ 4] A = A - 1 (1 more line completed)
-   JP   NZ,dsa48_next_line ;; [10] 
-
-   RET                     ;; [10]
+   ret                      ;; [10]

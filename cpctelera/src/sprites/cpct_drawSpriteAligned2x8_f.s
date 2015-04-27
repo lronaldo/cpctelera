@@ -38,73 +38,73 @@
 ;###  TIME:   449 cycles (113.25 us)                                  ###
 ;########################################################################
 ;
-.globl _cpct_drawSprite2x8Fast_aligned
-_cpct_drawSprite2x8Fast_aligned::
+
+_cpct_drawSpriteAligned2x8_f::
   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   POP  AF                  ;; [10] AF = Return Address
-   POP  HL                  ;; [10] HL = Source address
-   POP  DE                  ;; [10] DE = Destination address
-   PUSH DE                  ;; [11] Leave the stack as it was
-   PUSH HL                  ;; [11]
-   PUSH AF                  ;; [11]
+   pop  af                  ;; [10] AF = Return Address
+   pop  hl                  ;; [10] HL = Source address
+   pop  de                  ;; [10] DE = Destination address
+   push de                  ;; [11] Leave the stack as it was
+   push hl                  ;; [11]
+   push af                  ;; [11]
 
    ;; Copy 8 lines of 2 bytes width (2x8 = 16 bytes)
    ;;  (Unrolled version of the loop)
-   LD   A, D                ;; [ 4] First, save DE into A and B, 
-   LD   B, E                ;; [ 4]   to ease the 800h increment step
-   LD   C, #17              ;; [ 7] Ensure that 16 LDIs do not change value of B (as they will decrement BC)
+   ld    a, d               ;; [ 4] First, save DE into A and B, 
+   ld    b, e               ;; [ 4]   to ease the 800h increment step
+   ld    c, #17             ;; [ 7] Ensure that 16 LDIs do not change value of B (as they will decrement BC)
 
    ;; Sprite Line 1
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
-   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
-   LD   D, A                ;; [ 4]
-   LD   E, B                ;; [ 4]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
    ;; Sprite Line 2
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
-   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
-   LD   D, A                ;; [ 4]
-   LD   E, B                ;; [ 4]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
    ;; Sprite Line 3
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
-   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
-   LD   D, A                ;; [ 4]
-   LD   E, B                ;; [ 4]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
    ;; Sprite Line 4
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
-   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
-   LD   D, A                ;; [ 4]
-   LD   E, B                ;; [ 4]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
    ;; Sprite Line 5
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
-   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
-   LD   D, A                ;; [ 4]
-   LD   E, B                ;; [ 4]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
    ;; Sprite Line 6
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
-   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
-   LD   D, A                ;; [ 4]
-   LD   E, B                ;; [ 4]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
    ;; Sprite Line 7
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
-   ADD  #8                  ;; [ 7] DE += 800h (Using previous A, B copy)
-   LD   D, A                ;; [ 4]
-   LD   E, B                ;; [ 4]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
    ;; Sprite Line 8
-   LDI                      ;; [16] Copy line (2 bytes)
-   LDI                      ;; [16]
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
 
-   RET                      ;; [10]
+   ret                      ;; [10]

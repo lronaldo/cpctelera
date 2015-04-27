@@ -32,16 +32,16 @@
 // Calculate mem page value for cpct_setVideoMemoryPage
 #define cpct_memPage6(A) ((A) >> 2)
 
-extern void cpct_drawSprite2x8_aligned     (void *sprite, void* memory);
-extern void cpct_drawSprite2x8Fast_aligned (void *sprite, void* memory);
-extern void cpct_drawSprite4x8_aligned     (void *sprite, void* memory);
-extern void cpct_drawSprite4x8Fast_aligned (void *sprite, void* memory);
-extern void cpct_drawSprite                (void *sprite, void* memory, u8 width, u8 height);
-extern void cpct_drawMaskedSprite          (void *sprite, void* memory, u8 width, u8 height);
-extern void cpct_drawSolidBox              (void *memory, u8 colour_pattern, u8 width, u8 height);
-extern void cpct_setVideoMemoryPage        (  i8 page_codified_in_6LSb);
-extern void cpct_setVideoMemoryOffset      (  i8 offset);
-extern void cpct_memset                    (void *array, u8 value, u16 size);
+extern void cpct_drawSpriteAligned2x8  (void *sprite, void* memory);
+extern void cpct_drawSpriteAligned4x8  (void *sprite, void* memory);
+extern void cpct_drawSpriteAligned2x8_f(void *sprite, void* memory);
+extern void cpct_drawSpriteAligned4x8_f(void *sprite, void* memory);
+extern void cpct_drawSprite            (void *sprite, void* memory, u8 width, u8 height);
+extern void cpct_drawMaskedSprite      (void *sprite, void* memory, u8 width, u8 height);
+extern void cpct_drawSolidBox          (void *memory, u8 colour_pattern, u8 width, u8 height);
+extern void cpct_setVideoMemoryPage    (  i8 page_codified_in_6LSb);
+extern void cpct_setVideoMemoryOffset  (  i8 offset);
+extern void cpct_memset                (void *array, u8 value, u16 size);
 
 extern   u8 cpct_px2byteM0(u8 px0, u8 px1);
 extern   u8 cpct_px2byteM1(u8 px0, u8 px1, u8 px2, u8 px3);
