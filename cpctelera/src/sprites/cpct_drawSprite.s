@@ -23,7 +23,7 @@
 ;;
 ;; Function: cpct_drawSprite
 ;;
-;;    Copys a sprite from an array to video memory (or to a screen buffer).
+;;    Copies a sprite from an array to video memory (or to a screen buffer).
 ;;
 ;; C Definition:
 ;;    void *cpct_drawSprite* (void* *sprite*, void* *memory*, u8 *width*, u8 *height*);
