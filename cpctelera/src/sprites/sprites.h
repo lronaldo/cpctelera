@@ -42,20 +42,49 @@ extern void cpct_drawSpriteAligned4x8  (void *sprite, void* memory);
 extern void cpct_drawSpriteAligned2x8_f(void *sprite, void* memory);
 extern void cpct_drawSpriteAligned4x8_f(void *sprite, void* memory);
 extern void cpct_drawSprite            (void *sprite, void* memory, u8 width, u8 height);
-extern void cpct_drawMaskedSprite      (void *sprite, void* memory, u8 width, u8 height);
+extern void cpct_drawSpriteMasked      (void *sprite, void* memory, u8 width, u8 height);
 extern void cpct_drawSolidBox          (void *memory, u8 colour_pattern, u8 width, u8 height);
 
 // Functions to modify video memory location
 extern void cpct_setVideoMemoryPage    (  i8 page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset  (  i8 offset);
 
-// Useful constants with some typical video memory pages
-const i8 cpct_pageC0 = 0x30; // 0xC0 >> 2 = 0x40
-const i8 cpct_page80 = 0x20; // 0x80 >> 2 = 0x20
-const i8 cpct_page40 = 0x10; // 0x40 >> 2 = 0x10
-const i8 cpct_page00 = 0x00;
-
-// Calculate mempage value for cpct_setVideoMemoryPage
+//
+// Macro: cpct_memPage6
+//
+// 	Macro that encodes a video memory page in the 6 Least Significant bits (LSb)
+// of a byte, required as parameter for <cpct_setVideoMemoryPage>
+//
+// C Definition:
+//	#define *cpct_memPage6* (*PAGE*)
+//
+// Parameters (1 byte):
+//	(1B) PAGE - Video memory page wanted 
+//
+// Returns:
+//	 u8	- Video Memory Page encoded in the 6 LSb of the byte.
+//
+// Details:
+//	 This is just a macro that shifts *PAGE* 2 bits to the right, to leave it
+// with just 6 significant bits. For more information, check functions
+// <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
+//
 #define cpct_memPage6(A) ((A) >> 2)
+
+//
+// Constants: Video Memory Pages
+//
+// Useful constants defining some typical Video Memory Pages to be used as 
+// parameters for <cpct_setVideoMemoryPage>
+//
+//	cpct_pageCO - Video Memory Page 0xC0 (0xC0··)
+//	cpct_page8O - Video Memory Page 0x80 (0x80··)
+//	cpct_page4O - Video Memory Page 0x40 (0x40··)
+//	cpct_page0O - Video Memory Page 0x00 (0x00··)
+//
+#define cpct_pageC0 0x30
+#define cpct_page80 0x20
+#define cpct_page40 0x10
+#define cpct_page00 0x00
 
 #endif
