@@ -6,10 +6,10 @@ Keyboard and joystick are connected to AY-3-8912 Programmable Sound Generator (P
 (start code)
            Peripheral          |  Port
          -------------------------------
-          PPI Port A           | 0xF4··
-          PPI Port B           | 0xF5··
-          PPI Port C           | 0xF6··
-          PPI Control-Register | 0xF7··
+          PPI Port A           | 0xF4--
+          PPI Port B           | 0xF5--
+          PPI Port C           | 0xF6--
+          PPI Control-Register | 0xF7--
          -------------------------------
   Table 1. Programmable Peripheral Interface (PPI) Ports
 (end)
