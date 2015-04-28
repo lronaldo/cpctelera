@@ -17,9 +17,12 @@
 ;;-------------------------------------------------------------------------------
 ;
 .module cpct_keyboard
+
+;
+; Function: cpct_isKeyPressed
 ;
 ;########################################################################
-;### FUNCTION: _cpct_isKeyPressed                                     ###
+;### 
 ;########################################################################
 ;### Checks if a concrete key is pressed or not. It does it looking   ###
 ;### at the keyboardStatusBuffer, which is filled up by scan routines.###
@@ -33,31 +36,31 @@
 ;###   -> True if the selected key is pressed, False otherwise.       ###
 ;########################################################################
 ;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: A, BC, HL                            ###
+;###  Destroyed Register values: A, D, BC, HL                         ###
 ;########################################################################
 ;### MEASURED TIME                                                    ###
-;###  97/100 cyles (24.25/25.00 us)                                   ###
+;###  95 cyles (23.75 us)                                             ###
 ;########################################################################
-;
+; 
 ;; Keyboard Status Buffer defined in an external file
 .globl cpct_keyboardStatusBuffer
 
-.globl _cpct_isKeyPressed
 _cpct_isKeyPressed::
    ;; Get Parameters from stack
-   LD  HL, #2                       ;; [10] HL = SP + 2 (Place where parameters start) 
-   LD   B,  H                       ;; [ 4] B = 0 (We need B to be 0 later, and here we save 3 cycles against a LD B, #0)
-   ADD HL, SP                       ;; [11]
-   LD   C, (HL)                     ;; [ 7] C = First Parameter (KeyID - Matrix Line)
-   INC HL                           ;; [ 6] 
-   LD   A, (HL)                     ;; [ 7] A = Second Parameter (KeyID - Bit Mask)
+   ld   hl, #2                      ;; [10] HL = SP + 2 (Place where parameters start) 
+   ld    b,  h                      ;; [ 4] B = 0 (We need B to be 0 later, and here we save 3 cycles against a ld B, #0)
+   add  hl, sp                      ;; [11]
+   ld    C, (hl)                    ;; [ 7] C = First Parameter (KeyID - Matrix Line)
+   inc  hl                          ;; [ 6] 
+   ld    a, (hl)                    ;; [ 7] A = Second Parameter (KeyID - Bit Mask)
+   ld    d, a                       ;; [ 4] D = A, save the Bit Mask into D for later use
 
-   LD  HL,#cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer
-   ADD HL, BC                       ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) (As B is already 0, so BC = C)
-   AND (HL)                         ;; [ 7] A = AND operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
-   JP  NZ,  ikp_returnFalse         ;; [10] If AND resulted non-zero, Key's bit was 1, what means key was not pressed (return false = 0)
-   LD   L, #0x01                    ;; [ 7] Else, Key's bit was 0, what means key was pressed (return true, L = 1)
-   RET                              ;; [10] Return
-ikp_returnFalse:
-   LD   L,  B                       ;; [ 4] Return false (L = 0)
-   RET                              ;; [10] Return
+   ld   hl,#cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer
+   add  hl, bc                      ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) (As B is already 0, so BC = C)
+   xor (hl)                         ;; [ 7] A = XOR operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
+                                    ;; .... Inverts the value of the bit associated to the given key that represents 
+                                    ;; .... because 1 represents not pressed and 0 pressed, but we want the inverse
+   and   d                          ;; [ 4] AND with the Bit Mask: leaves out only the bit associated to the key
+
+   ld    l, a                       ;; [ 4] Place the return value in L (0=not pressed, >0=pressed)
+   ret                              ;; [10] Return
