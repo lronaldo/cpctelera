@@ -88,6 +88,7 @@ extern   u8 cpct_isKeyPressed     (cpct_keyID key);
 //  FKC | cpct_keyID      || FKC  | cpct_keyID    ||  FKC  |  cpct_keyID   
 // --------------------------------------------------------------------
 //    0 | Key_CursorUp    ||  27  | Key_P         ||   54  |  Key_B
+//      |                 ||      |               ||       |  Key_Joy1Fire3
 //    1 | Key_CursorRight ||  28  | Key_SemiColon ||   55  |  Key_V
 //    2 | Key_CursorDown  ||  29  | Key_Colon     ||   56  |  Key_4
 //    3 | Key_F9          ||  30  | Key_Slash     ||   57  |  Key_3
