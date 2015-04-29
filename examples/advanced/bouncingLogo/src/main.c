@@ -27,7 +27,7 @@
 // Checks user input and returns acceleration values based on
 // the keys pressed by the user
 //
-void checkUserInput (float *ax, float *ay) {
+void checkUserInput (f32 *ax, f32 *ay) {
    // Read the keyboard
    cpct_scanKeyboardFast();
 
@@ -65,7 +65,7 @@ void main(void) {
       { 0.5, 0.2, 0, 0, 1, 1 }       // Velocity values (vx, vy, acum_x,acum_y, max_x, max_y)
    };
    // Set up global message
-   g_message.videopos = (unsigned char*)0xC000;
+   g_message.videopos = (u8*)0xC000;
    g_message.str[0]   = '\0';
    g_message.time     = 0;
 
@@ -76,16 +76,16 @@ void main(void) {
    cpct_disableFirmware();
 
    // Set up palette and border 
-   cpct_fw2hw(gc_palette, 16);           // Convert firmware color values to hardware values
-   cpct_setBorderColour(gc_palette[2]);  // Set the border
-   cpct_setPalette(gc_palette, 16);      // Set the palette
+   cpct_fw2hw(gc_palette, 16);      // Convert firmware color values to hardware values
+   cpct_setBorder(gc_palette[2]);   // Set the border
+   cpct_setPalette(gc_palette, 16); // Set the palette
 
    // Set video mode to 0 (160x200, 16 colours)
    cpct_setVideoMode(0);
 
    // MAIN LOOP
    while(1) {
-      float ax=0, ay=0;    // User acceleration values
+      f32 ax=0, ay=0;    // User acceleration values
 
       checkUserInput(&ax, &ay);
       updateEntities(&logo, ax, ay);
