@@ -17,73 +17,151 @@
 //------------------------------------------------------------------------------
 #include <cpctelera.h>
 
+// TFunc
+//  3 enumerated aliases for the 3 getBits functions available on CPCtelera
+//
 typedef enum {
-   f_getbit,
-   f_get2bits,
-   f_get4bits
+   f_getbit,    // Function to get bits one by one
+   f_get2bits,  // Function to get pairs of bits
+   f_get4bits   // Function to get chunks of 4 bits
 } TFunc;
 
-void printArray(unsigned char* video, void *array, unsigned char numelems, TFunc thefunction)
-{
-    unsigned int i;
-    unsigned char out;
+//
+// printArray
+//   This function prints the contents of a bitarray as characters on the screen.
+// Value 0 is shown as '_' for visual clarity. Other values are shown as characters
+// [1, 2, 3, 4, 5, 6, 7, 8, 9, :, ;, <, =, >, ?].
+//
+void printArray(u8* pvideomem, void *array, u8 nItems, TFunc thefunction) {
+    u8 out = 0; // Value returned by getBit functions [0-15]
+    u8 i;       // Counter through the number of elements in the array
+    u8 c;       // Character to draw 
 
-    for (i = 0; i < numelems; ++i) {
-       unsigned char c = 0;
-       switch(thefunction) {
-          case f_getbit:   c = cpct_getBit  (array, i)         ? '1'       : '_';  break;
-          case f_get2bits: c = (out = cpct_get2Bits(array, i)) ? '0' + out : '_';  break;
-          case f_get4bits: c = (out = cpct_get4Bits(array, i)) ? '0' + out : '_';  break;
-       }
-       cpct_drawCharM2(video, 1, c);
-       video++;
+    // Iterate through all the items in the array to print them one by one
+    for (i = 0; i < nItems; ++i) {
+
+      // Access the array using the function that has been told to us 
+      // in the parameter 'thefunction'
+      switch(thefunction) {
+        // Get element as a single bit (As return value could be anything, 
+        // we distinguish between 0 and >0, so out will finally be 0 or 1).
+        case f_getbit:   out = (cpct_getBit (array, i) > 0); break;
+
+        // Get element as a pair of bits 
+        case f_get2bits: out = cpct_get2Bits(array, i); break;
+
+        // Get element as a chunk of 4 bits
+        case f_get4bits: out = cpct_get4Bits(array, i); break;
+      }
+      // Depending on the value got from getXBits function, calculate
+      // the character we have to print. (0 = '_', >0 = '0' + out)
+      if (out) 
+        c = '0' + out;
+      else
+        c = '_';
+
+      // Draw the character and point to the next byte in memory (next location
+      // to draw a character, as 1 byte = 8 pixels in mode 2)
+      cpct_drawCharM2(pvideomem, 1, c);
+      pvideomem++;
     }
 }
 
-void main (void)
-{
-   unsigned char i, j=0, array[10], array2[20], array3[40];
+//
+// Bit Arrays Example: Main
+//
+void main (void) {
+  u8 i, j;       // Counters for loops
+  u8 array1[10]; // Array of 10 bytes, 80 bits, to be used bit by bit
+  u8 array2[20]; // Array of 20 bytes, 160 bits, 80 groups of 2 bits.
+  u8 array4[40]; // Array of 40 bytes, 320 bits, 80 groups of 4 bits.
 
-   cpct_disableFirmware();
-   cpct_setVideoMode(2);
+  // Disable firmware to prevent it from restoring video mode or
+  // interfering with our drawChar functions
+  cpct_disableFirmware();
 
-   while(1) {
-      cpct_memset(array,  0, 10);
-      cpct_memset(array2, 0, 20);
-      cpct_memset(array3, 0, 40);
+  // Set mode 2 for visual clarity on arrays printed
+  cpct_setVideoMode(2);
 
+  // 
+  // Main Loop: loop forever showing arrays
+  //
+  while(1) {
+    // First, erase all contents of our 3 arrays,
+    // setting all their bits to 0
+    cpct_memset(array1, 0, 10);
+    cpct_memset(array2, 0, 20);
+    cpct_memset(array4, 0, 40);
+
+    //
+    // Test 1: Set to 1 each bit on the array1 individually (all others to 0)
+    //
+    for (i = 0; i < 80; ++i) {
+      // Set Bit i to 1
+      cpct_setBit(array1, i, 1);
+
+      // Print the complete array at the top of the screen
+      printArray((u8*)0xC000, array1, 80, f_getbit); 
+      
+      // Reset again the bit to 0 an iterate
+      cpct_setBit(array1, i, 0);
+    }
+
+    //
+    // Test 2: Fill in the array2 with individual values from 3 to 1 
+    //              (all the rest should be 0)
+    //
+    for (j = 3; j > 0; --j) { 
       for (i = 0; i < 80; ++i) {
-         cpct_setBit  (array,  i,     1);
-         printArray((void*)0xC000, array,  80,   f_getbit); 
-         cpct_setBit  (array,  i,     0);
+        // Set the index i to the value j (1 to 3)
+        cpct_set2Bits(array2, i, j);
+
+        // Print the complete array
+        printArray((u8*)0xC0A0, array2, 80, f_get2bits);
+
+        // Reset the value of the item to 0 again
+        cpct_set2Bits(array2, i, 0);
       }
+    }
 
-      for (j = 0; j < 16; j++) { 
-         for (i = 0; i < 80; ++i) {
-            cpct_set4Bits(array3, i, (i & 0x0F) + j);
-            printArray((void*)0xC140, array3, 80, f_get4bits);
-         }
-      }
-
-      for (j = 3; j > 0; --j) { 
-         for (i = 0; i < 80; ++i) {
-            cpct_set2Bits(array2, i, j);
-            printArray((void*)0xC0A0, array2, 80, f_get2bits);
-            cpct_set2Bits(array2, i, 0);
-         }
-      }
-
-
+    //
+    // Test 3: Fill in the array4 with consecutive elements from 0 to 15,
+    //         16 times, rotating all the 16 elements through all the positions
+    //         in the array.
+    //
+    for (j = 0; j < 16; j++) { 
       for (i = 0; i < 80; ++i) {
-         cpct_setBit(array, i, 1);
-         printArray((void*)0xC000, array,  80,   f_getbit); 
-      }
+        // Increment value using loop indexes and calculate module 16 (AND 0x0F)
+        u8 value = (i + j) & 0x0F;
 
-      for (j = 3; j > 0; --j) { 
-         for (i = 0; i < 80; ++i) {
-            cpct_set2Bits(array2, i, j);
-            printArray((void*)0xC0A0, array2, 80, f_get2bits); 
-         }
+        // Set next 4-bits element (i) to the calculated value and print the array
+        cpct_set4Bits(array4, i, value);
+        printArray((u8*)0xC140, array4, 80, f_get4bits);
       }
-   }
+    }
+
+    //
+    // Test 4: Fill the array1 with 1's
+    //
+    for (i = 0; i < 80; ++i) {
+      // Set next bit i to 1  
+      cpct_setBit(array1, i, 1);
+
+      // Print the complete array1 again
+      printArray((u8*)0xC000, array1, 80, f_getbit); 
+    }
+
+    //
+    // Test 5: Fill the array2 with 3's, then with 2's and then with 1's
+    //
+    for (j = 3; j > 0; --j) { 
+      for (i = 0; i < 80; ++i) {
+        // Set next bit i to j (3, 2, 1)  
+        cpct_set2Bits(array2, i, j);
+
+        // Print the complete array again
+        printArray((u8*)0xC0A0, array2, 80, f_get2bits); 
+      }
+    }
+  }
 }
