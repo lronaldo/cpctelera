@@ -26,6 +26,7 @@ extern void cpct_setVideoMode  (u8 videoMode);
 
 // Waiting for VSYNC
 extern void cpct_waitVSYNC     ();
+extern  u16 cpct_count2VSYNC   ();
 
 // Palette functions
 extern void cpct_fw2hw        (void *fw_colour_array, u8 size);
@@ -34,12 +35,12 @@ extern   u8 cpct_getHWColour  (u8 firmware_colour);
 extern void cpct_setPALColour (u8 pen, u8 hw_ink);
 
 ///
-/// Function: cpct_setBorderColour
+/// Function: cpct_setBorder
 ///
 ///   Changes the colour of the screen border.
 ///
 /// C Definition:
-///   #define *cpct_setBorderColour* (HWC)  <cpct_setPALColour> (16, (HWC))
+///   #define *cpct_setBorder* (HWC)  <cpct_setPALColour> (16, (HWC))
 ///
 /// Input Parameters (1 Byte):
 ///   *HWC* - Hardware colour value for the screen border.
@@ -53,7 +54,7 @@ extern void cpct_setPALColour (u8 pen, u8 hw_ink);
 /// is called when using *cpct_setBorderColour* (It is called using 16 as *pen*
 /// argument, which identifies the border).
 ///
-#define cpct_setBorderColour(HW_C) cpct_setPALColour(16, (HW_C))
+#define cpct_setBorder(HW_C) cpct_setPALColour(16, (HW_C))
 
 
 #endif

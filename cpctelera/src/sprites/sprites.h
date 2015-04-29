@@ -49,14 +49,8 @@ extern void cpct_drawSolidBox          (void *memory, u8 colour_pattern, u8 widt
 extern void cpct_setVideoMemoryPage    (  i8 page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset  (  i8 offset);
 
-// Useful constants with some typical video memory pages
-#define cpct_pageC0 0x30
-#define cpct_page80	0x20
-#define cpct_page40	0x10
-#define cpct_page00 0x00
-
 //
-// Function: cpct_memPage6
+// Macro: cpct_memPage6
 //
 // 	Macro that encodes a video memory page in the 6 Least Significant bits (LSb)
 // of a byte, required as parameter for <cpct_setVideoMemoryPage>
@@ -76,5 +70,21 @@ extern void cpct_setVideoMemoryOffset  (  i8 offset);
 // <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
 //
 #define cpct_memPage6(A) ((A) >> 2)
+
+//
+// Constants: Video Memory Pages
+//
+// Useful constants defining some typical Video Memory Pages to be used as 
+// parameters for <cpct_setVideoMemoryPage>
+//
+//	cpct_pageCO - Video Memory Page 0xC0 (0xC0··)
+//	cpct_page8O - Video Memory Page 0x80 (0x80··)
+//	cpct_page4O - Video Memory Page 0x40 (0x40··)
+//	cpct_page0O - Video Memory Page 0x00 (0x00··)
+//
+#define cpct_pageC0 0x30
+#define cpct_page80 0x20
+#define cpct_page40 0x10
+#define cpct_page00 0x00
 
 #endif

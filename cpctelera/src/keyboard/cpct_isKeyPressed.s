@@ -18,30 +18,57 @@
 ;
 .module cpct_keyboard
 
-;
-; Function: cpct_isKeyPressed
-;
-;########################################################################
-;### 
-;########################################################################
-;### Checks if a concrete key is pressed or not. It does it looking   ###
-;### at the keyboardStatusBuffer, which is filled up by scan routines.###
-;### So, take into account that keyboard has to be scanned before     ###
-;### using this routine or it won't work.                             ###
-;########################################################################
-;### INPUTS (2B)                                                      ###
-;###   -> KeyID, which contains Matrix Line(1B, C) and Bit Mask(1B, A)### 
-;########################################################################
-;### OUTPUTS (1B)                                                     ###
-;###   -> True if the selected key is pressed, False otherwise.       ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: A, D, BC, HL                         ###
-;########################################################################
-;### MEASURED TIME                                                    ###
-;###  95 cyles (23.75 us)                                             ###
-;########################################################################
-; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_isKeyPressed
+;;
+;;    Checks if a concrete key is pressed or not. 
+;;
+;; C Definition:
+;;    u8 *cpct_isKeyPressed* (<cpct_keyID> *key*);
+;;
+;; Input Parameters (2 Bytes):
+;;  (2B C A) key - A 16-bit value containing a Matrix Line(1B, C) and a Bit Mask(1B, A).
+;; 
+;;
+;; Parameter Restrictions:
+;;  * *key* must be a valid <cpct_keyID>, containing a Matrix Line (1st byte, 0-9) and a 
+;; Bit Mask (2nd byte, only 1 bit enabled). All keyID values are defined in 
+;; <cpct_keyID> enum. Giving any other value is possible, but returned value
+;; would be meaningless. If given value asks for a Matrix Line greater than 9,
+;; unexpected results may happen.
+;;
+;; Return value:
+;;    u8 - *false* (0, if not pressed) or *true* (>0, if pressed). Take into
+;; account that *true* is not 1, but any non-0 number.
+;;
+;; Details:
+;;    Checks if a concrete key is pressed or not. It does it looking   
+;; at the <cpct_keyboardStatusBuffer>, which is an 80-bit array holding
+;; the pressed / not pressed status of each of the 80 keys in the CPC
+;; keyboard. Matrix Line is used to determine whick of the 10 bytes in 
+;; the buffer contains the bit associated to the key, then Bit Mask is 
+;; used to get the concrete bit using XOR and AND operations.
+;;
+;;    The <cpct_keyboardStatusBuffer> is just an array in memory that must
+;; be updated with current key status. To do this, <cpct_scanKeyboard> 
+;; routines must be used before calling this function.
+;;
+;; Destroyed Register values: 
+;;    A, D, BC, HL
+;;
+;; Required memory:
+;;    17 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case | Cycles | microSecs (us)
+;; -------------------------------
+;; Any  |   95   |    23.25 
+;; -------------------------------
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Keyboard Status Buffer defined in an external file
 .globl cpct_keyboardStatusBuffer
 
@@ -50,7 +77,7 @@ _cpct_isKeyPressed::
    ld   hl, #2                      ;; [10] HL = SP + 2 (Place where parameters start) 
    ld    b,  h                      ;; [ 4] B = 0 (We need B to be 0 later, and here we save 3 cycles against a ld B, #0)
    add  hl, sp                      ;; [11]
-   ld    C, (hl)                    ;; [ 7] C = First Parameter (KeyID - Matrix Line)
+   ld    c, (hl)                    ;; [ 7] C = First Parameter (KeyID - Matrix Line)
    inc  hl                          ;; [ 6] 
    ld    a, (hl)                    ;; [ 7] A = Second Parameter (KeyID - Bit Mask)
    ld    d, a                       ;; [ 4] D = A, save the Bit Mask into D for later use

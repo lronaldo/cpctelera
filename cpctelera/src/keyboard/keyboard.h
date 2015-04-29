@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014 - 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+ //  Copyright (C) 2014 - 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,108 +15,28 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
+
 //
 //#####################################################################
-//### MODULE: Keyboard                                              ###
+//### MODULE Keyboard                                               ###
 //#####################################################################
 //### Routines control and check keyboard status, keys and joystick ###
 //#####################################################################
-//### TECHNICAL INFORMATION:                                        ###
-//### Keyboard and joystick are connected to AY-3-8912 Programable  ###
-//### Sound Generator (PSG) which recieves, processes and stores    ###
-//### pressed/not pressed information. The PSG is connected to the  ###
-//### 8255 Programable Peripheral Interface (PPI), which the CPU    ###
-//### can directly address. Therefore, to read the keyboard and     ###
-//### joystick status, the Z80 has to communicate with the PPI and  ###
-//### ask it to read the PSG status. This is done using OUT         ###
-//### instruction to the 8255 PPI ports:                            ###
-//###  > PPI Port A           = #F4xx                               ###
-//###  > PPI Port B           = #F5xx                               ###
-//###  > PPI Port C           = #F6xx                               ###
-//###  > PPI Control-Register = #F7xx                               ###
-//###                                                               ###
-//### Keyboard and joystick switches and buttons are arranged in a  ###
-//### 10x8 matrix. Each element of the matrix represents the state  ###
-//### of one button/switch/key (pressed/not pressed). That means    ###
-//### the CPC can control up to 80 keys/switches/buttons in total.  ###
-//###                                                               ###
-//### We're able to read a complete column of the matrix each time. ###
-//### That means we get the state of 8 switches at a time, in the   ###
-//### form of a byte (each bit represents the state of an switch).  ###
-//### Each bit will hold a "0" if the switch is "pressed" or a "1"  ###
-//### when the switch is "not pressed".                             ###
-//###                                                               ###
-//### It is relevant to notice something about joysticks. Although  ###
-//### joystick 0 has its own column in the matrix (9th) to control  ###
-//### its 6 switches, joystick 1 shares its switches with other     ###
-//### keys in the 6th column (namely: F, G, T, R, 5, 6). Therefore, ###
-//### it is possible to emulate a 2nd joystick using keyboard. The  ###
-//### exact mapping between matrix values and switches pressed is   ###
-//### included below as Table1.                                     ###
-//###                                                               ###
-//### To query for the values, we should select PSG's Register 14,  ###
-//### which is done writting 0Eh (14) to 8255 PPI port A (which is  ###
-//### directly connected to the PSG). Then, Bits 3..0 of PPI port C ###
-//### are connected to a decoder that sends this to the keyboard,   ###
-//### selecting Matrix Line to be read. Bits 7-6 are conected to    ###
-//### PSG's operation mode selector, and lets us select between     ###
-//### (00)inactive / (01)read / (10)write / (11)register_select     ###
-//### operation modes. So, writting C0h (11 000000) to Port C we    ###
-//### tell the PSG to select a register (the 0Eh that previouly was ###
-//### send to PSG through port A). Then, it is possible to start    ###
-//### asking for Matrix Lines and reading the Reg14 through Port A  ###
-//### to get the pressed/not pressed values from the Matrix.        ###
-//### Just one detail left: it is necessary to put PSG into inactive###
-//### mode between different opperations.                           ###
-//### Summing up:                                                   ###
-//###     > 1: Configure PPI Operation Mode for:                    ###
-//###          >> Port A: Ouput, Port C: Output (10000010b = 82h)   ###
-//###     > 2: Write 14 (0Eh) to Port A (the index of the register) ###
-//###     > 3: Write C0h to Port C (11 000000) to tell PSG that we  ###
-//###          want to select a register (indexed at Port A).       ###
-//###     > 4: Write 0 (00 000000) to Port C to finish operation    ###
-//###         (put PSG inactive between different operations)       ###
-//###     > 5: Configure PPI Operation Mode for:                    ###
-//###          >> Port A: Input, Port C: Output (10010010b = 92h)   ###
-//###     > 6: Write Matrix Line ID to Port C                       ###
-//###     > 7: Read Matrix Line Status from Port A                  ###
-//###     > 8: Repeat 6 until all Matrix Lines are read             ###
-//###     > 9: Configure Again PPI as in (1) (82h Output/Output)    ###
-//###          to leave it in this state.                           ###
-//#####################################################################
-//
-// (Table1) MAPPING OF KEYBOARD LINES TO CONCRETE KEYS/SWITCHES
-//=========================================================================================================
-//|     |                                       L I N E                                                   |
-//|     |-------------------------------------------------------------------------------------------------|
-//| BIT |      0      |     1      |   2   |  3  |  4  |  5   |      6       |  7  |    8     |     9     |
-//|=====|=============|============|=======|=====|=====|======|==============|=====|==========|===========|
-//|  7  | f.          | f0         | Ctrl  | > , | < . | Space| V            | X   | Z        | Del       |
-//|  6  | Enter       | f2         | ` \   | ? / | M   | N    | B            | C   | Caps Lock| Unused    |
-//|  5  | f3          | f1         | Shift | * : | K   | J    | F Joy1_Fire1 | D   | A        | Joy0_Fire1|
-//|  4  | f6          | f5         | f4    | + ; | L   | H    | G Joy1_Fire2 | S   | Tab      | Joy0_Fire2|
-//|  3  | f9          | f8         | } ]   | P   | I   | Y    | T Joy1_Right | W   | Q        | Joy0_Right|
-//|  2  | Cursor Down | f7         | Return| | @ | O   | U    | R Joy1_Left  | E   | Esc      | Joy0_Left |
-//|  1  | Cursor Right| Copy       | { [   | = - | ) 9 | ' 7  | % 5 Joy1_Down| # 3 | " 2      | Joy0_Down |
-//|  0  | Cursor Up   | Cursor Left| Clr   | £ ^ | _ 0 | ( 8  | & 6 Joy1_Up  | $ 4 | ! 1      | Joy0_Up   |
-//=========================================================================================================
-// Notes:
-//   > Bit 6 on lines 9 and 6, may be used to report a third fire button on a joystick. This bit is also used as the middle button on an AMX compatible mouse.  
-//   > "f." is the "." key on the numeric keypad. 
-//   > Enter is the Small enter key, whereas Return is the large one.
-//   > If matrix line 11-14 are selected, the byte is always &ff. After testing on a real CPC, it is found that these never change, they always return &FF. 
 //
 
+//
+// File: keyboard.h
+//
 
 #ifndef CPCT_KEYBOARD_H
 #define CPCT_KEYBOARD_H
 
 #include <types.h>
 
-///
-/// Declare type for CPC keys
-///
-enum cpct_e_keyID;
+//
+// Declare type for CPC keys
+//
+        enum cpct_e_keyID;
 typedef enum cpct_e_keyID cpct_keyID;
 
 ///
@@ -126,10 +46,85 @@ extern void cpct_scanKeyboard     ();
 extern void cpct_scanKeyboardFast ();
 extern   u8 cpct_isKeyPressed     (cpct_keyID key);
 
-///
-/// KEY DEFINITIONS
-/// Enumerated value with symbols for all the 80 possible Key/Joy definitions
-///
+//
+// Enum: cpct_keyID
+// 
+//    Enumerated type with symbols for all the 80 possible Key/Joy definitions.
+//
+// Details:
+//    Figure 1 shows the layout for an Amstrad CPC Keyboard, along with
+// its firmware Key Codes. Firmware Key Codes (FKCs) are used in table 1 to map them
+// to cpct_keyID enum values,
+//
+// (start code)
+//                                                      __
+//                                                     | 0|
+//                                          ENC*     —— —— ——
+//   AMSTRAD                   CPC464 RGB color     | 8| 9| 1|
+//                                                   —— —— ——
+//  __ __ __ __ __ __ __ __ __ __ __ __ __ __ ___      | 2|
+// |66|64|65|57|56|49|48|41|40|33|32|25|24|16|79 |      ——
+//  —— —— —— —— —— —— —— —— —— —— —— —— —— —— ———    —— —— ——
+// |68 |67|59|58|50|51|43|42|35|34|27|26|17|     |  |10|11| 3|
+//  ——— —— —— —— —— —— —— —— —— —— —— —— —— = 18 |   —— —— ——
+// | 70 |69|60|61|53|52|44|45|37|36|29|28|19|    |  |20|12| 4|
+//  ———— —— —— —— —— —— —— —— —— —— —— —— —— ————    —— —— ——
+// | 21  |71|63|62|55|54|46|38|39|31|30|22|  21  |  |13|14| 5|
+//  ————— —— —— —— —— —— —— —— —— —— —— —— ——————    —— —— ——
+//          |            47            |23|         |15| 7| 6|
+//           —————————————————————————— ——           —— —— ——
+//      JOY 0   ___               JOY 1   ___        
+//             | 72|                     | 48|       
+//         ——|———————|——             ——|———————|——   
+//        |74| 76| 77|75|           |50| 52| 53|51|  
+//         ——|———————|——             ——|———————|——   
+//             | 73|                     | 49|       
+//              ———                       ———        
+// ====================================================================
+//  Figure 1. Amstrad CPC Keyoard Layout with Firmware Key Codes (FKCs)
+// (end)
+//
+// (start code)
+//  FKC | cpct_keyID      || FKC  | cpct_keyID    ||  FKC  |  cpct_keyID   
+// --------------------------------------------------------------------
+//    0 | Key_CursorUp    ||  27  | Key_P         ||   54  |  Key_B
+//      |                 ||      |               ||       |  Key_Joy1Fire3
+//    1 | Key_CursorRight ||  28  | Key_SemiColon ||   55  |  Key_V
+//    2 | Key_CursorDown  ||  29  | Key_Colon     ||   56  |  Key_4
+//    3 | Key_F9          ||  30  | Key_Slash     ||   57  |  Key_3
+//    4 | Key_F6          ||  31  | Key_Dot       ||   58  |  Key_E
+//    5 | Key_F3          ||  32  | Key_0         ||   59  |  Key_W
+//    6 | Key_Enter       ||  33  | Key_9         ||   60  |  Key_S
+//    7 | Key_FDot        ||  34  | Key_O         ||   61  |  Key_D
+//    8 | Key_CursorLeft  ||  35  | Key_I         ||   62  |  Key_C
+//    9 | Key_Copy        ||  36  | Key_L         ||   63  |  Key_X
+//   10 | Key_F7          ||  37  | Key_K         ||   64  |  Key_1
+//   11 | Key_F8          ||  38  | Key_M         ||   65  |  Key_2
+//   12 | Key_F5          ||  39  | Key_Comma     ||   66  |  Key_Esc
+//   13 | Key_F1          ||  40  | Key_8         ||   67  |  Key_Q
+//   14 | Key_F2          ||  41  | Key_7         ||   68  |  Key_Tab
+//   15 | Key_F0          ||  42  | Key_U         ||   69  |  Key_A
+//   16 | Key_Clr         ||  43  | Key_Y         ||   70  |  Key_CapsLock
+//   17 | Key_OpenBracket ||  44  | Key_H         ||   71  |  Key_Z
+//   18 | Key_Return      ||  45  | Key_J         ||   72  |  Key_Joy0Up
+//   19 | Key_CloseBracket||  46  | Key_N         ||   73  |  Key_Joy0Down
+//   20 | Key_F4          ||  47  | Key_Space     ||   74  |  Key_Joy0Left
+//   21 | Key_Shift       ||  48  | Key_6         ||   75  |  Key_Joy0Right
+//      |                 ||      | Key_Joy1Up    ||
+//   22 | Key_BackSlash   ||  49  | Key_5         ||   76  |  Key_Joy0Fire1
+//      |                 ||      | Key_Joy1Down  ||
+//   23 | Key_Control     ||  50  | Key_R         ||   77  |  Key_Joy0Fire2
+//      |                 ||      | Key_Joy1Left  ||       |
+//   24 | Key_Caret       ||  51  | Key_T         ||   78  |  Key_Joy0Fire3
+//      |                 ||      | Key_Joy1Right ||
+//   25 | Key_Hyphen      ||  52  | Key_G         ||   79  |  Key_Del
+//      |                 ||      | Key_Joy1Fire1 ||
+//   26 | Key_At          ||  53  | Key_F         ||
+//      |                 ||      | Key_Joy1Fire2 ||
+// --------------------------------------------------------------------
+//  Table 1. cpct_keyIDs defined for each possible key, ordered by FKCs
+// (end)
+//
 enum cpct_e_keyID
 {
   // Matrix Line 00h
@@ -154,9 +149,9 @@ enum cpct_e_keyID
 
   // Matrix Line 02h
   Key_Clr          = (i16)0x0102,
-  Key_BraceOpen    = (i16)0x0202,
+  Key_OpenBracket  = (i16)0x0202,
   Key_Return       = (i16)0x0402,
-  Key_BraceClose   = (i16)0x0802,
+  Key_CloseBracket = (i16)0x0802,
   Key_F4           = (i16)0x1002,
   Key_Shift        = (i16)0x2002,
   Key_BackSlash    = (i16)0x4002,

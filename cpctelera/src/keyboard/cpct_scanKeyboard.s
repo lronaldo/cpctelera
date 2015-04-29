@@ -16,9 +16,11 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_keyboard
+
+;
+; FUNCTION: cpct_scanKeyboard
 ;
 ;########################################################################
-;### FUNCTION: _cpct_scanKeyboard                                     ###
 ;########################################################################
 ;### This function reads the status of keyboard and joysticks and     ###
 ;### stores it in the 10 bytes reserverd as "keyboardStatusBuffer"    ###

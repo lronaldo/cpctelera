@@ -1,0 +1,65 @@
+Title: Keyboard technical information
+
+Topic: Keyboard
+
+Keyboard and joystick are connected to AY-3-8912 Programmable Sound Generator (PSG) which receives, processes and stores pressed / not pressed information. The PSG is connected to the 8255 Programmable Peripheral Interface (PPI), which the CPU can directly address. Therefore, to read the keyboard and joystick status, the Z80 has to communicate with the PPI and ask it to read the PSG status. This is done using OUT instruction to the 8255 PPI ports, described in Table 1,
+(start code)
+           Peripheral          |  Port
+         -------------------------------
+          PPI Port A           | 0xF4--
+          PPI Port B           | 0xF5--
+          PPI Port C           | 0xF6--
+          PPI Control-Register | 0xF7--
+         -------------------------------
+  Table 1. Programmable Peripheral Interface (PPI) Ports
+(end)
+
+Keyboard and joystick switches and buttons are arranged in a 10x8 matrix. Each element of the matrix represents the state of one button / switch / key (pressed / not pressed). That means the CPC can control up to 80 keys / switches / buttons in total. 
+                                                             
+We're able to read a complete column of the matrix each time. That means we get the state of 8 switches at a time, in the form of a byte (each bit represents the state of an switch). Each bit will hold a "0" if the switch is "pressed" or a "1" when the switch is "not pressed".                            
+                                                             
+It is relevant to notice something about joysticks. Although joystick 0 has its own column in the matrix (9th) to control its 6 switches, joystick 1 shares its switches with other keys in the 6th column (namely: F, G, T, R, 5, 6). Therefore, it is possible to emulate a 2nd joystick using keyboard. The exact mapping between matrix values and switches pressed is included below as Table 2.
+                 
+Reading keyboard status:
+To query for the values, we should select PSG's Register 14, which is done writing 0Eh (14) to 8255 PPI port A (which is directly connected to the PSG). Then, Bits 3..0 of PPI port C are connected to a decoder that sends this to the keyboard, selecting Matrix Line to be read. Bits 7-6 are connected to PSG's operation mode selector, and lets us select between (00)inactive / (01)read / (10)write / (11)register_select operation modes. So, writing 0xC0 (11 000000) to Port C we tell the PSG to select a register (the 0x0E that previously was send to PSG through port A). Then, it is possible to start asking for Matrix Lines and reading the Reg.14 through Port A to get the pressed / not pressed values from the Matrix. Just one detail left: it is necessary to put PSG into inactive mode between different operations.
+
+Summing up,
+
+	1 - Configure PPI Operation Mode for [[ Port A: Output, Port C: Output (10000010 = 0x82) ]]
+    2 - Write 14 (0x0E) to Port A (the index of the register to be selected)
+    3 - Write 0xC0 to Port C (11 000000) to tell PSG that we want to select a register (indexed at Port A)
+    4 - Write 0 (00 000000) to Port C to finish operation (put PSG inactive between different operations)
+    5 - Configure PPI Operation Mode for [[ Port A: Input, Port C: Output (10010010 = 0X92h ]]
+    6 - Write Matrix Line ID to Port C 
+    7 - Read Matrix Line Status from Port A                 
+    8 - Repeat 6 until all Matrix Lines are read            
+    9 - Configure Again PPI as in (1) (0x82 = Output/Output) to leave it in this state.                          
+
+(start code)
+=========================================================================================================
+|     |                                       L I N E                                                   |
+|     |-------------------------------------------------------------------------------------------------|
+| BIT |      0      |     1      |   2   |  3  |  4  |  5   |      6       |  7  |    8     |     9     |
+|=====|=============|============|=======|=====|=====|======|==============|=====|==========|===========|
+|  7  | f.          | f0         | Ctrl  | > , | < . | Space| V            | X   | Z        | Del       |
+|  6  | Enter       | f2         | ` \   | ? / | M   | N    | B            | C   | Caps Lock| Unused    |
+|  5  | f3          | f1         | Shift | * : | K   | J    | F Joy1_Fire1 | D   | A        | Joy0_Fire1|
+|  4  | f6          | f5         | f4    | + ; | L   | H    | G Joy1_Fire2 | S   | Tab      | Joy0_Fire2|
+|  3  | f9          | f8         | } ]   | P   | I   | Y    | T Joy1_Right | W   | Q        | Joy0_Right|
+|  2  | Cursor Down | f7         | Return| | @ | O   | U    | R Joy1_Left  | E   | Esc      | Joy0_Left |
+|  1  | Cursor Right| Copy       | { [   | = - | ) 9 | ' 7  | % 5 Joy1_Down| # 3 | " 2      | Joy0_Down |
+|  0  | Cursor Up   | Cursor Left| Clr   | £ ^ | _ 0 | ( 8  | & 6 Joy1_Up  | $ 4 | ! 1      | Joy0_Up   |
+=========================================================================================================
+                 Table 2. Mapping of keyboard lines to concrete keys / switches
+(end)
+
+ Notes:
+ 	- Bit 6 on lines 9 and 6, may be used to report a third fire button on a joystick. This bit is also used as the middle button on an AMX compatible mouse.  
+ 	- *f.* is the *.* key on the numeric keypad. (Bit 7, Line 0)
+ 	- *Enter* is the Small enter key, whereas *Return* is the large one.
+ 	- If matrix lines 11-14 are selected, the returned byte is always 0xFF. After testing on a real CPC, it is found that these never change, they always return 0xFF. 
+
+References:
+	- <Retroisle::Scanning the Keyboard and Joystick at http://www.retroisle.com/amstrad/cpc/Technical/hardware_Kbd%20Joystick%20Scanning.php>
+	- <CPCWiki::Keyboard Scanning at http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning>
+	- <Odiesoft::The Amstrad CPC Keyboard Clash at http://www.odiesoft.de/amstrad/megablasters/keyboard/keyboard.html>

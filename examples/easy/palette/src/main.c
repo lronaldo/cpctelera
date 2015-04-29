@@ -20,12 +20,12 @@
 #include "newton_sprite.def"
 
 // Standard CPC Palette (16 firmware colour values for mode 0, same as BASIC's INK values)
-const unsigned char c_palette[16] = {  1, 24, 20,  6, 26,  0,  2,  8,
+const u8 c_palette[16] = {  1, 24, 20,  6, 26,  0,  2,  8,
                                       10, 12, 14, 16, 18, 22, 24, 16};
 
 // Correspondant hardware colour values, used by CRTC registers. This may be used
 // directly to the cpct_setPalette function, without previous conversion.
-//const unsigned char c_palette[16] = { 0x04, 0x0A, 0x13, 0x0C, 0x0B, 0x14, 0x15, 0x0D,
+//const u8 c_palette[16] = { 0x04, 0x0A, 0x13, 0x0C, 0x0B, 0x14, 0x15, 0x0D,
 //                                      0x06, 0x1E, 0x1F, 0x07, 0x12, 0x19, 0x0A, 0x07 };
 
 // Keys used to modify individual palette colors
@@ -33,8 +33,8 @@ const cpct_keyID c_palkeys[16] = { Key_0, Key_1, Key_2, Key_3, Key_4, Key_5, Key
                                    Key_8, Key_9, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Y };
 
 // Fucntion that rotates the colors of the palette to the left
-void rotatePalette(unsigned char* pal, unsigned char size) {
-    unsigned char i, first;
+void rotatePalette(u8* pal, u8 size) {
+    u8 i, first;
     first = pal[0];
     for (i=0; i < size-1; i++)
         pal[i] = pal[i+1];
@@ -42,9 +42,9 @@ void rotatePalette(unsigned char* pal, unsigned char size) {
 }
 
 void main(void) {
-   unsigned char x=0, y=0, t=0, k=0, border=1;
-   char*dest = (char*)0xC000;
-   unsigned char* palette = (unsigned char*)c_palette;
+   u8  x=0, y=0, t=0, k=0, border=1;
+   u8* dest = (u8*)0xC000;
+   u8* palette = (u8*)c_palette;
 
    cpct_disableFirmware();
    cpct_setVideoMode(0);
@@ -64,7 +64,7 @@ void main(void) {
           cpct_setPalette(palette, 16);
           t=50;
       } else if (cpct_isKeyPressed(Key_Enter) && !t) {
-          cpct_setBorderColour(++border);
+          cpct_setBorder(++border);
           t=25;
       } else {
          for (k=0; k<16; k++) {
