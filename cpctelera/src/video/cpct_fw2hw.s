@@ -31,7 +31,7 @@
 ;;    Converts an array of firmware colour values into their equivalent hardware colour values.
 ;;
 ;; C Definition:
-;;    void *cpct_fw2hw* (void* *fw_colour_array*, u8 *size*);
+;;    void <cpct_fw2hw> (void* <fw_colour_array*, <u8> *size*);
 ;;
 ;; Input Parameters (3 Bytes):
 ;;    (2B DE) fw_colour_array - Pointer to an array of firmware colour values (in the range [0-26])

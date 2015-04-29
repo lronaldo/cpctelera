@@ -35,15 +35,15 @@ extern   u8 cpct_getHWColour  (u8 firmware_colour);
 extern void cpct_setPALColour (u8 pen, u8 hw_ink);
 
 ///
-/// Function: cpct_setBorder
+/// Macro: cpct_setBorder
 ///
 ///   Changes the colour of the screen border.
 ///
 /// C Definition:
-///   #define *cpct_setBorder* (HWC)  <cpct_setPALColour> (16, (HWC))
+///   #define <cpct_setBorder> (HWC)  <cpct_setPALColour> (16, (HWC))
 ///
 /// Input Parameters (1 Byte):
-///   *HWC* - Hardware colour value for the screen border.
+///   (1B) HWC - Hardware colour value for the screen border.
 ///
 /// More information:
 ///   This is not a real function, but a C macro. Beware of using it along

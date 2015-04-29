@@ -25,7 +25,7 @@
 ;; video memory starts.
 ;;
 ;; C Definition:
-;;    void *cpct_setVideoMemoryPage* (i8 *page_6LSb*);
+;;    void <cpct_setVideoMemoryPage> (<u8> *page_6LSb*);
 ;;
 ;; Input Parameters (4 bytes):
 ;;    (1B A) page_6LSb - New starting page for Video Memory (Only 6 Least Significant bits are used)

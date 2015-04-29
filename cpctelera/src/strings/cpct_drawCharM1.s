@@ -36,7 +36,7 @@
 ;; in Mode 1 (320x200 px, 4 colours).
 ;;
 ;; C Definition:
-;;    void *cpct_drawCharM1* (void* *video_memory*, u8 *fg_pen*, u8 *bg_pen*, i8 *ascii*)
+;;    void <cpct_drawCharM1> (void* *video_memory*, <u8> *fg_pen*, <u8> *bg_pen*, <i8> *ascii*)
 ;;
 ;; Input Parameters (5 Bytes):
 ;;  (2B DE) video_memory - Video memory location where the character will be drawn

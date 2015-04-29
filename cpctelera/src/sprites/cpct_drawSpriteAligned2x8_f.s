@@ -26,7 +26,7 @@
 ;; ~26% faster than <cpct_drawSpriteAligned2x8>.
 ;;
 ;; C Definition:
-;;    void *cpct_drawSpriteAligned2x8_f* (void* *sprite*, void* *memory*)
+;;    void <cpct_drawSpriteAligned2x8_f> (void* *sprite*, void* *memory*)
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (16-byte array with 8-bit pixel data)

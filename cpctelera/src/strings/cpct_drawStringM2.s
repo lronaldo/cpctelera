@@ -31,7 +31,7 @@
 ;; position on the screen in Mode 2 (640x200 px, 2 colours).
 ;;
 ;; C Definition:
-;;    void *cpct_drawStringM2* (void* *string*, void* *video_memory*, u8 *pen*)
+;;    void <cpct_drawStringM2> (void* *string*, void* *video_memory*, <u8> *pen*)
 ;;
 ;; Input Parameters (4 Bytes):
 ;;  (2B HL) string       - Pointer to the null terminated string being drawn

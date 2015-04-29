@@ -28,7 +28,7 @@
 ;; erasing screen rectangles easily.
 ;;
 ;; C Definition:
-;;    void *cpct_drawSolidBox* (void* *memory*, u8 *colour_pattern*, u8 *width*, u8 *height*);
+;;    void <cpct_drawSolidBox> (void* *memory*, <u8> *colour_pattern*, <u8> *width*, <u8> *height*);
 ;;
 ;; Input Parameters (5 bytes):
 ;;  (2B DE) memory         - Video memory pointer to the upper left box corner byte

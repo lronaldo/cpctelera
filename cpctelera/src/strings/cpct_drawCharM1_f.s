@@ -36,7 +36,7 @@
 ;; in Mode 1 (320x200 px, 4 colours). It does it ~50% faster than <cpct_drawCharM1>.
 ;;
 ;; C Definition:
-;;    void *cpct_drawCharM1_f* (void* *video_memory*, u8 *fg_pen*, u8 *bg_pen*, i8 *ascii*)
+;;    void <cpct_drawCharM1_f> (void* *video_memory*, <u8> *fg_pen*, <u8> *bg_pen*, <i8> *ascii*)
 ;;
 ;; Input Parameters (5 Bytes):
 ;;  (2B DE) video_memory - Video memory location where the character will be drawn

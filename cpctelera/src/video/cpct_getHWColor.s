@@ -31,7 +31,7 @@
 ;;    Converts a firmware colour value into its equivalent hardware one.
 ;;
 ;; C Definition:
-;;    u8 *cpct_getHWColour* (u8 *firmware_colour*)
+;;    <u8> <cpct_getHWColour> (<u8> *firmware_colour*)
 ;;
 ;; Input Parameters (1 Bytes):
 ;;    (1B C) firmware_colour - [0-26] Firmware colour value to be converted (Similar to BASIC's INK value)
@@ -40,7 +40,7 @@
 ;;    * *firmware_colour* must be in the range [0-26], otherwise, return value will be unexpected.
 ;;
 ;; Return Value:
-;;    u8 - [0-31] Hardware colour value corresponding to *firmware_colour* provided.
+;;    <u8> - [0-31] Hardware colour value corresponding to *firmware_colour* provided.
 ;;
 ;; Details:
 ;;    Uses the *firmware_colour* as index in a conversion table to get its equivalent hardware

@@ -32,7 +32,7 @@
 ;; faster than <cpct_drawStringM1>
 ;;
 ;; C Definition:
-;;    void *cpct_drawStringM1_f* (void* *string*, void* *video_memory*, u8 *fg_pen*, u8 *bg_pen*)
+;;    void <cpct_drawStringM1_f> (void* *string*, void* *video_memory*, <u8> *fg_pen*, <u8> *bg_pen*)
 ;;
 ;; Input Parameters (5 Bytes):
 ;;  (2B HL) string       - Pointer to the null terminated string being drawn

@@ -26,7 +26,10 @@
 ;; the number of active wait loop cycles done.
 ;;
 ;; C Definition:
-;;    u16 *cpct_count2VSYNC* ()
+;;    <u16> <cpct_count2VSYNC> ()
+;;
+;; Return Value:
+;;    <u16> - Total number of iterations done of the wait loop until VSYNC was active.
 ;;
 ;; Details:
 ;;    This function implements a wait loop that exists only when VSYNC signal 

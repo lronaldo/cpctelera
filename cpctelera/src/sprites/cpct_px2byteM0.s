@@ -26,7 +26,7 @@
 ;; pixel format for Mode 0.
 ;;
 ;; C Definition:
-;;    u8 *cpct_px2byteM0* (u8 *px0*, u8 *px1*);
+;;    <u8> <cpct_px2byteM0> (<u8> *px0*, <u8> *px1*);
 ;;
 ;; Input Parameters (2 Bytes):
 ;;    (1B A) px0 - Firmware colour value for left  pixel (pixel 0) [0-15]

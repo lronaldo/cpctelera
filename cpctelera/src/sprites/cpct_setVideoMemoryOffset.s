@@ -25,7 +25,7 @@
 ;; video memory starts.
 ;;
 ;; C Definition:
-;;    void *cpct_setVideoMemoryOffset* (i8 *offset*)
+;;    void <cpct_setVideoMemoryOffset> (<u8> *offset*)
 ;;
 ;; Input Parameters (4 bytes):
 ;;    (1B A) offset - New starting offset for Video Memory (8 Least Significant bits)

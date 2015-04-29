@@ -25,7 +25,7 @@
 ;;    Checks if a concrete key is pressed or not. 
 ;;
 ;; C Definition:
-;;    u8 *cpct_isKeyPressed* (<cpct_keyID> *key*);
+;;    <u8> <cpct_isKeyPressed> (<cpct_keyID> *key*);
 ;;
 ;; Input Parameters (2 Bytes):
 ;;  (2B C A) key - A 16-bit value containing a Matrix Line(1B, C) and a Bit Mask(1B, A).

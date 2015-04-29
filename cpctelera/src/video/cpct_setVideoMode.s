@@ -31,7 +31,7 @@
 ;;    Sets the video mode of the CPC Screen, changing resolution and palette size.
 ;;
 ;; C Definition:
-;;    void *cpct_setVideoMode* (u8 *videoMode*)
+;;    void <cpct_setVideoMode> (<u8> *videoMode*)
 ;;
 ;; Input Parameters (1 Byte):
 ;;    (1B A) videoMode - [0-3] Video mode to set

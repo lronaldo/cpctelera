@@ -25,7 +25,7 @@
 ;; 10 bytes reserved as <cpct_keyboardStatusBuffer>
 ;;
 ;; C Definition:
-;;    void *cpct_scanKeyboard* ()
+;;    void <cpct_scanKeyboard> ()
 ;;
 ;; Output results (10 bytes):
 ;;    <cpct_keyboardStatusBuffer> filled up with pressed / not pressed info

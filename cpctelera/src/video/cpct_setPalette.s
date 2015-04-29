@@ -31,7 +31,7 @@
 ;;    Changes the hardware palette colour values (selecting new ones).
 ;;
 ;; C Definition:
-;;    void *cpct_setPalette* (u8* *colour_array*, u8 *size*)
+;;    void <cpct_setPalette> (<u8>* *colour_array*, <u8> *size*)
 ;;
 ;; Input Parameters (3 Bytes):
 ;;  (2B DE) colour_array  - Pointer to a byte array containing new hardware colour values [0 - 31]

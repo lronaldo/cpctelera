@@ -26,7 +26,7 @@
 ;;    Fills up a complete byte-array in memory with a given 8-bit value (as std memset)
 ;;
 ;; C Definition:
-;;    void *cpct_memset* (void* *array*, u16 *size*, u8 *value*);
+;;    void <cpct_memset> (void* *array*, <u16> *size*, <u8> *value*);
 ;;
 ;; Input Parameters (5 Bytes):
 ;;  (2B DE) array - Pointer to the first byte of the array to be filled up (starting point in memory)

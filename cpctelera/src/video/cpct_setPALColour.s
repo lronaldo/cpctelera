@@ -31,7 +31,7 @@
 ;;   Changes one colour value of the Palette, similarly to BASIC's INK instruction.
 ;;
 ;; C Definition:
-;;    void *cpct_setPALColour* (u8 *pen*, u8 *hw_ink*)
+;;    void <cpct_setPALColour> (<u8> *pen*, <u8> *hw_ink*)
 ;;
 ;; Input Parameters (2 Bytes):
 ;;    (1B C) pen    - [0-16] Index of the palette colour to change. Similar to PEN Number in BASIC.

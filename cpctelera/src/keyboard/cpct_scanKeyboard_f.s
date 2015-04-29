@@ -26,7 +26,7 @@
 ;; standard <cpct_scanKeyboard>.
 ;;
 ;; C Definition:
-;;    void *cpct_scanKeyboard_f* ()
+;;    void <cpct_scanKeyboard_f> ()
 ;;
 ;; Output results (10 bytes):
 ;;    <cpct_keyboardStatusBuffer> filled up with pressed / not pressed info
@@ -64,10 +64,11 @@
 ;; (end code)
 ;;
 ;; Credits:                                                       
-;;    This fragment of code is based on a scanKeyboard code issued by CPCWiki.                                                    
-;; http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning. This version
+;;    This fragment of code is based on a <scanKeyboard code issued by CPCWiki at
+;; http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning>. This version
 ;; of the code, however, is ~60% faster than CPCWiki's.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Keyboard Status Buffer defined in an external file
 .globl _cpct_keyboardStatusBuffer
 
@@ -75,104 +76,104 @@ _cpct_scanKeyboard_f::
 
    ld   hl, #_cpct_keyboardStatusBuffer ;; [10] HL Points to the start of the keyboardBuffer, where scanned data will be stored
 
-   di                        ;; [ 4] Disable interrupts
+   di                       ;; [ 4] Disable interrupts
 
    ;; Configure PPI: Select Register 14 (the one connected with keyboard status) and set it for reading
    ;;
-   ld  bc,  #0xF782          ;; [10] Configure PPI 8255: Set Both Port A and Port C as Output. 
-   out (c), c                ;; [12] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
-                             ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
-   ld  bc,  #0xF40E          ;; [10] Write (0Eh = 14) on PPI 8255 Port A (F4h): the register we want to select on AY-3-8912  
-   ld  e, b                  ;; [ 4] Save F4h into E to use it later in the loop
-   out (c), c                ;; [12] 
+   ld  bc,  #0xF782         ;; [10] Configure PPI 8255: Set Both Port A and Port C as Output. 
+   out (c), c               ;; [12] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
+                            ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
+   ld  bc,  #0xF40E         ;; [10] Write (0Eh = 14) on PPI 8255 Port A (F4h): the register we want to select on AY-3-8912  
+   ld  e, b                 ;; [ 4] Save F4h into E to use it later in the loop
+   out (c), c               ;; [12] 
 
-   ld  bc,  #0xF6C0          ;; [10] Write (C0h = 11 000000b) on PPI Port C (F6h): operation > select register 
-   ld  d, b                  ;; [ 4] Save F6h into D to use it later in the loop
-   out (c), c                ;; [12]
-   .DW #0x71ED ; out (c), 0  ;; [12] out (C), 0 => Write 0 on PPI's Port C to put PSG's in inactive mode (required in between different operations)
+   ld  bc,  #0xF6C0         ;; [10] Write (C0h = 11 000000b) on PPI Port C (F6h): operation > select register 
+   ld  d, b                 ;; [ 4] Save F6h into D to use it later in the loop
+   out (c), c               ;; [12]
+   .dw #0x71ED ; out (c), 0 ;; [12] out (C), 0 => Write 0 on PPI's Port C to put PSG's in inactive mode (required in between different operations)
 
-   ld  bc,  #0xF792          ;; [10] Configure PPI 8255: Set Port A = Input, Port C = Output. 
-   out (c), c                ;; [12] 92h= 1001 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=1)=> Port A=Input, 
-                             ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
+   ld  bc,  #0xF792         ;; [10] Configure PPI 8255: Set Port A = Input, Port C = Output. 
+   out (c), c               ;; [12] 92h= 1001 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=1)=> Port A=Input, 
+                            ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
 
    ;; Read Loop (Unrolled version): We read the 10-bytes that define the pressed/not pressed status
    ;;
-   ld  a,   #0x40            ;; [ 7] A refers to the next keyboard line to be read (40h to 49h)
+   ld  a,   #0x40           ;; [ 7] A refers to the next keyboard line to be read (40h to 49h)
 
-    ;; Read line 40h
-    ld  b, d                 ;; [ 4] B = F6h => Write the value of A to PPI's Port C to select next Matrix Line
-    out (c), a               ;; [12] 
-    ld  b, e                 ;; [ 4] B = F4h => Read from PPI's Port A: Pressed/Not Pressed Values from PSG
-    ini                      ;; [16] The read value is written to (HL), then HL<-HL+1 and B<-B-1
-    inc a                    ;; [ 4] Loop: Increment A => Next Matrix Line. 
+   ;; Read line 40h
+   ld  b, d                 ;; [ 4] B = F6h => Write the value of A to PPI's Port C to select next Matrix Line
+   out (c), a               ;; [12] 
+   ld  b, e                 ;; [ 4] B = F4h => Read from PPI's Port A: Pressed/Not Pressed Values from PSG
+   ini                      ;; [16] The read value is written to (HL), then HL<-HL+1 and B<-B-1
+   inc a                    ;; [ 4] Loop: Increment A => Next Matrix Line. 
 
-    ;; Read line 41h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12] 
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 41h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12] 
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
 
-    ;; Read line 42h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12] 
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 42h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12] 
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
 
-    ;; Read line 43h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12]  
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 43h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12]  
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
 
-    ;; Read line 44h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12] 
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 44h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12] 
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
  
-    ;; Read line 45h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12] 
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 45h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12] 
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
 
-    ;; Read line 46h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12] 
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 46h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12] 
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
 
-    ;; Read line 47h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12]  
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 47h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12]  
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
 
-    ;; Read line 48h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12]  
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
-    inc a                    ;; [ 4]
+   ;; Read line 48h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12]  
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
+   inc a                    ;; [ 4]
 
-    ;; Read line 49h
-    ld  b, d                 ;; [ 4]
-    out (c), a               ;; [12] 
-    ld  b, e                 ;; [ 4]
-    ini                      ;; [16]
+   ;; Read line 49h
+   ld  b, d                 ;; [ 4]
+   out (c), a               ;; [12] 
+   ld  b, e                 ;; [ 4]
+   ini                      ;; [16]
 
-    ;; Restore PPI status to Port A=Output, Port C=Output
-    ;;
-    ld  bc,  #0xF782         ;; [10] Put again PPI in Output/Output mode for Ports A/C.
-    out (c), c               ;; [12]
+   ;; Restore PPI status to Port A=Output, Port C=Output
+   ;;
+   ld  bc,  #0xF782         ;; [10] Put again PPI in Output/Output mode for Ports A/C.
+   out (c), c               ;; [12]
 
-    ei                       ;; [ 4] Re-enable interrupts
+   ei                       ;; [ 4] Re-enable interrupts
 
-    ret                      ;; [10] Return
+   ret                      ;; [10] Return

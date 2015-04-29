@@ -30,7 +30,7 @@
 ;; required by printf when we use C standard library.
 ;;
 ;; C Definition:
-;;    void putchar(char c)
+;;    void <putchar> (char c)
 ;;
 ;; Details:
 ;;    This function is required by C standard library to be able to use printf.
