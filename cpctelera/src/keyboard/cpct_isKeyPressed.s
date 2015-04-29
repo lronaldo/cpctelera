@@ -70,7 +70,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Keyboard Status Buffer defined in an external file
-.globl cpct_keyboardStatusBuffer
+.globl _cpct_keyboardStatusBuffer
 
 _cpct_isKeyPressed::
    ;; Get Parameters from stack
@@ -82,7 +82,7 @@ _cpct_isKeyPressed::
    ld    a, (hl)                    ;; [ 7] A = Second Parameter (KeyID - Bit Mask)
    ld    d, a                       ;; [ 4] D = A, save the Bit Mask into D for later use
 
-   ld   hl,#cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer
+   ld   hl,#_cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer
    add  hl, bc                      ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) (As B is already 0, so BC = C)
    xor (hl)                         ;; [ 7] A = XOR operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
                                     ;; .... Inverts the value of the bit associated to the given key that represents 

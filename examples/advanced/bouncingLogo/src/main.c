@@ -29,7 +29,7 @@
 //
 void checkUserInput (f32 *ax, f32 *ay) {
    // Read the keyboard
-   cpct_scanKeyboardFast();
+   cpct_scanKeyboard_f();
 
    // Check for pressed keys and do correspondant actions
    // Cursor keys = apply acceleration to the entity

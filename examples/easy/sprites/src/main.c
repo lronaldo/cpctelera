@@ -27,7 +27,7 @@ void main(void) {
    cpct_setVideoMode(0);
 
    while(1) {
-      cpct_scanKeyboardFast();
+      cpct_scanKeyboard_f();
       if      (cpct_isKeyPressed(Key_CursorRight) && x < 64 ) { x++; dest++; }
       else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
       if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }

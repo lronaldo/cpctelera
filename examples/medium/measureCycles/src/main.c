@@ -51,7 +51,7 @@ void main(void) {
       cpct_waitVSYNC();
 
       // Scan Keyboard and change sprite location if cursor keys are pressed
-      cpct_scanKeyboardFast();
+      cpct_scanKeyboard_f();
       if      (cpct_isKeyPressed(Key_CursorRight) && x <  80 - SPR_W) { x++; pvideomem++; }
       else if (cpct_isKeyPressed(Key_CursorLeft)  && x >   0        ) { x--; pvideomem--; }
       if      (cpct_isKeyPressed(Key_CursorUp)    && y >   0        ) { pvideomem -= (y-- & 7) ? 0x0800 : 0xC850; }

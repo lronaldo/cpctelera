@@ -54,7 +54,7 @@ void main(void) {
 
       // Check keyboard to let the user play/stop the song with de Space Bar
       // (Only change status when space_bar is released)
-      cpct_scanKeyboardFast();
+      cpct_scanKeyboard_f();
       if (space_bar == K_PRESSED) {
          if ( !cpct_isKeyPressed(Key_Space) ) {
             space_bar = K_RELEASED;

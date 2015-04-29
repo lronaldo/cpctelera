@@ -33,7 +33,7 @@ void main(void) {
    // MAIN Loop
    while(1) {
       // Scan keyboard
-      cpct_scanKeyboardFast();
+      cpct_scanKeyboard_f();
 
       // Change Video Memory Page if we press Key 1 or Key 2
       if      (cpct_isKeyPressed(Key_1))

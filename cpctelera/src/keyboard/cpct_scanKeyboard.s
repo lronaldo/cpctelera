@@ -49,7 +49,7 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    17 bytes
+;;    50 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -66,11 +66,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Keyboard Status Buffer defined in an external file
-.globl cpct_keyboardStatusBuffer
+.globl _cpct_keyboardStatusBuffer
 
 _cpct_scanKeyboard:: 
 
-   ld   hl, #cpct_keyboardStatusBuffer ;; [10] HL Points to the start of the keyboardBuffer, where scanned data will be stored
+   ld   hl, #_cpct_keyboardStatusBuffer ;; [10] HL Points to the start of the keyboardBuffer, where scanned data will be stored
 
    di                       ;; [ 4] Disable interrupts
 

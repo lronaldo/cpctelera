@@ -62,7 +62,7 @@ void updateUser(TEntity* user) {
    TEntityStatus animrequest = es_stop;
 
    // Scan Keyboard
-   cpct_scanKeyboardFast();
+   cpct_scanKeyboard_f();
 
    // Check possible keys to press, and do actions
    if      ( cpct_isKeyPressed(Key_Space)       ) animrequest = es_hit;

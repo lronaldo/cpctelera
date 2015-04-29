@@ -17,24 +17,10 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_keyboard
 
-;;
-;; File: keyboard.s
-;;
-
 ;; bndry directive does not work when linking previously compiled files
 ;.bndry 16
 ;;   16-byte aligned in memory to let functions use 8-bit maths for pointing
 ;;   (alignment not working on user linking)
 
-;; Array: cpct_keyboardStatusBuffer
-;;
-;; 	10-byte *array* buffer storing keyboard status data (pressed / not pressed keys)
-;; Each bit represents 1 key, with the meaning 0=pressed, 1=not pressed.
-;; To know more about how this 10 bytes are distributed, consult <Keyboard>
-;; and <cpct_scanKeyboard> 
-;;
-;;	It is used internally by all keyboard functions.
-;;
-
-cpct_keyboardStatusBuffer:: .ds 10
+_cpct_keyboardStatusBuffer:: .ds 10
 

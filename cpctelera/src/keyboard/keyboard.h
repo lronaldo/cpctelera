@@ -42,9 +42,22 @@ typedef enum cpct_e_keyID cpct_keyID;
 ///
 /// Function Declarations
 ///
-extern void cpct_scanKeyboard     ();
-extern void cpct_scanKeyboardFast ();
-extern   u8 cpct_isKeyPressed     (cpct_keyID key);
+extern void cpct_scanKeyboard   ();
+extern void cpct_scanKeyboard_f ();
+extern   u8 cpct_isKeyPressed   (cpct_keyID key);
+
+//
+// Array: cpct_keyboardStatusBuffer
+//
+//    10-bytes (80-bits) array containing pressed / not pressed status of 
+// all the keys / buttons the Amstrad CPC can manage (up to 80). Each bit 
+// represents 1 key, with the meaning 0=pressed, 1=not pressed. This array
+// is filled up using <cpct_scanKeyboard> or <cpct_scanKeyboard_f> functions,
+// and then it can be easily read with <cpct_isKeyPressed> function.
+// To know more about how this 10 bytes are distributed, consult <Keyboard>
+// and <cpct_scanKeyboard> 
+//
+extern u8 cpct_keyboardStatusBuffer[10];
 
 //
 // Enum: cpct_keyID
@@ -88,7 +101,7 @@ extern   u8 cpct_isKeyPressed     (cpct_keyID key);
 //  FKC | cpct_keyID      || FKC  | cpct_keyID    ||  FKC  |  cpct_keyID   
 // --------------------------------------------------------------------
 //    0 | Key_CursorUp    ||  27  | Key_P         ||   54  |  Key_B
-//      |                 ||      |               ||       |  Key_Joy1Fire3
+//      |                 ||      |               ||       |  Joy1_Fire3
 //    1 | Key_CursorRight ||  28  | Key_SemiColon ||   55  |  Key_V
 //    2 | Key_CursorDown  ||  29  | Key_Colon     ||   56  |  Key_4
 //    3 | Key_F9          ||  30  | Key_Slash     ||   57  |  Key_3
@@ -106,21 +119,21 @@ extern   u8 cpct_isKeyPressed     (cpct_keyID key);
 //   15 | Key_F0          ||  42  | Key_U         ||   69  |  Key_A
 //   16 | Key_Clr         ||  43  | Key_Y         ||   70  |  Key_CapsLock
 //   17 | Key_OpenBracket ||  44  | Key_H         ||   71  |  Key_Z
-//   18 | Key_Return      ||  45  | Key_J         ||   72  |  Key_Joy0Up
-//   19 | Key_CloseBracket||  46  | Key_N         ||   73  |  Key_Joy0Down
-//   20 | Key_F4          ||  47  | Key_Space     ||   74  |  Key_Joy0Left
-//   21 | Key_Shift       ||  48  | Key_6         ||   75  |  Key_Joy0Right
-//      |                 ||      | Key_Joy1Up    ||
-//   22 | Key_BackSlash   ||  49  | Key_5         ||   76  |  Key_Joy0Fire1
-//      |                 ||      | Key_Joy1Down  ||
-//   23 | Key_Control     ||  50  | Key_R         ||   77  |  Key_Joy0Fire2
-//      |                 ||      | Key_Joy1Left  ||       |
-//   24 | Key_Caret       ||  51  | Key_T         ||   78  |  Key_Joy0Fire3
-//      |                 ||      | Key_Joy1Right ||
+//   18 | Key_Return      ||  45  | Key_J         ||   72  |  Joy0_Up
+//   19 | Key_CloseBracket||  46  | Key_N         ||   73  |  Joy0_Down
+//   20 | Key_F4          ||  47  | Key_Space     ||   74  |  Joy0_Left
+//   21 | Key_Shift       ||  48  | Key_6         ||   75  |  Joy0_Right
+//      |                 ||      | Joy1_Up       ||
+//   22 | Key_BackSlash   ||  49  | Key_5         ||   76  |  Joy0_Fire1
+//      |                 ||      | Joy1_Down     ||
+//   23 | Key_Control     ||  50  | Key_R         ||   77  |  Joy0_Fire2
+//      |                 ||      | Joy1_Left     ||       |
+//   24 | Key_Caret       ||  51  | Key_T         ||   78  |  Joy0_Fire3
+//      |                 ||      | Joy1 Right    ||
 //   25 | Key_Hyphen      ||  52  | Key_G         ||   79  |  Key_Del
-//      |                 ||      | Key_Joy1Fire1 ||
+//      |                 ||      | Joy1_Fire1    ||
 //   26 | Key_At          ||  53  | Key_F         ||
-//      |                 ||      | Key_Joy1Fire2 ||
+//      |                 ||      | Joy1_Fire2    ||
 // --------------------------------------------------------------------
 //  Table 1. cpct_keyIDs defined for each possible key, ordered by FKCs
 // (end)
@@ -189,19 +202,19 @@ enum cpct_e_keyID
 
   // Matrix Line 06h
   Key_6            = (i16)0x0106,
-  Key_Joy1Up       = (i16)0x0106,
+  Joy1_Up          = (i16)0x0106,
   Key_5            = (i16)0x0206,
-  Key_Joy1Down     = (i16)0x0206,
+  Joy1_Down        = (i16)0x0206,
   Key_R            = (i16)0x0406,
-  Key_Joy1Left     = (i16)0x0406,
+  Joy1_Left        = (i16)0x0406,
   Key_T            = (i16)0x0806,
-  Key_Joy1Right    = (i16)0x0806,
+  Joy1_Right       = (i16)0x0806,
   Key_G            = (i16)0x1006,
-  Key_Joy1Fire2    = (i16)0x1006,
+  Joy1_Fire2       = (i16)0x1006,
   Key_F            = (i16)0x2006,
-  Key_Joy1Fire1    = (i16)0x2006,
+  Joy1_Fire1       = (i16)0x2006,
   Key_B            = (i16)0x4006,
-  Key_Joy1Fire3    = (i16)0x4006,
+  Joy1_Fire3       = (i16)0x4006,
   Key_V            = (i16)0x8006,
 
   // Matrix Line 07h
@@ -225,13 +238,13 @@ enum cpct_e_keyID
   Key_Z            = (i16)0x8008,
 
   // Matrix Line 09h
-  Key_Joy0Up       = (i16)0x0109,
-  Key_Joy0Down     = (i16)0x0209,
-  Key_Joy0Left     = (i16)0x0409,
-  Key_Joy0Right    = (i16)0x0809,
-  Key_Joy0Fire1    = (i16)0x1009,
-  Key_Joy0Fire2    = (i16)0x2009,
-  Key_Joy0Fire3    = (i16)0x4009,
+  Joy0_Up          = (i16)0x0109,
+  Joy0_Down        = (i16)0x0209,
+  Joy0_Left        = (i16)0x0409,
+  Joy0_Right       = (i16)0x0809,
+  Joy0_Fire1       = (i16)0x1009,
+  Joy0_Fire2       = (i16)0x2009,
+  Joy0_Fire3       = (i16)0x4009,
   Key_Del          = (i16)0x8009
 };
 

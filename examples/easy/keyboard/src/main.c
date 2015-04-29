@@ -25,7 +25,7 @@ void main(void) {
     cpct_disableFirmware();
     cpct_setVideoMode(0);
     while (1) {
-        cpct_scanKeyboardFast();
+        cpct_scanKeyboard_f();
 
         if (cpct_isKeyPressed(Key_Space))
             sprite = G_newton_sprite;
