@@ -22,17 +22,21 @@
 #include <types.h>
 
 // Setting Video Mode
-extern void cpct_setVideoMode  (u8 videoMode);
+extern void cpct_setVideoMode (u8 videoMode);
 
 // Waiting for VSYNC
-extern void cpct_waitVSYNC     ();
-extern  u16 cpct_count2VSYNC   ();
+extern void cpct_waitVSYNC    ();
+extern  u16 cpct_count2VSYNC  ();
 
 // Palette functions
 extern void cpct_fw2hw        (void *fw_colour_array, u8 size);
 extern void cpct_setPalette   (u8* ink_array, u8 ink_array_size);
 extern   u8 cpct_getHWColour  (u8 firmware_colour);
 extern void cpct_setPALColour (u8 pen, u8 hw_ink);
+
+// Functions to modify video memory location
+extern void cpct_setVideoMemoryPage   (u8 page_codified_in_6LSb);
+extern void cpct_setVideoMemoryOffset (u8 offset);
 
 ///
 /// Macro: cpct_setBorder

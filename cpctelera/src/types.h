@@ -20,7 +20,7 @@
 #define CPCTELERA_TYPES_H
 
 ///
-/// Types: Builtin types aliases
+/// Types: Aliases for builtin types
 ///
 ///		CPCtelera's short useful aliases for standard SDCC built-in types.
 ///

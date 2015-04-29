@@ -47,10 +47,6 @@ extern void cpct_drawSprite          (void *sprite, void* memory, u8 width, u8 h
 extern void cpct_drawSpriteMasked    (void *sprite, void* memory, u8 width, u8 height);
 extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height);
 
-// Functions to modify video memory location
-extern void cpct_setVideoMemoryPage    (  u8 page_codified_in_6LSb);
-extern void cpct_setVideoMemoryOffset  (  u8 offset);
-
 //
 // Macro: cpct_memPage6
 //
