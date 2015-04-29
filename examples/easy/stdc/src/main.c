@@ -25,22 +25,30 @@
 //   Do not disable firmware in this example, as printf makes use of it through putchar
 //
 void main(void) {
-   // Clear Screen
-   memset((void*)0xC000, 0, 0x4000);
+   // Clear Screen filling it up with 0's
+   cpct_clearScreen(0)
 
-   // Print out some messages using printf and sizeof
-   printf("Welcome to CPCtelera!\n\r\n\r");
-   printf("This example makes use of standard C libraries ");
-   printf("to print out byte sizes of standard SDCC types.\n\r\n\r");
-   printf("Size of  u8=%d\n\r", sizeof(u8));
-   printf("Size of u16=%d\n\r", sizeof(u16));
-   printf("Size of u32=%d\n\r", sizeof(u32));
-   printf("Size of u64=%d\n\r", sizeof(u64));
-   printf("Size of  i8=%d\n\r", sizeof(i8));
-   printf("Size of i16=%d\n\r", sizeof(i16));
-   printf("Size of i32=%d\n\r", sizeof(i32));
-   printf("Size of i64=%d\n\r", sizeof(i64));
-   printf("Size of f32=%d\n\r", sizeof(f32));
+   // Print out some messages using printf and sizeof to know the sizes in bytes
+   // ...of all the builting types in SDCC (using CPCtelera's aliases)
+   // We use Firmware Screen Character Commands to change colour on screen.
+   // Printing \0XX is equivalent to printing the character XX (in octal).
+   // Character 15 (017 in octal) does the PEN command, and uses immediate next
+   // character as the parameter for PEN. Then, \017\003 is equivalent to PEN 3. 
+   //
+   printf("      \017\003Welcome to \017\002CPCtelera\017\003!\017\001\n\r\n\r");
+   printf("This  example  makes  use  of standard C");
+   printf("libraries  to  print out  byte sizes  of");
+   printf("standard  SDCC  types, using \017\002CPCtelera\017\001's");
+   printf("convenient aliases.\n\r\n\r");
+   printf("Size of \017\003 u8 \017\001=\017\002 %d \017\001byte\n\r", sizeof(u8));
+   printf("Size of \017\003u16 \017\001=\017\002 %d \017\001byte\n\r", sizeof(u16));
+   printf("Size of \017\003u32 \017\001=\017\002 %d \017\001byte\n\r", sizeof(u32));
+   printf("Size of \017\003u64 \017\001=\017\002 %d \017\001byte\n\r", sizeof(u64));
+   printf("Size of \017\003 i8 \017\001=\017\002 %d \017\001byte\n\r", sizeof(i8));
+   printf("Size of \017\003i16 \017\001=\017\002 %d \017\001byte\n\r", sizeof(i16));
+   printf("Size of \017\003i32 \017\001=\017\002 %d \017\001byte\n\r", sizeof(i32));
+   printf("Size of \017\003i64 \017\001=\017\002 %d \017\001byte\n\r", sizeof(i64));
+   printf("Size of \017\003f32 \017\001=\017\002 %d \017\001byte\n\r", sizeof(f32));
 
    // Loop forever
    while (1);
