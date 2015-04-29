@@ -36,14 +36,16 @@ extern void cpct_memset    (void *array, u8 value, u16 size);
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1);
 extern   u8 cpct_px2byteM1 (u8 px0, u8 px1, u8 px2, u8 px3);
 
+// Tile drawing functions
+extern void cpct_drawTileAligned2x8  (void *sprite, void* memory);
+extern void cpct_drawTileAligned4x8  (void *sprite, void* memory);
+extern void cpct_drawTileAligned2x8_f(void *sprite, void* memory);
+extern void cpct_drawTileAligned4x8_f(void *sprite, void* memory);
+
 // Sprite and box drawing functions
-extern void cpct_drawSpriteAligned2x8  (void *sprite, void* memory);
-extern void cpct_drawSpriteAligned4x8  (void *sprite, void* memory);
-extern void cpct_drawSpriteAligned2x8_f(void *sprite, void* memory);
-extern void cpct_drawSpriteAligned4x8_f(void *sprite, void* memory);
-extern void cpct_drawSprite            (void *sprite, void* memory, u8 width, u8 height);
-extern void cpct_drawSpriteMasked      (void *sprite, void* memory, u8 width, u8 height);
-extern void cpct_drawSolidBox          (void *memory, u8 colour_pattern, u8 width, u8 height);
+extern void cpct_drawSprite          (void *sprite, void* memory, u8 width, u8 height);
+extern void cpct_drawSpriteMasked    (void *sprite, void* memory, u8 width, u8 height);
+extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height);
 
 // Functions to modify video memory location
 extern void cpct_setVideoMemoryPage    (  u8 page_codified_in_6LSb);
@@ -56,7 +58,7 @@ extern void cpct_setVideoMemoryOffset  (  u8 offset);
 // of a byte, required as parameter for <cpct_setVideoMemoryPage>
 //
 // C Definition:
-//	#define *cpct_memPage6* (*PAGE*)
+//	#define <cpct_memPage6> (*PAGE*)
 //
 // Parameters (1 byte):
 //	(1B) PAGE - Video memory page wanted 
@@ -69,7 +71,27 @@ extern void cpct_setVideoMemoryOffset  (  u8 offset);
 // with just 6 significant bits. For more information, check functions
 // <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
 //
-#define cpct_memPage6(A) ((A) >> 2)
+#define cpct_memPage6(PAGE) ((PAGE) >> 2)
+
+//
+// Macro: cpct_clearScreen
+//
+//    Macro to simplify clearing the screen.
+//
+// C Definition:
+//	  #define <cpct_clearScreen> (*COL*)
+//
+// Parameters (1 byte):
+//	  (1B) COL - Colour pattern to be used for screen clearing. Typically, a 0x00 is used 
+// to fill up all the screen with 0's (firmware colour 0). However, you may use it in 
+// combination with <cpct_px2byteM0>, <cpct_px2byteM1> or a manually created colour pattern.
+//
+// Details:
+//	  Fills up all the standard screen (range [0xC000-0xFFFF]) with *COL* byte, the colour 
+// pattern given. It uses <cpc_memset> to do the task, just filling up 16K bytes out of
+// *COL* value, starting at 0xC000.
+//
+#define cpct_clearScreen(COL)	cpct_memset((void*)0xC000, (COL), 0x4000);
 
 //
 // Constants: Video Memory Pages

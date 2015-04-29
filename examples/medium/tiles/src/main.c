@@ -17,52 +17,65 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "sprite_definitions.inc"
+#include "sprites.h"
 
-//
-// Macro for fastly cleaning the screen, filling it up with 0's
-//
-#define CLEAR_SCREEN cpct_memset((char*)0xC000, 0, 0x4000);
-
-//
-// Convenient type definitions
-//
-typedef unsigned char Byte;
 // 4 names for our 4 types of drawSprite functions
 typedef enum { _2x8, _4x8, _2x8Fast, _4x8Fast } TDrawFunc;
 
+// Structure grouping all the information required about a tile for this example
+//    ( pixel data, width in bytes and function to draw the tile)
+typedef struct {
+         u8* sprite;   // Pixel data defining the tile
+         u8  width;    // Width in bytes of the tile
+   TDrawFunc function; // Function that should be used to draw this tile
+} TTile;
+
 // Constants used to control length of waiting time
-const unsigned int WAITCLEARED = 20000; 
-const unsigned int WAITPAINTED = 60000; 
+const u16 WAITCLEARED = 20000; 
+const u16 WAITPAINTED = 60000; 
 
-// Tables with values for each of the 4 iterations of the main loop
-//  (sprite to use, width of the sprite and draw function to use)
-const Byte* const  sprites[4] = { waves_2x8,     F_2x8, waves_4x8,    FF_4x8 };
-const Byte      spr_widths[4] = {         2,         2,         4,         4 };
-const TDrawFunc  functions[4] = {      _2x8,  _2x8Fast,      _4x8,  _4x8Fast };
+// Table with all the tiles and the required information to draw them
+const TTile tiles[4] = {
+//    Sprite    Width  Function
+//--------------------------------
+   { waves_2x8,   2,   _2x8     },  // Tile 0
+   {     F_2x8,   2,   _2x8Fast },  // Tile 1
+   { waves_4x8,   4,   _4x8     },  // Tile 2
+   {    FF_4x8,   4,   _4x8Fast }   // Tile 3
+};
 
 //
-// Fills all the screen with sprites using drawSprite_XXX_aligned functions
+// Fills all the screen with sprites using drawTileAlignedXXX functions
 //
-void printAllScreen(Byte* sprite, Byte spritewidth, TDrawFunc function) {
-   Byte *video_mem = (Byte*)0xC000, x, y;
+void fillupScreen(TTile* tile) {
+   u8 *pvideomem = (u8*)0xC000;      // Pointer to the start of video memory
+   u8 x, y;                          // Loop counters for x and y screen tiles
+   u8 tilesperline = 80/tile->width; // Number of tiles per line = LINEWIDTH / TILEWIDTH
 
    // Cover all the screen (25 lines) with tiles
    for (y=0; y < 25; y++) { 
-      for (x=0; x < (80/spritewidth); x++) {
-         switch (function) {
-            case _2x8Fast: cpct_drawSpriteAligned2x8_f(sprite, video_mem); break;
-            case _2x8:     cpct_drawSpriteAligned2x8  (sprite, video_mem); break;
-            case _4x8Fast: cpct_drawSpriteAligned4x8_f(sprite, video_mem); break;
-            case _4x8:     cpct_drawSpriteAligned4x8  (sprite, video_mem); break;
+      
+      // Draw all the tiles for this line
+      for (x=0; x < tilesperline; x++) {
+         
+         // Select the appropriate function to draw the tile, and draw it
+         switch (tile->function) {
+            case _2x8Fast: cpct_drawTileAligned2x8_f(tile->sprite, pvideomem); break;
+            case _2x8:     cpct_drawTileAligned2x8  (tile->sprite, pvideomem); break;
+            case _4x8Fast: cpct_drawTileAligned4x8_f(tile->sprite, pvideomem); break;
+            case _4x8:     cpct_drawTileAligned4x8  (tile->sprite, pvideomem); break;
          }
-         video_mem += spritewidth;
+
+         // Increase video memory pointer by tile->width bytes (point to next tile's place)
+         pvideomem += tile->width;
       }
    }
 }
 
+//
+// MAIN LOOP
+//
 void main(void) {
-
    // Initialization
    cpct_disableFirmware();
    cpct_setVideoMode(0);
@@ -70,13 +83,18 @@ void main(void) {
    // Main loop: filling the screen using the 4 different basic 
    //            aligned functions in turns.
    while(1) {
-      Byte i;
-      unsigned int w;
+      u8  i;   // Loop counters
+      u16 w;
 
+      // 4 iterations of filling up the screen out of tiles using
+      // the 4 different tile-drawing functions
       for (i=0; i < 4; i++) {
-         CLEAR_SCREEN
+         // First, clear the screen and wait for a while
+         cpct_clearScreen(0);
          for (w=0; w < WAITCLEARED; w++);
-         printAllScreen(sprites[i], spr_widths[i], functions[i]);
+
+         // Then, fill up the screen with the next tile-drawing function and wait another while
+         fillupScreen(&(tiles[i]));
          for (w=0; w < WAITPAINTED; w++);
       }
    }

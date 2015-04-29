@@ -19,16 +19,17 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_drawSpriteAligned4x8
+;; Function: cpct_drawTileAligned2x8_f
 ;;
-;;    Copies a 4x8-byte sprite to video memory (or screen buffer), assuming that
-;; location to be copied is Pixel Line 0 of a character line. 
+;;    Copies a 2x8-byte sprite to video memory (or screen buffer), assuming that
+;; location to be copied is Pixel Line 0 of a character line. This function is 
+;; ~26% faster than <cpct_drawTileAligned2x8>.
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteAligned4x8> (void* *sprite*, void* *memory*)
+;;    void <cpct_drawTileAligned2x8_f> (void* *sprite*, void* *memory*)
 ;;
 ;; Input Parameters (4 bytes):
-;;  (2B HL) sprite - Source Sprite Pointer (32-byte array with 8-bit pixel data)
+;;  (2B HL) sprite - Source Sprite Pointer (16-byte array with 8-bit pixel data)
 ;;  (2B DE) memory - Pointer (aligned) to the first byte in video memory where the sprite will be copied.
 ;;
 ;; Parameter Restrictions:
@@ -36,7 +37,7 @@
 ;; data in screen pixel format. Sprite must be rectangular and all bytes in the 
 ;; array must be consecutive pixels, starting from top-left corner and going 
 ;; left-to-right, top-to-bottom down to the bottom-right corner. Total amount of
-;; bytes in pixel array should be *32*. You may check screen pixel format for
+;; bytes in pixel array should be *16*. You may check screen pixel format for
 ;; mode 0 (<cpct_px2byteM0>) and mode 1 (<cpct_px2byteM1>) as for mode 2 is 
 ;; linear (1 bit = 1 pixel).
 ;;    * *memory* must be a pointer to the first byte in video memory (or screen
@@ -62,7 +63,11 @@
 ;; 8 in mode 2).
 ;;
 ;; Details:
-;;    Copies a 4x8-byte sprite from an array with 32 screen pixel format 
+;;    This function does the same as <cpct_drawTileAligned2x8>, but using
+;; an unrolled loop. This makes this function *~26% faster* than the original
+;; one, but taking a greater amount of memory for the code (~184% more).
+;;
+;;    Copies a 2x8-byte sprite from an array with 16 screen pixel format 
 ;; bytes to video memory or a screen buffer. This function is tagged 
 ;; *aligned*, meaning that the destination byte must be *character aligned*. 
 ;; Being character aligned means that the 8 lines of the sprite will 
@@ -93,46 +98,83 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    30 bytes
+;;    71 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;; Case  | Cycles | microSecs (us)
 ;; ---------------------------------
-;; Any   |   927  |  231.75
+;; Any   |   449  |  112.25
 ;; ---------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawSpriteAligned4x8::
-   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   pop  af                 ;; [10] AF = Return Address
-   pop  hl                 ;; [10] HL = Source address
-   pop  de                 ;; [10] DE = Destination address
-   push de                 ;; [11] Leave the stack as it was
-   push hl                 ;; [11] 
-   push af                 ;; [11] 
+_cpct_drawTileAligned2x8_f::
+  ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   pop  af                  ;; [10] AF = Return Address
+   pop  hl                  ;; [10] HL = Source address
+   pop  de                  ;; [10] DE = Destination address
+   push de                  ;; [11] Leave the stack as it was
+   push hl                  ;; [11]
+   push af                  ;; [11]
 
-   ;; Copy 8 lines of 4 bytes width
-   ld    a, #8             ;; [ 7] We have to draw 8 lines of sprite
-   jp dsa48_first_line     ;; [10] First line does not need to do maths to start transferring data. 
+   ;; Copy 8 lines of 2 bytes width (2x8 = 16 bytes)
+   ;;  (Unrolled version of the loop)
+   ld    a, d               ;; [ 4] First, save DE into A and B, 
+   ld    b, e               ;; [ 4]   to ease the 800h increment step
+   ld    c, #17             ;; [ 7] Ensure that 16 LDIs do not change value of B (as they will decrement BC)
 
-dsa48_next_line:
-   ;; Move to the start of the next line
-   ex   de, hl             ;; [ 4] Make DE point to the start of the next line of pixels in video memory, by adding BC
-   add  hl, bc             ;; [11] (We need to interchange HL and DE because DE does not have ADD)
-   ex   de, hl             ;; [ 4]
+   ;; Sprite Line 1
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
-dsa48_first_line:
-   ;; Draw a sprite-line of 4 bytes
-   ld   bc, #0x800         ;; [10] 800h bytes is the distance to the start of the first pixel in the next line in video memory (it will be decremented by 1 by each LDI)
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
+   ;; Sprite Line 2
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
-   ;; Repeat for all the lines
-   dec   a                 ;; [ 4] A = A - 1 (1 more line completed)
-   jp   nz, dsa48_next_line;; [10] Continue to next line if A != 0 (A = Lines left)
+   ;; Sprite Line 3
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
 
-   ret                     ;; [10]
+   ;; Sprite Line 4
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
+
+   ;; Sprite Line 5
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
+
+   ;; Sprite Line 6
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
+
+   ;; Sprite Line 7
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+   add   #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
+   ld    d, a               ;; [ 4]
+   ld    e, b               ;; [ 4]
+
+   ;; Sprite Line 8
+   ldi                      ;; [16] Copy line (2 bytes)
+   ldi                      ;; [16]
+
+   ret                      ;; [10]
