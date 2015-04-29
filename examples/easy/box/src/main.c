@@ -18,26 +18,47 @@
 
 #include <cpctelera.h>
 
+//
+// Details about this example:
+//
+//    cpct_px2byteM1 function gets 4 values, corresponding to 4 firmware colours, 
+// for each one of the 4 pixels that can be drawn with 1 single byte in Mode 1. 
+// Then this function mixes all these 4 values into 1 8-bit value which is in 
+// screen pixel format. Drawing 1 byte of that pattern is the same as drawing 4
+// pixels on the screen with the 4 given colours, in the given order. 
+//
+//    This byte pattern can be used in drawSolidBox and clearScreen functions.
+//
+
+//
+// Creating Boxes example: main
+//
 void main(void) {
-   // Clear Screen
-   cpct_memset((void*)0xC000, 0, 0x4000);
+   // Clear the screen (fill it with 0's)
+   cpct_clearScreen(0x00);
 
-   cpct_drawSolidBox((void*)0xC235, 0x3C, 10, 20); 
-   cpct_drawSolidBox((void*)0xC245, 0x92, 10, 20); 
-   cpct_drawSolidBox((void*)0xC255, 0x14, 10, 20); 
+   // Lets draw some boxes
 
-   cpct_drawSolidBox((void*)0xC325, 0xAA, 10, 20); 
-   cpct_drawSolidBox((void*)0xC335, 0xA0, 10, 20); 
-   cpct_drawSolidBox((void*)0xC345, 0x0A, 10, 20); 
+   // 3 boxes with varying colour patterns
+   cpct_drawSolidBox((void*)0xC235, cpct_px2byteM1(2, 2, 1, 1), 10, 20); 
+   cpct_drawSolidBox((void*)0xC245, cpct_px2byteM1(1, 0, 2, 1), 10, 20); 
+   cpct_drawSolidBox((void*)0xC255, cpct_px2byteM1(0, 2, 0, 1), 10, 20); 
 
-   cpct_drawSolidBox((void*)0xC415, 0x55, 10, 20); 
-   cpct_drawSolidBox((void*)0xC425, 0x50, 10, 20); 
-   cpct_drawSolidBox((void*)0xC435, 0x05, 10, 20); 
+   // 3 stripped boxes in 2 alternating colours
+   cpct_drawSolidBox((void*)0xC325, 0xAA, 10, 20); // 0xAA = cpct_px2byteM1(3, 0, 3, 0)
+   cpct_drawSolidBox((void*)0xC335, 0xA0, 10, 20); // 0xA0 = cpct_px2byteM1(1, 0, 1, 0)
+   cpct_drawSolidBox((void*)0xC345, 0x0A, 10, 20); // 0x0A = cpct_px2byteM1(2, 0, 2, 0)
+
+   // Another 3 stripped boxes, with the strips displaced
+   cpct_drawSolidBox((void*)0xC415, 0x55, 10, 20); // 0x55 = cpct_px2byteM1(0, 3, 0, 3)
+   cpct_drawSolidBox((void*)0xC425, 0x50, 10, 20); // 0x50 = cpct_px2byteM1(0, 1, 0, 1)
+   cpct_drawSolidBox((void*)0xC435, 0x05, 10, 20); // 0x05 = cpct_px2byteM1(0, 2, 0, 2)
                      
-   cpct_drawSolidBox((void*)0xC505, 0xFF, 10, 20); 
-   cpct_drawSolidBox((void*)0xC515, 0xF0, 10, 20); 
-   cpct_drawSolidBox((void*)0xC525, 0x0F, 10, 20); 
+   // 3 Boxes in solid colour (4 pixels of the same colour)
+   cpct_drawSolidBox((void*)0xC505, cpct_px2byteM1(3, 3, 3, 3), 10, 20); // 0xFF 
+   cpct_drawSolidBox((void*)0xC515, cpct_px2byteM1(2, 2, 2, 2), 10, 20); // 0xF0
+   cpct_drawSolidBox((void*)0xC525, cpct_px2byteM1(1, 1, 1, 1), 10, 20); // 0x0F
    
-   // Loop forever
+   // After drawing, loop forever
    while (1);
 }
