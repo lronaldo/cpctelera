@@ -33,5 +33,29 @@
 ;;
 ;; Global symbols
 ;;
-.globl cpct_firmware_address
-.globl cpct_mode_rom_status
+
+;;
+;; Variable: cpct_firmware_address
+;;
+;;    16-bit space for storing the address where ROM routines start. This is
+;; used by functions <cpct_disableFirmware> and <cpct_reenableFirmware>.
+;;
+.globl _cpct_firmware_address
+
+;;
+;; Variable: cpct_mode_rom_status
+;;
+;;    8-bit space for storing the latest selection of MODE, INT.GENERATOR 
+;; and ROM status. This lets us know if Lower / Upper ROM are enabled or 
+;; disabled, if interrupts are enabled or not, and which Video Mode is actually set.
+;;
+;; Description of the bits:
+;;  > [ GGGIRRnn ]
+;;    GGG - Command for video mode and ROM selection (100)
+;;    I   - Interrupt Generation Enabled (1)
+;;    RR  - Reading from Lower and Upper ROM Disabled (11) (a 0 value means ROM enabled)
+;;    nn  - Video Mode 1 (01)
+;;
+;; Default value: 0x9C = (10011100)
+;;
+.globl _cpct_mode_rom_status

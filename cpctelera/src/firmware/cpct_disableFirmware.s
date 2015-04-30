@@ -26,52 +26,79 @@
 
 .include /firmware.s/
 
-;;================== cpct_mode_rom_status ===================================
-;; Store the last selection of MODE, INT.GENERATOR and ROM status 
-;;  Default: 0x9C = (10011100) == (GGGIRRnn)
-;;  GGG=Command for video mode and ROM selection (100)
-;;  I=Interrupt Generation Enabled (1)
-;;  RR=Reading from Lower and Upper ROM Disabled (11) (a 0 value means ROM enabled)
-;;  nn=Video Mode 1 (01)
-cpct_mode_rom_status:: .db #0x9D
+;; 1-byte storage for MODE, INT. GENERATOR and ROM status (with default value)
+_cpct_mode_rom_status:: .db #0x9D
 
-;; Reserve two bytes (a word) to store the address where ROM routines start
-;; This will be used by functions _cpct_disableFirmware and _cpct_reenableFirmware
-cpct_firmware_address:: .DW 0
+;; 2-byte storage for firmware address
+_cpct_firmware_address:: .dw 0
 
-;
-;########################################################################
-;### FUNCTION: _cpct_disableFirmware                                  ###
-;########################################################################
-;###  Disables the firmware modifying the interrupt vector at 0x38.   ###
-;### Normally, firmware routines are called and executed at each      ###
-;### interrupt and the ROM entry point is stored at 0x38.             ###
-;### This function substitutes the 2 bytes located at 0x38 by 0xC9FB, ###
-;### (FB = EI, C9 = RET), which basically does nothing at each        ###
-;### interruption.                                                    ###
-;########################################################################
-;### INPUTS (none)                                                    ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values:HL                                    ###
-;########################################################################
-;### MEASURED TIME                                                    ###
-;###  84 cycles                                                       ###
-;########################################################################
-;### CREDITS:                                                         ###
-;###  This function was coded copying and modifying                   ###
-;### cpc_disableFirmware from cpcrslib by Raul Simarro.               ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_disableFirmware
+;;
+;;    Disables Amstrad CPC firmware, preventing it from being executed at every
+;; CPU interrupt.
+;;
+;; C Definition:
+;;    void <cpct_disableFirmware> ()
+;;
+;; Details:
+;;    Disables the firmware modifying the interrupt vector at memory location 
+;; 0x38. Normally, firmware routines are called and executed at every interrupt
+;; and the ROM entry point is stored at 0x38 (a 16-bit address where the 
+;; firmware code starts). This function substitutes the 2 bytes located at 
+;; 0x38 by 0xC9FB, (0xFB = EI, 0xC9 = RET), which basically does nothing 
+;; at each interruption (restores interrupts and returns).
+;;
+;;    Before inserting 0xC9FB at 0x38, the 2 bytes lying there at saved in
+;; <cpct_firmware_address> variable. This permits restoring firmware function
+;; copying this bytes again to 0x38, as <cpct_reenableFirmware> does.
+;;
+;;    Disabling the firmware is useful for several reasons:
+;;    - Firmware code gets executed 6 times per frame (1 at each interrupt) when 
+;; is active. If you turn it off, you win CPU clock cycles for your program, 
+;; because firmware will not execute anymore.
+;;    - Most of CPCtelera's functions talk directly to hardware, no to firmware.
+;; They are faster, but they do not change firmware variables. As a result, 
+;; firmware can revert changes made by CPCtelera's functions when active. For 
+;; instance, if you change to video mode 0 using CPCtelera's functions, firmware
+;; will see that the video mode is different from what it should be (attending 
+;; to its own variables) and will change it again to 1. This happens with video
+;; modes and palette values mainly.
+;;    - Also, firmware uses part of the RAM to store its variables (from 
+;; 0xA6FC to 0xBFFF). If you accidentaly overwrite anything there with firmware
+;; being active, unpredictable things will happen, even hanging the computer.
+;; Moreover, disabling firmware lets you use this part of the RAM for your 
+;; own uses.
+;;
+;; Destroyed Register values: 
+;;    HL
+;;
+;; Required memory:
+;;    20 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case | Cycles | microSecs (us)
+;; -------------------------------
+;; Any  |   84   |   21
+;; -------------------------------
+;; (end code)
+;;
+;; Credits:                                                       
+;;    This function was coded copying and modifying cpc_disableFirmware 
+;; from CPCRSLib by Raul Simarro.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _cpct_disableFirmware::
-   DI                         ;; [ 4] Disable interrupts
-   LD HL,(firmware_RST_jp)    ;; [16] Obtain firmware ROM code pointer and store it for restoring it later
-   LD (cpct_firmware_address),HL ;; [16]
+   di                         ;; [ 4] Disable interrupts
+   ld   hl, (firmware_RST_jp) ;; [16] Obtain firmware ROM code pointer and store it for restoring it later
+   ld (_cpct_firmware_address),hl ;; [16]
 
-   IM 1                       ;; [ 8] Set Interrupt Mode 1 (CPU will jump to &0038 when a interrupt occurs)
-   LD HL,#0xC9FB              ;; [10] FB C9 (take into account little endian) => EI : RET
+   im    1                    ;; [ 8] Set Interrupt Mode 1 (CPU will jump to 0x38 when a interrupt occurs)
+   ld   hl, #0xC9FB           ;; [10] FB C9 (take into account little endian) => EI : RET
 
-   LD (firmware_RST_jp), HL   ;; [16] Setup new "interrupt handler" and enable interrupts again
-   EI                         ;; [ 4] 
+   ld (firmware_RST_jp), hl   ;; [16] Setup new "interrupt handler" and enable interrupts again
+   ei                         ;; [ 4] 
 
-   RET                        ;; [10]
+   ret                        ;; [10] Return

@@ -48,11 +48,10 @@
 ;### cpc_disableFirmware from cpcrslib by Raul Simarro.               ###
 ;########################################################################
 ;
-.globl _cpct_reenableFirmware
 _cpct_reenableFirmware::
    DI                         ;; [ 4] Disable interrupts
 
-   LD HL,(cpct_firmware_address) ;; [16] Restore previously saved pointer to ROM code
+   LD HL,(_cpct_firmware_address) ;; [16] Restore previously saved pointer to ROM code
    LD (#0x38), HL             ;; [16]
 
    EI                         ;; [ 4] Reenable interrupts and return

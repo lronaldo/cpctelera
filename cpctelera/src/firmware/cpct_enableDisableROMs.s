@@ -78,7 +78,7 @@ _cpct_disableUpperROM::
 
 mrs_modifyROMstatus:
    LD  (mrs_operation), HL   ;; [16] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
-   LD   HL, #cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
+   LD   HL, #_cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
    LD   A,  (HL)             ;; [ 7] A = mode_rom_status (present value)
 mrs_operation:
    AND  #0b11111011          ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)

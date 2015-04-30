@@ -25,8 +25,11 @@
 #ifndef CPCT_FIRMWARE_ED_H
 #define CPCT_FIRMWARE_ED_H
 
+// Enabling and disabling Firmware
 extern void cpct_reenableFirmware();
 extern void cpct_disableFirmware();
+
+// Upper and Lower ROM control
 extern void cpct_enableLowerROM();
 extern void cpct_disableLowerROM();
 extern void cpct_enableUpperROM();
