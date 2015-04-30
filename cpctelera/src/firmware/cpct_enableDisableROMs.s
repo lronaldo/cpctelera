@@ -19,37 +19,81 @@
 
 .include /firmware.s/
 
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Title: Enabling / disabling ROMs
+;;
+;; Functions: Enabling/disabling ROMs
+;;
+;; cpct_enableUpperROM  - Enables Upper ROM  [0xC000 - 0xFFFF]
+;; cpct_enableLowerROM  - Enables Lower ROM  [0x0000 - 0x3FFF]
+;; cpct_disableUpperROM - Disables upper ROM [0xC000 - 0xFFFF]
+;; cpct_disableLowerROM - Disables Lower ROM [0x0000 - 0x3FFF]
+;;
+;;    This 4 functions enable/disable lower or upper ROMs.
+;;
+;; C Definitions:
+;;    void <cpct_enableUpperROM> ()
+;;    void <cpct_enableLowerROM> ()
+;;    void <cpct_disableUpperROM> ()
+;;    void <cpct_enableUpperROM> ()
+;;
+;; Known limitations:
+;;
+;;    * If the execution of your program if going through some of these 2 
+;; ROM spaces and you enable ROM, CPU will be unable to get machine code 
+;; of your program, as it will start reading from ROM instead of RAM (where your program is placed). This will re- 
+;; sult in unexpected behaviour.                                    
+;; WARNING 2: Enabling Lower ROM reenables Firmware JMP in interrupt
+;; mode one, as it reestablishes the values at 0x0038 mem.location. 
+;; If you have disabled the firmware by putting FB:C9 (EI:RET) at   
+;; 0x0038 (as _cpct_disableFirmware does) you may experience unde-  
+;; sired behaviour when next interrupts come. The most tipical is   
+;; a return to MODE 1, as firmware may be unaware of your currently 
+;; selected MODE and will try to reestablish its own MODE. Take it  
+;; into account and disable interrupts if you need.                 
+;;
+;; Details:
+;;    This 4 functions enable/disable lower or upper ROMs. By default, CPCtelera 
+;; sets both ROMS as disabled at the first event of video mode change. Enabling 
+;; one of them means changing the way the cpu gets information from memory: on 
+;; the places where ROM is enabled, CPU gets values from ROM whenever it tries 
+;; to read from memory.  
+;;
+;; If ROM is disabled, these memory reads get values from RAM. ROMs 
+;; are mapped in this address space:
+;;
+;;  Lower ROM - [ 0000h - 3FFFh ]
+;;  Upper ROM - [ C000h - FFFFh ]
+;;
+;; CPU Requests to write to memory are always mapped to RAM, so there is no need
+;; to worry about that. Also, Gate Array always gets video memory values from 
+;; RAM (it never reads from ROM), so enabling Upper ROM does not have any impact
+;; on the screen.
+;;
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    122 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case | Cycles | microSecs (us)
+;; -------------------------------
+;; Any  |  561   |   140.25
+;; -------------------------------
+;; (end code)
+;;
+;; Credits:                                                       
+;;    This fragment of code is based on a <scanKeyboard code issued by CPCWiki at
+;; http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning>. This version
+;; of the code, however, is ~60% faster than CPCWiki's.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 ;########################################################################
-;## FUNCTIONs: _cpct_enableLowerROM, _cpct_disableLowerROM,           ###
-;##            _cpct_enableUpperROM, _cpct_disableUpperROM            ###
-;########################################################################
-;### This 4 functions enable/disable low or upper ROMs. By default,   ###
-;### cpctelera sets both ROMS as disabled at the first event of video ###
-;### mode change. Enabling one of them means changing the way the cpu ###
-;### gets information from memory: on the places where ROM is enabled,###
-;### cpu gets values from ROM whenever it tries to read from memory.  ###
-;### If ROM is disabled, these memory reads get values from RAM. ROMs ###
-;### are mapped in this address space:                                ###
-;###  - Lower ROM: 0000h - 3FFFh                                      ###
-;###  - Upper ROM: C000h - FFFFh                                      ###
-;### CPU Requests to write to memory are always mapped to RAM, so     ###
-;### there is no need to worry about that. Also, Gate Array always    ###
-;### gets video memory values from RAM (it never reads from ROM), so  ###
-;### enabling Upper ROM does not have any impact on the screen.       ###
-;### WARNING 1: If the execution of your program if going through some###
-;### of these 2 ROM spaces and you enable ROM, cpu will be unable to  ###
-;### get machine code of your program, as it will start reading from  ###
-;### ROM instead of RAM (where your program is placed). This will re- ###
-;### sult in unexpected behaviour.                                    ###
-;### WARNING 2: Enabling Lower ROM reenables Firmware JMP in interrupt###
-;### mode one, as it reestablishes the values at 0x0038 mem.location. ###
-;### If you have disabled the firmware by putting FB:C9 (EI:RET) at   ###
-;### 0x0038 (as _cpct_disableFirmware does) you may experience unde-  ###
-;### sired behaviour when next interrupts come. The most tipical is   ###
-;### a return to MODE 1, as firmware may be unaware of your currently ###
-;### selected MODE and will try to reestablish its own MODE. Take it  ###
-;### into account and disable interrupts if you need.                 ###
 ;########################################################################
 ;### INPUTS (~)                                                       ###
 ;########################################################################
