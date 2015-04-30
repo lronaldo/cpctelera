@@ -26,33 +26,44 @@
 
 .include /firmware.s/
 
-;
-;########################################################################
-;### FUNCTION: _cpct_reenableFirmware                                 ###
-;########################################################################
-;###   Restores the ROM address where the firmware routines start.    ###
-;### Beware: cpct_disableFirmware has to be called before calling     ###
-;### this routine; otherwise, it would put a 0 in 0x38 and a reset    ###
-;### will be performed at the next interrupt.                         ###
-;########################################################################
-;### INPUTS (none)                                                    ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: HL                                   ###
-;########################################################################
-;### MEASURED TIME                                                    ###
-;###  50 cycles                                                       ###
-;########################################################################
-;### CREDITS:                                                         ###
-;###  This function was coded copying and modifying                   ###
-;### cpc_disableFirmware from cpcrslib by Raul Simarro.               ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_reenableFirmware
+;;
+;;    Reenables previously disabled Amstrad CPC firmware.
+;;
+;; C Definition:
+;;    void <cpct_reenableFirmware> ()
+;;
+;; Details:
+;;    Restores normal operation of Amstrad CPC firmware after having been disabled.
+;; Do not try to call this function before disabling firmware. If you do, the most
+;; normal result is getting your Amstrad CPC resetted.
+;;
+;; Destroyed Register values: 
+;;    HL
+;;
+;; Required memory:
+;;    9 bytes
+;;
+;; Time Measures:
+;; (start code)
+;; Case | Cycles | microSecs (us)
+;; -------------------------------
+;; Any  |   50   |   14.50
+;; -------------------------------
+;; (end code)
+;;
+;; Credits:                                                       
+;;    This function was coded copying and modifying cpc_disableFirmware 
+;; from CPCRSLib by Raul Simarro.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _cpct_reenableFirmware::
-   DI                         ;; [ 4] Disable interrupts
+   di                         ;; [ 4] Disable interrupts
 
-   LD HL,(_cpct_firmware_address) ;; [16] Restore previously saved pointer to ROM code
-   LD (#0x38), HL             ;; [16]
+   ld   hl,(_cpct_firmware_address) ;; [16] Restore previously saved pointer to ROM code
+   ld (firmware_RST_jp), hl   ;; [16]
 
-   EI                         ;; [ 4] Reenable interrupts and return
-   RET                        ;; [10]
+   ei                         ;; [ 4] Reenable interrupts and return
+   ret                        ;; [10]
