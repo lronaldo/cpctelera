@@ -46,11 +46,14 @@ CPCT_PATH := %%%CPCTELERA_PATH%%%
 PROJNAME   := %%%PROJECT_NAME%%%
 Z80CODELOC := 0x%%%CODE_LOAD_ADDRESS%%%
 
-# Folders and file extensions
+# Folders 
 SRCDIR  := src
 OBJDIR  := obj
-SRCEXT  := c
-OBJEXT  := rel
+
+# File extensions
+C_EXT   := c
+ASM_EXT := s
+OBJ_EXT := rel
 
 # BINARY CONFIG
 BINFILE := $(OBJDIR)/$(PROJNAME).bin
@@ -92,7 +95,15 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
 
+# Calculate all subdirectories
 SUBDIRS    := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
 OBJSUBDIRS := $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))
-SRCFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(SRCEXT)))
-OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(SRCEXT), %.$(OBJEXT), $(SRCFILES)))
+
+# Calculate all source files
+CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
+ASMFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
+
+# Calculate all object files
+C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(CFILES)))
+ASM_OBJFILES := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
+OBJFILES		 := $(C_OBJFILES) $(ASM_OBJFILES)

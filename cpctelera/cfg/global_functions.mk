@@ -117,3 +117,14 @@ define COMPILECFILE
 $(1): $(2)
 	$(Z80CC) $(Z80CCINCLUDE) -mz80 $(Z80CCFLAGS) -c $(2) -o $(1)
 endef
+
+#################
+# COMPILEASMFILE: General rule to compile an ASM file for Z80, having source file and object file in different places
+#
+# $(1): Object file to be created  (with its relative path)
+# $(2): Source file to be compiled (with its relative path)
+#
+define COMPILEASMFILE
+$(1): $(2)
+	$(Z80ASM) $(Z80ASMFLAGS) $(Z80CCINCLUDE) $(1) $(2) 
+endef

@@ -35,10 +35,11 @@ BINADDRLOG=$(OBJDIR)/binaryAddresses.log
 all: $(OBJSUBDIRS) $(TARGET)
 
 ## COMPILING SOURCEFILES AND SAVE OBJFILES IN THEIR CORRESPONDENT SUBDIRS
-$(foreach OF, $(OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJEXT)=%.$(SRCEXT))))))
+$(foreach OF, $(C_OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(C_EXT))))))
+$(foreach OF, $(ASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(ASM_EXT))))))
 
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
-$(IHXFILE): $(OBJFILES)
+$(IHXFILE): $(OBJFILES) 
 	@$(call PRINT,$(PROJNAME),"Linking binary file")
 	$(Z80CC) $(Z80CCLINKARGS) $^ -o "$@"
 

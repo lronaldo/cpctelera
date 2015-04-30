@@ -47,11 +47,14 @@ CPCT_PATH      := $(THIS_FILE_PATH)../../../../cpctelera/
 PROJNAME   := bitArrays
 Z80CODELOC := 0x4000
 
-# Folders and file extensions
+# Folders 
 SRCDIR  := src
 OBJDIR  := obj
-SRCEXT  := c
-OBJEXT  := rel
+
+# File extensions
+C_EXT   := c
+ASM_EXT := s
+OBJ_EXT := rel
 
 # BINARY CONFIG
 BINFILE := $(OBJDIR)/$(PROJNAME).bin
@@ -69,7 +72,7 @@ TARGET  := $(CDT) $(DSK)
 ## here. You may overwrite the values of path variables after the include 
 ## if you wanted specific configuration for this project.
 ####
-include $(CPCT_PATH)cfg/global_paths.mk
+include $(CPCT_PATH)/cfg/global_paths.mk
 
 ####
 ## SECTION 3: COMPILATION CONFIGURATION
@@ -91,9 +94,17 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ##  and files with source extension found are added, up to 1 level of depth in
 ##  folder structure inside the main source directory.
 ####
-include $(CPCT_PATH)cfg/global_functions.mk
+include $(CPCT_PATH)/cfg/global_functions.mk
 
+# Calculate all subdirectories
 SUBDIRS    := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
 OBJSUBDIRS := $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))
-SRCFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(SRCEXT)))
-OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(SRCEXT), %.$(OBJEXT), $(SRCFILES)))
+
+# Calculate all source files
+CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
+ASMFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
+
+# Calculate all object files
+C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(CFILES)))
+ASM_OBJFILES := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
+OBJFILES		 := $(C_OBJFILES) $(ASM_OBJFILES)
