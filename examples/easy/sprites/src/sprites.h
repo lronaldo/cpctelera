@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-//  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,25 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#include <cpctelera.h>
-#include "sprites.h"
+#include <types.h>
 
-void main(void) {
-   unsigned char x=0, y=0;
-   char* dest = (char*)0xC000;
-
-   cpct_disableFirmware();
-   cpct_fw2hw(G_palette, 4);
-   cpct_setPalette(G_palette, 4);
-   cpct_setVideoMode(1);
-
-   while(1) {
-      cpct_scanKeyboard_f();
-      if      (cpct_isKeyPressed(Key_CursorRight) && x < 68 ) { x++; dest++; }
-      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
-      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
-      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 138) { dest += (++y & 7) ? 0x0800 : 0xC850; }
-
-      cpct_drawSprite(G_LCT1, dest, 12, 62);
-   }
-}
+extern const u8 G_palette[4];
+extern const unsigned char G_LCT1[744];
