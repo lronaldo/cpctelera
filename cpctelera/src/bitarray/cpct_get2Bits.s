@@ -19,85 +19,109 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_bitarray
 
-;
-;########################################################################
-;### FUNCTION: cpct_get2Bits                                          ###
-;########################################################################
-;### Returns 0, 1, 2 or 3 depending on the value of the group of 2    ###
-;### bits at the given position in the specified array.               ###
-;### It will asume that the array elements have a size of 8 bits and  ###
-;### also that the given position is not bigger than the number of    ###
-;### groups of two bits in the array (size of the array multiplied    ###
-;### by four).                                                        ###
-;### Limitations: Maximum of 65536 2bit-groups, 16384 bytes per array ###
-;########################################################################
-;### INPUTS (4 Bytes)                                                 ###
-;###  * (2B DE) Array Pointer                                         ###
-;###  * (2B HL) Position of the bit in the array                      ###
-;########################################################################
-;### RETURN VALUE                                                     ###
-;###  L = {0, 1, 2, 3} Value read from 2bitvector                     ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 46 bytes                                                 ###
-;### TIME:                                                            ###
-;###   Best Case  (0) = 171 cycles ( 42.75 us)                        ###
-;###   Worst Case (2) = 209 cycles ( 52,25 us)                        ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_get2Bits
+;;
+;;    Returns the value of a given group of 2 bits into an array (0, 1, 2 or 3)
+;;
+;; C Definition:
+;;    extern <u8> <cpct_get2Bits> (void* *array*, <u16> *pos*);
+;;
+;; Input Parameters (4 Bytes):
+;;    (2B DE) array - Pointer to the first byte of the array
+;;    (2B HL) pos   - Position of the group of 2 bits to be retrieved from the array
+;;
+;; Parameter Restrictions:
+;;    * *array* must be the memory location of the first byte of the array.
+;; However, this function will accept any given 16-value, without performing
+;; any check. So, be warned that giving mistaken values to this function will
+;; not make it fail, but giving an unpredictable return result.
+;;    * *pos* position of the group of 2 bits to be retrieved from the array, 
+;; starting in 0. As this function does not perform any boundary check, if you gave
+;; an index outside the boundaries of the array, the return result would
+;; be unpredictable and meaningless.
+;;
+;; Return value:
+;;    u8 - Value of the selected group of 2 bits: 0, 1, 2 or 3
+;;
+;; Known limitations:
+;;    * Maximum of 65536 groups of 2-bits, 16384 bytes per *array*.      
+;;
+;; Details:
+;;    Returns 0, 1, 2 or 3 depending on the value of the 2-bits group at 
+;; the given position (*pos*) in the specified *array*. It will assume that 
+;; the array elements have a size of 8 bits and also that the given position 
+;; is not bigger than the number of bits in the array (size of the array 
+;; multiplied by four).
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    46 bytes 
+;;
+;; Time Measures:
+;; (start code)
+;; Case      | Cycles | microSecs (us)
+;; -----------------------------------
+;; Best (0)  |   171  |  42.75
+;; -----------------------------------
+;; Worst (2) |   209  |  52.25
+;; -----------------------------------
+;; (end)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _cpct_get2Bits::
 
    ;; Get parameters from the stack
-   POP   AF          ;; [10] AF = Return address
-   POP   DE          ;; [10] DE = Pointer to the array in memory
-   POP   HL          ;; [10] HL = Index of the bit we want to get
-   PUSH  HL          ;; [11] << Restore stack status
-   PUSH  DE          ;; [11]
-   PUSH  AF          ;; [11]
+   pop   af          ;; [10] AF = Return address
+   pop   de          ;; [10] DE = Pointer to the array in memory
+   pop   hl          ;; [10] HL = Index of the bit we want to get
+   push  hl          ;; [11] << Restore stack status
+   push  de          ;; [11]
+   push  af          ;; [11]
 
-   LD   A, L         ;; [ 4] A = L 
-   AND  #0x03        ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be getting from the target byte: the remainder of L/4)
-   LD   B, A         ;; [ 4] B = index of the group of 2 bits that we want to get from 0 to 3 ([00 11 22 33])
+   ld    a, l        ;; [ 4] A = L 
+   AND   #0x03       ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be getting from the target byte: the remainder of L/4)
+   ld    b, a        ;; [ 4] B = index of the group of 2 bits that we want to get from 0 to 3 ([00 11 22 33])
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 4 index positions (8 bits)
    ;; So, first, we calculate INDEX/4 (HL/4) to know the target byte.
-   SRL   H           ;; [ 8]
-   RR    L           ;; [ 8]
-   SRL   H           ;; [ 8]
-   RR    L           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
-   ADD  HL, DE       ;; [11] HL += DE => HL points to the target byte in the array 
-   LD    A, (HL)     ;; [ 7] A = array[index] Get the byte where our 2 target bits are located
+   srl   h           ;; [ 8]
+   rr    l           ;; [ 8]
+   srl   h           ;; [ 8]
+   rr    l           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
+   add  hl, de       ;; [11] HL += DE => HL points to the target byte in the array 
+   ld    a, (hl)     ;; [ 7] A = array[index] Get the byte where our 2 target bits are located
 
    ;; Move the 2 required bits to the least significant position (bits 0 & 1)
    ;;   This is done to make easier the opperation of returning a value from 0 to 3 (represented by the 2 bits searched).
    ;;   Once the bits are at least significant position, we only have to AND them and we are done.
    ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be returned
    ;;   inside the target byte [ 0 0 | 1 1 | 2 2 | 3 3 ].
-   DEC B               ;; [ 4] If B=0, B-- is negative, turning on S flag
-   JP M, g2b_B_is_0    ;; [10] IF S flag is on, B was 0
-   DEC B               ;; [ 4] B-- (second time, so B-=2)
-   JP P, g2b_B_is_2or3 ;; [10] If S flag is off, B was > 1, else B was 1
+   dec   b             ;; [ 4] If B=0, B-- is negative, turning on S flag
+   jp    m, g2b_B_is_0 ;; [10] IF S flag is on, B was 0
+   dec   b             ;; [ 4] B-- (second time, so B-=2)
+   jp    p, g2b_B_is_2or3 ;; [10] If S flag is off, B was > 1, else B was 1
 g2b_B_is_1:
-   RLCA                ;; [ 4] <| Move bits 5 & 4 to positions 0 & 1 with 4 left rotations
-   RLCA                ;; [ 4] <|
-   JP g2b_B_is_0       ;; [10] We have done 2 rotations, and jump to B_is_0, to make another 2 rotations
+   rlca                ;; [ 4] <| Move bits 5 & 4 to positions 0 & 1 with 4 left rotations
+   rlca                ;; [ 4] <|
+   jp g2b_B_is_0       ;; [10] We have done 2 rotations, and jump to B_is_0, to make another 2 rotations
 g2b_B_is_2or3:
-   DEC B               ;; [ 4] B-- (third time, so B-=3)
-   JP P, g2b_end       ;; [10] IF S flag is off, B was >2 (3), else B was 2
+   dec   b             ;; [ 4] B-- (third time, so B-=3)
+   jp    p, g2b_end    ;; [10] IF S flag is off, B was >2 (3), else B was 2
 g2b_B_is_2:
-   RRCA                ;; [ 4] <| Move bits 2 & 3 to positions 0 & 1 with 2 right rotations
-   RRCA                ;; [ 4] <|
+   rrca                ;; [ 4] <| Move bits 2 & 3 to positions 0 & 1 with 2 right rotations
+   rrca                ;; [ 4] <|
    .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from next 2 bytes, which are RLCA;RLCA. Not jumping leaves us 3 bytes from here, at g2b_end)
 g2b_B_is_0:
-   RLCA                ;; [ 4] <| Move bits 7 & 6 to positions 0 & 1 with 2 left rotations
-   RLCA                ;; [ 4] <|
+   rlca                ;; [ 4] <| Move bits 7 & 6 to positions 0 & 1 with 2 left rotations
+   rlca                ;; [ 4] <|
 g2b_end:                            ; 0:22, 1:54, 2:60 3:42
-   AND #0x03           ;; [ 7] Leave out the 2 required bits (bits 0 & 1, at least significant positions).
-   LD   L, A           ;; [ 4] Set the return value in L 
+   and   #0x03         ;; [ 7] Leave out the 2 required bits (bits 0 & 1, at least significant positions).
+   ld    l, a          ;; [ 4] Set the return value in L 
 
-   RET                 ;; [10] Return to caller
+   ret                 ;; [10] Return to caller
