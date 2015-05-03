@@ -19,40 +19,64 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_bitarray
 
-;
-;########################################################################
-;### FUNCTION: cpct_getBit                                            ###
-;########################################################################
-;### Returns 0 or >0 depending on the value of the bit at the given   ###
-;### position in the specified array.                                 ###
-;### It will asume that the array elements have a size of 8 bits and  ###
-;### also that the given position is not bigger than the number of    ###
-;### bits in the array (size of the array multiplied by eight).       ###
-;### Limitations: Maximum of 65536 bits, 8192 bytes per array.        ###
-;########################################################################
-;### INPUTS (4 Bytes)                                                 ###
-;###  * (2B DE) Array Pointer                                         ###
-;###  * (2B HL) Position of the bit in the array                      ###
-;########################################################################
-;### RETURN VALUE                                                     ###
-;###  L = 0 if bit was unset                                          ###
-;###  L > 0 if bit was set                                            ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 42 bytes (8 table + 33 code)                             ###
-;### TIME: 191 cycles ( 47.75 us)                                     ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_getBit
+;;
+;;    Returns the status of a given bit into a bitarray (0 or !0)
+;;
+;; C Definition:
+;;    extern <u8> <cpct_getBit> (void* *array*, <u16> *pos*);
+;;
+;; Input Parameters (4 Bytes):
+;;    (2B DE) array - Pointer to the first byte of the array
+;;    (2B HL) pos   - Position of the bit in the array to be retrieved
+;;
+;; Parameter Restrictions:
+;;    * *array* must be the memory location of the first byte of the array.
+;; However, this function will accept any given 16-value, without performing
+;; any check. So, be warned that giving mistaken values to this function will
+;; not make it fail, but giving an unpredictable return result.
+;;    * *pos* position of the bit to be retrieved from the array, starting
+;; in 0. As this function does not perform any boundary check, if you gave
+;; an index outside the boundaries of the array, the return result would
+;; be unpredictable and meaningless.
+;;
+;; Return value:
+;;    u8 - Status of the selected bit: *false* (0) when the bit value is 0, 
+;; *true* (> 0) when the bit value is 1. Take into account that >0 means any
+;; value different than 0, and not necessarily 1.
+;;
+;; Known limitations:
+;;    * Maximum of 65536 bits, 8192 bytes per *array*.      
+;;
+;; Details:
+;;    Returns 0 or >0 depending on the value of the bit at the given 
+;; position (*pos*) in the specified *array*. It will assume that the 
+;; array elements have a size of 8 bits and also that the given position 
+;; is not bigger than the number of bits in the array (size of the array 
+;; multiplied by eight).
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    42 bytes (8 bytes bitWeights table, 33 bytes code)
+;;
+;; Time Measures:
+;; (start code)
+;; Case | Cycles | microSecs (us)
+;; -------------------------------
+;; Any  |   191  |  47.75
+;; -------------------------------
+;; (end)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; .bndry 8 ;; Make this vector start at a 8-byte aligned address to be able to use 8-bit arithmetic with pointers
 ;; bndry does not work when generated object file is linked later on.
 cpct_bitWeights:: .db #0x01, #0x02, #0x04, #0x08, #0x10, #0x20, #0x40, #0x80
 
 _cpct_getBit::
-
    ;; Get parameters from the stack
    pop   af          ;; [10] AF = Return address
    pop   de          ;; [10] DE = Pointer to the array in memory
