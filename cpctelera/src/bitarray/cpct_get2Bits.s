@@ -26,18 +26,18 @@
 ;;    Returns the value of a given group of 2 bits into an array (0, 1, 2 or 3)
 ;;
 ;; C Definition:
-;;    extern <u8> <cpct_get2Bits> (void* *array*, <u16> *pos*);
+;;    extern <u8> <cpct_get2Bits> (void* *array*, <u16> *index*);
 ;;
 ;; Input Parameters (4 Bytes):
 ;;    (2B DE) array - Pointer to the first byte of the array
-;;    (2B HL) pos   - Position of the group of 2 bits to be retrieved from the array
+;;    (2B HL) index - Position of the group of 2 bits to be retrieved from the array
 ;;
 ;; Parameter Restrictions:
 ;;    * *array* must be the memory location of the first byte of the array.
 ;; However, this function will accept any given 16-value, without performing
 ;; any check. So, be warned that giving mistaken values to this function will
 ;; not make it fail, but giving an unpredictable return result.
-;;    * *pos* position of the group of 2 bits to be retrieved from the array, 
+;;    * *index* position of the group of 2 bits to be retrieved from the array, 
 ;; starting in 0. As this function does not perform any boundary check, if you gave
 ;; an index outside the boundaries of the array, the return result would
 ;; be unpredictable and meaningless.
@@ -50,7 +50,7 @@
 ;;
 ;; Details:
 ;;    Returns 0, 1, 2 or 3 depending on the value of the 2-bits group at 
-;; the given position (*pos*) in the specified *array*. It will assume that 
+;; the given position (*index*) in the specified *array*. It will assume that 
 ;; the array elements have a size of 8 bits and also that the given position 
 ;; is not bigger than the number of bits in the array (size of the array 
 ;; multiplied by four).
