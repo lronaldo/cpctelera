@@ -23,48 +23,50 @@
 ;;
 ;; Title: Enabling / disabling ROMs
 ;;
-;; Functions: Enabling/disabling ROMs
+;; Functions: Enabling / disabling ROMs
 ;;
 ;; cpct_enableUpperROM  - Enables Upper ROM  [0xC000 - 0xFFFF]
 ;; cpct_enableLowerROM  - Enables Lower ROM  [0x0000 - 0x3FFF]
 ;; cpct_disableUpperROM - Disables upper ROM [0xC000 - 0xFFFF]
 ;; cpct_disableLowerROM - Disables Lower ROM [0x0000 - 0x3FFF]
 ;;
-;;    This 4 functions enable/disable lower or upper ROMs.
+;;    This 4 functions enable / disable lower or upper ROMs.
 ;;
 ;; C Definitions:
 ;;    void <cpct_enableUpperROM> ()
+;;
 ;;    void <cpct_enableLowerROM> ()
+;;
 ;;    void <cpct_disableUpperROM> ()
+;;
 ;;    void <cpct_enableUpperROM> ()
 ;;
 ;; Known limitations:
-;;
-;;    * If the execution of your program if going through some of these 2 
+;;    * If the execution of your program is going through some of these 2 
 ;; ROM spaces and you enable ROM, CPU will be unable to get machine code 
-;; of your program, as it will start reading from ROM instead of RAM (where your program is placed). This will re- 
-;; sult in unexpected behaviour.                                    
-;; WARNING 2: Enabling Lower ROM reenables Firmware JMP in interrupt
-;; mode one, as it reestablishes the values at 0x0038 mem.location. 
-;; If you have disabled the firmware by putting FB:C9 (EI:RET) at   
-;; 0x0038 (as _cpct_disableFirmware does) you may experience unde-  
-;; sired behaviour when next interrupts come. The most tipical is   
-;; a return to MODE 1, as firmware may be unaware of your currently 
-;; selected MODE and will try to reestablish its own MODE. Take it  
-;; into account and disable interrupts if you need.                 
+;; of your program, as it will start reading from ROM instead of RAM (where 
+;; your program is placed). This will result in unexpected behaviour.
+;;    * Enabling Lower ROM re-enables Firmware JMP in interrupt mode 1, 
+;; as it re-establishes the values at memory location 0x0038. If you have 
+;; disabled the firmware by putting FB:C9 (EI:RET) at 0x0038 (as 
+;; <cpct_disableFirmware> does) you may experience undesired behaviour 
+;; when next interrupts come. The most typical is a return to MODE 1, as 
+;; firmware may be unaware of your currently selected MODE and will try to 
+;; re-establish its own MODE. Take it into account and disable interrupts 
+;; if you need.
 ;;
 ;; Details:
-;;    This 4 functions enable/disable lower or upper ROMs. By default, CPCtelera 
+;;    These 4 functions enable / disable lower or upper ROMs. By default, *CPCtelera* 
 ;; sets both ROMS as disabled at the first event of video mode change. Enabling 
-;; one of them means changing the way the cpu gets information from memory: on 
+;; one of them means changing the way the CPU gets information from memory: on 
 ;; the places where ROM is enabled, CPU gets values from ROM whenever it tries 
 ;; to read from memory.  
 ;;
 ;; If ROM is disabled, these memory reads get values from RAM. ROMs 
 ;; are mapped in this address space:
 ;;
-;;  Lower ROM - [ 0000h - 3FFFh ]
-;;  Upper ROM - [ C000h - FFFFh ]
+;;  Lower ROM - [ 0x0000 - 0x3FFF ]
+;;  Upper ROM - [ 0xC000 - 0xFFFF ]
 ;;
 ;; CPU Requests to write to memory are always mapped to RAM, so there is no need
 ;; to worry about that. Also, Gate Array always gets video memory values from 
@@ -73,64 +75,49 @@
 ;;
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, BC, HL
 ;;
 ;; Required memory:
 ;;    122 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case | Cycles | microSecs (us)
+;; Case  | Cycles | microSecs (us)
 ;; -------------------------------
-;; Any  |  561   |   140.25
+;; Best  |   86   |   21.50
+;; -------------------------------
+;; Worst |   96   |   24.00
 ;; -------------------------------
 ;; (end code)
-;;
-;; Credits:                                                       
-;;    This fragment of code is based on a <scanKeyboard code issued by CPCWiki at
-;; http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning>. This version
-;; of the code, however, is ~60% faster than CPCWiki's.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;########################################################################
-;########################################################################
-;### INPUTS (~)                                                       ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, HL                           ###
-;########################################################################
-;### MEASURED TIME                                                    ###
-;###  86/96 cycles (22.5/24 us)                                       ###
-;########################################################################
-;
 _cpct_enableLowerROM::
-   LD  HL, #0xFBE6           ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
-   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0xFBE6          ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
+   jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
 
 _cpct_disableLowerROM::
-   LD  HL, #0x04F6           ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
-   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0x04F6          ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
+   jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
 
 _cpct_enableUpperROM::
-   LD  HL, #0xF7E6           ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
-   JP  mrs_modifyROMstatus   ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0xF7E6          ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
+   jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
 
 _cpct_disableUpperROM::
-   LD  HL, #0x08F6           ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
-   ;JP  mrs_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0x08F6          ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
+   ;jp  mrs_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
 
 mrs_modifyROMstatus:
-   LD  (mrs_operation), HL   ;; [16] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
-   LD   HL, #_cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
-   LD   A,  (HL)             ;; [ 7] A = mode_rom_status (present value)
+   ld  (mrs_operation), hl   ;; [16] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
+   ld   hl, #_cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
+   ld    a, (hl)             ;; [ 7] A = mode_rom_status (present value)
 mrs_operation:
-   AND  #0b11111011          ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
-   LD   B,  #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
-   OUT (C), A                ;; [12] GA Command: Set Video Mode and ROM status (100)
+   and  #0b11111011          ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
+   ld    b, #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
+   out (c), a                ;; [12] GA Command: Set Video Mode and ROM status (100)
 
-   LD (HL), A                ;; [ 7] Save new Mode and ROM status for later use if required
+   ld (hl), a                ;; [ 7] Save new Mode and ROM status for later use if required
 
-   RET                       ;; [10] Return
+   ret                       ;; [10] Return
 
 
