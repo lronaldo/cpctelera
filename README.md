@@ -32,14 +32,14 @@ Follow setup instructions. Setup checks that required software is previously ins
  * XCode Command Line tools (`xcode-select --install`)
  * Libboost from Homebrew (`brew install boost`)
 
-Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. To have a quick glance about what CPCtelera offers, you may enter `examples/` folder and check all the examples included. You can build any one of them just by typing `make` inside the example folder, then CDT and DSK files will be automatically generated.
+Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. To have a quick glance about what _**CPCtelera**_ offers, you may enter `examples/` folder and check all the examples included. You can build any one of them just by typing `make` inside the example folder, then CDT and DSK files will be automatically generated.
 
 For creating your own projects, _**CPCtelera**_ includes the `cpct_mkproject` script. `setup.sh` configures your system's $PATH variable so that you have direct access to `cpct_mkproject` anywhere on your system (you should close and open your terminal again after `setup.sh` finishes). Creating a new project is as easy as typing this:
  * `cpct_mkproject <project_folder>`
 
  If you wanted to specify a project name (different than the folder name) and/or a concrete binary load address, you may check options with `cpct_mkproject --help`.
 
-If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with CPCtelera. This package creates Xcode projects from examples and lets you build them directly from Xcode.
+If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with _**CPCtelera**_. This package creates Xcode projects from examples and lets you build them directly from Xcode.
 
 _**CPCtelera**_ is fully usable and has been tested under these platforms:
  * Windows (with Cygwin 32/64 bits)
@@ -79,19 +79,22 @@ If you have any questions, please contact us:
    * [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos)
  * **[Small Devices C Compiler (SDCC)](http://sdcc.sourceforge.net/)**
    * [SDCC Team](http://sdcc.sourceforge.net/index.php#Who)
- * **iDSK**
+ * **[iDSK](http://koaks.amstrad.free.fr/amstrad/projets/)**
    * Sid / IMPACT 
    * [Pulkomandy](http://www.pushnpop.net/profile-47.html) / [Shinra Team](http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml)
- * **Hex2bin**
+ * **[Hex2bin](http://sourceforge.net/projects/hex2bin/)**
    * [Jaques Pelletier](https://www.linkedin.com/pub/jacques-pelletier/a/668/309)
- * **2CDT**
+ * **[2CDT](http://www.cpcwiki.eu/forum/applications/2cdt/)**
    * [Kevin Thacker](http://www.cpctech.org.uk/about.html) / [CPCTech](http://www.cpctech.org.uk/) 
+ * **[Retro Game Asset Studio (RGAS)](http://www.cpcwiki.eu/index.php/Retro_Game_Asset_Studio)**
+   * [Lachlan Keown](http://www.twitter.com/lachlankeown) (lachlankeown at gmail dot com)
 
 #### Special Thanks
 
+ * [Lachlan Keown](http://www.twitter.com/lachlankeown) (For being incredibly kind and helpful, and adding every required modification to better integrate RGAS with _**CPCtelera**_)
  * [Cpcitor](http://github.com/cpcitor) (for his great help and advice, and for developing [cpc-dev-tool-chain](http://github.com/cpcitor/cpc-dev-tool-chain))
  * [CPCWiki](http://cpcwiki.eu) & [Grimware](http://grimware.org/) (for providing great technical documentations and examples)
  * Raúl Simarro (for developing [CPCRSLib](http://sourceforge.net/projects/cpcrslib/) game creation library)
- * [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos) (for developing Arkos Traker&Player and giving great support on adding it to CPCtelera. Also for giving general advice during development of CPCtelera)
+ * [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos) (for developing Arkos Traker&Player and giving great support on adding it to _**CPCtelera**_. Also for giving general advice during development of _**CPCtelera**_)
  * [Pulkomandy](http://www.pushnpop.net/profile-47.html) / [Shinra Team](http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml) (for maintaining [cpcsdk](https://github.com/cpcsdk), with tools like [iDSK](https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z&can=2&q=) or [cpcfs](https://code.google.com/p/cpcsdk/wiki/cpcfs), among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
  * José Ángel Rodriguez ([@rvjose](http://twitter.com/rvjose)) (for early testing, bug reporting and giving great ideas)
