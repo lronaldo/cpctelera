@@ -30,6 +30,9 @@
 ;; Input Parameters (4 bytes):
 ;;    (1B A) offset - New starting offset for Video Memory (8 Least Significant bits)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_setVideoMemoryOffset_asm
+;;
 ;; Parameter Restrictions:
 ;;    * *offset* could be any 8-bit value, and should contain video memory 
 ;; offset value. Its 8-bits will become the 8 Least Significant bits (LSb) of
@@ -95,10 +98,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
-;; ---------------------------------
-;; Any   |    76  |   19.00
-;; ---------------------------------
+;;    Case    | Cycles | microSecs (us)
+;; ------------------------------------
+;;     Any    |   76   |   19.00
+;; ------------------------------------
+;; Asm saving |  -28   |   -7.00
+;; ------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -107,6 +112,8 @@ _cpct_setVideoMemoryOffset::
    ld   hl, #2       ;; [10] HL = SP + 2 (Place where parameter is)
    add  hl, sp       ;; [11]
    ld    a, (hl)     ;; [ 7] A = First Parameter (Video Memory Offset to Establish)
+
+cpct_setVideoMemoryOffset_asm::     ;; Assembly entry point
 
    ;; Select R13 Register from the CRTC and Write there the selected Video Memory Offset
    ld   bc, #0xBC0D  ;; [10] 0xBC = Port for selecting CRTC Register, 0x0D = Selecting R13

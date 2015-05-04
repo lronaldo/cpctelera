@@ -37,6 +37,9 @@
 ;;  (2B DE) colour_array  - Pointer to a byte array containing new hardware colour values [0 - 31]
 ;;  (1B A ) size          - [1 - 16] Number of colours to change
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_setPalette_asm
+;;
 ;; Parameter Restrictions:
 ;;  * *colour_array* must be an array of unsigned 8-bit values (u8), each one
 ;; in the [0-31] range.
@@ -118,9 +121,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles      | microSecs (us)
-;; ---------------------------------------
-;; Any   | 101 + 78*NC | 25,25 + 19,50*NC
+;;    Case    | Cycles      | microSecs (us)
+;; ---------------------------------------------
+;;     Any    | 101 + 78*NC | 25,25 + 19,50*NC
+;; ---------------------------------------------
+;; Asm saving |    -54      |    -13.50
+;; ---------------------------------------------
 ;; (end)
 ;;    NC=Number of colours to be set
 ;;
@@ -143,6 +149,7 @@ _cpct_setPalette::
    inc  hl                  ;; [ 6]
    ld   a, (hl)             ;; [ 7] A = Second parameter, Number of colours to set (up to 16) 
 
+cpct_setPalette_asm::       ;; Assembly entry point
    ex   de, hl              ;; [ 4] HL = DE, We will use HL to point to the array and get colour ID values
    dec  a                   ;; [ 4] A -= 1 (We leave A as 1 colour less to convert 16 into 15 and be able to use AND to ensure no more than 16 colours are passed)
    and  #0x0F               ;; [ 7] A %= 16, A will be 15 at most, that is, the number of colours to set minus 1

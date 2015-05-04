@@ -37,6 +37,9 @@
 ;;    (1B C) pen    - [0-16] Index of the palette colour to change. Similar to PEN Number in BASIC.
 ;;    (1B A) hw_ink - [0-31] New hardware colour value for the given palette index.
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_setPALColour_asm
+;;
 ;; Parameter Restrictions:
 ;;    - *pen* must be <= 16. Values [0-15] are normal palette colours, whilest index 16
 ;; refers to the Screen Border. Giving pen > 16 may yield unexpected behaviour.
@@ -70,9 +73,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
-;; -------------------------------
-;; Any   |  95    |  23.75
+;;    Case    | Cycles | microSecs (us)
+;; --------------------------------------
+;;     Any    |  95    |  23.75
+;; --------------------------------------
+;; Asm saving | -41    | -10.25
+;; --------------------------------------
 ;; (end code)
 ;;
 ;; Credits:
@@ -89,6 +95,7 @@ _cpct_setPALColour::
    inc   hl                ;; [ 6] 
    ld     a, (hl)          ;; [ 7] A = Second Parameter (INKR)
 
+cpct_setPALColour_asm::    ;; Assembly entry point
   ;or  #PAL_PENR           ;; [ 7] (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). As PENR command is 000, nothing to be done here.
    ld     b, #GA_port_byte ;; [ 7] B = Gate Array Port (0x7F). C has the command that GA will execute.
    out  (c), c             ;; [12] GA command: Select PENR. C = Command + Parameter (PENR + PEN number to select)

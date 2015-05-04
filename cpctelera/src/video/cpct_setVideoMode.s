@@ -33,6 +33,9 @@
 ;; C Definition:
 ;;    void <cpct_setVideoMode> (<u8> *videoMode*)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_setVideoMode_asm
+;;
 ;; Input Parameters (1 Byte):
 ;;    (1B A) videoMode - [0-3] Video mode to set
 ;;
@@ -68,9 +71,13 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
+;; Case       | Cycles | microSecs (us)
 ;; -------------------------------
-;; Any   |  71    |  17.75
+;; Any        |   71   |  17.75
+;; -------------------------------
+;; Asm saving |  -28   |  -7.00
+;; -------------------------------
+;; Asm 
 ;; (end code)
 ;;
 ;; Credits:
@@ -83,6 +90,8 @@ _cpct_setVideoMode::
    ld   hl, #2               ;; [10] HL = SP + 2 (Place where parameters are in the stack)
    add  hl, sp               ;; [11]
    ld    c, (hl)             ;; [ 7] A = First Paramter (Video Mode to be selected)
+
+cpct_setVideoMode_asm::      ;; Entry point for assembly calls using registers for parameter passing
 
    ld   hl, #_cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
    ld    a, (hl)             ;; [ 7] A = Present values for MODE, INT.GEN and ROM selection. (See mode_rom_status)

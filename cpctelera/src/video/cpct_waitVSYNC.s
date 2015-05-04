@@ -27,6 +27,9 @@
 ;; C Definition:
 ;;    void <cpct_waitVSYNC> ()
 ;;
+;; Assembly call:
+;;    > call cpct_waitVSYNC_asm
+;;
 ;; Details:
 ;;    This function implements a wait loop that exists only when VSYNC signal 
 ;; from the CRTC is detected. This signal means that the monitor has finished 
@@ -76,6 +79,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_waitVSYNC::
+cpct_waitVSYNC_asm::	;; Assembly entry point
    ld  b, #PPI_PORT_B;; [ 7] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
 
 wvs_wait:

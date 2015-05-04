@@ -30,6 +30,9 @@
 ;; Input Parameters (4 bytes):
 ;;    (1B A) page_6LSb - New starting page for Video Memory (Only 6 Least Significant bits are used)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_setVideoMemoryPage_asm
+;;
 ;; Parameter Restrictions:
 ;;    * *page_6LSb* should contain video memory page value encoded in its 6 
 ;; Least Significant bits (LSb). This parameter must be in the range [0-63] as 
@@ -95,10 +98,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
-;; ---------------------------------
-;; Any   |    76  |   19.00
-;; ---------------------------------
+;;    Case    | Cycles | microSecs (us)
+;; ------------------------------------
+;;     Any    |   76   |   19.00
+;; ------------------------------------
+;; Asm saving |  -28   |   -7.00
+;; ------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -107,6 +112,8 @@ _cpct_setVideoMemoryPage::
    ld   hl, #2       ;; [10] HL = SP + 2 (Place where parameter is)
    add  hl, sp       ;; [11]
    ld    a, (hl)     ;; [ 7] A = First Parameter (Video Memory Page to Set)
+
+cpct_setVideoMemoryPage_asm::  ;; Assembly entry point
 
    ;; Select R12 Register from the CRTC and Write there the selected Video Memory Page
    ld   bc, #0xBC0C  ;; [10] 0xBC = Port for selecting CRTC Register, 0x0C = Selecting R12

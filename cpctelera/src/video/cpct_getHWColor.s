@@ -36,6 +36,9 @@
 ;; Input Parameters (1 Bytes):
 ;;    (1B C) firmware_colour - [0-26] Firmware colour value to be converted (Similar to BASIC's INK value)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_getHWColour_asm
+;;
 ;; Parameter Restrictions:
 ;;    * *firmware_colour* must be in the range [0-26], otherwise, return value will be unexpected.
 ;;
@@ -54,9 +57,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
-;; -------------------------------
-;; Any   |  63    |  15.75
+;;     Case   | Cycles  | microSecs (us)
+;; ---------------------------------------
+;;     Any    |   63    |   15.75
+;; ---------------------------------------
+;; Asm saving |  -15    |   -3.75
+;; ---------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -66,11 +72,17 @@ cpct_firmware2hw_colour::
   .db 0x16, 0x06, 0x17, 0x1E, 0x00, 0x1F, 0x0E, 0x07, 0x0F
   .db 0x12, 0x02, 0x13, 0x1A, 0x19, 0x1B, 0x0A, 0x03, 0x0B
 
+cpct_getHWColour_asm::       ;; Assembly entry point
+   ld    b, #0               ;; [ 7] B = 0 (Required later to increment HL with BC)
+   jp    ghc_endparams       ;; [10] Jump to the end of parameter retrieval from stack
+
 _cpct_getHWColour::
    ld   hl, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
    ld    b, h                ;; [ 4] B = 0, to be able to use C as an incremente for HL (adding BC)
    add  hl, sp               ;; [11]
    ld    c, (hl)             ;; [ 7] A = Firmware INK colour value 
+
+ghc_endparams:
 
    ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the colour table
    add  hl, bc               ;; [11] HL += C (as B=0), HL points to the exact hardware color value to return

@@ -1822,10 +1822,12 @@ PLY_Stop:
    ;;
    ;; Time Measures:
    ;; (start code)
-   ;; Case  | Cycles | microSecs (us)
+   ;;    Case    | Cycles | microSecs (us)
    ;; --------------------------------
-   ;; Any   |  146   |  36.50
+   ;;    Any     |  146   |  36.50
    ;; --------------------------------
+   ;; Asm saving |  -41   | -10.25
+   ;; -------------------------------
    ;; (end code)
    ;;
    ;; Credits:
@@ -1879,10 +1881,12 @@ PLY_Stop:
    ;;
    ;; Time Measures:
    ;; (start code)
-   ;; Case  | Cycles | microSecs (us)
+   ;;    Case    | Cycles | microSecs (us)
    ;; --------------------------------
-   ;; Any   |   68   |  15.50
+   ;;    Any     |   68   |  15.50
    ;; --------------------------------
+   ;; Asm saving |    0   |   0
+   ;; -------------------------------
    ;; (end code)
    ;;
    ;; Credits:
@@ -1950,7 +1954,12 @@ PLY_Stop:
    ;;
    ;; Time Measures:
    ;; (start code)
-   ;;    To be done
+   ;;    Case    | Cycles  | microSecs (us)
+   ;; --------------------------------------
+   ;;    Any     |     To be done
+   ;; --------------------------------------
+   ;; Asm saving |  -141   |  -45.25
+   ;; --------------------------------------
    ;; (end code)
    ;;
    ;; Credits:
@@ -2071,11 +2080,13 @@ PLY_Stop:
    ;;
    ;; Time Measures:
    ;; (start code)
-   ;; Case     | Cycles | microSecs (us)
+   ;; Case       | Cycles | microSecs (us)
    ;; --------------------------------
-   ;; Best (0) |  101   |  25.25 
+   ;; Best (0)   |  101   |  25.25 
    ;; --------------------------------
-   ;; Best (1) |  149   |  37.25 
+   ;; Best (1)   |  149   |  37.25 
+   ;; --------------------------------
+   ;; Asm saving |  -28   |  -7.00
    ;; --------------------------------
    ;; (end code)
    ;;
