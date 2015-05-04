@@ -21,50 +21,84 @@
 
 .include /bitarray.s/
 
-;
-;########################################################################
-;### FUNCTION: cpct_set4Bits                                          ###
-;########################################################################
-;### Set the the value of the group of 4 bits at the given position   ###
-;### in the specified array to a given value.                         ###
-;### It will asume that the array elements have a size of 8 bits and  ###
-;### also that the given position is not bigger than the number of    ###
-;### groups of four bits in the array (size of the array multiplied   ###
-;### by 2).                                                           ###
-;### The function expects a value in the range 0-15, but any value    ###
-;### greater than that will be cropped (only bits 0-3 will be used)   ###
-;### Limitations: Maximum of 65536 4bit-groups, 32768 bytes per array ###
-;########################################################################
-;### INPUTS (5 Bytes)                                                 ###
-;###  * (2B DE) Array Pointer                                         ###
-;###  * (2B HL) Position of the group of four bits in the array       ###
-;###  * (1B C) Value from 0 to 15 to set in the given position        ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL	                      ###
-;########################################################################
-;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 33 bytes                                                 ###
-;### TIME:                                                            ###
-;###   Best Case  (1) = 175 cycles ( 43.75 us)                        ###
-;###   Worst Case (0) = 198 cycles ( 49.50 us)                        ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_set4Bits
+;;
+;;    Sets the value of a selected group of 4 bits (nibble) into a bitarray to [0-15]
+;;
+;; C Definition:
+;;    void <cpct_set4Bits>  (void* *array*, <u16> *index*, <u8> *value*)
+;;
+;; Input Parameters (4 Bytes):
+;;    (2B DE) array - Pointer to the first byte of the array
+;;    (2B HL) index - Position of the group of 4 bits in the array to be modified
+;;    (1B C ) value - New value [0-15] for the group of 4 bits at the given position
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call _cpct_set4Bits_asm
+;;
+;; Parameter Restrictions:
+;;    * *array* must be the memory location of the first byte of the array.
+;; However, this function will accept any given 16-value, without performing
+;; any check. Giving and incorrect *array* pointer will have unpredictable
+;; results: a random nibble from your memory may result changed.
+;;    * *index* position of the group of 4 bits (nibble) to be modified in 
+;; the array, starting in 0. Again, as this function does not perform any 
+;; boundary check, if you gave an index outside the boundaries of the array,
+;; a nibble outside the array will be changed in memory, what will have 
+;; unpredictable results.
+;;    * *value* new value for the selected nibble [0-15]. Only the 4 Least 
+;; Significant Bits (LSBs) are used. This means that any given *value* 
+;; will "work": *value* module 16 will be finally inserted in the *array*
+;; position (*index*).
+;;
+;; Known limitations:
+;;    * Maximum of 65536 bits, 32768 bytes per array.
+;;
+;; Details:
+;;    Set the new *value* of the 4-bits group (nibble) at the given position 
+;; (*index*) in the specified *array*. This function assumes that the *array* 
+;; elements have a size of 8 bits and also that the given *index* is not bigger
+;; than the number of nibbles in the *array* (size of the *array* multiplied
+;; by 2). The *value* to be set is also assumed to be in the range [0-15] but 
+;; other values will "work" (just the 4 Least Significant Bits will be used, 
+;; so *value* module 16 will be inserted).
+;; 
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    33 bytes 
+;;
+;; Time Measures:
+;; (start code)
+;; Case       | Cycles | microSecs (us)
+;; -------------------------------
+;; Best  (1)  |   175  |  43.75
+;; -------------------------------
+;; Worst (0)  |   198  |  49.50
+;; -------------------------------
+;; Asm saving |   -84  | -21.00
+;; -------------------------------
+;; (end)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_set4Bits::
 
    ;; GET Parameters from the stack (Pop + Restoring SP)
 .if let_disable_interrupts_for_function_parameters
    ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   LD (s4b_restoreSP+1), SP ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   DI                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   POP  AF                  ;; [10] AF = Return Address
-   POP  DE                  ;; [10] DE = Pointer to the bitarray in memory
-   POP  HL                  ;; [10] HL = Index of the bit to be set
-   POP  BC                  ;; [10] BC => C = Set Value (0-15), B = Undefined
+   ld (s4b_restoreSP+1), sp ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   di                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   pop  af                  ;; [10] AF = Return Address
+   pop  de                  ;; [10] DE = Pointer to the bitarray in memory
+   pop  hl                  ;; [10] HL = Index of the bit to be set
+   pop  bc                  ;; [10] BC => C = Set Value (0-15), B = Undefined
 s4b_restoreSP:
-   LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   EI                       ;; [ 4] Enable interrupts again
+   ld   sp, #0              ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   ei                       ;; [ 4] Enable interrupts again
 .else 
    ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
    pop  af                  ;; [10] AF = Return Address
@@ -77,9 +111,11 @@ s4b_restoreSP:
    push af                  ;; [11]
 .endif
 
-   LD  A, #0x0F        ;; [ 7] A = 0F  <| Setting up masks for getting upper or lower nibble (4 bits)
-   LD  B, #0xF0        ;; [ 7] B = F0  <|
-   AND C               ;; [ 4] C = Value to be set (ensure it is in the range 0-15)
+_cpct_set4Bits_asm::   ;; Entry point for assembly calls using registers for parameter passing
+
+   ld    a, #0x0F      ;; [ 7] A = 0F  <| Setting up masks for getting upper or lower nibble (4 bits)
+   ld    b, #0xF0      ;; [ 7] B = F0  <|
+   and   c             ;; [ 4] C = Value to be set (ensure it is in the range 0-15)
 
    ;; We need to know how many bytes do we have to
    ;; jump into the array, to move HL to that point.
@@ -87,20 +123,20 @@ s4b_restoreSP:
    ;; So, first, we calculate INDEX/2 (HL/2) to know the target byte, and
    ;;  the remainder to know the group of 4bits we want [ 0000 1111 ], and 
    ;;  that will go to the Carry Flag.
-   SRL   H             ;; [ 8]
-   RR    L             ;; [ 8] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
-   JP C, s4b_setGroup1 ;; [10] IF Carry is set, then last bit of L was 1, we have to set group 1 (bits 0 to 4)
+   srl   h             ;; [ 8]
+   rr    l             ;; [ 8] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
+   jp    c, s4b_setGroup1 ;; [10] IF Carry is set, then last bit of L was 1, we have to set group 1 (bits 0 to 4)
 s4b_setGroup0:
-   RRCA                ;; [ 4] <| As we are goint to set the grop 0 (4 most significant bits), we rotate the
-   RRCA                ;; [ 4]  | value 4 times and place it in bits 4 to 7
-   RRCA                ;; [ 4]  |
-   RRCA                ;; [ 4] <|
-   LD  B, #0x0F        ;; [ 7] We need a diferent mask, as we want to leave out only bits from 0 to 3
+   rrca                ;; [ 4] <| As we are goint to set the grop 0 (4 most significant bits), we rotate the
+   rrca                ;; [ 4]  | value 4 times and place it in bits 4 to 7
+   rrca                ;; [ 4]  |
+   rrca                ;; [ 4] <|
+   ld    b, #0x0F      ;; [ 7] We need a diferent mask, as we want to leave out only bits from 0 to 3
 s4b_setGroup1:
-   ADD  HL, DE         ;; [11] HL += DE => HL points to the target byte in the array 
-   LD   C, A           ;; [ 4] C = Value to be set
-   LD   A, (HL)        ;; [ 7] A = Target Byte
-   AND  B              ;; [ 4] Mask A to reset the bits we want to set
-   OR   C              ;; [ 4] Set our value in the 4 bits previously resetted
-   LD   (HL), A        ;; [ 7] Save the byte again in the array
-   RET                 ;; [10] Return to the caller
+   add  hl, de         ;; [11] HL += DE => HL points to the target byte in the array 
+   ld   c, a           ;; [ 4] C = Value to be set
+   ld   a, (hl)        ;; [ 7] A = Target Byte
+   and  b              ;; [ 4] Mask A to reset the bits we want to set
+   or   c              ;; [ 4] Set our value in the 4 bits previously resetted
+   ld   (hl), a        ;; [ 7] Save the byte again in the array
+   ret                 ;; [10] Return to the caller

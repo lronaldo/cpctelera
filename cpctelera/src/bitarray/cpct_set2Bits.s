@@ -42,13 +42,13 @@
 ;;    * *array* must be the memory location of the first byte of the array.
 ;; However, this function will accept any given 16-value, without performing
 ;; any check. Giving and incorrect *array* pointer will have unpredictable
-;; results: a random bit from your memory may result changed.
-;;    * *index* position of the bit to be retrieved from the array, starting
-;; in 0. Again, as this function does not perform any boundary check, if you 
-;; gave an index outside the boundaries of the array, a bit outside the array
-;; will be changed in memory, what will have unpredictable results.
-;;    * *value* new value for the selected bit [0-3]. Only the 2 Least 
-;; Significant Bits (LSBs) are used. This means that any given *value* 
+;; results: a random group of 2 bits from your memory may result changed.
+;;    * *index* position of the group of 2 bits to be modified in the array, 
+;; starting in 0. Again, as this function does not perform any boundary check, 
+;; if you gave an index outside the boundaries of the array, a group of 2 bits 
+;; outside the array will be changed in memory, what will have unpredictable results.
+;;    * *value* new value for the selected group of 2 bits [0-3]. Only the 
+;; 2 Least Significant Bits (LSBs) are used. This means that any given *value* 
 ;; will "work": *value* module 4 will be finally inserted in the *array*
 ;; position (*index*).
 ;;
