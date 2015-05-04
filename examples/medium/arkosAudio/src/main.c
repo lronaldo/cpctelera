@@ -24,16 +24,17 @@ typedef enum { K_RELEASED, K_PRESSED } TKeyStatus;
 
 void main(void) {
    TKeyStatus space_bar = K_RELEASED;
-   unsigned char playing = 1, color = 1;
-   char* video_pos = (char*) 0xC000;
+   u8  playing   = 1;
+   u8  color     = 1;
+   u8* pvideomem = (u8*) 0xC000;
 
    cpct_disableFirmware();
    cpct_setVideoMode(2);
 
    // Initialize the song to be played
-   cpct_arkosPlayer_songInit(molusk_song);
-   cpct_arkosPlayer_SFXInit(molusk_song);
-   cpct_arkosPlayer_enableSFX(7);
+   cpct_akp_musicInit(molusk_song);
+   cpct_akp_SFXInit(molusk_song);
+   cpct_akp_enableSFX(7);
 
    while (1) {
       // We have to call the play function 50 times per second (because the song is 
@@ -42,12 +43,12 @@ void main(void) {
       cpct_waitVSYNC();
 
       if (playing) {
-         cpct_arkosPlayer_songPlay();
+         cpct_akp_musicPlay();
 
          // Write a new dash to the screen to see something while playing
-         cpct_drawCharM2(video_pos, color, '#');
-         if (++video_pos >= (char*)0xC7D0) {
-            video_pos = (char*)0xC000;
+         cpct_drawCharM2(pvideomem, color, '#');
+         if (++pvideomem >= (char*)0xC7D0) {
+            pvideomem = (char*)0xC000;
             color ^= 1;
          }
       }
@@ -59,15 +60,15 @@ void main(void) {
          if ( !cpct_isKeyPressed(Key_Space) ) {
             space_bar = K_RELEASED;
             if (playing)
-               cpct_arkosPlayer_songStop();
+               cpct_akp_musicStop();
             playing ^= 1;
          }
       } else if (cpct_isKeyPressed(Key_Space)) {
          space_bar = K_PRESSED;
       } else if (cpct_isKeyPressed(Key_0)) {
-         cpct_arkosPlayer_SFXPlay(13, 15, 36, 20, 0, 1);
+         cpct_akp_SFXPlay(13, 15, 36, 20, 0, 1);
       } else if (cpct_isKeyPressed(Key_1)) {
-         cpct_arkosPlayer_SFXPlay(3, 15, 60, 0, 40, 2);
+         cpct_akp_SFXPlay(3, 15, 60, 0, 40, 2);
       }
    }
 }

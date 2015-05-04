@@ -18,24 +18,35 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_audio
 
+;;
+;; Title: Arkos Player Control
+;;
+
 ;;------------------------------------------------------------------------------------------------------
 ;;--- PLAYER CONFIGURATION CONSTANTS
 ;;------------------------------------------------------------------------------------------------------
 
-;Set to 1 if you want to use Sound Effects in your player. Both CPU and memory consuming.
+;;
+;; Constants: Arkos Player Compilation Constants
+;;
+;;    Constants used to control which features are enabled / disabled in the Arkos Tracker
+;; Player code. Changing them requires recompiling CPCtelera's library to take effect.
+;;
+;;    PLY_UseSoundEffects - Set to 1 if you want to use Sound Effects in your player. 
+;; Both CPU and memory consuming. It is set to 1 by default in CPCtelera.
+;;    PLY_UseFades        - Set to 1 to allow fades in / out. A little CPU and memory 
+;; consuming. _cpct_akp_setFadeVolume becomes available.
+;;    PLY_SystemFriendly  - Set to 1 if you want to save the Registers used by AMSDOS 
+;; (AF', BC', IX, IY) which allows you to call this player in BASIC. As this option is 
+;; system-friendly, it cuts interruptions, and restores them ONLY IF NECESSARY. It is set
+;; to 0 by default. However, IX and IY registers are always saved.
+;;    PLY_RetrigValue     - Value used to trigger the Re-trig of Register 13. 0xFE 
+;; corresponds to 'CP xx'. Do not change it!
+;;
 .equ PLY_UseSoundEffects, 1
-
-;Set to 1 to allow fades in/out. A little CPU and memory consuming.
-;PLY_SetFadeValue becomes available.
-.equ PLY_UseFades, 0
-
-;Set to 1 if you want to save the Registers used by AMSDOS (AF', BC', IX, IY)
-;(which allows you to call this player in BASIC)
-;As this option is system-friendly, it cuts the interruption, and restore them ONLY IF NECESSARY.
-.equ PLY_SystemFriendly, 1
-
-;Value used to trigger the Retrig of Register 13. #FE corresponds to cp xx. Do not change it !
-.equ PLY_RetrigValue, #0xFE
+.equ PLY_UseFades       , 0
+.equ PLY_SystemFriendly , 0
+.equ PLY_RetrigValue    , #0xFE
 
 ;;------------------------------------------------------------------------------------------------------
 ;;--- PLAYER CODE START
@@ -46,13 +57,13 @@ PLY_Digidrum: .db 0
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_arkosPlayer_play                                  ###
+;## FUNCTION: _cpct_akp_play                                  ###
 ;########################################################################
 ;### This function is to be called to start and continue playing the  ###
 ;### song. Depending on the frequency at which the song were created, ###
 ;### this function should be called 12, 25, 50, 100, 200 or 300 times ###
 ;### per second. It is recommended to try to call this function with  ###
-;### the most accurate timming possible, to get best sound results.   ###
+;### the most accurate timing possible, to get best sound results.   ###
 ;########################################################################
 ;### INPUTS (0 Bytes)                                                 ###
 ;########################################################################
@@ -64,7 +75,7 @@ PLY_Digidrum: .db 0
 ;### TIME: (Not measured)                                             ###
 ;########################################################################
 ;
-_cpct_arkosPlayer_songPlay::
+_cpct_akp_musicPlay::
 PLY_Play:
 
 ;***** Player System Friendly has to restore registers *****
@@ -74,9 +85,9 @@ PLY_Play:
    exx
    push af
    push bc
+.endif
    push ix
    push iy
-.endif
 
    xor  a
    ld   (PLY_Digidrum), a     ;Reset the Digidrum flag.
@@ -990,9 +1001,12 @@ PLY_SendRegisters:
 
          call PLY_PSGReg13_Code
 
+   .endif
       PLY_PSGREG13_RecoverSystemRegisters:
          pop iy
          pop ix
+
+   .if PLY_SystemFriendly
          pop bc
          pop af
          exx
@@ -1558,7 +1572,7 @@ PLY_FrequencyTable:
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_arkosPlayer_init                                  ###
+;## FUNCTION: _cpct_akp_init                                  ###
 ;########################################################################
 ;### This function should be called fist to initialize the song that  ###
 ;### is to be played. The function reads the song header and prepares ###
@@ -1575,7 +1589,7 @@ PLY_FrequencyTable:
 ;### TIME: (Not measured)                                             ###
 ;########################################################################
 ;
-_cpct_arkosPlayer_songInit::
+_cpct_akp_musicInit::
    ld  hl, #2    ;; [10] Retrieve parameters from stack
    add hl, sp    ;; [11]
    ld  e, (HL)   ;; [ 7] DE = Pointer to the start of music
@@ -1634,7 +1648,7 @@ PLY_Init:
 
 ;
 ;########################################################################
-;## FUNCTION: _cpct_arkosPlayer_stop                                  ###
+;## FUNCTION: _cpct_akp_stop                                  ###
 ;########################################################################
 ;### This function stops the music and sound effects playing in the   ###
 ;### 3 channels. It can be later continued calling play.              ###
@@ -1651,7 +1665,7 @@ PLY_Init:
 ;
 
 ;Stop the music, cut the channels.
-_cpct_arkosPlayer_songStop::
+_cpct_akp_musicStop::
 PLY_Stop:
 
    .if PLY_SystemFriendly
@@ -1660,9 +1674,9 @@ PLY_Stop:
       exx
       push af
       push bc
-      push ix
-      push iy
    .endif
+   push ix
+   push iy
 
    ld  hl, #PLY_PSGReg8
    ld  bc, #0x0500
@@ -1675,7 +1689,7 @@ PLY_Stop:
 .if PLY_UseSoundEffects
    ;
    ;########################################################################
-   ;## FUNCTION: _cpct_arkosPlayer_SFXInit                               ###
+   ;## FUNCTION: _cpct_akp_SFXInit                               ###
    ;########################################################################
    ;### Initialize a sound effect. Receives a pointer to a sound effect  ###
    ;### "song" and initializes it.                                       ###
@@ -1692,7 +1706,7 @@ PLY_Stop:
    ;########################################################################
    ;
    PLY_SFX_Init:
-   _cpct_arkosPlayer_SFXInit::
+   _cpct_akp_SFXInit::
       ld  hl, #2                                   ;; [10] Get Parameter from Stack
       add hl, sp                                   ;; [11]
       ld  e, (hl)                                  ;; [ 7]
@@ -1707,7 +1721,7 @@ PLY_Stop:
       ;; Initialization continues clearing sound effects from the 3 channels
    ;
    ;########################################################################
-   ;### FUNCTION: _cpct_arkosPlayer_StopAll                              ###
+   ;### FUNCTION: _cpct_akp_StopAll                              ###
    ;########################################################################
    ;### Stops the reproduction of any sound effect in the 3 channels     ###
    ;########################################################################
@@ -1721,7 +1735,7 @@ PLY_Stop:
    ;### TIME: 68 cycles (14,5 us)                                        ###
    ;########################################################################
    ;
-   _cpct_arkosPlayer_SFXStopAll::
+   _cpct_akp_SFXStopAll::
    PLY_SFX_StopAll:
       ;Clear the three channels of any sound effect.
       ld  hl, #0                                   ;; [10]
@@ -1739,7 +1753,7 @@ PLY_Stop:
 
    ;
    ;########################################################################
-   ;### FUNCTION: _cpct_arkosPlayer_SFXPlay                              ###
+   ;### FUNCTION: _cpct_akp_SFXPlay                              ###
    ;########################################################################
    ;### Plays a given sound effect, along with the music, in a concrete  ###
    ;### channel and with some parameters (Volume, Note, Speed, Inverted  ###
@@ -1761,7 +1775,7 @@ PLY_Stop:
    ;### TIME:  cycles ( us)                                              ###
    ;########################################################################
    ;
-   _cpct_arkosPlayer_SFXPlay::
+   _cpct_akp_SFXPlay::
    PLY_SFX_Play:
       ld  (PLY_SFX_Recover_IX+2), ix            ;; [20] Save IX value (cannot use push as parameters are on the stack)
       pop  af                                   ;; [10]
@@ -1823,7 +1837,7 @@ PLY_Stop:
 
    ;
    ;########################################################################
-   ;### FUNCTION: _cpct_arkosPlayer_SFXStop                              ###
+   ;### FUNCTION: _cpct_akp_SFXStop                              ###
    ;########################################################################
    ;### Stops the reproduction of any sound effect in the selected       ###
    ;### channels. Channels are passed as a bitmask, with 1 for channels  ###
@@ -1842,7 +1856,7 @@ PLY_Stop:
    ;### TIME:  cycles (us)                                               ###
    ;########################################################################
    ;
-   _cpct_arkosPlayer_SFXStop::
+   _cpct_akp_SFXStop::
    PLY_SFX_Stop:
       ld  hl, #2                              ;; [10] Get Parameter from Stack
       add hl, sp                              ;; [11]
@@ -1886,7 +1900,7 @@ PLY_Stop:
 
    ;
    ;########################################################################
-   ;## FUNCTION: _cpct_arkosPlayer_enableSFX                             ###
+   ;## FUNCTION: _cpct_akp_enableSFX                             ###
    ;########################################################################
    ;### This function enables the reproduction of SFX sound on given cha-###
    ;### nnels. The user passes desired channels as a bitmask, and the    ###
@@ -1904,7 +1918,7 @@ PLY_Stop:
    ;### TIME: (Not measured)                                             ###
    ;########################################################################
    ;
-   _cpct_arkosPlayer_enableSFX::
+   _cpct_akp_enableSFX::
       ld hl, #2                           ;; [10] Get parameter from stack
       add hl, sp                          ;; [11]
       ld  a, (hl)                         ;; [ 7] A = Channel bitmask
@@ -1931,12 +1945,12 @@ PLY_Stop:
 
    ;
    ;########################################################################
-   ;## FUNCTION: _cpct_arkosPlayer_disableSFX                            ###
+   ;## FUNCTION: _cpct_akp_disableSFX                            ###
    ;########################################################################
    ;### This function disables the reproduction of SFX sound on given    ###
    ;### channels. The user passes desired channels as a bitmask, and the ###
    ;### function reads it and disables desired channels.                 ###
-   ;### Warning: Function shares code with _cpct_arkosPlayer_enableSFX   ###
+   ;### Warning: Function shares code with _cpct_akp_enableSFX   ###
    ;########################################################################
    ;### INPUTS (1 Byte)                                                  ###
    ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
@@ -1955,7 +1969,7 @@ PLY_Stop:
    ;; (Beware: We assume code for all 3 channels occupies the same ammount of bytes)
    .equ PLY_SFX_JumpDisableTrack1, 0x18 + 0x100 * (PLY_SFX_Track1_End - PLY_SFX_Track1_Activation - 2)
 
-   _cpct_arkosPlayer_disableSFX::
+   _cpct_akp_disableSFX::
       ld hl, #2                           ;; [10] Get parameter from stack
       add hl, sp                          ;; [11]
       ld  a, (hl)                         ;; [ 7] A = Channel bitmask
@@ -1966,9 +1980,18 @@ PLY_Stop:
 .endif
 
 .if PLY_UseFades
+   
    ;Sets the Fade value.
    ;E = Fade value (0 = full volume, 16 or more = no volume).
    ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+9/+18, value).
+
+_cpct_akp_setFadeVolume::
+   ;; Get parameter from the stack
+   ld    hl, #2
+   add   hl, sp
+   ld     e, (hl)    ;; E = Fade Volume 
+
+   _cpct_akp_setFadeVolume_asm:: ;; ASM Entry point for setFadeVolume
    PLY_SetFadeValue:
       ld   a, e
       ld  (PLY_Channel1_FadeValue + 1), a
