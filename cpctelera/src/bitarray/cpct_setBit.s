@@ -23,35 +23,68 @@
 
 .globl cpct_bitWeights
 
-;
-;########################################################################
-;### FUNCTION: cpct_setBit                                            ###
-;########################################################################
-;### Set the the value of the bit at the given position in the        ###
-;### specified array to a given value (0 or 1).                       ###
-;### It will asume that the array elements have a size of 8 bits and  ###
-;### also that the given position is not bigger than the number of    ###
-;### bits in the array (size of the array multiplied by 8).           ###
-;### The value to set is also asumed to be 0 or 1, but other values   ###
-;### will work (just the least significant bit will be used, so odd   ###
-;### values are treated as 1, even vales as 0)                        ###
-;### Limitations: Maximum of 65536 bits, 8192 bytes per array.        ###
-;########################################################################
-;### INPUTS (5 Bytes)                                                 ###
-;###  * (2B DE) Array Pointer                                         ###
-;###  * (2B HL) Index of the bit to be set                            ###
-;###  * (1B C)  Value from 0 to 1 to set in the given position        ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL                       ###
-;########################################################################
-;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 52 bytes (8 table + 43 code)                             ###
-;### TIME:                                                            ###
-;###   Best Case  (1) = 229 cycles ( 57.25 us)                        ###
-;###   Worst Case (0) = 240 cycles ( 60.00 us)                        ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_setBit
+;;
+;;    Sets the value of a concrete bit into a bitarray to 0 or 1
+;;
+;; C Definition:
+;;    void <cpct_setBit>  (void* *array*, <u16> *index*, <u8> *value*)
+;;
+;; Input Parameters (4 Bytes):
+;;    (2B DE) array - Pointer to the first byte of the array
+;;    (2B HL) index - Position of the bit in the array to be modified
+;;    (1B C ) value - New value {0, 1} for the bit at the given position
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call _cpct_setBit_asm
+;;
+;; Parameter Restrictions:
+;;    * *array* must be the memory location of the first byte of the array.
+;; However, this function will accept any given 16-value, without performing
+;; any check. Giving and incorrect *array* pointer will have unpredictable
+;; results: a random bit from your memory may result changed.
+;;    * *index* position of the bit to be retrieved from the array, starting
+;; in 0. Again, as this function does not perform any boundary check, if you 
+;; gave an index outside the boundaries of the array, a bit outside the array
+;; will be changed in memory, what will have unpredictable results.
+;;    * *value* new value for the selected bit (0 or 1). Only the Least 
+;; Significant Bit (LSB) is used. This means that any given *value* will "work".
+;; Odd values will have the same effect as a 1, whereas even values will
+;; do the same as a 0.
+;;
+;; Known limitations:
+;;    * Maximum of 65536 bits, 8192 bytes per array.
+;;
+;; Details:
+;;    Set the new *value* of the bit at the given position (*index*) in the 
+;; specified *array*. This function assumes that the *array* elements have 
+;; a size of 8 bits and also that the given *index* is not bigger than 
+;; the number of bits in the *array* (size of the *array* multiplied by 8).         
+;; The *value* to be set is also assumed to be 0 or 1, but other values 
+;; will "work" (just the least significant bit will be used, so odd values 
+;; are treated as 1, even vales as 0).
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    52 bytes (8 bytes bitWeights table, 43 bytes code)
+;;
+;; Time Measures:
+;; (start code)
+;; Case       | Cycles | microSecs (us)
+;; -------------------------------
+;; Best  (1)  |   229  |  57.25
+;; -------------------------------
+;; Worst (0)  |   240  |  60.00
+;; -------------------------------
+;; Asm saving |   -84  | -21.00
+;; -------------------------------
+;; (end)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 _cpct_setBit::
    ;; GET Parameters from the stack
@@ -78,7 +111,9 @@ sb_restoreSP:
    push af                  ;; [11]
 .endif
 
-   ld    a, l                 ;; [ 4] Save L into A for later use (Knowing which bit to access into the target byte => L % 8)
+_cpct_setBit_asm::         ;; Entry point for assembly calls using registers for parameter passing
+
+   ld    a, l              ;; [ 4] Save L into A for later use (Knowing which bit to access into the target byte => L % 8)
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
@@ -107,14 +142,14 @@ sb_restoreSP:
 
    ;; Set/reset the bit of the target byte, using the bit weight stored in A
    bit   0, c              ;; [ 4] Test bit 0 to know if we are setting (1) or resetting (0)
-   jp   nz, sb_setBit        ;; [10] If Bit=1, We have to set the bit with OR, else we have to reset it with AND
+   jp   nz, sb_setBit      ;; [10] If Bit=1, We have to set the bit with OR, else we have to reset it with AND
 sb_resetBit:   
    cpl                     ;; [ 4] A = !A (All bits to 1 except the bit we want to reset)
-   and (HL)                ;; [ 7] Reset the bit making and AND with only the selected bit to 0
+   and (hl)                ;; [ 7] Reset the bit making and AND with only the selected bit to 0
    .db #0x38   ; JR C, xx  ;; [ 7] Fake jumping over OR(HL). Carry is never set after and AND.
 sb_setBit:
-   or (HL)                 ;; [ 7] Setting the bit with an OR.
+   or (hl)                 ;; [ 7] Setting the bit with an OR.
 
-   ld (HL), a             ;; [ 7] Saving the new byte in memory, with the bit setted/resetted
+   ld (hl), a              ;; [ 7] Saving the new byte in memory, with the bit setted/resetted
 
    ret                     ;; [10] Return to caller 

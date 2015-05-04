@@ -26,7 +26,7 @@
 ;;    Returns the status of a given bit into a bitarray (0 or !0)
 ;;
 ;; C Definition:
-;;    extern <u8> <cpct_getBit> (void* *array*, <u16> *index*);
+;;    <u8> <cpct_getBit> (void* *array*, <u16> *index*);
 ;;
 ;; Input Parameters (4 Bytes):
 ;;    (2B DE) array - Pointer to the first byte of the array

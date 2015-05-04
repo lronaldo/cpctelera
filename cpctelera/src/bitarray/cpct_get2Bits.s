@@ -26,7 +26,7 @@
 ;;    Returns the value of a given group of 2 bits into an array (0, 1, 2 or 3)
 ;;
 ;; C Definition:
-;;    extern <u8> <cpct_get2Bits> (void* *array*, <u16> *index*);
+;;    <u8> <cpct_get2Bits> (void* *array*, <u16> *index*);
 ;;
 ;; Input Parameters (4 Bytes):
 ;;    (2B DE) array - Pointer to the first byte of the array
