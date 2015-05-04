@@ -46,4 +46,20 @@ extern void cpct_akp_SFXPlay    (u8 sfx_num, u8 volume, u8 note, u8 speed,
 extern void cpct_akp_enableSFX  (u8 enable_bitmask);
 extern void cpct_akp_disableSFX (u8 disable_bitmask);
 
+// 
+// Constants: Audio Channels (bitmasks)
+//
+//    Bitmask constants for referring to audio channels of the
+// AY-3-8912 PSG chip.
+//
+//    AY_CHANNEL_A   - Audio Channel A (also referred as 0)
+//    AY_CHANNEL_B   - Audio Channel B (also referred as 1)
+//    AY_CHANNEL_C   - Audio Channel C (also referred as 2)
+//    AY_CHANNEL_ALL - All audio channels (A, B & C)
+//
+#define AY_CHANNEL_A    0b00000001
+#define AY_CHANNEL_B    0b00000010
+#define AY_CHANNEL_C    0b00000100
+#define AY_CHANNEL_ALL  0b00000111
+
 #endif

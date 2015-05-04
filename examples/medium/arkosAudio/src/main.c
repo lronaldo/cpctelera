@@ -34,7 +34,7 @@ void main(void) {
    // Initialize the song to be played
    cpct_akp_musicInit(molusk_song);
    cpct_akp_SFXInit(molusk_song);
-   cpct_akp_enableSFX(7);
+   cpct_akp_enableSFX(AY_CHANNEL_ALL);
 
    while (1) {
       // We have to call the play function 50 times per second (because the song is 
@@ -66,9 +66,9 @@ void main(void) {
       } else if (cpct_isKeyPressed(Key_Space)) {
          space_bar = K_PRESSED;
       } else if (cpct_isKeyPressed(Key_0)) {
-         cpct_akp_SFXPlay(13, 15, 36, 20, 0, 1);
+         cpct_akp_SFXPlay(13, 15, 36, 20, 0, AY_CHANNEL_A);
       } else if (cpct_isKeyPressed(Key_1)) {
-         cpct_akp_SFXPlay(3, 15, 60, 0, 40, 2);
+         cpct_akp_SFXPlay(3, 15, 60, 0, 40, AY_CHANNEL_B);
       }
    }
 }

@@ -1948,7 +1948,7 @@ PLY_Stop:
    ;; effect calls. 
    ;;
    ;; Destroyed Register values: 
-   ;;    AF, BC, DE, HL, IX
+   ;;    AF, BC, DE, HL,
    ;;
    ;; Required memory:
    ;;    87 bytes 
@@ -1987,13 +1987,31 @@ PLY_Stop:
 
       cpct_akp_SFXPlay_asm::     ;; Entry point for assembly calls using registers for parameter passing
 
-      ld  ix, #PLY_SFX_Track1_Pitch
-      or   a
-      jr   z, #PLY_SFX_Play_Selected
-      ld  ix, #PLY_SFX_Track2_Pitch
-      dec  a
-      jr   z, #PLY_SFX_Play_Selected
-      ld  ix, #PLY_SFX_Track3_Pitch
+      ;; Pick up the selected audio channel using bitmasks
+      ;; to reproduce the sound effect
+      bit   2, a                       ;; [ 8] Check for channel 2 / C (bit 2)
+      jp    z, sfp_channel_c           ;; [10] 
+      bit   1, a                       ;; [ 8] Check for channel 1 / B (bit 1)
+      jp    z, sfp_channel_b           ;; [10]
+      
+      sfp_channel_a:                   ;; If it is not channel B or C, is channel 0 / A (bit 0)
+      ld   ix, #PLY_SFX_Track1_Pitch   ;; [14] IX = Track 1 (channel 0 / A)
+      jp  PLY_SFX_Play_Selected        ;; [10] 
+      
+      sfp_channel_b:
+      ld   ix, #PLY_SFX_Track2_Pitch   ;; [14] IX = Track 2 (channel 1 / B)
+      jp  PLY_SFX_Play_Selected        ;; [10]
+      
+      sfp_channel_c:
+      ld   ix, #PLY_SFX_Track3_Pitch   ;; [14] IX = Track 3 (Channel 2 / C)
+
+      ;ld  ix, #PLY_SFX_Track1_Pitch
+      ;or   a
+      ;jr   z, #PLY_SFX_Play_Selected
+      ;ld  ix, #PLY_SFX_Track2_Pitch
+      ;dec  a
+      ;jr   z, #PLY_SFX_Play_Selected
+      ;ld  ix, #PLY_SFX_Track3_Pitch
 
    PLY_SFX_Play_Selected:
       ld  PLY_SFX_OffsetPitch + 1(ix), c        ;Set Pitch
@@ -2031,32 +2049,67 @@ PLY_Stop:
 
       ret
 
-   ;
-   ;########################################################################
-   ;### FUNCTION: _cpct_akp_SFXStop                              ###
-   ;########################################################################
-   ;### Stops the reproduction of any sound effect in the selected       ###
-   ;### channels. Channels are passed as a bitmask, with 1 for channels  ###
-   ;### that should be stopped and 0 for those that should continue      ###
-   ;### playing.                                                         ###
-   ;########################################################################
-   ;### INPUTS (1 Byte)                                                  ###
-   ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
-   ;###         1 and 0. Enabled bits stand for channel to be stopped    ###
-   ;########################################################################
-   ;### EXIT STATUS                                                      ###
-   ;###  Destroyed Register values: AF, HL                               ###
-   ;########################################################################
-   ;### MEASURES                                                         ###
-   ;### MEMORY:  bytes                                                   ###
-   ;### TIME:  cycles (us)                                               ###
-   ;########################################################################
-   ;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
+   ;; Function: cpct_akp_SFXStop
+   ;;
+   ;;    Stops the reproduction sound FX on given channels
+   ;;
+   ;; C Definition:
+   ;;    void <cpct_akp_SFXStop> (<u8> *stop_bitmask*)
+   ;;
+   ;; Input Parameters (1 byte):
+   ;;  (1B A) stop_bitmask - A value where the 3 Least Significant Bits represent which channels to stop (bits enabled = channels to stop)
+   ;;
+   ;; Assembly call (Input parameters on registers):
+   ;;    > call cpct_akp_SFXStop_asm
+   ;;
+   ;; Parameter Restrictions:
+   ;;    * *stop_bitmask* must be a value that operates as a set of enabled / 
+   ;; disabled bits (a bitmask). Concretely, the 3 Least Significant bits, 2, 1 
+   ;; and 0 (xxxxx210) refer to Channels C, B and A respectively. Rest of the 
+   ;; bits are ignored. Bits set to 1 mean that those channels will be stopped. 
+   ;; Bits set to 0 mean that those channels are to be left as they are.
+   ;;
+   ;; Details:
+   ;;    This function lets you selectively stop sound FX reproduction on one, two
+   ;; or the 3 available channels. A *stop_bitmask* is given as parameter containing
+   ;; the information about what channels shall be stopped.
+   ;;
+   ;; Destroyed Register values: 
+   ;;    AF, HL
+   ;;
+   ;; Required memory:
+   ;;    33 bytes 
+   ;;
+   ;;    However, take into account that all of Arkos Tracker Player's
+   ;; functions are linked and included, because they depend on each other. Total
+   ;; memory requirement is around 2097 bytes.
+   ;;
+   ;; Time Measures:
+   ;; (start code)
+   ;; Case     | Cycles | microSecs (us)
+   ;; --------------------------------
+   ;; Best (0) |  101   |  25.25 
+   ;; --------------------------------
+   ;; Best (1) |  149   |  37.25 
+   ;; --------------------------------
+   ;; (end code)
+   ;;
+   ;; Credits:
+   ;;    This is a modification of the original <Arkos Tracker Player at
+   ;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+   ;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+   ;; contributed to this source.
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    _cpct_akp_SFXStop::
    PLY_SFX_Stop:
       ld  hl, #2                              ;; [10] Get Parameter from Stack
       add hl, sp                              ;; [11]
       ld  a, (hl)                             ;; [ 7] A = Channel number to be stopped
+
+   cpct_akp_SFXStop_asm::     ;; Entry point for assembly calls using registers for parameter passing
 
       ld hl, #0                               ;; [10] Value 0 to stop SFX in a channel
 
@@ -2076,22 +2129,6 @@ PLY_Stop:
 
    PLY_SFSStop_no1:
       ret                                     ;; [10] Return
-
-      ;ld   a, e
-      ;ld  hl, #PLY_SFX_Track1_Instrument + 1
-      ;or   a
-      ;jr   z, PLY_SFX_Stop_ChannelFound
-      ;ld  hl, #PLY_SFX_Track2_Instrument + 1
-      ;dec  a
-      ;jr   z, PLY_SFX_Stop_ChannelFound
-      ;ld  hl, #PLY_SFX_Track3_Instrument + 1
-      ;dec  a
-
-   PLY_SFX_Stop_ChannelFound:
-      ;ld  (hl), a
-      ;inc hl
-      ;ld  (hl), a
-      ;ret
 
 
    ;
