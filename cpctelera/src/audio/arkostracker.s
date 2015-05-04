@@ -104,7 +104,7 @@ PLY_Digidrum: .db 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_akp_musicPlay::
-cpct_akp_musicPlay_asm::
+cpct_akp_musicPlay_asm::   ;; Entry point for assembly calls 
 PLY_Play:
 
 ;***** Player System Friendly has to restore registers *****
@@ -1667,7 +1667,7 @@ _cpct_akp_musicInit::
    inc hl        ;; [ 6]
    ld  d, (HL)   ;; [ 7]
 
-cpct_akp_musicInit_asm::
+cpct_akp_musicInit_asm::   ;; Entry point for assembly calls using registers for parameter passing
 
 PLY_Init:
    ld  hl, #9                          ;Skip Header, SampleChannel, YM Clock (DB*3), and Replay Frequency.
@@ -1719,26 +1719,50 @@ PLY_Init:
    ld  (PLY_Track3_Instrument + 1), hl
    ret
 
-;
-;########################################################################
-;## FUNCTION: _cpct_akp_stop                                  ###
-;########################################################################
-;### This function stops the music and sound effects playing in the   ###
-;### 3 channels. It can be later continued calling play.              ###
-;########################################################################
-;### INPUTS (0 Bytes)                                                 ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL, IX, IY, AF'          ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY: 146 bytes                                                ###
-;### TIME: (Not measured)                                             ###
-;########################################################################
-;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_akp_stop
+;;
+;;    Stops playing musing and sound effects on all 3 channels.
+;;
+;; C Definition:
+;;    void <cpct_akp_stop> ()
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_akp_stop_asm
+;;
+;; Details:
+;;    This function stops the music and sound effects playing in the 3 channels. 
+;; It can be later continued again calling <cpct_akp_musicPlay>. Please, take
+;; into account that sound effects cannot be played while music is stopped, as
+;; code for sound effects and music play is integrated.
+;;
+;; Destroyed Register values: 
+;;    AF, AF', BC, DE, HL, IX, IY
+;;
+;; Required memory:
+;;    19 bytes 
+;;
+;;    However, take into account that all of Arkos Tracker Player's
+;; functions are linked and included, because they depend on each other. Total
+;; memory requirement is around 2097 bytes.
+;;
+;; Time Measures:
+;; (start code)
+;;    To be done
+;; (end code)
+;;
+;; Credits:
+;;    This is a modification of the original <Arkos Tracker Player at
+;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+;; contributed to this source.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;Stop the music, cut the channels.
-_cpct_akp_musicStop::
+_cpct_akp_stop::
+cpct_akp_stop_asm::  ;; Entry point for assembly calls 
 PLY_Stop:
 
    .if PLY_SystemFriendly
@@ -1760,24 +1784,66 @@ PLY_Stop:
    jp  PLY_SendRegisters
 
 .if PLY_UseSoundEffects
-   ;
-   ;########################################################################
-   ;## FUNCTION: _cpct_akp_SFXInit                               ###
-   ;########################################################################
-   ;### Initialize a sound effect. Receives a pointer to a sound effect  ###
-   ;### "song" and initializes it.                                       ###
-   ;########################################################################
-   ;### INPUTS (2 Bytes)                                                 ###
-   ;###  (2B DE) Pointer to the start of the SFX "song"                  ###
-   ;########################################################################
-   ;### EXIT STATUS                                                      ###
-   ;###  Destroyed Register values: AF, DE, HL                           ###
-   ;########################################################################
-   ;### MEASURES                                                         ###
-   ;### MEMORY: 27 bytes                                                 ###
-   ;### TIME: 146 cycles (36,5 us)                                       ###
-   ;########################################################################
-   ;
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
+   ;; Function: cpct_akp_SFXInit
+   ;;
+   ;;    Initializes sound effect instruments to be able to play sound effects.
+   ;;
+   ;; C Definition:
+   ;;    void <cpct_akp_SFXInit> (void* *sfx_song_data*)
+   ;;
+   ;; Input Parameters (2 bytes):
+   ;;  (2B DE) sfx_song_data - Pointer to the start of a song file containing instrument data for SFX
+   ;;
+   ;; Assembly call (Input parameters on registers):
+   ;;    > call cpct_akp_SFXInit_asm
+   ;;
+   ;; Parameter Restrictions:
+   ;;    * *sfx_song_data* must be a song in binary AKS format. However, this song 
+   ;; only needs to have instruments defined (there is not need for an actual "song"
+   ;; as a list of notes, patterns and others). Instruments will be set up for 
+   ;; playing SFX later on with functions like <cpct_akp_SFXPlay>.
+   ;;
+   ;; Details:
+   ;;    This function initializes instruments that will be used later on to play 
+   ;; FX sounds at will using <cpct_akp_SFXPLAY>. In order for the instruments to
+   ;; be initialized, *sfx_song_data* must point to a song defined in AKS format.
+   ;; For the purpose of this function, the song only requires to have instruments
+   ;; defined in it, as patterns, notes and other information is not used for FX
+   ;; sounds. 
+   ;;
+   ;;    You may use instruments from another song or a specific song containing
+   ;; instrument data only. Any song with instruments defined in it is valid to
+   ;; set up SFX with Arkos Tracker Player.
+   ;;
+   ;; Destroyed Register values: 
+   ;;    AF, DE, HL
+   ;;
+   ;; Required memory:
+   ;;    14 bytes (+13 bytes from <cpct_akp_SFXStopAll> that comes next to this
+   ;; function and is used in initialization)
+   ;;
+   ;;    However, take into account that all of Arkos Tracker Player's
+   ;; functions are linked and included, because they depend on each other. Total
+   ;; memory requirement is around 2097 bytes.
+   ;;
+   ;; Time Measures:
+   ;; (start code)
+   ;; Case  | Cycles | microSecs (us)
+   ;; --------------------------------
+   ;; Any   |  146   |  36.50
+   ;; --------------------------------
+   ;; (end code)
+   ;;
+   ;; Credits:
+   ;;    This is a modification of the original <Arkos Tracker Player at
+   ;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+   ;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+   ;; contributed to this source.
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    PLY_SFX_Init:
    _cpct_akp_SFXInit::
       ld  hl, #2                                   ;; [10] Get Parameter from Stack
@@ -1785,6 +1851,8 @@ PLY_Stop:
       ld  e, (hl)                                  ;; [ 7]
       inc hl                                       ;; [ 6]
       ld  d, (hl)                                  ;; [ 7] DE = Pointer to the SFX "Song"
+
+   cpct_akp_SFXInit_asm::     ;; Entry point for assembly calls using registers for parameter passing
 
       ;Find the Instrument Table.
       ld  hl, #12                                  ;; [10]
