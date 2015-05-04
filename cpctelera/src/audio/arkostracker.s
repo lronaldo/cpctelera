@@ -565,9 +565,6 @@ PLY_Track3_PlayNoForward:
 ;***************************************
 .if PLY_UseSoundEffects
 
-   PLY_SFX_Track3_Activation:          ; This jump is modified by 2 NOPs when we want sound effects activated
-      jr PLY_SFX_Track3_End            ; [12] Jump to end of play-effect section (Deactivated by default)
-
    PLY_SFX_Track3_Pitch: 
       ld  de, #0
       exx
@@ -657,9 +654,6 @@ PLY_Track2_PlayNoForward:
 ;Play Sound Effects on Track 2 (If activated)
 ;***************************************
 .if PLY_UseSoundEffects
-
-   PLY_SFX_Track2_Activation:          ; This jump is modified by 2 NOPs when we want sound effects activated
-      jr PLY_SFX_Track2_End            ; [12] Jump to end of play-effect section (Deactivated by default)
 
    PLY_SFX_Track2_Pitch:
       ld  de, #0
@@ -753,9 +747,6 @@ PLY_Track1_PlayNoForward:
 ;Play Sound Effects on Track 1 (If activated)
 ;***************************************
 .if PLY_UseSoundEffects
-
-   PLY_SFX_Track1_Activation:          ; This jump is modified by 2 NOPs when we want sound effects activated
-      jr PLY_SFX_Track1_End            ; [12] Jump to end of play-effect section (Deactivated by default)
 
    PLY_SFX_Track1_Pitch:
       ld  de, #0
@@ -1971,19 +1962,19 @@ PLY_Stop:
 
    _cpct_akp_SFXPlay::
    PLY_SFX_Play:
-      ld  (PLY_SFX_Recover_IX+2), ix            ;; [20] Save IX value (cannot use push as parameters are on the stack)
-      pop  af                                   ;; [10]
-      pop  hl                                   ;; [10]
-      pop  de                                   ;; [10]
-      pop  bc                                   ;; [10]
-      pop  ix                                   ;; [14]
-      push ix                                   ;; [15]
-      push bc                                   ;; [11]
-      push de                                   ;; [11]
-      push hl                                   ;; [11]
-      push af                                   ;; [11]
+      ld  (PLY_SFX_Recover_IX+2), ix   ;; [20] Save IX value (cannot use push as parameters are on the stack)
+      pop  af                          ;; [10]
+      pop  hl                          ;; [10]
+      pop  de                          ;; [10]
+      pop  bc                          ;; [10]
+      pop  ix                          ;; [14]
+      push ix                          ;; [15]
+      push bc                          ;; [11]
+      push de                          ;; [11]
+      push hl                          ;; [11]
+      push af                          ;; [11]
 
-      .dw #0x7DDD  ; ld a, ixl                  ;; [ 8] A = Channel number
+      .dw #0x7DDD  ; ld a, ixl         ;; [ 8] A = Channel number
 
       cpct_akp_SFXPlay_asm::     ;; Entry point for assembly calls using registers for parameter passing
 
@@ -2004,14 +1995,6 @@ PLY_Stop:
       
       sfp_channel_c:
       ld   ix, #PLY_SFX_Track3_Pitch   ;; [14] IX = Track 3 (Channel 2 / C)
-
-      ;ld  ix, #PLY_SFX_Track1_Pitch
-      ;or   a
-      ;jr   z, #PLY_SFX_Play_Selected
-      ;ld  ix, #PLY_SFX_Track2_Pitch
-      ;dec  a
-      ;jr   z, #PLY_SFX_Play_Selected
-      ;ld  ix, #PLY_SFX_Track3_Pitch
 
    PLY_SFX_Play_Selected:
       ld  PLY_SFX_OffsetPitch + 1(ix), c        ;Set Pitch
@@ -2129,86 +2112,6 @@ PLY_Stop:
 
    PLY_SFSStop_no1:
       ret                                     ;; [10] Return
-
-
-   ;
-   ;########################################################################
-   ;## FUNCTION: _cpct_akp_enableSFX                             ###
-   ;########################################################################
-   ;### This function enables the reproduction of SFX sound on given cha-###
-   ;### nnels. The user passes desired channels as a bitmask, and the    ###
-   ;### function reads it and deactivate desired channels.               ###
-   ;########################################################################
-   ;### INPUTS (1 Bytes)                                                 ###
-   ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
-   ;###         1 and 0. Enabled bits stand for channel to be enabled    ###
-   ;########################################################################
-   ;### EXIT STATUS                                                      ###
-   ;###  Destroyed Register values: AF, HL                               ###
-   ;########################################################################
-   ;### MEASURES                                                         ###
-   ;### MEMORY: bytes                                                    ###
-   ;### TIME: (Not measured)                                             ###
-   ;########################################################################
-   ;
-   _cpct_akp_enableSFX::
-      ld hl, #2                           ;; [10] Get parameter from stack
-      add hl, sp                          ;; [11]
-      ld  a, (hl)                         ;; [ 7] A = Channel bitmask
-
-      ld hl, #0                           ;; [10] 0000h = NOP; NOP (To eliminate JR jump at the start of the channel)
-
-   PLY_EFX_do:
-      bit 2, a                            ;; [ 8] Test bit 2 (00000100) to know if channel 2 has to be enabled
-      jp  z, PLY_EFX_no3                  ;; [10] If bit2=0, channel 2 is left as is.
-      ld (PLY_SFX_Track3_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 2 play code
-
-   PLY_EFX_no3:
-      bit 1, a                            ;; [ 8] Test bit 1 (00000010) to know if channel 1 has to be enabled
-      jp  z, PLY_EFX_no2                  ;; [10] If bit1=0, channel 1 is left as is.
-      ld (PLY_SFX_Track2_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 1 play code
-
-   PLY_EFX_no2:
-      and #0x01                           ;; [ 7] Test bit 0 (00000001) to know if channel 0 has to be enabled
-      jp  z, PLY_EFX_no1                  ;; [10] If bit0=0, channel 0 is left as is.
-      ld (PLY_SFX_Track2_Activation), hl  ;; [16] Eliminate jump to the end at the start of Channel 0 play code
-
-   PLY_EFX_no1:
-      ret                                 ;; [10] Return
-
-   ;
-   ;########################################################################
-   ;## FUNCTION: _cpct_akp_disableSFX                            ###
-   ;########################################################################
-   ;### This function disables the reproduction of SFX sound on given    ###
-   ;### channels. The user passes desired channels as a bitmask, and the ###
-   ;### function reads it and disables desired channels.                 ###
-   ;### Warning: Function shares code with _cpct_akp_enableSFX   ###
-   ;########################################################################
-   ;### INPUTS (1 Byte)                                                  ###
-   ;###  (1B A) Channel mask. Bits 2-0 (xxxxx210) represent channels 2,  ###
-   ;###         1 and 0. Enabled bits stand for channel to be disabled   ###
-   ;########################################################################
-   ;### EXIT STATUS                                                      ###
-   ;###  Destroyed Register values: AF, HL                               ###
-   ;########################################################################
-   ;### MEASURES                                                         ###
-   ;### MEMORY: bytes                                                    ###
-   ;### TIME: (Not measured)                                             ###
-   ;########################################################################
-   ;
-   ;; Constants defining code for JR xx required for disabling SFX code for each channel
-   ;; JR xx = 18xxh (Little endian!, so HL = xx18h = (xxh - 2)* 100h + 0x18 ) 
-   ;; (Beware: We assume code for all 3 channels occupies the same ammount of bytes)
-   .equ PLY_SFX_JumpDisableTrack1, 0x18 + 0x100 * (PLY_SFX_Track1_End - PLY_SFX_Track1_Activation - 2)
-
-   _cpct_akp_disableSFX::
-      ld hl, #2                           ;; [10] Get parameter from stack
-      add hl, sp                          ;; [11]
-      ld  a, (hl)                         ;; [ 7] A = Channel bitmask
-
-      ld hl, #PLY_SFX_JumpDisableTrack1   ;; [10] HL = code for JR xx, jump to the end of channel play-sfx code
-      jp PLY_EFX_do                       ;; [10] Do the disabling, using the same code as enableSFX
 
 .endif
 

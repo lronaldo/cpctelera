@@ -42,10 +42,6 @@ extern void cpct_akp_SFXStop    (u8 stop_bitmask);
 extern void cpct_akp_SFXPlay    (u8 sfx_num, u8 volume, u8 note, u8 speed, 
                                  u16 inverted_pitch, u8 channel_num);
 
-// Enabling and disabling SFX in execution time
-extern void cpct_akp_enableSFX  (u8 enable_bitmask);
-extern void cpct_akp_disableSFX (u8 disable_bitmask);
-
 // 
 // Constants: Audio Channels (bitmasks)
 //
