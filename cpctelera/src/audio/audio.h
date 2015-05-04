@@ -26,14 +26,22 @@
 #ifndef CPCT_AUDIO_H
 #define CPCT_AUDIO_H
 
-extern void cpct_arkosPlayer_songInit   (void* songdata);
-extern void cpct_arkosPlayer_songPlay   ();
-extern void cpct_arkosPlayer_songStop   ();
-extern void cpct_arkosPlayer_enableSFX  (u8 enable_bitmask);
-extern void cpct_arkosPlayer_disableSFX (u8 disable_bitmask);
-extern void cpct_arkosPlayer_SFXInit    (void* sfx_song_data);
-extern void cpct_arkosPlayer_SFXStopAll ();
-extern void cpct_arkosPlayer_SFXStop    (u8 stop_bitmask);
-extern void cpct_arkosPlayer_SFXPlay    (u8 sfx_num, u8 volume, u8 note, u8 speed, u16 inverted_pitch, u8 channel_num);
+//
+// Arkos Player: full control version (without interrupts)
+// 
+
+// Arkos Player Music Control Functions
+extern void cpct_akp_musicInit  (void* songdata);
+extern void cpct_akp_musicPlay  ();
+extern void cpct_akp_musicStop  ();
+
+// Arkos Player Sound FX Control Functions
+extern void cpct_akp_enableSFX  (u8 enable_bitmask);
+extern void cpct_akp_disableSFX (u8 disable_bitmask);
+extern void cpct_akp_SFXInit    (void* sfx_song_data);
+extern void cpct_akp_SFXStopAll ();
+extern void cpct_akp_SFXStop    (u8 stop_bitmask);
+extern void cpct_akp_SFXPlay    (u8 sfx_num, u8 volume, u8 note, u8 speed, 
+                                 u16 inverted_pitch, u8 channel_num);
 
 #endif

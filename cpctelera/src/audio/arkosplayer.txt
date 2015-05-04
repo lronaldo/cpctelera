@@ -1,0 +1,58 @@
+Title: Arkos Player Technicals
+
+Topic: ArkosPlayer
+
+Arkos Player code included in CPCtelera is a modification of the original code was developed by Targhan / Arkos. This modification maintains the original spirit of Arkos Tracker and has just done changes to easily integrate it within the framework and Philosophy of CPCtelera. Also, original code was configurable to run either on CPC or on MSX, but specific MSX code has been removed in this version. The same was done with CPC-BASIC version.
+
+This version does not make use of interrupts, requiring to be called manually at the correct framerate to reproduce the song. Original comments from Targhan / Arkos have been kept unmodified, removing those referred to MSX / BASIC players or the original way to use this player (that has changed).
+
+Original documentation from Targhan / Arkos, with some minor modification, follows. Check this if you have special detail interest. For a standard use from C functions, check each function's documentation.
+
+Version and credits:
+   * [21/09/2009] Arkos Tracker Player V1.01 - CPC & MSX version (by Targhan/Arkos)
+   * [07/04/2015] CPCtelera's Arkos Player CPC-only version (by ronaldo / Fremos / Cheesetea / ByteRealms).
+   * PSG registers sendings based on Madram/Overlander's optimisation trick. Restoring interruption status snippet by Grim/Arkos.
+
+Additions to V1.01:
+   * Small (but not useless !) optimisations by Grim/Arkos at the PLY_Track1_WaitCounter / PLY_Track2_WaitCounter / PLY_Track3_WaitCounter labels.
+   * Optimisation of the R13 management by Grim/Arkos.
+
+Register modification:
+   * This player modifies all these registers = hl, de, bc, AF, hl', dE', BC', AF', IX, IY. 
+   * The Stack is used in conventional manners (Call, Ret, Push, Pop) so integration with any of your code should be seamless.
+   * The player does NOT modify the Interruption state, unless you use the PLY_SystemFriendly flag, which will cut the interruptions at the beginning, and will restore them ONLY IF NEEDED.
+
+Fades in / out:
+   * The player allows the volume to be modified. It provides the interface, but you'll have to set the volume by yourself.
+   * Set PLY_UseFades to 1.
+   * In Assembler 
+    > ld e,Volume  ;; (0 = full volume, 16 or more = no volume)
+   * call PLY_SetFadeValue
+
+Sound Effects:
+   * The player manages Sound Effects. They must be defined in another song, generated as a "SFX Music" in the Arkos Tracker.
+   * Set the PLY_UseSoundEffects to 1. 
+   * In Assembler:
+      > ld de,SFXMusicAddress
+      > call PLY_SFX_Init      ;; to initialise the SFX Song.
+   * Then initialise and play the "music" song normally.
+
+   * To play a sound effect 
+   (start code)
+   ;; A = No Channel (0,1,2)
+   ;; L = SFX Number (>0)
+   ;; H = Volume (0...F)
+   ;; E = Note (0...143)
+   ;; D = Speed (0 = As original, 1...255 = new Speed (1 is the fastest))
+   ;; BC = Inverted Pitch (-#FFFF -> FFFF). 0 is no pitch. The higher the pitch, the lower the sound.
+   call PLY_SFX_Play
+   (end code)
+   
+   * To stop a sound effect
+   > ld e,No Channel (0,1,2)
+   > call PLY_SFX_Stop
+   
+   * To stop the sound effects on all the channels
+   > call PLY_SFX_StopAll
+
+   For more information, check the manual. Any question, complaint, a need to reward ? Write to contact@julien-nevo.com
