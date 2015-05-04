@@ -1902,7 +1902,7 @@ PLY_Stop:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    _cpct_akp_SFXStopAll::
-   cpct_akp_SFXStopAll_asm::
+   cpct_akp_SFXStopAll_asm::  ;; Entry point for assembly calls 
    PLY_SFX_StopAll:
       ;Clear the three channels of any sound effect.
       ld  hl, #0                                   ;; [10]
@@ -1918,30 +1918,57 @@ PLY_Stop:
    .equ PLY_SFX_OffsetSpeed,        PLY_SFX_Track1_InstrumentSpeed - PLY_SFX_Track1_Pitch
    .equ PLY_SFX_OffsetSpeedCpt,     PLY_SFX_Track1_InstrumentSpeedCpt - PLY_SFX_Track1_Pitch
 
-   ;
-   ;########################################################################
-   ;### FUNCTION: _cpct_akp_SFXPlay                              ###
-   ;########################################################################
-   ;### Plays a given sound effect, along with the music, in a concrete  ###
-   ;### channel and with some parameters (Volume, Note, Speed, Inverted  ###
-   ;### Pitch).                                                          ###
-   ;########################################################################
-   ;### INPUTS (0 Bytes)                                                 ###
-   ;A = No Channel (0,1,2)
-   ;L = SFX Number (>0)
-   ;H = Volume (0...F)
-   ;E = Note (0...143)
-   ;D = Speed (0 = As original, 1...255 = new Speed (1 is fastest))
-   ;BC = Inverted Pitch (-#FFFF -> FFFF). 0 is no pitch. The higher the pitch, the lower the sound.
-   ;########################################################################
-   ;### EXIT STATUS                                                      ###
-   ;###  Destroyed Register values: HL                                   ###
-   ;########################################################################
-   ;### MEASURES                                                         ###
-   ;### MEMORY:  bytes                                                   ###
-   ;### TIME:  cycles ( us)                                              ###
-   ;########################################################################
-   ;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
+   ;; Function: cpct_akp_SFXPlay
+   ;;
+   ;;    Plays a concrete sound effect, using the instruments of the "SFX song" 
+   ;; given to <cpct_akp_SFXInit> when initializing sound effects.
+   ;;
+   ;; C Definition:
+   ;;    void <cpct_akp_SFXPlay> (<u8> *sfx_num*, <u8> *volume*, <u8> *note*, 
+   ;; <u8> *speed*, <u16> *inverted_pitch*, <u8> *channel_num*)
+   ;;
+   ;; Input Parameters (7 bytes):
+   ;;  (1B L ) sfx_num        - Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
+   ;;  (1B H ) volume         - Volume [0-15], 0 = off, 15 = maximum volume.
+   ;;  (1B E ) note           - Note to be played with the given instrument [0-143]
+   ;;  (1B D ) speed          - Speed (0 = As original, [1-255] = new Speed (1 is fastest))
+   ;;  (2B BC) inverted_pitch - Inverted Pitch (-0xFFFF -> 0xFFFF). 0 is no pitch. The higher the pitch, the lower the sound.
+   ;;  (1B A ) channel_num    - Number of Channel where to reproduce the FX (0, 1, 2)
+   ;;
+   ;; Assembly call (Input parameters on registers):
+   ;;    > call cpct_akp_SFXPlay_asm
+   ;;
+   ;; Details:
+   ;;    Plays a given sound effect, along with the music, in a concrete channel 
+   ;; and with some parameters (Volume, Note, Speed, Inverted Pitch). This lets
+   ;; you create lots of different (and potentially complex) sound effects 
+   ;; from a set of instruments. In fact, you could play a song made of sound
+   ;; effect calls. 
+   ;;
+   ;; Destroyed Register values: 
+   ;;    AF, BC, DE, HL, IX
+   ;;
+   ;; Required memory:
+   ;;    87 bytes 
+   ;;
+   ;;    However, take into account that all of Arkos Tracker Player's
+   ;; functions are linked and included, because they depend on each other. Total
+   ;; memory requirement is around 2097 bytes.
+   ;;
+   ;; Time Measures:
+   ;; (start code)
+   ;;    To be done
+   ;; (end code)
+   ;;
+   ;; Credits:
+   ;;    This is a modification of the original <Arkos Tracker Player at
+   ;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+   ;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+   ;; contributed to this source.
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    _cpct_akp_SFXPlay::
    PLY_SFX_Play:
       ld  (PLY_SFX_Recover_IX+2), ix            ;; [20] Save IX value (cannot use push as parameters are on the stack)
@@ -1957,6 +1984,8 @@ PLY_Stop:
       push af                                   ;; [11]
 
       .dw #0x7DDD  ; ld a, ixl                  ;; [ 8] A = Channel number
+
+      cpct_akp_SFXPlay_asm::     ;; Entry point for assembly calls using registers for parameter passing
 
       ld  ix, #PLY_SFX_Track1_Pitch
       or   a
