@@ -60,7 +60,7 @@ void main(void) {
          if ( !cpct_isKeyPressed(Key_Space) ) {
             space_bar = K_RELEASED;
             if (playing)
-               cpct_akp_musicStop();
+               cpct_akp_stop();
             playing ^= 1;
          }
       } else if (cpct_isKeyPressed(Key_Space)) {

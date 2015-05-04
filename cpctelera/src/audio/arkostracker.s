@@ -1860,23 +1860,49 @@ PLY_Stop:
       ld  (PLY_SFX_Play_InstrumentTable + 1), hl   ;; [16]
 
       ;; Initialization continues clearing sound effects from the 3 channels
-   ;
-   ;########################################################################
-   ;### FUNCTION: _cpct_akp_StopAll                              ###
-   ;########################################################################
-   ;### Stops the reproduction of any sound effect in the 3 channels     ###
-   ;########################################################################
-   ;### INPUTS (0 Bytes)                                                 ###
-   ;########################################################################
-   ;### EXIT STATUS                                                      ###
-   ;###  Destroyed Register values: HL                                   ###
-   ;########################################################################
-   ;### MEASURES                                                         ###
-   ;### MEMORY: 13 bytes                                                 ###
-   ;### TIME: 68 cycles (14,5 us)                                        ###
-   ;########################################################################
-   ;
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
+   ;; Function: cpct_akp_SFXStopAll
+   ;;
+   ;;    Stops the reproduction of any sound effect in the 3 channels.
+   ;;
+   ;; C Definition:
+   ;;    void <cpct_akp_SFXStopAll> ()
+   ;;
+   ;; Assembly call (Input parameters on registers):
+   ;;    > call cpct_akp_SFXStopAll_asm
+   ;;
+   ;; Details:
+   ;;    This function stops all sound FX reproduction on all the 3 sound channels.
+   ;;
+   ;; Destroyed Register values: 
+   ;;    HL
+   ;;
+   ;; Required memory:
+   ;;    13 bytes 
+   ;;
+   ;;    However, take into account that all of Arkos Tracker Player's
+   ;; functions are linked and included, because they depend on each other. Total
+   ;; memory requirement is around 2097 bytes.
+   ;;
+   ;; Time Measures:
+   ;; (start code)
+   ;; Case  | Cycles | microSecs (us)
+   ;; --------------------------------
+   ;; Any   |   68   |  15.50
+   ;; --------------------------------
+   ;; (end code)
+   ;;
+   ;; Credits:
+   ;;    This is a modification of the original <Arkos Tracker Player at
+   ;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+   ;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+   ;; contributed to this source.
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    _cpct_akp_SFXStopAll::
+   cpct_akp_SFXStopAll_asm::
    PLY_SFX_StopAll:
       ;Clear the three channels of any sound effect.
       ld  hl, #0                                   ;; [10]
@@ -1966,7 +1992,7 @@ PLY_Stop:
    PLY_SFX_Play_UserSpeed:
       ld  PLY_SFX_OffsetSpeed + 1 (ix), a
       ld  PLY_SFX_OffsetSpeedCpt + 1 (ix), a
-      inc hl                                    ;Skip Retrig
+      inc hl                                    ;Skip Re-trig
       inc hl
       ld  PLY_SFX_OffsetInstrument + 1 (ix), l
       ld  PLY_SFX_OffsetInstrument + 2 (ix), h
