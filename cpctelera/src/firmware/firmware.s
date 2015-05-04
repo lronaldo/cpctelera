@@ -25,6 +25,10 @@
 .module cpct_firmware
 
 ;;
+;; Title: Firmware&ROM variables
+;;
+
+;;
 ;; Constant values
 ;;
 .equ firmware_RST_jp, 0x38  ;; Memory address were a jump (jp) to the firmware code is stored.

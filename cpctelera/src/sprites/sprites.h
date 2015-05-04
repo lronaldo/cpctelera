@@ -24,6 +24,10 @@
 //#####################################################################
 //
 
+//
+// Title: Sprite Macros&Constants
+//
+
 #ifndef CPCT_SPRITES_H
 #define CPCT_SPRITES_H
 

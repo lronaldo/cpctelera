@@ -25,7 +25,7 @@
 //
 
 //
-// File: keyboard.h
+// Title: Keyboard Mappings&Constants
 //
 
 #ifndef CPCT_KEYBOARD_H
