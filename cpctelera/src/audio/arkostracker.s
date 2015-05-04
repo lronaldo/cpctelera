@@ -911,7 +911,7 @@ PLY_SendRegisters:
          ld   a, (hl)
 
       PLY_Channel1_FadeValue:
-         sub  0               ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+         sub  #0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
          jr  nc, .+6
          .dw #0x71ED  ;out(c), 0
          jr  .+4
@@ -942,7 +942,7 @@ PLY_SendRegisters:
          ld   a, (hl)
 
       PLY_Channel2_FadeValue:
-         sub  0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+         sub  #0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
          jr  nc, .+6
          .dw #0x71ED  ;out(c), 0
          jr  .+4
@@ -973,7 +973,7 @@ PLY_SendRegisters:
          ld   a, (hl)
 
          PLY_Channel3_FadeValue:
-         sub  0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
+         sub  #0             ;Set a value from 0 (full volume) to 16 or more (volume to 0).
          jr  nc, .+6
          .dw #0x71ED  ;out(c), 0
          jr  .+4
@@ -2117,23 +2117,70 @@ PLY_Stop:
 
 .if PLY_UseFades
    
-   ;Sets the Fade value.
    ;E = Fade value (0 = full volume, 16 or more = no volume).
-   ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+9/+18, value).
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_akp_setFadeVolume
+;;
+;;    Sets global volumes for creating fade in / out effects.
+;;
+;; C Definition:
+;;    void <cpct_akp_setFadeVolume> (<u8> *volume*)
+;;
+;; Input Parameters (1 byte):
+;;  (1B A) volume - Global volume for all channels, [0-15]. 0 = max volume, 16 or more = no volume
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_akp_setFadeVolume_asm
+;;
+;; Parameter Restrictions:
+;;    * *volume* must be a value in the range [0-15] for some meaning. Values 
+;; greater than 15 mean no volume at all. 0 is the maximum volume, 15 the minimum.
+;;
+;; Details:
+;;    This function controls the global reproduction volume for all channels. This
+;; lets you do Fade in / out effects, by making the volume progressively go up 
+;; or down.
+;;
+;; Destroyed Register values: 
+;;    AF, HL
+;;
+;; Required memory:
+;;    15 bytes 
+;;
+;;    However, take into account that all of Arkos Tracker Player's
+;; functions are linked and included, because they depend on each other. Total
+;; memory requirement is around 2097 bytes.
+;;
+;; Time Measures:
+;; (start code)
+;;    Case    | Cycles | microSecs (us)
+;; -------------------------------------
+;;    Any     |   51   |  12.75
+;; -------------------------------------
+;; Asm saving |  -28   |   7.00
+;; -------------------------------------
+;; (end code)
+;;
+;; Credits:
+;;    This is a modification of the original <Arkos Tracker Player at
+;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+;; contributed to this source.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 _cpct_akp_setFadeVolume::
    ;; Get parameter from the stack
-   ld    hl, #2
-   add   hl, sp
-   ld     e, (hl)    ;; E = Fade Volume 
+   ld    hl, #2      ;; [10]
+   add   hl, sp      ;; [11]
+   ld     a, (hl)    ;; [ 7] A = Fade Volume 
 
-   _cpct_akp_setFadeVolume_asm:: ;; ASM Entry point for setFadeVolume
+cpct_akp_setFadeVolume_asm::     ;; ASM Entry point for setFadeVolume
    PLY_SetFadeValue:
-      ld   a, e
-      ld  (PLY_Channel1_FadeValue + 1), a
-      ld  (PLY_Channel2_FadeValue + 1), a
-      ld  (PLY_Channel3_FadeValue + 1), a
-      ret
+      ld  (PLY_Channel1_FadeValue + 1), a   ;; [ 7] Set fade volume for channel A (0)
+      ld  (PLY_Channel2_FadeValue + 1), a   ;; [ 7] Set fade volume for channel B (1)
+      ld  (PLY_Channel3_FadeValue + 1), a   ;; [ 7] Set fade volume for channel C (2)
+      ret                                   ;; [10]
 .endif
 
 .if PLY_SystemFriendly
