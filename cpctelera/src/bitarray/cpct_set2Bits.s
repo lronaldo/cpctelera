@@ -21,49 +21,82 @@
 
 .include /bitarray.s/
 
-;
-;########################################################################
-;### FUNCTION: cpct_set2Bits                                          ###
-;########################################################################
-;### Set the the value of the group of 2 bits at the given position   ###
-;### in the specified array to a given value.                         ###
-;### It will asume that the array elements have a size of 8 bits and  ###
-;### also that the given position is not bigger than the number of    ###
-;### groups of four bits in the array (size of the array multiplied   ###
-;### by 4).                                                           ###
-;### The function expects a value from 0 to 3. However, if a greater  ###
-;### value is given, it will be cropped (only bits 0 & 1 will be used)###
-;### Limitations: Maximum of 65536 2bit-groups, 16384 bytes per array ###
-;########################################################################
-;### INPUTS (5 Bytes)                                                 ###
-;###  * (2B DE) Array Pointer                                         ###
-;###  * (2B HL) Position of the group of four bits in the array       ###
-;###  * (1B C) Value from 0 to 3  to set in the given position        ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL	                      ###
-;########################################################################
-;### MEASURES (Way 2 for parameter retrieval from stack)              ###
-;### MEMORY: 64 bytes                                                 ###
-;### TIME:                                                            ###
-;###   Best Case  (0) = 228 cycles ( 57.00 us)                        ###
-;###   Worst Case (1) = 260 cycles ( 65.00 us)                        ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_set2Bits
+;;
+;;    Sets the value of a selected group of 2 bits into a bitarray to [0-3]
+;;
+;; C Definition:
+;;    void <cpct_set2Bits>  (void* *array*, <u16> *index*, <u8> *value*)
+;;
+;; Input Parameters (4 Bytes):
+;;    (2B DE) array - Pointer to the first byte of the array
+;;    (2B HL) index - Position of the group of 2 bits in the array to be modified
+;;    (1B C ) value - New value {0, 1, 2, 3} for the group of 2 bits at the given position
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call _cpct_set2Bits_asm
+;;
+;; Parameter Restrictions:
+;;    * *array* must be the memory location of the first byte of the array.
+;; However, this function will accept any given 16-value, without performing
+;; any check. Giving and incorrect *array* pointer will have unpredictable
+;; results: a random bit from your memory may result changed.
+;;    * *index* position of the bit to be retrieved from the array, starting
+;; in 0. Again, as this function does not perform any boundary check, if you 
+;; gave an index outside the boundaries of the array, a bit outside the array
+;; will be changed in memory, what will have unpredictable results.
+;;    * *value* new value for the selected bit [0-3]. Only the 2 Least 
+;; Significant Bits (LSBs) are used. This means that any given *value* 
+;; will "work": *value* module 4 will be finally inserted in the *array*
+;; position (*index*).
+;;
+;; Known limitations:
+;;    * Maximum of 65536 bits, 16384 bytes per array.
+;;
+;; Details:
+;;    Set the new *value* of the 2-bits group at the given position (*index*) 
+;; in the specified *array*. This function assumes that the *array* elements have 
+;; a size of 8 bits and also that the given *index* is not bigger than 
+;; the number of 2-bits groups in the *array* (size of the *array* multiplied
+;; by 4). The *value* to be set is also assumed to be in the range [0-3] but 
+;; other values will "work" (just the 2 Least Significant Bits will be used, 
+;; so *value* module 4 will be inserted).
+;; 
+;;
+;; Destroyed Register values: 
+;;    AF, BC, DE, HL
+;;
+;; Required memory:
+;;    64 bytes 
+;;
+;; Time Measures:
+;; (start code)
+;; Case       | Cycles | microSecs (us)
+;; -------------------------------
+;; Best  (0)  |   228  |  57.00
+;; -------------------------------
+;; Worst (1)  |   260  |  65.00
+;; -------------------------------
+;; Asm saving |   -84  | -21.00
+;; -------------------------------
+;; (end)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_set2Bits::
    ;; GET Parameters from the stack
 .if let_disable_interrupts_for_function_parameters
    ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   LD (s2b_restoreSP+1), SP ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   DI                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   POP  AF                  ;; [10] AF = Return Address
-   POP  DE                  ;; [10] DE = Pointer to the bitarray in memory
-   POP  HL                  ;; [10] HL = Index of the bit to be set
-   POP  BC                  ;; [10] BC => C = Set Value (0-3), B = Undefined
+   ld (s2b_restoreSP+1), sp ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   di                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
+   pop  af                  ;; [10] AF = Return Address
+   pop  de                  ;; [10] DE = Pointer to the bitarray in memory
+   pop  hl                  ;; [10] HL = Index of the bit to be set
+   pop  bc                  ;; [10] BC => C = Set Value (0-3), B = Undefined
 s2b_restoreSP:
-   LD SP, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   EI                       ;; [ 4] Enable interrupts again
+   ld   sp, #0              ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   ei                       ;; [ 4] Enable interrupts again
 .else 
    ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
    pop  af                  ;; [10] AF = Return Address
@@ -76,55 +109,57 @@ s2b_restoreSP:
    push af                  ;; [11]
 .endif
 
+_cpct_set2Bits_asm::        ;; Entry point for assembly calls using registers for parameter passing
+
    ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be set
    ;;   inside the target byte ([ 00 11 22 33 ]).
-   LD   A, L                ;; [ 4] A = L (Least significant bits from array index)
-   AND  #0x03               ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be setting from the target byte: the remainder of L/4)
-   LD   B, A                ;; [ 4] B = index of the group of 2 bits that we want to set from 0 to 3 ([00 11 22 33])
-   LD   A, C                ;; [ 4] A = C     (Value to be set)
-   AND  #0x03               ;; [ 7] A = C % 4 (Ensure value to be set is in the range 0-3)
+   ld    a, l               ;; [ 4] A = L (Least significant bits from array index)
+   and   #0x03              ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be setting from the target byte: the remainder of L/4)
+   ld    b, a               ;; [ 4] B = index of the group of 2 bits that we want to set from 0 to 3 ([00 11 22 33])
+   ld    a, c               ;; [ 4] A = C     (Value to be set)
+   and   #0x03              ;; [ 7] A = C % 4 (Ensure value to be set is in the range 0-3)
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 4 index positions (8 bits)
    ;; So, first, we calculate INDEX/4 (HL/4) to know the target byte.
-   SRL   H           ;; [ 8]
-   RR    L           ;; [ 8]
-   SRL   H           ;; [ 8]
-   RR    L           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
-   ADD  HL, DE       ;; [11] HL += DE => HL points to the target byte in the array 
+   srl   h           ;; [ 8]
+   rr    l           ;; [ 8]
+   srl   h           ;; [ 8]
+   rr    l           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
+   add  hl, de       ;; [11] HL += DE => HL points to the target byte in the array 
 
    ;; Move the 2 new bits to be set from bits 0 & 1 to their final position in the target byte
    ;;  and setting up a mask to be used for inserting them in the target byte of the array
-   DEC B               ;; [ 4] If B=0, B-- is negative, turning on S flag
-   JP M, s2b_B_is_0    ;; [10] IF S flag is on, B was 0
-   DEC B               ;; [ 4] B-- (second time, so B-=2)
-   JP P, s2b_B_is_2or3 ;; [10] If S flag is off, B was > 1, else B was 1
+   dec   b             ;; [ 4] If B=0, B-- is negative, turning on S flag
+   jp    m, s2b_B_is_0 ;; [10] IF S flag is on, B was 0
+   dec   b             ;; [ 4] B-- (second time, so B-=2)
+   jp    p, s2b_B_is_2or3 ;; [10] If S flag is off, B was > 1, else B was 1
 s2b_B_is_1:
-   RRCA                ;; [ 4] <| Move bits to positions 5 & 4 using 4 right rotations
-   RRCA                ;; [ 4] <|
-   LD  C, #0xCF        ;; [ 7] Mask for leaving out bits 5 & 4
-   JP s2b_B_is_0 + 2   ;; [10] We have done 2 rotations, and jump to B_is_0 + 2, to make another 2 rotations
+   rrca                ;; [ 4] <| Move bits to positions 5 & 4 using 4 right rotations
+   rrca                ;; [ 4] <|
+   ld    c, #0xCF      ;; [ 7] Mask for leaving out bits 5 & 4
+   jp s2b_B_is_0 + 2   ;; [10] We have done 2 rotations, and jump to B_is_0 + 2, to make another 2 rotations
 s2b_B_is_2or3:
-   DEC B               ;; [ 4] B-- (third time, so B-=3)
-   JP P, s2b_B_is_3    ;; [10] IF S flag is off, B was >2 (3), else B was 2
+   dec   b             ;; [ 4] B-- (third time, so B-=3)
+   jp    p, s2b_B_is_3 ;; [10] IF S flag is off, B was >2 (3), else B was 2
 s2b_B_is_2:
-   RLCA                ;; [ 4] <| Move bits to positions  2 & 3 with 2 left rotations
-   RLCA                ;; [ 4] <|
-   LD  C, #0xF3        ;; [ 7] Mask for leaving out bits 2 & 3
-   JP s2b_end          ;; [10] Done with preparing mask and rotations, continue to setting bits
+   rlca                ;; [ 4] <| Move bits to positions  2 & 3 with 2 left rotations
+   rlca                ;; [ 4] <|
+   ld    c, #0xF3      ;; [ 7] Mask for leaving out bits 2 & 3
+   jp s2b_end          ;; [10] Done with preparing mask and rotations, continue to setting bits
 s2b_B_is_0:
-   LD  C, #0x3F        ;; [ 7] Mask for leaving out bits 7 & 6
-   RRCA                ;; [ 4] <| Move bits to positions 7 & 6 with 2 right rotations
-   RRCA                ;; [ 4] <|
-   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from next 2 bytes, which are "LD C, #0xFC". Not jumping leaves us 3 bytes from here, at g2b_end)
+   ld    c, #0x3F      ;; [ 7] Mask for leaving out bits 7 & 6
+   rrca                ;; [ 4] <| Move bits to positions 7 & 6 with 2 right rotations
+   rrca                ;; [ 4] <|
+   .db #0xF2 ;jp P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from next 2 bytes, which are "ld C, #0xFC". Not jumping leaves us 3 bytes from here, at g2b_end)
 s2b_B_is_3:
-   LD  C, #0xFC        ;; [ 7] Mask for leaving out bits 1 & 0
+   ld    c, #0xFC      ;; [ 7] Mask for leaving out bits 1 & 0
 s2b_end:
-   LD  B, A            ;; [ 4] B = A (Bits to be set)
-   LD  A, (HL)         ;; [ 7] A = target Byte
-   AND C               ;; [ 4] A = target Byte Masked (Set to 0 the 2 bits we are going to set with our new value)
-   OR  B               ;; [ 4] A = final value        (Set the new value for our new bits, ORing them with the other 3 2bit groups)
-   LD  (HL), A         ;; [ 7] Store the final value of the target byte in the array
+   ld    b, a          ;; [ 4] B = A (Bits to be set)
+   ld    a, (hl)       ;; [ 7] A = target Byte
+   and   c             ;; [ 4] A = target Byte Masked (Set to 0 the 2 bits we are going to set with our new value)
+   or    b             ;; [ 4] A = final value        (Set the new value for our new bits, ORing them with the other 3 2bit groups)
+   ld  (HL), A         ;; [ 7] Store the final value of the target byte in the array
 
-   RET                 ;; [10] Return to caller
+   ret                 ;; [10] Return to caller

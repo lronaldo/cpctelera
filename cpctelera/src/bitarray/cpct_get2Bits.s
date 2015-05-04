@@ -53,7 +53,7 @@
 ;; the given position (*index*) in the specified *array*. It will assume that 
 ;; the array elements have a size of 8 bits and also that the given position 
 ;; is not bigger than the number of bits in the array (size of the array 
-;; multiplied by four).
+;; multiplied by 4).
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
