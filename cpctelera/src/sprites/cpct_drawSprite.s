@@ -132,6 +132,12 @@
 ;; ---------------------------------------------------------------------------------------
 ;;           Table 1 - Video memory starting locations for all pixel lines 
 ;; (end)
+;;    *Note on how to interpret Table 1*: Table 1 contains starting video memory locations 
+;; for all 200 pixel lines on the screen (with default configuration). To know where does 
+;; a particular pixel line start, please read Table 1 left-to-right, top-to-bottom. So, 
+;; ROW 1 at Table 1 contains the memory start locations for the first 8 pixel lines on 
+;; screen (0 to 7), ROW 2 refers to pixel lines 8 to 15, ROW 3 has pixel lines 16 to 23, 
+;; and so on.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL

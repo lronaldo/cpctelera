@@ -66,7 +66,7 @@
 ;; Credits:                                                       
 ;;    This fragment of code is based on a <scanKeyboard code issued by CPCWiki at
 ;; http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning>. This version
-;; of the code, however, is ~60% faster than CPCWiki's.
+;; of the code is, however, ~60% faster than CPCWiki's.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Keyboard Status Buffer defined in an external file
