@@ -19,7 +19,7 @@
 .module cpct_audio
 
 ;;
-;; Title: Arkos Player Control
+;; Title: Arkos Tracker Player
 ;;
 
 ;;------------------------------------------------------------------------------------------------------
@@ -55,27 +55,56 @@
 ;Read here to know if a Digidrum has been played (0=no).
 PLY_Digidrum: .db 0
 
-;
-;########################################################################
-;## FUNCTION: _cpct_akp_play                                  ###
-;########################################################################
-;### This function is to be called to start and continue playing the  ###
-;### song. Depending on the frequency at which the song were created, ###
-;### this function should be called 12, 25, 50, 100, 200 or 300 times ###
-;### per second. It is recommended to try to call this function with  ###
-;### the most accurate timing possible, to get best sound results.   ###
-;########################################################################
-;### INPUTS (0 Bytes)                                                 ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL, IX, IY, AF'          ###
-;########################################################################
-;### MEASURES (Including SystemFriendly and PLY_UseSoundEffects code) ###
-;### MEMORY: 1021 bytes                                               ###
-;### TIME: (Not measured)                                             ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_akp_musicPlay
+;;
+;;    Plays next music cycle of the present song with Arkos Tracker Player. Song 
+;; has had to be previously established with <cpct_akp_musicInit>.
+;;
+;; C Definition:
+;;    void <cpct_akp_musicPlay> ()
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_akp_musicPlay_asm
+;;
+;; Details:
+;;    This function is to be called to start and continue playing the presently 
+;; selected song with Arkos Tracker Player. Depending on the frequency at which 
+;; the song were created, this function should be called 12, 25, 50, 100, 200 
+;; or 300 times per second. 
+;;
+;;    Each time you call the function, it plays 1/frequency seconds. This means
+;; that you have to manually synchronize your calls to this function to have
+;; a stable music playing. If you call too fast or too slow you will either 
+;; interrupt sound or have sound valleys. Therefore, you are responsible for
+;; calling this function with the most accurate timing possible, to get best 
+;; sound results.
+;;
+;; Destroyed Register values: 
+;;    AF, AF', BC, DE, HL, IX, IY
+;;
+;; Required memory:
+;;    1794 bytes 
+;;
+;;    However, take into account that all of Arkos Tracker Player's
+;; functions are linked and included, because they depend on each other. Total
+;; memory requirement is around 2097 bytes.
+;;
+;; Time Measures:
+;; (start code)
+;;    To be done
+;; (end code)
+;;
+;; Credits:
+;;    This is a modification of the original <Arkos Tracker Player at
+;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+;; contributed to this source.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _cpct_akp_musicPlay::
+cpct_akp_musicPlay_asm::
 PLY_Play:
 
 ;***** Player System Friendly has to restore registers *****
@@ -1570,31 +1599,75 @@ PLY_FrequencyTable:
 .dw 4,4,3,3,3,3,3,2,2,2,2,2
 .dw 2,2,2,2,1,1,1,1,1,1,1,1
 
-;
-;########################################################################
-;## FUNCTION: _cpct_akp_init                                  ###
-;########################################################################
-;### This function should be called fist to initialize the song that  ###
-;### is to be played. The function reads the song header and prepares ###
-;### the player to start playing it.                                  ###
-;########################################################################
-;### INPUTS (2 Bytes)                                                 ###
-;### (2B DE) Song address                                             ###
-;########################################################################
-;### EXIT STATUS                                                      ###
-;###  Destroyed Register values: AF, BC, DE, HL, IX, IY, AF'          ###
-;########################################################################
-;### MEASURES                                                         ###
-;### MEMORY:  381 bytes (289 freq. table + 92 code)                   ###
-;### TIME: (Not measured)                                             ###
-;########################################################################
-;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_akp_musicInit
+;;
+;;    Sets up a music into Arkos Tracker Player to be played later on with
+;; <cpct_akp_musicPlay>.
+;;
+;; C Definition:
+;;    void <cpct_akp_musicInit> (void* *songdata*)
+;;
+;; Input Parameters (2 bytes):
+;;    (2B DE) songdata - Pointer to the start of the array containing song's data in AKS binary format
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_akp_musicInit_asm
+;;
+;; Parameter Restrictions:
+;;    * *songdata* must be an array containing dong's data in AKS binary format.
+;; Take into account that AKS binary format enforces a concrete start location in
+;; memory. Therefore, song must have been created in Arkos Tracker and exported 
+;; to the same memory location that *songdata* points to. If you fail to 
+;; locate the song at the same memory location it was exported for in Arkos 
+;; Tracker, unexpected results will happen (Typically, noise will be played but,
+;; occasionally your program may hang or crash).
+;;
+;; Known limitations:
+;;    * *songdata* must be the same memory address that the one given to Arkos
+;; Tracker when exporting song's binary. Arkos Tracker songs are created to
+;; be at a concrete memory location, due to optimization constraints. Therefore,
+;; this must be taken into account. If you wanted to change the memory location
+;; of the song, you should first open the song into Arkos Tracker and export
+;; it again with the new desired memory location.
+;;
+;; Details:
+;;    This function should be called fist to initialize the song that is to be 
+;; played. The function reads the song header and sets up the player to start 
+;; playing it. Once this process is done, <cpct_akp_musicPlay> should be called
+;; at the required frequency to continuously play the song.
+;;
+;; Destroyed Register values: 
+;;    AF, AF', BC, DE, HL, IX, IY
+;;
+;; Required memory:
+;;    92 bytes 
+;;
+;;    However, take into account that all of Arkos Tracker Player's
+;; functions are linked and included, because they depend on each other. Total
+;; memory requirement is around 2097 bytes.
+;;
+;; Time Measures:
+;; (start code)
+;;    To be done
+;; (end code)
+;;
+;; Credits:
+;;    This is a modification of the original <Arkos Tracker Player at
+;; http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start> 
+;; code from Targhan / Arkos. Madram / Overlander and Grim / Arkos have also 
+;; contributed to this source.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 _cpct_akp_musicInit::
    ld  hl, #2    ;; [10] Retrieve parameters from stack
    add hl, sp    ;; [11]
    ld  e, (HL)   ;; [ 7] DE = Pointer to the start of music
    inc hl        ;; [ 6]
    ld  d, (HL)   ;; [ 7]
+
+cpct_akp_musicInit_asm::
 
 PLY_Init:
    ld  hl, #9                          ;Skip Header, SampleChannel, YM Clock (DB*3), and Replay Frequency.

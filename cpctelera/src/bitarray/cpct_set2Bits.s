@@ -36,7 +36,7 @@
 ;;    (1B C ) value - New value {0, 1, 2, 3} for the group of 2 bits at the given position
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call _cpct_set2Bits_asm
+;;    > call cpct_set2Bits_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *array* must be the memory location of the first byte of the array.
@@ -109,7 +109,7 @@ s2b_restoreSP:
    push af                  ;; [11]
 .endif
 
-_cpct_set2Bits_asm::        ;; Entry point for assembly calls using registers for parameter passing
+cpct_set2Bits_asm::         ;; Entry point for assembly calls using registers for parameter passing
 
    ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be set
    ;;   inside the target byte ([ 00 11 22 33 ]).

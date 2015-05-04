@@ -36,7 +36,7 @@
 ;;    (1B C ) value - New value [0-15] for the group of 4 bits at the given position
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call _cpct_set4Bits_asm
+;;    > call cpct_set4Bits_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *array* must be the memory location of the first byte of the array.
@@ -111,7 +111,7 @@ s4b_restoreSP:
    push af                  ;; [11]
 .endif
 
-_cpct_set4Bits_asm::   ;; Entry point for assembly calls using registers for parameter passing
+cpct_set4Bits_asm::    ;; Entry point for assembly calls using registers for parameter passing
 
    ld    a, #0x0F      ;; [ 7] A = 0F  <| Setting up masks for getting upper or lower nibble (4 bits)
    ld    b, #0xF0      ;; [ 7] B = F0  <|

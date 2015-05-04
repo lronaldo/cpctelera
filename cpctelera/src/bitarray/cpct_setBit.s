@@ -38,7 +38,7 @@
 ;;    (1B C ) value - New value {0, 1} for the bit at the given position
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call _cpct_setBit_asm
+;;    > call cpct_setBit_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *array* must be the memory location of the first byte of the array.
@@ -111,7 +111,7 @@ sb_restoreSP:
    push af                  ;; [11]
 .endif
 
-_cpct_setBit_asm::         ;; Entry point for assembly calls using registers for parameter passing
+cpct_setBit_asm::          ;; Entry point for assembly calls using registers for parameter passing
 
    ld    a, l              ;; [ 4] Save L into A for later use (Knowing which bit to access into the target byte => L % 8)
 
