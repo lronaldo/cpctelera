@@ -20,39 +20,40 @@ Additions to V1.01:
 Register modification:
    * This player modifies all these registers = hl, de, bc, AF, hl', dE', BC', AF', IX, IY. 
    * The Stack is used in conventional manners (Call, Ret, Push, Pop) so integration with any of your code should be seamless.
-   * The player does NOT modify the Interruption state, unless you use the PLY_SystemFriendly flag, which will cut the interruptions at the beginning, and will restore them ONLY IF NEEDED.
+   * The player does NOT modify the Interruption state, unless you use the 
+   <PLY_SystemFriendly> flag, which will cut the interruptions at the beginning, and will restore them ONLY IF NEEDED.
 
 Fades in / out:
    * The player allows the volume to be modified. It provides the interface, but you'll have to set the volume by yourself.
-   * Set PLY_UseFades to 1.
+   * Set <PLY_UseFades> to 1.
    * In Assembler 
-    > ld e,Volume  ;; (0 = full volume, 16 or more = no volume)
-   * call PLY_SetFadeValue
+    > ld a, Volume  ;; (0 = full volume, 16 or more = no volume)
+    > call cpct_akp_setFadeVolume_asm
 
 Sound Effects:
    * The player manages Sound Effects. They must be defined in another song, generated as a "SFX Music" in the Arkos Tracker.
-   * Set the PLY_UseSoundEffects to 1. 
+   * Set the <PLY_UseSoundEffects> to 1. 
    * In Assembler:
-      > ld de,SFXMusicAddress
-      > call PLY_SFX_Init      ;; to initialise the SFX Song.
+      > ld de, SFXMusicAddress
+      > call cpct_akp_SFXInit_asm   ;; to initialise the SFX Song.
    * Then initialise and play the "music" song normally.
 
    * To play a sound effect 
    (start code)
    ;; A = No Channel (0,1,2)
-   ;; L = SFX Number (>0)
+   ;; L = Instrument Number (>0) 
    ;; H = Volume (0...F)
    ;; E = Note (0...143)
    ;; D = Speed (0 = As original, 1...255 = new Speed (1 is the fastest))
    ;; BC = Inverted Pitch (-#FFFF -> FFFF). 0 is no pitch. The higher the pitch, the lower the sound.
-   call PLY_SFX_Play
+   call cpct_akp_SFXPlay_asm
    (end code)
    
    * To stop a sound effect
-   > ld e,No Channel (0,1,2)
-   > call PLY_SFX_Stop
+   > ld a, NoChannel       ; (0,1,2)
+   > call cpct_akp_SFXStop_asm
    
    * To stop the sound effects on all the channels
-   > call PLY_SFX_StopAll
+   > call cpct_akp_SFXStopAll_asm
 
    For more information, check the manual. Any question, complaint, a need to reward ? Write to contact@julien-nevo.com
