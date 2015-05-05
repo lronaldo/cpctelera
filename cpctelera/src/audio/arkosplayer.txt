@@ -1,12 +1,125 @@
 Title: Arkos Player Technicals
 
-Topic: ArkosPlayer
+
+Topic: About Arkos Player
 
 Arkos Player code included in CPCtelera is a modification of the original code was developed by Targhan / Arkos. This modification maintains the original spirit of Arkos Tracker and has just done changes to easily integrate it within the framework and Philosophy of CPCtelera. Also, original code was configurable to run either on CPC or on MSX, but specific MSX code has been removed in this version. The same was done with CPC-BASIC version.
 
 This version does not make use of interrupts, requiring to be called manually at the correct framerate to reproduce the song. Original comments from Targhan / Arkos have been kept unmodified, removing those referred to MSX / BASIC players or the original way to use this player (that has changed).
 
 Original documentation from Targhan / Arkos, with some minor modification, follows. Check this if you have special detail interest. For a standard use from C functions, check each function's documentation.
+
+
+
+Section: How to use the player
+
+
+
+So you've got a great song ready, and you want to use it on CPC. Or you have converted a STarKos song into a Arkos Tracker (AT) song, in order to use the new player. How clever you are.
+
+This player will allow you to,
+   - Play any exported song on CPC
+   - Play Sound Effects along with any music. Or Sound Effects only!
+   - Play music and sound effects in C or Assembler
+   - Fade in / out the music.
+
+On the Sound Effects side, you'll be able to,
+   - Play any of your Sound Effects on any, or all of the 3 channels.
+   - Play a SFX on the note you want.
+   - Add Pitch if you want (it's great if you want to add a little randomness to the sound).
+   - Play a SFX with the volume you want.
+   - Play a SFX at the speed it has been created, or faster or slower.
+   - Stop any SFX that has been triggered.
+   - Up to 255 SFXs available !
+
+Also, the player is the fastest ever (25 scanlines max on a CPC), the music are light, so why wait ?
+
+
+
+Topic: How to create usable files
+
+First of all, export any AKS or SKS (STarKos) song with the Arkos Tracker "Export as binary" option in File->Export as binary. Export it at the address you want (from 0 to 0xFFFF). *Warning*! if you want to use the Interruption mode, your song HAS TO BE generated above 0x3FFF, due to system limitations. Namely, the range [0x0000-0x3FFF] is used by Lower ROM and shadows RAM, making any data there inaccessible.
+
+If you don't intend to export a SFX music, you can skip the next section. Disable the "Export SFX only" option before clicking on "OK".
+
+
+
+Topic: Sound effects music
+
+So you want to use sound effects in your production. These, of course, are made with AT, and it must be done in one single song dedicated to Sound Effects. In the "Export as binary" panel is a tick-box called "Export SFX only". Enable it, and export the song. Such songs will contains only the Instruments it is composed of. All your Tracks will be cleared so that the song only contains what's necessary (i.e. the sound effects!).
+
+So as you've guess, if you want music + sound effects, you'll need two files (one "music" file, and one "SFX" file). Why did I do that ? Because "Music" files are very optimised, sounds are reorganised, so you'd lost track with where you put your sounds. But most importantly, it's very flexible this way. Imagine you're working on a game with 5 levels, each having a different song. Do you want to include also all the SFXs inside these 5 songs ? Of course not !
+
+The Instruments become your sound effects in your game / demo. So note their number well ! 
+
+What if I want to use only Sound effects, and no music?:
+   It is possible ! This shall be explained a bit later when focusing on calling the player.
+
+Topic: Using the music file
+
+Once a binary file has been exported, you can use the player kindly given with this software. Take a look at the examples included in examples/ folder. 
+
+In order to include the binary song in your program you may do these steps:
+   * Convert the binary file to a C Array. You may use <cpct_bin2c> script for this task.
+   * Include the C Array into a file in your project
+   * Use the file in your project calling Arkos Tracker Player's CPCtelera C functions. Imagine your song has been included as the C Array named "mysong":
+   (start code)
+      // Set up the song for playing
+      cpct_akp_musicInit(mysong);
+      // Main loop
+      while(1) {
+         // Synchronize with Vertical VSYNC signal, which happens 50 times per second (frequency = 1/50)
+         cpct_waitVSYNC(); 
+
+         // Call music player 50 times per second, synchronized with VSYNC to have great precision
+         cpct_akp_musicPlay();
+      }
+   (end code)
+   * *Important!* Your song data must be at the same location in memory that the one you choose when exporting it to binary (File->Export as binary) in Arkos Tracker. To accomplish this, you sometimes will have to force SDCC to locate the C Array containing your song at the required place in memory. Imagine that you wanted to locate your song at 0x0100 in memory; you can do it with this code:
+   (start code)
+      __at(0x100) const unsigned char mysong[] = { ...
+   (end code)
+
+
+Topic: Using the player
+
+Though there is just one player, it can be used in three different mode:
+   - Your production is done in Assembler. You don't mind if the player modifies all the registers. If you need some registers to be saved, you will do it by yourself. This is called the "ASM" mode. 
+   - Your production is in C, but you want to have full control of the player. You will manage to call the player every time, at your song's required frequency. This is the default way of using the player.
+   - Your production is either on C or ASM, but you don't want to have fine-grained control of the player, and you just want the music to play, consuming whatever cycles it requires. A simple call will put the music into interruption. This is called the "INTERRUPTION" mode. It is currently unavailable, but it will be on the near future.
+
+You can switch from one mode to another by setting the constants PLY_SystemFriendly and PLY_UseFirmwareInterruptions to 0 or 1, like said in the player. An example : in the ASM mode, both must be turned to 0, so find the two constants and :
+PLY_SystemFriendly equ 0
+PLY_UseFirmwareInterruptions equ 0
+
+Then assemble the player (like said above), save it, and use it.
+
+For ASM and BASIC players, these three functions are always available :
+PLY_Init : This one is needed once before playing the song. Without it, nothing will be heard. (DE = song address)
+PLY_Play : Play one frame of the song. It can also resume the song if it had been stopped (with the function just after).
+PLY_Stop : Stop the song, cut the sound.
+
+Basic users can call these functions easily. If you have loaded your player in &4000 and your song in &5000 :
+CALL &4000, &5000 : Initialize the song.
+CALL &4000 + 3 : Play/resume the song.
+CALL &4000 + 6 : Stop the song.
+
+
+INTERRUPTION players don't exactly work this way :
+PLY_InterruptionOn : Play the song (no need to initialize it). (DE = song address)
+PLY_InterruptionOff : Stop the song.
+PLY_InterruptionContinue : Resume the song.
+
+Or in Basic :
+CALL &4000, &5000 : Start the song.
+CALL &4000 + 3 : Stop the song.
+CALL &4000 + 6 : Resume the song.
+
+
+
+Section: Credits and Some technical details
+
+
 
 Version and credits:
    * [21/09/2009] Arkos Tracker Player V1.01 - CPC & MSX version (by Targhan/Arkos)
