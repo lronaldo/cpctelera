@@ -1,0 +1,130 @@
+Format: 1.52
+
+
+Title: CPCtelera
+SubTitle: Reference Manual &amp; Documentation
+
+Footer: (C)opyright 2015 CPCtelera authors. Distributed under GNU GPL License.
+Timestamp: Last updated yyyy/mm/dd
+#   m     - One or two digit month.  January is "1"
+#   mm    - Always two digit month.  January is "01"
+#   mon   - Short month word.  January is "Jan"
+#   month - Long month word.  January is "January"
+#   d     - One or two digit day.  1 is "1"
+#   dd    - Always two digit day.  1 is "01"
+#   day   - Day with letter extension.  1 is "1st"
+#   yy    - Two digit year.  2006 is "06"
+#   yyyy  - Four digit year.  2006 is "2006"
+#   year  - Four digit year.  2006 is "2006"
+
+
+# --------------------------------------------------------------------------
+# 
+# Cut and paste the lines below to change the order in which your files
+# appear on the menu.  Don't worry about adding or removing files, Natural
+# Docs will take care of that.
+# 
+# You can further organize the menu by grouping the entries.  Add a
+# "Group: [name] {" line to start a group, and add a "}" to end it.
+# 
+# You can add text and web links to the menu by adding "Text: [text]" and
+# "Link: [name] ([URL])" lines, respectively.
+# 
+# The formatting and comments are auto-generated, so don't worry about
+# neatness when editing the file.  Natural Docs will clean it up the next
+# time it is run.  When working with groups, just deal with the braces and
+# forget about the indentation and comments.
+# 
+# --------------------------------------------------------------------------
+
+
+Link: CPCtelera at Github  (https://github.com/lronaldo/cpctelera)
+Text: ______________________________________________________________________
+File: Aliases for builtin types  (types.h)
+
+Group: Audio  {
+
+   File: Arkos Player Technicals  (audio/arkosplayer.txt)
+   File: Arkos Tracker Player  (audio/arkostracker.s)
+   File: Audio Channels &lparen;bitmasks&rparen;  (audio/audio.h)
+   }  # Group: Audio
+
+Group: Bitarray  {
+
+   File: cpct_get2Bits  (bitarray/cpct_get2Bits.s)
+   File: cpct_get4Bits  (bitarray/cpct_get4Bits.s)
+   File: cpct_getBit  (bitarray/cpct_getBit.s)
+   File: cpct_set2Bits  (bitarray/cpct_set2Bits.s)
+   File: cpct_set4Bits  (bitarray/cpct_set4Bits.s)
+   File: cpct_setBit  (bitarray/cpct_setBit.s)
+   }  # Group: Bitarray
+
+Group: Firmware  {
+
+   File: cpct_disableFirmware  (firmware/cpct_disableFirmware.s)
+   File: cpct_reenableFirmware  (firmware/cpct_reenableFirmware.s)
+   File: Enabling / disabling ROMs  (firmware/cpct_enableDisableROMs.s)
+   File: Firmware&amp;ROM variables  (firmware/firmware.s)
+   }  # Group: Firmware
+
+Group: Keyboard  {
+
+   File: cpct_isKeyPressed  (keyboard/cpct_isKeyPressed.s)
+   File: cpct_scanKeyboard  (keyboard/cpct_scanKeyboard.s)
+   File: cpct_scanKeyboard_f  (keyboard/cpct_scanKeyboard_f.s)
+   File: Keyboard Mappings&amp;Constants  (keyboard/keyboard.h)
+   File: Keyboard Technicals  (keyboard/keyboard.txt)
+   }  # Group: Keyboard
+
+Group: Sprites  {
+
+   File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.s)
+   File: cpct_drawSprite  (sprites/cpct_drawSprite.s)
+   File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.s)
+   File: cpct_drawTileAligned2x8  (sprites/cpct_drawTileAligned2x8.s)
+   File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.s)
+   File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.s)
+   File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.s)
+   File: cpct_memset  (sprites/cpct_memset.s)
+   File: cpct_px2byteM0  (sprites/cpct_px2byteM0.s)
+   File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
+   File: Sprite Macros&amp;Constants  (sprites/sprites.h)
+   }  # Group: Sprites
+
+Group: Strings  {
+
+   File: cpct_drawCharM0  (strings/cpct_drawCharM0.s)
+   File: cpct_drawCharM1  (strings/cpct_drawCharM1.s)
+   File: cpct_drawCharM1_f  (strings/cpct_drawCharM1_f.s)
+   File: cpct_drawCharM2  (strings/cpct_drawCharM2.s)
+   File: cpct_drawStringM0  (strings/cpct_drawStringM0.s)
+   File: cpct_drawStringM1  (strings/cpct_drawStringM1.s)
+   File: cpct_drawStringM1_f  (strings/cpct_drawStringM1_f.s)
+   File: cpct_drawStringM2  (strings/cpct_drawStringM2.s)
+   File: putchar  (strings/cpct_putChar.s)
+   }  # Group: Strings
+
+Group: Video  {
+
+   File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
+   File: cpct_fw2hw  (video/cpct_fw2hw.s)
+   File: cpct_getHWColour  (video/cpct_getHWColor.s)
+   File: cpct_setBorder  (video/videomode.h)
+   File: cpct_setPALColour  (video/cpct_setPALColour.s)
+   File: cpct_setPalette  (video/cpct_setPalette.s)
+   File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
+   File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
+   File: cpct_setVideoMode  (video/cpct_setVideoMode.s)
+   File: cpct_waitVSYNC  (video/cpct_waitVSYNC.s)
+   }  # Group: Video
+
+Group: Index  {
+
+   Constant Index: Constants
+   Index: Everything
+   Function Index: Functions
+   Macro Index: Macros
+   Type Index: Types
+   Variable Index: Variables
+   }  # Group: Index
+
