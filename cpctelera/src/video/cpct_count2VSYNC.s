@@ -31,6 +31,9 @@
 ;; Return Value:
 ;;    <u16> - Total number of iterations done of the wait loop until VSYNC was active.
 ;;
+;; Assembly call:
+;;    > call cpct_coun2VSYNC_asm
+;;
 ;; Details:
 ;;    This function implements a wait loop that exists only when VSYNC signal 
 ;; from the CRTC is detected. It works in the same way as <cpct_waitVSYNC>, but
@@ -74,6 +77,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_count2VSYNC::
+cpct_count2VSYNC_asm::		;; Assembly entry point
    ld    b, #PPI_PORT_B;; [ 7] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
    ld   hl, #0       ;; [10] HL=0 HL will be the loop iterations counter, as it is directly used as return value in C
 

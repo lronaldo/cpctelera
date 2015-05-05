@@ -35,7 +35,11 @@
 ;;
 ;; Input Parameters (3 Bytes):
 ;;    (2B DE) fw_colour_array - Pointer to an array of firmware colour values (in the range [0-26])
-;;    (1B A)  size            - Number of colour values in the array       
+;;    (1B BC) size            - Number of colour values in the array       
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_fw2hw_asm
+;;    * BC = *size* implies that B = 0, C = *size*
 ;;
 ;; Parameter Restrictions:
 ;;    * *fw_colour_array* must be an array of values in the range [0-26], otherwise, return 
@@ -57,13 +61,15 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  |   Cycles    |  microSecs (us)
-;; ---------------------------------------
-;; Best  |  68 + 61*NC |  17.00 + 15.25*NC
-;; Worst |  68 + 65*NC |  17.00 + 16.25*NC
-;; ---------------------------------------
-;; NC= 8 |  556 /  588 |  139.00 / 147.00
-;; NC=16 | 1044 / 1108 |  261.00 / 277.00 
+;;    Case    |   Cycles    |  microSecs (us)
+;; ---------------------------------------------
+;;   Best     |  68 + 61*NC |  17.00 + 15.25*NC
+;;   Worst    |  68 + 65*NC |  17.00 + 16.25*NC
+;; ---------------------------------------------
+;; Asm saving |     -58     |      24.50
+;; ---------------------------------------------
+;; NC= 8      |  556 /  588 |  139.00 / 147.00
+;; NC=16      | 1044 / 1108 |  261.00 / 277.00 
 ;; (end code)
 ;;    NC=Number of colours to convert
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,6 +83,8 @@ _cpct_fw2hw::
    ld    d, (hl)            ;; [ 7]
    inc  hl                  ;; [ 6]
    ld    c, (hl)            ;; [ 7] C = Number of colours to convert 
+
+cpct_fw2hw_asm::            ;; Assembly entry point 
 
 f2h_colour_loop:
    ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the firmware2hw_colour array

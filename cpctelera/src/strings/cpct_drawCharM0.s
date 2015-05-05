@@ -38,6 +38,9 @@
 ;;  (1B B )  bg_pen       - Background palette colour index (PEN, 0-15)
 ;;  (1B A )  ascii        - Character to be drawn (ASCII code)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawCharM0_asm
+;;
 ;; Parameter Restrictions:
 ;;  * *video_memory* could theoretically be any 16-bit memory location. It will work
 ;; outside current screen memory boundaries, which is useful if you use any kind of
@@ -74,14 +77,17 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    153 bytes (16 bytes conversion table, 137 bytes code)
+;;    157 bytes (16 bytes conversion table, 141 bytes code)
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case   | Cycles | microSecs (us)
+;;   Case     | Cycles | microSecs (us)
 ;; --------------------------------
-;; Best   |  3738  |   934.50
-;; Worst  |  4418  |  1104.50
+;;   Best     |  3730  |   932.50
+;;   Worst    |  4410  |  1102.50
+;; --------------------------------
+;; Asm saving |   -80  |   -20
+;; --------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -94,30 +100,17 @@ dc_mode0_ct:: .db 0x00, 0x40, 0x04, 0x44, 0x10, 0x50, 0x14, 0x54, 0x01, 0x41, 0x
 
 _cpct_drawCharM0::
    ;; GET Parameters from the stack 
-.if let_disable_interrupts_for_function_parameters
-   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   ld (dcm0_restoreSP+1), sp   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   di                          ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   pop   af                    ;; [10] AF = Return Address
-   pop   de                    ;; [10] DE = Destination address (Video memory location where character will be printed)
-   pop   bc                    ;; [10] BC = Colours (B=Background colour, C=Foreground colour) 
-   pop   hl                    ;; [10] HL = ASCII code of the character (H=??, L=ASCII code)
-dcm0_restoreSP:
-   ld   sp, #0                 ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   ei                          ;; [ 4] Enable interrupts again
-.else 
-   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
-   pop   af                    ;; [10] AF = Return Address
-   pop   de                    ;; [10] DE = Destination address (Video memory location where character will be printed)
-   pop   bc                    ;; [10] BC = colours (B=Background colour, C=Foreground colour) 
-   pop   hl                    ;; [10] HL = ASCII code of the character (H=??, L=ASCII code)
-   push  hl                    ;; [11] Restore Stack status pushing values again
-   push  bc                    ;; [11] (Interrupt safe way, 6 cycles more)
-   push  de                    ;; [11]
-   push  af                    ;; [11]
-.endif
-
-   ld    a, l                    ;; [ 4] A = ASCII code of the character
+   ld    hl, #2                ;; [10] HL = Pointer to the place where parameters start (SP + 2)
+   add   hl, sp                ;; [11]
+   ld     e, (hl)              ;; [ 7] DE = Destination address (Video memory location where character will be printed) 
+   inc   hl                    ;; [ 6]
+   ld     d, (hl)              ;; [ 7]
+   inc   hl                    ;; [ 6]
+   ld     c, (hl)              ;; [ 7] C = Foreground colour
+   inc   hl                    ;; [ 6]
+   ld     b, (hl)              ;; [ 7] B = Background colour
+   inc   hl                    ;; [ 6]
+   ld     a, (hl)              ;; [ 7] A = ASCII code of the character
 
 _cpct_drawCharM0_asm::
    ld  (dcm0_asciiHL+2), a     ;; [13] Save ASCII code of the character as data of a later "OR #data" instruction. 
