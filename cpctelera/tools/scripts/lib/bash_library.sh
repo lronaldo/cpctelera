@@ -82,14 +82,34 @@ function clearScreen {
    printf "\033[H\033[J"
 }
 
+
 ## $1: Seconds between characters
 ## $2: Message to write
-function machineEcho {
+function machineEcho_sleep {
    local i
    for i in $(seq 0 ${#2}); do
       echo -n "${2:${i}:1}"
       sleep "$1"
    done
+}
+
+## $1: Seconds between characters
+## $2: Message to write
+function machineEcho_no_sleep {
+   local i
+   for i in $(seq 0 ${#2}); do
+      echo -n "${2:${i}:1}"
+   done
+}
+
+## Select specific machineEcho mode depending
+## on the system we are being executed
+function machineEcho {
+  if checkSystem "cygwin"; then
+    machineEcho_no_sleep "$1" "$2" 
+  else
+    machineEcho_sleep "$1" "$2"
+  fi
 }
 
 ## $1: Color ANSI sequence
