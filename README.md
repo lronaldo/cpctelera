@@ -48,6 +48,10 @@ _**CPCtelera**_ is fully usable and has been tested under these platforms:
 
 If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
 
+### Reference Manual
+
+[CPCtelera reference manual](cpctelera/docs/index.html) is now online, and included in html with the library.
+
 ### Contact information and support
 
 If you have any questions, please contact us:
