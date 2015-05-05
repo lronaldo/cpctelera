@@ -50,7 +50,7 @@ If you test it in any platform (listed here or not) and have problems, please fe
 
 ### Reference Manual
 
-[CPCtelera reference manual](cpctelera/docs/index.html) is now online, and included in html with the library.
+[CPCtelera reference manual](http://lronaldo.github.io/cpctelera) is now online, and included in html with the library.
 
 ### Contact information and support
 
