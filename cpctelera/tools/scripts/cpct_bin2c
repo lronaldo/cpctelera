@@ -115,17 +115,34 @@ TMPFILE=$(createTempFile)
 IDENTIFIER=$(basename "$FILENAME") 
 IDENTIFIER=${IDENTIFIER%.*}
 
-## Convert binary to C Array and Store in $TMPFILE
-od -An -t x1 -v -w"$BYTESPERLINE" "$FILENAME"| sed -e 's/^ /0x/g' | sed -e 's/ /, 0x/g' | sed 's/$/,/g' | sed '$s/,$//g' > $TMPFILE
+## Calculate the total amount of bytes to be converted (in the binary file)
+BYTES=$(wc -c < "$FILENAME")
 
-## Calculate the total amount of bytes converted (as number of words outputted)
-BYTES=$(wc -w < "$TMPFILE")
-
-## Finally, output the conversion to stdout with the C Array declaration and the number of bytes
+## Output the C Array declaration and the number of bytes to stdout
 echo "// File $FILENAME converted using cpct_bin2c"
 echo "const unsigned char G_${IDENTIFIER}[${BYTES}] = {"
-cat $TMPFILE
-echo "};"
 
-## Delete temporal file
-rm $TMPFILE
+## Convert binary file to bytes in hexadecimal and store in a temporary file
+od -An -t x1 -v "$FILENAME" > $TMPFILE
+
+## Convert binary to C Array and output to stdout
+i=1
+COMMA=""
+while read LINE; do
+	BYTES=( $LINE )
+	for B in ${BYTES[@]}; do
+		printf "$COMMA"
+		if (( i >= BYTESPERLINE )); then
+			COMMA=",\n"
+			i=0
+		else
+			COMMA=","
+		fi
+		printf " 0x%s" $B
+		i=$((i+1))
+	done
+done < $TMPFILE
+
+## Output end bracket and semi-colon
+echo
+echo "};"
