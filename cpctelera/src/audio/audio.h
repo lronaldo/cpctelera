@@ -27,6 +27,10 @@
 #define CPCT_AUDIO_H
 
 //
+// File: Audio Constants&Variables
+//
+
+//
 // Arkos Player: full control version (without interrupts)
 // 
 
@@ -56,7 +60,7 @@ extern void cpct_akp_setFadeVolume(u8 volume);
 // read about <Digidrums>.
 // 
 //
-extern   u8 cpct_akp_digidrumStatus;
+extern volatile  u8 cpct_akp_digidrumStatus;
 
 //
 // Variable: cpct_akp_songLoopTimes
@@ -66,7 +70,7 @@ extern   u8 cpct_akp_digidrumStatus;
 // may use it to know if a song has finished or if it has looped
 // N times.
 //
-extern   u8 cpct_akp_songLoopTimes;
+extern volatile  u8 cpct_akp_songLoopTimes;
 
 
 // 

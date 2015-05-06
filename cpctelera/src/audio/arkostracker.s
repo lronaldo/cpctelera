@@ -19,7 +19,7 @@
 .module cpct_audio
 
 ;;
-;; Title: Arkos Tracker Player
+;; Title: Arkos Player Functions
 ;;
 
 ;;------------------------------------------------------------------------------------------------------

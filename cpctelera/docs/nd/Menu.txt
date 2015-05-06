@@ -44,18 +44,18 @@ File: Aliases for builtin types  (types.h)
 
 Group: Audio  {
 
-   File: Arkos Player Technicals  (audio/arkosplayer.txt)
-   File: Arkos Tracker Player  (audio/arkostracker.s)
-   File: Audio Channels &lparen;bitmasks&rparen;  (audio/audio.h)
-   Link: cpct_akp_musicPlay  (audio/arkostracker-s.html&amp;#x23;cpct_akp_musicPlay)
-   Link: cpct_akp_musicInit  (audio/arkostracker-s.html&amp;#x23;cpct_akp_musicInit)
-   Link: cpct_akp_stop  (audio/arkostracker-s.html&amp;#x23;cpct_akp_stop)
-   Link: cpct_akp_SFXGetInstrument  (audio/arkostracker-s.html&amp;#x23;cpct_akp_SFXGetInstrument)
-   Link: cpct_akp_SFXInit  (audio/arkostracker-s.html&amp;#x23;cpct_akp_SFXInit)
-   Link: cpct_akp_SFXStopAll  (audio/arkostracker-s.html&amp;#x23;cpct_akp_SFXStopAll)
-   Link: cpct_akp_SFXPlay  (audio/arkostracker-s.html&amp;#x23;cpct_akp_SFXPlay)
-   Link: cpct_akp_SFXStop  (audio/arkostracker-s.html&amp;#x23;cpct_akp_stop)
-   Link: cpct_akp_setFadeVolume  (audio/arkostracker-s.html&amp;#x23;cpct_akp_setFadeVolume)
+   File: Arkos Player Functions  (audio/arkostracker.s)
+   File: Arkos Player Manual  (audio/arkosplayer.txt)
+   File: Audio Constants&amp;Variables  (audio/audio.h)
+   Link: cpct_akp_musicPlay  (arkostracker-s.html&amp;#x23;cpct_akp_musicPlay)
+   Link: cpct_akp_musicInit  (arkostracker-s.html&amp;#x23;cpct_akp_musicInit)
+   Link: cpct_akp_stop  (arkostracker-s.html&amp;#x23;cpct_akp_stop)
+   Link: cpct_akp_SFXGetInstrument  (arkostracker-s.html&amp;#x23;cpct_akp_SFXGetInstrument)
+   Link: cpct_akp_SFXInit  (arkostracker-s.html&amp;#x23;cpct_akp_SFXInit)
+   Link: cpct_akp_SFXStopAll  (arkostracker-s.html&amp;#x23;cpct_akp_SFXStopAll)
+   Link: cpct_akp_SFXPlay  (arkostracker-s.html&amp;#x23;cpct_akp_SFXPlay)
+   Link: cpct_akp_SFXStop  (arkostracker-s.html&amp;#x23;cpct_akp_stop)
+   Link: cpct_akp_setFadeVolume  (arkostracker-s.html&amp;#x23;cpct_akp_setFadeVolume)
    }  # Group: Audio
 
 Group: Bitarray  {
@@ -131,6 +131,7 @@ Group: Index  {
 
    Constant Index: Constants
    Index: Everything
+   File Index: Files
    Function Index: Functions
    Macro Index: Macros
    Type Index: Types

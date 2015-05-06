@@ -1,4 +1,4 @@
-Title: Arkos Player Technicals
+Title: Arkos Player Manual
 
 
 Topic: About Arkos Player
@@ -192,6 +192,20 @@ Topic: How to detect the song is over
 To detect the end of a song, or the number of times it has looped, you should check the value of the global variable <cpct_akp_songLoopTimes>. This global variable is set to 0 when calling <cpct_akp_musicInit> and updated by Arkos Player every time the song reaches its end. Therefore, you just have to read its value to know if a song has ended / looped or how many times it has looped. 
 
 Please, take into account that <cpct_akp_songLoopTimes> is an <u8> variable. This means that, if a song loops more than 255 times, it will overflow and return to 0.
+
+
+Topic: How to relocate songs 
+
+Relocating a song is complicated. All data values inside the song point to absolute memory locations, and the format of the Instrument is not that simple. The easiest way to relocate a song is to open it in Arkos Tracker and export it again to the desired new memory location address.
+
+
+Topic: Can I remove parts of the code if I need memory ?
+
+Well, as long as it won't crash it, why not ? :) Arkos Traker Player and CPCtelera are distributed under GNU GPL license, that lets you do any changes that you like, provided that you distribute your modifications if you publicize your results. Don't forget that a lot of code is actually only assembled with conditions. You don't have to remove the SFX code part if <PLY_UseSoundEffects> is set to 0. But,
+   * You can remove all the references to <cpct_akp_digidrumStatus> if you don't use/need digidrums/events in your song.
+   * You can remove all the management of the Special Tracks if the song has no Speed change/Digidrums (from PLY_SpecialTrack_WaitCounter to PLY_SpecialTrack_Wait).
+   * You can remove the <cpct_akp_stop> function if you don't intend to stop the song!
+
 
 
 Section: Credits and Some technical details

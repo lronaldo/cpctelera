@@ -1,61 +1,61 @@
 1.52
 Assembly
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.txt	1430760928	1	Keyboard Technicals
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM0.s	1430936723	1	cpct_drawCharM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned4x8.s	1430324996	1	cpct_drawTileAligned4x8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.s	1430168408	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h	1430756083	1	Sprite Macros&Constants
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.s	1430324508	0	keyboard.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h	1430742620	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkosplayer.txt	1430936723	1	Arkos Player Technicals
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM1.s	1430324508	1	cpct_px2byteM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour.s	1430936723	1	cpct_setPALColour
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0.s	1430324508	1	cpct_px2byteM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits.s	1430742332	1	cpct_get4Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_memset.s	1430324851	1	cpct_memset
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit.s	1430742320	1	cpct_getBit
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM0.s	1430324508	1	cpct_drawStringM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned4x8_f.s	1430325062	1	cpct_drawTileAligned4x8_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_enableDisableROMs.s	1430682255	1	Enabling / disabling ROMs
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_f.s	1430760510	1	cpct_scanKeyboard_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker.s	1430936723	1	Arkos Tracker Player
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/audio.h	1430936723	1	Audio Channels (bitmasks)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryOffset.s	1430936723	1	cpct_setVideoMemoryOffset
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1_f.s	1430324508	1	cpct_drawStringM1_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isKeyPressed.s	1430324508	1	cpct_isKeyPressed
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned2x8_f.s	1430325077	1	cpct_drawTileAligned2x8_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryPage.s	1430936723	1	cpct_setVideoMemoryPage
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM2.s	1430324508	1	cpct_drawStringM2
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h	1430328019	1	cpct_setBorder
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette.s	1430936723	1	cpct_setPalette
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h	1430421410	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned2x8.s	1430325087	1	cpct_drawTileAligned2x8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite.s	1430761280	1	cpct_drawSprite
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM1_f.s	1430421410	1	cpct_drawCharM1_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.h	1430756111	1	Keyboard Mappings&Constants
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard.s	1430760525	1	cpct_scanKeyboard
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM1.s	1430936723	1	cpct_drawCharM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked.s	1430324508	1	cpct_drawSpriteMasked
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits.s	1430763660	1	cpct_set2Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/types.h	1430327831	1	Aliases for builtin types
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode.s	1430936723	1	cpct_setVideoMode
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_disableFirmware.s	1430421410	1	cpct_disableFirmware
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h	1430421410	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.s	1430755954	1	Firmware&ROM variables
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits.s	1430742338	1	cpct_get2Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s	1428436407	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox.s	1430324508	1	cpct_drawSolidBox
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h	1429963427	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h	1429804807	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits.s	1430763674	1	cpct_set4Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_count2VSYNC.s	1430936723	1	cpct_count2VSYNC
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM2.s	1430421410	1	cpct_drawCharM2
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s	1430421410	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_waitVSYNC.s	1430936723	1	cpct_waitVSYNC
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_putChar.s	1430324508	1	putchar
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM2.s	1430324508	1	cpct_drawStringM2
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/audio.h	1430940371	1	Audio Constants&Variables
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned4x8_f.s	1430325062	1	cpct_drawTileAligned4x8_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode.s	1430936723	1	cpct_setVideoMode
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.s	1430421410	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1.s	1430324508	1	cpct_drawStringM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_reenableFirmware.s	1430421410	1	cpct_reenableFirmware
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker.s	1430940121	1	Arkos Player Functions
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM2.s	1430421410	1	cpct_drawCharM2
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_count2VSYNC.s	1430936723	1	cpct_count2VSYNC
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.s	1428436407	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getHWColor.s	1430936723	1	cpct_getHWColour
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isKeyPressed.s	1430324508	1	cpct_isKeyPressed
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.s	1430324508	0	keyboard.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryOffset.s	1430936723	1	cpct_setVideoMemoryOffset
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryPage.s	1430936723	1	cpct_setVideoMemoryPage
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_disableFirmware.s	1430421410	1	cpct_disableFirmware
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette.s	1430936723	1	cpct_setPalette
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s	1430421410	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.txt	1430760928	1	Keyboard Technicals
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned4x8.s	1430324996	1	cpct_drawTileAligned4x8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM1.s	1430324508	1	cpct_px2byteM1
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw.s	1430936723	1	cpct_fw2hw
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkosplayer.txt	1430940109	1	Arkos Player Manual
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits.s	1430763660	1	cpct_set2Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h	1430756083	1	Sprite Macros&Constants
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit.s	1430742320	1	cpct_getBit
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h	1430742620	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getHWColor.s	1430936723	1	cpct_getHWColour
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit.s	1430763644	1	cpct_setBit
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite.s	1430761280	1	cpct_drawSprite
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0.s	1430324508	1	cpct_px2byteM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM0.s	1430936723	1	cpct_drawCharM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits.s	1430742332	1	cpct_get4Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_putChar.s	1430324508	1	putchar
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h	1430328019	1	cpct_setBorder
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM0.s	1430324508	1	cpct_drawStringM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_waitVSYNC.s	1430936723	1	cpct_waitVSYNC
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h	1429804807	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/types.h	1430327831	1	Aliases for builtin types
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits.s	1430763674	1	cpct_set4Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_f.s	1430760510	1	cpct_scanKeyboard_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard.s	1430760525	1	cpct_scanKeyboard
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.s	1430168408	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked.s	1430324508	1	cpct_drawSpriteMasked
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned2x8.s	1430325087	1	cpct_drawTileAligned2x8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.h	1430756111	1	Keyboard Mappings&Constants
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1.s	1430324508	1	cpct_drawStringM1
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits.s	1430742338	1	cpct_get2Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawTileAligned2x8_f.s	1430325077	1	cpct_drawTileAligned2x8_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1_f.s	1430324508	1	cpct_drawStringM1_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s	1428436407	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_memset.s	1430324851	1	cpct_memset
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_enableDisableROMs.s	1430682255	1	Enabling / disabling ROMs
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h	1429963427	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM1_f.s	1430421410	1	cpct_drawCharM1_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_reenableFirmware.s	1430421410	1	cpct_reenableFirmware
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour.s	1430936723	1	cpct_setPALColour
