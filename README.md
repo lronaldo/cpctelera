@@ -80,7 +80,16 @@ If you have any questions, please contact us:
 ### 3rdparty software authors
  
  * **[Arkos Tracker](http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start)**
-   * [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos)
+   * Main Author: [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos) 
+   * Other Authors / Collaborators: SuperSylvestre / Les Sucres, 
+   Augusto Ruiz Garcia (WYZ) / [Retroworks](http://www.retroworks.es), 
+   Grim / [Arkos](http://www.cpcwiki.eu/index.php/Arkos), 
+   [Lachlan Keown](http://www.twitter.com/lachlankeown), 
+   Ramlaid / [Arkos](http://www.cpcwiki.eu/index.php/Arkos), 
+   Madram / Overlanders
+   UltraSyd / Brainstorm,
+   [NoRecess](http://norecess.cpcscene.net/) / [Condense](http://www.pouet.net/groups.php?which=8),
+   Syx
  * **[Small Devices C Compiler (SDCC)](http://sdcc.sourceforge.net/)**
    * [SDCC Team](http://sdcc.sourceforge.net/index.php#Who)
  * **[iDSK](http://koaks.amstrad.free.fr/amstrad/projets/)**
