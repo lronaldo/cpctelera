@@ -94,7 +94,7 @@ _cpct_akp_songLoopTimes:: .db 0
 ;;
 ;;    However, take into account that all of Arkos Tracker Player's
 ;; functions are linked and included, because they depend on each other. Total
-;; memory requirement is around 2082 2077 bytes.
+;; memory requirement is around 2089 bytes.
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -1649,7 +1649,7 @@ PLY_FrequencyTable:
 ;;
 ;;    However, take into account that all of Arkos Tracker Player's
 ;; functions are linked and included, because they depend on each other. Total
-;; memory requirement is around 2077 bytes.
+;; memory requirement is around 2089 bytes.
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -1752,7 +1752,7 @@ PLY_Init:
 ;;
 ;;    However, take into account that all of Arkos Tracker Player's
 ;; functions are linked and included, because they depend on each other. Total
-;; memory requirement is around 2077 bytes.
+;; memory requirement is around 2089 bytes.
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -1818,7 +1818,7 @@ PLY_Stop:
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2077 bytes.
+   ;; memory requirement is around 2089 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
@@ -1902,7 +1902,7 @@ PLY_Stop:
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2077 bytes.
+   ;; memory requirement is around 2089 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
@@ -1961,7 +1961,7 @@ PLY_Stop:
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2077 bytes.
+   ;; memory requirement is around 2089 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
@@ -2034,7 +2034,7 @@ PLY_Stop:
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2077 bytes.
+   ;; memory requirement is around 2089 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
