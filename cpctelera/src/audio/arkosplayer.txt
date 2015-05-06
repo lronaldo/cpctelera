@@ -174,6 +174,24 @@ Topic: How to test a priority of a sound effect over another?
 
 Arkos Tracker provides a "low level" sound effects player, but it's up to you to manage how to trigger them. If a "bang" explosion shouldn't be cut by a "jump" sound, then you have to manage a priority list of your sound effects. It's quite easy to code in your own SFX management code.
 
+Topic: Digidrums
+
+Digidrums are in fact only "events" sent by the player, for you to know you must trigger something. For more flexibility, and as there are countless ways to play samples according to how to manage them, I chose not to include any code for playing sample. It's up to you.
+
+After the song is played, simply read the <cpct_akp_digidrumStatus> variable. If it's 0, nothing happened. Any other value means that a digidrum must be played. The digidrum number is of course entered by the musician inside the song, so take care to communicate well how to designate the samples (for example 1=kick drum, 2=snare, ...).
+
+One variation of the use of Digidrums is event signaling. Imagine you want to synchronize your production with the music. You can set "markers" in your song thanks to this. For example, if the Digidrum "255" if played, it means that your next effect must appear.
+
+
+
+Section: Random Questions
+
+
+Topic: How to detect the song is over
+
+To detect the end of a song, or the number of times it has looped, you should check the value of the global variable <cpct_akp_songLoopTimes>. This global variable is set to 0 when calling <cpct_akp_musicInit> and updated by Arkos Player every time the song reaches its end. Therefore, you just have to read its value to know if a song has ended / looped or how many times it has looped. 
+
+Please, take into account that <cpct_akp_songLoopTimes> is an <u8> variable. This means that, if a song loops more than 255 times, it will overflow and return to 0.
 
 
 Section: Credits and Some technical details

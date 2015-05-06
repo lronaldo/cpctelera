@@ -52,8 +52,13 @@
 ;;--- PLAYER CODE START
 ;;------------------------------------------------------------------------------------------------------
 
-;Read here to know if a Digidrum has been played (0=no).
-PLY_Digidrum: .db 0
+;; Digidrum Status
+;;    Read here to know if a Digidrum has been played (0=no).
+_cpct_akp_digidrumStatus:: .db 0
+
+;; Loop times
+;;    Read here to know the number of times a song has looped
+_cpct_akp_songLoopTimes:: .db 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -119,7 +124,7 @@ PLY_Play:
    push iy
 
    xor  a
-   ld   (PLY_Digidrum), a     ;Reset the Digidrum flag.
+   ld   (_cpct_akp_digidrumStatus), a     ;Reset the Digidrum flag.
 
 ;Manage Speed. If Speed counter is over, we have to read the Pattern further.
 PLY_SpeedCpt:
@@ -143,7 +148,14 @@ PLY_Linker_PT:
    rra
    jr  nc, PLY_SongNotOver
 
-   ;Song over ! We read the address of the Loop point.
+   ;Song over ! 
+   
+   ;; Increment song loop times
+   ld    a, (_cpct_akp_songLoopTimes)
+   inc   a
+   ld (_cpct_akp_songLoopTimes), a
+
+   ;; We read the address of the Loop point.
    ld   a, (hl)
    inc hl
    ld   h, (hl)
@@ -247,7 +259,7 @@ PLY_SpecialTrack_PT:
 PLY_SpecialTrack_NoEscapeCode:
    ;Now, we test the Effect type, since the Carry didn't change.
    jr nc,PLY_SpecialTrack_Speed
-   ld (PLY_Digidrum), a
+   ld (_cpct_akp_digidrumStatus), a
    jr PLY_PT_SpecialTrack_EndData
 
 PLY_SpecialTrack_Speed:
@@ -1652,13 +1664,16 @@ PLY_FrequencyTable:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_akp_musicInit::
-   ld  hl, #2    ;; [10] Retrieve parameters from stack
-   add hl, sp    ;; [11]
-   ld  e, (HL)   ;; [ 7] DE = Pointer to the start of music
-   inc hl        ;; [ 6]
-   ld  d, (HL)   ;; [ 7]
+   ld   hl, #2    ;; [10] Retrieve parameters from stack
+   add  hl, sp    ;; [11]
+   ld    e, (hl)  ;; [ 7] DE = Pointer to the start of music
+   inc  hl        ;; [ 6]
+   ld    d, (hl)  ;; [ 7]
 
 cpct_akp_musicInit_asm::   ;; Entry point for assembly calls using registers for parameter passing
+   ;; First, set song loop times to 0 when we start
+   xor   a                          ;; A = 0
+   ld (_cpct_akp_songLoopTimes), a  ;; _cpct_akp_songLoopTimes = 0
 
 PLY_Init:
    ld  hl, #9                          ;Skip Header, SampleChannel, YM Clock (DB*3), and Replay Frequency.

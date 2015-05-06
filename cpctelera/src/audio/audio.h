@@ -46,6 +46,29 @@ extern  u16 cpct_akp_SFXGetInstrument (u8 channel_bitmask);
 // Arkos Player Fade in / out volume control (Only valid if Fades are active)
 extern void cpct_akp_setFadeVolume(u8 volume);
 
+//
+// Variable: cpct_akp_digidrumStatus
+//
+//    This is an internal variable, updated by Arkos Tracker Player, 
+// that is used by the player for signalling events to user code. You
+// may read it at any time to know if any "event" has happened (as 
+// signalled by the player) and then react accordingly. To know more,
+// read about <Digidrums>.
+// 
+//
+extern   u8 cpct_akp_digidrumStatus;
+
+//
+// Variable: cpct_akp_songLoopTimes
+//
+//    This is an internal variable, updated by Arkos Tracker Player, 
+// that contains the number of times the present song has looped. You
+// may use it to know if a song has finished or if it has looped
+// N times.
+//
+extern   u8 cpct_akp_songLoopTimes;
+
+
 // 
 // Constants: Audio Channels (bitmasks)
 //

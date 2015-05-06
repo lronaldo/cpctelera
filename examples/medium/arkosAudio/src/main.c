@@ -51,13 +51,17 @@ void main(void) {
          else if (cpct_akp_SFXGetInstrument(AY_CHANNEL_C))
             cpct_drawCharM2(pvideomem, color, 'C');
          else
-            cpct_drawCharM2(pvideomem, color, '#');
+            cpct_drawCharM2(pvideomem, color, '0' + cpct_akp_songLoopTimes);
 
          // Point to the start of the next character in video memory
          if (++pvideomem >= (char*)0xC7D0) {
             pvideomem = (char*)0xC000;
             color ^= 1;
          }
+
+         // If Music has already ended, cycle it again
+         if (cpct_akp_songLoopTimes > 0)
+            cpct_akp_musicInit(molusk_song);
       }
 
       // Check keyboard to let the user play/stop the song with de Space Bar
