@@ -89,7 +89,7 @@ PLY_Digidrum: .db 0
 ;;
 ;;    However, take into account that all of Arkos Tracker Player's
 ;; functions are linked and included, because they depend on each other. Total
-;; memory requirement is around 2097 bytes.
+;; memory requirement is around 2082 2077 bytes.
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -1637,7 +1637,7 @@ PLY_FrequencyTable:
 ;;
 ;;    However, take into account that all of Arkos Tracker Player's
 ;; functions are linked and included, because they depend on each other. Total
-;; memory requirement is around 2097 bytes.
+;; memory requirement is around 2077 bytes.
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -1737,7 +1737,7 @@ PLY_Init:
 ;;
 ;;    However, take into account that all of Arkos Tracker Player's
 ;; functions are linked and included, because they depend on each other. Total
-;; memory requirement is around 2097 bytes.
+;; memory requirement is around 2077 bytes.
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -1778,6 +1778,75 @@ PLY_Stop:
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;
+   ;; Function: cpct_akp_SFXGetInstrument
+   ;;
+   ;;    Returns the number of the instrument which is playing SFX in the selected
+   ;; channel (0 = Channel free / not playing SFX).
+   ;;
+   ;; C Definition:
+   ;;    <u16> <cpct_akp_SFXGetInstrument> (<u8> *channel_bitmask*)
+   ;;
+   ;; Assembly call (Input parameters on registers):
+   ;;    > call cpct_akp_SFXGetInstrument_asm
+   ;;
+   ;; Details:
+   ;;    This function returns the number of the instrumeent which is playing in
+   ;; the given channel. You may use it to check the status of an FX reproduction. 
+   ;; If this function returns a 0 it means that no SFX is playing on the channel 
+   ;; (i.e. the channel is free for reproducing new SFXs).
+   ;;
+   ;; Destroyed Register values: 
+   ;;    AF, HL
+   ;;
+   ;; Required memory:
+   ;;    25 bytes 
+   ;;
+   ;;    However, take into account that all of Arkos Tracker Player's
+   ;; functions are linked and included, because they depend on each other. Total
+   ;; memory requirement is around 2077 bytes.
+   ;;
+   ;; Time Measures:
+   ;; (start code)
+   ;;    Case    | Cycles | microSecs (us)
+   ;; --------------------------------------
+   ;;   Best     |   68   |  17.00
+   ;; --------------------------------------
+   ;;   Worst    |   82   |  20.50
+   ;; --------------------------------------
+   ;; Asm saving |  -28   |  -7.00
+   ;; --------------------------------------
+   ;; (end code)
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   _cpct_akp_SFXGetInstrument::
+      ;; Get Parameter from Stack
+      ld   hl, #2               ;; [10] HL points to the start of parameters in the stack
+      add  hl, sp               ;; [11]
+      ld    a, (hl)             ;; [ 7] A = Selected Channel Bitmask
+
+   cpct_akp_SFXGetInstrument_asm::  ;; Entry point for assembly calls using registers for parameter passing
+
+      ;; Check the selected audio channel depending on bitmask
+      rrca                      ;; [ 4] Rotate A right to test bit0 (Check for channel 0 / A)
+      jp    c, sfcb_channel_a   ;; [10] if Carry=1, bit0 was 1, Channel A selected
+      rrca                      ;; [ 4] Rotate A right to test bit1 (Check for channel 1 / B)
+      jp    c, sfcb_channel_b   ;; [10] if Carry=1, bit1 was 1, Channel B selected
+   
+   sfcb_channel_c:       ;; If it is not channel B or C, is channel 0 / A (bit 0)
+      ld   hl, (PLY_SFX_Track3_Instrument + 1) ;; [16] HL = SFX Track 3 (Channel 2 / C) Pitch Status
+      ret                                      ;; [10] return
+   
+   sfcb_channel_b:
+      ld   hl, (PLY_SFX_Track2_Instrument + 1) ;; [16] HL = SFX Track 2 (Channel 1 / B) Pitch Status
+      ret                                      ;; [10] return
+   
+   sfcb_channel_a:
+      ld   hl, (PLY_SFX_Track1_Instrument + 1) ;; [16] HL = SFX Track 1 (Channel 0 / C) Pitch Status
+      ret                                      ;; [10] return
+
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;
    ;; Function: cpct_akp_SFXInit
    ;;
    ;;    Initializes sound effect instruments to be able to play sound effects.
@@ -1799,7 +1868,7 @@ PLY_Stop:
    ;;
    ;; Details:
    ;;    This function initializes instruments that will be used later on to play 
-   ;; FX sounds at will using <cpct_akp_SFXPLAY>. In order for the instruments to
+   ;; FX sounds at will using <cpct_akp_SFXPlay>. In order for the instruments to
    ;; be initialized, *sfx_song_data* must point to a song defined in AKS format.
    ;; For the purpose of this function, the song only requires to have instruments
    ;; defined in it, as patterns, notes and other information is not used for FX
@@ -1818,7 +1887,7 @@ PLY_Stop:
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2097 bytes.
+   ;; memory requirement is around 2077 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
@@ -1877,7 +1946,7 @@ PLY_Stop:
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2097 bytes.
+   ;; memory requirement is around 2077 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
@@ -1946,11 +2015,11 @@ PLY_Stop:
    ;;    AF, BC, DE, HL,
    ;;
    ;; Required memory:
-   ;;    87 bytes 
+   ;;    95 bytes 
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2097 bytes.
+   ;; memory requirement is around 2077 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
@@ -1989,21 +2058,21 @@ PLY_Stop:
 
       ;; Pick up the selected audio channel using bitmasks
       ;; to reproduce the sound effect
-      bit   2, a                       ;; [ 8] Check for channel 2 / C (bit 2)
-      jp    z, sfp_channel_c           ;; [10] 
-      bit   1, a                       ;; [ 8] Check for channel 1 / B (bit 1)
-      jp    z, sfp_channel_b           ;; [10]
+      rrca                             ;; [ 4] Check for channel 0 / A (bit 0)
+      jp    c, sfp_channel_a           ;; [10] 
+      rrca                             ;; [ 4] Check for channel 1 / B (bit 1)
+      jp    c, sfp_channel_b           ;; [10]
       
-      sfp_channel_a:                   ;; If it is not channel B or C, is channel 0 / A (bit 0)
-      ld   ix, #PLY_SFX_Track1_Pitch   ;; [14] IX = Track 1 (channel 0 / A)
+      sfp_channel_c:                   ;; If it is not channel A or B, is channel 2 / C (bit 2)
+      ld   ix, #PLY_SFX_Track3_Pitch   ;; [14] IX = Track 3 (channel 2 / C)
       jp  PLY_SFX_Play_Selected        ;; [10] 
       
       sfp_channel_b:
       ld   ix, #PLY_SFX_Track2_Pitch   ;; [14] IX = Track 2 (channel 1 / B)
       jp  PLY_SFX_Play_Selected        ;; [10]
       
-      sfp_channel_c:
-      ld   ix, #PLY_SFX_Track3_Pitch   ;; [14] IX = Track 3 (Channel 2 / C)
+      sfp_channel_a:
+      ld   ix, #PLY_SFX_Track1_Pitch   ;; [14] IX = Track 1 (Channel 0 / A)
 
    PLY_SFX_Play_Selected:
       ld  PLY_SFX_OffsetPitch + 1(ix), c        ;Set Pitch
@@ -2072,11 +2141,11 @@ PLY_Stop:
    ;;    AF, HL
    ;;
    ;; Required memory:
-   ;;    33 bytes 
+   ;;    30 bytes 
    ;;
    ;;    However, take into account that all of Arkos Tracker Player's
    ;; functions are linked and included, because they depend on each other. Total
-   ;; memory requirement is around 2097 bytes.
+   ;; memory requirement is around 2082 bytes.
    ;;
    ;; Time Measures:
    ;; (start code)
@@ -2099,29 +2168,29 @@ PLY_Stop:
 
    _cpct_akp_SFXStop::
    PLY_SFX_Stop:
-      ld  hl, #2                              ;; [10] Get Parameter from Stack
-      add hl, sp                              ;; [11]
-      ld  a, (hl)                             ;; [ 7] A = Channel number to be stopped
+      ld   hl, #2                             ;; [10] Get Parameter from Stack
+      add  hl, sp                             ;; [11]
+      ld    a, (hl)                           ;; [ 7] A = Channel number to be stopped
 
    cpct_akp_SFXStop_asm::     ;; Entry point for assembly calls using registers for parameter passing
 
-      ld hl, #0                               ;; [10] Value 0 to stop SFX in a channel
+      ld   hl, #0                             ;; [10] Value 0 to stop SFX in a channel
 
-      bit 2, a                                ;; [ 8] Test bit 2 (00000100) to know if channel 2 has to be stopped
-      jp  z, PLY_SFSStop_no3                  ;; [10] If bit2=0, channel 2 is left as is.
-      ld (PLY_SFX_Track3_Instrument + 1), hl  ;; [16] Stop Channel 2 
-
-   PLY_SFSStop_no3:
-      bit 1, a                                ;; [ 8] Test bit 1 (00000010) to know if channel 1 has to be stopped
-      jp  z, PLY_SFSStop_no2                  ;; [10] If bit1=0, channel 1 is left as is.
-      ld (PLY_SFX_Track2_Instrument + 1), hl  ;; [16] Stop Channel 1
-
-   PLY_SFSStop_no2:
-      and #0x01                               ;; [ 7] Test bit 0 (00000001) to know if channel 0 has to be stopped
-      jp  z, PLY_SFSStop_no1                  ;; [10] If bit0=0, channel 0 is left as is.
+      rrca                                    ;; [ 4] Test bit 0 (00000001) to know if channel 0 has to be stopped
+      jp   nc, PLY_SFSStop_no1                ;; [10] If Carry=0, channel 2 is left as is.
       ld (PLY_SFX_Track1_Instrument + 1), hl  ;; [16] Stop Channel 0
 
    PLY_SFSStop_no1:
+      rrca                                    ;; [ 4] Test bit 1 (00000010) to know if channel 1 has to be stopped
+      jp   nc, PLY_SFSStop_no2                ;; [10] If Carry=0, channel 1 is left as is.
+      ld (PLY_SFX_Track2_Instrument + 1), hl  ;; [16] Stop Channel 1
+
+   PLY_SFSStop_no2:
+      rrca                                    ;; [ 4] Test bit 2 (00000100) to know if channel 0 has to be stopped
+      jp  z, PLY_SFSStop_no3                  ;; [10] If Carry=0, channel 0 is left as is.
+      ld (PLY_SFX_Track3_Instrument + 1), hl  ;; [16] Stop Channel 2
+
+   PLY_SFSStop_no3:
       ret                                     ;; [10] Return
 
 .endif
@@ -2162,7 +2231,7 @@ PLY_Stop:
 ;;
 ;;    However, take into account that all of Arkos Tracker Player's
 ;; functions are linked and included, because they depend on each other. Total
-;; memory requirement is around 2097 bytes.
+;; memory requirement is around 2082 bytes.
 ;;
 ;; Time Measures:
 ;; (start code)

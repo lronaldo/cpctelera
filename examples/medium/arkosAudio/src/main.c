@@ -45,7 +45,15 @@ void main(void) {
          cpct_akp_musicPlay();
 
          // Write a new dash to the screen to see something while playing
-         cpct_drawCharM2(pvideomem, color, '#');
+         //  -> If some SFX is playing write the channel where it is playing
+         if (cpct_akp_SFXGetInstrument(AY_CHANNEL_A))
+            cpct_drawCharM2(pvideomem, color, 'A');
+         else if (cpct_akp_SFXGetInstrument(AY_CHANNEL_C))
+            cpct_drawCharM2(pvideomem, color, 'C');
+         else
+            cpct_drawCharM2(pvideomem, color, '#');
+
+         // Point to the start of the next character in video memory
          if (++pvideomem >= (char*)0xC7D0) {
             pvideomem = (char*)0xC000;
             color ^= 1;

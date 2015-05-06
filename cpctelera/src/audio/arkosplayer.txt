@@ -88,32 +88,91 @@ Though there is just one player, it can be used in three different mode:
    - Your production is in C, but you want to have full control of the player. You will manage to call the player every time, at your song's required frequency. This is the default way of using the player.
    - Your production is either on C or ASM, but you don't want to have fine-grained control of the player, and you just want the music to play, consuming whatever cycles it requires. A simple call will put the music into interruption. This is called the "INTERRUPTION" mode. It is currently unavailable, but it will be on the near future.
 
-You can switch from one mode to another by setting the constants PLY_SystemFriendly and PLY_UseFirmwareInterruptions to 0 or 1, like said in the player. An example : in the ASM mode, both must be turned to 0, so find the two constants and :
-PLY_SystemFriendly equ 0
-PLY_UseFirmwareInterruptions equ 0
+At the present stage, you can use C and ASM modes, by calling to C or ASM functions directly. When using ASM mode, if you want the player to explicitly preserve AMSDOS registers, you should enable <PLY_SystemFriendly> constant and recompile the library.
 
-Then assemble the player (like said above), save it, and use it.
-
-For ASM and BASIC players, these three functions are always available :
-PLY_Init : This one is needed once before playing the song. Without it, nothing will be heard. (DE = song address)
-PLY_Play : Play one frame of the song. It can also resume the song if it had been stopped (with the function just after).
-PLY_Stop : Stop the song, cut the sound.
-
-Basic users can call these functions easily. If you have loaded your player in &4000 and your song in &5000 :
-CALL &4000, &5000 : Initialize the song.
-CALL &4000 + 3 : Play/resume the song.
-CALL &4000 + 6 : Stop the song.
+These are the functions available for C modes. All of them may be called on ASM mode just by adding the suffix "_asm" to the name. ASM mode lets you call the functions passing the parameters in registers, instead of using the stack:
+   - <cpct_akp_musicInit>  : Set up a new music file for reproducing
+   - <cpct_akp_musicPlay>  : Reproduce a 1/nth of the song. nth depends on the frequency at which the song has been created.
+   - <cpct_akp_stop>       : Stop all musing and sound effects.
 
 
-INTERRUPTION players don't exactly work this way :
-PLY_InterruptionOn : Play the song (no need to initialize it). (DE = song address)
-PLY_InterruptionOff : Stop the song.
-PLY_InterruptionContinue : Resume the song.
+Topic: Fade in / out
 
-Or in Basic :
-CALL &4000, &5000 : Start the song.
-CALL &4000 + 3 : Stop the song.
-CALL &4000 + 6 : Resume the song.
+The player allows the global volume to be modified. However, this function is disabled by default, as it consumes a little more memory and CPU. If you wanted to enable it, you should set <PLY_UseFades> to 1 and recompile the library.
+
+The player provides the interface for fading, but you'll have to set the volume by yourself. Therefore, fading in or out consist on setting global volume progressively up or down by hand. This is more flexible and powerful this way. 
+
+In assembler:
+   > ld a,Volume                       ;; (0=full volume, 16 or more=no volume)
+   > call cpct_akp_setFadeVolume_asm   ;; Set the global volume
+
+In C:
+   > u8 new_fade_volume = 1;
+   > cpct_akp_setFadeVolume(new_fade_volume);
+
+
+Topic: Sound Effects
+
+Sound Effects are defined in another song (which we will be refered as "SFX Music"), exported as a "SFX Music" in the Arkos Tracker. Sound effects are activated by default in the player, but you may deactivate them by setting <PLY_UseSoundEffects> to 0 (if you wanted to save some memory and CPU for some reason).
+
+Like any song, the SFX Music must be initialized, but with a specific function :
+
+In Assembler:
+   > ld de, SFXMusicAddress      ;; DE = Pointer to SFX Music 
+   > call cpct_akp_SFXInit_asm   ;; Initialize instruments for SFX
+
+In C:
+   > cpct_akp_SFXInit(my_music);
+
+You may even use the same music file for music and SFX (that is, SFX will use same instruments as the music song), 
+   > ld de, musicAddress         ;; DE = pointer to music
+   > call cpct_akp_SFXInit_asm   ;; Initialize instruments for SFX
+   > ld de, musicAddress         ;; Make DE point to music again, as previous call may have corrupted it
+   > call cpct_akp_musicInit     ;; Initialize instruments and music for music play
+
+To play a sound effect, you must call the <cpct_akp_SFXPlay> function, which has a lot of parameters, 
+   channel_num ( A )    - Channel Number (1, 2 or 4, but better use <AY_CHANNEL_A>, <AY_CHANNEL_B> and <AY_CHANNEL_C>) constants.
+   sfx_instrument ( L ) - SFX Number, that refers to the instrument to use for playing the SFX (>0)
+   volume ( H )         - Volume from 0 to 15 (min to max)
+   note ( E )           - Note (0...143) (0 is the lowest, 143 the highest)
+   speed ( D )          - Speed (0 = As original, 1...255 = new Speed (1 is the fastest))
+   inverted pitch (BC)  - BC = Inverted Pitch (-&FFFF -> &FFFF). 0 is no pitch (=the original sound). The higher the pitch, the lower the sound.
+
+To stop a sound effect playing on channel A,
+   > cpct_akp_SFXStop(AY_CHANNEL_A);
+
+To stop the sound effects on all the channels,
+   > cpct_akp_SFXStopAll();
+
+Obviously, SFXs are "added" to the music. So you need to play the song to actually hear them ! Also, as they are adding another layer of sound to the player, they are consuming more CPU, especially if you're playing SFXs on the three channels at once.
+
+Also, note that triggering a sound over another one will cut this last one.
+
+
+Topic: What if I don't want any music, and only SFXs?
+
+This is possible. As you need a "music" to be playing in order to reproduce SFX, just initialize the music player with the SFX music you want to use. SFX musics have a null music pattern, so no music will be played anyway. Then initialize SFX with the same SFX music and start the player. You will then be able to reproduce any FX sound you wanted to,
+   > ld de, SFXMusicAddress        ;; DE = SFX Music (only instruments, no music pattern)
+   > call cpct_akp_SFXInit_asm     ;; Initialize sound FX
+   > ld de, SFXMusicAddress        ;; DE = SFX Music again
+   > call cpct_akp_musicInit_asm   ;; Initialize music player with the SFX music
+
+
+Topic: How to test a sound effect is over?
+
+To test if a sound effect is over, you have to test if the channel where you reproduced your SFX is still reproducing or not. This can be done using the <cpct_akp_SFXGetInstrument>. This function returns the number of the instrument which is playing at a given sound channel, or 0 if the channel is not playing any SFX. Then, you could do something like this,
+   (start code)
+   // Check if a SFX is still playing in Channel A
+   if ( ! cpct_akp_SFXGetInstrument(AY_CHANNEL_A) ) {
+      // ... Channel A is free (no SFX playing in) ...
+   } else {
+      // ... A SFX is still playing on Channel A ...
+   }
+   (end code)
+
+Topic: How to test a priority of a sound effect over another?
+
+Arkos Tracker provides a "low level" sound effects player, but it's up to you to manage how to trigger them. If a "bang" explosion shouldn't be cut by a "jump" sound, then you have to manage a priority list of your sound effects. It's quite easy to code in your own SFX management code.
 
 
 

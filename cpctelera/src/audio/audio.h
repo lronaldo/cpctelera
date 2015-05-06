@@ -35,12 +35,13 @@ extern void cpct_akp_musicInit  (void* songdata);
 extern void cpct_akp_musicPlay  ();
 extern void cpct_akp_stop       ();
 
-// Arkos Player Sound FX Control Functions
+// Arkos Player Sound FX Control Functions (Only available if SFX is active)
 extern void cpct_akp_SFXInit    (void* sfx_song_data);
 extern void cpct_akp_SFXStopAll ();
 extern void cpct_akp_SFXStop    (u8 stop_bitmask);
 extern void cpct_akp_SFXPlay    (u8 sfx_num, u8 volume, u8 note, u8 speed, 
                                  u16 inverted_pitch, u8 channel_num);
+extern  u16 cpct_akp_SFXGetInstrument (u8 channel_bitmask);
 
 // Arkos Player Fade in / out volume control (Only valid if Fades are active)
 extern void cpct_akp_setFadeVolume(u8 volume);
