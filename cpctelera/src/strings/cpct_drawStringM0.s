@@ -21,7 +21,7 @@
 ;; Include constants and general values
 ;;
 .include /strings.s/
-.globl _cpct_drawCharM0_asm
+.globl cpct_drawCharM0_asm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -38,6 +38,9 @@
 ;;  (2B DE) video_memory - Video memory location where the string will be drawn
 ;;  (1B C ) fg_pen       - Foreground colour (PEN, 0-15)
 ;;  (1B B ) bg_pen       - Background colour (PEN, 0-15)
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawStringM0_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *string* must be a null terminated string. It could contain any 8-bit value as 
@@ -85,10 +88,13 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case   |    Cycles    |   microSecs (us)
-;; -------------------------------------------
-;; Best   | 185 + 3774*L | 46.25 +  956.00*L
-;; Worst  | 185 + 4454*L | 46.25 + 1126.00*L
+;;   Case     |    Cycles    |   microSecs (us)
+;; ----------------------------------------------
+;;   Best     | 185 + 3774*L | 46.25 +  956.00*L
+;;   Worst    | 185 + 4454*L | 46.25 + 1126.00*L
+;; ----------------------------------------------
+;; Asm saving |        -84   |          -21.00
+;; ----------------------------------------------
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
 ;;
@@ -121,13 +127,15 @@ drsm0_restoreSP:
    push af                             ;; [11]
 .endif
 
+cpct_drawStringM0_asm::                ;; Assembly entry point
+
    ld (drsm0_values+1), bc             ;; [20] Save BC as LD direct value to be read later for saving colour values (Foreground and Background)
    jp drsm0_firstChar                  ;; [10] Jump to first char
 
 drsm0_nextChar:
    push hl                             ;; [11] Save HL and DE to the stack before calling draw char
    push de                             ;; [11]
-   call _cpct_drawCharM0_asm           ;; [17] Draw next char
+   call cpct_drawCharM0_asm            ;; [17] Draw next char
    pop  de                             ;; [10] Recover HL and DE from the stack
    pop  hl                             ;; [10]
 

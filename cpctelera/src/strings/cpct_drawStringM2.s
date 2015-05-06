@@ -21,7 +21,7 @@
 ;; Include constants and general values
 ;;
 .include /strings.s/
-.globl _cpct_drawCharM2_asm
+.globl cpct_drawCharM2_asm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -37,6 +37,9 @@
 ;;  (2B HL) string       - Pointer to the null terminated string being drawn
 ;;  (2B DE) video_memory - Video memory location where the string will be drawn
 ;;  (1B C ) pen          - Colour configuration (!=0 Normal / =0 Inverted)
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawStringM2_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *string* must be a null-terminated string. It could contain any 8-bit value 
@@ -82,10 +85,13 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case   |   Cycles    |   microSecs (us)
+;;   Case     |   Cycles    |   microSecs (us)
 ;; -------------------------------------------
-;; Best   | 143 + 799*L | 28.75 + 199.75*L 
-;; Worst  | 143 + 843*L | 28.75 + 210.75*L
+;;   Best     | 143 + 799*L | 28.75 + 199.75*L 
+;;   Worst    | 143 + 843*L | 28.75 + 210.75*L
+;; ----------------------------------------------
+;; Asm saving |       -84   |         -21.00
+;; ----------------------------------------------
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
 ;;
@@ -118,6 +124,8 @@ drsm1f_restoreSP:
    push af                             ;; [11]
 .endif
 
+cpct_drawStringM2_asm::                ;; Assembly entry point
+
    ld a, c                             ;; [ 4] A = Foreground color
    ld (drsm2_firstChar+1), a           ;; [ 7] Save foreground color in its placeholder to be restored at every step in the loop
    jp drsm2_firstChar                  ;; [10] Jump to first char
@@ -126,7 +134,7 @@ drsm2_nextChar:
    push hl                             ;; [11] Save HL and DE to the stack befor calling draw char
    push de                             ;; [11]
    ld  b, a                            ;; [ 4] B = Next character to be drawn
-   call _cpct_drawCharM2_asm           ;; [17] Draw next char
+   call cpct_drawCharM2_asm            ;; [17] Draw next char
    pop  de                             ;; [10] Recover HL and DE from the stack
    pop  hl                             ;; [10]
 

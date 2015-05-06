@@ -21,7 +21,7 @@
 ;; Include constants and general values
 ;;
 .include /strings.s/
-.globl _cpct_drawCharM1_asm
+.globl cpct_drawCharM1_asm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -38,6 +38,9 @@
 ;;  (2B DE) video_memory - Video memory location where the string will be drawn
 ;;  (1B C ) fg_pen       - Foreground colour (PEN, 0-3)
 ;;  (1B B ) bg_pen       - Background colour (PEN, 0-3)
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawStringM1_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *string* must be a null terminated string. It could contain any 8-bit value as 
@@ -85,10 +88,13 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case   |    Cycles    |   microSecs (us)
+;;   Case     |    Cycles    |   microSecs (us)
 ;; -------------------------------------------
-;; Best   | 173 + 4406*L | 43.25 + 1101.50*L
-;; Worst  | 173 + 5086*L | 43.25 + 1271.50*L
+;;   Best     | 173 + 4406*L | 43.25 + 1101.50*L
+;;   Worst    | 173 + 5086*L | 43.25 + 1271.50*L
+;; ----------------------------------------------
+;; Asm saving |        -84   |          -21.00
+;; ----------------------------------------------
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
 ;;
@@ -121,13 +127,15 @@ drsm1_restoreSP:
    push af                             ;; [11]
 .endif
 
+cpct_drawStringM1_asm::                ;; Assembly entry point
+
    ld (drsm1_values+1), bc             ;; [20] Save BC as LD direct value to be read later for saving color values (Foreground and Background)
    jp drsm1_firstChar                  ;; [10] Jump to first char
 
 drsm1_nextChar:
    push hl                             ;; [11] Save HL and DE to the stack befor calling draw char
    push de                             ;; [11]
-   call _cpct_drawCharM1_asm           ;; [17] Draw next char
+   call cpct_drawCharM1_asm            ;; [17] Draw next char
    pop  de                             ;; [10] Recover HL and DE from the stack
    pop  hl                             ;; [10]
 

@@ -43,6 +43,9 @@
 ;;  (1B C ) pen          - Colour configuration (!=0 Normal / =0 Inverted)
 ;;  (1B B ) ascii        - Character to be printed (ASCII code)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawCharM2_asm
+;;
 ;; Parameter Restrictions:
 ;;  * *video_memory* could theoretically be any 16-bit memory location. It will work
 ;; outside current screen memory boundaries, which is useful if you use any kind of
@@ -82,10 +85,13 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case   | Cycles | microSecs (us)
-;; --------------------------------
-;; Best   |   759  |   189.75
-;; Worst  |   803  |   200.75
+;;   Case     | Cycles | microSecs (us)
+;; ------------------------------------
+;;   Best     |   759  |   189.75
+;;   Worst    |   803  |   200.75
+;; ------------------------------------
+;; Asm saving |   -63  |   -15.75
+;; ------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -98,7 +104,7 @@ _cpct_drawCharM2::
    push de                     ;; [11] 
    push af                     ;; [11]
 
-_cpct_drawCharM2_asm::
+cpct_drawCharM2_asm::
 
    ;; Set up the color for printing, either foreground or video-inverted
    xor   a                     ;; [ 4] A = 0 + Carry reset (NOP machine code, which will do nothing in the main loop)

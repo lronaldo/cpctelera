@@ -118,7 +118,7 @@ _cpct_drawCharM1::
    inc   hl                    ;; [ 6]
    ld     a, (hl)              ;; [ 7] A = ASCII code of the character
 
-_cpct_drawCharM1_asm::
+cpct_drawCharM1_asm::
 
    ;; Set up foreground and background colours for printing (getting them from tables)
    ;; -- Basically, we need to get values of the 2 bits that should be enabled when the a pixel is present

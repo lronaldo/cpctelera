@@ -112,7 +112,7 @@ _cpct_drawCharM0::
    inc   hl                    ;; [ 6]
    ld     a, (hl)              ;; [ 7] A = ASCII code of the character
 
-_cpct_drawCharM0_asm::
+cpct_drawCharM0_asm::
    ld  (dcm0_asciiHL+2), a     ;; [13] Save ASCII code of the character as data of a later "OR #data" instruction. 
                                ;; .... This is 1-cycle faster than pushing and popping to the stack and resets Carry Flag
 
