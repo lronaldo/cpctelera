@@ -32,6 +32,9 @@
 ;;  (2B HL) sprite - Source Sprite Pointer (32-byte array with 8-bit pixel data)
 ;;  (2B DE) memory - Pointer (aligned) to the first byte in video memory where the sprite will be copied.
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawTileAligned4x8_f_asm
+;;
 ;; Parameter Restrictions:
 ;;    * *sprite* must be a pointer to an array array containing sprite's pixels
 ;; data in screen pixel format. Sprite must be rectangular and all bytes in the 
@@ -102,9 +105,11 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
+;;    Case    | Cycles | microSecs (us)
 ;; ---------------------------------
-;; Any   |   705  |  176.25
+;;    Any     |   705  |  176.25
+;; ---------------------------------
+;; Asm saving |   -63  |  -15.75
 ;; ---------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,6 +122,8 @@ _cpct_drawTileAligned4x8_f::
    push de                 ;; [11] Leave the stack as it was
    push hl                 ;; [11] 
    push af                 ;; [11] 
+
+cpct_drawTileAligned4x8_f_asm::     ;; Assembly entry point
 
    ;; Copy 8 lines of 4 bytes each (4x8 = 32 bytes)
    ;;  (Unrolled version of the loop)

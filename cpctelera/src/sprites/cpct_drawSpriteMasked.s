@@ -35,6 +35,9 @@
 ;;  (1B B ) width  - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
 ;;  (1B C ) height - Sprite Height in bytes (>0)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawSpriteMasked_asm
+;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
 ;; along with mask data. Each mask byte will contain enabled bits as those that should
@@ -114,13 +117,16 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case     |           Cycles                 |      microSecs (us)
-;; ----------------------------------------------------------------------------------
-;; Best     |  64 + 59*W*H + 54*H + 40*[H / 8] | 16 + 14.75*W*H + 13.50*H + 10*[H/8]
-;; Worst    | 104 + 59*W*H + 54*H + 40*[H / 8] | 26 + 14.75*W*H + 13.50*H + 10*[H/8]
-;; ----------------------------------------------------------------------------------
-;; W=2,H=16 |        2894 / 2943               |     723.50 /  733.50
-;; W=4,H=32 |        9422 / 9462               |    2355.50 / 2365.50
+;;  Case      |           Cycles                 |      microSecs (us)
+;; ------------------------------------------------------------------------------------
+;;  Best      |  64 + 59*W*H + 54*H + 40*[H / 8] | 16 + 14.75*W*H + 13.50*H + 10*[H/8]
+;;  Worst     | 104 + 59*W*H + 54*H + 40*[H / 8] | 26 + 14.75*W*H + 13.50*H + 10*[H/8]
+;; ------------------------------------------------------------------------------------
+;;  W=2,H=16  |        2894 / 2943               |     723.50 /  733.50
+;;  W=4,H=32  |        9422 / 9462               |    2355.50 / 2365.50
+;; ------------------------------------------------------------------------------------
+;; Asm saving |         -84                      |     -21.00 
+;; ------------------------------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -150,6 +156,8 @@ dms_restoreSP:
    push hl                    ;; [11]
    push af                    ;; [11]
 .endif
+
+cpct_drawSpriteMasked_asm::   ;; Assembly entry point
 
    push ix                    ;; [15] Save IX regiter before using it as temporal var
    .DW  #0x69DD ; ld ixl, c   ;; [ 8] Save Sprite Width into IXL for later use

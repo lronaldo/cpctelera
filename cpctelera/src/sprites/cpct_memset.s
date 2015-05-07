@@ -63,19 +63,28 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    20 bytes
+;;    25 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case   |   Cycles   | microSecs (us)
-;; -------------------------------------
-;; Any    | 108 + 21*S | 27.00 + 5.25*S
-;; -------------------------------------
+;;   Case     |   Cycles   | microSecs (us)
+;; -----------------------------------------
+;;   Any      | 108 + 21*S | 27.00 + 5.25*S
+;; -----------------------------------------
+;; Asm saving |    -60     |   -15.00
+;; -----------------------------------------
 ;; (end code)
 ;;    S = *size* (Number of total bytes to set)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
+;; Assembly call entry point
+cpct_memset_asm::
+   ld (de), a        ;; [ 7] Copy value to the first byte of the memory to be set
+   inc  de           ;; [ 6] DE points to the second byte (next to be set)
+   jp ms_asmEntry    ;; [10] Jump to assembly entry
+
+;; C call entry point
 _cpct_memset::
    ;; Recover parameters from stack
    ld   hl, #2       ;; [10] Make HL point to the byte where parameters start in the
@@ -89,8 +98,10 @@ _cpct_memset::
    ld    c, (hl)     ;; [ 7] BC = Amount of bytes in memory to set to the value of A
    inc  hl           ;; [ 6]
    ld    b, (hl)     ;; [ 7]
-   dec   bc          ;; [ 6] BC-- (As 1 byte has alread been copied)
 
+ms_asmEntry:
+   dec   bc          ;; [ 6] BC-- (As 1 byte has alread been copied)
+   
    ;; Set up HL and DE for a massive copy of the Value to be set
    ld    h, d        ;; [ 4] HL = DE (2nd byte of the memory array to be filled up)
    ld    l, e        ;; [ 4] 
