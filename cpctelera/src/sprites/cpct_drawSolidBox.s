@@ -32,9 +32,12 @@
 ;;
 ;; Input Parameters (5 bytes):
 ;;  (2B DE) memory         - Video memory pointer to the upper left box corner byte
-;;  (1B _ ) colour_pattern - 1-byte colour pattern (in screen pixel format) to fill the box with
+;;  (1B A ) colour_pattern - 1-byte colour pattern (in screen pixel format) to fill the box with
 ;;  (1B C ) width          - Box width *in bytes* [1-64] (Beware! *not* in pixels!)
 ;;  (1B B ) height         - Box height in bytes (>0)
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawSolidBox_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *memory* could be any place in memory, inside or outside current video memory. It
@@ -83,47 +86,58 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    54 bytes
+;;    192 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case     |           Cycles               |      microSecs (us)
+;;  Case      |           Cycles               |      microSecs (us)
 ;; ----------------------------------------------------------------------------------
-;; Best     |  81 + (107 + 16W)H + 40[H / 8] | 20.25 + (26.75 + 4W)H + 10*[H / 8]
-;; Worst    | 121 + (107 + 16W)H + 40[H / 8] | 30.25 + (26.75 + 4W)H + 10*[H / 8]
+;;  Best      |  81 + (107 + 16W)H + 40[H / 8] | 20.25 + (26.75 + 4W)H + 10*[H / 8]
+;;  Worst     | 121 + (107 + 16W)H + 40[H / 8] | 30.25 + (26.75 + 4W)H + 10*[H / 8]
 ;; ----------------------------------------------------------------------------------
-;; W=2,H=16 |        2345 / 2385             |     586.25 /  596.25
-;; W=4,H=32 |        5673 / 5713             |    1418.25 / 1428.25
+;;  W=2,H=16  |        2345 / 2385             |     586.25 /  596.25
+;;  W=4,H=32  |        5673 / 5713             |    1418.25 / 1428.25
+;; ----------------------------------------------------------------------------------
+;; Asm saving |         -66                    |     -16.50 
+;; ----------------------------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+cpct_drawSolidBox_asm::
+   ld    h, d       ;; [ 4] HL = DE (HL Points to the first byte of the box, 
+   ld    l, e       ;; [ 4] ... the one that will contain the colour pattern)
+   ld (de), a       ;; [ 7] Copy colour pattern (first byte) to video memory
+   inc  de          ;; [ 6] DE points to the next byte (where 2nd byte will be copied)
+   jp dsb_asmEntry  ;; [10] Jump over parameter getting from stack
 
 _cpct_drawSolidBox::
    ;; GET Parameters from the stack
-   ld  hl, #2         ;; [10] HL Points to SP+2 (first 2 bytes are return address)
-   add hl, sp         ;; [11]    , to use it for getting parameters from stack
-   ld   e, (hl)       ;; [ 7] DE = First Parameter (Video memory pointer)
-   inc hl             ;; [ 6]
-   ld   d, (hl)       ;; [ 7]
-   inc hl             ;; [ 6]  / Copy first value to video memory (upper-left corner of the box)
-   ldi                ;; [16] (HL)->(DE) Move second parameter (1-byte Colour Pattern) directly into first byte of the box in memory
-   ld   c, (hl)       ;; [ 7] C = Third Parameter (Box Width)
-   inc hl             ;; [ 6]
-   ld   b, (hl)       ;; [ 7] B = Fourth Parameter (Box Height)
+   ld   hl, #2      ;; [10] HL Points to SP+2 (first 2 bytes are return address)
+   add  hl, sp      ;; [11]    , to use it for getting parameters from stack
+   ld    e, (hl)    ;; [ 7] DE = First Parameter (Video memory pointer)
+   inc  hl          ;; [ 6]
+   ld    d, (hl)    ;; [ 7]
+   inc  hl          ;; [ 6]  / Copy first value to video memory (upper-left corner of the box)
+   ldi              ;; [16] (HL)->(DE) Move second parameter (1-byte Colour Pattern) directly into first byte of the box in memory
+   ld    c, (hl)    ;; [ 7] C = Third Parameter (Box Width)
+   inc  hl          ;; [ 6]
+   ld    b, (hl)    ;; [ 7] B = Fourth Parameter (Box Height)
 
    ;; Prepare HL and DE pointers for copying bytes consecutively
-   ld   h, d          ;; [ 4] HL = DE - 1 (HL Points to the first byte of the box, the one that contains the colour pattern)
-   ld   l, e          ;; [ 4]
-   dec  hl            ;; [ 6]
-   push hl            ;; [11] Save HL (Pointer to the first byte of the box) for later use
+   ld    h, d       ;; [ 4] HL = DE - 1 (HL Points to the first byte of the box, the one that contains the colour pattern)
+   ld    l, e       ;; [ 4]
+   dec   hl         ;; [ 6]
+
+dsb_asmEntry:
+   push  hl         ;; [11] Save HL (Pointer to the first byte of the box) for later use
 
    ;; Modify code using width to jump in drawSpriteWidth
-   dec c                       ;; [ 4] The first line of bytes has 1 byte less to be copied (the first value we have already copied)
-   ld  a, #126                 ;; [ 7] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite*2 (2B)
-   sub c                       ;; [ 4]    to do as much LDIs as bytes the Sprite is wide
-   sub c                       ;; [ 4]
-   ld (dsb_drawFirstLine+3), A ;; [13] Modify JR data to create the jump we need
+   dec   c          ;; [ 4] The first line of bytes has 1 byte less to be copied (the first value we have already copied)
+   ld    a, #126    ;; [ 7] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite*2 (2B)
+   sub   c          ;; [ 4]    to do as much LDIs as bytes the Sprite is wide
+   sub   c          ;; [ 4]
+   ld (dsb_drawFirstLine+3), a ;; [13] Modify JR data to create the jump we need
    jp dsb_drawFirstLine        ;; [10] Jump to the code required for the first line (different from next lines)
 
    ;; Draw a sprite-line of n bytes 
