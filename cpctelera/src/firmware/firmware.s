@@ -69,13 +69,3 @@
 ;; Default value: 0x9C = (10011100)
 ;;
 .globl _cpct_mode_rom_status
-
-;;
-;; Assembly entry points for functions
-;;
-;;.globl cpct_enableUpperROM_asm
-;;.globl cpct_enableLowerROM_asm
-;;.globl cpct_disableUpperROM_asm
-;;.globl cpct_enableUpperROM_asm
-;;.globl cpct_reenableFirmware_asm
-;;.globl cpct_disableFirmware_asm

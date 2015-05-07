@@ -39,15 +39,3 @@
 ;; External values
 ;;
 .globl _cpct_mode_rom_status       ;; defined in firmware_ed.s
-
-;;
-;; Assembly entry points for functions
-;;
-;;.globl cpct_drawCharM0_asm
-;;.globl cpct_drawCharM1_asm
-;;.globl cpct_drawCharM1_f_asm
-;;.globl cpct_drawCharM2_asm
-;;.globl cpct_drawStringM0_asm
-;;.globl cpct_drawStringM1_asm
-;;.globl cpct_drawStringM1_f_asm
-;;.globl cpct_drawStringM2_asm
