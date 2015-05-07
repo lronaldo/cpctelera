@@ -94,7 +94,6 @@ Group: Sprites  {
    File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.s)
    File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.s)
    File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.s)
-   File: cpct_memset  (sprites/cpct_memset.s)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0.s)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
    File: Sprite Macros&amp;Constants  (sprites/sprites.h)
@@ -118,14 +117,20 @@ Group: Video  {
    File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
    File: cpct_fw2hw  (video/cpct_fw2hw.s)
    File: cpct_getHWColour  (video/cpct_getHWColor.s)
-   File: cpct_setBorder  (video/videomode.h)
    File: cpct_setPALColour  (video/cpct_setPALColour.s)
    File: cpct_setPalette  (video/cpct_setPalette.s)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
    File: cpct_setVideoMode  (video/cpct_setVideoMode.s)
    File: cpct_waitVSYNC  (video/cpct_waitVSYNC.s)
+   File: Video Macros&amp;Constants  (video/videomode.h)
    }  # Group: Video
+
+Group: Memutils  {
+
+   File: cpct_memcpy  (memutils/cpct_memcpy.s)
+   File: cpct_memset  (memutils/cpct_memset.s)
+   }  # Group: Memutils
 
 Group: Index  {
 

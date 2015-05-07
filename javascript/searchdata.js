@@ -1,10 +1,10 @@
 var indexSectionsWithContent = {
-   "Constants": {
+   "Files": {
       "Symbols": false,
       "Numbers": false,
       "A": true,
       "B": false,
-      "C": true,
+      "C": false,
       "D": false,
       "E": false,
       "F": false,
@@ -17,7 +17,7 @@ var indexSectionsWithContent = {
       "M": false,
       "N": false,
       "O": false,
-      "P": true,
+      "P": false,
       "Q": false,
       "R": false,
       "S": false,
@@ -29,7 +29,7 @@ var indexSectionsWithContent = {
       "Y": false,
       "Z": false
       },
-   "Macros": {
+   "Variables": {
       "Symbols": false,
       "Numbers": false,
       "A": false,
@@ -89,18 +89,18 @@ var indexSectionsWithContent = {
       "Y": false,
       "Z": false
       },
-   "Variables": {
+   "Types": {
       "Symbols": false,
       "Numbers": false,
-      "A": false,
+      "A": true,
       "B": false,
       "C": true,
       "D": false,
       "E": false,
-      "F": false,
+      "F": true,
       "G": false,
       "H": false,
-      "I": false,
+      "I": true,
       "J": false,
       "K": false,
       "L": false,
@@ -112,7 +112,7 @@ var indexSectionsWithContent = {
       "R": false,
       "S": false,
       "T": false,
-      "U": false,
+      "U": true,
       "V": false,
       "W": false,
       "X": false,
@@ -149,12 +149,12 @@ var indexSectionsWithContent = {
       "Y": false,
       "Z": false
       },
-   "Files": {
+   "Macros": {
       "Symbols": false,
       "Numbers": false,
-      "A": true,
+      "A": false,
       "B": false,
-      "C": false,
+      "C": true,
       "D": false,
       "E": false,
       "F": false,
@@ -179,7 +179,7 @@ var indexSectionsWithContent = {
       "Y": false,
       "Z": false
       },
-   "Types": {
+   "Constants": {
       "Symbols": false,
       "Numbers": false,
       "A": true,
@@ -187,23 +187,23 @@ var indexSectionsWithContent = {
       "C": true,
       "D": false,
       "E": false,
-      "F": true,
+      "F": false,
       "G": false,
       "H": false,
-      "I": true,
+      "I": false,
       "J": false,
       "K": false,
       "L": false,
       "M": false,
       "N": false,
       "O": false,
-      "P": false,
+      "P": true,
       "Q": false,
       "R": false,
       "S": false,
       "T": false,
-      "U": true,
-      "V": false,
+      "U": false,
+      "V": true,
       "W": false,
       "X": false,
       "Y": false,
