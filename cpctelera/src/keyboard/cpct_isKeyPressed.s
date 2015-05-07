@@ -30,6 +30,8 @@
 ;; Input Parameters (2 Bytes):
 ;;  (2B C A) key - A 16-bit value containing a Matrix Line(1B, C) and a Bit Mask(1B, A).
 ;; 
+;; Assembly call (Input parameters on registers):
+;;    Check <cpct_isKeyPressed_asm> specific assembly function.
 ;;
 ;; Parameter Restrictions:
 ;;  * *key* must be a valid <cpct_keyID>, containing a Matrix Line (1st byte, 0-9) and a 
@@ -46,7 +48,7 @@
 ;;    Checks if a concrete key is pressed or not. It does it looking   
 ;; at the <cpct_keyboardStatusBuffer>, which is an 80-bit array holding
 ;; the pressed / not pressed status of each of the 80 keys in the CPC
-;; keyboard. Matrix Line is used to determine whick of the 10 bytes in 
+;; keyboard. Matrix Line is used to determine which of the 10 bytes in 
 ;; the buffer contains the bit associated to the key, then Bit Mask is 
 ;; used to get the concrete bit using XOR and AND operations.
 ;;
@@ -79,7 +81,7 @@ _cpct_isKeyPressed::
    add  hl, sp                      ;; [11]
    ld    c, (hl)                    ;; [ 7] C = First Parameter (KeyID - Matrix Line)
    inc  hl                          ;; [ 6] 
-   ld    a, (hl)                    ;; [ 7] A = Second Parameter (KeyID - Bit Mask)
+   ld    a, (hl)                    ;; [ 7] A = Second Parameter (KeyID - Bit Mask)  
    ld    d, a                       ;; [ 4] D = A, save the Bit Mask into D for later use
 
    ld   hl,#_cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer

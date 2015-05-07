@@ -32,6 +32,9 @@
 ;;    <cpct_keyboardStatusBuffer> filled up with pressed / not pressed info
 ;; about all the 80 available Amstrad CPC's keys / buttons.
 ;;
+;; Assembly call:
+;;    > call cpct_scanKeyboard_f_asm
+;;
 ;; Known limitations:
 ;;    This function disables interrupts while does keyboard scanning. Interrupts
 ;; are enabled at the end, when scanning has finished.
@@ -73,6 +76,7 @@
 .globl _cpct_keyboardStatusBuffer
 
 _cpct_scanKeyboard_f:: 
+cpct_scanKeyboard_f_asm::   ;; Assembly entry point
 
    ld   hl, #_cpct_keyboardStatusBuffer ;; [10] HL Points to the start of the keyboardBuffer, where scanned data will be stored
 
