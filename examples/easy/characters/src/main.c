@@ -18,7 +18,7 @@
 
 #include <cpctelera.h>
 
-//
+//////////////////////////////////////////////////////////////////////////////////////////////
 // This function calculates next video memory location, cycling pointer
 // when it exceedes the end of standard screen video memory
 //
@@ -36,107 +36,71 @@ u8* incrementedVideoPos(u8* pvideomem, u8 inc) {
    return pvideomem;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Print all 256 characters using a concrete drawing function and increment
 //
+void print256Chars(u8 **pvideomem, u8 mode, u8 fg_colour, u8 bg_colour) {
+   const u8 increments[3] = { 4, 2, 1 };
+   u8 charnum, increment;
+
+   // Calculate increment in bytes, for every time we want to move 
+   // video memory pointer to the next character
+   increment = increments[mode];
+
+   // Draw the complete set of 256 characters (excluding char 0)
+   for(charnum=1; charnum != 0; charnum++) {
+      switch (mode) {
+         case 2: cpct_drawCharM2  (*pvideomem, fg_colour, charnum);            break;
+         case 1: cpct_drawCharM1_f(*pvideomem, fg_colour, bg_colour, charnum); break;
+         case 0: cpct_drawCharM0  (*pvideomem, fg_colour, bg_colour, charnum); break;
+      }
+      // Point to next location on screen to draw (increment bytes required for this mode)
+      *pvideomem = incrementedVideoPos(*pvideomem, increment);
+   }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Function to repeat N times drawing 256 characters on a given mode
+//    The function modifies video memory pointer and colours (received by reference)
+//
+void drawCharacters(u8** pvideomem, u8 maxtimes, u8 mode, u8* fg_colour, u8* bg_colour) {
+   u8 times;                            // Loop counter for times to repeat
+   const u8 colours[3] = { 16, 4, 2 };  // Number of colour each mode has (0 = 16, 1 = 4, 2 = 2)
+
+   cpct_clearScreen(0);     // Clear Screen filling up with 0's
+   cpct_setVideoMode(mode); // Set desired video mode
+
+   // Print the complete set of 256 characters maxtimes times
+   for(times=0; times < maxtimes; times++) {
+      // Each time we start printing the set, we change foreground and background colours.
+      // We loop foreground colours up to the max colour, and then loop background colours
+      if (++(*fg_colour) == colours[mode]) {
+         *fg_colour = 0;
+         if (++(*bg_colour) == colours[mode])
+            *bg_colour = 0;
+      }
+      
+      // Print all 256 chars in mode 1 usingcurrent colours
+      print256Chars(pvideomem, mode, *fg_colour, *bg_colour);
+   }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
 // Drawing Characters example: MAIN
 //
 void main(void) {
-   u8 *pvideomem = (u8*)0xC000;  // Pointer to the start of video memory, to draw first character there
-   u8 charnum;                   // Character that will be drawn 
-   u8 times;                     // Counter of how many times to repeat drawing characters
-   u8 colours[5] = {0};          // Colours values: 1 colour for mode 2, 2 for mode 1 and another 2 for mode 0
+   u8* pvideomem  = (u8*)0xC000;    // Pointer to video memory
+   u8  colours[6] = {0};            // 6 variables for 3 pairs of foreground / background colour
 
    // Disable firmware to prevent it from restoring our video memory changes 
    // ... and interfering with drawChar functions
    cpct_disableFirmware();
 
-   //
    // Loop forever showing characters on different modes and colours
    //
    while(1) {
-      //
-      // DRAW SOME CHARACTERS ON MODE 2
-      //
-      cpct_clearScreen(0);    // Clear Screen filling up with 0's
-      cpct_setVideoMode(2);   // Set Mode 2 (640x200, 2 colours)
-
-      // Print the complete set of 256 characters 16 times
-      for(times=0; times < 16; times++) {
-         // Each time we start printing the set, we change colour from 1 to 0 and 0 to 1
-         // We do this using and XOR with 1
-         colours[0] ^= 0x01;
-
-         // Draw the complete set of 256 characters (excluding char 0)
-         for(charnum=1; charnum != 0; charnum++) {
-            
-            // Draw next character in current colour
-            cpct_drawCharM2(pvideomem, colours[0], charnum);
-
-            // Point to next location on screen to draw 
-            // (increment 1 byte, as 1 byte = 8 pixels in mode 2)
-            pvideomem = incrementedVideoPos(pvideomem, 1);     
-         }
-      }
-
-      //
-      // DRAW SOME CHARACTERS ON MODE 1
-      //
-      cpct_clearScreen(0);    // Clear Screen filling up with 0's
-      cpct_setVideoMode(1);   // Set Mode 1 (320x200, 4 colours)
-
-      // Print the complete set of 256 characters 16 times
-      for(times=0; times < 16; times++) {
-         // Each time we start printing the set, we change foreground and background
-         // colours. Foreground and background colours rotate around the 4 values available
-         if (++colours[1] > 3) {
-            // Each time all 4 colours have been used for foreground, we increment
-            // background and reset foreground to 0.
-            colours[1] = 0;
-            if (++colours[2] > 3)
-               colours[2] = 0;
-         }
-
-         // Draw the complete set of 256 characters (excluding char 0)
-         for(charnum=1; charnum != 0; charnum++) {
-            
-            // Draw next character in current foreground and background colours
-            cpct_drawCharM1_f(pvideomem, colours[1], colours[2], charnum); 
-
-            // Point to next location on screen to draw 
-            // (increment 2 bytes, as 1 byte = 4 pixels in mode 1)
-            pvideomem = incrementedVideoPos(pvideomem, 2);
-         }  
-      }
-
-      //
-      // DRAW SOME CHARACTERS ON MODE 0
-      //
-      cpct_clearScreen(0);    // Clear Screen filling up with 0's
-      cpct_setVideoMode(0);   // Set Mode 1 (160x200, 16 colours)
-
-
-      // Print the complete set of 256 characters 32 times
-      // As there are much more colours to show in mode 0
-      for(times=0; times < 32; times++) {
-         // Each time we start printing the set, we change foreground and background
-         // colours. Foreground and background colours rotate around the 16 values available
-         if (++colours[3] > 15) {
-            // Each time all 16 colours have been used for foreground, we increment
-            // background and reset foreground to 0.           
-            colours[3] = 0;
-            if (++colours[4] > 15)
-               colours[4] = 0;
-         }
-
-         // Draw the complete set of 256 characters (excluding char 0)
-         for(charnum=1; charnum != 0; charnum++) {
-
-            // Draw next character in current foreground and background colours
-            cpct_drawCharM0(pvideomem, colours[3], colours[4], charnum);
-
-            // Point to next location on screen to draw 
-            // (increment 4 bytes, as 1 byte = 2 pixels in mode 0)
-            pvideomem = incrementedVideoPos(pvideomem, 4);
-         }
-      }
+      drawCharacters(&pvideomem, 14, 2, (colours+0), (colours+1)); // Drawing on mode 2, 14 times
+      drawCharacters(&pvideomem, 17, 1, (colours+2), (colours+3)); // Drawing on mode 1, 17 times
+      drawCharacters(&pvideomem, 21, 0, (colours+4), (colours+5)); // Drawing on mode 0, 21 times
    }
 }
