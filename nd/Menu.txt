@@ -41,6 +41,8 @@ Timestamp: Last updated yyyy/mm/dd
 Link: CPCtelera at Github  (https://github.com/lronaldo/cpctelera)
 Text: ______________________________________________________________________
 File: Aliases for builtin types  (types.h)
+Text: ______________________________________________________________________
+Text: Packages
 
 Group: Audio  {
 
@@ -79,6 +81,7 @@ Group: Firmware  {
 Group: Keyboard  {
 
    File: cpct_isKeyPressed  (keyboard/cpct_isKeyPressed.s)
+   File: cpct_isKeyPressed_asm  (keyboard/cpct_isKeyPressed_asm.s)
    File: cpct_scanKeyboard  (keyboard/cpct_scanKeyboard.s)
    File: cpct_scanKeyboard_f  (keyboard/cpct_scanKeyboard_f.s)
    File: Keyboard Mappings&amp;Constants  (keyboard/keyboard.h)
