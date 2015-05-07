@@ -133,8 +133,10 @@ cpct_setBit_asm::          ;; Entry point for assembly calls using registers for
    ;;   a byte with only bitnum bit on, and the rest off. cpct_bitWeights table contains this.
    ld   de, #cpct_bitWeights ;; [10] DE = Pointer to the start of the bitWeights array
    and   #0x07               ;; [ 7] A = L % 8       (bit number to be tested from the target byte of the array) 
-   add   e                   ;; [ 4] A += E          (Use bit number as index in cpct_bitweights table, adding it to E (adding to DE starts by adding to E))
-   ld    e, a                ;; [ 4] DE = DE + L % 8 (If carry is 0, this already points to the weight of the bit number that is to be tested in the target byte of the array)
+   add   e                   ;; [ 4] A += E          (Use bit number as index in cpct_bitweights table, adding it to E) 
+                             ;; ....                 (adding to DE starts by adding to E)
+   ld    e, a                ;; [ 4] DE = DE + L % 8 (If carry is 0, this already points to the weight of 
+                             ;; ....                 the bit number that is to be tested in the target byte of the array)
    sub   a                   ;; [ 4] A = 0           (Preserving carry flag that must be added to D, if it is 1)
    adc   d                   ;; [ 4] A = D + Carry   (Add Carry to D)
    ld    d, a                ;; [ 4] D += Carry      (Move result to D, to ensure DE points to the bitweight)

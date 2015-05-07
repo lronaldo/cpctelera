@@ -95,7 +95,8 @@ _cpct_set2Bits::
    pop  hl                  ;; [10] HL = Index of the bit to be set
    pop  bc                  ;; [10] BC => C = Set Value (0-3), B = Undefined
 s2b_restoreSP:
-   ld   sp, #0              ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   ld   sp, #0              ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual 
+                            ;; ....                              SP value previously)
    ei                       ;; [ 4] Enable interrupts again
 .else 
    ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
@@ -114,7 +115,8 @@ cpct_set2Bits_asm::         ;; Entry point for assembly calls using registers fo
    ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be set
    ;;   inside the target byte ([ 00 11 22 33 ]).
    ld    a, l               ;; [ 4] A = L (Least significant bits from array index)
-   and   #0x03              ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be setting from the target byte: the remainder of L/4)
+   and   #0x03              ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be setting from the target byte:
+                            ;; ....             the remainder of L/4)
    ld    b, a               ;; [ 4] B = index of the group of 2 bits that we want to set from 0 to 3 ([00 11 22 33])
    ld    a, c               ;; [ 4] A = C     (Value to be set)
    and   #0x03              ;; [ 7] A = C % 4 (Ensure value to be set is in the range 0-3)
@@ -152,14 +154,15 @@ s2b_B_is_0:
    ld    c, #0x3F      ;; [ 7] Mask for leaving out bits 7 & 6
    rrca                ;; [ 4] <| Move bits to positions 7 & 6 with 2 right rotations
    rrca                ;; [ 4] <|
-   .db #0xF2 ;jp P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from next 2 bytes, which are "ld C, #0xFC". Not jumping leaves us 3 bytes from here, at g2b_end)
+   .db #0xF2 ;jp P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from 
+                       ;; .... next 2 bytes, which are "ld C, #0xFC". Not jumping leaves us 3 bytes from here, at g2b_end)
 s2b_B_is_3:
    ld    c, #0xFC      ;; [ 7] Mask for leaving out bits 1 & 0
 s2b_end:
    ld    b, a          ;; [ 4] B = A (Bits to be set)
    ld    a, (hl)       ;; [ 7] A = target Byte
    and   c             ;; [ 4] A = target Byte Masked (Set to 0 the 2 bits we are going to set with our new value)
-   or    b             ;; [ 4] A = final value        (Set the new value for our new bits, ORing them with the other 3 2bit groups)
+   or    b             ;; [ 4] A = final value (Set the new value for our new bits, ORing them with the other 3 2bit groups)
    ld  (HL), A         ;; [ 7] Store the final value of the target byte in the array
 
    ret                 ;; [10] Return to caller

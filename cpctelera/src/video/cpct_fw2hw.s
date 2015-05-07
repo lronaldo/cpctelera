@@ -21,8 +21,8 @@
 ;### Routines to establish and control video modes                 ###
 ;#####################################################################
 ;
-.module cpct_videomode
-
+.module cpct_video
+   
 .include /videomode.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -84,7 +84,7 @@ _cpct_fw2hw::
    inc  hl                  ;; [ 6]
    ld    c, (hl)            ;; [ 7] C = Number of colours to convert 
 
-cpct_fw2hw_asm::            ;; Assembly entry point 
+cpct_fw2hw_asm:             ;; Assembly entry point 
 
 f2h_colour_loop:
    ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the firmware2hw_colour array

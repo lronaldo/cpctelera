@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU General Public License as published by
@@ -15,17 +15,14 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-;#####################################################################
-;### MODULE: Sprites                                               ###
-;#####################################################################
-;### This module contains several functions and routines to manage ###
-;### sprites and video memory in an Amstrad CPC environment.       ###
-;#####################################################################
-;
-.module cpct_sprites
 
 ;;
-;; Compilation control directives
+;; Array: cpct_firmware2hw_colour
+;;    Array that maps any firmware colour value (0-27) to
+;; its equivalent hardware colour value, which is used 
+;; by <cpct_setPalette> and <cpct_setPALColour> functions
 ;;
-;; If true, interrupts can be disabled to get function parameters faster
-.equ let_disable_interrupts_for_function_parameters, 0  
+cpct_firmware2hw_colour:: 
+  .db 0x14, 0x04, 0x15, 0x1C, 0x18, 0x1D, 0x0C, 0x05, 0x0D
+  .db 0x16, 0x06, 0x17, 0x1E, 0x00, 0x1F, 0x0E, 0x07, 0x0F
+  .db 0x12, 0x02, 0x13, 0x1A, 0x19, 0x1B, 0x0A, 0x03, 0x0B

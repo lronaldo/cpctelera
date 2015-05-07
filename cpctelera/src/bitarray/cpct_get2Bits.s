@@ -83,7 +83,8 @@ _cpct_get2Bits::
    push  af          ;; [11]
 
    ld    a, l        ;; [ 4] A = L 
-   AND   #0x03       ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be getting from the target byte: the remainder of L/4)
+   AND   #0x03       ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be getting from the target byte: 
+                     ;; ....            the remainder of L/4)
    ld    b, a        ;; [ 4] B = index of the group of 2 bits that we want to get from 0 to 3 ([00 11 22 33])
 
    ;; We need to know how many bytes do we have to 
@@ -116,7 +117,8 @@ g2b_B_is_2or3:
 g2b_B_is_2:
    rrca                ;; [ 4] <| Move bits 2 & 3 to positions 0 & 1 with 2 right rotations
    rrca                ;; [ 4] <|
-   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got from next 2 bytes, which are RLCA;RLCA. Not jumping leaves us 3 bytes from here, at g2b_end)
+   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got 
+                       ;; .... from next 2 bytes, which are RLCA;RLCA. Not jumping leaves us 3 bytes from here, at g2b_end)
 g2b_B_is_0:
    rlca                ;; [ 4] <| Move bits 7 & 6 to positions 0 & 1 with 2 left rotations
    rlca                ;; [ 4] <|

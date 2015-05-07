@@ -190,15 +190,16 @@ dms_sprite_width_loop:
    add   #0x08                ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
    ld    d, a                 ;; [ 4]
    and   #0x38                ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
-   jp   nz, dms_sprite_height_loop ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
+   jp   nz, dms_sprite_height_loop ;; [10]  by checking the 4 bits that identify present memory line. 
+                                   ;; ....  If 0, we have crossed boundaries
 
 dms_sprite_8bit_boundary_crossed:
    ld    a, e                 ;; [ 4] DE = DE + 0xC050h
-   add   #0x50                ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line:
-   ld    e, a                 ;; [ 4]   -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
-   ld    a, d                 ;; [ 4]   -- which effectively is the same as moving it 1 bank backwards and then
-   adc   #0xC0                ;; [ 7]   -- 50 bytes forwards (which is what we want to move it to the next pixel line)
-   ld    d, a                 ;; [ 4]   -- Calculations are made with 8 bit arithmetic as it is faster than other alternaives here
+   add   #0x50                ;; [ 7] -- Relocate DE pointer to the start of the next pixel line:
+   ld    e, a                 ;; [ 4] -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
+   ld    a, d                 ;; [ 4] -- which effectively is the same as moving it 1 bank backwards and then
+   adc   #0xC0                ;; [ 7] -- 50 bytes forwards (which is what we want to move it to the next pixel line)
+   ld    d, a                 ;; [ 4] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
 
    jp  dms_sprite_height_loop ;; [10] Jump to continue with next pixel line
 

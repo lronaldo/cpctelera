@@ -111,7 +111,8 @@ _cpct_px2byteM1::
    ld    b, #4           ;; [ 7] We have 4 pixels to mix into 1 byte, so set loop counter to 4
 px1_repeat:
    ld   de, #dc_mode1_ct ;; [10] DE points to the start of the colour table
-   ld    a, (hl)         ;; [ 7] A = Firmware colour for next pixel (to be added to DE, as it is the index of the colour value to retrieve)
+   ld    a, (hl)         ;; [ 7] A = Firmware colour for next pixel (to be added to DE, 
+                         ;; .... as it is the index of the colour value to retrieve)
    ;; Compute DE += Pixel 0 (A)
    add   e               ;; [ 4] | E += A
    ld    e, a            ;; [ 4] |

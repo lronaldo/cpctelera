@@ -85,7 +85,8 @@ _cpct_isKeyPressed::
    ld    d, a                       ;; [ 4] D = A, save the Bit Mask into D for later use
 
    ld   hl,#_cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer
-   add  hl, bc                      ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) (As B is already 0, so BC = C)
+   add  hl, bc                      ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) 
+                                    ;; ...  (As B is already 0, so BC = C)
    xor (hl)                         ;; [ 7] A = XOR operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
                                     ;; .... Inverts the value of the bit associated to the given key that represents 
                                     ;; .... because 1 represents not pressed and 0 pressed, but we want the inverse

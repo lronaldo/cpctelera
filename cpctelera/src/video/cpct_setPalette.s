@@ -21,7 +21,7 @@
 ;### Routines to establish and control video modes                 ###
 ;#####################################################################
 ;
-.module cpct_videomode
+.module cpct_video
 
 .include /videomode.s/
 
@@ -151,7 +151,8 @@ _cpct_setPalette::
 
 cpct_setPalette_asm::       ;; Assembly entry point
    ex   de, hl              ;; [ 4] HL = DE, We will use HL to point to the array and get colour ID values
-   dec  a                   ;; [ 4] A -= 1 (We leave A as 1 colour less to convert 16 into 15 and be able to use AND to ensure no more than 16 colours are passed)
+   dec  a                   ;; [ 4] A -= 1 (We leave A as 1 colour less to convert 16 into 15 and 
+                            ;; ....         be able to use AND to ensure no more than 16 colours are passed)
    and  #0x0F               ;; [ 7] A %= 16, A will be 15 at most, that is, the number of colours to set minus 1
    inc  a                   ;; [ 4] A += 1 Restore the 1 to leave A as the number of colours to set
    ld   e, a                ;; [ 4] E = A, E will have the number of colours to set 
@@ -160,14 +161,15 @@ cpct_setPalette_asm::       ;; Assembly entry point
    ld   b, #GA_port_byte    ;; [ 7] BC = Gate Array Port (0x7F), to send commands using OUT
 svp_setPens_loop:
    ld   a, d                ;; [ 4] A = D, A has index of the next PEN to be established
-  ;OR   #PAL_PENR           ;; [ 7] A = (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). As PENR command is 000, nothing to be done here.
+  ;OR   #PAL_PENR           ;; [ 7] A = (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). 
+                            ;; .... As PENR command is 000, nothing to be done here.
    out (c),a                ;; [11] GA Command: Select PENR. A = Command + Parameter (PENR + PEN number to select)
 
    ld   a, (hl)             ;; [ 7] Get Color value (INK) for the selected PEN from array
    and  #0x1F               ;; [ 7] Leave out only the 5 Least significant bits (3 MSB can cause problems)
    or   #PAL_INKR           ;; [ 7] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for PEN number (n). 
-   out (c),a                ;; [11] GA Command: Set INKR. A = Command + Parameter (INKR + INK to be set for selected PEN number)
-
+   out (c),a                ;; [11] GA Command: Set INKR. A = Command + Parameter 
+                            ;; .... (INKR + INK to be set for selected PEN number)
    inc  hl                  ;; [ 6] HL += 1, Point to the next INK in the array
    inc  d                   ;; [ 4] D += 1, Next PEN index to be set 
    dec  e                   ;; [ 4] E -= 1, count how many PENs still to be set

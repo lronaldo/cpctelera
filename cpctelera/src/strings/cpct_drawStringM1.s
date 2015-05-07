@@ -106,14 +106,15 @@ _cpct_drawStringM1::
    ;; Get parameters form stack
 .if let_disable_interrupts_for_function_parameters
    ;; Way 1: Pop + Restoring SP. Faster, but consumes 7 bytes more, and requires disabling interrupts
-   ld (drsm1_restoreSP+1), sp          ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
+   ld (drsm1_restoreSP+1), sp          ;; [20] Save SP into placeholder of the instruction LD SP, 0, to restore it later.
    di                                  ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
    pop  af                             ;; [10] AF = Return Address
    pop  hl                             ;; [10] HL = Pointer to the null terminated string
    pop  de                             ;; [10] DE = Destination address (Video memory location where character will be printed)
    pop  bc                             ;; [10] BC = Colors (B=Background color, C=Foreground color) 
 drsm1_restoreSP:
-   ld sp, #0                           ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
+   ld sp, #0                           ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with 
+                                       ;; .... actual SP value previously)
    ei                                  ;; [ 4] Enable interrupts again
 .else 
    ;; Way 2: Pop + Push. Just 8 cycles more, but does not require disabling interrupts
@@ -129,7 +130,8 @@ drsm1_restoreSP:
 
 cpct_drawStringM1_asm::                ;; Assembly entry point
 
-   ld (drsm1_values+1), bc             ;; [20] Save BC as LD direct value to be read later for saving color values (Foreground and Background)
+   ld (drsm1_values+1), bc             ;; [20] Save BC as LD direct value to be read later for saving color values
+                                       ;; ....  (Foreground and Background)
    jp drsm1_firstChar                  ;; [10] Jump to first char
 
 drsm1_nextChar:

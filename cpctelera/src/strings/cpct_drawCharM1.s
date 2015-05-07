@@ -126,27 +126,29 @@ cpct_drawCharM1_asm::
                                ;; .... This is 1-cycle faster than pushing and popping to the stack and resets Carry Flag
 
    ld  hl, #dc_mode1_ct        ;; [10] HL points to the start of the color table
-   ;LD  A, L                   ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment HL by C bytes,
-   ;ADD C                      ;; [ 4]          which makes HL point to the Foreground color bits we need. This is valid because
-   ;LD  L, A                   ;; [ 4]          table is 4-bytes aligned and we just need to increment L, as H won't change)
-   ;SUB C                      ;; [ 4] A = L again (Make A save the original value of L, to use it again later with Background color)
+   ;LD  A, L                   ;; [ 4] HL += C (Foreground color is an index in the color table, so we increment 
+   ;ADD C                      ;; [ 4]          HL by C bytes, which makes HL point to the Foreground color bits we need. 
+   ;LD  L, A                   ;; [ 4]          This is valid because table is 4-bytes aligned and we just need 
+                               ;; ....          to increment L, as H won't change)
+   ;SUB C                      ;; [ 4] A = L again (Make A save the original value of L, to use it again 
+   ;                           ;; ....              later with Background color)
    ;LD  C, (HL)                ;; [ 7] C = Foreground color bits
-   ;ADD B                      ;; [ 4] HL += B (We increment HL with Background color index, same as we did earlier with Foreground color C)
-   ;LD  L, A                   ;; [ 4]
+   ;ADD B                      ;; [ 4] HL += B (We increment HL with Background color index, 
+   ;LD  L, A                   ;; [ 4]          same as we did earlier with Foreground color C)
 
    ld  a, l                    ;; [ 4] HL += C (Let HL point to the concrete color in the table:
-   add c                       ;; [ 4]          HL points initial to the start of the table and C is the Foreground PEN number,
-   ld  l, a                    ;; [ 4]          so HL+C is the memory location of the color bits we need).
-   adc h                       ;; [ 4]
+   add c                       ;; [ 4]          HL points initial to the start of the table and C is 
+   ld  l, a                    ;; [ 4]          the Foreground PEN number, so HL+C is the memory location of 
+   adc h                       ;; [ 4]          the color bits we need).
    sub l                       ;; [ 4]
    ld  h, a                    ;; [ 4]
 
    ld  c, (hl)                 ;; [ 7] C = Foreground color bits
    ld  hl, #dc_mode1_ct        ;; [10] HL points again to the start of the color table
    ld  a, l                    ;; [ 4] HL += B (Let HL point to the concrete color in the table:
-   add b                       ;; [ 4]          HL points initial to the start of the table and B is the Background PEN number,
-   ld  l, a                    ;; [ 4]          so HL+B is the memory location of the color bits we need).
-   adc h                       ;; [ 4]
+   add b                       ;; [ 4]          HL points initial to the start of the table and B is 
+   ld  l, a                    ;; [ 4]          the Background PEN number, so HL+B is the memory location of 
+   adc h                       ;; [ 4]          the color bits we need).
    sub l                       ;; [ 4]
    ld  h, a                    ;; [ 4]
 
@@ -159,7 +161,8 @@ cpct_drawCharM1_asm::
    ;; ... start (HL = 0x3800 + 8*ASCII value). char0_ROM_address = 0x3800
 dcm1_asciiHL:
    xor  a                      ;; [ 4] A = 0
-   or   #0                     ;; [ 7] A = ASCII Value and Resetting carry flag (#0 is a placeholder that will be filled up with ASII value)
+   or   #0                     ;; [ 7] A = ASCII Value and Resetting carry flag 
+                               ;; ....     (#0 is a placeholder that will be filled up with ASII value)
    ld   h, #0x07               ;; [ 7] H = 0x07, because 0x07 * 8 = 0x38, (high byte of 0x3800)
 
    rla                         ;; [ 4] A = 8*A (using 3 rotates left). We use RLA as it passes exceeding bits 
@@ -181,24 +184,30 @@ dcm1_asciiHL:
 
    ;; Do this each pixel line (8-pixels)
 dcm1_nextline:
-   ld c, (hl)                  ;; [ 7] C = Next Character pixel line definition (8 bits defining 0=background color, 1=foreground)
+   ld c, (hl)                  ;; [ 7] C = Next Character pixel line definition 
+                               ;; .... (8 bits defining 0=background color, 1=foreground)
    push hl                     ;; [11] Save HL register to be able to use it as temporal storage
    ld l, #2                    ;; [ 7] L=2 bytes per line
 
    ;; Do this each video-memory-byte (4-pixels)
 dcm1_next4pixels:
-   xor a                       ;; [ 4] A = 0 (A will hold the values of the next 4 pixels in video memory. They will be calculated as Character is read)
+   xor a                       ;; [ 4] A = 0 (A will hold the values of the next 4 pixels in video memory. 
+                               ;; ....        They will be calculated as Character is read)
    ld  b, #4                   ;; [ 7] B = 4 (4 pixels for each byte)
 
    ;; Do this each pixel inside a byte (each byte has 4 pixels) 
 dcm1_nextpixel:
-   sla c                       ;; [ 8] Shift C (Char pixel line) left to know about Bit7 (next pixel) that will turn on/off the carry flag
+   sla c                       ;; [ 8] Shift C (Char pixel line) left to know about Bit7 (next pixel) 
+                               ;; .... that will turn on/off the carry flag
    jp c, dcm1_drawForeground   ;; [10] IF Carry, bit 7 was a 1, what means foreground color
    or  #00                     ;; [ 7] Bit7=0, draw next pixel of Background color
-   .db #0xDA  ; JP C, xxxx     ;; [10] As carry is never set after an OR, this jump will never be done, and next instruction will be 3 bytes from here (effectively jumping over OR xx without a jump) 
+   .db #0xDA  ; JP C, xxxx     ;; [10] As carry is never set after an OR, this jump will never be done, and next 
+                               ;; .... instruction will be 3 bytes from here (effectively jumping over OR xx without a jump) 
 dcm1_drawForeground:
    or  #00                     ;; [ 7] Bit7=1, draw next pixel of Foreground color
-   rlca                        ;; [ 4] Rotate A 1 bit left to prepare it for inserting next pixel color (same 2 bits will be operated but, as long as A is rotated first, we effectively operate on next 2 bits to the right)
+   rlca                        ;; [ 4] Rotate A 1 bit left to prepare it for inserting next pixel color 
+                               ;; .... (same 2 bits will be operated but, as long as A is rotated first,
+                               ;; ....  we effectively operate on next 2 bits to the right)
    djnz dcm1_nextpixel         ;; [13/8] IF B!=0, continue calculations with next pixel
 
    ld (de), a                  ;; [ 7] Save the 4 recently calculated pixels into video memory
@@ -213,8 +222,10 @@ dcm1_drawForeground:
 dcm1_endpixelline:
    ;; Move to next pixel-line definition of the character
    pop hl                      ;; [10] Restore HL previous value from stack
-   inc l                       ;; [ 4] Next pixel Line (characters are 8-byte-aligned in memory, so we only need to increment L, as H will not change)
-   ld  a, l                    ;; [ 4] IF next pixel line corresponds to a new character (this is, we have finished drawing our character),
+   inc l                       ;; [ 4] Next pixel Line (characters are 8-byte-aligned in memory, 
+                               ;; .... so we only need to increment L, as H will not change)
+   ld  a, l                    ;; [ 4] IF next pixel line corresponds to a new character 
+                               ;; .... (this is, we have finished drawing our character), ....
    and #0x07                   ;; [ 7] ... then L % 8 == 0, as it is 8-byte-aligned. 
    jp z, dcm1_end_printing     ;; [10] IF L%8 = 0, we have finished drawing the character, else, proceed to next line
 
@@ -225,7 +236,8 @@ dcm1_endpixelline:
    add #0x08                   ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
    ld  d, a                    ;; [ 4]
    and #0x38                   ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
-   jp nz, dcm1_nextline        ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
+   jp nz, dcm1_nextline        ;; [10]  by checking the 4 bits that identify present memory line.
+                               ;; ....  If 0, we have crossed boundaries
 dcm1_8bit_boundary_crossed:
    ld  a, e                    ;; [ 4] DE = DE + C050h 
    add #0x50                   ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line 

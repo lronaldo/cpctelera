@@ -74,15 +74,17 @@
 _cpct_scanKeyboard:: 
 cpct_scanKeyboard_asm::     ;; Assembly entry point
 
-   ld   hl, #_cpct_keyboardStatusBuffer ;; [10] HL Points to the start of the keyboardBuffer, where scanned data will be stored
+   ld   hl, #_cpct_keyboardStatusBuffer ;; [10] HL Points to the start of the keyboardBuffer, 
+                                        ;; .... where scanned data will be stored
 
    di                       ;; [ 4] Disable interrupts
 
    ;; Configure PPI: Select Register 14 (the one connected with keyboard status) and set it for reading
    ;;
    ld   bc, #0xF782         ;; [10] Configure PPI 8255: Set Both Port A and Port C as Output. 
-   out (c), c               ;; [12] 82 = 1000 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=0)=> Port A=Output, 
-                            ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
+   out (c), c               ;; [12] 82 = 1000 0010 :(B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          
+                            ;;                      (B4=0)=> Port A=Output,  (B3=0)=> Port Cu=Output, 
+                            ;;                      (B2=0)=> Group B, Mode 0,(B1=1)=> Port B=Input, (B0=0)=> Port Cl=Output
 
    ld   bc, #0xF40E         ;; [10] Write (0Eh = 14) on PPI 8255 Port A (F4h): the register we want to select on AY-3-8912  
    ld    e, b               ;; [ 4] Save F4h into E to use it later in the loop
@@ -91,11 +93,12 @@ cpct_scanKeyboard_asm::     ;; Assembly entry point
    ld   bc, #0xF6C0         ;; [10] Write (C0h = 11 000000b) on PPI Port C (F6h): operation > select register 
    ld    d, b               ;; [ 4] Save F6h into D to use it later in the loop
    out (c), c               ;; [12]
-   .DW #0x71ED ; out (c), 0 ;; [12] OUT (C), 0 => Write 0 on PPI's Port C to put PSG's in inactive mode (required in between different operations)
-
+   .DW #0x71ED ; out (c), 0 ;; [12] OUT (C), 0 => Write 0 on PPI's Port C to put PSG's in inactive mode 
+                            ;; .... (required in between different operations)
    ld   bc, #0xF792         ;; [10] Configure PPI 8255: Set Port A = Input, Port C = Output. 
-   out (c), c               ;; [12] 92h= 1001 0010 : (B7=1)=> I/O Mode,       (B6-5=00)=> Mode 1,          (B4=1)=> Port A=Input, 
-                            ;;                        (B3=0)=> Port Cu=Output, (B2=0)   => Group B, Mode 0, (B1=1)=> Port B=Input,  (B0=0)=> Port Cl=Output
+   out (c), c               ;; [12] 92h= 1001 0010 :(B7=1)=> I/O Mode,        (B6-5=00)=> Mode 1,
+                            ;;                      (B4=1)=> Port A=Input,    (B3=0)=> Port Cu=Output, 
+                            ;;                      (B2=0)=> Group B, Mode 0, (B1=1)=> Port B=Input, (B0=0)=> Port Cl=Output
 
    ;; Read Loop: We read the 10-bytes that define the pressed/not pressed status
    ;;

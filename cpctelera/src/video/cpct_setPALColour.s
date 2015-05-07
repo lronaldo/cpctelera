@@ -21,7 +21,7 @@
 ;### Routines to establish and control video modes                 ###
 ;#####################################################################
 ;
-.module cpct_videomode
+.module cpct_video
 
 .include /videomode.s/
 
@@ -96,11 +96,12 @@ _cpct_setPALColour::
    ld     a, (hl)          ;; [ 7] A = Second Parameter (INKR)
 
 cpct_setPALColour_asm::    ;; Assembly entry point
-  ;or  #PAL_PENR           ;; [ 7] (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). As PENR command is 000, nothing to be done here.
+  ;or  #PAL_PENR           ;; [ 7] (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). 
+                           ;; .... As PENR command is 000, nothing to be done here.
    ld     b, #GA_port_byte ;; [ 7] B = Gate Array Port (0x7F). C has the command that GA will execute.
    out  (c), c             ;; [12] GA command: Select PENR. C = Command + Parameter (PENR + PEN number to select)
 
    or  #PAL_INKR           ;; [ 7] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for INKR number (n). 
-   out  (c), a             ;; [11] GA command: Set INKR. A = Command + Parameter (INKR + INK to be set for selected PEN number)
-
+   out  (c), a             ;; [11] GA command: Set INKR. A = Command + Parameter 
+                           ;; .... (INKR + INK to be set for selected PEN number)
    ret                     ;; [10] Return

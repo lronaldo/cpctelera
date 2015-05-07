@@ -341,8 +341,8 @@ PLY_Track1_InstrumentsTablePT:
    ld  (PLY_Track1_InstrumentSpeed + 1), a
    ld  (PLY_Track1_InstrumentSpeedCpt + 1), a
    ld   a, (hl)
-   or   a                        ;Get IsRetrig?. Code it only if different to 0, else next Instruments are going to overwrite it.
-   jr   z, .+5
+   or   a                        ;Get IsRetrig?. Code it only if different to 0, else next Instruments are
+   jr   z, .+5                   ; going to overwrite it.
    ld  (PLY_PSGReg13_Retrig + 1), a
 
    inc hl
@@ -533,8 +533,8 @@ PLY_SpeedEnd:
 ;Play the Sound on Track 3
 ;-------------------------
 ;Plays the sound on each frame, but only save the forwarded Instrument pointer when Instrument Speed is reached.
-;This is needed because TrackPitch is involved in the Software Frequency/Hardware Frequency calculation, and is calculated every frame.
-
+;This is needed because TrackPitch is involved in the Software Frequency/Hardware Frequency calculation, 
+;and is calculated every frame.
    ld  iy, #PLY_PSGRegistersArray + 4
 
 PLY_Track3_Pitch: 
@@ -596,8 +596,8 @@ PLY_Track3_PlayNoForward:
       call PLY_PlaySound
       xor  a
       ld  (PLY_PS_EndSound_SFX + 1), a
-      ld   a, l                        ;If the new address is 0, the instrument is over. Speed is set in the process, we don't care.
-      or   h
+      ld   a, l                        ;If the new address is 0, the instrument is over. 
+      or   h                           ;Speed is set in the process, we don't care.
       jr   z, PLY_SFX_Track3_Instrument_SetAddress
 
    PLY_SFX_Track3_InstrumentSpeedCpt:
@@ -685,8 +685,8 @@ PLY_Track2_PlayNoForward:
       call PLY_PlaySound
       xor  a
       ld  (PLY_PS_EndSound_SFX + 1), a
-      ld   a, l                        ;If the new address is 0, the instrument is over. Speed is set in the process, we don't care.
-      or   h
+      ld   a, l                        ;If the new address is 0, the instrument is over. 
+      or   h                           ;Speed is set in the process, we don't care.
       jr   z, PLY_SFX_Track2_Instrument_SetAddress
 
    PLY_SFX_Track2_InstrumentSpeedCpt:
@@ -778,8 +778,8 @@ PLY_Track1_PlayNoForward:
       call PLY_PlaySound
       xor  a
       ld  (PLY_PS_EndSound_SFX + 1), a
-      ld   a, l                           ;If the new address is 0, the instrument is over. Speed is set in the process, we don't care.
-      or   h
+      ld   a, l                           ;If the new address is 0, the instrument is over. 
+      or   h                              ;Speed is set in the process, we don't care.
       jr   z, PLY_SFX_Track1_Instrument_SetAddress
 
    PLY_SFX_Track1_InstrumentSpeedCpt:
@@ -1071,8 +1071,8 @@ PLY_PSGReg13_Retrig:
 
    ret
 
-;There are two holes in the list, because the Volume registers are set relatively to the Frequency of the same Channel (+7, always).
-;Also, the Reg7 is passed as a register, so is not kept in the memory.
+;There are two holes in the list, because the Volume registers are set relatively to 
+;the Frequency of the same Channel (+7, always). Also, the Reg7 is passed as a register, so is not kept in the memory.
 PLY_PSGRegistersArray:
 PLY_PSGReg0:  .db 0
 PLY_PSGReg1:  .db 0
@@ -1209,8 +1209,8 @@ PLY_PS_Hard:
 
 PLY_PS_Hard_NoRetrig:
    ;Independant/Loop or Software/Hardware Dependent ?
-   bit  1, b                                    ;We don't shift the bits, so that we can use the same code (Frequency calculation) several times.
-   jp  nz, PLY_PS_Hard_LoopOrIndependent
+   bit  1, b                                    ;We don't shift the bits, so that we can use the same code 
+   jp  nz, PLY_PS_Hard_LoopOrIndependent        ;(Frequency calculation) several times.
 
    ;Hardware Sound.
    ld  7(iy), #16                               ;Set Volume
@@ -1220,8 +1220,8 @@ PLY_PS_Hard_NoRetrig:
    ld   c, (hl)                                 ;Get Second Byte.
    inc hl
    ld   a, c                                    ;Get the Hardware Envelope waveform.
-   and  #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, else the waveform might be reset.
-   ld  (PLY_PSGReg13), a
+   and  #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, 
+   ld  (PLY_PSGReg13), a                        ;else the waveform might be reset.
 
    bit  0, b
    jr   z, PLY_PS_HardwareDependent
@@ -1359,8 +1359,8 @@ PLY_PS_HD_NoSoftwarePitch:
 
 
 PLY_PS_Hard_LoopOrIndependent:
-   bit  0, b                                    ;We mustn't shift it to get the result in the Carry, as it would be mess the structure
-   jr   z, PLY_PS_Independent                   ;of the flags, making it uncompatible with the common code.
+   bit  0, b                                    ;We mustn't shift it to get the result in the Carry, as it would be mess 
+   jr   z, PLY_PS_Independent                   ;the structure of the flags, making it uncompatible with the common code.
 
    ;The sound has ended.
    ;If Sound Effects activated, we mark the "end of sound" by returning a 0 as an address.
@@ -1400,8 +1400,8 @@ PLY_PS_Independent:
 
 PLY_PS_I_SoundOn:
    .db #0xDD, #0x2E, #0b1000 ; ld ixl, %1000   ;Sound is on.
-   .dw #0x63DD               ; ld ixh, e       ;Save the original note for the Hardware frequency, because a Software Arpeggio will modify it. 
-
+   .dw #0x63DD               ; ld ixh, e       ;Save the original note for the Hardware frequency, 
+                                               ;because a Software Arpeggio will modify it. 
    ;Calculate the Software frequency
    bit 4-2, b                                  ;Manual Frequency ? -2 Because the byte has been shifted previously.
    call PLY_PS_CalculateFrequency_TestManualFrequency
@@ -1415,8 +1415,8 @@ PLY_PS_I_SkipSoftwareFrequencyCalculation:
    ld   b, (hl)                                ;Get Second Byte.
    inc hl
    ld   a, b                                   ;Get the Hardware Envelope waveform.
-   and #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, else the waveform might be reset.
-   ld  (PLY_PSGReg13), a
+   and #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, 
+   ld  (PLY_PSGReg13), a                       ;else the waveform might be reset.
 
    ;Calculate the Hardware frequency
    rr   b                                      ;Must shift it to match the expected data of the subroutine.
@@ -1426,7 +1426,8 @@ PLY_PS_I_SkipSoftwareFrequencyCalculation:
    ld  (PLY_PSGReg11), hl                      ;Code Hardware Frequency.
    exx
 
-   ;Noise ? We can't use the previous common code, because the setting of the Noise is different, since Independent can have no Sound.
+   ;Noise ? We can't use the previous common code, because the setting of the Noise is different, 
+   ;since Independent can have no Sound.
    bit 7-2, b
    ret z
 
@@ -2009,7 +2010,8 @@ PLY_Stop:
    ;; <u8> *speed*, <u16> *inverted_pitch*, <u8> *channel_num*)
    ;;
    ;; Input Parameters (7 bytes):
-   ;;  (1B L ) sfx_num        - Number of the instrument in the SFX Song (>0), same as the number given to the instrument in Arkos Tracker.
+   ;;  (1B L ) sfx_num        - Number of the instrument in the SFX Song (>0), same as the number given to the 
+   ;; instrument in Arkos Tracker.
    ;;  (1B H ) volume         - Volume [0-15], 0 = off, 15 = maximum volume.
    ;;  (1B E ) note           - Note to be played with the given instrument [0-143]
    ;;  (1B D ) speed          - Speed (0 = As original, [1-255] = new Speed (1 is fastest))
@@ -2135,7 +2137,8 @@ PLY_Stop:
    ;;    void <cpct_akp_SFXStop> (<u8> *stop_bitmask*)
    ;;
    ;; Input Parameters (1 byte):
-   ;;  (1B A) stop_bitmask - A value where the 3 Least Significant Bits represent which channels to stop (bits enabled = channels to stop)
+   ;;  (1B A) stop_bitmask - A value where the 3 Least Significant Bits represent which channels to stop 
+   ;; (bits enabled = channels to stop)
    ;;
    ;; Assembly call (Input parameters on registers):
    ;;    > call cpct_akp_SFXStop_asm

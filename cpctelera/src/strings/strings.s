@@ -26,7 +26,8 @@
 ;;
 ;; Compilation control directives
 ;;
-.equ let_disable_interrupts_for_function_parameters, 0  ;; If true, interrupts can be disabled to get function parameters faster
+;; If true, interrupts can be disabled to get function parameters faster
+.equ let_disable_interrupts_for_function_parameters, 0  
 
 ;;
 ;; Constant values
@@ -42,11 +43,11 @@
 ;;
 ;; Assembly entry points for functions
 ;;
-.globl cpct_drawCharM0_asm
-.globl cpct_drawCharM1_asm
-.globl cpct_drawCharM1_f_asm
-.globl cpct_drawCharM2_asm
-.globl cpct_drawStringM0_asm
-.globl cpct_drawStringM1_asm
-.globl cpct_drawStringM1_f_asm
-.globl cpct_drawStringM2_asm
+;;.globl cpct_drawCharM0_asm
+;;.globl cpct_drawCharM1_asm
+;;.globl cpct_drawCharM1_f_asm
+;;.globl cpct_drawCharM2_asm
+;;.globl cpct_drawStringM0_asm
+;;.globl cpct_drawStringM1_asm
+;;.globl cpct_drawStringM1_f_asm
+;;.globl cpct_drawStringM2_asm

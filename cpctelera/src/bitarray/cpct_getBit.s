@@ -91,8 +91,10 @@ _cpct_getBit::
    ld    bc, #cpct_bitWeights ;; [10] BC = Pointer to the start of the bitWeights array
    ld    a, l        ;; [ 4]
    and   #0x07       ;; [ 7] A = L % 8       (bit number to be tested from the target byte of the array) 
-   add   c           ;; [ 4] A += C          (bit number is used as index, to increment BC, and make BC point to its corresponding bit weight in the table)
-   ld    c, a        ;; [ 4] BC = BC + L % 8 (Most of the time BC now points to the corresponding bitweight in the table, except when A += C generates carry)
+   add   c           ;; [ 4] A += C          (bit number is used as index, to increment BC, and 
+                     ;; ....                  make BC point to its corresponding bit weight in the table)
+   ld    c, a        ;; [ 4] BC = BC + L % 8 (Most of the time BC now points to the corresponding bitweight 
+                     ;; ....                  in the table, except when A += C generates carry)
    sub   a           ;; [ 4] A  = 0          (preserving the carry, because we have to add it to B)
    adc   b           ;; [ 4] A  = B + Carry  (Add carry to B)
    ld    b, a        ;; [ 4] B += Carry      (Move result to B, to ensure BC now points to the bitweight)

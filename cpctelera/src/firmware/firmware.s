@@ -73,9 +73,9 @@
 ;;
 ;; Assembly entry points for functions
 ;;
-.globl cpct_enableUpperROM_asm
-.globl cpct_enableLowerROM_asm
-.globl cpct_disableUpperROM_asm
-.globl cpct_enableUpperROM_asm
-.globl cpct_reenableFirmware_asm
-.globl cpct_disableFirmware_asm
+;;.globl cpct_enableUpperROM_asm
+;;.globl cpct_enableLowerROM_asm
+;;.globl cpct_disableUpperROM_asm
+;;.globl cpct_enableUpperROM_asm
+;;.globl cpct_reenableFirmware_asm
+;;.globl cpct_disableFirmware_asm

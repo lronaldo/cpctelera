@@ -15,8 +15,8 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-.module cpct_videomode
-
+.module cpct_video
+   
 .include /videomode.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -32,7 +32,7 @@
 ;;    <u16> - Total number of iterations done of the wait loop until VSYNC was active.
 ;;
 ;; Assembly call:
-;;    > call cpct_coun2VSYNC_asm
+;;    > call cpct_count2VSYNC_asm
 ;;
 ;; Details:
 ;;    This function implements a wait loop that exists only when VSYNC signal 

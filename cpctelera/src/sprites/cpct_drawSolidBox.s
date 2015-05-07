@@ -121,7 +121,7 @@ _cpct_drawSolidBox::
    inc  hl          ;; [ 6]
    ld    d, (hl)    ;; [ 7]
    inc  hl          ;; [ 6]  / Copy first value to video memory (upper-left corner of the box)
-   ldi              ;; [16] (HL)->(DE) Move second parameter (1-byte Colour Pattern) directly into first byte of the box in memory
+   ldi              ;; [16] (HL)->(DE) Move 2nd parameter (1-byte Colour Pattern) directly into 1st byte of the box in memory
    ld    c, (hl)    ;; [ 7] C = Third Parameter (Box Width)
    inc  hl          ;; [ 6]
    ld    b, (hl)    ;; [ 7] B = Fourth Parameter (Box Height)

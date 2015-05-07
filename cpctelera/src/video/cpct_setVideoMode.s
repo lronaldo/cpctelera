@@ -21,8 +21,8 @@
 ;### Routines to establish and control video modes                 ###
 ;#####################################################################
 ;
-.module cpct_videomode
-
+.module cpct_video
+   
 .include /videomode.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

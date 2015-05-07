@@ -27,7 +27,8 @@
 
 ;   V1.01 additions
 ;   ---------------
-;   - Small (but not useless !) optimisations by Grim/Arkos at the PLY_Track1_WaitCounter / PLY_Track2_WaitCounter / PLY_Track3_WaitCounter labels.
+;   - Small (but not useless !) optimisations by Grim/Arkos at the PLY_Track1_WaitCounter / PLY_Track2_WaitCounter
+;     / PLY_Track3_WaitCounter labels.
 ;   - Optimisation of the R13 management by Grim/Arkos.
 
 ;   This player can adapt to the following machines =
@@ -56,7 +57,8 @@
 
 ;   BASIC
 ;   -----
-;   Used in Basic (on CPC), or under the helm of any OS. Interruptions will be cut by the player, but restored ONLY IF NECESSARY.
+;   Used in Basic (on CPC), or under the helm of any OS. Interruptions will be cut by the player, 
+;   but restored ONLY IF NECESSARY.
 ;   Also, some registers are saved (AF', BC', IX and IY), as they are used by the CPC Firmware.
 ;   If you need to add/remove more registers, take care to do it at PLY_Play, but also at PLY_Stop.
 ;   Registers are restored at PLY_PSGREG13_RecoverSystemRegisters.
@@ -504,8 +506,8 @@ PLY_Track1_InstrumentsTablePT:
    ld  (PLY_Track1_InstrumentSpeed + 1), a
    ld  (PLY_Track1_InstrumentSpeedCpt + 1), a
    ld   a, (hl)
-   or   a                        ;Get IsRetrig?. Code it only if different to 0, else next Instruments are going to overwrite it.
-   jr   z, .+5
+   or   a                        ;Get IsRetrig?. Code it only if different to 0, else next 
+   jr   z, .+5                   ;...Instruments are going to overwrite it.
    ld  (PLY_PSGReg13_Retrig + 1), a
 
    inc hl
@@ -696,8 +698,8 @@ PLY_SpeedEnd:
 ;Play the Sound on Track 3
 ;-------------------------
 ;Plays the sound on each frame, but only save the forwarded Instrument pointer when Instrument Speed is reached.
-;This is needed because TrackPitch is involved in the Software Frequency/Hardware Frequency calculation, and is calculated every frame.
-
+;This is needed because TrackPitch is involved in the Software Frequency/Hardware Frequency calculation, 
+;and is calculated every frame.
    ld  iy, #PLY_PSGRegistersArray + 4
 
 PLY_Track3_Pitch: 
@@ -759,8 +761,8 @@ PLY_Track3_PlayNoForward:
       call PLY_PlaySound
       xor  a
       ld  (PLY_PS_EndSound_SFX + 1), a
-      ld   a, l                        ;If the new address is 0, the instrument is over. Speed is set in the process, we don't care.
-      or   h
+      ld   a, l                        ;If the new address is 0, the instrument is over.      
+      or   h                           ;...Speed is set in the process, we don't care.
       jr   z, PLY_SFX_Track3_Instrument_SetAddress
 
    PLY_SFX_Track3_InstrumentSpeedCpt:
@@ -848,8 +850,8 @@ PLY_Track2_PlayNoForward:
       call PLY_PlaySound
       xor  a
       ld  (PLY_PS_EndSound_SFX + 1), a
-      ld   a, l                        ;If the new address is 0, the instrument is over. Speed is set in the process, we don't care.
-      or   h
+      ld   a, l                        ;If the new address is 0, the instrument is over. 
+      or   h                           ;...Speed is set in the process, we don't care.
       jr   z, PLY_SFX_Track2_Instrument_SetAddress
 
    PLY_SFX_Track2_InstrumentSpeedCpt:
@@ -941,8 +943,8 @@ PLY_Track1_PlayNoForward:
       call PLY_PlaySound
       xor  a
       ld  (PLY_PS_EndSound_SFX + 1), a
-      ld   a, l                           ;If the new address is 0, the instrument is over. Speed is set in the process, we don't care.
-      or   h
+      ld   a, l                           ;If the new address is 0, the instrument is over. 
+      or   h                              ;...Speed is set in the process, we don't care.
       jr   z, PLY_SFX_Track1_Instrument_SetAddress
 
    PLY_SFX_Track1_InstrumentSpeedCpt:
@@ -1397,8 +1399,8 @@ PLY_SendRegisters:
 
 .endif
 
-;There are two holes in the list, because the Volume registers are set relatively to the Frequency of the same Channel (+7, always).
-;Also, the Reg7 is passed as a register, so is not kept in the memory.
+;There are two holes in the list, because the Volume registers are set relatively to the Frequency 
+;of the same Channel (+7, always). Also, the Reg7 is passed as a register, so is not kept in the memory.
 PLY_PSGRegistersArray:
 PLY_PSGReg0:  .db 0
 PLY_PSGReg1:  .db 0
@@ -1535,8 +1537,8 @@ PLY_PS_Hard:
 
 PLY_PS_Hard_NoRetrig:
    ;Independant/Loop or Software/Hardware Dependent ?
-   bit  1, b                                    ;We don't shift the bits, so that we can use the same code (Frequency calculation) several times.
-   jp  nz, PLY_PS_Hard_LoopOrIndependent
+   bit  1, b                                    ;We don't shift the bits, so that we can use the same code 
+   jp  nz, PLY_PS_Hard_LoopOrIndependent        ;...(Frequency calculation) several times.
 
    ;Hardware Sound.
    ld  7(iy), #16                               ;Set Volume
@@ -1546,8 +1548,8 @@ PLY_PS_Hard_NoRetrig:
    ld   c, (hl)                                 ;Get Second Byte.
    inc hl
    ld   a, c                                    ;Get the Hardware Envelope waveform.
-   and  #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, else the waveform might be reset.
-   ld  (PLY_PSGReg13), a
+   and  #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, 
+   ld  (PLY_PSGReg13), a                        ;...else the waveform might be reset.
 
    bit  0, b
    jr   z, PLY_PS_HardwareDependent
@@ -1686,8 +1688,8 @@ PLY_PS_HD_NoSoftwarePitch:
 
 
 PLY_PS_Hard_LoopOrIndependent:
-   bit  0, b                                    ;We mustn't shift it to get the result in the Carry, as it would be mess the structure
-   jr   z, PLY_PS_Independent                   ;of the flags, making it uncompatible with the common code.
+   bit  0, b                                    ;We mustn't shift it to get the result in the Carry, as it would be mess
+   jr   z, PLY_PS_Independent                   ;the structure of the flags, making it uncompatible with the common code.
 
    ;The sound has ended.
    ;If Sound Effects activated, we mark the "end of sound" by returning a 0 as an address.
@@ -1727,8 +1729,8 @@ PLY_PS_Independent:
 
 PLY_PS_I_SoundOn:
    .db #0xDD, #0x2E, #0b1000 ; ld ixl, %1000   ;Sound is on.
-   .dw #0x63DD               ; ld ixh, e       ;Save the original note for the Hardware frequency, because a Software Arpeggio will modify it. 
-
+   .dw #0x63DD               ; ld ixh, e       ;Save the original note for the Hardware frequency, 
+                                               ; because a Software Arpeggio will modify it. 
    ;Calculate the Software frequency
    bit 4-2, b                                  ;Manual Frequency ? -2 Because the byte has been shifted previously.
    call PLY_PS_CalculateFrequency_TestManualFrequency
@@ -1742,8 +1744,8 @@ PLY_PS_I_SkipSoftwareFrequencyCalculation:
    ld   b, (hl)                                ;Get Second Byte.
    inc hl
    ld   a, b                                   ;Get the Hardware Envelope waveform.
-   and #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, else the waveform might be reset.
-   ld  (PLY_PSGReg13), a
+   and #0b1111                                 ;We don't care about the bit 7-4, but we have to clear them, 
+   ld  (PLY_PSGReg13), a                       ;else the waveform might be reset.
 
    ;Calculate the Hardware frequency
    rr   b                                      ;Must shift it to match the expected data of the subroutine.
@@ -1753,7 +1755,8 @@ PLY_PS_I_SkipSoftwareFrequencyCalculation:
    ld  (PLY_PSGReg11), hl                      ;Code Hardware Frequency.
    exx
 
-   ;Noise ? We can't use the previous common code, because the setting of the Noise is different, since Independent can have no Sound.
+   ;Noise ? We can't use the previous common code, because the setting of the Noise is different, 
+   ;since Independent can have no Sound.   
    bit 7-2, b
    ret z
 
@@ -1954,8 +1957,8 @@ PLY_Init:
 
 .if PLY_UseFirmwareInterruptions
 
-   ld  hl, #8                          ;Skip Header, SampleChannel, YM Clock (DB*3). The Replay Frequency is used in Interruption mode.
-   add hl, de
+   ld  hl, #8                          ;Skip Header, SampleChannel, YM Clock (DB*3). The Replay Frequency 
+   add hl, de                          ;is used in Interruption mode.
    ld  de, #PLY_ReplayFrequency + 1
    ldi
 
@@ -2111,7 +2114,8 @@ PLY_Stop:
 
       ;Stops a sound effect on the selected channel
       ;E = No Channel (0,1,2)
-      ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+15, value).
+      ;I used the E register instead of A so that Basic users can call this code in a straightforward way 
+      ;(call player+15, value).
       PLY_SFX_Stop:
          ld   a, e
          ld  hl, #PLY_SFX_Track1_Instrument + 1
@@ -2136,7 +2140,8 @@ PLY_Stop:
 
       ;Sets the Fade value.
       ;E = Fade value (0 = full volume, 16 or more = no volume).
-      ;I used the E register instead of A so that Basic users can call this code in a straightforward way (call player+9/+18, value).
+      ;I used the E register instead of A so that Basic users can call this code in a straightforward way 
+      ;(call player+9/+18, value).
       PLY_SetFadeValue:
          ld   a, e
          ld  (PLY_Channel1_FadeValue + 1), a

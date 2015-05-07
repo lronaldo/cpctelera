@@ -132,9 +132,10 @@ dsa48_next_line:
 
 dsa48_first_line:
    ;; Draw a sprite-line of 4 bytes
-   ld   bc, #0x800         ;; [10] 800h bytes is the distance to the start of the first pixel in the next line in video memory (it will be decremented by 1 by each LDI)
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC (distance is 1 byte less as we progress up)
-   ldi                     ;; [16]  |
+   ld   bc, #0x800         ;; [10] 800h bytes is the distance to the start of the first pixel in the next line in 
+                           ;; .... video memory (it will be decremented by 1 by each LDI)
+   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [16]  | (distance is 1 byte less as we progress up)
    ldi                     ;; [16]  |
    ldi                     ;; [16] <|
 

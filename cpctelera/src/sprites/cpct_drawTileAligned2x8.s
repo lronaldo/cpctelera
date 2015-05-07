@@ -127,8 +127,8 @@ cpct_drawTileAligned2x8_asm:: ;; Assembly entry point
 
 dsa28_next_line:
    ;; This 4 lines do "DE += 800h - 2h" to move DE pointer to the next pixel line at video memory
-   dec   e                  ;; [ 4] E -= 2 (We only decrement E because D is saved into A, 
-   dec   e                  ;; [ 4]         hence, it does not matter if E is 00 and becomes FF, cause we do not have to worry about D)
+   dec   e                  ;; [ 4] E -= 2 (We only decrement E because D is saved into A, hence,
+   dec   e                  ;; [ 4] it does not matter if E is 00 and becomes FF, cause we do not have to worry about D)
    add   #8                 ;; [ 7] D += 8 (To add 800h to DE, we increment previous value of D by 8, and move it into D)
    ld    d, a               ;; [ 4]
 

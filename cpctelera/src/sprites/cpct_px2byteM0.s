@@ -101,7 +101,8 @@ _cpct_px2byteM0::
    ;; Transform pixel 0 into Screen Pixel Format
    ;;
    ld   de, #dc_mode0_ct ;; [10] DE points to the start of the colour table
-   ld    a, (hl)         ;; [ 7] A = Firmware colour for pixel 0 (to be added to DE, as it is the index of the colour value to retrieve)
+   ld    a, (hl)         ;; [ 7] A = Firmware colour for pixel 0 (to be added to DE, 
+                         ;; .... as it is the index of the colour value to retrieve)
    ;; Compute DE += Pixel 0 (A)
    add   e               ;; [ 4] | E += A
    ld    e, a            ;; [ 4] |
@@ -110,7 +111,8 @@ _cpct_px2byteM0::
    ld    d, a            ;; [ 4] |
 
    ld    a, (de)         ;; [ 7] A = Screen format for Firmware colour of Pixel 0
-   sla   a               ;; [ 8] A <<= 1, as Screen formats in table are in Pixel Y disposition (see Scheme 1 in this function's documentation)
+   sla   a               ;; [ 8] A <<= 1, as Screen formats in table are in Pixel Y disposition 
+                         ;; .... (see Scheme 1 in this function's documentation)
    ld    b, a            ;; [ 4] B = Transformed value for pixel 0
 
    ;;
@@ -118,7 +120,8 @@ _cpct_px2byteM0::
    ;;
    ld   de, #dc_mode0_ct ;; [10] DE points to the start of the colour table
    inc  hl               ;; [ 6] HL points to next parameter (Pixel 1)
-   ld    a, (hl)         ;; [ 7] A = Firmware colour for pixel 1 (to be added to DE, as it is the index of the colour value to retrieve)
+   ld    a, (hl)         ;; [ 7] A = Firmware colour for pixel 1 (to be added to DE, 
+                         ;; .... as it is the index of the colour value to retrieve)
    ;; Compute DE += Pixel 1 (A)
    add   e               ;; [ 4] | E += A
    ld    e, a            ;; [ 4] |

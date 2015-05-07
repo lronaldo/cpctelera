@@ -99,17 +99,19 @@ _cpct_drawCharM2::
    ;; Get Parameters from stack (POP + Push)
    pop  af                     ;; [10] AF = Return Address
    pop  de                     ;; [10] DE = Pointer to video memory location where to print character
-   pop  bc                     ;; [10] B = Character to be printed (ASCII), C = Foreground Color (0, 1)
+   pop  bc                     ;; [10] B = Character to be printed (ASCII), C = Foreground Colour (0, 1)
    push bc                     ;; [11] --- Restore Stack status ---
    push de                     ;; [11] 
    push af                     ;; [11]
 
 cpct_drawCharM2_asm::
 
-   ;; Set up the color for printing, either foreground or video-inverted
+   ;; Set up the colour for printing, either foreground or video-inverted
    xor   a                     ;; [ 4] A = 0 + Carry reset (NOP machine code, which will do nothing in the main loop)
-   dec   c                     ;; [ 4] Check if C is 0 or not, preserving Carry Flag status (C: Character color, 0=Inverted, 1=Foreground color)
-   jp    p, dc_print_fg_color  ;; [10] IF B != 0 (C is still positive after dec), then continue printing in normal foreground colour
+   dec   c                     ;; [ 4] Check if C is 0 or not, preserving Carry Flag status 
+                               ;; .... (C: Character colour, 0=Inverted, 1=Foreground colour)
+   jp    p, dc_print_fg_color  ;; [10] IF B != 0 (C is still positive after dec), 
+                               ;; .... then continue printing in normal foreground colour
    ld    a, #0x2F              ;; [ 7] A = 2Fh (CPL machine code, used to invert bytes in main loop)
 dc_print_fg_color:
    ld (dc_nextline+1), a       ;; [13] Modify XOR code to be XOR #0xFF or XOR #0, to invert colours on printing or not
@@ -141,8 +143,9 @@ dc_print_fg_color:
    ;; Copy character to Video Memory
 dc_nextline:
    ld    a, (hl)               ;; [ 7] Copy 1 Character Line to Screen (HL -> DE)
-   nop                         ;; [ 4]  -- When we paint in Foreground Color, we do nothing, but this byte
-                               ;;       -- gets modified NOP (00h) --> CPL (2Fh) to invert bits when painting Background Color (inverted mode)
+   nop                         ;; [ 4]  -- When we paint in Foreground Colour, we do nothing, but this byte
+                               ;;       -- gets modified NOP (00h) --> CPL (2Fh) to invert bits when
+                               ;;       --  painting Background Colour (inverted mode)
    ld (de), a                  ;; [ 7]
 
    dec   c                     ;; [ 4] C-- (1 Character line less to finish)
@@ -158,7 +161,8 @@ dc_nextline:
    add   #0x08                 ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
    ld    d, a                  ;; [ 4]
    and   #0x38                 ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
-   jp   nz, dc_nextline        ;; [10]  by checking the 4 bits that identify present memory line. If 0, we have crossed boundaries
+   jp   nz, dc_nextline        ;; [10]  by checking the 4 bits that identify present memory line. 
+                               ;; .... If 0, we have crossed boundaries
 dc_8bit_boundary_crossed:
    ld    a, e                  ;; [ 4] DE = DE + C050h 
    add   #0x50                 ;; [ 7]   -- Relocate DE pointer to the start of the next pixel line 
