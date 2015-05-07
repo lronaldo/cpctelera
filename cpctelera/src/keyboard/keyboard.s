@@ -25,6 +25,13 @@
 _cpct_keyboardStatusBuffer:: .ds 10
 
 ;;
+;; Assembly entry points for functions
+;;
+.globl cpct_isKeyPressed_asm
+.globl cpct_scanKeyboard_asm
+.globl cpct_scanKeyboard_f_asm
+
+;;
 ;; Assembly constant definitions for keyboard mapping
 ;;
 

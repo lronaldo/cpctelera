@@ -27,3 +27,9 @@
 ;; Compilation control directives
 ;;
 .equ let_disable_interrupts_for_function_parameters, 0  ;; If true, interrupts can be disabled to get function parameters faster
+
+;;
+;; Assembly entry points for functions
+;;
+.globl cpct_memcpy_asm
+.globl cpct_memset_asm

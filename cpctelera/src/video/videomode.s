@@ -37,3 +37,16 @@
 ;;
 .globl _cpct_mode_rom_status   ;; defined in firmware_ed.s
 .globl cpct_firmware2hw_colour ;; colour conversion table defined in cpct_getHWColour.s
+
+;;
+;; Assembly entry points for functions
+;;
+.globl cpct_coun2VSYNC_asm
+.globl cpct_fw2hw_asm
+.globl cpct_getHWColour_asm
+.globl cpct_setPALColour_asm
+.globl cpct_setPalette_asm
+.globl cpct_setVideoMemoryOffset_asm
+.globl cpct_setVideoMemoryPage_asm
+.globl cpct_setVideoMode_asm
+.globl cpct_waitVSYNC_asm
