@@ -44,7 +44,7 @@ CPCT_PATH      := $(THIS_FILE_PATH)../../../../cpctelera/
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := asm
+PROJNAME   := helloworld
 Z80CODELOC := 0x4000
 
 # Folders 

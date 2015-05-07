@@ -33,8 +33,8 @@ string: .asciz "Welcome to CPCtelera in ASM!"
 ;; Symbols with the names of the CPCtelera functions we want to use
 ;; must be declared globl to be recognized by the compiler. Later on,
 ;; linker will do its job and make the calls go to function code.
-.globl _cpct_disableFirmware
-.globl _cpct_drawStringM1
+.globl cpct_disableFirmware_asm
+.globl cpct_drawStringM1_asm
 
 ;;
 ;; MAIN function. This is the entry point of the application.
@@ -43,7 +43,7 @@ string: .asciz "Welcome to CPCtelera in ASM!"
 _main::
 
    ;; Disable firmware to prevent it from interfering with drawString
-   call _cpct_disableFirmware
+   call cpct_disableFirmware_asm
 
    ;; We are going to call draw String, and we have to push parameters
    ;; to the stack first (as the function recovers it from there).
@@ -51,13 +51,7 @@ _main::
    ld   de, #0xC280  ;; DE = Pointer to video memory location where the string will be drawn
    ld   bc, #0x0003  ;; B = Background colour, C = Foreground colour
 
-   push bc           ;; Push parameters to the stack in reverse order. To enable the function
-   push de           ;; to get them in normal order, as the stack is LIFO (Last in, First Out).
-   push hl           
-   call _cpct_drawStringM1 ;; Call the string drawing function
-   ld   hl,#6        ;; Restore stack status. As we have pushed 6 bytes to the stack, we 
-   add  hl,sp        ;; have to move Stack Pointer (SP) 6 bytes forward to leave it at its
-   ld   sp,hl        ;; previous location. 
+   call cpct_drawStringM1_asm ;; Call the string drawing function
 
 forever:
    jp forever        ;; Infinite waiting loop
