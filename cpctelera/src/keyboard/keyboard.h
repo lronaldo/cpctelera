@@ -67,7 +67,10 @@ extern u8 cpct_keyboardStatusBuffer[10];
 // Details:
 //    Figure 1 shows the layout for an Amstrad CPC Keyboard, along with
 // its firmware Key Codes. Firmware Key Codes (FKCs) are used in table 1 to map them
-// to cpct_keyID enum values,
+// to <cpct_keyID> enum values. Please, take into account that FKCs are not used
+// in CPCtelera. Do not make comparisons or store values based on firmware values
+// unless you know what you are doing. To check key / joy statuses, you should
+// use <cpct_keyID> enum values from table 1.
 //
 // (start code)
 //                                                      __
