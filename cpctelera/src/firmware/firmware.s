@@ -29,7 +29,13 @@
 ;;
 
 ;;
-;; Constant values
+;; Constants: Firmware useful constants
+;;
+;;    Constants used by firmware routines.
+;;
+;;    firmware_RST_jp - Memory address that stores a pointer to the start of 
+;; firmware code, executed on every interruption.
+;;    GA_port_byte    - Output port where Gate Array (GA) listens.
 ;;
 .equ firmware_RST_jp, 0x38  ;; Memory address were a jump (jp) to the firmware code is stored.
 .equ GA_port_byte,    0x7F  ;; 8-bit Port of the Gate Array
@@ -63,3 +69,13 @@
 ;; Default value: 0x9C = (10011100)
 ;;
 .globl _cpct_mode_rom_status
+
+;;
+;; Assembly entry points for functions
+;;
+.globl cpct_enableUpperROM_asm
+.globl cpct_enableLowerROM_asm
+.globl cpct_disableUpperROM_asm
+.globl cpct_enableUpperROM_asm
+.globl cpct_reenableFirmware_asm
+.globl cpct_disableFirmware_asm

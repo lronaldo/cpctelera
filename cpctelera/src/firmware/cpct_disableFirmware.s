@@ -42,6 +42,9 @@ _cpct_firmware_address:: .dw 0
 ;; C Definition:
 ;;    void <cpct_disableFirmware> ()
 ;;
+;; Assembly call:
+;;    > call cpct_disableFirmware_asm
+;;
 ;; Details:
 ;;    Disables the firmware modifying the interrupt vector at memory location 
 ;; 0x38. Normally, firmware routines are called and executed at every interrupt
@@ -91,6 +94,7 @@ _cpct_firmware_address:: .dw 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_disableFirmware::
+cpct_disableFirmware_asm::    ;; Assembly entry point
    di                         ;; [ 4] Disable interrupts
    ld   hl, (firmware_RST_jp) ;; [16] Obtain firmware ROM code pointer and store it for restoring it later
    ld (_cpct_firmware_address),hl ;; [16]

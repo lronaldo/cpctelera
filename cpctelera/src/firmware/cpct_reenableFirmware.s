@@ -35,6 +35,9 @@
 ;; C Definition:
 ;;    void <cpct_reenableFirmware> ()
 ;;
+;; Assembly call:
+;;    > call cpct_reenableFirmware_asm
+;;
 ;; Details:
 ;;    Restores normal operation of Amstrad CPC firmware after having been disabled.
 ;; Do not try to call this function before disabling firmware. If you do, the most
@@ -60,6 +63,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_reenableFirmware::
+cpct_reenableFirmware_asm::   ;; Assembly entry point
    di                         ;; [ 4] Disable interrupts
 
    ld   hl,(_cpct_firmware_address) ;; [16] Restore previously saved pointer to ROM code

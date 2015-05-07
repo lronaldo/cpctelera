@@ -41,6 +41,12 @@
 ;;
 ;;    void <cpct_enableUpperROM> ()
 ;;
+;; Assembly calls:
+;;   > call cpct_enableUpperROM_asm
+;;   > call cpct_enableLowerROM_asm
+;;   > call cpct_disableUpperROM_asm
+;;   > call cpct_enableUpperROM_asm
+;;
 ;; Known limitations:
 ;;    * If the execution of your program is going through some of these 2 
 ;; ROM spaces and you enable ROM, CPU will be unable to get machine code 
@@ -92,18 +98,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_enableLowerROM::
+cpct_enableLowerROM_asm::
    ld   hl, #0xFBE6          ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
    jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
 
 _cpct_disableLowerROM::
+cpct_disableLowerROM_asm::
    ld   hl, #0x04F6          ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
    jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
 
 _cpct_enableUpperROM::
+cpct_enableUpperROM_asm::
    ld   hl, #0xF7E6          ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
    jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
 
 _cpct_disableUpperROM::
+cpct_disableUpperROM_asm::
    ld   hl, #0x08F6          ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
    ;jp  mrs_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
 
