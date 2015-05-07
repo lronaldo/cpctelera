@@ -15,9 +15,9 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-.module cpct_memset
+.module cpct_memutils
 
-.include /sprites.s/
+.include /memutils.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -32,6 +32,9 @@
 ;;  (2B DE) array - Pointer to the first byte of the array to be filled up (starting point in memory)
 ;;  (2B BC) size  - Number of bytes to be set (>= 2)
 ;;  (1B A ) value - 8-bit value to be set
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_memset_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *array* could theoretically be any 16-bit memory location. However, take into 

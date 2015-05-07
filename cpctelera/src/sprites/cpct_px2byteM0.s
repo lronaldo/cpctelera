@@ -29,11 +29,19 @@
 ;;    <u8> <cpct_px2byteM0> (<u8> *px0*, <u8> *px1*);
 ;;
 ;; Input Parameters (2 Bytes):
-;;    (1B A) px0 - Firmware colour value for left  pixel (pixel 0) [0-15]
-;;    (1B A) px1 - Firmware colour value for right pixel (pixel 1) [0-15]
+;;    (1B _) px0 - Firmware colour value for left  pixel (pixel 0) [0-15]
+;;    (1B _) px1 - Firmware colour value for right pixel (pixel 1) [0-15]
 ;;
 ;; Returns:
 ;;    u8 - byte with *px0* and *px1* colour information in screen pixel format.
+;;
+;; Assembly call:
+;;    This function does not have assembly entry point. You should use C entry
+;; point and put parameters on the stack, this way:
+;;    > ld   bc, #0x0103      ;; B = *px1* = 1, C = *px0* = 3 (Firmware colours)
+;;    > push bc               ;; Put parameters on the stack
+;;    > call _cpct_px2byteM0  ;; Call the function on the C entry point
+;;    > pop  bc               ;; Recover parameter from stack to leave it at its previous state
 ;;
 ;; Parameter Restrictions:
 ;;    * *px0* and *px1* must be firmware colour values in the range [0-15]. If

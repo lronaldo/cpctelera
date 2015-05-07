@@ -16,17 +16,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
+//#####################################################################
+//### MODULE: Memutils                                              ###
+//#####################################################################
+//### Utilities to manage memory blocks                             ###
+//#####################################################################
+//
 
-#include "types.h"
-#include "firmware/firmware.h"
-#include "memutils/memutils.h"
-#include "keyboard/keyboard.h"
-#include "bitarray/bitarray.h"
-#include "sprites/sprites.h"
-#include "strings/strings.h"
-#include "video/videomode.h"
-#include "audio/audio.h"
+#ifndef CPCT_MEMUTILS_H
+#define CPCT_MEMUTILS_H
+
+#include <types.h>
+
+// Standard memory management functions
+extern void cpct_memset (void *array, u8 value, u16 size);
+extern void cpct_memcpy (void *to, const void *from, u16 size);
 
 #endif

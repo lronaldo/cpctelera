@@ -19,7 +19,12 @@
 #ifndef CPCT_VIDEOMODE_H
 #define CPCT_VIDEOMODE_H
 
+//
+// File: Video Macros&Constants
+//
+
 #include <types.h>
+#include <memutils/memutils.h>
 
 // Setting Video Mode
 extern void cpct_setVideoMode (u8 videoMode);
@@ -60,5 +65,25 @@ extern void cpct_setVideoMemoryOffset (u8 offset);
 ///
 #define cpct_setBorder(HW_C) cpct_setPALColour(16, (HW_C))
 
+
+//
+// Macro: cpct_clearScreen
+//
+//    Macro to simplify clearing the screen.
+//
+// C Definition:
+//   #define <cpct_clearScreen> (*COL*)
+//
+// Parameters (1 byte):
+//   (1B) COL - Colour pattern to be used for screen clearing. Typically, a 0x00 is used 
+// to fill up all the screen with 0's (firmware colour 0). However, you may use it in 
+// combination with <cpct_px2byteM0>, <cpct_px2byteM1> or a manually created colour pattern.
+//
+// Details:
+//   Fills up all the standard screen (range [0xC000-0xFFFF]) with *COL* byte, the colour 
+// pattern given. It uses <cpc_memset> to do the task, just filling up 16K bytes out of
+// *COL* value, starting at 0xC000.
+//
+#define cpct_clearScreen(COL) cpct_memset((void*)0xC000, (COL), 0x4000);
 
 #endif
