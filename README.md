@@ -110,4 +110,5 @@ If you have any questions, please contact us:
  * Raúl Simarro (for developing [CPCRSLib](http://sourceforge.net/projects/cpcrslib/) game creation library)
  * [Targhan](http://www.julien-nevo.com/) / [Arkos](http://www.cpcwiki.eu/index.php/Arkos) (for developing Arkos Traker&Player and giving great support on adding it to _**CPCtelera**_. Also for giving general advice during development of _**CPCtelera**_)
  * [Pulkomandy](http://www.pushnpop.net/profile-47.html) / [Shinra Team](http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml) (for maintaining [cpcsdk](https://github.com/cpcsdk), with tools like [iDSK](https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z&can=2&q=) or [cpcfs](https://code.google.com/p/cpcsdk/wiki/cpcfs), among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
+ * Mochilote / [CPCMania](http://cpcmania.com) (for creating great tutorials and useful documentation in his site)
  * José Ángel Rodriguez ([@rvjose](http://twitter.com/rvjose)) (for early testing, bug reporting and giving great ideas)

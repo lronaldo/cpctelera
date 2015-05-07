@@ -104,13 +104,15 @@
 ;;    W = *width* in bytes, H = *height* in bytes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-cpct_drawSolidBox_asm::
+;; Assembly call entry point
+cpct_drawSolidBox_asm::    
    ld    h, d       ;; [ 4] HL = DE (HL Points to the first byte of the box, 
    ld    l, e       ;; [ 4] ... the one that will contain the colour pattern)
    ld (de), a       ;; [ 7] Copy colour pattern (first byte) to video memory
    inc  de          ;; [ 6] DE points to the next byte (where 2nd byte will be copied)
    jp dsb_asmEntry  ;; [10] Jump over parameter getting from stack
 
+;; C call Entry Point
 _cpct_drawSolidBox::
    ;; GET Parameters from the stack
    ld   hl, #2      ;; [10] HL Points to SP+2 (first 2 bytes are return address)

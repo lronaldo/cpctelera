@@ -34,6 +34,9 @@
 ;;  (1B B ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
 ;;  (1B C ) height - Sprite Height in bytes (>0)
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_drawSprite_asm
+;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format.
 ;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
@@ -147,13 +150,16 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case     |           Cycles              | microSecs (us)
-;; --------------------------------------------------------------------------
-;; Best     |  70 + (85 + 16W)H + 31[H / 8] | 17.50+(21.25+4*W)*H + 7.75*[H/8]
-;; Worst    | 101 + (85 + 16W)H + 31[H / 8] | 25.25+(21.25+4*W)*H + 7.75*[H/8]
-;; --------------------------------------------------------------------------
-;; W=2,H=16 |        1493 / 1514            |   373.25 /  378.50
-;; W=4,H=32 |        4931 / 4962            |  1232.75 / 1240.50
+;;  Case      |           Cycles              | microSecs (us)
+;; ------------------------------------------------------------------------------
+;;  Best      |  70 + (85 + 16W)H + 31[H / 8] | 17.50+(21.25+4*W)*H + 7.75*[H/8]
+;;  Worst     | 101 + (85 + 16W)H + 31[H / 8] | 25.25+(21.25+4*W)*H + 7.75*[H/8]
+;; ------------------------------------------------------------------------------
+;;  W=2,H=16  |        1493 / 1514            |   373.25 /  378.50
+;;  W=4,H=32  |        4931 / 4962            |  1232.75 / 1240.50
+;; ------------------------------------------------------------------------------
+;; Asm saving |         -84                   |   -21.00 
+;; ------------------------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes
 ;;
@@ -190,6 +196,8 @@ ds_restoreSP:
    push hl                    ;; [11]
    push af                    ;; [11] 
 .endif
+
+cpct_drawSprite_asm::         ;; Assembly entry point
 
    ;; Modify code using width to jump in drawSpriteWidth
    ld    a, #126              ;; [ 7] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite * 2 (2B)
