@@ -20,8 +20,8 @@
 #include "sprites.h"
 
 void main(void) {
-   unsigned char x=0, y=0;
-   char* dest = (char*)0xC000;
+   u8  x=10, y=10;
+   u8* pvideomem;
 
    cpct_disableFirmware();
    cpct_fw2hw(G_palette, 4);
@@ -30,11 +30,16 @@ void main(void) {
 
    while(1) {
       cpct_scanKeyboard_f();
-      if      (cpct_isKeyPressed(Key_CursorRight) && x < 68 ) { x++; dest++; }
-      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
-      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
-      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 138) { dest += (++y & 7) ? 0x0800 : 0xC850; }
-
-      cpct_drawSprite(G_LCT1, dest, 12, 62);
+//      if      (cpct_isKeyPressed(Key_CursorRight) && x < 68 ) { x++; dest++; }
+//      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
+//      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
+//      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 138) { dest += (++y & 7) ? 0x0800 : 0xC850; }
+      if      (cpct_isKeyPressed(Key_CursorRight) && x < 68 ) ++x; 
+      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) --x; 
+      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) --y;
+      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 138) ++y;
+      
+      pvideomem = cpct_getScreenPtr((u8*)0xC000, x, y);
+      cpct_drawSprite(G_LCT1, pvideomem, 12, 62);
    }
 }
