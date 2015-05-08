@@ -33,6 +33,16 @@
 ## images. You create a big sprite out of the image and then use this tool
 ## to create an array of tiles out of the sprite.
 ##
+##    [file] must contain a C array of bytes filled with hexadecimal values
+## (for instance, 0xFF or 0xA5). If any byte is not in this 4 digit format
+## (0xDD, D=Digit), it will be removed by the script and it will likely 
+## throw an error. 
+##
+##    Take also into account that the [file] must not contain more hexadecimal
+## values than those related to the sprite to be converted, or they will
+## be considered part of the same sprite. Use [file]s with only one sprite
+## in them as input.
+##
 ##    The converted output is outputted to the standard output.
 ##
 ## Command line options:
@@ -60,6 +70,14 @@ smaller tiles extracted from the sprite. It converts the sprite into a tile arra
 This is useful if you want to create tiled backgrounds from complete images. You create \
 a big sprite out of the image and then use this tool to create an array of tiles out of \
 the sprite."
+   echo
+   echo "  <file> must contain a C array of bytes filled with hexadecimal values \
+(for instance, 0xFF or 0xA5). If any byte is not in this 4 digit format (0xDD, D=Digit), \
+it will be removed by the script and it will likely throw an error."
+   echo
+   echo "  Take also into account that the [file] must not contain more hexadecimal \
+values than those related to the sprite to be converted, or they will be considered \
+part of the same sprite. Use [file]s with only one sprite in them as input."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo 
