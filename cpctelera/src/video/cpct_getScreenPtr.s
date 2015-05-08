@@ -54,7 +54,7 @@
 ;; care.
 ;;
 ;; Return Value:
-;;    <u8>* - Pointer to the (*x*,*y*) byte in the screen memory that starts 
+;;    u8* - Pointer to the (*x*,*y*) byte in the screen memory that starts 
 ;; at *screen_start*.
 ;;
 ;; Known limitations:

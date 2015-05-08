@@ -17,21 +17,34 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "newton_sprite.def"
+#include "sprites.h"
 
+//
+// MAIN: Keyboard check example
+//
 void main(void) {
-    const unsigned char *sprite = G_void_sprite;
+    u8 space_pressed = 0;     // Status of the space key (0 not pressed, 1 pressed)
 
+    // Initialize screen
+    //
+    // Disable firmware to prevent it from interfering with setVideoMode
     cpct_disableFirmware();
-    cpct_setVideoMode(0);
+    // Set video mode 0: 160x200, 16 colours
+    cpct_setVideoMode(0);     
+
+    // Infinite loop
+    //
     while (1) {
-        cpct_scanKeyboard_f();
+        // Scan the keyboard to fill up cpct_keyboardStatusBuffer with
+        // the status of the keys and joystiks (pressed / not pressed)
+        cpct_scanKeyboard();
 
-        if (cpct_isKeyPressed(Key_Space))
-            sprite = G_newton_sprite;
-        else
-            sprite = G_void_sprite;
-
-        cpct_drawSprite(sprite, (void*)0xC000, 16, 32);
+        if (!space_pressed && cpct_isKeyPressed(Key_Space)) {
+            cpct_drawSprite(G_newton_sprite, (u8*)0xC000, 16, 32);
+            space_pressed = 1;
+        } else if (space_pressed && !cpct_isKeyPressed(Key_Space)) {
+            cpct_drawSolidBox((u8*)0xC000, 0x00, 16, 32);
+            space_pressed = 0;
+        }
     }
 }
