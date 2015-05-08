@@ -26,7 +26,7 @@
 ;; (in *bytes*, NOT in pixels!)
 ;;
 ;; C Definition:
-;;    <u8*> <cpct_getScreenPtr> (void* *screen_start*, <u8> *x*, <u8> *y*)
+;;    <u8>* <cpct_getScreenPtr> (void* *screen_start*, <u8> *x*, <u8> *y*)
 ;;
 ;; Input Parameters (4 Bytes):
 ;;    (2B DE) screen_start - Pointer to the start of the screen (or a backbuffer)
@@ -54,7 +54,7 @@
 ;; care.
 ;;
 ;; Return Value:
-;;    <u8*> - Pointer to the (*x*,*y*) byte in the screen memory that starts 
+;;    <u8>* - Pointer to the (*x*,*y*) byte in the screen memory that starts 
 ;; at *screen_start*.
 ;;
 ;; Known limitations:
@@ -68,7 +68,7 @@
 ;; what is the same, a pointer to the first byte of the screen. The "screen"
 ;; may be the actual screen or a backbuffer with same layout.
 ;;
-;;    What this function exactly does is this calculation:
+;;    What this function exactly does is this calculation,
 ;;    > return screen_start + 80 * ((int)(y / 8)) + 2048 * (y % 8) + x
 ;;
 ;;    This calculation is based on the default layout of the screen, which is

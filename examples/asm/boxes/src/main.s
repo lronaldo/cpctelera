@@ -27,7 +27,7 @@
 ;; treated as code and executed!)
 .include "keyboard/keyboard.s"
 
-str_press: .asciz "Please, press Space Key";
+str_press: .asciz "Please, press Space key.";
 
 ;;
 ;; Start of _CODE area
@@ -43,6 +43,7 @@ str_press: .asciz "Please, press Space Key";
 .globl cpct_scanKeyboard_f_asm 
 .globl cpct_drawStringM1_f_asm
 .globl cpct_disableFirmware_asm
+.globl cpct_getScreenPtr_asm
 
 ;;
 ;; MAIN function. This is the entry point of the application.
@@ -59,9 +60,15 @@ _main::
    
    call cpct_memset_asm ;; Fill up video memory with colour pattern
 
+   ;; Calculate a location for printing a string
+   ld   de, #0xC000    ;; DE = Pointer to start of the screen
+   ld   bc, #0x1810    ;; B  = y coordinate (0x18 = 24), C = x coordinate (0x10 = 16)
+
+   call cpct_getScreenPtr_asm ;; Calculate video memory location and return it in HL
+
    ;; Print a string to ask the user for pressing Space
+   ex   de, hl         ;; Interchange HL <-> DE to make DE = Pointer to video memory where string will be drawn
    ld   hl, #str_press ;; HL = Pointer to the string 
-   ld   de, #0xC0FF    ;; DE = Pointer to video memory location where string will be drawn
    ld   bc, #0x0300    ;; B  = Background PEN (3), C = Foreground PEN (0)
 
    call cpct_drawStringM1_f_asm  ;; Draw the string
