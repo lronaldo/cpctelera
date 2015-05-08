@@ -1,0 +1,277 @@
+#!/bin/bash
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+##
+## File: cpct_sp2tile
+##    Cuts up a big sprite into smaller tiles
+##
+## Usage:
+##    cpct_sp2tile [file] -s [SpriteRes] -t [TileRes]
+##
+## Description:
+##    This script converts a C array sprite into an array made of smaller
+## tiles extracted from the sprite. It converts the sprite into a tile array.
+## This is useful if you want to create tiled backgrounds from complete
+## images. You create a big sprite out of the image and then use this tool
+## to create an array of tiles out of the sprite.
+##
+##    The converted output is outputted to the standard output.
+##
+## Command line options:
+##    -s | --sprite-resolution - Sets the resolution of the main sprite to 
+## be cut into tiles.
+##    -t | --tile-resolution   - Sets the resolution of each individual tile
+##    -h | --help              - Shows help information on the terminal.
+##
+###########################################################################
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<filename> -s \
+<sprite-resolution> -t <tile-resolution>"
+   echo
+   echo "${COLOR_CYAN}  Cuts up a big sprite into smaller tiles. "
+   echo 
+   echo "${COLOR_NORMAL}  This script converts a C array sprite into an array made of \
+smaller tiles extracted from the sprite. It converts the sprite into a tile array. \
+This is useful if you want to create tiled backgrounds from complete images. You create \
+a big sprite out of the image and then use this tool to create an array of tiles out of \
+the sprite."
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -s | --sprite-resolution"
+   echo "${COLOR_CYAN}       Sets the resolution of the main sprite to echo  be cut into tiles."
+   echo "${COLOR_LIGHT_BLUE}  -t | --tile-resolution"
+   echo "${COLOR_CYAN}       Sets the resolution of each individual tile"
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+## Check if a given input is in the format WxH (2D Resolution)
+##
+## $1: Given input
+## 
+## Returns 0 when $1 is in the correct format
+##
+function is2DResolution() {
+   ## Check for the existance of an 'x' in the middle of the string 
+   if [ "$1" == "${1/x}" ]; then
+      return 1
+   fi
+
+   ## Check that there is only one 'x'
+   L1=${#1}    # Len of parameter 1
+   L2=${1//x}  # Parameter 1 without 'x's
+   L2=${#L2}    # Len of parameter 1 without 'x's
+   if (( L2 + 1 != L1 )); then 
+      return 1
+   fi
+
+   ## Check that there is an integer at each part of the x
+   NUM1=${1%x*}   # Remove 'x*' at the end of the string
+   NUM2=${1#*x}   # Remove '*x' at the front of the string
+   if ! isInt "$NUM1" -o ! isInt "$NUM2"; then
+      return 1
+   fi
+
+   ## Correct. Is a 2D Resolution
+   return 0
+}
+
+## Get a number of lines from a file, starting at a given line
+##
+## $1: File
+## $2: Start line
+## $3: number of lines
+##
+## It echoes the lines to stdout
+##
+function getLinesFromFile () {
+   tail -n+${2} ${1} | head -n${3}
+}
+
+##############################################################
+###############################################################
+## Check command line parameters
+##
+FILENAME=
+TILE_WIDTH=0
+TILE_HEIGHT=0
+SPRITE_WIDTH=0
+SPRITE_HEIGHT=0
+
+if (( $# < 5 )); then
+   usage
+fi
+
+while (( $# >= 1 )); do
+   case $1 in
+      ## Get the tile resolution
+      "-t" | "--tile-resolution")
+         if ! is2DResolution "$2"; then
+            paramError "Parameter -t (tile resolution) must be followed by the resolution of the tile (WxH)"
+         fi
+         ## Get the two resolution numbers (Width x Height)
+         TILE_WIDTH=${2%x*}
+         TILE_HEIGHT=${2#*x}
+         TILE_WIDTH=$((10#$TILE_WIDTH))
+         TILE_HEIGHT=$((10#$TILE_HEIGHT))
+         shift
+      ;;
+      ## Get the sprite resolution
+      "-s" | "--sprite-resolution")
+         if ! is2DResolution "$2"; then
+            paramError "Parameter -s (sprite resolution) must be followed by the resolution of the sprite (WxH)"
+         fi
+         ## Get the two resolution numbers (Width x Height)
+         SPRITE_WIDTH=${2%x*}
+         SPRITE_HEIGHT=${2#*x}
+         SPRITE_WIDTH=$((10#$SPRITE_WIDTH))
+         SPRITE_HEIGHT=$((10#$SPRITE_HEIGHT))
+         shift
+      ;;
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Get main parameter (ProjectDir)
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         elif ! isEmpty "$FILENAME"; then
+            paramError "Unrecognized parameter '$1'. Have you already provided a <filename> parameter?" 6
+         else
+            EnsureExists file "$1"
+         fi
+         FILENAME="$1"
+      ;;
+   esac
+   shift
+done
+
+## Check resolutions and their validity
+##
+if (( SPRITE_WIDTH < 1 || SPRITE_HEIGHT < 1 || TILE_HEIGHT < 1 || TILE_WIDTH < 1)); then
+   paramError "Invalid resolutions. Resolutions must be integers greater or equal than 1"
+fi
+
+## Check dimensions (tiles must be smaller than sprite)
+##
+if (( SPRITE_WIDTH < TILE_WIDTH || SPRITE_HEIGHT < TILE_HEIGHT )); then
+   paramError "Tile dimensions must be smaller or equal than sprite dimensions"
+fi
+
+## Check divisibility (sprites dimensions must be divisible by tile dimensions)
+##
+if (( SPRITE_WIDTH % TILE_WIDTH != 0 )); then
+   paramError "Sprite hidth ($SPRITE_WIDTH) is not divisible by Tile width ($TILE_WIDTH)."
+fi
+if (( SPRITE_HEIGHT % TILE_HEIGHT != 0 )); then
+   paramError "Sprite height ($SPRITE_HEIGHT) is not divisible by Tile heiht ($TILE_HEIGHT)."
+fi
+
+###############################################################
+###############################################################
+## Read and convert file
+##
+
+## Create a temporary file to store binary conversion previous to output
+TMPFILE=$(createTempFile)
+
+## Extract the name of the file without extension as IDENTIFIER for C
+IDENTIFIER=$(basename "$FILENAME") 
+IDENTIFIER=${IDENTIFIER%.*}
+
+## Create a temporary file that contains only byte definitions (1 byte per line)
+grep -oE '0x[0-9A-Fa-f]{2}' "$FILENAME" > "$TMPFILE"
+
+## Calculate total ammount of bytes available (should coincide with bytes of the sprite)
+BYTES=$(wc -l < "$TMPFILE")
+if (( SPRITE_HEIGHT * SPRITE_WIDTH != BYTES )); then
+   MULT=$(( SPRITE_HEIGHT * SPRITE_WIDTH ))
+   paramError "Sprite dimensions do not match total amount of bytes in file (${SPRITE_WIDTH}x$SPRITE_HEIGHT = $MULT) ($FILENAME = $BYTES)"
+fi
+
+## Create an array with the FILE
+declare -a BYTES_ARRAY
+I=0
+while read L; do
+   BYTES_ARRAY[$I]=$L
+   I=$((I+1))
+done < "$TMPFILE"
+
+## Remove temporary file
+rm "$TMPFILE"
+
+## Calculate ammount of tiles
+HORIZ_TILES=$(( SPRITE_WIDTH / TILE_WIDTH ))
+VERT_TILES=$(( SPRITE_HEIGHT / TILE_HEIGHT ))
+TILE_BYTES=$(( TILE_HEIGHT * TILE_WIDTH ))
+SPRITEROW_BYTES=$(( SPRITE_WIDTH * TILE_HEIGHT ))
+
+## Echo header of the tileset
+echo "// Converted tileset from $FILENAME using $(basename $0)"
+echo "const unsigned char G_tiled_${IDENTIFIER}[$HORIZ_TILES][$VERT_TILES][$TILE_BYTES] = {"
+
+## Traverse all (T_X, T_Y) and create a tile for each
+for T_X in $(seq 0 $((HORIZ_TILES-1))); do
+   echo "   //"
+   echo "   // Tile Column $T_X"
+   echo "   //"
+   echo "   { "
+   for T_Y in $(seq 0 $((VERT_TILES-1))); do
+      START=$((T_Y * SPRITEROW_BYTES + T_X * TILE_WIDTH ))
+      echo "      // Tile $T_X, $T_Y"
+      echo "      {"
+      for I in $(seq 0 $((TILE_HEIGHT-1))); do
+         printf "         "
+         for J in $(seq 0 $((TILE_WIDTH-1))); do
+            POS=$((START + J))
+            printf "%s" "${BYTES_ARRAY[$POS]}"
+            if (( I != TILE_HEIGHT-1 || J != TILE_WIDTH-1 )); then
+               printf ","
+            fi
+         done
+         echo 
+         START=$((START + SPRITE_WIDTH))
+      done
+      printf "      }"
+      if (( T_Y != VERT_TILES-1 )); then
+         printf ","
+      fi
+      echo
+   done
+   printf "   }"
+   if (( T_X != HORIZ_TILES-1 )); then
+      printf ","
+   fi
+   echo
+done
+## Echo last closing bracket
+echo "};"
