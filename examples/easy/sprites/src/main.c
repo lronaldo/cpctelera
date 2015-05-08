@@ -19,27 +19,52 @@
 #include <cpctelera.h>
 #include "sprites.h"
 
-void main(void) {
-   u8  x=10, y=10;
-   u8* pvideomem;
+// Sprite size (in bytes)
+#define SP_W   12
+#define SP_H   62
 
+// Screen size (in bytes)
+#define SCR_W   80
+#define SCR_H  200
+
+//
+// MAIN: Sprite drawing and moving example
+//
+void main(void) {
+   u8  x=10, y=10;   // Sprite coordinates
+   u8* pvideomem;    // Pointer to video memory
+
+   //
+   // Set up the screen
+   //
+   // Disable firmware to prevent it from interfering with setPalette and setVideoMode
    cpct_disableFirmware();
-   cpct_fw2hw(G_palette, 4);
-   cpct_setPalette(G_palette, 4);
+
+   // Set the colour palette
+   cpct_fw2hw     (G_palette, 4); // Convert our palette from firmware to hardware colours 
+   cpct_setPalette(G_palette, 4); // Set up the hardware palette using hardware colours
+   
+   // Set video mode 1 (320x200, 4 colours)
    cpct_setVideoMode(1);
 
+   // 
+   // Infinite moving loop
+   //
    while(1) {
+      // Scan Keyboard fast
       cpct_scanKeyboard_f();
-//      if      (cpct_isKeyPressed(Key_CursorRight) && x < 68 ) { x++; dest++; }
-//      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
-//      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
-//      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 138) { dest += (++y & 7) ? 0x0800 : 0xC850; }
-      if      (cpct_isKeyPressed(Key_CursorRight) && x < 68 ) ++x; 
-      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) --x; 
-      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) --y;
-      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 138) ++y;
+
+      // Check if user has pressed a Cursor Key and, if so, move the sprite if
+      // it will still be inside screen boundaries
+      if      (cpct_isKeyPressed(Key_CursorRight) && x < (SCR_W - SP_W) ) ++x; 
+      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0              ) --x; 
+      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0              ) --y;
+      else if (cpct_isKeyPressed(Key_CursorDown)  && y < (SCR_H - SP_H) ) ++y;
       
+      // Get video memory byte for coordinates x, y of the sprite (in bytes)
       pvideomem = cpct_getScreenPtr((u8*)0xC000, x, y);
-      cpct_drawSprite(G_LCT1, pvideomem, 12, 62);
+
+      // Draw the sprite in the video memory location got from coordinates x, y
+      cpct_drawSprite(G_spriteLogoCT, pvideomem, SP_W, SP_H);
    }
 }

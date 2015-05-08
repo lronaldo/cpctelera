@@ -18,5 +18,6 @@
 
 #include <types.h>
 
+// Declare sprites and palette, without defining them (they are defined in sprites.c)
 extern const u8 G_palette[4];
-extern const unsigned char G_LCT1[744];
+extern const u8 G_spriteLogoCT[744];
