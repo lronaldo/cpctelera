@@ -121,6 +121,7 @@ Group: Video  {
    File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
    File: cpct_fw2hw  (video/cpct_fw2hw.s)
    File: cpct_getHWColour  (video/cpct_getHWColor.s)
+   File: cpct_getScreenPtr  (video/cpct_getScreenPtr.s)
    File: cpct_setPALColour  (video/cpct_setPALColour.s)
    File: cpct_setPalette  (video/cpct_setPalette.s)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
