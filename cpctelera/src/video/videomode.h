@@ -44,7 +44,7 @@ extern void cpct_setVideoMemoryPage   (u8 page_codified_in_6LSb);
 extern void cpct_setVideoMemoryOffset (u8 offset);
 
 // Using screen coordinates to get byte pointers
-extern  u8* cpct_getScreenPtr (u8* screen_start, u8 x, u8 y);
+extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y);
 
 ///
 /// Macro: cpct_setBorder

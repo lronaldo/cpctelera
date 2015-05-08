@@ -1,6 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
-//  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C)      2015 Maximo / Cheesetea / ByteRealms (@rgallego87)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,32 +20,54 @@
 #include <cpctelera.h>
 #include "sprites.h"
 
+// Sprite size (in bytes)
+#define SP_W   12
+#define SP_H   62
+
+// Screen size (in bytes)
+#define SCR_W   80
+#define SCR_H  200
+
 //
-// MAIN: Keyboard check example
+// MAIN: Using keyboard to move a sprite example
 //
 void main(void) {
-    u8 space_pressed = 0;     // Status of the space key (0 not pressed, 1 pressed)
+   u8  x=10, y=10;   // Sprite coordinates
+   u8* pvideomem;    // Pointer to video memory
 
-    // Initialize screen
-    //
-    // Disable firmware to prevent it from interfering with setVideoMode
-    cpct_disableFirmware();
-    // Set video mode 0: 160x200, 16 colours
-    cpct_setVideoMode(0);     
+   //
+   // Set up the screen
+   //
+   // Disable firmware to prevent it from interfering with setPalette and setVideoMode
+   cpct_disableFirmware();
 
-    // Infinite loop
-    //
-    while (1) {
-        // Scan the keyboard to fill up cpct_keyboardStatusBuffer with
-        // the status of the keys and joystiks (pressed / not pressed)
-        cpct_scanKeyboard();
+   // Set the colour palette
+   cpct_fw2hw     (G_palette, 4); // Convert our palette from firmware to hardware colours 
+   cpct_setPalette(G_palette, 4); // Set up the hardware palette using hardware colours
+   
+   // Set video mode 1 (320x200, 4 colours)
+   cpct_setVideoMode(1);
 
-        if (!space_pressed && cpct_isKeyPressed(Key_Space)) {
-            cpct_drawSprite(G_newton_sprite, (u8*)0xC000, 16, 32);
-            space_pressed = 1;
-        } else if (space_pressed && !cpct_isKeyPressed(Key_Space)) {
-            cpct_drawSolidBox((u8*)0xC000, 0x00, 16, 32);
-            space_pressed = 0;
-        }
-    }
+   // 
+   // Infinite moving loop
+   //
+   while(1) {
+      // Scan Keyboard (fastest routine)
+      // The Keyboard has to be scanned to obtain pressed / not pressed status of
+      // every key before checking each individual key's status.
+      cpct_scanKeyboard_f();
+
+      // Check if user has pressed a Cursor Key and, if so, move the sprite if
+      // it will still be inside screen boundaries
+      if      (cpct_isKeyPressed(Key_CursorRight) && x < (SCR_W - SP_W) ) ++x; 
+      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0              ) --x; 
+      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0              ) --y;
+      else if (cpct_isKeyPressed(Key_CursorDown)  && y < (SCR_H - SP_H) ) ++y;
+      
+      // Get video memory byte for coordinates x, y of the sprite (in bytes)
+      pvideomem = cpct_getScreenPtr((u8*)0xC000, x, y);
+
+      // Draw the sprite in the video memory location got from coordinates x, y
+      cpct_drawSprite(G_spriteLogoCT, pvideomem, SP_W, SP_H);
+   }
 }

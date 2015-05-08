@@ -1,6 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2015 Stefano Beltran / ByteRealms (stefanobb at gmail dot com)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,6 +19,12 @@
 
 #include <types.h>
 
-// Declare sprites and palette, without defining them (they are defined in sprites.c)
-extern const u8 G_palette[4];
-extern const u8 G_spriteLogoCT[744];
+// Declare Palettes to use
+extern const u8 G_banner_palette[16];
+extern const u8 G_logo_palette[4];
+
+// Declare sprite to be used
+//  CPCtelera's Logo and Banner by Stefano Beltran (stefanobb at gmail dot com )
+extern const u8 G_CPCt_left[3840]; 
+extern const u8 G_CPCt_right[3840];
+extern const u8 G_CPCt_logo[7640]; 
