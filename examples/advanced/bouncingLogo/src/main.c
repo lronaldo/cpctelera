@@ -19,9 +19,9 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "entities.h"
-#include "message.h"
-#include "logofremos.h"
+#include "entities/logofremos.h"
+#include "entities/entities.h"
+#include "msg/message.h"
 
 //
 // Checks user input and returns acceleration values based on

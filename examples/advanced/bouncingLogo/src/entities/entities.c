@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <cpctelera.h>
 #include "entities.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -30,9 +31,9 @@
 // This function returns the video memory address where 
 // a given pixel line y (0-200) starts.
 //
-unsigned char *getScreenPointer(unsigned char y) {
+u8 *getScreenPointer(u8 y) {
    y = y << 1;
-   return (unsigned char *)0xC000 + ((y >> 3) * 80) + ((y & 7) * 2048);
+   return (u8 *)0xC000 + ((y >> 3) * 80) + ((y & 7) * 2048);
 }
 
 //
@@ -43,13 +44,13 @@ unsigned char *getScreenPointer(unsigned char y) {
 // "bounced" off the limits and that is reported returning a 1 (bounced=1).
 // Otherwise, the function returns 0 (bounced=0).
 //
-char moveEntityX (TEntity* ent, char mx, unsigned char sx) {
-   char bounced = 0;
+i8 moveEntityX (TEntity* ent, i8 mx, u8 sx) {
+   i8 bounced = 0;
 
    // Case 1: Moving to the left (negative ammount of pixels)
    if (mx < 0) {
       // Convert mx to unsigned_mx, as SDCC has problems adding signed values to unsigned ones
-      unsigned char umx = -mx;
+      u8 umx = -mx;
 
       // Move umx pixels to the left, taking care not to pass 0 limit
       if (umx <= ent->x) {
@@ -64,8 +65,8 @@ char moveEntityX (TEntity* ent, char mx, unsigned char sx) {
    // Case 2: Moving to the right (positive amount of pixels)
    } else if (mx) {
       // Calculate available space to move to the right
-      unsigned char space_left = sx - ent->width - ent->x;
-      unsigned char umx = mx;
+      u8 space_left = sx - ent->width - ent->x;
+      u8 umx = mx;
 
       // Check if we are trying to move more than the available space or not
       if (umx > space_left) {
@@ -92,29 +93,29 @@ char moveEntityX (TEntity* ent, char mx, unsigned char sx) {
 // "bounced" off the limits and that is reported returning a 1 (bounced=1).
 // Otherwise, the function returns 0 (bounced=0).
 //
-char moveEntityY (TEntity* ent, char my, unsigned char sy) {
-   char bounced = 0;
+i8 moveEntityY (TEntity* ent, i8 my, u8 sy) {
+   i8 bounced = 0;
 
    // Case 1: Moving up (negative ammount of pixels)
    if (my < 0) {
       // Convert my to unsigned_my (umy), as SDCC has problems adding signed values to unsigned ones
-      unsigned char umy = -my;
+      u8 umy = -my;
 
       // Move umy pixels up, taking care not to pass 0 limit
       if (umy <= ent->y) {
          ent->y        -= umy;
-         ent->videopos  = getScreenPointer(ent->y) + ent->x;
+         ent->videopos  = cpct_getScreenPtr((u8*)0xC000, ent->x, 2*ent->y);
       } else {
          // movement tryied to pass 0 limit, adjusting to 0 and reporting bounce
-         ent->videopos  = (unsigned char*)0xC000 + ent->x;
+         ent->videopos  = (u8*)0xC000 + ent->x;
          ent->y         = 0;
          bounced = 1;
       }
    // Case 1: Moving down (positive ammount of pixels)
    } else if (my) {
       // Calculate available space to move to the right
-      unsigned char space_left = sy - (ent->height>>1) - ent->y;
-      unsigned char umy = my;
+      u8 space_left = sy - (ent->height>>1) - ent->y;
+      u8 umy = my;
 
       // Check if we are trying to move more than the available space or not
       if (umy > space_left) {
@@ -125,7 +126,7 @@ char moveEntityY (TEntity* ent, char my, unsigned char sy) {
          ent->y += umy;
       }
       // Recalculating video pos when y has been changed
-      ent->videopos = getScreenPointer(ent->y) + ent->x;
+      ent->videopos = cpct_getScreenPtr((u8*)0xC000, ent->x, 2*ent->y);
    }
 
    return bounced;
@@ -137,8 +138,8 @@ char moveEntityY (TEntity* ent, char my, unsigned char sy) {
 // given acceleration and gravity. Takes care of velocity limits not being
 // exceeded.
 //
-float g_gravity;
-void entityPhysicsUpdate (TVelocity *vel, float ax, float ay) {
+f32 g_gravity;
+void entityPhysicsUpdate (TVelocity *vel, f32 ax, f32 ay) {
    // Update velocity using given acceleration
    vel->vx += ax;
    vel->vy += ay;
@@ -161,9 +162,9 @@ void entityPhysicsUpdate (TVelocity *vel, float ax, float ay) {
 //
 // Update entities based on physics status (velocity and given acceleration)
 //
-void updateEntities(TEntity *logo, float ax, float ay) {
-   const float bounceCoefficient=0.85;
-   char dx=0, dy=0;
+void updateEntities(TEntity *logo, f32 ax, f32 ay) {
+   const f32 bounceCoefficient=0.85;
+   i8 dx=0, dy=0;
 
    // Update logo physics (accumulated movement and velocity)
    entityPhysicsUpdate(&logo->vel, ax, ay);

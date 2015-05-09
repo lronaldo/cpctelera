@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <types.h>
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////
@@ -31,9 +33,9 @@
 //   - max_x and max_y control de maximum possible velocity the body may have.
 //
 typedef struct {
-   float vx, vy;           // Velocity
-   float acum_x, acum_y;   // Acumulated movement
-   float max_x, max_y;     // Max velocity
+   f32 vx, vy;           // Velocity
+   f32 acum_x, acum_y;   // Acumulated movement
+   f32 max_x, max_y;     // Max velocity
 } TVelocity;
 
 //
@@ -42,16 +44,16 @@ typedef struct {
 // height and width. It also has physics, with velocity.
 //
 typedef struct {
-   unsigned char* sprite;
-   unsigned char* videopos;
-   unsigned char x, y, width, height;
+   const u8* sprite;
+   u8* videopos;
+   u8 x, y, width, height;
    TVelocity vel;
 } TEntity;
 
 //
 // Define global gravity variable to make it publicly accessible
 //
-extern float g_gravity;
+extern f32 g_gravity;
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -61,8 +63,8 @@ extern float g_gravity;
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-unsigned char *getScreenPointer(unsigned char y);
-char moveEntityX         (TEntity* ent, char mx, unsigned char sx);
-char moveEntityY         (TEntity* ent, char my, unsigned char sy);
-void entityPhysicsUpdate (TVelocity *vel, float ax, float ay);
-void updateEntities      (TEntity *logo, float ax, float ay);
+  u8 *getScreenPointer   (u8 y);
+  i8 moveEntityX         (TEntity* ent, i8 mx, u8 sx);
+  i8 moveEntityY         (TEntity* ent, i8 my, u8 sy);
+void entityPhysicsUpdate (TVelocity *vel, f32 ax, f32 ay);
+void updateEntities      (TEntity *logo,  f32 ax, f32 ay);

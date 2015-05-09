@@ -39,7 +39,7 @@ void drawMessage() {
 //
 // Copy a string into a given buffer
 //
-void strcpy(char* to, const char* from){
+void strcpy(i8* to, const i8* from){
    while (*to++ = *from++);
 }
 
@@ -47,9 +47,9 @@ void strcpy(char* to, const char* from){
 // Inserts a number (3 digits at most) at a given position in a string
 // (adds \0 at the end)
 //
-void concatNum (char* to, char num) {
-   char digits[5] = { 32, 48, 48, 48, 0 };
-   unsigned char d, unum;
+void concatNum (i8* to, i8 num) {
+   i8 digits[5] = { 32, 48, 48, 48, 0 };
+   u8 d, unum;
 
    // Check for the sign
    if (num < 0) {
@@ -61,7 +61,7 @@ void concatNum (char* to, char num) {
 
    // Calculate the ascii values of the 3 digits, dividing the number
    for (d=3; d != 0; --d) {
-      unsigned char r=unum % 10;
+      u8 r=unum % 10;
       unum /= 10;
       digits[d]=48 + r;
    }

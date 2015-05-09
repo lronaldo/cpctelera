@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <types.h>
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////
@@ -28,9 +30,9 @@
 // Describes a temporal message to show at a given video location at the screen
 //
 typedef struct {
-   unsigned char* videopos;
-   unsigned char  str[14];
-   unsigned char  time;
+   u8* videopos;
+   u8  str[14];
+   u8  time;
 } TMessage;
 
 //
@@ -46,5 +48,5 @@ extern TMessage g_message;
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 void drawMessage();
-void concatNum  (char* to, char num);
-void strcpy     (char* to, const char* from);
+void concatNum  (i8* to, i8 num);
+void strcpy     (i8* to, const i8* from);
