@@ -18,12 +18,28 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##                        CPCTELERA ENGINE                               ##
-##          Script for converting rgas sprite output to C arrays         ##
-##-----------------------------------------------------------------------##
-## This script converts the RGAS sprite definition output in CPCRSLib    ##
-## format to C arrays, ready to be included in a project                 ##
+## CPCTELERA ENGINE
+##
+## File: cpct_rgas2c
+##    This converts RGAS sprite definitions in CPCRSLib asm output format to
+## CPCtelera's C arrays. 
+##
+## Usage:
+##    cpct_rgas2c [filename] [options]
+##
+## Description:
+##    This script converts a file containing sprites in CPCRSLib asm output format
+## to CPCtelera's C arays. The file must contain the direct output that RGAS 
+## gives when selecting CPCRSLib asm output. This scripts outputs the conversion
+## to standard output, then you can redirect or to other script as required.
+##
+## Command line options:
+##    -b | --bytes-per-line [numbytes] - Establishes the number of bytes that 
+## should contain each printed line of each C array. Default value is 16.
+##    -h | --help                      - Shows help information on the terminal.
+##
 ###########################################################################
+
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh

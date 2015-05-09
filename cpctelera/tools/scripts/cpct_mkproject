@@ -18,11 +18,32 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##                        CPCTELERA ENGINE                               ##
-##                  Script for creating new projects                     ##
-##-----------------------------------------------------------------------##
-## This script helps in the creation of new projects that use CPCtelera  ##
-## engine.                                                               ##
+## CPCTELERA ENGINE
+##
+## File: cpct_mkproject
+##    This script helps in the creation of new projects that use CPCtelera
+## engine.
+##
+## Usage:
+##    cpct_mkproject [foldername] [options]
+##
+## Description:
+##    This script creates a new folder and fills it up with required files
+## to use that folder as a basic CPCtelera project. Once the folder is
+## created, you only have to launch 'make' command inside it to compile
+## the project an generate DSK and CDT files. A basic main.c source file
+## is created under src/ sub-folder, and a standard build_config.mk file 
+## under cfg/ folder. You may edit both and add new source files as 
+## required by your project.
+##
+## Command line options:
+##    -n | --project-name [projname] - Lets you name your project in a different
+## way than the project folder.
+##    -l | --load-address [loadaddr] - Lets you establish the memory address where
+## the binary of your project should be loaded into CPC memory. Default value is 0x4000.
+## You always can change this value by editing cfg/build_config.mk
+##    -h | --help                      - Shows help information on the terminal.
+##
 ###########################################################################
 
 ## Bash Include files
