@@ -19,6 +19,8 @@
 
 ###########################################################################
 ## CPCTELERA ENGINE
+###########################################################################
+
 ##
 ## File: cpct_mkproject
 ##    This script helps in the creation of new projects that use CPCtelera
@@ -44,7 +46,6 @@
 ## You always can change this value by editing cfg/build_config.mk
 ##    -h | --help                      - Shows help information on the terminal.
 ##
-###########################################################################
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh

@@ -19,6 +19,8 @@
 
 ###########################################################################
 ## CPCTELERA ENGINE
+###########################################################################
+
 ##
 ## File: cpct_rgas2c
 ##    This converts RGAS sprite definitions in CPCRSLib asm output format to
@@ -38,7 +40,6 @@
 ## should contain each printed line of each C array. Default value is 16.
 ##    -h | --help                      - Shows help information on the terminal.
 ##
-###########################################################################
 
 
 ## Bash Include files

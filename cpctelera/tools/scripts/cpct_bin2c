@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
@@ -19,6 +20,8 @@
 
 ###########################################################################
 ## CPCTELERA ENGINE
+###########################################################################
+
 ##
 ## File: cpct_bin2c
 ##    Script for converting binary files to C arrays
@@ -38,7 +41,7 @@
 ## write at each array line in C. 16 by default
 ##    -h | --help                      - Shows help information on the terminal.
 ##
-###########################################################################
+
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh

@@ -19,6 +19,8 @@
 
 ###########################################################################
 ## CPCTELERA ENGINE
+###########################################################################
+
 ##
 ## File: cpct_sp2tile
 ##    Cuts up a big sprite into smaller tiles
@@ -51,7 +53,6 @@
 ##    -t | --tile-resolution   - Sets the resolution of each individual tile
 ##    -h | --help              - Shows help information on the terminal.
 ##
-###########################################################################
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh
