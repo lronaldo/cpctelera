@@ -52,7 +52,7 @@ endef
 # $(2): Hex2bin log file to parse 
 #
 define GETLOADADDRESS
-  $(eval $(1):=$(shell sed -n 's/^Binary file start = 0000\([0-9]*\).*$$/\1/p' < $(2)))
+  $(eval $(1):=$(shell sed -n 's/^Binary file start = 0000\([0-9A-Fa-f]*\).*$$/\1/p' < $(2)))
 endef
 
 #################
