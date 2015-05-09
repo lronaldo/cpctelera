@@ -17,7 +17,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#include <types.h>
+#include <cpctelera.h>
 
 // Declare utility function wait_frames (defined in utils.c)
 void wait_frames(u16 nframes);
