@@ -17,65 +17,49 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "newton_sprite.def"
+#include "sprites.h"    // Pixel data definitions of the sprites and TSprite structure
+#include "palette.h"    // Palette functions: fade-in, fade-out and RGB-HW colour conversions
+#include "utils.h"      // Function wait_frames 
 
-// Standard CPC Palette (16 firmware colour values for mode 0, same as BASIC's INK values)
-const u8 c_palette[16] = {  1, 24, 20,  6, 26,  0,  2,  8,
-                                      10, 12, 14, 16, 18, 22, 24, 16};
+// Default video memory location at CPC's start up
+#define SCR_VMEM  (u8*)0xC000
 
-// Correspondant hardware colour values, used by CRTC registers. This may be used
-// directly to the cpct_setPalette function, without previous conversion.
-//const u8 c_palette[16] = { 0x04, 0x0A, 0x13, 0x0C, 0x0B, 0x14, 0x15, 0x0D,
-//                                      0x06, 0x1E, 0x1F, 0x07, 0x12, 0x19, 0x0A, 0x07 };
-
-// Keys used to modify individual palette colors
-const cpct_keyID c_palkeys[16] = { Key_0, Key_1, Key_2, Key_3, Key_4, Key_5, Key_6, Key_7,
-                                   Key_8, Key_9, Key_Q, Key_W, Key_E, Key_R, Key_T, Key_Y };
-
-// Fucntion that rotates the colors of the palette to the left
-void rotatePalette(u8* pal, u8 size) {
-    u8 i, first;
-    first = pal[0];
-    for (i=0; i < size-1; i++)
-        pal[i] = pal[i+1];
-    pal[size-1] = first;
-}
-
+//
+// MAIN: Palette Effects Example
+//
 void main(void) {
-   u8  x=0, y=0, t=0, k=0, border=1;
-   u8* dest = (u8*)0xC000;
-   u8* palette = (u8*)c_palette;
+  // Create a table with the 3 sprites that will be used
+  const TSprite img[3] = { 
+    { G_Goku,   30, 75, 20, 49 }, // Goku sprite centered   (size = 20x49 bytes = 40x49 pixels)
+    { G_Vegeta, 22, 60, 36, 80 }, // Vegeta sprite centered (size = 36x80 bytes = 72x80 pixels)
+    { G_No13,   22, 60, 36, 80 }  // No13 sprite centered   (size = 36x80 bytes = 72x80 pixels)
+  };
+  u8* pvmem;  // Pointer to video memory where sprites will be drawn
+  u8  i;      // Index variable to iterate through the sprites
 
-   cpct_disableFirmware();
-   cpct_setVideoMode(0);
-   cpct_fw2hw(palette, 16);      // Converts colours from firmware values (BASIC INKs) to hardware values
-   cpct_setPalette(palette, 16); // Uses hardware colours to set up the video palette
+  // Initialize the CPC
+  cpct_disableFirmware();   // Disable firmware to prevent it from interfering
+  cpct_setVideoMode(0);     // Set video mode 0 (160x200, 16 colours)
+  setBlackPalette(0, 16);   // Set all 17 colours (16 palette + border) to Black
 
-   while(1) {
-      if (t) t--;
+  //
+  // Infinite Loop
+  //
+  while(1) {
 
-      cpct_scanKeyboard_f();
-      if      (cpct_isKeyPressed(Key_CursorRight) && x < 64 ) { x++; dest++; }
-      else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0  ) { x--; dest--; }
-      if      (cpct_isKeyPressed(Key_CursorUp)    && y > 0  ) { dest -= (y-- & 7) ? 0x0800 : 0xC850; }
-      else if (cpct_isKeyPressed(Key_CursorDown)  && y < 168) { dest += (++y & 7) ? 0x0800 : 0xC850; }
-      if      (cpct_isKeyPressed(Key_Space) && !t) {
-          rotatePalette(palette, 16);
-          cpct_setPalette(palette, 16);
-          t=50;
-      } else if (cpct_isKeyPressed(Key_Enter) && !t) {
-          cpct_setBorder(++border);
-          t=25;
-      } else {
-         for (k=0; k<16; k++) {
-            if (cpct_isKeyPressed(c_palkeys[k]) && !t) {
-               palette[k] = (palette[k] + 1) & 0x1F;
-               cpct_setPALColour(k, palette[k]);
-               t=25;
-            }
-         }
-      }
+    // Iterate through the 3 sprites using fade in / fade out palette effect
+    for(i=0; i < 3; ++i) {
+      cpct_clearScreen(0x00);   // Clear the screen filling it up with 0's
+      
+      // Calculate video memory location for next sprite and draw it
+      pvmem = cpct_getScreenPtr(SCR_VMEM, img[i].x, img[i].y);
+      cpct_drawSprite(img[i].sprite, pvmem, img[i].w, img[i].h);
 
-      cpct_drawSprite(G_newton_sprite, dest, 16, 32);
-   }
+      wait_frames(50);                    // Wait 1 second  ( 50 VSYNCs)
+      fade_in (G_rgb_palette, 0, 16, 4);  // Do a Fade in effect to show the sprite
+      
+      wait_frames(100);                   // Wait 2 seconds (100 VSYNCs)
+      fade_out(G_rgb_palette, 0, 16, 4);  // Do a Fade out effect to return to black
+    }
+  }
 }

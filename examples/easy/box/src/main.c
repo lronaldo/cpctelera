@@ -40,24 +40,24 @@ void main(void) {
    // Lets draw some boxes
 
    // 3 boxes with varying colour patterns
-   cpct_drawSolidBox((void*)0xC235, cpct_px2byteM1(2, 2, 1, 1), 10, 20); 
-   cpct_drawSolidBox((void*)0xC245, cpct_px2byteM1(1, 0, 2, 1), 10, 20); 
-   cpct_drawSolidBox((void*)0xC255, cpct_px2byteM1(0, 2, 0, 1), 10, 20); 
+   cpct_drawSolidBox((u8*)0xC235, cpct_px2byteM1(2, 2, 1, 1), 10, 20); 
+   cpct_drawSolidBox((u8*)0xC245, cpct_px2byteM1(1, 0, 2, 1), 10, 20); 
+   cpct_drawSolidBox((u8*)0xC255, cpct_px2byteM1(0, 2, 0, 1), 10, 20); 
 
    // 3 stripped boxes in 2 alternating colours
-   cpct_drawSolidBox((void*)0xC325, 0xAA, 10, 20); // 0xAA = cpct_px2byteM1(3, 0, 3, 0)
-   cpct_drawSolidBox((void*)0xC335, 0xA0, 10, 20); // 0xA0 = cpct_px2byteM1(1, 0, 1, 0)
-   cpct_drawSolidBox((void*)0xC345, 0x0A, 10, 20); // 0x0A = cpct_px2byteM1(2, 0, 2, 0)
+   cpct_drawSolidBox((u8*)0xC325, 0xAA, 10, 20); // 0xAA = cpct_px2byteM1(3, 0, 3, 0)
+   cpct_drawSolidBox((u8*)0xC335, 0xA0, 10, 20); // 0xA0 = cpct_px2byteM1(1, 0, 1, 0)
+   cpct_drawSolidBox((u8*)0xC345, 0x0A, 10, 20); // 0x0A = cpct_px2byteM1(2, 0, 2, 0)
 
    // Another 3 stripped boxes, with the strips displaced
-   cpct_drawSolidBox((void*)0xC415, 0x55, 10, 20); // 0x55 = cpct_px2byteM1(0, 3, 0, 3)
-   cpct_drawSolidBox((void*)0xC425, 0x50, 10, 20); // 0x50 = cpct_px2byteM1(0, 1, 0, 1)
-   cpct_drawSolidBox((void*)0xC435, 0x05, 10, 20); // 0x05 = cpct_px2byteM1(0, 2, 0, 2)
+   cpct_drawSolidBox((u8*)0xC415, 0x55, 10, 20); // 0x55 = cpct_px2byteM1(0, 3, 0, 3)
+   cpct_drawSolidBox((u8*)0xC425, 0x50, 10, 20); // 0x50 = cpct_px2byteM1(0, 1, 0, 1)
+   cpct_drawSolidBox((u8*)0xC435, 0x05, 10, 20); // 0x05 = cpct_px2byteM1(0, 2, 0, 2)
                      
    // 3 Boxes in solid colour (4 pixels of the same colour)
-   cpct_drawSolidBox((void*)0xC505, cpct_px2byteM1(3, 3, 3, 3), 10, 20); // 0xFF 
-   cpct_drawSolidBox((void*)0xC515, cpct_px2byteM1(2, 2, 2, 2), 10, 20); // 0xF0
-   cpct_drawSolidBox((void*)0xC525, cpct_px2byteM1(1, 1, 1, 1), 10, 20); // 0x0F
+   cpct_drawSolidBox((u8*)0xC505, cpct_px2byteM1(3, 3, 3, 3), 10, 20); // 0xFF 
+   cpct_drawSolidBox((u8*)0xC515, cpct_px2byteM1(2, 2, 2, 2), 10, 20); // 0xF0
+   cpct_drawSolidBox((u8*)0xC525, cpct_px2byteM1(1, 1, 1, 1), 10, 20); // 0x0F
    
    // After drawing, loop forever
    while (1);
