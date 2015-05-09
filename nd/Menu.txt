@@ -137,6 +137,14 @@ Group: Memutils  {
    File: cpct_memset  (memutils/cpct_memset.s)
    }  # Group: Memutils
 
+Group: Command Line Tools  {
+
+   File: cpct_bin2c  (no auto-title, commandline/cpct_bin2c)
+   File: cpct_mkproject  (no auto-title, commandline/cpct_mkproject)
+   File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
+   File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
+   }  # Group: Command Line Tools
+
 Group: Index  {
 
    Constant Index: Constants
