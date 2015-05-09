@@ -28,15 +28,6 @@
 //////////////////////////////////////////////////////////////////////////
 
 //
-// This function returns the video memory address where 
-// a given pixel line y (0-200) starts.
-//
-u8 *getScreenPointer(u8 y) {
-   y = y << 1;
-   return (u8 *)0xC000 + ((y >> 3) * 80) + ((y & 7) * 2048);
-}
-
-//
 // Move an entity along the X axis in pixels. The entity 'ent' will be
 // moved 'mx' pixels, taking into account that the entity cannot go beyond
 // limits (0 and 'sx'). 
