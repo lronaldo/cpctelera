@@ -27,7 +27,7 @@
 ## CPCtelera's C arrays. 
 ##
 ## Usage:
-##    cpct_rgas2c [filename] [options]
+##    <cpct_rgas2c> [filename] [options]
 ##
 ## Description:
 ##    This script converts a file containing sprites in CPCRSLib asm output format

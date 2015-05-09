@@ -27,7 +27,7 @@
 ##    Script for converting binary files to C arrays
 ##
 ## Usage:
-##    cpct_bin2c [file] [options]
+##    <cpct_bin2c> [file] [options]
 ##
 ## Description:
 ##    This script converts any given binary file into a C array containing

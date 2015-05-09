@@ -26,7 +26,7 @@
 ##    Cuts up a big sprite into smaller tiles
 ##
 ## Usage:
-##    cpct_sp2tile [file] -s [SpriteRes] -t [TileRes]
+##    <cpct_sp2tile> [file] -s [SpriteRes] -t [TileRes]
 ##
 ## Description:
 ##    This script converts a C array sprite into an array made of smaller

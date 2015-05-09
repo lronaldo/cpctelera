@@ -27,7 +27,7 @@
 ## engine.
 ##
 ## Usage:
-##    cpct_mkproject [foldername] [options]
+##    <cpct_mkproject> [foldername] [options]
 ##
 ## Description:
 ##    This script creates a new folder and fills it up with required files
