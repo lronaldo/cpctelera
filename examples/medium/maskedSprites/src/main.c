@@ -17,7 +17,7 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "sprites.h"
+#include "sprites/sprites.h"
 
 // Pointer to the start of default screen video memory
 #define SCR_VMEM  (u8*)0xC000
