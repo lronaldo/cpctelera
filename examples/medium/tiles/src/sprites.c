@@ -16,12 +16,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <types.h>
+
 //
 // Sprite definitions used in this example
 //
 
 // Waves sprite, 2x8 bytes size (4x8 mode 0 pixels)
-const unsigned char waves_2x8[16] = {
+const u8 waves_2x8[16] = {
    0xE0,0xE0,
    0xD0,0xD0,
    0x58,0x58,
@@ -32,7 +34,7 @@ const unsigned char waves_2x8[16] = {
    0xF1,0xF1 };
 
 // F sprite, 2x8 bytes size (4x8 mode 0 pixels)
-const unsigned char F_2x8[16] = {
+const u8 F_2x8[16] = {
    0x0C,0x3C,
    0x4C,0x9C,
    0x4C,0x3C,
@@ -43,7 +45,7 @@ const unsigned char F_2x8[16] = {
    0xF0,0xF0  };
         
 // Waves sprite, 4x8 bytes size (8x8 mode 0 pixels)
-const unsigned char waves_4x8[32] = {       
+const u8 waves_4x8[32] = {       
   0x03,0xC3,0x0C,0xC0,
   0x47,0xE1,0x4C,0x60,
   0x52,0xCB,0x18,0xC8,
@@ -54,7 +56,7 @@ const unsigned char waves_4x8[32] = {
   0x03,0xC3,0x0C,0xC0 };
 
 // Inverted waves sprite, 4x8 bytes size (8x8 mode 0 pixels)
-const unsigned char FF_4x8[32] = {
+const u8 FF_4x8[32] = {
   0x61,0xC3,0xC3,0x92,
   0x61,0x33,0x33,0x72,
   0x61,0x72,0xF0,0xF0,
