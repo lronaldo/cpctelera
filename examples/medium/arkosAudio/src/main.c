@@ -17,23 +17,64 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "demo.song"
+#include "music/music.h"
 
-// Status of a Key (Pressed / Released)
-typedef enum { K_RELEASED, K_PRESSED } TKeyStatus;
+//
+// Defined type to know the status of a Key 
+//    Key is either Pressed / Released, and K_NOEVENT is used to
+//    report that a key is in the same status as in previous checks
+//    (Continues pressed or continues released)
+//
+typedef enum { K_NOEVENT, K_RELEASED, K_PRESSED } TKeyStatus;
 
+////////////////////////////////////////////////////////////////////////
+// Checks if a Key has changed from pressed to released or viceversa
+// If it has changed, that is considered and event, the status of 
+// the key is changed and the concrete event is returned. If it is
+// in its previous status, nothing is done and K_NOEVENT is returned
+//
+TKeyStatus checkKeyEvent(cpct_keyID key, TKeyStatus *keystatus) {
+   TKeyStatus newstatus;   // Hold the new status of the key (pressed / released)
+
+   // Check the new status of the key and save it into newstatus
+   if ( cpct_isKeyPressed(key) )
+      newstatus = K_PRESSED;   // Key is now pressed
+   else
+      newstatus = K_RELEASED;  // Key is now released
+
+   // Check if newstatus is same or different than previous one
+   // If it is different, change key status and report the event
+   if (newstatus == *keystatus)
+      return K_NOEVENT;       // Same key status, report NO EVENT
+   else {
+      *keystatus = newstatus; // Status has changed, save it...
+      return newstatus;       // And return the new status
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+// MAIN: Arkos Tracker Music Example
+//    Keys:
+//       * SPACE - Start / Stop Music
+//       *   1   - Play a sound effect on Channel A
+//       *   2   - Play a sound effect on Channel C
+//
 void main(void) {
-   TKeyStatus space_bar = K_RELEASED;
-   u8  playing   = 1;
-   u8  color     = 1;
-   u8* pvideomem = (u8*) 0xC000;
+   TKeyStatus k_space, k_0, k_1; // Status of the 3 Keys for this example (Space, 1, 2)
+   u8  playing   = 1;            // Flag to know if music is playing or not
+   u8  color     = 1;            // Color to draw charactes (normal / inverse)
+   u8* pvideomem = (u8*) 0xC000; // Pointer to video memory where next character will be drawn
 
-   cpct_disableFirmware();
-   cpct_setVideoMode(2);
+   // All 3 keys are considered to be released at the start of the program
+   k_space = k_0 = k_1 = K_RELEASED;
+
+   // Initialize CPC
+   cpct_disableFirmware(); // Disable firmware to prevent interaction
+   cpct_setVideoMode(2);   // Set Mode 2 (640x200, 2 colours)
 
    // Initialize the song to be played
-   cpct_akp_musicInit(molusk_song);
-   cpct_akp_SFXInit(molusk_song);
+   cpct_akp_musicInit(molusk_song);    // Initialize the music
+   cpct_akp_SFXInit(molusk_song);      // Initialize instruments to be used for SFX (Same as music song)
 
    while (1) {
       // We have to call the play function 50 times per second (because the song is 
@@ -41,45 +82,61 @@ void main(void) {
       // when the song is not stopped (still playing)
       cpct_waitVSYNC();
 
+      // Check if the music is playing. When it is, do all the things the music
+      // requires to be done every 1/50 secs.
       if (playing) {
-         cpct_akp_musicPlay();
+         cpct_akp_musicPlay();   // Play next music 1/50 step.
 
-         // Write a new dash to the screen to see something while playing
+         // Write a new number to the screen to see something while playing. 
+         // The number will be 0 when music is playing, and 1 when it finishes.
          //  -> If some SFX is playing write the channel where it is playing
+         
+         // Check if there is an instrument plaing on channel A
          if (cpct_akp_SFXGetInstrument(AY_CHANNEL_A))
-            cpct_drawCharM2(pvideomem, color, 'A');
+            cpct_drawCharM2(pvideomem, color, 'A'); // Write an 'A' because channel A is playing
+         
+         // Check if there is an instrument plaing on channel C
          else if (cpct_akp_SFXGetInstrument(AY_CHANNEL_C))
-            cpct_drawCharM2(pvideomem, color, 'C');
+            cpct_drawCharM2(pvideomem, color, 'C'); // Write an 'C' because channel A is playing 
+         
+         // No SFX is playing on Channels A or C, write the number of times
+         // this song has looped.
          else
             cpct_drawCharM2(pvideomem, color, '0' + cpct_akp_songLoopTimes);
 
          // Point to the start of the next character in video memory
-         if (++pvideomem >= (char*)0xC7D0) {
-            pvideomem = (char*)0xC000;
-            color ^= 1;
+         if (++pvideomem >= (u8*)0xC7D0) {
+            pvideomem = (u8*)0xC000; // When we reach the end of the screen, we return..
+            color ^= 1;              // .. to the start, and change the colour
          }
 
-         // If Music has already ended, cycle it again
+         // Check if music has already ended (when looptimes is > 0)
          if (cpct_akp_songLoopTimes > 0)
-            cpct_akp_musicInit(molusk_song);
+            cpct_akp_musicInit(molusk_song); // Song has ended, start it again and set loop to 0
       }
 
       // Check keyboard to let the user play/stop the song with de Space Bar
-      // (Only change status when space_bar is released)
+      // and reproduce some sound effects with keys 1 and 0
       cpct_scanKeyboard_f();
-      if (space_bar == K_PRESSED) {
-         if ( !cpct_isKeyPressed(Key_Space) ) {
-            space_bar = K_RELEASED;
-            if (playing)
-               cpct_akp_stop();
-            playing ^= 1;
-         }
-      } else if (cpct_isKeyPressed(Key_Space)) {
-         space_bar = K_PRESSED;
-      } else if (cpct_isKeyPressed(Key_0)) {
+
+      // When Space is released, stop / continue music
+      if ( checkKeyEvent(Key_Space, &k_space) == K_RELEASED ) {
+         // Only stop it when it was playing previously
+         // No need to call "play" again when continuing, as the
+         // change in "playing" status will make the program call "play"
+         // again from the next cycle on
+         if (playing)
+            cpct_akp_stop();
+         
+         // Change it from playing to not playing and viceversa (0 to 1, 1 to 0)
+         playing ^= 1;
+
+      // Check if Key 0 has been released to reproduce a Sound effect on channel A
+      } else if ( checkKeyEvent(Key_0, &k_0) == K_RELEASED ) {
          cpct_akp_SFXPlay(13, 15, 36, 20, 0, AY_CHANNEL_A);
-      } else if (cpct_isKeyPressed(Key_1)) {
+
+      // Check if Key 1 has been released to reproduce a Sound effect on channel C
+      } else if ( checkKeyEvent(Key_1, &k_1) == K_RELEASED ) 
          cpct_akp_SFXPlay(3, 15, 60, 0, 40, AY_CHANNEL_C);
-      }
    }
 }
