@@ -81,7 +81,7 @@ void drawLogo() {
 
     // Draw the sprite at screen byte coordinates (20, 4) (pixel coordinates (80, 4))
     pvideo = cpct_getScreenPtr(SCR_VMEM, 20, 4);
-    cpct_drawSprite(G_CPCt_logo, pvideo_, LOGO_W, LOGO_H);
+    cpct_drawSprite(G_CPCt_logo, pvideo, LOGO_W, LOGO_H);
 }
 
 //
