@@ -17,9 +17,9 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "sprites.h"    // Pixel data definitions of the sprites and TSprite structure
-#include "palette.h"    // Palette functions: fade-in, fade-out and RGB-HW colour conversions
-#include "utils.h"      // Function wait_frames 
+#include "modules/sprites.h" // Pixel data definitions of the sprites and TSprite structure
+#include "modules/palette.h" // Palette functions: fade-in, fade-out and RGB-HW colour conversions
+#include "modules/utils.h"   // Function wait_frames 
 
 // Default video memory location at CPC's start up
 #define SCR_VMEM  (u8*)0xC000
