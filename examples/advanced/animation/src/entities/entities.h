@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <types.h>
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////
@@ -38,11 +40,11 @@ typedef enum {
 // Description of an animation frame
 //
 typedef struct {
-   unsigned char* sprite;        // Sprite associated to this frame
-   unsigned char  width, height; // Sprite dimensions in bytes
-            char  mx, my;        // Pixel movements, in bytes, to be executed at the start of this Frame
-            char  ex, ew, eh;    // Pixel bytes to erase (ew, eh=width and height of box to be eliminated, ex=X displacement, in bytes, from the top-left corner)
-   unsigned char  time;          // Time that the sprite should be shown
+   u8* sprite;        // Sprite associated to this frame
+   u8  width, height; // Sprite dimensions in bytes
+   i8  mx, my;        // Pixel movements, in bytes, to be executed at the start of this Frame
+   i8  ex, ew, eh;    // Pixel bytes to erase (ew, eh=width and height of box to be eliminated, ex=X displacement, in bytes, from the top-left corner)
+   u8  time;          // Time that the sprite should be shown
 } TAnimFrame;
 
 //
@@ -50,10 +52,10 @@ typedef struct {
 //   Time is measured in main loop cycles
 //
 typedef struct {
-   TAnimFrame**      frames;     // Vector containing all the frames of the animation
-   unsigned char   frame_id;     // Index of the current frame
-   unsigned char       time;     // Remaining time for this frame
-   TAnimStatus       status;     // Status of the animation
+   TAnimFrame**  frames;    // Vector containing all the frames of the animation
+   u8            frame_id;  // Index of the current frame
+   u8            time;      // Remaining time for this frame
+   TAnimStatus   status;    // Status of the animation
 } TAnimation;
 
 //
@@ -74,10 +76,10 @@ typedef enum {
 // Describes a game entity (typically, a character)
 //
 typedef struct {
-   TAnimation        *anim;   // Animation currently associated with this entity
-   unsigned char *videopos;   // Video memory location where entity will be drawn
-   unsigned char      x, y;   // X, Y coordinates of entity in the screen
-   TEntityStatus    status;   // Present status of the entity
+   TAnimation    *anim;     // Animation currently associated with this entity
+   u8            *videopos; // Video memory location where entity will be drawn
+   u8            x, y;      // X, Y coordinates of entity in the screen
+   TEntityStatus status;    // Present status of the entity
 } TEntity;
 
 //////////////////////////////////////////////////////////////////////////
@@ -88,10 +90,10 @@ typedef struct {
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-unsigned char *getScreenPointer(unsigned char y);
+    u8 * getScreenPointer(u8 y);
 TEntity* getPersea();
-void updateEntity(TEntity *ent);
-void setAnimation(TEntity *ent, TEntityStatus newstatus);
-char moveEntityX (TEntity* ent, char mx);
-char moveEntityY (TEntity* ent, char my);
-void drawEntity  (TEntity* ent);
+    void updateEntity(TEntity *ent);
+    void setAnimation(TEntity *ent, TEntityStatus newstatus);
+      i8 moveEntityX (TEntity* ent, i8 mx);
+      i8 moveEntityY (TEntity* ent, i8 my);
+    void drawEntity  (TEntity* ent);

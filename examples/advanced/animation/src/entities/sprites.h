@@ -17,6 +17,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <types.h>
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 ///////////
@@ -25,13 +27,13 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-extern const unsigned char gc_palette[16];
-extern const unsigned char gc_LogoFremos[55*20];
-extern const unsigned char gc_PerseaWalk13[8*24];
-extern const unsigned char gc_PerseaWalk2[8*24];
-extern const unsigned char gc_PerseaWalk4[8*24];
-extern const unsigned char gc_PerseaFist[9*24];
-extern const unsigned char gc_PerseaKick[9*24];
-extern const unsigned char gc_PerseaHit[8*24];
-extern const unsigned char gc_PerseaWins[8*24];
-extern const unsigned char gc_PerseaKO[12*8];
+extern const u8 gc_palette[16];
+extern const u8 gc_LogoFremos[55*20];
+extern const u8 gc_PerseaWalk13[8*24];
+extern const u8 gc_PerseaWalk2[8*24];
+extern const u8 gc_PerseaWalk4[8*24];
+extern const u8 gc_PerseaFist[9*24];
+extern const u8 gc_PerseaKick[9*24];
+extern const u8 gc_PerseaHit[8*24];
+extern const u8 gc_PerseaWins[8*24];
+extern const u8 gc_PerseaKO[12*8];

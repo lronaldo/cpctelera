@@ -85,8 +85,8 @@ const TEntity g_persea = { &g_perseaAnimation, 0xC2D0, 0, 72, es_stop };
 //
 // Some global constants defining our world
 //
-const unsigned char g_SCR_WIDTH  =  80;  // Screen width in bytes (80 bytes = 160 píxels)
-const unsigned char g_SCR_HEIGHT = 200;  // Screen height in bytes
+const u8 g_SCR_WIDTH  =  80;  // Screen width in bytes (80 bytes = 160 píxels)
+const u8 g_SCR_HEIGHT = 200;  // Screen height in bytes
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -104,22 +104,15 @@ TEntity* getPersea() {
 }
 
 //
-// This function returns the video memory address where a given pixel line y starts.
-//
-unsigned char *getScreenPointer(unsigned char y) {
-   return (unsigned char *)0xC000 + ((y >> 3) * 80) + ((y & 7) * 2048);
-}
-
-//
 // Move an entity along the X axis in pixels. The entity 'ent' will be
 // moved 'mx' pixels, taking into account that the entity cannot go beyond
 // limits (0 and 'Screen width'). 
 // If the entity tries to pass the limits, it is stopped at them.
 // This function returns NumMovedBytes when entity has been moved, 0 otherwise
 //
-char moveEntityX (TEntity* ent, char mx) {
-   unsigned char moved = 0;// Tells us how many bytes the entity has moved
-   unsigned char umx;      // Holds the value of mx without sign (always positive)
+i8 moveEntityX (TEntity* ent, i8 mx) {
+   u8 moved = 0;// Tells us how many bytes the entity has moved
+   u8 umx;      // Holds the value of mx without sign (always positive)
 
    // Case 1: Moving to the left (negative ammount of pixels)
    if (mx < 0) {
@@ -139,7 +132,7 @@ char moveEntityX (TEntity* ent, char mx) {
    // Case 2: Moving to the right (positive amount of pixels)
    } else if (mx) {
       TAnimation*   anim;
-      unsigned char space_left;
+      u8 space_left;
       umx = mx;   // umx = mx, as both of them are positive
 
       // Calculate available space to move to the right
@@ -171,9 +164,9 @@ char moveEntityX (TEntity* ent, char mx) {
 // If the entity is stopped from passing limits, it will be stopped at them.
 // This function returns NumMovedBytes when entity has been moved, 0 otherwise
 //
-char moveEntityY (TEntity* ent, char my) {
-   char moved = 0;      // Number of bytes the entity has moved 
-   unsigned char umy;   // Holds the value of my without sign (always positive)
+i8 moveEntityY (TEntity* ent, i8 my) {
+   i8 moved = 0;      // Number of bytes the entity has moved 
+   u8 umy;   // Holds the value of my without sign (always positive)
 
    // Case 1: Moving up (negative ammount of pixels)
    if (my < 0) {
@@ -182,17 +175,17 @@ char moveEntityY (TEntity* ent, char my) {
       // Move umy pixels up, taking care not to pass 0 limit
       if (umy <= ent->y) {
          ent->y        -= umy;
-         ent->videopos  = getScreenPointer(ent->y) + ent->x;
+         ent->videopos  = cpct_getScreenPtr((u8*)0xC000, ent->x, ent->y);
          moved          = my;
       } else if ( ent->y ) {
          // movement tryied to pass 0 limit, adjusting to 0 
-         ent->videopos  = (unsigned char*)0xC000 + ent->x;
+         ent->videopos  = (u8*)0xC000 + ent->x;
          moved          = -ent->y;
          ent->y         = 0;
       }
    // Case 1: Moving down (positive ammount of pixels)
    } else if (my) {
-      unsigned char space_left;
+      u8 space_left;
       TAnimation*   anim;
       umy = my;   // Both umy and my are positive
 
@@ -211,7 +204,7 @@ char moveEntityY (TEntity* ent, char my) {
       }
       if (moved) {
          // Recalculating video pos when y has been changed
-         ent->videopos = getScreenPointer(ent->y) + ent->x;
+         ent->videopos = cpct_getScreenPtr((u8*)0xC000, ent->x, ent->y);
       }
    }
 
@@ -223,8 +216,8 @@ char moveEntityY (TEntity* ent, char my) {
 // Updates an animation
 //   Returns 1 when a new frame is reached, and 0 otherwise
 //
-char updateAnimation(TAnimation* anim) {
-   char newframe = 0;
+i8 updateAnimation(TAnimation* anim) {
+   i8 newframe = 0;
 
    // Update only if animation is not paused or finished
    if (anim->status != as_pause && anim->status != as_end) {

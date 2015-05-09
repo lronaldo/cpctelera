@@ -18,8 +18,8 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "entities.h"
-#include "sprites.h"
+#include "entities/entities.h"
+#include "entities/sprites.h"
 
 //
 // Initialization of the Amstrad CPC at the start of the game
@@ -78,8 +78,15 @@ void updateUser(TEntity* user) {
       setAnimation(user, animrequest);
 }
 
-//
+//////////////////////////////////////////////////////////////////////
 // MAIN EXAMPLE CODE
+//    Keys:
+//       * Cursor left-right: Move character (walk)
+//       * Cursor up        : Kick
+//       * Cursor down      : Fist
+//       * Space            : Get Hit
+//       * 1                : Die
+//       * w                : Win
 //
 void main(void) {
    TEntity* persea;
