@@ -97,8 +97,8 @@ img {
 
 header {
   width:270px;
-  float:left;
-  position:fixed;
+  float:right;
+  position:relative;
 }
 
 header ul {
@@ -161,7 +161,7 @@ header ul a strong {
 
 section {
   width:500px;
-  float:right;
+  float:left;
   padding-bottom:50px;
 }
 
@@ -178,8 +178,8 @@ hr {
 
 footer {
   width:270px;
-  float:left;
-  position:fixed;
+  float:right;
+  position:static;
   bottom:50px;
 }
 
