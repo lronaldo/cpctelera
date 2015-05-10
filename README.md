@@ -9,7 +9,7 @@ routines to aid developers in the creation of games. The main aims of _**CPCtele
 
 **Installing and using** _**CPCtelera**_ is very easy: 
  * [How to install CPCtelera](http://lronaldo.github.io/cpctelera/files/readme-txt.html#Installing_CPCtelera)
- * [CPCtelera reference manual](http://lronaldo.github.io/cpctelera) 
+ * [CPCtelera reference manual](http://lronaldo.github.io/cpctelera/files/readme-txt.html) 
  
 If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with _**CPCtelera**_. This package creates Xcode projects from examples and lets you build them directly from Xcode.
 
