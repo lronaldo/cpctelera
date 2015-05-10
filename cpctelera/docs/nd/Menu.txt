@@ -40,6 +40,8 @@ Timestamp: Last updated yyyy/mm/dd
 
 Link: CPCtelera at Github  (https://github.com/lronaldo/cpctelera)
 File: CPCtelera Reference Manual  (no auto-title, readme.txt)
+File: Authors  (no auto-title, authors.txt)
+File: License  (no auto-title, license.txt)
 Text: ______________________________________________________________________
 File: Aliases for builtin types  (types.h)
 

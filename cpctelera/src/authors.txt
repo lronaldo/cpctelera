@@ -1,0 +1,72 @@
+Title: Authors
+
+Section: Project authors
+   
+   Maintainer, low-level library and build system developers
+
+Project owner:
+   * <ronaldo at http://twitter.com/frangallegobr> / (<Cheesetea at http://www.cheesetea.com>, <Fremos at http://fremos.cheesetea.com>, <ByteRealms at http://www.byterealms.com>)
+ 
+Awesome collaborators:
+   * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
+   * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
+   * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
+   * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
+ 
+Bitarrays idea and original implementation:
+   * Alberto García García (Blitzman, albertgg93@gmail.com, <@algertgarcia93 at http://twitter.com/algertgarcia93>)
+   * Pablo Martínez González (pablo2093@gmail.com, <@pablo_2093 at http://twitter.com/pablo_2093>)
+ 
+Some original code and ideas for sprite drawing and firmware enabling/disabling:
+   * Raúl Simarro (Artaburu / ESP Soft)
+ 
+Some makefile code and ideas:
+   * <Cpcitor at http://github.com/cpcitor>
+ 
+Arkos player original code:
+   * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>
+
+Section: 3rdparty software authors
+   
+   Developers of tools or 3rdparty software used by CPCtelera
+ 
+ <Arkos Tracker at http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start>:
+   * Main Author: <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> 
+   * Other Authors / Collaborators: SuperSylvestre / Les Sucres, 
+   Augusto Ruiz Garcia (WYZ) / <Retroworks at http://www.retroworks.es>, 
+   Grim / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>, 
+   <Lachlan Keown at http://www.twitter.com/lachlankeown>, 
+   Ramlaid / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>, 
+   Madram / Overlanders
+   UltraSyd / Brainstorm,
+   <NoRecess at http://norecess.cpcscene.net/> / <Condense at http://www.pouet.net/groups.php?which=8>,
+   Syx
+ 
+ <Small Devices C Compiler (SDCC) at http://sdcc.sourceforge.net/>:
+   * <SDCC Team at http://sdcc.sourceforge.net/index.php#Who>
+ 
+ <iDSK at http://koaks.amstrad.free.fr/amstrad/projets/>:
+   * Sid / IMPACT 
+   * <Pulkomandy at http://www.pushnpop.net/profile-47.html> / <Shinra Team at http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml>
+ 
+ <Hex2bin at http://sourceforge.net/projects/hex2bin/>:
+   * <Jaques Pelletier at https://www.linkedin.com/pub/jacques-pelletier/a/668/309>
+ 
+ <2CDT at http://www.cpcwiki.eu/forum/applications/2cdt/>:
+   * <Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+ 
+ <Retro Game Asset Studio (RGAS) at http://www.cpcwiki.eu/index.php/Retro_Game_Asset_Studio>:
+   * <Lachlan Keown at http://www.twitter.com/lachlankeown> (lachlankeown@gmail.com)
+
+Section: Special Thanks
+
+   Developers, collaborators and others that helped a great deal
+
+ * <Lachlan Keown at http://www.twitter.com/lachlankeown> (For being incredibly kind and helpful, and adding every required modification to better integrate RGAS with *CPCtelera*)
+ * <Cpcitor at http://github.com/cpcitor> (for his great help and advice, and for developing <cpc-dev-tool-chain at http://github.com/cpcitor/cpc-dev-tool-chain>)
+ * <CPCWiki at http://cpcwiki.eu> & <Grimware at http://grimware.org/> (for providing great technical documentations and examples)
+ * Raúl Simarro (for developing <CPCRSLib at http://sourceforge.net/projects/cpcrslib/> game creation library)
+ * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> (for developing Arkos Traker&Player and giving great support on adding it to *CPCtelera*. Also for giving general advice during development of *CPCtelera*)
+ * <Pulkomandy at http://www.pushnpop.net/profile-47.html> / <Shinra Team at http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml> (for maintaining <cpcsdk at https://github.com/cpcsdk>, with tools like <iDSK at https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z&can=2&q=> or <cpcfs at https://code.google.com/p/cpcsdk/wiki/cpcfs>, among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
+ * Mochilote / <CPCMania at http://cpcmania.com> (for creating great tutorials and useful documentation in his site)
+ * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)

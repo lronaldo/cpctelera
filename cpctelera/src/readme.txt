@@ -2,7 +2,7 @@ File: CPCtelera Reference Manual
 
 (see cpct_logo.png)
 
-*Astonishing fast Amstrad CPC game engine for C and Assembler developers*
+*Astonishing fast Amstrad CPC game engine for C and Assembler developers*. CPCtelera has been created by these *<Authors>*, and is distributed under *GPL v3 <License>*.
 
 (see paypaldonations.jpg)
 
