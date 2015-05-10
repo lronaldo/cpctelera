@@ -1,4 +1,4 @@
-# CPCtelera
+![CPCtelera Logo](https://github.com/lronaldo/cpctelera/blob/master/cpctelera/docs/images/cpct_logo.png)
 
 _**Astonishing fast Amstrad CPC game engine for C developers**_
 
@@ -7,39 +7,13 @@ _**Astonishing fast Amstrad CPC game engine for C developers**_
 _**CPCtelera**_ is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
 routines to aid developers in the creation of games. The main aims of _**CPCtelera**_ are producing the fastest possible code, being very easy to install and use in every modern platform and having an extensively commented code, to aid those wanting to learn from code.
 
-_**CPCtelera**_ is still under develpment, at a very early stage. However, it is completely usable at the moment.
-
-**Installing and using** _**CPCtelera**_ is very easy:
- 1. Open a terminal (under Windows, you will have to install [Cygwin](https://cygwin.com/) previously)
- 2. Clone _**CPCtelera**_ repository
-   * `git clone https://github.com/lronaldo/cpctelera`
- 3. Enter _**CPCtelera**_ folder
-   * `cd cpctelera/`
- 4. Launch `setup.sh`
-   * `./setup.sh`
-
-Follow setup instructions. Setup checks that required software is previously installed, and shows messages if some prerrequisite is missing. If that were the case, install required software and launch setup again. Currenly, _**CPCtelera**_ requires these software to be installed:
- * Compilers: `gcc`, `g++`
- * Parsers: `make`, `bison`, `flex`
- * Utilities: `git`
- * Libraries (OS X): `boost`
- * Libraries (Linux): `libboost-dev`
- * Libraries (Cygwin): `libboost-devel`,`libintl-devel`
-
-**Mac OSX**, previously to these requirements, needs to have installed: 
- * [Homebrew](http://brew.sh/)
- * [XCode](https://itunes.apple.com/es/app/xcode/id497799835?mt=12)
- * XCode Command Line tools (`xcode-select --install`)
- * Libboost from Homebrew (`brew install boost`)
-
-Once `setup.sh` completes without errors, _**CPCtelera**_ will be ready to use. To have a quick glance about what _**CPCtelera**_ offers, you may enter `examples/` folder and check all the examples included. You can build any one of them just by typing `make` inside the example folder, then CDT and DSK files will be automatically generated.
-
-For creating your own projects, _**CPCtelera**_ includes the `cpct_mkproject` script. `setup.sh` configures your system's $PATH variable so that you have direct access to `cpct_mkproject` anywhere on your system (you should close and open your terminal again after `setup.sh` finishes). Creating a new project is as easy as typing this:
- * `cpct_mkproject <project_folder>`
-
- If you wanted to specify a project name (different than the folder name) and/or a concrete binary load address, you may check options with `cpct_mkproject --help`.
-
+**Installing and using** _**CPCtelera**_ is very easy: 
+ * [How to install CPCtelera](http://lronaldo.github.io/cpctelera/files/readme-txt.html#Installing_CPCtelera)
+ * [CPCtelera reference manual](http://lronaldo.github.io/cpctelera) 
+ 
 If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with _**CPCtelera**_. This package creates Xcode projects from examples and lets you build them directly from Xcode.
+
+### Supported Platforms
 
 _**CPCtelera**_ is fully usable and has been tested under these platforms:
  * Windows (with Cygwin 32/64 bits)
@@ -47,10 +21,6 @@ _**CPCtelera**_ is fully usable and has been tested under these platforms:
  * Linux (Ubuntu/Debian, Raspbian, Arch and Manjaro)
 
 If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
-
-### Reference Manual
-
-[CPCtelera reference manual](http://lronaldo.github.io/cpctelera) is now online, and included in html with the library.
 
 ### Contact information and support
 
