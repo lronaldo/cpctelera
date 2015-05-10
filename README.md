@@ -1,4 +1,4 @@
-![CPCtelera Logo](https://github.com/lronaldo/cpctelera/blob/master/cpctelera/docs/images/cpct_logo.png)
+![CPCtelera Logo](http://lronaldo.github.io/cpctelera/images/cpct_logo.png)
 
 _**Astonishing fast Amstrad CPC game engine for C developers**_
 
