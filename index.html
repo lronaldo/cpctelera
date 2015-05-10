@@ -11,16 +11,6 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-16956670-3', 'auto');
-      ga('send', 'pageview');
-
-    </script>    
   </head>
   <body>
     <div class="wrapper">
@@ -49,186 +39,88 @@
 
 <img src="https://github.com/lronaldo/cpctelera/blob/master/cpctelera/docs/images/cpct_logo.png?raw=true" alt="CPCtelera Logo">
 
-<p><em><strong>CPCtelera</strong></em> is a game engine for Amstrad CPC computers whose aim is to have the fastest possible 
-routines to aid developers in the creation of games. The main aims of <em><strong>CPCtelera</strong></em> are producing the fastest possible code, being very easy to install and use in every modern platform and having an extensively commented code, to aid those wanting to learn from code.</p>
+<p>Astohishing fast Amstrad CPC game engine for C developers</p>
 
-<p><strong>Installing and using</strong> <em><strong>CPCtelera</strong></em> is very easy: </p>
+<hr>
 
+<p><em><strong>CPCtelera</strong></em> is an integrated development framework for creating <em><strong>Amstrad CPC</strong></em> games and content which includes:
 <ul>
-<li><a href="http://lronaldo.github.io/cpctelera/files/readme-txt.html#Installing_CPCtelera">How to install CPCtelera</a></li>
-<li>
-<a href="http://lronaldo.github.io/cpctelera/files/readme-txt.html">CPCtelera reference manual</a> </li>
+<li>A low-level library with support for: graphics, audio, keyboard, firmware, strings, video hardware manipulation and memory management.
+</li><li>An API for developing games and software in C and Assembler.
+</li><li>A complete multi-platform building system with support for building CDTs and DSKs automatically.
+</li><li>Tools for content authoring (audio, graphics and level editing)
+</li>
 </ul>
 
-<p>If you are a Mac user, you will want to consider installing <a href="https://github.com/dfreniche/cpctelera_samples_xcode">CPCtelera-samples-Xcode</a> by <a href="http://blog.freniche.com">Diego Freniche</a>, along with <em><strong>CPCtelera</strong></em>. This package creates Xcode projects from examples and lets you build them directly from Xcode.</p>
+<p><em><strong>CPCtelera</strong></em> has been conceived with these aims in mind:
+
+<ul>
+<li>Delivering a convenient, usable and fast environment for developing games
+</li><li>Providing an up-to-date, detailed and easy to consult documentation
+</li><li>Giving technical details of the complete implementation for those curious
+</li><li>Easing the install and configuration process
+</li>
+</ul>
+
+<p><strong>Starting with </strong> <em><strong>CPCtelera</strong></em> is very easy: </p>
+
+<ul>
+<li><strong><a href="http://lronaldo.github.io/cpctelera/files/readme-txt.html#Installing_CPCtelera">How to install CPCtelera</a></strong>
+</li><li><strong><a href="http://lronaldo.github.io/cpctelera/files/readme-txt.html">CPCtelera reference manual</a></strong> 
+</li>
+</ul>
 
 <h3>
 <a id="supported-platforms" class="anchor" href="#supported-platforms" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supported Platforms</h3>
 
-<p><em><strong>CPCtelera</strong></em> is fully usable and has been tested under these platforms:</p>
-
 <ul>
-<li>Windows (with Cygwin 32/64 bits)</li>
+<li>Windows (with <a href="http://www.cygwin.com">Cygwin</a> 32/64 bits)</li>
 <li>OS X</li>
-<li>Linux (Ubuntu/Debian, Raspbian, Arch and Manjaro)</li>
+<li>Linux</li>
 </ul>
 
 <p>If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. </p>
 
-<h3>
-<a id="contact-information-and-support" class="anchor" href="#contact-information-and-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact information and support</h3>
-
-<p>If you have any questions, please contact us:</p>
-
-<ul>
-<li>email:    <em>cpctelera (at) cheesetea (dot) com</em>
-</li>
-<li>twitter:  <em><a href="http://twitter.com/frangallegobr">@FranGallegoBR</a></em>
-</li>
-</ul>
+<p>If you are a Mac user, you will want to consider installing <a href="https://github.com/dfreniche/cpctelera_samples_xcode">CPCtelera-samples-Xcode</a> by <a href="http://blog.freniche.com">Diego Freniche</a>, along with <em><strong>CPCtelera</strong></em>. This package creates Xcode projects from examples and lets you build them directly from Xcode.</p>
 
 <h3>
-<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors</h3>
+<a id="contact-information-and-support" class="anchor" href="#contact-information-and-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact information and support
+</h3>
 
 <ul>
-<li>
-<strong>Project owner</strong> 
-
-<ul>
-<li>
-<a href="http://twitter.com/frangallegobr">ronaldo</a> / (<a href="http://www.cheesetea.com">Cheesetea</a>, <a href="http://fremos.cheesetea.com">Fremos</a>,  <a href="http://www.byterealms.com">ByteRealms</a>)</li>
-</ul>
-</li>
-<li>
-<strong>Awesome collaborators</strong>
-
-<ul>
-<li>
-<a href="http://lalunadedardalorth.blogspot.com.es/">Dardalorth</a> / <a href="http://fremos.cheesetea.com">Fremos</a> / <a href="http://carlio.es">Carlio</a>
-</li>
-<li>Stefano Beltran / <a href="http://www.byterealms.com">ByteRealms</a> </li>
-<li>
-<a href="https://twitter.com/ronsonmaria">Fran Fernández</a> / <a href="http://www.pensandocomopollos.com/">Pensando como Pollos</a> (<a href="https://twitter.com/ronsonmaria">@ronsonmaria</a>)</li>
-<li>
-<a href="http://blog.freniche.com">Diego Freniche</a> (<a href="https://twitter.com/dfreniche">@dfreniche</a>)</li>
-</ul>
-</li>
-<li>
-<strong>Bitarrays idea and original implementation</strong>
-
-<ul>
-<li>Alberto García García (Blitzman, <em>albertgg93 (at) gmail (dot) com, <a href="http://twitter.com/algertgarcia93">@algertgarcia93</a></em>)</li>
-<li>Pablo Martínez González (<em>pablo2093 (at) gmail (dot) com, <a href="http://twitter.com/pablo_2093">@pablo_2093</a></em>)</li>
-</ul>
-</li>
-<li>
-<strong>Some original code and ideas for sprite drawing and firmware enabling/disabling</strong>
-
-<ul>
-<li>Raúl Simarro (Artaburu / ESP Soft)</li>
-</ul>
-</li>
-<li>
-<strong>Some makefile code and ideas</strong>
-
-<ul>
-<li><a href="http://github.com/cpcitor">Cpcitor</a></li>
-</ul>
-</li>
-<li>
-<strong>Arkos player original code</strong>
-
-<ul>
-<li>
-<a href="http://www.julien-nevo.com/">Targhan</a> / <a href="http://www.cpcwiki.eu/index.php/Arkos">Arkos</a>
-</li>
-</ul>
+<li>github:    <em><a href="https://github.com/lronaldo/cpctelera">Cpctelera at Github</a></em>
+</li><li>email:    <em>cpctelera@cheesetea.com</em>
+</li><li>twitter:  <em><a href="http://twitter.com/frangallegobr">@FranGallegoBR</a></em>
 </li>
 </ul>
 
 <h3>
-<a id="3rdparty-software-authors" class="anchor" href="#3rdparty-software-authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>3rdparty software authors</h3>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors
+</h3>
 
 <ul>
-<li>
-<strong><a href="http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start">Arkos Tracker</a></strong>
-
-<ul>
-<li>Main Author: <a href="http://www.julien-nevo.com/">Targhan</a> / <a href="http://www.cpcwiki.eu/index.php/Arkos">Arkos</a> </li>
-<li>Other Authors / Collaborators: SuperSylvestre / Les Sucres, 
-Augusto Ruiz Garcia (WYZ) / <a href="http://www.retroworks.es">Retroworks</a>, 
-Grim / <a href="http://www.cpcwiki.eu/index.php/Arkos">Arkos</a>, 
-<a href="http://www.twitter.com/lachlankeown">Lachlan Keown</a>, 
-Ramlaid / <a href="http://www.cpcwiki.eu/index.php/Arkos">Arkos</a>, 
-Madram / Overlanders
-UltraSyd / Brainstorm,
-<a href="http://norecess.cpcscene.net/">NoRecess</a> / <a href="http://www.pouet.net/groups.php?which=8">Condense</a>,
-Syx</li>
-</ul>
-</li>
-<li>
-<strong><a href="http://sdcc.sourceforge.net/">Small Devices C Compiler (SDCC)</a></strong>
-
-<ul>
-<li><a href="http://sdcc.sourceforge.net/index.php#Who">SDCC Team</a></li>
-</ul>
-</li>
-<li>
-<strong><a href="http://koaks.amstrad.free.fr/amstrad/projets/">iDSK</a></strong>
-
-<ul>
-<li>Sid / IMPACT </li>
-<li>
-<a href="http://www.pushnpop.net/profile-47.html">Pulkomandy</a> / <a href="http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml">Shinra Team</a>
-</li>
-</ul>
-</li>
-<li>
-<strong><a href="http://sourceforge.net/projects/hex2bin/">Hex2bin</a></strong>
-
-<ul>
-<li><a href="https://www.linkedin.com/pub/jacques-pelletier/a/668/309">Jaques Pelletier</a></li>
-</ul>
-</li>
-<li>
-<strong><a href="http://www.cpcwiki.eu/forum/applications/2cdt/">2CDT</a></strong>
-
-<ul>
-<li>
-<a href="http://www.cpctech.org.uk/about.html">Kevin Thacker</a> / <a href="http://www.cpctech.org.uk/">CPCTech</a> </li>
-</ul>
-</li>
-<li>
-<strong><a href="http://www.cpcwiki.eu/index.php/Retro_Game_Asset_Studio">Retro Game Asset Studio (RGAS)</a></strong>
-
-<ul>
-<li>
-<a href="http://www.twitter.com/lachlankeown">Lachlan Keown</a> (lachlankeown at gmail dot com)</li>
-</ul>
+<li>(C) Copyright 2014-2015 <a href="http://lronaldo.github.io/cpctelera/files/authors-txt.html">CPCtelera's <em>awesome</em> authors</A>
+</li><li>Distributed under <a href="http://lronaldo.github.io/cpctelera/files/license-txt.html">GNU General Public License v3</a>
 </li>
 </ul>
 
-<h4>
-<a id="special-thanks" class="anchor" href="#special-thanks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Special Thanks</h4>
+<p>
+  <a href="http://www.cheesetea.com"><img src="https://camo.githubusercontent.com/ebd4ca29b33602298f51a6ed421af665fc08f563/687474703a2f2f6c726f6e616c646f2e6769746875622e696f2f63706374656c6572612f696d616765732f6c6f676f5f6368656573657465615f3233302e706e67" alt="Cheesetea Logo" data-canonical-src="http://lronaldo.github.io/cpctelera/images/logo_cheesetea_230.png" style="max-width:100%;">
+  </a> 
+  <a href="http://fremos.cheesetea.com"><img src="https://camo.githubusercontent.com/738e78122f79d9a849191dbc9d011e375fb0b30e/687474703a2f2f6c726f6e616c646f2e6769746875622e696f2f63706374656c6572612f696d616765732f6c6f676f5f6672656d6f735f3233302e706e67" alt="Fremos logo" data-canonical-src="http://lronaldo.github.io/cpctelera/images/logo_fremos_230.png" style="max-width:100%;">
+  </a>
+</p>
 
-<ul>
-<li>
-<a href="http://www.twitter.com/lachlankeown">Lachlan Keown</a> (For being incredibly kind and helpful, and adding every required modification to better integrate RGAS with <em><strong>CPCtelera</strong></em>)</li>
-<li>
-<a href="http://github.com/cpcitor">Cpcitor</a> (for his great help and advice, and for developing <a href="http://github.com/cpcitor/cpc-dev-tool-chain">cpc-dev-tool-chain</a>)</li>
-<li>
-<a href="http://cpcwiki.eu">CPCWiki</a> &amp; <a href="http://grimware.org/">Grimware</a> (for providing great technical documentations and examples)</li>
-<li>Raúl Simarro (for developing <a href="http://sourceforge.net/projects/cpcrslib/">CPCRSLib</a> game creation library)</li>
-<li>
-<a href="http://www.julien-nevo.com/">Targhan</a> / <a href="http://www.cpcwiki.eu/index.php/Arkos">Arkos</a> (for developing Arkos Traker&amp;Player and giving great support on adding it to <em><strong>CPCtelera</strong></em>. Also for giving general advice during development of <em><strong>CPCtelera</strong></em>)</li>
-<li>
-<a href="http://www.pushnpop.net/profile-47.html">Pulkomandy</a> / <a href="http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml">Shinra Team</a> (for maintaining <a href="https://github.com/cpcsdk">cpcsdk</a>, with tools like <a href="https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z&amp;can=2&amp;q=">iDSK</a> or <a href="https://code.google.com/p/cpcsdk/wiki/cpcfs">cpcfs</a>, among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)</li>
-<li>Mochilote / <a href="http://cpcmania.com">CPCMania</a> (for creating great tutorials and useful documentation in his site)</li>
-<li>José Ángel Rodriguez (<a href="http://twitter.com/rvjose">@rvjose</a>) (for early testing, bug reporting and giving great ideas)</li>
-</ul>
-      </section>
+<p>
+  <a href="http://www.byterealms.com"><img src="https://camo.githubusercontent.com/e0b6331687f1f5c0736220c5281431714e0f20d6/687474703a2f2f6c726f6e616c646f2e6769746875622e696f2f63706374656c6572612f696d616765732f6c6f676f5f627974657265616c6d735f3233302e706e67" alt="ByteRealms Logo" data-canonical-src="http://lronaldo.github.io/cpctelera/images/logo_byterealms_230.png" style="max-width:100%;">
+  </a> 
+  <a href="http://www.carlio.es"><img src="https://camo.githubusercontent.com/c5d74324ac63e84741e7ac325aa2fa5c87e748cf/687474703a2f2f6c726f6e616c646f2e6769746875622e696f2f63706374656c6572612f696d616765732f6c6f676f5f6361726c696f5f3233302e706e67" alt="Carlio Logo" data-canonical-src="http://lronaldo.github.io/cpctelera/images/logo_carlio_230.png" style="max-width:100%;">
+  </a>
+</p>
+
+</section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/lronaldo">lronaldo</a></p>
+        <p>This project is maintained by <a href="https://github.com/lronaldo">ronaldo</a></p>
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
@@ -243,6 +135,17 @@ Syx</li>
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
+<!--
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+      ga('create', 'UA-16956670-3', 'auto');
+      ga('send', 'pageview');
+
+    </script>    
+  -->
   </body>
 </html>
