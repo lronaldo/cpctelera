@@ -26,6 +26,8 @@ Some makefile code and ideas:
 Arkos player original code:
    * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>
 
+(see logos_composite_long.png)
+
 Section: 3rdparty software authors
    
    Developers of tools or 3rdparty software used by CPCtelera
@@ -45,6 +47,9 @@ Section: 3rdparty software authors
  <Small Devices C Compiler (SDCC) at http://sdcc.sourceforge.net/>:
    * <SDCC Team at http://sdcc.sourceforge.net/index.php#Who>
  
+ <Z80 assembler compiler and linker (asz80 & aslink) at http://shop-pdp.net/ashtml/asxdoc.htm>:
+   * Alan R. Baldwin (baldwin@shop-pdp.net)
+
  <iDSK at http://koaks.amstrad.free.fr/amstrad/projets/>:
    * Sid / IMPACT 
    * <Pulkomandy at http://www.pushnpop.net/profile-47.html> / <Shinra Team at http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml>
@@ -67,6 +72,6 @@ Section: Special Thanks
  * <CPCWiki at http://cpcwiki.eu> & <Grimware at http://grimware.org/> (for providing great technical documentations and examples)
  * Raúl Simarro (for developing <CPCRSLib at http://sourceforge.net/projects/cpcrslib/> game creation library)
  * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> (for developing Arkos Traker&Player and giving great support on adding it to *CPCtelera*. Also for giving general advice during development of *CPCtelera*)
- * <Pulkomandy at http://www.pushnpop.net/profile-47.html> / <Shinra Team at http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml> (for maintaining <cpcsdk at https://github.com/cpcsdk>, with tools like <iDSK at https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z&can=2&q=> or <cpcfs at https://code.google.com/p/cpcsdk/wiki/cpcfs>, among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
+ * <Pulkomandy at http://www.pushnpop.net/profile-47.html> / <Shinra Team at http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml> (for maintaining <cpcsdk at https://github.com/cpcsdk>, with tools like <iDSK at https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z> or <cpcfs at https://code.google.com/p/cpcsdk/wiki/cpcfs>, among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
  * Mochilote / <CPCMania at http://cpcmania.com> (for creating great tutorials and useful documentation in his site)
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)

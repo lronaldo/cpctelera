@@ -128,6 +128,14 @@ Once you have your own new project, you can enter its folder and you will have a
 
 The rest is up to you. Navigate this reference manual, grasp code from examples and start your own projects. All of us are waiting to see your new games! :D
 
+Section: Advice for Assembly coders
+
+Just a few comments for those wanting to program in Assembly with CPCtelera. Most of the assemblers available out there use MAXAM assembly syntax, and most assembly code out there is coded this way. CPCtelera uses SDCC, which comes with ASZ80 integrated as assembler. ASZ80 has its own syntax and directives which are different to MAXAM's. Take this into account when porting code to CPCtelera or when analyzing CPCtelera's own code. 
+
+ASZ80 is developed by Alan R. Baldwin, and hast a good and detailed <documentation for ASZ80 assembly syntax online at http://shop-pdp.net/ashtml/asmlnk.htm>. Check it to port your programs from MAXAM's to CPCtelera.
+
+CPCtelera lets you add assembly files to your projects by using the extension *.s*. Any *.s* file that you include in the src/ folder of your project (or any first-level subfolder) will be automatically detected and compiled by the default Makefile.
+
 Section: Screenshots
 
 Let's have a quick look at some things that CPCtelera can do.
