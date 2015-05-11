@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //  Copyright (C) 2015 Stefano Beltran / ByteRealms (stefanobb at gmail dot com)
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -23,9 +23,8 @@
 // Pointer to the memory location where screen video memory starts by default
 #define SCR_VMEM  (u8*)0xC000
 
-// Sizes of the sprites (in bytes)
+// Size of the sprite (in bytes)
 //  Logo         = (160x191 pixels in Mode 1 => 40x191 bytes)
-//  Banner parts = ( 80x96  pixels in Mode 0 => 40x96  bytes)
 #define LOGO_W      40
 #define LOGO_H     191
 
