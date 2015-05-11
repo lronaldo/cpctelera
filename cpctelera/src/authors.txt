@@ -9,6 +9,7 @@ Project owner:
  
 Awesome collaborators:
    * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
+   * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
    * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
    * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
