@@ -26,44 +26,26 @@
 //   Sets Palette and Mode, and disables firmware
 //
 void initializeCPC() {
-   u8 c0, c1;  // Variables to hold pairs of pixels in video memory colour pixel format
-
    // Disable firmware: we dont want it to interfere with our code
    cpct_disableFirmware();
 
    // Set the hardware palette (convert firmware colour values to hardware ones and set the palette)
-   cpct_fw2hw(gc_palette, 16);
-   cpct_setPalette(gc_palette, 16);
+   cpct_fw2hw(G_palette, 16);
+   cpct_setPalette(G_palette, 16);
 
    // Change to Mode 0 (160x200, 16 colours)
    cpct_setVideoMode(0);
-
-   // Draw Sky and Fremos Logo
-   c0 = cpct_px2byteM0(4, 4);   // c0 = 2 consecutive pixels of firmware colour 4 (blue)
-   cpct_drawSolidBox((void*)0xC000, c0, 40, 60); // Boxes cannot be wider than 64 bytes,
-   cpct_drawSolidBox((void*)0xC028, c0, 40, 60); // ... so we use 2 boxes of 40 bytes wide.
-   cpct_drawSprite(gc_LogoFremos, (void*)0xC0FC, 55, 20);
-
-   // Draw Floor
-   c1 = cpct_px2byteM0(2, 8);  // c1 = 2 pixels of firmware colours 2(brown) and 8(black)
-   cpct_drawSolidBox((void*)0xC3C0, c1, 40, 8);
-   cpct_drawSolidBox((void*)0xC3E8, c1, 40, 8);
-
-   // Draw Underfloor
-   cpct_drawSolidBox((void*)0xC410, c0, 40, 96);
-   cpct_drawSolidBox((void*)0xC438, c0, 40, 96);
 }
 
 //
 // Scan Keyboard and do user actions as requested
 //
 void updateUser(TEntity* user) {
-   // Animation Request (new entity status to promote)
-   TEntityStatus animrequest = es_stop;
+   user;
 
    // Scan Keyboard
    cpct_scanKeyboard_f();
-
+/*
    // Check possible keys to press, and do actions
    if      ( cpct_isKeyPressed(Key_Space)       ) animrequest = es_hit;
    else if ( cpct_isKeyPressed(Key_CursorUp)    ) animrequest = es_kick;
@@ -76,30 +58,25 @@ void updateUser(TEntity* user) {
    // Set new animation, based on action requested
    if (animrequest != es_stop)
       setAnimation(user, animrequest);
+*/
 }
 
 //////////////////////////////////////////////////////////////////////
 // MAIN EXAMPLE CODE
 //    Keys:
-//       * Cursor left-right: Move character (walk)
-//       * Cursor up        : Kick
-//       * Cursor down      : Fist
-//       * Space            : Get Hit
-//       * 1                : Die
-//       * w                : Win
 //
 void main(void) {
-   TEntity* persea;
 
    // Initialize game
    initializeCPC();
-   persea = getPersea();
+   initializeEntities();
+   newSolidBlock(20, 100, 10, 3, 0xA0);
 
    // Main Game Loop
    while(1) {
-      updateUser(persea);
+//      updateUser(persea);
       cpct_waitVSYNC();
-      updateEntity(persea);
-      drawEntity(persea);
+//      updateEntity(persea);
+      drawAll();
    }
 }

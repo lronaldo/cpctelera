@@ -65,24 +65,54 @@ typedef enum {
    es_jump,       // Entity jumping
    es_hit,        // Entity is being hit
    es_NUMSTATUSES // Total amount of statuses available
-} TEntityStatus;
+} TCharacterStatus;
 
 //
 // Entities can be heading both sides
 //
-typedef enum { s_left = 0, s_right, s_NUMSIDES } TEntitySide;
+typedef enum { s_left = 0, s_right, s_NUMSIDES } TCharacterSide;
 
 //
-// Describes a game entity (typically, a character)
+// Describes physical behaviour for an object
 //
 typedef struct {
-   TAnimation    *anim;    // Animation currently associated with this entity
-   u8            *pscreen;  // Pointer to Screen Video memory location where entity will be drawn
-   u8             x,  y;    // X, Y coordinates of entity in the screen
-   u8            nx, ny;    // Next X, Y coordinates of entity in the screen (for next frame)
-   TEntityStatus status;    // Present status of the entity
-   TEntitySide   side;      // Side the entity is facing
+   u16   x,  y;  // X, Y coordinates of entity in a subpixel world (in pixels*SCALE)
+   i16  vx, vy;  // Velocity vector controlling entity movement (In pixels*SCALE)
+   u16  bounce;  // Bounce coefficient (In pixels*SCALE. < SCALE absorves energy, > SCALE gives energy)
+} TPhysics;
+
+//
+// Information for solid objects that occupy a rectangular space in the screen
+//
+typedef struct {
+   u8   w, h;   // Width and height in bytes
+   u8 colour;   // Colour pattern use for drawing
+} TBlock;
+
+//
+// Describes a game entity
+//
+typedef struct {
+   // Entities have an animation or a solid rectangular block 
+   union {
+      TAnimation  anim;    // Animation currently associated with this entity
+      TBlock      block;   // Definition of a rectangular block in the screen
+   } graph;
+
+   u8        *pscreen;  // Pointer to Screen Video memory location where entity will be drawn
+   u8           x,  y;  // X, Y coordinates of entity in the screen (in bytes)
+   u8          nx, ny;  // Next X, Y coordinates of entity in the screen (in bytes)
+   TPhysics      phys;  // Values for entities that have Physical components
 } TEntity;
+
+//
+// Describes a game character (the main character, for instance)
+//
+typedef struct {
+   TEntity           entity;  // Entity model for this character
+   TCharacterStatus  status;  // Present status of the character
+   TCharacterSide    side;    // Side the character is facing
+} TCharacter;
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -92,8 +122,11 @@ typedef struct {
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-    void updateEntity(TEntity *ent);
-    void setAnimation(TEntity *ent, TEntityStatus newstatus);
-      i8 moveEntityX (TEntity* ent, i8 mx);
-      i8 moveEntityY (TEntity* ent, i8 my);
-    void drawEntity  (TEntity* ent);
+    void initializeEntities();
+    void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy);
+    void setAnimation (TEntity *ent, TAnimFrame** animation, TAnimStatus status);
+    void setCharacterAnim(TCharacter *ch, TCharacterStatus newstatus, TCharacterSide newside);
+    void updateEntity (TEntity *ent);
+    void drawEntity   (TEntity *ent);
+    void drawAll      ();
+TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
