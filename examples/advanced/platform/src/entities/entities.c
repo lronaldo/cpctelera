@@ -81,12 +81,6 @@ TAnimFrame** const g_anim[es_NUMSTATUSES][s_NUMSIDES] = {
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-// Scale value for fixed point maths calculations using integers
-#define SCALE   256  // 2^8
-
-// Expected Frames per Second drawing Ratio   
-#define FPS      50
-
 // Gravity constants (in fixed decimal, pixels/frame)
 // Assuming 1 px = 1 meter
 const i16 G_gy     = 0.981 * SCALE / FPS; // Defining gravity as 0.981 px/sec^2
@@ -101,9 +95,9 @@ u8* const g_SCR_VMEM   = (u8*)0xC000; // Pointer to the start of default video m
 
 // Define entities in the world and main character
 //
-#define g_MaxEntities 10            // Maximum number of entities at the same time
-TEntity g_Entities[g_MaxEntities];  // Vector with the values of the entities
-     u8 g_lastEntity;               // Last entity value (next available)
+#define g_MaxBlocks 10          // Maximum number of blocks at the same time
+TEntity g_blocks[g_MaxBlocks];  // Vector with the values of the blocks
+     u8 g_lastBlock;            // Last block value (next available)
 
 // Main Character
 const TCharacter g_Character = {
@@ -130,8 +124,9 @@ const TCharacter g_Character = {
 // Initialize entities
 //   Sets up entities at their initial values
 void initializeEntities() {
-   g_lastEntity = 0;
-   newSolidBlock(20, 190, 40, 5, 0xFF);
+   TPhysics *p = ((TPhysics*)&g_Character.entity.phys); 
+   g_lastBlock = 0;
+   p->floor = newSolidBlock(20, 190, 40, 5, 0xFF);
    setEntityLocation(&g_Character.entity, 38, 174, 0, 0);
 }
 
@@ -173,12 +168,81 @@ i8 updateAnimation(TAnimation* anim) {
 }
 
 
+TCharacter* getCharacter() { return &g_Character; }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Update an entity (do animation, and change screen location)
 //
-void updateEntity(TEntity *ent) {
-   TAnimation* anim = &ent->graph.anim;
+void updateCharacter(TCharacter *c) {
+   TEntity  *e = &c->entity;
+   TPhysics *p = &e->phys;
+   TAnimation* anim = &e->graph.anim;
+
+   // Previous to calculations, next position is similar to current
+   e->nx = e->x;
+   e->ny = e->y;
+
+   // Update animation
+   switch(c->status) {
+      case es_walk: 
+         if      (p->vx < 0 || c->side != s_left)  setAnimation(e, g_anim[es_walk][s_left],  as_cycle);
+         else if (p->vx > 0 || c->side != s_right) setAnimation(e, g_anim[es_walk][s_right], as_cycle);
+         else if (!p->vx) e->graph.anim.status = as_pause;
+         break;
+
+      default:
+   }
    updateAnimation(anim);
+
+   // Apply gravity only if the entity is not over a floor
+   if ( !isOverFloor(e) ) {
+      if ( p->floor ) p->floor = 0; // If the entity was over a floor, disconnect the floor from the entity
+
+      // Apply gravity
+      p->vy += G_gy;
+      p->vx += G_gx;
+      p->vx = 0;
+   }
+   // Crop velocity limits
+   if ( p->vy > G_maxVel) p->vy = 0;// G_maxVel;
+   //if (-p->vy > G_maxVel) p->vy = -G_maxVel;
+   //if ( p->vx > G_maxVel) p->vx =  G_maxVel;
+   //if (-p->vx > G_maxVel) p->vx = -G_maxVel;
+
+   // Move character
+   p->x += p->vx;
+   p->y += p->vy;
+
+   // Calculate pixel position
+   e->nx = p->x / SCALE;
+   e->ny = p->y / SCALE;
+
+   // Check if character has moved to calculate new location
+   if      ( e->ny != e->y ) e->pscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
+   else if ( e->nx != e->x ) e->pscreen += (i8)e->nx - (i8)e->x;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks if a entity is still over its defined floor
+//
+u8 isOverFloor(TEntity *e) {
+   u8 over = 0;                  // Value to sign if we are over a floor or not
+   TEntity *f = e->phys.floor;   // Get the pointer to the floor assigned to this entity
+
+   // Check if there is a floor assigned to the entity (not null pointer)
+   if ( f ) {
+      TAnimFrame *e_a = e->graph.anim.frames[e->graph.anim.frame_id];
+      // Check X boundaries
+      if ( e->x <= (f->x + f->graph.block.w) &&    // X lower  than right border of the block
+          (e->x + e_a->width) >= f->x           )  // X + width higher than left border of the block
+         over = 1;
+
+      // Note: We do not check Y boundaries, because they do not change until the user
+      // jumps, but then the floor is disconnected automatically. 
+   }
+
+   // Inform if we are over a floor or not
+   return over;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,8 +307,10 @@ void drawAll() {
    u8 i;
 
    drawEntity(&g_Character.entity);
-   for (i=0; i < g_lastEntity; ++i) {
-      TEntity *e = (g_Entities + i);
+
+   // Draw Blocks
+   for (i=0; i < g_lastBlock; ++i) {
+      TEntity *e = (g_blocks + i);
       cpct_drawSolidBox(e->pscreen, e->graph.block.colour, e->graph.block.w, e->graph.block.h);
    }
 }
@@ -256,9 +322,9 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
    TEntity *newEnt = 0;
 
    // Only can create when we are below the limit
-   if (g_lastEntity < g_MaxEntities) {
+   if (g_lastBlock < g_MaxBlocks) {
       // Create the new entity by assigning given values to the one in the entity vector
-      newEnt = &g_Entities[g_lastEntity];
+      newEnt = &g_blocks[g_lastBlock];
       newEnt->graph.block.w      = width;
       newEnt->graph.block.h      = height;
       newEnt->graph.block.colour = colour;
@@ -267,7 +333,7 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
       newEnt->y = newEnt->ny     = y;
       newEnt->phys.bounce        = 0.85 * SCALE; // Only bounce coefficient makes sense on solid blocks,
                                                  // as they are not affected by Physics
-      ++g_lastEntity;   // One more entity added to the vector
+      ++g_lastBlock;   // One more entity added to the vector
    }
 
    return newEnt;

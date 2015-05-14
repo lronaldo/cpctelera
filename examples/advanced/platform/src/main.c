@@ -41,24 +41,28 @@ void initializeCPC() {
 // Scan Keyboard and do user actions as requested
 //
 void updateUser(TEntity* user) {
-   user;
+   TPhysics *p = &user->phys;
 
    // Scan Keyboard
    cpct_scanKeyboard_f();
-/*
+
    // Check possible keys to press, and do actions
-   if      ( cpct_isKeyPressed(Key_Space)       ) animrequest = es_hit;
-   else if ( cpct_isKeyPressed(Key_CursorUp)    ) animrequest = es_kick;
-   else if ( cpct_isKeyPressed(Key_CursorDown)  ) animrequest = es_fist;
-   else if ( cpct_isKeyPressed(Key_CursorRight) ) animrequest = es_walk_right;
-   else if ( cpct_isKeyPressed(Key_CursorLeft)  ) animrequest = es_walk_left;
-   else if ( cpct_isKeyPressed(Key_1)           ) animrequest = es_dead;
-   else if ( cpct_isKeyPressed(Key_2)           ) animrequest = es_win;
+   if      ( cpct_isKeyPressed(Key_CursorRight) ) p->vx =  SCALE;
+   else if ( cpct_isKeyPressed(Key_CursorLeft)  ) p->vx = -SCALE;
+   else if ( p->vx ) {
+      /*
+      if (p->vx > SCALE) 
+         p->vx /= 2;
+      else
+         p->vx = 0;
+         */
+      p->vx = 0;
+   }
 
    // Set new animation, based on action requested
-   if (animrequest != es_stop)
-      setAnimation(user, animrequest);
-*/
+//   if (animrequest != es_stop)
+//      setAnimation(user, animrequest);
+
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -66,17 +70,19 @@ void updateUser(TEntity* user) {
 //    Keys:
 //
 void main(void) {
+   TCharacter* c;
 
    // Initialize game
    initializeCPC();
    initializeEntities();
    newSolidBlock(20, 100, 10, 3, 0xA0);
+   c = getCharacter();
 
    // Main Game Loop
    while(1) {
-//      updateUser(persea);
+      updateUser(&c->entity);
+      updateCharacter(c);
       cpct_waitVSYNC();
-//      updateEntity(persea);
       drawAll();
    }
 }

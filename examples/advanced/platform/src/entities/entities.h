@@ -18,6 +18,12 @@
 
 #include <types.h>
 
+// Scale value for fixed point maths calculations using integers
+#define SCALE   256  // 2^8
+
+// Expected Frames per Second drawing Ratio   
+#define FPS      50
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////
@@ -75,10 +81,12 @@ typedef enum { s_left = 0, s_right, s_NUMSIDES } TCharacterSide;
 //
 // Describes physical behaviour for an object
 //
+struct Entity;
 typedef struct {
-   u16   x,  y;  // X, Y coordinates of entity in a subpixel world (in pixels*SCALE)
-   i16  vx, vy;  // Velocity vector controlling entity movement (In pixels*SCALE)
-   u16  bounce;  // Bounce coefficient (In pixels*SCALE. < SCALE absorves energy, > SCALE gives energy)
+   u16   x,  y;    // X, Y coordinates of entity in a subpixel world (in pixels*SCALE)
+   i16  vx, vy;    // Velocity vector controlling entity movement (In pixels*SCALE)
+   u16  bounce;    // Bounce coefficient (In pixels*SCALE. < SCALE absorves energy, > SCALE gives energy)
+   struct Entity* floor; // Entity that acts as floor
 } TPhysics;
 
 //
@@ -92,7 +100,7 @@ typedef struct {
 //
 // Describes a game entity
 //
-typedef struct {
+typedef struct Entity {
    // Entities have an animation or a solid rectangular block 
    union {
       TAnimation  anim;    // Animation currently associated with this entity
@@ -126,7 +134,9 @@ typedef struct {
     void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy);
     void setAnimation (TEntity *ent, TAnimFrame** animation, TAnimStatus status);
     void setCharacterAnim(TCharacter *ch, TCharacterStatus newstatus, TCharacterSide newside);
-    void updateEntity (TEntity *ent);
+    void updateCharacter(TCharacter *c);
     void drawEntity   (TEntity *ent);
     void drawAll      ();
+      u8 isOverFloor(TEntity *e);
 TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
+TCharacter* getCharacter();
