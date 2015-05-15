@@ -78,7 +78,7 @@ Topic: Software Requirements
 _Under Linux_:
    Install these packages on your Linux distribution. Although they are pretty standard, names may slightly vary on some distributions.
 
-   * *gcc*, *g++*, *make* (usually included in *build-essentials*)
+   * *gcc*, *g++*, *make* (included in package *build-essential*)
    * *bison*, *flex*, *libboost-dev*
 
 _Under Windows_:
@@ -105,13 +105,15 @@ Topic: Installing CPCtelera in your system
    These are the steps to install CPCtelera in your system
 
    1. - Install required <Software Requirements>
-   2. - Open a terminal an enter cpctelera/ folder
+   2. - Download and unzip <current stable version of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.0.0.zip>
+   3. - Open a terminal an enter cpctelera/ folder
    > cd cpctelera/
-   3. - Launch *setup.sh* 
+   4. - Launch *setup.sh* 
    > ./setup.sh
    * Setup checks software dependencies. If some dependency is not met, you will receive an error message requesting you to install it and then launch *setup.sh* again.
-   4. - Close the terminal and open a new one. 
-   5. - CPCtelera is ready to be used in your system.
+   5. - Close the terminal and open a new one. 
+   
+CPCtelera is ready to be used in your system.
 
 
 Section: Starting with CPCtelera
