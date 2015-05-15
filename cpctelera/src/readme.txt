@@ -66,7 +66,7 @@ Topic: Downloading CPCtelera
 
    You can download CPCtelera from these sources
 
-   * Download <current stable version 1.0.0 at https://github.com/lronaldo/cpctelera/archive/v1.0.0.zip>
+   * Download <current stable version 1.0.1 at https://github.com/lronaldo/cpctelera/archive/v1.0.1.zip>
 
    * Get Latest version from github:
    > git clone https://github.com/lronaldo/cpctelera
@@ -105,7 +105,7 @@ Topic: Installing CPCtelera in your system
    These are the steps to install CPCtelera in your system
 
    1. - Install required <Software Requirements>
-   2. - Download and unzip <current stable version of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.0.0.zip>
+   2. - Download and unzip <current stable version of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.0.1.zip>
    3. - Open a terminal an enter cpctelera/ folder
    > cd cpctelera/
    4. - Launch *setup.sh* 
