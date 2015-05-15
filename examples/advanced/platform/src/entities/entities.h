@@ -36,10 +36,11 @@
 // Possible statuses of an animation
 //
 typedef enum {
-   as_play,    // Playing till the last frame
-   as_cycle,   // Playing continuosly
-   as_pause,   // Paused, waiting to continue
-   as_end      // Animation has ended
+   as_null = 0, // We require this to represent a null status
+   as_play = 1, // Playing till the last frame
+   as_cycle,    // Playing continuosly
+   as_pause,    // Paused, waiting to continue
+   as_end       // Animation has ended
 } TAnimStatus;
 
 //
@@ -108,9 +109,17 @@ typedef struct Entity {
    } graph;
 
    u8        *pscreen;  // Pointer to Screen Video memory location where entity will be drawn
+   u8       *npscreen;  // Pointer the next Screen Video memory location where entity will be drawn
    u8           x,  y;  // X, Y coordinates of entity in the screen (in bytes)
    u8          nx, ny;  // Next X, Y coordinates of entity in the screen (in bytes)
+   u8          pw, ph;  // Previous Width and height of the entity (depending on animation). Used to erase it
    TPhysics      phys;  // Values for entities that have Physical components
+
+   u8            draw;  // Flag to be set when the entity needs to be drawn again
+
+   // Used to change animation on next timestep
+   TAnimFrame  **nAnim; // Pointer to next animation frames (null when no next animation)
+   TAnimStatus nStatus; // Next animation status
 } TEntity;
 
 //
@@ -131,8 +140,8 @@ typedef struct {
 //////////////////////////////////////////////////////////////////////////
 
     void initializeEntities();
+    void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side);
     void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy);
-    void setAnimation (TEntity *ent, TAnimFrame** animation, TAnimStatus status);
     void setCharacterAnim(TCharacter *ch, TCharacterStatus newstatus, TCharacterSide newside);
     void updateCharacter(TCharacter *c);
     void drawEntity   (TEntity *ent);

@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <stdio.h>
+
 #include <cpctelera.h>
 #include "entities.h"
 #include "sprites.h"
@@ -83,9 +85,12 @@ TAnimFrame** const g_anim[es_NUMSTATUSES][s_NUMSIDES] = {
 
 // Gravity constants (in fixed decimal, pixels/frame)
 // Assuming 1 px = 1 meter
-const i16 G_gy     = 9.81 * SCALE / FPS;  // Defining gravity as 9.81 px/sec^2
-const i16 G_gx     = 0;                   // No gravity on x axis, at the start
-const i16 G_maxVel = 100 / FPS * SCALE;   // Maximum velocity for an entity, 100 px/sec
+const i16 G_gy        = 9.81 * SCALE / FPS;  // Defining gravity as 9.81 px/sec^2
+const i16 G_gx        = 0;                   // No gravity on x axis, at the start
+const i16 G_maxVel    = 100 / FPS * SCALE;   // Maximum velocity for an entity, 100 px/sec
+const u16 G_minVel    = SCALE / 8;           // Minimum velocity for an entity (below that, velocity considered as 0)
+const u8  G_airFric   = 2;                   // Friction divisor applied to horizontal movement on air
+const u8  G_floorFric = 4;                   // Friction divisor applied to horizontal movement on floor
 
 // Size of the Screen and base pointer (in pixels)
 //
@@ -103,10 +108,11 @@ TEntity g_blocks[g_MaxBlocks];  // Vector with the values of the blocks
 const TCharacter g_Character = {
    // Entity values
    { 
-     { .anim = { g_walkRight, 0, 0, as_pause } }, // Initial animation
-      (u8*)0xC000,
-      0, 0, 0, 0, 
-     { 0, 0, 0, 0, 0 }
+     { .anim = { g_walkRight, 0, 2, as_pause } }, // Initial animation
+      (u8*)0xC000, (u8*)0xC000,
+      0, 0, 0, 0, 0, 0, 
+     { 0, 0, 0, 0, 0 },
+     1, 0, as_null
    },
    es_walk,    // Walking 
    s_right     // To the right
@@ -134,8 +140,29 @@ void initializeEntities() {
 // Updates an animation
 //   Returns 1 when a new frame is reached, and 0 otherwise
 //
-i8 updateAnimation(TAnimation* anim) {
+i8 updateAnimation(TEntity* e) {
+   TAnimation *anim = &e->graph.anim;
    i8 newframe = 0;
+
+   // If new animation, set it!
+   if ( e->nAnim ) {
+      anim->frames   = e->nAnim;   // Sets the new animation to the entity
+      anim->frame_id = 0;          // First frame of the animation
+      
+      // Set time on non void animations
+      if ( e->nAnim[0] )
+         anim->time = e->nAnim[0]->time; // Animation is at its initial timestep
+
+      // Set next animation to 0, to prevent it from changing again
+      e->nAnim = 0;
+      newframe = 1; // We have changed animation, an that makes this a new frame
+   }
+
+   // If new animation status, set it!
+   if ( e->nStatus ) {
+      anim->status = e->nStatus; // Set the initial status for the animation    
+      e->nStatus   = as_null;    // No next status
+   }
 
    // Update only if animation is not paused or finished
    if (anim->status != as_pause && anim->status != as_end) {
@@ -170,29 +197,96 @@ i8 updateAnimation(TAnimation* anim) {
 
 TCharacter* getCharacter() { return &g_Character; }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Make changes in a Character for next frame, depending on 
+// given actions to perform
+//
+void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side) {
+   TEntity *e = &c->entity;   // Get entity associated to the character
+   TPhysics *p = &e->phys;    // Get Physics information associated to the entity
+
+   // Perform actions depending on the requested move
+   switch(move) {
+      // Requested action: move left or right
+      case es_walk:
+
+         // Check present action being performed, to act consequently
+         switch(c->status) {
+            // Things to do when we were already walking
+            case es_walk:
+               // If we're changing side, set up the new animation
+               if ( side != c->side ) {
+                  e->nAnim   = g_anim[es_walk][side]; // Next animation changes
+                  c->side    = side;
+               }
+               e->nStatus = as_cycle;  // Make character cycle animation
+               
+               // << No BREAK here: we continue to es_jump, as there we perform
+               // modifications to the velocity of the character
+
+            // Things to do when we were jumping and now try to walk left or right
+            case es_jump:
+               // When jumping, we can move the character left or right
+               // and that makes it accelerate to left (-) or right (+)
+               if ( side == s_left )
+                  p->vx -= SCALE;
+               else
+                  p->vx += SCALE;
+               break;
+
+            // Nothing to do on other cases
+            default:
+         }
+         break;
+      
+      case es_jump:
+      case es_hit:
+      
+      // No move selected to perform. Check if we have to stop ongoing moves
+      default:
+         // When walking, stop animation
+         if ( c->status == es_walk )
+            e->nStatus = as_pause;     // Pause animation on next timestep
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Crop velocity according to limits (minimum and maximum)
+//
+void cropVelocity(i16 *v) {
+   // Crop depending on v being positive or negative. This is best done this
+   // way as SDCC has some problems with signed / unsigned numbers
+   if ( *v >= 0 ) {
+      // Positive. Check limits.
+      if      ( *v > G_maxVel ) *v = G_maxVel; // Crop to max. positive velocity
+      else if ( *v < G_minVel ) *v = 0;        // Round to min positive velocity
+   } else {
+      // Negative
+      if      ( *v < -G_maxVel ) *v = -G_maxVel;  // Crop to max negative velocity
+      else if ( *v > -G_minVel ) *v = 0;          // Round to mix negative velocity
+   }
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Update an entity (do animation, and change screen location)
 //
 void updateCharacter(TCharacter *c) {
    TEntity  *e = &c->entity;
    TPhysics *p = &e->phys;
-   TAnimation* anim = &e->graph.anim;
+   TAnimation *anim = &e->graph.anim;
+   TAnimFrame   *af = anim->frames[anim->frame_id];
 
    // Previous to calculations, next position is similar to current
-   e->x = e->nx;
-   e->y = e->ny;
+   e->x       = e->nx;
+   e->y       = e->ny;
+   e->pscreen = e->npscreen;
+   e->pw      = af->width;
+   e->ph      = af->height;
 
-   // Update animation
-   switch(c->status) {
-      case es_walk: 
-         if      (p->vx < 0 || c->side != s_left)  setAnimation(e, g_anim[es_walk][s_left],  as_cycle);
-         else if (p->vx > 0 || c->side != s_right) setAnimation(e, g_anim[es_walk][s_right], as_cycle);
-         else if (!p->vx) e->graph.anim.status = as_pause;
-         break;
-
-      default:
-   }
-   updateAnimation(anim);
+   // Update animation. If changes sprite, then we should redraw
+   if ( updateAnimation(e) ) e->draw = 1;
 
    // Apply gravity only if the entity is not over a floor
    if ( !isOverFloor(e) ) {
@@ -202,29 +296,35 @@ void updateCharacter(TCharacter *c) {
       p->vy += G_gy;
       p->vx += G_gx;
    }
-   // Crop velocity limits
-   if ( p->vy >= 0 ) {
-      if ( p->vy > G_maxVel ) p->vy = G_maxVel;
-   } else if ( p->vy < -G_maxVel ) { 
-      p->vy = -G_maxVel;
+
+   // Check if there is any movement on Y axis
+   if ( p->vy ) {
+      cropVelocity(&p->vy);   // Crop velocity to min / max limits
+      p->y  += p->vy;         // Then add it to position
+      e->ny  = p->y / SCALE;  // Calculate new screen position
    }
-   if ( p->vx >= 0 ) {
-      if ( p->vx > G_maxVel ) p->vx = G_maxVel;
-   } else if ( p->vx < -G_maxVel ) {
-      p->vx = -G_maxVel;  
+   
+   // Check if there is any movement on x axis
+   if ( p->vx ) {
+      cropVelocity(&p->vx);   // Crop velocity to min / max limits
+      p->x += p->vx;          // Then add it to position
+      e->nx = p->x / SCALE;   // And calculate new screen position
+
+      // After movement, apply friction to velocity for next frame
+      if ( c->status == es_walk )
+         p->vx /= G_floorFric;   // Friction on the floor
+      else
+         p->vx /= G_airFric;     // Friction on air
    }
-
-   // Move character
-   p->x += p->vx;
-   p->y += p->vy;
-
-   // Calculate pixel position
-   e->nx = p->x / SCALE;
-   e->ny = p->y / SCALE;
-
-   // Check if character has moved to calculate new location
-   if      ( e->ny != e->y ) e->pscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
-   else if ( e->nx != e->x ) e->pscreen += (i8)e->nx - (i8)e->x;
+   
+   // Check if character has moved to calculate new location and set for drawing
+   if      ( e->ny != e->y ) { 
+      e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
+      e->draw = 1;
+   } else if ( e->nx != e->x ) {
+      e->npscreen += (i8)e->nx - (i8)e->x;
+      e->draw = 1; 
+   } 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -255,6 +355,7 @@ u8 isOverFloor(TEntity *e) {
 //
 void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy) {
    e->pscreen   = cpct_getScreenPtr(g_SCR_VMEM, x, y);
+   e->npscreen  = e->pscreen;
    e->x = e->nx = x;
    e->y = e->ny = y;
    e->phys.x    = x  * SCALE;
@@ -264,45 +365,21 @@ void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Sets up a new animation for a given entity
-//
-void setAnimation(TEntity *ent, TAnimFrame** animation, TAnimStatus status) {
-   TAnimation* anim = &ent->graph.anim;
-   anim->frames     = animation; // Sets the new animation to the entity
-   anim->frame_id   = 0;         // First frame of the animation
-   anim->time       = 0;         // Animation is at its initial timestep
-   anim->status     = status;    // Set the initial status for the animation
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// Sets up a new animation and status for a given Character
-//
-void setCharacterAnim(TCharacter *ch, TCharacterStatus newstatus, TCharacterSide newside) {
-   TAnimStatus  a_st = as_play;                     // Initial status for the animation (Play, by default)
-   TAnimFrame** anim = g_anim[newstatus][newside];  // Animation frames for the entity
-   
-   // Set new status of the character and the side where it is facing
-   ch->status = newstatus; // New status for the entity
-   ch->side   = newside;   // New side the entity is facing
-      
-   // Initial status of the animation is "play" except when walking ("cycle", then)
-   if (newstatus == es_walk)
-      a_st = as_cycle;
-
-   // Set the animation
-   setAnimation(&ch->entity, anim, a_st);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw a given entity on the screen
 //
-void drawEntity  (TEntity* ent){
-   // Get the entity values from its current animation status
-   TAnimation* anim  = &ent->graph.anim;
-   TAnimFrame* frame = anim->frames[anim->frame_id];
+void drawEntity (TEntity* e){
+   // Check if needs to be redrawn
+   if ( e->draw ) {
+      // Get the entity values from its current animation status
+      TAnimation* anim  = &e->graph.anim;
+      TAnimFrame* frame = anim->frames[anim->frame_id];
+   
+      // Remove trails 
+      cpct_drawSolidBox(e->pscreen, 0x00, e->pw, e->ph);
 
-   // Draw the entity
-   cpct_drawSprite(frame->sprite, ent->pscreen, frame->width, frame->height);
+      // Draw the entity
+      cpct_drawSprite(frame->sprite, e->npscreen, frame->width, frame->height);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -41,29 +41,17 @@ void initializeCPC() {
 //
 // Scan Keyboard and do user actions as requested
 //
-void updateUser(TEntity* user) {
-   TPhysics *p = &user->phys;
-
+void updateUser(TCharacter* user) {
    // Scan Keyboard
    cpct_scanKeyboard_f();
 
    // Check possible keys to press, and do actions
-   if      ( cpct_isKeyPressed(Key_CursorRight) ) p->vx += SCALE;
-   else if ( cpct_isKeyPressed(Key_CursorLeft)  ) p->vx -= SCALE;
-   else if ( p->vx ) {
-/*
-      if ((u8)p->vx > SCALE) 
-         p->vx /= 2;
-      else
-         p->vx = 0;
-         */
-         p->vx = 0;
-   }
-
-   // Set new animation, based on action requested
-//   if (animrequest != es_stop)
-//      setAnimation(user, animrequest);
-
+   if      ( cpct_isKeyPressed(Key_CursorRight) )
+      performAction(user, es_walk, s_right);
+   else if ( cpct_isKeyPressed(Key_CursorLeft)  ) 
+      performAction(user, es_walk, s_left);
+   else
+      performAction(user, es_static, user->side);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -81,7 +69,7 @@ void main(void) {
 
    // Main Game Loop
    while(1) {
-      updateUser(&c->entity);
+      updateUser(c);
       updateCharacter(c);
       cpct_disableFirmware();
       cpct_waitVSYNC();
