@@ -83,9 +83,9 @@ TAnimFrame** const g_anim[es_NUMSTATUSES][s_NUMSIDES] = {
 
 // Gravity constants (in fixed decimal, pixels/frame)
 // Assuming 1 px = 1 meter
-const i16 G_gy     = 0.981 * SCALE / FPS; // Defining gravity as 0.981 px/sec^2
+const i16 G_gy     = 9.81 * SCALE / FPS;  // Defining gravity as 9.81 px/sec^2
 const i16 G_gx     = 0;                   // No gravity on x axis, at the start
-const u16 G_maxVel = 100 / FPS * SCALE;   // Maximum velocity for an entity, 100 px/sec
+const i16 G_maxVel = 100 / FPS * SCALE;   // Maximum velocity for an entity, 100 px/sec
 
 // Size of the Screen and base pointer (in pixels)
 //
@@ -179,8 +179,8 @@ void updateCharacter(TCharacter *c) {
    TAnimation* anim = &e->graph.anim;
 
    // Previous to calculations, next position is similar to current
-   e->nx = e->x;
-   e->ny = e->y;
+   e->x = e->nx;
+   e->y = e->ny;
 
    // Update animation
    switch(c->status) {
@@ -201,13 +201,18 @@ void updateCharacter(TCharacter *c) {
       // Apply gravity
       p->vy += G_gy;
       p->vx += G_gx;
-      p->vx = 0;
    }
    // Crop velocity limits
-   if ( p->vy > G_maxVel) p->vy = 0;// G_maxVel;
-   //if (-p->vy > G_maxVel) p->vy = -G_maxVel;
-   //if ( p->vx > G_maxVel) p->vx =  G_maxVel;
-   //if (-p->vx > G_maxVel) p->vx = -G_maxVel;
+   if ( p->vy >= 0 ) {
+      if ( p->vy > G_maxVel ) p->vy = G_maxVel;
+   } else if ( p->vy < -G_maxVel ) { 
+      p->vy = -G_maxVel;
+   }
+   if ( p->vx >= 0 ) {
+      if ( p->vx > G_maxVel ) p->vx = G_maxVel;
+   } else if ( p->vx < -G_maxVel ) {
+      p->vx = -G_maxVel;  
+   }
 
    // Move character
    p->x += p->vx;

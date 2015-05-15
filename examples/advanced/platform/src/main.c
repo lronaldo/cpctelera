@@ -17,6 +17,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <stdio.h>
 #include <cpctelera.h>
 #include "entities/entities.h"
 #include "entities/sprites.h"
@@ -47,16 +48,16 @@ void updateUser(TEntity* user) {
    cpct_scanKeyboard_f();
 
    // Check possible keys to press, and do actions
-   if      ( cpct_isKeyPressed(Key_CursorRight) ) p->vx =  SCALE;
-   else if ( cpct_isKeyPressed(Key_CursorLeft)  ) p->vx = -SCALE;
+   if      ( cpct_isKeyPressed(Key_CursorRight) ) p->vx += SCALE;
+   else if ( cpct_isKeyPressed(Key_CursorLeft)  ) p->vx -= SCALE;
    else if ( p->vx ) {
-      /*
-      if (p->vx > SCALE) 
+/*
+      if ((u8)p->vx > SCALE) 
          p->vx /= 2;
       else
          p->vx = 0;
          */
-      p->vx = 0;
+         p->vx = 0;
    }
 
    // Set new animation, based on action requested
@@ -82,6 +83,7 @@ void main(void) {
    while(1) {
       updateUser(&c->entity);
       updateCharacter(c);
+      cpct_disableFirmware();
       cpct_waitVSYNC();
       drawAll();
    }
