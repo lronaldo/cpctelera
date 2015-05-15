@@ -246,7 +246,10 @@ function EnsureCPPHeaderAvailable {
    echo "int main(void) { return 0; }" >> "$SRCTMP"
    g++ -o "$OUTTMP" -c "$SRCTMP" 2> "$ERRTMP"
    if [ -s "$ERRTMP" ]; then
-      Error "$2"
+      # File has warnings or errors. We ignore warnings.
+      if grep "error" "$ERRTMP"; then
+         Error "$2"
+      fi
    fi
 }
 
