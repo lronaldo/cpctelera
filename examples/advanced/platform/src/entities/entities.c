@@ -38,16 +38,16 @@ const TAnimFrame g_allAnimFrames[14] = {
    { G_EMRright2,      3, 16,  2 }, // 1// |
    { G_EMRleft,        4, 16,  2 }, // 2// << Walk Left Frames
    { G_EMRleft2,       3, 16,  2 }, // 3// |
-   { G_EMRjumpright1,  4,  8,  2 }, // 4// << Jump Right Frames 
-   { G_EMRjumpright2,  4,  8,  2 }, // 5// |
-   { G_EMRjumpright3,  4,  8,  2 }, // 6// |
-   { G_EMRjumpright4,  4,  8,  2 }, // 7// |
-   { G_EMRjumpleft1,   4,  8,  2 }, // 8// << Jump Left Frames 
-   { G_EMRjumpleft2,   4,  8,  2 }, // 9// |
-   { G_EMRjumpleft3,   4,  8,  2 }, //10// |
-   { G_EMRjumpleft4,   4,  8,  2 }, //11// |
-   { G_EMRhitright,    4, 16,  2 }, //12// << Hit Right Frame
-   { G_EMRhitleft,     4, 16,  2 }  //13// << Hit Left Frame
+   { G_EMRjumpright1,  4,  8,  3 }, // 4// << Jump Right Frames 
+   { G_EMRjumpright2,  4,  8,  4 }, // 5// |
+   { G_EMRjumpright3,  4,  8,  4 }, // 6// |
+   { G_EMRjumpright4,  4,  8,  3 }, // 7// |
+   { G_EMRjumpleft1,   4,  8,  3 }, // 8// << Jump Left Frames 
+   { G_EMRjumpleft2,   4,  8,  4 }, // 9// |
+   { G_EMRjumpleft3,   4,  8,  4 }, //10// |
+   { G_EMRjumpleft4,   4,  8,  3 }, //11// |
+   { G_EMRhitright,    4, 16,  6 }, //12// << Hit Right Frame
+   { G_EMRhitleft,     4, 16,  6 }  //13// << Hit Left Frame
 };
 
 // Use a define for convenience
@@ -58,8 +58,8 @@ const TAnimFrame g_allAnimFrames[14] = {
 //
 TAnimFrame*  const g_walkLeft[3]  = { &AF[3], &AF[2], 0 };
 TAnimFrame*  const g_walkRight[3] = { &AF[1], &AF[0], 0 };
-TAnimFrame*  const g_jumpLeft[5]  = { &AF[8], &AF[9], &AF[10], &AF[11], 0 };
-TAnimFrame*  const g_jumpRight[5] = { &AF[8], &AF[9], &AF[10], &AF[11], 0 };
+TAnimFrame*  const g_jumpLeft[6]  = { &AF[8], &AF[9], &AF[10], &AF[11], &AF[3], 0 };
+TAnimFrame*  const g_jumpRight[6] = { &AF[8], &AF[9], &AF[10], &AF[11], &AF[1], 0 };
 TAnimFrame*  const g_hitLeft[2]   = { &AF[13], 0 };
 TAnimFrame*  const g_hitRight[2]  = { &AF[12], 0 };
 
@@ -89,6 +89,7 @@ const i16 G_gy        = 9.81 * SCALE / FPS;  // Defining gravity as 9.81 px/sec^
 const i16 G_gx        = 0;                   // No gravity on x axis, at the start
 const i16 G_maxVel    = 100 / FPS * SCALE;   // Maximum velocity for an entity, 100 px/sec
 const u16 G_minVel    = SCALE / 8;           // Minimum velocity for an entity (below that, velocity considered as 0)
+const i16 G_jumpVel   = -100 / FPS * SCALE;  // Velocity when we start a jump
 const u8  G_airFric   = 2;                   // Friction divisor applied to horizontal movement on air
 const u8  G_floorFric = 4;                   // Friction divisor applied to horizontal movement on floor
 
@@ -184,7 +185,8 @@ i8 updateAnimation(TEntity* e) {
             anim->frame_id = 0;
             anim->time     = anim->frames[0]->time;
          } else {
-            // End animation
+            // End animation (leaving last frame_id visible)
+            --anim->frame_id;
             anim->status = as_end;
          }
       }
@@ -208,7 +210,9 @@ void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side) {
 
    // Perform actions depending on the requested move
    switch(move) {
+      //-------- 
       // Requested action: move left or right
+      //-------- 
       case es_walk:
 
          // Check present action being performed, to act consequently
@@ -240,7 +244,21 @@ void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side) {
          }
          break;
       
+      //-------- 
+      // Requested Action: jump left or right
+      //--------
       case es_jump:
+         // We only can jump when walking on the floor
+         if (c->status == es_walk) {
+            e->nAnim   = g_anim[es_jump][side]; // Next animation changes
+            e->nStatus = as_play;   // Jump animation only plays once
+            c->side    = side;      // New side
+            c->status  = es_jump;   // New status
+            p->floor   = 0;         // When jumping, we left the floor
+            p->vy     += G_jumpVel; // Add jump velocity to the character
+         }
+         break;
+
       case es_hit:
       
       // No move selected to perform. Check if we have to stop ongoing moves
@@ -316,15 +334,111 @@ void updateCharacter(TCharacter *c) {
       else
          p->vx /= G_airFric;     // Friction on air
    }
+
    
+   // Check collisions
+   {
+      TCollision *col = checkCollisionEntBlock(e, &g_blocks[0]);
+      // There is a collision
+      if (col->w && col->h) {
+         // 4 Possible collisions (up, down, left or right)
+         if (col->w == af->width || col->h <= col->w ) {
+            // Collision up or down
+            if (col->y > e->ny) {
+               e->ny     -= col->h;       // Move col->h bytes upside and 
+               p->floor   = &g_blocks[0]; // Make this entity the floor
+               e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
+               e->nStatus = as_pause;     // Make character cycle animation
+               c->status  = es_walk;
+            } else {
+               e->ny  += col->h;          // Move col->h bytes downside (ceil)
+            }
+            p->y  = e->ny * SCALE;
+            p->vy = 0;
+         } else {
+            // Collision left or right
+            if (col->x > e->nx) 
+               e->nx -= col->w;        // move col->w bytes left (colliding right)
+            else
+               e->nx += col->w;        // move col->w bytes right (colliding left)
+            p->x  = e->nx  * SCALE;
+            p->vx = 0;
+         }
+      }
+   }
+
+
    // Check if character has moved to calculate new location and set for drawing
-   if      ( e->ny != e->y ) { 
+   if ( e->ny != e->y ) { 
       e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
       e->draw = 1;
    } else if ( e->nx != e->x ) {
       e->npscreen += (i8)e->nx - (i8)e->x;
       e->draw = 1; 
    } 
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks collisions between an animated entity and a block
+//
+TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b) {
+   static TCollision c;
+   TAnimFrame *ani = a->graph.anim.frames [a->graph.anim.frame_id];
+   TBlock     *blk = &b->graph.block;
+
+   // No collision at the start of the check
+   c.w = 0;
+
+   // Calculate horizontal collision
+   {
+      u8 a_rbound = a->nx + ani->width; // -- right boundary limit of a
+      u8 b_rbound = b->nx + blk->w;     // -- right boundary limit of b
+
+      if ( a->nx <= b->nx ) {           // Case 1: a is left, b is right
+         if ( b->nx < a_rbound ) {      // Check if b is inside the width of a
+            c.x = b->nx;                // Yes, calculate horizontal collision area
+            if ( b_rbound < a_rbound )
+               c.w = b_rbound - c.x;
+            else
+               c.w = a_rbound - c.x;
+         }
+      } else if ( b->nx < a->nx ) {     // Case 2: b is left, a is right
+         if ( a->nx < b_rbound ) {      // Check if a is inside the width of b
+            c.x = a->nx;                // Yes, calculate horizontal collision area
+            if ( b_rbound < a_rbound )
+               c.w = b_rbound - c.x;
+            else
+               c.w = a_rbound - c.x;
+         }     
+      }
+   }
+
+   // Continue only it there is an horizontal collision
+   if (c.w) {
+      u8 a_bbound = a->ny + ani->height; // -- bottom boundary of a
+      u8 b_bbound = b->ny + blk->h;      // -- bottom boundary of b
+
+      // Calculate vertical collision
+      if ( a->ny <= b->ny ) {               // Case 1: a is up, b is down
+         if ( b->ny < a_bbound ) {          // Check if b is inside the height of a
+            c.y = b->ny;                    // Yes, calculate vertical collision area
+            if ( b_bbound < a_bbound )
+               c.h = b_bbound - c.y;
+            else
+               c.h = a_bbound - c.y;
+         }
+      } else if ( b->ny < a->ny ) {         // Case 2: b is up, a is down
+         if ( a->ny < b_bbound ) {          // Check if a is inside the height of b
+            c.y = a->ny;                    // Yes, calculate vertical collision area
+            if ( b_bbound < a_bbound )
+               c.h = b_bbound - c.y;
+            else
+               c.h = a_bbound - c.y;
+         }
+      }
+   }
+
+   return &c;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -409,10 +523,14 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
       newEnt = &g_blocks[g_lastBlock];
       newEnt->graph.block.w      = width;
       newEnt->graph.block.h      = height;
+      newEnt->pw                 = width;
+      newEnt->ph                 = height;
       newEnt->graph.block.colour = colour;
       newEnt->pscreen            = cpct_getScreenPtr(g_SCR_VMEM, x, y);
+      newEnt->npscreen           = newEnt->pscreen;
       newEnt->x = newEnt->nx     = x;
       newEnt->y = newEnt->ny     = y;
+      newEnt->draw               = 1;
       newEnt->phys.bounce        = 0.85 * SCALE; // Only bounce coefficient makes sense on solid blocks,
                                                  // as they are not affected by Physics
       ++g_lastBlock;   // One more entity added to the vector

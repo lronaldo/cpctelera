@@ -131,6 +131,14 @@ typedef struct {
    TCharacterSide    side;    // Side the character is facing
 } TCharacter;
 
+//
+// Information about a collision rectangle 
+//
+typedef struct {
+   u8    x, y;    // Screen coordinates of the top-left square of the collision
+   u8    w, h;    // Width and height in bytes
+} TCollision;
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////
@@ -149,3 +157,4 @@ typedef struct {
       u8 isOverFloor(TEntity *e);
 TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
 TCharacter* getCharacter();
+TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b);

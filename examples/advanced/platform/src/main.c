@@ -46,10 +46,12 @@ void updateUser(TCharacter* user) {
    cpct_scanKeyboard_f();
 
    // Check possible keys to press, and do actions
-   if      ( cpct_isKeyPressed(Key_CursorRight) )
+   if ( cpct_isKeyPressed(Key_CursorUp) )
+      performAction(user, es_jump, user->side);
+   else if ( cpct_isKeyPressed(Key_CursorRight) )
       performAction(user, es_walk, s_right);
    else if ( cpct_isKeyPressed(Key_CursorLeft)  ) 
-      performAction(user, es_walk, s_left);
+      performAction(user, es_walk, s_left); 
    else
       performAction(user, es_static, user->side);
 }
