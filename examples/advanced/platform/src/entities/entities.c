@@ -35,9 +35,9 @@
 //
 const TAnimFrame g_allAnimFrames[14] = {
    { G_EMRright,       4, 16,  4 }, // 0// << Walk Right Frames
-   { G_EMRright2,      3, 16,  4 }, // 1// |
+   { G_EMRright2,      2, 16,  4 }, // 1// |
    { G_EMRleft,        4, 16,  4 }, // 2// << Walk Left Frames
-   { G_EMRleft2,       3, 16,  4 }, // 3// |
+   { G_EMRleft2,       2, 16,  4 }, // 3// |
    { G_EMRjumpright1,  4,  8,  3 }, // 4// << Jump Right Frames 
    { G_EMRjumpright2,  4,  8,  4 }, // 5// |
    { G_EMRjumpright3,  4,  8,  4 }, // 6// |
@@ -183,7 +183,7 @@ void initializeEntities() {
    G_platfColour = 8;
 
    // Initialize main character
-   setEntityLocation(&g_Character.entity, 38, 120-20, 0, 0, 1);
+   setEntityLocation(&g_Character.entity, 28, 120-20, 0, 0, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -354,6 +354,7 @@ void scrollWorld() {
       if (e->ny != e->y) {
          if (e->ny > G_maxY) {
             destroyBlock(i);
+            ce->phys.floor = 0;  // Eliminate floor. Make recalculation
             i--;
             continue;
          }
@@ -414,7 +415,10 @@ u8 updateCharacter(TCharacter *c) {
    e->ph      = af->height;
 
    // Update animation. If changes sprite, then we should redraw
-   if ( updateAnimation(e) ) e->draw = 1;
+   if ( updateAnimation(e) ) { 
+      e->draw = 1;                        // Redraw 
+      af = anim->frames[anim->frame_id];  // Get values of the new frame
+   }
 
    // Apply gravity only if the entity is not over a floor
    if ( !isOverFloor(e) ) {
@@ -454,58 +458,85 @@ u8 updateCharacter(TCharacter *c) {
          p->vx /= G_airFric;     // Friction on air
    }
 
-   
+//#define DEBUG
+
    // Check collisions
    {
       u8 i;
+#ifdef DEBUG
+         u8 str[14]="             ";
+         cpct_drawStringM0("             ", (u8*)0xC780, 0, 6);
+#endif
       for(i=0; i < g_lastBlock; ++i) {
-         TCollision *col = checkCollisionEntBlock(e, &g_blocks[i]);
+         TEntity    *ebl = &g_blocks[i];
+         TCollision *col = checkCollisionEntBlock(e, ebl);
          // There is a collision
          if (col->w && col->h) {
             // 4 Possible collisions (up, down, left or right)
-            if (col->w == af->width || col->h <= col->w ) {
-               // Collision up or down
-               if (col->y >= e->ny + af->height - 4) {                 
-                  e->ny     -= col->h;       // Move col->h bytes upside and 
-                  p->floor   = &g_blocks[i]; // Make this entity the floor
-                  e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
-                  e->nStatus = as_pause;     // Make character cycle animation
-                  c->status  = es_walk;
-               } else {
-                  e->ny  += col->h;          // Move col->h bytes downside (ceil)
-               }
-               
-               // Update physics vertical coordinates
-               p->y  = e->ny * SCALE;
-               p->vy = 0;
-            } else {
-               // Collision left or right
-               if (col->x > e->nx) 
-                  e->nx -= col->w;    // move col->w bytes left (colliding right)
+
+            // Lateral
+            if(e->x <= col->x - e->pw  || e->x >= ebl->x + ebl->pw ) {
+#ifdef DEBUG
+               str[0]='-';
+#endif
+               if (col->x > g_blocks[i].nx) 
+                  e->nx += col->w;    // move col->w bytes right (colliding right)
                else
-                  e->nx += col->w;    // move col->w bytes right (colliding left)
- 
-               // If we are colliding laterally with our floor, it 
-               // is not a proper floor         
-               if (p->floor == &g_blocks[i])
-                  p->floor = 0;
+                  e->nx -= col->w;    // move col->w bytes left  (colliding left)
 
                // Update physics horizontal coordinates
-               p->x  = e->nx  * SCALE;
+               p->x  = e->nx * SCALE;
                p->vx = 0;
+
+            // Up
+            } else if (e->y < col->y - e->ph / 2) { 
+#ifdef DEBUG
+               str[0]='^';
+#endif
+               p->floor   = &g_blocks[i]; // Make this entity the floor
+               e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
+               e->nStatus = as_pause;     // Make character cycle animation
+               c->status  = es_walk;
+               e->ny      = col->y - e->nAnim[0]->height; // Move col->h bytes upside and 
+               p->y       = e->ny * SCALE;
+               p->vy      = 0;
+
+            // Down
+            } else {
+#ifdef DEBUG
+                  str[1]='v';
+#endif
+               e->ny  = col->y + col->h;  // Move col->h bytes downside (ceil)
+               p->y   = e->ny * SCALE;
+               p->vy  = 0;
             }
+
+#ifdef DEBUG
+         sprintf(str+2, "%d,%d|%d,%d", col->x, col->y, col->w, col->h);
+         cpct_drawStringM0(str, (u8*)0xC780, 1, 0);
+#endif
          }
       }
    }
+
+#ifdef DEBUG
+   { 
+      u8 str[12];
+      str[0] = str[1] = ' ';
+      sprintf(str+2, "%d|", e->nx);
+#endif
 
    // Maintain into limits
    if ( e->nx <= G_minX ) { 
       e->nx = G_minX + 1; 
       p->x = e->nx * SCALE; 
    } 
-   else if ( e->nx + af->width  >= G_maxX ) {
-      e->nx = G_maxX - af->width - 1;
-      p->x = e->nx * SCALE;  
+   else if ( e->nx + af->width >= G_maxX ) {
+#ifdef DEBUG
+      str[0] ='!';
+#endif
+      e->nx = G_maxX - af->width;
+      p->x  = e->nx * SCALE;  
    }
    if ( e->ny + af->height >= G_maxY ) { 
       e->ny = G_maxY - af->height;
@@ -513,18 +544,31 @@ u8 updateCharacter(TCharacter *c) {
       alive = 0;
    }
    else if ( e->ny <= G_minY ) { 
-      e->ny = G_minY + 1;
+      e->ny = G_minY;
       p->y = e->ny * SCALE;
    }
+   
 
    // Check if character has moved to calculate new location and set for drawing
    if ( e->ny != e->y ) { 
+#ifdef DEBUG
+      str[1] ='y';
+#endif
       e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
       e->draw = 1;
    } else if ( e->nx != e->x ) {
-      e->npscreen += (i8)e->nx - (i8)e->x;
+#ifdef DEBUG
+      str[1] ='x';
+#endif
+      e->npscreen = e->npscreen + e->nx - e->x;
       e->draw = 1; 
    } 
+
+#ifdef DEBUG
+      sprintf(str+5, "%d(%d)", e->nx, e->x);
+      cpct_drawStringM0(str, g_SCR_VMEM, 1, 8);
+   }
+#endif
 
    return alive;
 }

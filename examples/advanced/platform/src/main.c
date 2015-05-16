@@ -23,6 +23,7 @@
 #include "entities/sprites.h"
 
 
+#define DEBUG
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialization of the Amstrad CPC at the start of the game
@@ -70,6 +71,10 @@ void initializeScreen(u16 hiscore) {
    cpct_drawStringM0(str, pscr, 15, 8);
 }
 
+#ifdef DEBUG
+   u8 g_stepByStep;
+#endif
+
 //
 // Scan Keyboard and do user actions as requested
 //
@@ -86,9 +91,38 @@ void updateUser(TCharacter* user) {
       performAction(user, es_walk, s_right);
    else if ( cpct_isKeyPressed(Key_CursorLeft)  ) 
       performAction(user, es_walk, s_left); 
-   else
+
+#ifdef DEBUG
+   else if ( cpct_isKeyPressed(Key_D)  ) 
+      g_stepByStep = 1;
+   else if ( cpct_isKeyPressed(Key_N)  ) 
+      g_stepByStep = 0;
+#endif   
+
+   else 
       performAction(user, es_static, user->side);
 }
+
+void waitNSyncs(u8 n) {
+   if (n > 1) {
+      while (--n) {
+         cpct_waitVSYNC();
+         __asm__("halt");
+         __asm__("halt");
+      }
+   }
+   cpct_waitVSYNC();
+}
+
+void wait4Key(cpct_keyID key) {
+   do
+      cpct_scanKeyboard_f();
+   while( ! cpct_isKeyPressed(key) );
+   do
+      cpct_scanKeyboard_f();
+   while( cpct_isKeyPressed(key) );
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Plays a complete game, until the death of the character
@@ -96,6 +130,10 @@ void updateUser(TCharacter* user) {
 u16 game(u16 hiscore) {
    u8 alive = 1;
    TCharacter* c;
+
+#ifdef DEBUG
+   g_stepByStep = 0;
+#endif 
 
    // Initialize game
    initializeScreen(hiscore);
@@ -109,7 +147,12 @@ u16 game(u16 hiscore) {
       scrollWorld();
       alive = updateCharacter(c);
       cpct_waitVSYNC();
+      //waitNSyncs(8);
       drawAll();
+#ifdef DEBUG
+      if (g_stepByStep)
+         wait4Key(Key_X);
+#endif
    }
 
    return getScore();
