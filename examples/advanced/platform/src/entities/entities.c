@@ -94,10 +94,33 @@ const i16 G_jumpVel   = -150 / FPS * SCALE;  // Velocity when we start a jump
 const i16 G_scrollVel =   3 * SCALE / FPS;   // Scroll down velocity, 5 px/sec
 const u8  G_airFric   = 2;                   // Friction divisor applied to horizontal movement on air
 const u8  G_floorFric = 4;                   // Friction divisor applied to horizontal movement on floor
-const u8  G_minX      =  10;                 // Horizontal limits of the playing area (bytes)
-const u8  G_maxX      =  70;                 // 
+const u8  G_minX      =   4;                 // Horizontal limits of the playing area (bytes)
+const u8  G_maxX      =  54;                 // 
 const u8  G_minY      =   8;                 // Vertical limits of the playing area (bytes)
 const u8  G_maxY      = 192;                 // 
+
+// Colour pattern for platforms
+u8  G_platfColour;
+
+// Random distribution repeating every 2^8
+u8 g_nextRand;
+const u8 g_randUnif[256] = {253, 69, 158, 112, 225, 82, 36, 35, 105, 42, 
+108, 176, 219, 199, 94, 24, 255, 215, 241, 72, 8, 175, 32, 248, 192, 115, 
+91, 44, 213, 80, 130, 63, 70, 217, 93, 205, 96, 102, 13, 243, 109, 134, 
+159, 210, 66, 231, 184, 128, 81, 56, 170, 182, 221, 99, 78, 122, 147, 117, 
+148, 23, 118, 250, 220, 90, 216, 34, 188, 111, 207, 43, 208, 181, 26, 190, 
+119, 139, 218, 4, 150, 164, 146, 186, 77, 162, 71, 46, 168, 84, 123, 238, 
+83, 239, 171, 67, 142, 58, 136, 41, 226, 61, 212, 187, 251, 116, 33, 86, 
+6, 138, 174, 143, 98, 97, 110, 76, 29, 120, 135, 137, 145, 12, 154, 149, 
+64, 18, 124, 7, 59, 235, 113, 19, 242, 79, 10, 60, 240, 101, 3, 100, 106, 
+2, 252, 197, 1, 21, 92, 152, 151, 47, 132, 249, 51, 22, 114, 191, 27, 246,
+201, 125, 55, 144, 88, 39, 20, 157, 53, 165, 194, 195, 232, 233, 17, 49,
+183, 103, 203, 172, 127, 45, 126, 68, 166, 237, 167, 198, 11, 230, 173, 34, 
+244, 245, 196, 200, 95, 206, 224, 73, 227, 236, 57, 211, 25, 121, 38, 161, 
+202, 131, 189, 48, 153, 133, 204, 129, 5, 31, 156, 65, 50, 54, 247, 74, 
+160, 107, 223, 140, 179, 222, 254, 178, 9, 180, 163, 40, 214, 229, 15, 193,
+228, 28, 52, 177, 87, 37, 89, 185, 155, 14, 209, 16, 169, 104, 0, 141, 85, 
+62, 30, 75};
 
 // Size of the Screen and base pointer (in pixels)
 //
@@ -107,7 +130,7 @@ u8* const g_SCR_VMEM   = (u8*)0xC000; // Pointer to the start of default video m
 
 // Define entities in the world and main character
 //
-#define g_MaxBlocks 10          // Maximum number of blocks at the same time
+#define g_MaxBlocks 16          // Maximum number of blocks at the same time
 TEntity g_blocks[g_MaxBlocks];  // Vector with the values of the blocks
      u8 g_lastBlock;            // Last block value (next available)
 
@@ -119,7 +142,7 @@ const TCharacter g_Character = {
       (u8*)0xC000, (u8*)0xC000,
       0, 0, 0, 0, 0, 0, 
      { 0, 0, 0, 0, 0 },
-     1, 0, as_null
+     0, 0, as_null
    },
    es_walk,    // Walking 
    s_right     // To the right
@@ -136,10 +159,25 @@ const TCharacter g_Character = {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Initialize entities
 //   Sets up entities at their initial values
+//
 void initializeEntities() {
    TPhysics *p = ((TPhysics*)&g_Character.entity.phys); 
+   G_platfColour = cpct_px2byteM0(8, 8);
+
+   // Initialize blocks
    g_lastBlock = 0;
-   setEntityLocation(&g_Character.entity, 38, 174, 0, 0, 1);
+   newSolidBlock( 4, 120, 50, 5, G_platfColour);
+   newSolidBlock(14, 100, 10, 3, G_platfColour);
+   newSolidBlock(34, 100, 10, 3, G_platfColour);
+   newSolidBlock(26,  80,  6, 3, G_platfColour);
+   newSolidBlock( 8,  60, 10, 3, G_platfColour);
+   newSolidBlock(36,  55, 10, 3, G_platfColour);
+   newSolidBlock(20,  30, 20, 3, G_platfColour);
+   newSolidBlock( 9,  10, 10, 3, G_platfColour);
+   newSolidBlock(44,   9,  4, 3, G_platfColour);
+
+   // Initialize main character
+   setEntityLocation(&g_Character.entity, 38, 120-20, 0, 0, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -324,6 +362,20 @@ void scrollWorld() {
          e->draw = 1;
       }
    }
+
+   // Expand a new block
+   i = g_blocks[g_lastBlock-1].ny;
+   if (i > G_minY + 10 && 
+             (g_randUnif[g_nextRand++] & 0x1F) < i) {
+      u8 x, w, col = cpct_px2byteM0(3, 3);
+      do {
+         x = G_minX + (g_randUnif[g_nextRand++] & 0x3F);
+      } while (x >= G_maxX - 1);
+      g_nextRand += ce->nx;
+      w = (g_randUnif[g_nextRand++] & 0x07) + 8;    // 8-15
+      if (x + w > G_maxX) w = G_maxX - x;
+      newSolidBlock(x, G_minY-3, w, 3, G_platfColour);
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -347,7 +399,12 @@ void updateCharacter(TCharacter *c) {
 
    // Apply gravity only if the entity is not over a floor
    if ( !isOverFloor(e) ) {
-      if ( p->floor ) p->floor = 0; // If the entity was over a floor, disconnect the floor from the entity
+      // If the entity was over a floor, disconnect the floor from the entity
+      if ( p->floor ) {
+         p->floor     = 0; 
+         c->status    = es_jump;
+//         anim->status = as_pause;
+      }
 
       // Apply gravity
       p->vy += G_gy;
@@ -423,20 +480,20 @@ void updateCharacter(TCharacter *c) {
    }
 
    // Maintain into limits
-   if      ( e->nx < G_minX ) { 
-      e->nx = G_minX; 
+   if ( e->nx <= G_minX ) { 
+      e->nx = G_minX + 1; 
       p->x = e->nx * SCALE; 
    } 
-   else if ( e->nx + af->width  > G_maxX ) {
-      e->nx = G_maxX - af->width;
+   else if ( e->nx + af->width  >= G_maxX ) {
+      e->nx = G_maxX - af->width - 1;
       p->x = e->nx * SCALE;  
    }
-   if      ( e->ny + af->height > G_maxY ) { 
+   if ( e->ny + af->height >= G_maxY ) { 
       e->ny = G_maxY - af->height;
       p->y = e->ny * SCALE;
    }
-   else if ( e->ny < G_minY ) { 
-      e->ny = G_minY;
+   else if ( e->ny <= G_minY ) { 
+      e->ny = G_minY + 1;
       p->y = e->ny * SCALE;
    }
 
@@ -559,9 +616,10 @@ void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw a given animated entity on the screen
 //
-void drawAnimEntity (TEntity* e){
+void drawAnimEntity (TEntity* e) {
    // Check if needs to be redrawn
    if ( e->draw ) {
+      u8 str[10];
       // Get the entity values from its current animation status
       TAnimation* anim  = &e->graph.anim;
       TAnimFrame* frame = anim->frames[anim->frame_id];
@@ -584,31 +642,36 @@ void drawBlockEntity (TEntity* e){
    if ( e->draw ) {
       u8* sp;   // Starting video mem pointer for blocks that are in the upper non-visible zone
       u8  dy;   // Distance the block moved
+      u8  drawh;// Height to draw of the box (taking into account invisible zones)
 
       // Get the entity values from its current animation status
       TBlock* block  = &e->graph.block;
          
-      // Blocks only move down
-      dy = e->ny - e->y;
-      if (dy > block->h) dy = block->h;
-
-      // Remove trails 
-      if (dy)
-         cpct_drawSolidBox(e->pscreen, 0x00, block->w, dy);
-
-      // Take into account non visible zones
+      // Take into account non visible zones for drawing the blocks
       sp = e->npscreen;
       if (e->ny < G_minY) {
-         dy = block->h + e->ny - G_minY;
+         drawh = block->h + e->ny - G_minY;
          sp = cpct_getScreenPtr(g_SCR_VMEM, e->nx, G_minY);
       } else if (e->ny + block->h > G_maxY) {
-         dy = G_maxY - e->ny;
+         drawh = G_maxY - e->ny;
       } else
-         dy = block->h;
+         drawh = block->h;
+
+      // Blocks only move down, so trail will always be 
+      // the entire block or the moved pixels
+      if (e->ny > G_minY) {
+         dy = e->ny - e->y;
+         if (dy > block->h) dy = block->h;
+
+         // Remove trails 
+         if (dy)
+            cpct_drawSolidBox(e->pscreen, 0x00, block->w, dy);
+      }
+
 
       // Draw the entity
-      if (dy)
-         cpct_drawSolidBox(sp, block->colour, block->w, dy);
+      if (drawh)
+         cpct_drawSolidBox(sp, block->colour, block->w, drawh);
 
       e->draw = 0;
    }
@@ -619,10 +682,10 @@ void drawBlockEntity (TEntity* e){
 // Draw all the scene 
 //
 void drawAll() {
-   u8 i;
+   u8 i = g_lastBlock;
 
    // Draw Blocks
-   for (i=0; i < g_lastBlock; ++i) 
+   while(i--)
       drawBlockEntity(&g_blocks[i]);
 
    // Draw Character

@@ -160,3 +160,19 @@ typedef struct {
 TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
 TCharacter* getCharacter();
 TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b);
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////
+//////  UTILITY GLOBALS
+//////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+// Random seed
+extern u8 g_nextRand;
+
+// Size of the Screen and base pointer (in pixels)
+//
+extern const u8  g_SCR_WIDTH;  // Screen width in bytes (80 bytes = 160 pixels)
+extern const u8  g_SCR_HEIGHT; // Screen height in bytes
+extern u8* const g_SCR_VMEM;   // Pointer to the start of default video memory screen
