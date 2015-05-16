@@ -33,7 +33,7 @@
 //
 // All the animation frames to be used in this example
 //
-const TAnimFrame g_allAnimFrames[14] = {
+const TAnimFrame g_allAnimFrames[15] = {
    { G_EMRright,       4, 16,  4 }, // 0// << Walk Right Frames
    { G_EMRright2,      2, 16,  4 }, // 1// |
    { G_EMRleft,        4, 16,  4 }, // 2// << Walk Left Frames
@@ -47,7 +47,8 @@ const TAnimFrame g_allAnimFrames[14] = {
    { G_EMRjumpleft3,   4,  8,  4 }, //10// |
    { G_EMRjumpleft4,   4,  8,  3 }, //11// |
    { G_EMRhitright,    4, 16,  6 }, //12// << Hit Right Frame
-   { G_EMRhitleft,     4, 16,  6 }  //13// << Hit Left Frame
+   { G_EMRhitleft,     4, 16,  6 }, //13// << Hit Left Frame
+   { G_EMRright3,      4, 16,  4 }  //14// << Walk 3 steps
 };
 
 // Use a define for convenience
@@ -57,7 +58,7 @@ const TAnimFrame g_allAnimFrames[14] = {
 // All complete animations used in this example (NULL terminated, to know the end of the array)
 //
 TAnimFrame*  const g_walkLeft[3]  = { &AF[3], &AF[2], 0 };
-TAnimFrame*  const g_walkRight[3] = { &AF[1], &AF[0], 0 };
+TAnimFrame*  const g_walkRight[5] = { &AF[0], &AF[1], &AF[14], &AF[1], 0 };
 TAnimFrame*  const g_jumpLeft[6]  = { &AF[8], &AF[9], &AF[10], &AF[11], &AF[3], 0 };
 TAnimFrame*  const g_jumpRight[6] = { &AF[4], &AF[5], &AF[ 6], &AF[ 7], &AF[1], 0 };
 TAnimFrame*  const g_hitLeft[2]   = { &AF[13], 0 };
@@ -498,6 +499,9 @@ u8 updateCharacter(TCharacter *c) {
                e->nStatus = as_pause;     // Make character cycle animation
                c->status  = es_walk;
                e->ny      = col->y - e->nAnim[0]->height; // Move col->h bytes upside and 
+               // Beware of jumping below 0: e->ny is unsigned!
+               if (e->ny > G_maxY)  
+                  e->ny=G_minY;
                p->y       = e->ny * SCALE;
                p->vy      = 0;
 
@@ -527,7 +531,7 @@ u8 updateCharacter(TCharacter *c) {
 #endif
 
    // Maintain into limits
-   if ( e->nx <= G_minX ) { 
+   if ( e->nx <= G_minX) { 
       e->nx = G_minX + 1; 
       p->x = e->nx * SCALE; 
    } 
@@ -544,7 +548,7 @@ u8 updateCharacter(TCharacter *c) {
       alive = 0;
    }
    else if ( e->ny <= G_minY ) { 
-      e->ny = G_minY;
+      e->ny = G_minY + 1;
       p->y = e->ny * SCALE;
    }
    
@@ -774,8 +778,11 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
       newEnt->graph.block.colour = colour;
       setEntityLocation(newEnt, x, y, 0, 0, 1);
       newEnt->draw               = 1;
+      // Synchronize with previous blocks at subscale movement
+      if (g_lastBlock > 0) 
+         newEnt->phys.y += g_blocks[g_lastBlock-1].phys.y % SCALE;
       newEnt->phys.bounce        = 0.85 * SCALE;
-                                                 // as they are not affected by Physics
+
       ++g_lastBlock;   // One more entity added to the vector
       ++G_score;       // 1 point for each new platform
    }

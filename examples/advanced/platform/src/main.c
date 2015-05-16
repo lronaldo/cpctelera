@@ -23,7 +23,7 @@
 #include "entities/sprites.h"
 
 
-#define DEBUG
+//#define DEBUG
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialization of the Amstrad CPC at the start of the game
@@ -147,7 +147,6 @@ u16 game(u16 hiscore) {
       scrollWorld();
       alive = updateCharacter(c);
       cpct_waitVSYNC();
-      //waitNSyncs(8);
       drawAll();
 #ifdef DEBUG
       if (g_stepByStep)
