@@ -91,7 +91,7 @@ const i16 G_maxYVel   = 150 / FPS * SCALE;   // Maximum vertical velocity for an
 const i16 G_maxXVel   =  75 / FPS * SCALE;   // Maximum horizontal velocity for an entity, 75 px/sec
 const u16 G_minVel    = SCALE / 8;           // Minimum velocity for an entity (below that, velocity considered as 0)
 const i16 G_jumpVel   = -150 / FPS * SCALE;  // Velocity when we start a jump
-const i16 G_scrollVel =   3 * SCALE / FPS;   // Scroll down velocity, 5 px/sec
+const i16 G_maxScrollVel = 25 * SCALE / FPS; // Scroll down velocity, 25 px/sec
 const u8  G_airFric   = 2;                   // Friction divisor applied to horizontal movement on air
 const u8  G_floorFric = 4;                   // Friction divisor applied to horizontal movement on floor
 const u8  G_minX      =   4;                 // Horizontal limits of the playing area (bytes)
@@ -99,8 +99,10 @@ const u8  G_maxX      =  54;                 //
 const u8  G_minY      =   8;                 // Vertical limits of the playing area (bytes)
 const u8  G_maxY      = 192;                 // 
 
-// Colour pattern for platforms
-u8  G_platfColour;
+
+i16 G_scrollVel;     // Velocity at which scroll goes 
+u8  G_platfColour;   // Colour pattern for platforms
+u16 G_score;         // Main score
 
 // Random distribution repeating every 2^8
 u8 g_nextRand;
@@ -163,6 +165,8 @@ const TCharacter g_Character = {
 void initializeEntities() {
    TPhysics *p = ((TPhysics*)&g_Character.entity.phys); 
    G_platfColour = cpct_px2byteM0(8, 8);
+   G_score = 0;
+   G_scrollVel = 3 * SCALE / FPS;  // Scroll down velocity, 3 px/sec
 
    // Initialize blocks
    g_lastBlock = 0;
@@ -175,6 +179,8 @@ void initializeEntities() {
    newSolidBlock(20,  30, 20, 3, G_platfColour);
    newSolidBlock( 9,  10, 10, 3, G_platfColour);
    newSolidBlock(44,   9,  4, 3, G_platfColour);
+
+   G_platfColour = 8;
 
    // Initialize main character
    setEntityLocation(&g_Character.entity, 38, 120-20, 0, 0, 1);
@@ -240,6 +246,7 @@ i8 updateAnimation(TEntity* e) {
 }
 
 
+        u16 getScore() { return G_score; }
 TCharacter* getCharacter() { return &g_Character; }
 
 
@@ -374,18 +381,30 @@ void scrollWorld() {
       g_nextRand += ce->nx;
       w = (g_randUnif[g_nextRand++] & 0x07) + 8;    // 8-15
       if (x + w > G_maxX) w = G_maxX - x;
-      newSolidBlock(x, G_minY-3, w, 3, G_platfColour);
+      newSolidBlock(x, G_minY-3, w, 3, cpct_px2byteM0(G_platfColour, G_platfColour));
+
+      // Change colour every 32 points and velocity up
+      if ( !(G_score & 0x0F) ) {
+         // Change platform colour
+         if ( ++G_platfColour > 16) 
+            G_platfColour = 1;
+
+         // Upgrade velocity
+         if (G_scrollVel < G_maxScrollVel)
+            ++G_scrollVel;
+      }
    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Update an entity (do animation, and change screen location)
 //
-void updateCharacter(TCharacter *c) {
+u8 updateCharacter(TCharacter *c) {
    TEntity  *e = &c->entity;
    TPhysics *p = &e->phys;
    TAnimation *anim = &e->graph.anim;
    TAnimFrame   *af = anim->frames[anim->frame_id];
+   u8         alive = 1;
 
    // Previous to calculations, next position is similar to current
    e->x       = e->nx;
@@ -403,7 +422,7 @@ void updateCharacter(TCharacter *c) {
       if ( p->floor ) {
          p->floor     = 0; 
          c->status    = es_jump;
-//         anim->status = as_pause;
+         anim->status = as_pause;
       }
 
       // Apply gravity
@@ -446,7 +465,7 @@ void updateCharacter(TCharacter *c) {
             // 4 Possible collisions (up, down, left or right)
             if (col->w == af->width || col->h <= col->w ) {
                // Collision up or down
-               if (col->y > e->ny) {                 
+               if (col->y >= e->ny + af->height - 4) {                 
                   e->ny     -= col->h;       // Move col->h bytes upside and 
                   p->floor   = &g_blocks[i]; // Make this entity the floor
                   e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
@@ -462,9 +481,9 @@ void updateCharacter(TCharacter *c) {
             } else {
                // Collision left or right
                if (col->x > e->nx) 
-                  e->nx -= col->w;        // move col->w bytes left (colliding right)
+                  e->nx -= col->w;    // move col->w bytes left (colliding right)
                else
-                  e->nx += col->w;        // move col->w bytes right (colliding left)
+                  e->nx += col->w;    // move col->w bytes right (colliding left)
  
                // If we are colliding laterally with our floor, it 
                // is not a proper floor         
@@ -491,6 +510,7 @@ void updateCharacter(TCharacter *c) {
    if ( e->ny + af->height >= G_maxY ) { 
       e->ny = G_maxY - af->height;
       p->y = e->ny * SCALE;
+      alive = 0;
    }
    else if ( e->ny <= G_minY ) { 
       e->ny = G_minY + 1;
@@ -505,6 +525,8 @@ void updateCharacter(TCharacter *c) {
       e->npscreen += (i8)e->nx - (i8)e->x;
       e->draw = 1; 
    } 
+
+   return alive;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -520,25 +542,25 @@ TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b) {
 
    // Calculate vertical collision
    {
-      u8 a_bbound = a->ny + ani->height; // -- bottom boundary of a
-      u8 b_bbound = b->ny + blk->h;      // -- bottom boundary of b
+      u8 a_bbound = a->ny + ani->height - 1;// -- bottom boundary of a
+      u8 b_bbound = b->ny + blk->h - 1;     // -- bottom boundary of b
 
       // Calculate vertical collision
       if ( a->ny <= b->ny ) {               // Case 1: a is up, b is down
-         if ( b->ny < a_bbound ) {          // Check if b is inside the height of a
+         if ( b->ny <= a_bbound ) {         // Check if b is inside the height of a
             c.y = b->ny;                    // Yes, calculate vertical collision area
             if ( b_bbound < a_bbound )
-               c.h = b_bbound - c.y;
+               c.h = b_bbound - c.y + 1;
             else
-               c.h = a_bbound - c.y;
+               c.h = a_bbound - c.y + 1;
          }
-      } else if ( b->ny < a->ny ) {         // Case 2: b is up, a is down
-         if ( a->ny < b_bbound ) {          // Check if a is inside the height of b
+      } else {                              // Case 2: b is up, a is down
+         if ( a->ny <= b_bbound ) {         // Check if a is inside the height of b
             c.y = a->ny;                    // Yes, calculate vertical collision area
             if ( b_bbound < a_bbound )
-               c.h = b_bbound - c.y;
+               c.h = b_bbound - c.y + 1;
             else
-               c.h = a_bbound - c.y;
+               c.h = a_bbound - c.y + 1;
          }
       }
    }
@@ -546,25 +568,25 @@ TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b) {
 
    // Calculate horizontal collision, only if there was vertical collision
    if (c.h) {
-      u8 a_rbound = a->nx + ani->width; // -- right boundary limit of a
-      u8 b_rbound = b->nx + blk->w;     // -- right boundary limit of b
+      u8 a_rbound = a->nx + ani->width - 1; // -- right boundary limit of a
+      u8 b_rbound = b->nx + blk->w - 1;     // -- right boundary limit of b
       c.w = 0;                          // Erase previous values and set to 0
 
       if ( a->nx <= b->nx ) {           // Case 1: a is left, b is right
-         if ( b->nx < a_rbound ) {      // Check if b is inside the width of a
+         if ( b->nx <= a_rbound ) {     // Check if b is inside the width of a
             c.x = b->nx;                // Yes, calculate horizontal collision area
             if ( b_rbound < a_rbound )
-               c.w = b_rbound - c.x;
+               c.w = b_rbound - c.x + 1;
             else
-               c.w = a_rbound - c.x;
+               c.w = a_rbound - c.x + 1;
          }
-      } else if ( b->nx < a->nx ) {     // Case 2: b is left, a is right
-         if ( a->nx < b_rbound ) {      // Check if a is inside the width of b
+      } else {                          // Case 2: b is left, a is right
+         if ( a->nx <= b_rbound ) {     // Check if a is inside the width of b
             c.x = a->nx;                // Yes, calculate horizontal collision area
             if ( b_rbound < a_rbound )
-               c.w = b_rbound - c.x;
+               c.w = b_rbound - c.x + 1;
             else
-               c.w = a_rbound - c.x;
+               c.w = a_rbound - c.x + 1;
          }     
       }
    }
@@ -619,7 +641,6 @@ void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev) {
 void drawAnimEntity (TEntity* e) {
    // Check if needs to be redrawn
    if ( e->draw ) {
-      u8 str[10];
       // Get the entity values from its current animation status
       TAnimation* anim  = &e->graph.anim;
       TAnimFrame* frame = anim->frames[anim->frame_id];
@@ -712,6 +733,7 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
       newEnt->phys.bounce        = 0.85 * SCALE;
                                                  // as they are not affected by Physics
       ++g_lastBlock;   // One more entity added to the vector
+      ++G_score;       // 1 point for each new platform
    }
 
    return newEnt;

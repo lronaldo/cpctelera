@@ -150,13 +150,13 @@ typedef struct {
     void initializeEntities();
     void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side);
     void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev);
-    void setCharacterAnim(TCharacter *ch, TCharacterStatus newstatus, TCharacterSide newside);
-    void updateCharacter(TCharacter *c);
+      u8 updateCharacter(TCharacter *c);
     void drawEntity   (TEntity *ent);
     void drawAll      ();
     void scrollWorld  ();
     void destroyBlock (u8 block_idx);
       u8 isOverFloor(TEntity *e);
+     u16 getScore();
 TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
 TCharacter* getCharacter();
 TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b);

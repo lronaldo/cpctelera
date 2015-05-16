@@ -22,14 +22,13 @@
 #include "entities/entities.h"
 #include "entities/sprites.h"
 
-//
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialization of the Amstrad CPC at the start of the game
 //   Sets Palette and Mode, and disables firmware
 //
 void initializeCPC() {
-   u8* pscr;   // Pointer to the screen location where we want to draw
-   u8  c;      // Colour pattern to draw
-
    // Disable firmware: we dont want it to interfere with our code
    cpct_disableFirmware();
 
@@ -40,6 +39,18 @@ void initializeCPC() {
 
    // Change to Mode 0 (160x200, 16 colours)
    cpct_setVideoMode(0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Initializes the screen to start a new game
+//
+void initializeScreen(u16 hiscore) {
+   u8* pscr;   // Pointer to the screen location where we want to draw
+   u8  c;      // Colour pattern to draw
+   u8  str[6]; // Score
+   
+   // Clear the screen
+   cpct_clearScreen(0);
 
    // Draw limits
    c = cpct_px2byteM0(8,8);
@@ -50,6 +61,13 @@ void initializeCPC() {
    cpct_drawSolidBox(g_SCR_VMEM+4, c, 50, 8);
    c = cpct_px2byteM0(6,6);
    cpct_drawSolidBox(pscr        , c, 50, 8);
+
+   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  16);
+   cpct_drawStringM0("HI", pscr, 3, 8);
+
+   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  24);
+   sprintf(str, "%5u", hiscore);
+   cpct_drawStringM0(str, pscr, 15, 8);
 }
 
 //
@@ -72,36 +90,71 @@ void updateUser(TCharacter* user) {
       performAction(user, es_static, user->side);
 }
 
-//////////////////////////////////////////////////////////////////////
-// MAIN EXAMPLE CODE
-//    Keys:
+////////////////////////////////////////////////////////////////////////////////
+// Plays a complete game, until the death of the character
 //
-//#define TESTCPU
-void main(void) {
+u16 game(u16 hiscore) {
+   u8 alive = 1;
    TCharacter* c;
 
    // Initialize game
-   initializeCPC();
+   initializeScreen(hiscore);
    initializeEntities();
       
    c = getCharacter();
 
    // Main Game Loop
-   while(1) {
+   while(alive) {
       updateUser(c);
       scrollWorld();
-      updateCharacter(c);
-      cpct_disableFirmware();
-
-#ifdef TESTCPU
-      {
-         u8 str[10];
-         sprintf(str, "%u   ", 22 + 34 * cpct_count2VSYNC());
-         cpct_drawStringM0(str, (u8*)0xC000, 1, 0);
-      }
-#endif
-
+      alive = updateCharacter(c);
       cpct_waitVSYNC();
       drawAll();
+   }
+
+   return getScore();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Plays a complete game, until the death of the character
+//
+void showGameEnd(u16 score) {
+   u8* pscr;   // Pointer to the screen place where to show messages
+   u8  str[6];
+
+   pscr = cpct_getScreenPtr(g_SCR_VMEM,  8, 24);
+   cpct_drawStringM0("GAME  OVER", pscr, 6, 0);
+
+   pscr = cpct_getScreenPtr(g_SCR_VMEM, 16, 48);
+   cpct_drawStringM0(  "SCORE", pscr, 9, 0);
+
+   pscr = cpct_getScreenPtr(g_SCR_VMEM, 16, 56);
+   sprintf(str, "%5u", score);
+   cpct_drawStringM0(str, pscr, 14, 0);
+
+   pscr = cpct_getScreenPtr(g_SCR_VMEM, 6, 112);
+   cpct_drawStringM0("PRESS SPACE", pscr, 11, 0);
+
+   do
+      cpct_scanKeyboard_f();
+   while ( !cpct_isKeyPressed(Key_Space) );
+}
+
+//////////////////////////////////////////////////////////////////////
+// MAIN EXAMPLE CODE
+//    Keys:
+//
+void main(void) {
+   u16 score, hi = 0;
+
+   initializeCPC();
+
+   // End of the game
+   while(1) {
+      score = game(hi);
+      if (score > hi)
+         hi = score;
+
+      showGameEnd(score);
    }
 }
