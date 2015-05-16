@@ -61,19 +61,31 @@ void updateUser(TCharacter* user) {
 //    Keys:
 //
 void main(void) {
+   u8 str[10];
    TCharacter* c;
 
    // Initialize game
    initializeCPC();
    initializeEntities();
-   newSolidBlock(20, 100, 10, 3, 0xA0);
+   
+   // Create floors
+   newSolidBlock(20, 160, 10, 3, 0xA5);
+   newSolidBlock(20, 190, 40, 5, 0xFF);
+   
    c = getCharacter();
 
    // Main Game Loop
    while(1) {
       updateUser(c);
+      scrollWorld();
       updateCharacter(c);
       cpct_disableFirmware();
+
+#ifdef TESTCPU
+      sprintf(str, "%u   ", 22 + 34 * cpct_count2VSYNC());
+      cpct_drawStringM0(str, (u8*)0xC000, 1, 0);
+#endif
+
       cpct_waitVSYNC();
       drawAll();
    }

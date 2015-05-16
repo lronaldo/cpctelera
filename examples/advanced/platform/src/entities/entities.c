@@ -34,10 +34,10 @@
 // All the animation frames to be used in this example
 //
 const TAnimFrame g_allAnimFrames[14] = {
-   { G_EMRright,       4, 16,  2 }, // 0// << Walk Right Frames
-   { G_EMRright2,      3, 16,  2 }, // 1// |
-   { G_EMRleft,        4, 16,  2 }, // 2// << Walk Left Frames
-   { G_EMRleft2,       3, 16,  2 }, // 3// |
+   { G_EMRright,       4, 16,  4 }, // 0// << Walk Right Frames
+   { G_EMRright2,      3, 16,  4 }, // 1// |
+   { G_EMRleft,        4, 16,  4 }, // 2// << Walk Left Frames
+   { G_EMRleft2,       3, 16,  4 }, // 3// |
    { G_EMRjumpright1,  4,  8,  3 }, // 4// << Jump Right Frames 
    { G_EMRjumpright2,  4,  8,  4 }, // 5// |
    { G_EMRjumpright3,  4,  8,  4 }, // 6// |
@@ -87,11 +87,17 @@ TAnimFrame** const g_anim[es_NUMSTATUSES][s_NUMSIDES] = {
 // Assuming 1 px = 1 meter
 const i16 G_gy        = 9.81 * SCALE / FPS;  // Defining gravity as 9.81 px/sec^2
 const i16 G_gx        = 0;                   // No gravity on x axis, at the start
-const i16 G_maxVel    = 100 / FPS * SCALE;   // Maximum velocity for an entity, 100 px/sec
+const i16 G_maxYVel   = 150 / FPS * SCALE;   // Maximum vertical velocity for an entity, 150 px/sec
+const i16 G_maxXVel   =  75 / FPS * SCALE;   // Maximum horizontal velocity for an entity, 75 px/sec
 const u16 G_minVel    = SCALE / 8;           // Minimum velocity for an entity (below that, velocity considered as 0)
-const i16 G_jumpVel   = -100 / FPS * SCALE;  // Velocity when we start a jump
+const i16 G_jumpVel   = -150 / FPS * SCALE;  // Velocity when we start a jump
+const i16 G_scrollVel =   3 * SCALE / FPS;   // Scroll down velocity, 5 px/sec
 const u8  G_airFric   = 2;                   // Friction divisor applied to horizontal movement on air
 const u8  G_floorFric = 4;                   // Friction divisor applied to horizontal movement on floor
+const u8  G_minX      =  10;                 // Horizontal limits of the playing area (bytes)
+const u8  G_maxX      =  70;                 // 
+const u8  G_minY      =   8;                 // Vertical limits of the playing area (bytes)
+const u8  G_maxY      = 192;                 // 
 
 // Size of the Screen and base pointer (in pixels)
 //
@@ -133,8 +139,7 @@ const TCharacter g_Character = {
 void initializeEntities() {
    TPhysics *p = ((TPhysics*)&g_Character.entity.phys); 
    g_lastBlock = 0;
-   p->floor = newSolidBlock(20, 190, 40, 5, 0xFF);
-   setEntityLocation(&g_Character.entity, 38, 174, 0, 0);
+   setEntityLocation(&g_Character.entity, 38, 174, 0, 0, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,20 +277,54 @@ void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Crop velocity according to limits (minimum and maximum)
 //
-void cropVelocity(i16 *v) {
+void cropVelocity(i16 *v, i16 maxvel, i16 minvel) {
    // Crop depending on v being positive or negative. This is best done this
    // way as SDCC has some problems with signed / unsigned numbers
    if ( *v >= 0 ) {
       // Positive. Check limits.
-      if      ( *v > G_maxVel ) *v = G_maxVel; // Crop to max. positive velocity
-      else if ( *v < G_minVel ) *v = 0;        // Round to min positive velocity
+      if      ( *v > maxvel ) *v = maxvel; // Crop to max. positive velocity
+      else if ( *v < minvel ) *v = 0;      // Round to min positive velocity
    } else {
       // Negative
-      if      ( *v < -G_maxVel ) *v = -G_maxVel;  // Crop to max negative velocity
-      else if ( *v > -G_minVel ) *v = 0;          // Round to mix negative velocity
+      if      ( *v < -maxvel ) *v = -maxvel;  // Crop to max negative velocity
+      else if ( *v > -minvel ) *v = 0;        // Round to mix negative velocity
    }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// scrolls the world at the given velocity
+//
+void scrollWorld() {
+   TEntity *ce = &g_Character.entity;
+   u8 i;
+
+   // Scroll all the given block entities
+   for(i=0; i < g_lastBlock; ++i) {
+      TEntity *e = &g_blocks[i];
+      e->y       = e->ny;
+      e->pscreen = e->npscreen;
+
+      e->phys.y += G_scrollVel;
+      e->ny      = e->phys.y / SCALE;
+      if (e->ny != e->y) {
+         if (e->ny > G_maxY) {
+            destroyBlock(i);
+            i--;
+            continue;
+         }
+
+         if (ce->phys.floor == e) {
+            TAnimation *anim = &ce->graph.anim;
+            ce->phys.y  = (e->ny - anim->frames[anim->frame_id]->height) * SCALE;
+            ce->phys.vy = G_minVel - 1;
+            ce->draw = 1;
+         }
+
+         e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
+         e->draw = 1;
+      }
+   }
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Update an entity (do animation, and change screen location)
@@ -317,14 +356,18 @@ void updateCharacter(TCharacter *c) {
 
    // Check if there is any movement on Y axis
    if ( p->vy ) {
-      cropVelocity(&p->vy);   // Crop velocity to min / max limits
+      // Crop velocity to min / max limits
+      cropVelocity(&p->vy, G_maxYVel, G_minVel);   
+
       p->y  += p->vy;         // Then add it to position
       e->ny  = p->y / SCALE;  // Calculate new screen position
    }
    
    // Check if there is any movement on x axis
    if ( p->vx ) {
-      cropVelocity(&p->vx);   // Crop velocity to min / max limits
+      // Crop velocity to min / max limits
+      cropVelocity(&p->vx, G_maxXVel, G_minVel);
+
       p->x += p->vx;          // Then add it to position
       e->nx = p->x / SCALE;   // And calculate new screen position
 
@@ -338,35 +381,64 @@ void updateCharacter(TCharacter *c) {
    
    // Check collisions
    {
-      TCollision *col = checkCollisionEntBlock(e, &g_blocks[0]);
-      // There is a collision
-      if (col->w && col->h) {
-         // 4 Possible collisions (up, down, left or right)
-         if (col->w == af->width || col->h <= col->w ) {
-            // Collision up or down
-            if (col->y > e->ny) {
-               e->ny     -= col->h;       // Move col->h bytes upside and 
-               p->floor   = &g_blocks[0]; // Make this entity the floor
-               e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
-               e->nStatus = as_pause;     // Make character cycle animation
-               c->status  = es_walk;
+      u8 i;
+      for(i=0; i < g_lastBlock; ++i) {
+         TCollision *col = checkCollisionEntBlock(e, &g_blocks[i]);
+         // There is a collision
+         if (col->w && col->h) {
+            // 4 Possible collisions (up, down, left or right)
+            if (col->w == af->width || col->h <= col->w ) {
+               // Collision up or down
+               if (col->y > e->ny) {                 
+                  e->ny     -= col->h;       // Move col->h bytes upside and 
+                  p->floor   = &g_blocks[i]; // Make this entity the floor
+                  e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
+                  e->nStatus = as_pause;     // Make character cycle animation
+                  c->status  = es_walk;
+               } else {
+                  e->ny  += col->h;          // Move col->h bytes downside (ceil)
+               }
+               
+               // Update physics vertical coordinates
+               p->y  = e->ny * SCALE;
+               p->vy = 0;
             } else {
-               e->ny  += col->h;          // Move col->h bytes downside (ceil)
+               // Collision left or right
+               if (col->x > e->nx) 
+                  e->nx -= col->w;        // move col->w bytes left (colliding right)
+               else
+                  e->nx += col->w;        // move col->w bytes right (colliding left)
+ 
+               // If we are colliding laterally with our floor, it 
+               // is not a proper floor         
+               if (p->floor == &g_blocks[i])
+                  p->floor = 0;
+
+               // Update physics horizontal coordinates
+               p->x  = e->nx  * SCALE;
+               p->vx = 0;
             }
-            p->y  = e->ny * SCALE;
-            p->vy = 0;
-         } else {
-            // Collision left or right
-            if (col->x > e->nx) 
-               e->nx -= col->w;        // move col->w bytes left (colliding right)
-            else
-               e->nx += col->w;        // move col->w bytes right (colliding left)
-            p->x  = e->nx  * SCALE;
-            p->vx = 0;
          }
       }
    }
 
+   // Maintain into limits
+   if      ( e->nx < G_minX ) { 
+      e->nx = G_minX; 
+      p->x = e->nx * SCALE; 
+   } 
+   else if ( e->nx + af->width  > G_maxX ) {
+      e->nx = G_maxX - af->width;
+      p->x = e->nx * SCALE;  
+   }
+   if      ( e->ny + af->height > G_maxY ) { 
+      e->ny = G_maxY - af->height;
+      p->y = e->ny * SCALE;
+   }
+   else if ( e->ny < G_minY ) { 
+      e->ny = G_minY;
+      p->y = e->ny * SCALE;
+   }
 
    // Check if character has moved to calculate new location and set for drawing
    if ( e->ny != e->y ) { 
@@ -469,21 +541,25 @@ u8 isOverFloor(TEntity *e) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Sets up a new location for an entity in screen (and its velocity)
 //
-void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy) {
-   e->pscreen   = cpct_getScreenPtr(g_SCR_VMEM, x, y);
-   e->npscreen  = e->pscreen;
-   e->x = e->nx = x;
-   e->y = e->ny = y;
+void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev) {
+   e->npscreen   = cpct_getScreenPtr(g_SCR_VMEM, x, y);
+   e->nx = x;
+   e->ny = y;
    e->phys.x    = x  * SCALE;
    e->phys.y    = y  * SCALE;
    e->phys.vx   = vx * SCALE;
    e->phys.vy   = vy * SCALE;
+   if (eraseprev) {
+      e->pscreen  = e->npscreen;
+      e->x = x;
+      e->y = y;
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Draw a given entity on the screen
+// Draw a given animated entity on the screen
 //
-void drawEntity (TEntity* e){
+void drawAnimEntity (TEntity* e){
    // Check if needs to be redrawn
    if ( e->draw ) {
       // Get the entity values from its current animation status
@@ -495,8 +571,49 @@ void drawEntity (TEntity* e){
 
       // Draw the entity
       cpct_drawSprite(frame->sprite, e->npscreen, frame->width, frame->height);
+
+      e->draw = 0;
    }
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Draw a given animated entity on the screen
+//
+void drawBlockEntity (TEntity* e){
+   // Check if needs to be redrawn
+   if ( e->draw ) {
+      u8* sp;   // Starting video mem pointer for blocks that are in the upper non-visible zone
+      u8  dy;   // Distance the block moved
+
+      // Get the entity values from its current animation status
+      TBlock* block  = &e->graph.block;
+         
+      // Blocks only move down
+      dy = e->ny - e->y;
+      if (dy > block->h) dy = block->h;
+
+      // Remove trails 
+      if (dy)
+         cpct_drawSolidBox(e->pscreen, 0x00, block->w, dy);
+
+      // Take into account non visible zones
+      sp = e->npscreen;
+      if (e->ny < G_minY) {
+         dy = block->h + e->ny - G_minY;
+         sp = cpct_getScreenPtr(g_SCR_VMEM, e->nx, G_minY);
+      } else if (e->ny + block->h > G_maxY) {
+         dy = G_maxY - e->ny;
+      } else
+         dy = block->h;
+
+      // Draw the entity
+      if (dy)
+         cpct_drawSolidBox(sp, block->colour, block->w, dy);
+
+      e->draw = 0;
+   }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw all the scene 
@@ -504,17 +621,16 @@ void drawEntity (TEntity* e){
 void drawAll() {
    u8 i;
 
-   drawEntity(&g_Character.entity);
-
    // Draw Blocks
-   for (i=0; i < g_lastBlock; ++i) {
-      TEntity *e = (g_blocks + i);
-      cpct_drawSolidBox(e->pscreen, e->graph.block.colour, e->graph.block.w, e->graph.block.h);
-   }
+   for (i=0; i < g_lastBlock; ++i) 
+      drawBlockEntity(&g_blocks[i]);
+
+   // Draw Character
+   drawAnimEntity(&g_Character.entity);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Creates a new solid block and returns its entity pointer
+// Creates an inserts a new solid block, returning its entity pointer
 //
 TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
    TEntity *newEnt = 0;
@@ -528,15 +644,21 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
       newEnt->pw                 = width;
       newEnt->ph                 = height;
       newEnt->graph.block.colour = colour;
-      newEnt->pscreen            = cpct_getScreenPtr(g_SCR_VMEM, x, y);
-      newEnt->npscreen           = newEnt->pscreen;
-      newEnt->x = newEnt->nx     = x;
-      newEnt->y = newEnt->ny     = y;
+      setEntityLocation(newEnt, x, y, 0, 0, 1);
       newEnt->draw               = 1;
-      newEnt->phys.bounce        = 0.85 * SCALE; // Only bounce coefficient makes sense on solid blocks,
+      newEnt->phys.bounce        = 0.85 * SCALE;
                                                  // as they are not affected by Physics
       ++g_lastBlock;   // One more entity added to the vector
    }
 
    return newEnt;
+}
+
+void destroyBlock(u8 i) {
+   i8 nEnts = g_lastBlock - i - 1;
+
+   if (nEnts)
+      cpct_memcpy(&g_blocks[i], &g_blocks[i+1], nEnts*sizeof(TEntity));
+   
+   --g_lastBlock;
 }
