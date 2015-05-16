@@ -59,7 +59,7 @@ const TAnimFrame g_allAnimFrames[14] = {
 TAnimFrame*  const g_walkLeft[3]  = { &AF[3], &AF[2], 0 };
 TAnimFrame*  const g_walkRight[3] = { &AF[1], &AF[0], 0 };
 TAnimFrame*  const g_jumpLeft[6]  = { &AF[8], &AF[9], &AF[10], &AF[11], &AF[3], 0 };
-TAnimFrame*  const g_jumpRight[6] = { &AF[8], &AF[9], &AF[10], &AF[11], &AF[1], 0 };
+TAnimFrame*  const g_jumpRight[6] = { &AF[4], &AF[5], &AF[ 6], &AF[ 7], &AF[1], 0 };
 TAnimFrame*  const g_hitLeft[2]   = { &AF[13], 0 };
 TAnimFrame*  const g_hitRight[2]  = { &AF[12], 0 };
 
@@ -387,34 +387,10 @@ TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b) {
    TBlock     *blk = &b->graph.block;
 
    // No collision at the start of the check
-   c.w = 0;
+   c.h = 0;
 
-   // Calculate horizontal collision
+   // Calculate vertical collision
    {
-      u8 a_rbound = a->nx + ani->width; // -- right boundary limit of a
-      u8 b_rbound = b->nx + blk->w;     // -- right boundary limit of b
-
-      if ( a->nx <= b->nx ) {           // Case 1: a is left, b is right
-         if ( b->nx < a_rbound ) {      // Check if b is inside the width of a
-            c.x = b->nx;                // Yes, calculate horizontal collision area
-            if ( b_rbound < a_rbound )
-               c.w = b_rbound - c.x;
-            else
-               c.w = a_rbound - c.x;
-         }
-      } else if ( b->nx < a->nx ) {     // Case 2: b is left, a is right
-         if ( a->nx < b_rbound ) {      // Check if a is inside the width of b
-            c.x = a->nx;                // Yes, calculate horizontal collision area
-            if ( b_rbound < a_rbound )
-               c.w = b_rbound - c.x;
-            else
-               c.w = a_rbound - c.x;
-         }     
-      }
-   }
-
-   // Continue only it there is an horizontal collision
-   if (c.w) {
       u8 a_bbound = a->ny + ani->height; // -- bottom boundary of a
       u8 b_bbound = b->ny + blk->h;      // -- bottom boundary of b
 
@@ -435,6 +411,32 @@ TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b) {
             else
                c.h = a_bbound - c.y;
          }
+      }
+   }
+
+
+   // Calculate horizontal collision, only if there was vertical collision
+   if (c.h) {
+      u8 a_rbound = a->nx + ani->width; // -- right boundary limit of a
+      u8 b_rbound = b->nx + blk->w;     // -- right boundary limit of b
+      c.w = 0;                          // Erase previous values and set to 0
+
+      if ( a->nx <= b->nx ) {           // Case 1: a is left, b is right
+         if ( b->nx < a_rbound ) {      // Check if b is inside the width of a
+            c.x = b->nx;                // Yes, calculate horizontal collision area
+            if ( b_rbound < a_rbound )
+               c.w = b_rbound - c.x;
+            else
+               c.w = a_rbound - c.x;
+         }
+      } else if ( b->nx < a->nx ) {     // Case 2: b is left, a is right
+         if ( a->nx < b_rbound ) {      // Check if a is inside the width of b
+            c.x = a->nx;                // Yes, calculate horizontal collision area
+            if ( b_rbound < a_rbound )
+               c.w = b_rbound - c.x;
+            else
+               c.w = a_rbound - c.x;
+         }     
       }
    }
 
