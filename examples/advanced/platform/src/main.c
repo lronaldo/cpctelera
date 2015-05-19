@@ -20,7 +20,8 @@
 #include <stdio.h>
 #include <cpctelera.h>
 #include "entities/entities.h"
-#include "entities/sprites.h"
+#include "sprites/sprites.h"
+#include "sprites/frame.h"
 
 
 //#define DEBUG
@@ -69,6 +70,8 @@ void initializeScreen(u16 hiscore) {
    pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  24);
    sprintf(str, "%5u", hiscore);
    cpct_drawStringM0(str, pscr, 15, 8);
+
+   drawFrame(g_SCR_VMEM, 0);
 }
 
 #ifdef DEBUG
