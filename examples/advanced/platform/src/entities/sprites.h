@@ -33,6 +33,7 @@ extern const u8 G_EMRright2[2*16];
 extern const u8 G_EMRright3[4*16];
 extern const u8 G_EMRleft[4*16];
 extern const u8 G_EMRleft2[2*16];
+extern const u8 G_EMRleft3[4*16];
 extern const u8 G_EMRjumpright1[4*8];
 extern const u8 G_EMRjumpright2[4*8];
 extern const u8 G_EMRjumpright3[4*8];

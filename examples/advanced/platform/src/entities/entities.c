@@ -33,7 +33,7 @@
 //
 // All the animation frames to be used in this example
 //
-const TAnimFrame g_allAnimFrames[15] = {
+const TAnimFrame g_allAnimFrames[16] = {
    { G_EMRright,       4, 16,  4 }, // 0// << Walk Right Frames
    { G_EMRright2,      2, 16,  4 }, // 1// |
    { G_EMRleft,        4, 16,  4 }, // 2// << Walk Left Frames
@@ -48,7 +48,8 @@ const TAnimFrame g_allAnimFrames[15] = {
    { G_EMRjumpleft4,   4,  8,  3 }, //11// |
    { G_EMRhitright,    4, 16,  6 }, //12// << Hit Right Frame
    { G_EMRhitleft,     4, 16,  6 }, //13// << Hit Left Frame
-   { G_EMRright3,      4, 16,  4 }  //14// << Walk 3 steps
+   { G_EMRright3,      4, 16,  4 }, //14// << Walk 3rd steps
+   { G_EMRleft3,       4, 16,  4 }  //15// |
 };
 
 // Use a define for convenience
@@ -57,7 +58,7 @@ const TAnimFrame g_allAnimFrames[15] = {
 //
 // All complete animations used in this example (NULL terminated, to know the end of the array)
 //
-TAnimFrame*  const g_walkLeft[3]  = { &AF[3], &AF[2], 0 };
+TAnimFrame*  const g_walkLeft[5]  = { &AF[2], &AF[3], &AF[15], &AF[3], 0 };
 TAnimFrame*  const g_walkRight[5] = { &AF[0], &AF[1], &AF[14], &AF[1], 0 };
 TAnimFrame*  const g_jumpLeft[6]  = { &AF[8], &AF[9], &AF[10], &AF[11], &AF[3], 0 };
 TAnimFrame*  const g_jumpRight[6] = { &AF[4], &AF[5], &AF[ 6], &AF[ 7], &AF[1], 0 };
@@ -746,18 +747,16 @@ void drawBlockEntity (TEntity* e){
    }
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Draw all the scene 
 //
 void drawAll() {
-   u8 i = g_lastBlock;
+   u8  i = g_lastBlock;
 
    // Draw Blocks
-   while(i--)
+   while(i--) 
       drawBlockEntity(&g_blocks[i]);
 
-   // Draw Character
    drawAnimEntity(&g_Character.entity);
 }
 
