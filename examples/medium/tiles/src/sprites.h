@@ -22,6 +22,8 @@
 // Declarations of sprites used in this example
 //
 
+// Waves sprite, 2x4 bytes size (4x4 mode 0 pixels)
+extern const u8 waves_2x4[8];
 // Waves sprite, 2x8 bytes size (4x8 mode 0 pixels)
 extern const u8 waves_2x8[16];
 // F sprite, 2x8 bytes size (4x8 mode 0 pixels)

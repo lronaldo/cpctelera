@@ -20,13 +20,14 @@
 #include "sprites.h"
 
 // 4 names for our 4 types of drawSprite functions
-typedef enum { _2x8, _4x8, _2x8Fast, _4x8Fast } TDrawFunc;
+typedef enum { _2x8, _4x8, _2x4Fast, _2x8Fast, _4x8Fast } TDrawFunc;
 
 // Structure grouping all the information required about a tile for this example
 //    ( pixel data, width in bytes and function to draw the tile)
 typedef struct {
          u8* sprite;   // Pixel data defining the tile
          u8  width;    // Width in bytes of the tile
+         u8  height;   // Height in bytes of the tile
    TDrawFunc function; // Function that should be used to draw this tile
 } TTile;
 
@@ -35,31 +36,33 @@ const u16 WAITCLEARED = 20000;
 const u16 WAITPAINTED = 60000; 
 
 // Table with all the tiles and the required information to draw them
-const TTile tiles[4] = {
-//    Sprite    Width  Function
-//--------------------------------
-   { waves_2x8,   2,   _2x8     },  // Tile 0
-   {     F_2x8,   2,   _2x8Fast },  // Tile 1
-   { waves_4x8,   4,   _4x8     },  // Tile 2
-   {    FF_4x8,   4,   _4x8Fast }   // Tile 3
+const TTile tiles[5] = {
+//    Sprite    Width Height   Function
+//-----------------------------------------
+   { waves_2x4,   2,    4,      _2x4Fast },  // Tile 0
+   { waves_2x8,   2,    8,      _2x8     },  // Tile 1
+   {     F_2x8,   2,    8,      _2x8Fast },  // Tile 2
+   { waves_4x8,   4,    8,      _4x8     },  // Tile 3
+   {    FF_4x8,   4,    8,      _4x8Fast }   // Tile 4
 };
 
 //
 // Fills all the screen with sprites using drawTileAlignedXXX functions
 //
 void fillupScreen(TTile* tile) {
-   u8 *pvideomem = (u8*)0xC000;      // Pointer to the start of video memory
-   u8 x, y;                          // Loop counters for x and y screen tiles
-   u8 tilesperline = 80/tile->width; // Number of tiles per line = LINEWIDTH / TILEWIDTH
+   u8 *pvideomem;                      // Pointer to the place where next tile will be drawn
+   u8 x, y;                            // Loop counters for x and y screen tiles
+   u8 tilesperline = 80/tile->width;   // Number of tiles per line = LINEWIDTH / TILEWIDTH
 
-   // Cover all the screen (25 lines) with tiles
-   for (y=0; y < 25; y++) { 
-      
+   // Cover all the screen (200 pixels) with tiles
+   for (y=0; y < 200; y += tile->height) { 
+      pvideomem = cpct_getScreenPtr((u8*)0xC000, 0, y); // Calculate byte there this pixel line starts
+
       // Draw all the tiles for this line
-      for (x=0; x < tilesperline; x++) {
-         
+      for (x=0; x < tilesperline; x++) {       
          // Select the appropriate function to draw the tile, and draw it
          switch (tile->function) {
+            case _2x4Fast: cpct_drawTileAligned2x4_f(tile->sprite, pvideomem); break;
             case _2x8Fast: cpct_drawTileAligned2x8_f(tile->sprite, pvideomem); break;
             case _2x8:     cpct_drawTileAligned2x8  (tile->sprite, pvideomem); break;
             case _4x8Fast: cpct_drawTileAligned4x8_f(tile->sprite, pvideomem); break;
@@ -88,7 +91,7 @@ void main(void) {
 
       // 4 iterations of filling up the screen out of tiles using
       // the 4 different tile-drawing functions
-      for (i=0; i < 4; i++) {
+      for (i=0; i < 5; i++) {
          // First, clear the screen and wait for a while
          cpct_clearScreen(0);
          for (w=0; w < WAITCLEARED; w++);

@@ -22,6 +22,15 @@
 // Sprite definitions used in this example
 //
 
+// Waves sprite, 2x4 bytes size (4x4 mode 0 pixels)
+const u8 waves_2x4[8] = {
+   0xE0,0xE0,
+   0xD0,0xD0,
+   0x58,0x58,
+   0xA4,0xA4
+};
+
+
 // Waves sprite, 2x8 bytes size (4x8 mode 0 pixels)
 const u8 waves_2x8[16] = {
    0xE0,0xE0,
