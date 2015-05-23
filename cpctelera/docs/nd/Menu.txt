@@ -94,6 +94,7 @@ Group: Sprites  {
    File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.s)
    File: cpct_drawSprite  (sprites/cpct_drawSprite.s)
    File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.s)
+   File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.s)
    File: cpct_drawTileAligned2x8  (sprites/cpct_drawTileAligned2x8.s)
    File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.s)
    File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.s)
