@@ -97,6 +97,7 @@ Group: Sprites  {
    File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.s)
    File: cpct_drawTileAligned2x8  (sprites/cpct_drawTileAligned2x8.s)
    File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.s)
+   File: cpct_drawTileAligned4x4_f  (sprites/cpct_drawTileAligned4x4_f.s)
    File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.s)
    File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.s)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0.s)
