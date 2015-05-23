@@ -28,6 +28,8 @@ extern const u8 waves_2x4[8];
 extern const u8 waves_2x8[16];
 // F sprite, 2x8 bytes size (4x8 mode 0 pixels)
 extern const u8 F_2x8[16];        
+// Waves sprite, 4x4 bytes size (8x4 mode 0 pixels)
+extern const u8 waves_4x4[16];
 // Waves sprite, 4x8 bytes size (8x8 mode 0 pixels)
 extern const u8 waves_4x8[32];
 // Inverted waves sprite, 4x8 bytes size (8x8 mode 0 pixels)

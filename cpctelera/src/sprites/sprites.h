@@ -45,6 +45,7 @@ extern void cpct_drawTileAligned2x8  (void *sprite, void* memory);
 extern void cpct_drawTileAligned4x8  (void *sprite, void* memory);
 extern void cpct_drawTileAligned2x4_f(void *sprite, void* memory);
 extern void cpct_drawTileAligned2x8_f(void *sprite, void* memory);
+extern void cpct_drawTileAligned4x4_f(void *sprite, void* memory);
 extern void cpct_drawTileAligned4x8_f(void *sprite, void* memory);
 
 // Sprite and box drawing functions

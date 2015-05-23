@@ -20,7 +20,7 @@
 #include "sprites.h"
 
 // 4 names for our 4 types of drawSprite functions
-typedef enum { _2x8, _4x8, _2x4Fast, _2x8Fast, _4x8Fast } TDrawFunc;
+typedef enum { _2x8, _4x8, _2x4Fast, _4x4Fast, _2x8Fast, _4x8Fast } TDrawFunc;
 
 // Structure grouping all the information required about a tile for this example
 //    ( pixel data, width in bytes and function to draw the tile)
@@ -36,10 +36,11 @@ const u16 WAITCLEARED = 20000;
 const u16 WAITPAINTED = 60000; 
 
 // Table with all the tiles and the required information to draw them
-const TTile tiles[5] = {
+const TTile tiles[6] = {
 //    Sprite    Width Height   Function
 //-----------------------------------------
    { waves_2x4,   2,    4,      _2x4Fast },  // Tile 0
+   { waves_4x4,   4,    4,      _4x4Fast },  // Tile 0
    { waves_2x8,   2,    8,      _2x8     },  // Tile 1
    {     F_2x8,   2,    8,      _2x8Fast },  // Tile 2
    { waves_4x8,   4,    8,      _4x8     },  // Tile 3
@@ -63,6 +64,7 @@ void fillupScreen(TTile* tile) {
          // Select the appropriate function to draw the tile, and draw it
          switch (tile->function) {
             case _2x4Fast: cpct_drawTileAligned2x4_f(tile->sprite, pvideomem); break;
+            case _4x4Fast: cpct_drawTileAligned4x4_f(tile->sprite, pvideomem); break;
             case _2x8Fast: cpct_drawTileAligned2x8_f(tile->sprite, pvideomem); break;
             case _2x8:     cpct_drawTileAligned2x8  (tile->sprite, pvideomem); break;
             case _4x8Fast: cpct_drawTileAligned4x8_f(tile->sprite, pvideomem); break;
@@ -91,7 +93,7 @@ void main(void) {
 
       // 4 iterations of filling up the screen out of tiles using
       // the 4 different tile-drawing functions
-      for (i=0; i < 5; i++) {
+      for (i=0; i < 6; i++) {
          // First, clear the screen and wait for a while
          cpct_clearScreen(0);
          for (w=0; w < WAITCLEARED; w++);

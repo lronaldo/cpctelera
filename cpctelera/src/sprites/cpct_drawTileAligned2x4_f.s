@@ -82,7 +82,7 @@
 ;;    [ 0xC000 -- 0xDFFF ] - RAM Bank 3 (Default Video Memory Bank)
 ;;    [ 0x8000 -- 0x9FFF ] - RAM Bank 2
 ;;    [ 0x4000 -- 0x5FFF ] - RAM Bank 1
-;;    [ 0x0000 -- 0x2FFF ] - RAM Bank 0
+;;    [ 0x0000 -- 0x1FFF ] - RAM Bank 0
 ;;
 ;;    All of them have 1 bit in common: bit 5 is always 0 (xx0xxxxx). Any 
 ;; address not having this bit set to 0 will refer to Pixel Lines 4-7 
