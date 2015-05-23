@@ -2,7 +2,11 @@ File: CPCtelera Reference Manual
 
 (see cpct_logo.png)
 
-*Astonishing fast Amstrad CPC game engine for C and Assembler developers*. CPCtelera has been created by these *<Authors>*, and is distributed under *GPL v3 <License>*.
+*Astonishing fast Amstrad CPC game engine for C and Assembler developers*. 
+
+CPCtelera has been created by these *<Authors>*, and is distributed under *GPL v3 <License>*. 
+
+We give *big thanks* to all users, contributors and supporters, and all respects to our *incredible <Donors>*.
 
 (see paypaldonations.jpg)
 
@@ -47,6 +51,13 @@ Section: Welcome to CPCtelera!
    And, of course, CPCtelera comes with a complete API documentation and lots of well documented examples for you to quickly and easily learn it!
 
    All these features included in a single bundle for you to download and use, free and under GPL v3.0. License. You have all source code available for you to analyse, explore, improve and distribute!
+
+Section: Donors
+   
+   We are *incredibly grateful to these people*, who sent us some economic support to continue with CPCtelera and other CPC-related projects. Big most sincere thanks and respects to all of you,
+
+   21/05/2015 - Lachlan Keown
+
 
 Section: Supporting CPCtelera
    We, as authors of CPCtelera, have started this journey to create a usable, free, convenient and up-to-date game engine. There are lots of things to do and improve in order to achieve our goals. If you want to help us, we are more than happy. Any kind of help is always welcome, but we prefer any of these ways,

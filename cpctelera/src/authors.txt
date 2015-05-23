@@ -1,5 +1,11 @@
 Title: Authors
 
+Section: Donnors
+   
+   We are incredibly grateful to these people, who sent us some economic support to continue with CPCtelera and other CPC-related projects. Big most sincere thanks to all of you:
+
+   21/05/2015 - Lachlan Keown
+
 Section: Project authors
    
    Maintainer, low-level library and build system developers
