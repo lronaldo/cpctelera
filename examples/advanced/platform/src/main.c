@@ -22,6 +22,7 @@
 #include "entities/entities.h"
 #include "sprites/sprites.h"
 #include "sprites/frame.h"
+#include "random/random.h"
 
 
 //#define DEBUG
@@ -88,7 +89,7 @@ void updateUser(TCharacter* user) {
    // Check possible keys to press, and do actions
    if ( cpct_isKeyPressed(Key_CursorUp) && user->status != es_jump ) {
       performAction(user, es_jump, user->side);
-      g_nextRand += user->entity.nx;    // Randomly move the random seed
+      getRandomUniform(user->entity.nx); // Randomly move the random seed
    }
    else if ( cpct_isKeyPressed(Key_CursorRight) )
       performAction(user, es_walk, s_right);

@@ -168,9 +168,6 @@ TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b);
 //////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-// Random seed
-extern u8 g_nextRand;
-
 // Size of the Screen and base pointer (in pixels)
 //
 extern const u8  g_SCR_WIDTH;  // Screen width in bytes (80 bytes = 160 pixels)
