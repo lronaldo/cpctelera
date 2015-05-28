@@ -439,15 +439,9 @@ u8 updateCharacter(TCharacter *c) {
          p->vx /= G_airFric;     // Friction on air
    }
 
-//#define DEBUG
-
    // Check collisions
    {
       u8 i;
-#ifdef DEBUG
-         u8 str[14]="             ";
-         cpct_drawStringM0("             ", (u8*)0xC780, 0, 6);
-#endif
       for(i=0; i < g_lastBlock; ++i) {
          TEntity    *ebl = &g_blocks[i];
          TCollision *col = checkCollisionEntBlock(e, ebl);
@@ -457,9 +451,6 @@ u8 updateCharacter(TCharacter *c) {
 
             // Lateral
             if(e->x <= col->x - e->pw  || e->x >= ebl->x + ebl->pw ) {
-#ifdef DEBUG
-               str[0]='-';
-#endif
                if (col->x > g_blocks[i].nx) 
                   e->nx += col->w;    // move col->w bytes right (colliding right)
                else
@@ -471,9 +462,6 @@ u8 updateCharacter(TCharacter *c) {
 
             // Up
             } else if (e->y < col->y - e->ph / 2) { 
-#ifdef DEBUG
-               str[0]='^';
-#endif
                p->floor   = &g_blocks[i]; // Make this entity the floor
                e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
                e->nStatus = as_pause;     // Make character cycle animation
@@ -487,28 +475,13 @@ u8 updateCharacter(TCharacter *c) {
 
             // Down
             } else {
-#ifdef DEBUG
-                  str[1]='v';
-#endif
                e->ny  = col->y + col->h;  // Move col->h bytes downside (ceil)
                p->y   = e->ny * SCALE;
                p->vy  = 0;
             }
-
-#ifdef DEBUG
-         sprintf(str+2, "%d,%d|%d,%d", col->x, col->y, col->w, col->h);
-         cpct_drawStringM0(str, (u8*)0xC780, 1, 0);
-#endif
          }
       }
    }
-
-#ifdef DEBUG
-   { 
-      u8 str[12];
-      str[0] = str[1] = ' ';
-      sprintf(str+2, "%d|", e->nx);
-#endif
 
    // Maintain into limits
    if ( e->nx <= G_minX) { 
@@ -516,9 +489,6 @@ u8 updateCharacter(TCharacter *c) {
       p->x = e->nx * SCALE; 
    } 
    else if ( e->nx + af->width >= G_maxX ) {
-#ifdef DEBUG
-      str[0] ='!';
-#endif
       e->nx = G_maxX - af->width;
       p->x  = e->nx * SCALE;  
    }
@@ -535,24 +505,12 @@ u8 updateCharacter(TCharacter *c) {
 
    // Check if character has moved to calculate new location and set for drawing
    if ( e->ny != e->y ) { 
-#ifdef DEBUG
-      str[1] ='y';
-#endif
       e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
       e->draw = 1;
    } else if ( e->nx != e->x ) {
-#ifdef DEBUG
-      str[1] ='x';
-#endif
       e->npscreen = e->npscreen + e->nx - e->x;
       e->draw = 1; 
    } 
-
-#ifdef DEBUG
-      sprintf(str+5, "%d(%d)", e->nx, e->x);
-      cpct_drawStringM0(str, g_SCR_VMEM, 1, 8);
-   }
-#endif
 
    return alive;
 }
