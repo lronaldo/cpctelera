@@ -1,6 +1,5 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-//  Copyright (C) 2015 Dardalorth / Fremos / Carlio
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -16,30 +15,29 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
-#include <types.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//// FRAME 
-////   Tiles and function used to draw the play area frame
+//// GAME MODULE
+////   Controls all the high-level logic that implements the game
 ////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-// Function for drawing the frame using the tiles
-void drawFrame(u8* pscr, u8 x);
+#include <types.h>
 
-// Tiles for defining the frame of the playing area
-// by Dardalorth / Fremos / Carlio
-extern const u8 G_frameUpLeftCorner[4*8];
-extern const u8 G_frameUpRightCorner[4*8];
-extern const u8 G_frameDownRightCorner[4*8];
-extern const u8 G_frameDownLeftCorner[4*8];
-extern const u8 G_frameLeft[4*8];
-extern const u8 G_frameRight[4*8];
-extern const u8 G_frameUp[4*8];
-extern const u8 G_frameDown[4*8];
-extern const u8 G_frameUpCenter[6*8];
-extern const u8 G_frameDownCenter[6*8];
-extern const u8 G_frameUpCenter2[2*8];
-extern const u8 G_frameDownCenter2[2*8];
+// 
+// Forward declara TCharacter struct (as we use a pointer in updateUser,
+//   and compiler must now its existance, but not its definition details).
+//
+extern struct Character;
+typedef struct Character TCharacter;
+
+//
+// Functions defined in the game module
+//
+void initializeGameScreen (u16 hiscore);
+void showGameEnd          (u16 score);
+void updateUser           (TCharacter* user);
+void wait4Key             (cpct_keyID key);
+ u16 game                 (u16 hiscore);

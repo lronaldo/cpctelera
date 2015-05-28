@@ -125,7 +125,7 @@ typedef struct Entity {
 //
 // Describes a game character (the main character, for instance)
 //
-typedef struct {
+typedef struct Character {
    TEntity           entity;  // Entity model for this character
    TCharacterStatus  status;  // Present status of the character
    TCharacterSide    side;    // Side the character is facing
