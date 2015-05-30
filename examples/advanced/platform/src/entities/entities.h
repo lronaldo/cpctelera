@@ -16,7 +16,11 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#ifndef _ENTITIES_H_
+#define _ENTITIES_H_
+
 #include <types.h>
+#include "../anim/animation.h"
 
 // Scale value for fixed point maths calculations using integers
 #define SCALE   256  // 2^8
@@ -31,37 +35,6 @@
 //////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-
-//
-// Possible statuses of an animation
-//
-typedef enum {
-   as_null = 0, // We require this to represent a null status
-   as_play = 1, // Playing till the last frame
-   as_cycle,    // Playing continuosly
-   as_pause,    // Paused, waiting to continue
-   as_end       // Animation has ended
-} TAnimStatus;
-
-//
-// Description of an animation frame
-//
-typedef struct {
-   u8* sprite;        // Sprite associated to this frame
-   u8  width, height; // Sprite dimensions in bytes
-   u8  time;          // Time that the sprite should be shown
-} TAnimFrame;
-
-//
-// Describes an Animation as a secuence of sprites, controlled by time
-//   Time is measured in main loop cycles
-//
-typedef struct {
-   TAnimFrame**  frames;    // Vector containing all the frames of the animation
-   u8            frame_id;  // Index of the current frame
-   u8            time;      // Remaining time for this frame
-   TAnimStatus   status;    // Status of the animation
-} TAnimation;
 
 //
 // Possible statuses of an entity
@@ -173,3 +146,5 @@ TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b);
 extern const u8  g_SCR_WIDTH;  // Screen width in bytes (80 bytes = 160 pixels)
 extern const u8  g_SCR_HEIGHT; // Screen height in bytes
 extern u8* const g_SCR_VMEM;   // Pointer to the start of default video memory screen
+
+#endif

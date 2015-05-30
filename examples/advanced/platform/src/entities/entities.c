@@ -20,63 +20,10 @@
 
 #include <cpctelera.h>
 #include "entities.h"
+#include "../anim/animation.h"
+#include "../anim/predefinedAnimations.h"
 #include "../sprites/sprites.h"
 #include "../random/random.h"
-
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-//////
-//////  PREDEFINED ANIMATIONS
-//////
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-
-//
-// All the animation frames to be used in this example
-//
-const TAnimFrame g_allAnimFrames[16] = {
-   { G_EMRright,       4, 16,  4 }, // 0// << Walk Right Frames
-   { G_EMRright2,      2, 16,  4 }, // 1// |
-   { G_EMRleft,        4, 16,  4 }, // 2// << Walk Left Frames
-   { G_EMRleft2,       2, 16,  4 }, // 3// |
-   { G_EMRjumpright1,  4,  8,  3 }, // 4// << Jump Right Frames 
-   { G_EMRjumpright2,  4,  8,  4 }, // 5// |
-   { G_EMRjumpright3,  4,  8,  4 }, // 6// |
-   { G_EMRjumpright4,  4,  8,  3 }, // 7// |
-   { G_EMRjumpleft1,   4,  8,  3 }, // 8// << Jump Left Frames 
-   { G_EMRjumpleft2,   4,  8,  4 }, // 9// |
-   { G_EMRjumpleft3,   4,  8,  4 }, //10// |
-   { G_EMRjumpleft4,   4,  8,  3 }, //11// |
-   { G_EMRhitright,    4, 16,  6 }, //12// << Hit Right Frame
-   { G_EMRhitleft,     4, 16,  6 }, //13// << Hit Left Frame
-   { G_EMRright3,      4, 16,  4 }, //14// << Walk 3rd steps
-   { G_EMRleft3,       4, 16,  4 }  //15// |
-};
-
-// Use a define for convenience
-#define AF g_allAnimFrames
-
-//
-// All complete animations used in this example (NULL terminated, to know the end of the array)
-//
-TAnimFrame*  const g_walkLeft[5]  = { &AF[2], &AF[3], &AF[15], &AF[3], 0 };
-TAnimFrame*  const g_walkRight[5] = { &AF[0], &AF[1], &AF[14], &AF[1], 0 };
-TAnimFrame*  const g_jumpLeft[6]  = { &AF[8], &AF[9], &AF[10], &AF[11], &AF[3], 0 };
-TAnimFrame*  const g_jumpRight[6] = { &AF[4], &AF[5], &AF[ 6], &AF[ 7], &AF[1], 0 };
-TAnimFrame*  const g_hitLeft[2]   = { &AF[13], 0 };
-TAnimFrame*  const g_hitRight[2]  = { &AF[12], 0 };
-
-//
-// Vector containing references to all animations, ordered by states and sides
-//
-TAnimFrame** const g_anim[es_NUMSTATUSES][s_NUMSIDES] = {
-   {  0, 0  },                   // STATE 0 = es_static: No animations
-   { g_walkLeft, g_walkRight },  // STATE 1 = es_walk
-   { g_jumpLeft, g_jumpRight },  // STATE 2 = es_jump
-   { g_hitLeft,  g_hitRight  }   // STATE 3 = es_hit
-};
-
-#undef AF
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -119,6 +66,7 @@ TEntity g_blocks[g_MaxBlocks];  // Vector with the values of the blocks
      u8 g_lastBlock;            // Last block value (next available)
 
 // Main Character
+//extern TAnimFrame** const g_walkRight;
 const TCharacter g_Character = {
    // Entity values
    { 
@@ -167,66 +115,6 @@ void initializeEntities() {
    // Initialize main character
    setEntityLocation(&g_Character.entity, 28, 120-20, 0, 0, 1);
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// Updates an animation
-//   Returns 1 when a new frame is reached, and 0 otherwise
-//
-i8 updateAnimation(TEntity* e) {
-   TAnimation *anim = &e->graph.anim;
-   i8 newframe = 0;
-
-   // If new animation, set it!
-   if ( e->nAnim ) {
-      anim->frames   = e->nAnim;   // Sets the new animation to the entity
-      anim->frame_id = 0;          // First frame of the animation
-      
-      // Set time on non void animations
-      if ( e->nAnim[0] )
-         anim->time = e->nAnim[0]->time; // Animation is at its initial timestep
-
-      // Set next animation to 0, to prevent it from changing again
-      e->nAnim = 0;
-      newframe = 1; // We have changed animation, an that makes this a new frame
-   }
-
-   // If new animation status, set it!
-   if ( e->nStatus ) {
-      anim->status = e->nStatus; // Set the initial status for the animation    
-      e->nStatus   = as_null;    // No next status
-   }
-
-   // Update only if animation is not paused or finished
-   if (anim->status != as_pause && anim->status != as_end) {
-
-      // Update time and, If time has finished for this frame, get next
-      if ( ! --anim->time ) {
-         TAnimFrame* frame;
-
-         // Next frame
-         newframe = 1;
-         frame = anim->frames[ ++anim->frame_id ];
-
-         // If frame is not null, we have a new frame, else animation may have ended or may recycle
-         if (frame) {
-            // New frame values
-            anim->time = frame->time;
-         } else if ( anim->status == as_cycle ) {
-            // Recycle to first frame
-            anim->frame_id = 0;
-            anim->time     = anim->frames[0]->time;
-         } else {
-            // End animation (leaving last frame_id visible)
-            --anim->frame_id;
-            anim->status = as_end;
-         }
-      }
-   }
-
-   // Report if a new frame has started
-   return newframe;
-}
-
 
         u16 getScore() { return G_score; }
 TCharacter* getCharacter() { return &g_Character; }
@@ -396,9 +284,11 @@ u8 updateCharacter(TCharacter *c) {
    e->ph      = af->height;
 
    // Update animation. If changes sprite, then we should redraw
-   if ( updateAnimation(e) ) { 
+   if ( updateAnimation(&e->graph.anim, e->nAnim, e->nStatus) ) { 
       e->draw = 1;                        // Redraw 
       af = anim->frames[anim->frame_id];  // Get values of the new frame
+      e->nAnim   = 0;                     // No next animation/animstatus
+      e->nStatus = as_null;
    }
 
    // Apply gravity only if the entity is not over a floor
