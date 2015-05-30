@@ -49,15 +49,12 @@ i8 updateAnimation(TAnimation* anim, TAnimFrame** newAnim, TAnimStatus newStatus
       if ( newAnim[0] )
          anim->time = newAnim[0]->time; // Animation is at its initial timestep
 
-      // Set next animation to 0, to prevent it from changing again
-      // e->nAnim = 0;
       newframe = 1; // We have changed animation, an that makes this a new frame
    }
 
    // If new animation status, set it!
    if ( newStatus )
       anim->status = newStatus;  // Set the initial status for the animation    
-      //e->nStatus   = as_null;  // No next status
 
    // Update only if animation is not paused or finished
    if (anim->status != as_pause && anim->status != as_end) {

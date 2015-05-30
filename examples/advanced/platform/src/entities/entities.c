@@ -66,7 +66,6 @@ TEntity g_blocks[g_MaxBlocks];  // Vector with the values of the blocks
      u8 g_lastBlock;            // Last block value (next available)
 
 // Main Character
-//extern TAnimFrame** const g_walkRight;
 const TCharacter g_Character = {
    // Entity values
    { 
