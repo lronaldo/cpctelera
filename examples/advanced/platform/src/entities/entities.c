@@ -33,6 +33,9 @@
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+    void applyCharacterBlockCollisions(TCharacter *c);
+    void updateCharacterPhysics(TCharacter *c);
+      u8 moveBlock(u8 b_idx);
     void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev);
     void destroyBlock (u8 block_idx);
     void drawEntity   (TEntity *ent);
@@ -232,6 +235,9 @@ void cropVelocity(i16 *v, i16 maxvel, i16 minvel) {
 // Moves a block
 // Parameters:
 //    b_idx: Index of the block
+// Returns:
+//    1 if the moved block has been destroyed
+//    0 if not
 //
 u8 moveBlock(u8 b_idx) {
    TEntity *e = &g_blocks[b_idx]; // Get next block entity
@@ -316,7 +322,9 @@ void scrollWorld() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Update an entity (do animation, and change screen location)
+// Update the Physics of the Character: Apply gravity and movements
+// Parameters:
+//    c: Character for updating its physics
 //
 void updateCharacterPhysics(TCharacter *c) {
    TEntity  *e = &c->entity;
@@ -363,7 +371,80 @@ void updateCharacterPhysics(TCharacter *c) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks collisions between main Character and Blocks and applies required changes
+// Parameters:
+//    c: Character for updating its physics
+//
+void applyCharacterBlockCollisions(TCharacter *c) {
+   TEntity  *e  = &c->entity;  // Entity associated to the character
+   TPhysics *p  = &e->phys;    // Physics component of the character
+   u8 i;                       // Index for blocks 
+//   u8 end_y;                   // Y location of character bottom
+//
+//   // Check collision limits
+//   end_y  = e->ny + e->ph; // Y location of the character bottom
+//
+//   // Do we have to move g_colMinBlock down?
+//   i = g_colMinBlock;
+//   if (i && g_blocks[i].y < end_y) {
+//      while (--i > 0 && g_blocks[i].y < end_y);
+//      g_colMinBlock = i + (g_blocks[i].y >= end_y);
+//   } else if (g_blocks[i].y < end_y) {
+//   }
+//
+//   while(g_colMinBlock <  && g_blocks[g_colMinBlock].y < i)
+//      --g_colMinBlock;
+//
+//   for(i=g_colMinBlock; i < g_colMaxBlock; ++i) {
+   for(i=0; i < g_lastBlock; ++i) {
+      // Get block entity and calculate collision
+      TEntity    *ebl = &g_blocks[i];
+      TCollision *col = checkCollisionEntBlock(e, ebl);
+      
+      // Check if there is a collision
+      if (col->w && col->h) {
+         // 4 Possible collisions (up, down, left or right)
+
+         // Lateral Collision
+         if(e->x <= col->x - e->pw  || e->x >= ebl->x + ebl->pw ) {
+            if (col->x > g_blocks[i].nx) 
+               e->nx += col->w;    // move col->w bytes right (colliding right)
+            else
+               e->nx -= col->w;    // move col->w bytes left  (colliding left)
+
+            // Update physics horizontal coordinates
+            p->x  = e->nx * SCALE;
+            p->vx = 0;
+
+         // Upside Collision
+         } else if (e->y < col->y - e->ph / 2) { 
+            p->floor   = &g_blocks[i]; // Make this entity the floor
+            e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
+            e->nStatus = as_pause;     // Make character cycle animation
+            c->status  = es_walk;
+            e->ny      = col->y - e->nAnim[0]->height; // Move col->h bytes upside and 
+            // Beware of jumping below 0: e->ny is unsigned!
+            if (e->ny > G_maxY)  
+               e->ny=G_minY;
+            p->y       = e->ny * SCALE;
+            p->vy      = 0;
+
+         // Downside Collision
+         } else {
+            e->ny  = col->y + col->h;  // Move col->h bytes downside (ceil)
+            p->y   = e->ny * SCALE;
+            p->vy  = 0;
+         }
+      }
+   }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Update an entity (do animation, and change screen location)
+// Parameters:
+//    c: Character to be updated
 //
 u8 updateCharacter(TCharacter *c) {
    TEntity  *e = &c->entity;
@@ -387,52 +468,9 @@ u8 updateCharacter(TCharacter *c) {
       e->nStatus = as_null;
    }
 
-   // Update physics
+   // Update physics and check collisions
    updateCharacterPhysics(c);
-
-   // Check collisions
-   {
-      u8 i;
-      for(i=0; i < g_lastBlock; ++i) {
-         TEntity    *ebl = &g_blocks[i];
-         TCollision *col = checkCollisionEntBlock(e, ebl);
-         // There is a collision
-         if (col->w && col->h) {
-            // 4 Possible collisions (up, down, left or right)
-
-            // Lateral
-            if(e->x <= col->x - e->pw  || e->x >= ebl->x + ebl->pw ) {
-               if (col->x > g_blocks[i].nx) 
-                  e->nx += col->w;    // move col->w bytes right (colliding right)
-               else
-                  e->nx -= col->w;    // move col->w bytes left  (colliding left)
-
-               // Update physics horizontal coordinates
-               p->x  = e->nx * SCALE;
-               p->vx = 0;
-
-            // Up
-            } else if (e->y < col->y - e->ph / 2) { 
-               p->floor   = &g_blocks[i]; // Make this entity the floor
-               e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
-               e->nStatus = as_pause;     // Make character cycle animation
-               c->status  = es_walk;
-               e->ny      = col->y - e->nAnim[0]->height; // Move col->h bytes upside and 
-               // Beware of jumping below 0: e->ny is unsigned!
-               if (e->ny > G_maxY)  
-                  e->ny=G_minY;
-               p->y       = e->ny * SCALE;
-               p->vy      = 0;
-
-            // Down
-            } else {
-               e->ny  = col->y + col->h;  // Move col->h bytes downside (ceil)
-               p->y   = e->ny * SCALE;
-               p->vy  = 0;
-            }
-         }
-      }
-   }
+   applyCharacterBlockCollisions(c);
 
    // Maintain into limits
    if ( e->nx <= G_minX) { 
