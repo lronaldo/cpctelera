@@ -28,6 +28,24 @@
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////
+//////  DECLARATIONS OF PRIVATE FUNCTIONS FOR THIS MODULE
+//////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+    void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev);
+    void scrollWorld  ();
+    void destroyBlock (u8 block_idx);
+    void drawEntity   (TEntity *ent);
+      u8 isOverFloor(TEntity *e);
+      u8 randomCreateNewBlock(u8 y, u8 h, u8 rndinc);
+TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
+TCharacter* getCharacter();
+TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b);
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////
 //////  PHYSICS CONSTANTS
 //////
 //////////////////////////////////////////////////////////////////////////
@@ -64,6 +82,8 @@ u8* const g_SCR_VMEM   = (u8*)0xC000; // Pointer to the start of default video m
 #define g_MaxBlocks 16          // Maximum number of blocks at the same time
 TEntity g_blocks[g_MaxBlocks];  // Vector with the values of the blocks
      u8 g_lastBlock;            // Last block value (next available)
+     u8 g_colMinBlock;          // Minimum block in the collision range
+     u8 g_colMaxBlock;          // Maximum block in the collision range
 
 // Main Character
 const TCharacter g_Character = {
@@ -98,21 +118,25 @@ void initializeEntities() {
    G_scrollVel = 3 * SCALE / FPS;  // Scroll down velocity, 3 px/sec
 
    // Initialize blocks
-   g_lastBlock = 0;
-   newSolidBlock( 4, 120, 50, 5, G_platfColour);
-   newSolidBlock(14, 100, 10, 3, G_platfColour);
-   newSolidBlock(34, 100, 10, 3, G_platfColour);
-   newSolidBlock(26,  80,  6, 3, G_platfColour);
-   newSolidBlock( 8,  60, 10, 3, G_platfColour);
-   newSolidBlock(36,  55, 10, 3, G_platfColour);
-   newSolidBlock(20,  30, 20, 3, G_platfColour);
-   newSolidBlock( 9,  10, 10, 3, G_platfColour);
-   newSolidBlock(44,   9,  4, 3, G_platfColour);
+   g_lastBlock = 0;                                // Block ID 
+   newSolidBlock( 4, 120, 50, 5, G_platfColour);   // 0 /
+   newSolidBlock(14, 100, 10, 3, G_platfColour);   // 1 /
+   newSolidBlock(34, 100, 10, 3, G_platfColour);   // 2 /
+   newSolidBlock(26,  80,  6, 3, G_platfColour);   // 3 /
+   newSolidBlock( 8,  60, 10, 3, G_platfColour);   // 4 /
+   newSolidBlock(36,  55, 10, 3, G_platfColour);   // 5 /
+   newSolidBlock(20,  30, 20, 3, G_platfColour);   // 6 /
+   newSolidBlock( 9,  10, 10, 3, G_platfColour);   // 7 /
+   newSolidBlock(44,   9,  4, 3, G_platfColour);   // 8 /
 
    G_platfColour = 8;
 
    // Initialize main character
    setEntityLocation(&g_Character.entity, 28, 120-20, 0, 0, 1);
+
+   // Define initial collition range
+   g_colMinBlock = 0;
+   g_colMaxBlock = 2;
 }
 
         u16 getScore() { return G_score; }
@@ -206,7 +230,7 @@ void cropVelocity(i16 *v, i16 maxvel, i16 minvel) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// scrolls the world at the given velocity
+// scrolls the world (all the blocks) at the given velocity
 //
 void scrollWorld() {
    TEntity *ce = &g_Character.entity;
@@ -240,22 +264,14 @@ void scrollWorld() {
       }
    }
 
-   // Expand a new block
-   i = g_blocks[g_lastBlock-1].ny;
-   if (i > G_minY + 10 && 
-             (getRandomUniform(1) & 0x1F) < i) {
-      u8 x, w, col = cpct_px2byteM0(3, 3);
-      do {
-         x = G_minX + (getRandomUniform(1) & 0x3F);
-      } while (x >= G_maxX - 1);
-      w = (getRandomUniform(ce->nx) & 0x07) + 8;    // 8-15
-      if (x + w > G_maxX) w = G_maxX - x;
-      newSolidBlock(x, G_minY-3, w, 3, cpct_px2byteM0(G_platfColour, G_platfColour));
-
-      // Change colour every 32 points and velocity up
-      if ( !(G_score & 0x0F) ) {
+   // Expand a new block, when required, at Y coordinate G_minY-3, 
+   // 3 pixels high and with ce->nx random increment
+   if ( randomCreateNewBlock(G_minY-3, 3, ce->nx) ) {
+      // If the block was created, increment score and check if we arrive
+      // to a new zone (every 16 blocks, new zone)
+      if ( !(++G_score & 0x0F) ) {
          // Change platform colour
-         if ( ++G_platfColour > 16) 
+         if ( ++G_platfColour > 15) 
             G_platfColour = 1;
 
          // Upgrade velocity
@@ -265,30 +281,10 @@ void scrollWorld() {
    }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// Update an entity (do animation, and change screen location)
-//
-u8 updateCharacter(TCharacter *c) {
+void updateCharacterPhysics(TCharacter *c) {
    TEntity  *e = &c->entity;
    TPhysics *p = &e->phys;
    TAnimation *anim = &e->graph.anim;
-   TAnimFrame   *af = anim->frames[anim->frame_id];
-   u8         alive = 1;
-
-   // Previous to calculations, next position is similar to current
-   e->x       = e->nx;
-   e->y       = e->ny;
-   e->pscreen = e->npscreen;
-   e->pw      = af->width;
-   e->ph      = af->height;
-
-   // Update animation. If changes sprite, then we should redraw
-   if ( updateAnimation(&e->graph.anim, e->nAnim, e->nStatus) ) { 
-      e->draw = 1;                        // Redraw 
-      af = anim->frames[anim->frame_id];  // Get values of the new frame
-      e->nAnim   = 0;                     // No next animation/animstatus
-      e->nStatus = as_null;
-   }
 
    // Apply gravity only if the entity is not over a floor
    if ( !isOverFloor(e) ) {
@@ -327,6 +323,35 @@ u8 updateCharacter(TCharacter *c) {
       else
          p->vx /= G_airFric;     // Friction on air
    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Update an entity (do animation, and change screen location)
+//
+u8 updateCharacter(TCharacter *c) {
+   TEntity  *e = &c->entity;
+   TPhysics *p = &e->phys;
+   TAnimation *anim = &e->graph.anim;
+   TAnimFrame   *af = anim->frames[anim->frame_id];
+   u8         alive = 1;
+
+   // Previous to calculations, next position is similar to current
+   e->x       = e->nx;
+   e->y       = e->ny;
+   e->pscreen = e->npscreen;
+   e->pw      = af->width;
+   e->ph      = af->height;
+
+   // Update animation. If changes sprite, then we should redraw
+   if ( updateAnimation(&e->graph.anim, e->nAnim, e->nStatus) ) { 
+      e->draw = 1;                        // Redraw 
+      af = anim->frames[anim->frame_id];  // Get values of the new frame
+      e->nAnim   = 0;                     // No next animation/animstatus
+      e->nStatus = as_null;
+   }
+
+   // Update physics
+   updateCharacterPhysics(c);
 
    // Check collisions
    {
@@ -615,7 +640,6 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
       newEnt->phys.bounce        = 0.85 * SCALE;
 
       ++g_lastBlock;   // One more entity added to the vector
-      ++G_score;       // 1 point for each new platform
    }
 
    return newEnt;
@@ -629,3 +653,49 @@ void destroyBlock(u8 i) {
    
    --g_lastBlock;
 }
+
+///////////////////////////////////////////////////////////////////////////
+// Create new block depending on some random constraints
+// Parameters:
+//    y = y coordinate for the new block
+//    h = height of the new block
+
+// Some Useful macros (help clarify code)
+#define MINPIXELSPACE   G_minY + 10
+#define RAND_0_31(R) (getRandomUniform((R)) & 0x1F)
+#define RAND_0_63(R) (getRandomUniform((R)) & 0x3F)
+#define RAND_4_19(R) ((getRandomUniform((R)) & 0x0F) + 4)
+
+u8 randomCreateNewBlock(u8 y, u8 h, u8 rndinc) {
+   u8 last_y = g_blocks[g_lastBlock-1].ny;   // y coordinate of the upmost block
+   u8 created = 0;                           // Flag to signal if a new block was created
+
+   // If there is enough pixel space, create a random number (0-31) and,
+   // if it is less than last_y (18...31), create a new platform
+   if ( (last_y > MINPIXELSPACE) && (RAND_0_31(1) < last_y) ) {
+      u8 w;                          // Random Width for the new block
+      u8 x = G_minX + RAND_0_63(1);  // Random X for the new block
+
+      // If random x is out of range, modularize it to set it on range
+      if (x >= G_maxX - 1) x = x - G_maxX + G_minX;
+
+      // Create random width for the new platform
+      w = RAND_4_19(rndinc);
+      
+      // If rightmost pixel of the new block exceedes range, 
+      //   adjust it to the limits
+      if (x + w > G_maxX) w = G_maxX - x;
+      
+      // Create the new solid block (if there is enough space)
+      if ( newSolidBlock(x, y, w, h, cpct_px2byteM0(G_platfColour, G_platfColour)) )
+         created = 1;
+   }
+
+   return created;
+}
+
+// Macros are not needed anymore
+#undef MINPIXELSPACE 
+#undef RAND1_0_31
+#undef RAND1_0_63  
+#undef RANDnx_8_15 

@@ -115,6 +115,11 @@ void wait4Key(cpct_keyID key) {
    while( cpct_isKeyPressed(key) );
 }
 
+#ifdef DEBUG
+u16 vscounts[256];
+u8 vsci;
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // Plays a complete game, until the death of the main character
 //
@@ -142,7 +147,11 @@ u16 game(u16 hiscore) {
       scrollWorld();                // Update world scrolling
       alive = updateCharacter(c);   // Update character status
       
+#ifdef DEBUG
+      vscounts[vsci++] = cpct_count2VSYNC();
+#else
       cpct_waitVSYNC();             // Wait for VSYNC and...
+#endif
       drawAll();                    // ..draw everything
 
 //-------------------DEDUG CODE---------------------------------
@@ -155,6 +164,14 @@ u16 game(u16 hiscore) {
 #endif
 //-----------------END DEBUG CODE--------------------------------
    }
+
+#ifdef DEBUG
+   vsci = 0;
+   do {
+      printf("%5u,", 22 + 34*vscounts[vsci]);
+   } while(++vsci);
+   wait4Key(Key_Space);
+#endif
 
    // Return final score, at the end of the game
    return getScore();

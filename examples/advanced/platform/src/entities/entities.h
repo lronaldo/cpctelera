@@ -115,24 +115,18 @@ typedef struct {
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////
-//////  UTILITY FUNCTIONS
+//////  PUBLIC UTILITY FUNCTIONS
 //////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
     void initializeEntities();
     void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side);
-    void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev);
       u8 updateCharacter(TCharacter *c);
-    void drawEntity   (TEntity *ent);
-    void drawAll      ();
-    void scrollWorld  ();
-    void destroyBlock (u8 block_idx);
-      u8 isOverFloor(TEntity *e);
+    void scrollWorld();
      u16 getScore();
-TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
+    void drawAll();
 TCharacter* getCharacter();
-TCollision* checkCollisionEntBlock(TEntity *a, TEntity *b);
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
