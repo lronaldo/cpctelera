@@ -103,6 +103,9 @@ void updateUser(TCharacter* user) {
       performAction(user, es_static, user->side);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Waits for a key to be pressed, but from a previous state of not being pressed
+//
 void wait4Key(cpct_keyID key) {
    do
       cpct_scanKeyboard_f();
@@ -111,7 +114,6 @@ void wait4Key(cpct_keyID key) {
       cpct_scanKeyboard_f();
    while( cpct_isKeyPressed(key) );
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Plays a complete game, until the death of the main character

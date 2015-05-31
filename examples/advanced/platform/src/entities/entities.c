@@ -494,15 +494,21 @@ u8 isOverFloor(TEntity *e) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Sets up a new location for an entity in screen (and its velocity)
+//    Parameters give information in screen coordinates and values
 //
 void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev) {
+   // Locate entity on screen
    e->npscreen   = cpct_getScreenPtr(g_SCR_VMEM, x, y);
    e->nx = x;
    e->ny = y;
+
+   // Locate entity on the physics world (with integer arithmetic)
    e->phys.x    = x  * SCALE;
    e->phys.y    = y  * SCALE;
    e->phys.vx   = vx * SCALE;
    e->phys.vy   = vy * SCALE;
+   
+   // Make previous values of the entity equal to next
    if (eraseprev) {
       e->pscreen  = e->npscreen;
       e->x = x;
@@ -545,17 +551,17 @@ void drawBlockEntity (TEntity* e){
          
       // Take into account non visible zones for drawing the blocks
       sp = e->npscreen;
-      if (e->ny < G_minY) {
+      if (e->ny <= G_minY) {
          drawh = block->h + e->ny - G_minY;
          sp = cpct_getScreenPtr(g_SCR_VMEM, e->nx, G_minY);
-      } else if (e->ny + block->h > G_maxY) {
-         drawh = G_maxY - e->ny;
-      } else
-         drawh = block->h;
+      } else {
+         if (e->ny + block->h > G_maxY)
+            drawh = G_maxY - e->ny;
+         else
+            drawh = block->h;
 
-      // Blocks only move down, so trail will always be 
-      // the entire block or the moved pixels
-      if (e->ny > G_minY) {
+         // Blocks only move down, so trail will always be 
+         // the entire block or the moved pixels
          dy = e->ny - e->y;
          if (dy > block->h) dy = block->h;
 
@@ -563,7 +569,6 @@ void drawBlockEntity (TEntity* e){
          if (dy)
             cpct_drawSolidBox(e->pscreen, 0x00, block->w, dy);
       }
-
 
       // Draw the entity
       if (drawh)
@@ -579,10 +584,11 @@ void drawBlockEntity (TEntity* e){
 void drawAll() {
    u8  i = g_lastBlock;
 
-   // Draw Blocks
+   // Draw Blocks (from last to first)
    while(i--) 
       drawBlockEntity(&g_blocks[i]);
 
+   // Draw main character
    drawAnimEntity(&g_Character.entity);
 }
 
