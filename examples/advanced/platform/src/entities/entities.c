@@ -34,7 +34,6 @@
 //////////////////////////////////////////////////////////////////////////
 
     void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev);
-    void scrollWorld  ();
     void destroyBlock (u8 block_idx);
     void drawEntity   (TEntity *ent);
       u8 isOverFloor(TEntity *e);
@@ -114,7 +113,6 @@ const TCharacter g_Character = {
 void initializeEntities() {
    TPhysics *p = ((TPhysics*)&g_Character.entity.phys); 
    G_platfColour = cpct_px2byteM0(8, 8);
-   G_score = 0;
    G_scrollVel = 3 * SCALE / FPS;  // Scroll down velocity, 3 px/sec
 
    // Initialize blocks
@@ -128,6 +126,7 @@ void initializeEntities() {
    newSolidBlock(20,  30, 20, 3, G_platfColour);   // 6 /
    newSolidBlock( 9,  10, 10, 3, G_platfColour);   // 7 /
    newSolidBlock(44,   9,  4, 3, G_platfColour);   // 8 /
+   G_score = 9; // 9 points for the 9 starting blocks
 
    G_platfColour = 8;
 
@@ -230,38 +229,73 @@ void cropVelocity(i16 *v, i16 maxvel, i16 minvel) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Moves a block
+// Parameters:
+//    b_idx: Index of the block
+//
+u8 moveBlock(u8 b_idx) {
+   TEntity *e = &g_blocks[b_idx]; // Get next block entity
+   u8 newY;                       // New calculated Y coordinate after movement
+
+   // Update entity location acording to physics
+   e->phys.y += G_scrollVel;      // All blocks use this same velocity for Y axis
+   newY       = e->phys.y / SCALE;
+   
+   // Check if we have to move the block graphically
+   if (newY != e->ny) {
+      // Save previous entity location on screen
+      e->y       = e->ny;
+      e->ny      = newY;
+      e->pscreen = e->npscreen;
+      
+      // Check if the block has disappeared from the screen, to destroy it
+      // Beware! Destroying a block moves all the rest in the array!
+      if (newY > G_maxY) {
+         destroyBlock(b_idx);
+         return 1;         // Return informing that the block has been destroyed!
+      }
+
+      e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, newY);
+      e->draw = 1;
+   }
+
+   // Return signalling that the block has NOT been destroyed
+   return 0;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // scrolls the world (all the blocks) at the given velocity
 //
 void scrollWorld() {
    TEntity *ce = &g_Character.entity;
+   TPhysics *p = &ce->phys;
    u8 i;
 
    // Scroll all the given block entities
    for(i=0; i < g_lastBlock; ++i) {
-      TEntity *e = &g_blocks[i];
-      e->y       = e->ny;
-      e->pscreen = e->npscreen;
-
-      e->phys.y += G_scrollVel;
-      e->ny      = e->phys.y / SCALE;
-      if (e->ny != e->y) {
-         if (e->ny > G_maxY) {
-            destroyBlock(i);
-            ce->phys.floor = 0;  // Eliminate floor. Make recalculation
-            i--;
-            continue;
-         }
-
-         if (ce->phys.floor == e) {
-            TAnimation *anim = &ce->graph.anim;
-            ce->phys.y  = (e->ny - anim->frames[anim->frame_id]->height) * SCALE;
-            ce->phys.vy = G_minVel - 1;
-            ce->draw = 1;
-         }
-
-         e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
-         e->draw = 1;
+      // Move the block and check if the block has been destroyed
+      if ( moveBlock(i) ) {
+         // The block has been destroyed: 
+         //  1. Eliminate floor from the main character to force recalculation
+         //  2. As blocks have been moved after destroy, repeat this last 
+         //     block by discounting 1 from the index and continuing.
+         p->floor = 0;  
+         i--;
       }
+   }
+
+   // If the floor of the Character has moved, it would have been set to be drawn.
+   // In that case, the character has to be moved along with its floor
+   if (p->floor && p->floor->draw) {
+      // Get height of the current sprite
+      TAnimation *anim = &ce->graph.anim;
+      u8 height = anim->frames[anim->frame_id]->height;
+
+      // Set new physics y coordinate and vy ~= 0 (less than minVel) 
+      ce->phys.y  = (p->floor->ny - height) * SCALE;
+      ce->phys.vy = G_minVel - 1;
+      ce->draw    = 1;
    }
 
    // Expand a new block, when required, at Y coordinate G_minY-3, 
@@ -281,6 +315,9 @@ void scrollWorld() {
    }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Update an entity (do animation, and change screen location)
+//
 void updateCharacterPhysics(TCharacter *c) {
    TEntity  *e = &c->entity;
    TPhysics *p = &e->phys;
@@ -638,6 +675,7 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
       if (g_lastBlock > 0) 
          newEnt->phys.y += g_blocks[g_lastBlock-1].phys.y % SCALE;
       newEnt->phys.bounce        = 0.85 * SCALE;
+      newEnt->phys.vx            = 0;
 
       ++g_lastBlock;   // One more entity added to the vector
    }

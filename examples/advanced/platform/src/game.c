@@ -142,35 +142,56 @@ u16 game(u16 hiscore) {
    /////
    // Main Game Loop (while character is alive)
    /////
+#ifdef DEBUG
+   vsci = 0;
+   do {
+      updateUser(c);                // Update user status (depending on keypresses)
+
+      vscounts[vsci++] = cpct_count2VSYNC();
+
+      scrollWorld();                // Update world scrolling
+
+      vscounts[vsci++] = cpct_count2VSYNC();
+
+      alive = updateCharacter(c);   // Update character status     
+
+      vscounts[vsci++] = cpct_count2VSYNC();
+
+      drawAll();                    // ..draw everything
+
+      vscounts[vsci++] = cpct_count2VSYNC();
+   } while (vsci);
+
+#else
    while(alive) {
       updateUser(c);                // Update user status (depending on keypresses)
       scrollWorld();                // Update world scrolling
-      alive = updateCharacter(c);   // Update character status
-      
-#ifdef DEBUG
-      vscounts[vsci++] = cpct_count2VSYNC();
-#else
+      alive = updateCharacter(c);   // Update character status     
       cpct_waitVSYNC();             // Wait for VSYNC and...
-#endif
       drawAll();                    // ..draw everything
 
 //-------------------DEDUG CODE---------------------------------
 //---- Define DEBUG constant to activate this on compilation ---
 //  Press X key to continue to next step in simulation
 //
-#ifdef DEBUG
-      if (g_stepByStep)
-         wait4Key(Key_X);
-#endif
+//#ifdef DEBUG
+//      if (g_stepByStep)
+//         wait4Key(Key_X);
+//#endif
 //-----------------END DEBUG CODE--------------------------------
    }
+#endif
 
 #ifdef DEBUG
-   vsci = 0;
-   do {
-      printf("%5u,", 22 + 34*vscounts[vsci]);
-   } while(++vsci);
-   wait4Key(Key_Space);
+   {
+      u16 k;
+
+      for(k=0; k<256; k++) {
+         if (!(k & 0x03)) printf("\n\r");
+         printf("%5u,", 22 + 34*vscounts[k]);
+         wait4Key(Key_Space);
+      }
+   }
 #endif
 
    // Return final score, at the end of the game
