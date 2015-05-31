@@ -33,6 +33,7 @@
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+      u8 getNearestBlockID(u8 bid, u8 y);
     void applyCharacterBlockCollisions(TCharacter *c);
     void updateCharacterPhysics(TCharacter *c);
       u8 moveBlock(u8 b_idx);
@@ -371,32 +372,58 @@ void updateCharacterPhysics(TCharacter *c) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Gets the ID of the block entity whose Y coord is nearest to a given Y coordinate
+// Parameters:
+//    bid: Block id where we start comparing and searching
+//      y: goal y (wanting block nearest to y)
+//
+u8 getNearestBlockID(u8 bid, u8 y) {
+   // Check if block id (bid) is upper or lower than desired y
+   if (g_blocks[bid].ny <= y) {
+      // Currend block is upper, select progressively lower blocks
+      // while they are upper or equal than given y
+      while (bid > 0 && g_blocks[bid-1].ny <= y) --bid;
+   } else {
+      // Current block is lower, select progressively upper blocks
+      // while they are lower than given y
+      while (bid < g_lastBlock - 1 && g_blocks[bid+1].ny > y) ++bid;
+   }
+
+   // Return selected block id
+   return bid;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Checks collisions between main Character and Blocks and applies required changes
 // Parameters:
 //    c: Character for updating its physics
 //
+#define PXMARGIN  4
 void applyCharacterBlockCollisions(TCharacter *c) {
    TEntity  *e  = &c->entity;  // Entity associated to the character
    TPhysics *p  = &e->phys;    // Physics component of the character
-   u8 i;                       // Index for blocks 
-//   u8 end_y;                   // Y location of character bottom
-//
-//   // Check collision limits
-//   end_y  = e->ny + e->ph; // Y location of the character bottom
-//
-//   // Do we have to move g_colMinBlock down?
-//   i = g_colMinBlock;
-//   if (i && g_blocks[i].y < end_y) {
-//      while (--i > 0 && g_blocks[i].y < end_y);
-//      g_colMinBlock = i + (g_blocks[i].y >= end_y);
-//   } else if (g_blocks[i].y < end_y) {
-//   }
-//
-//   while(g_colMinBlock <  && g_blocks[g_colMinBlock].y < i)
-//      --g_colMinBlock;
-//
-//   for(i=g_colMinBlock; i < g_colMaxBlock; ++i) {
-   for(i=0; i < g_lastBlock; ++i) {
+   u8 i;                       // Index for blocks (Also location used as limits for collision checking) 
+
+   // Adjust entity lower limit for collision checking (nearest to the bottom of the entity)
+   i = PXMARGIN + e->ny + e->graph.anim.frames[e->graph.anim.frame_id]->height; 
+   g_colMinBlock = getNearestBlockID(g_colMinBlock, i);
+
+   // Adjust entity upper limit for collision checking (nearest to the top of the entity)
+   i = e->ny - PXMARGIN;
+   g_colMaxBlock = getNearestBlockID(g_colMaxBlock, i);
+
+
+#ifdef DEBUGRG
+   {
+      u8 str[8];
+      sprintf(str, "%2u:%2u",g_colMinBlock,g_colMaxBlock);
+      cpct_drawStringM0(str, g_SCR_VMEM, 1, 0);
+   }
+#endif
+
+   // Check collisions only with the blocks that are in the 
+   // collision range [g_colMinBlock, g_colMaxBlock]
+   for(i=g_colMinBlock; i <= g_colMaxBlock; ++i) {
       // Get block entity and calculate collision
       TEntity    *ebl = &g_blocks[i];
       TCollision *col = checkCollisionEntBlock(e, ebl);
@@ -407,7 +434,7 @@ void applyCharacterBlockCollisions(TCharacter *c) {
 
          // Lateral Collision
          if(e->x <= col->x - e->pw  || e->x >= ebl->x + ebl->pw ) {
-            if (col->x > g_blocks[i].nx) 
+            if (col->x > ebl->nx) 
                e->nx += col->w;    // move col->w bytes right (colliding right)
             else
                e->nx -= col->w;    // move col->w bytes left  (colliding left)
@@ -418,7 +445,7 @@ void applyCharacterBlockCollisions(TCharacter *c) {
 
          // Upside Collision
          } else if (e->y < col->y - e->ph / 2) { 
-            p->floor   = &g_blocks[i]; // Make this entity the floor
+            p->floor   = ebl; // Make this entity the floor
             e->nAnim   = g_anim[es_walk][c->side]; // Next animation changes
             e->nStatus = as_pause;     // Make character cycle animation
             c->status  = es_walk;
@@ -438,8 +465,6 @@ void applyCharacterBlockCollisions(TCharacter *c) {
       }
    }
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Update an entity (do animation, and change screen location)

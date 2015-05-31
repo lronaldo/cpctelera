@@ -115,7 +115,7 @@ void wait4Key(cpct_keyID key) {
    while( cpct_isKeyPressed(key) );
 }
 
-#ifdef DEBUG
+#ifdef DEBUGPERF
 u16 vscounts[256];
 u8 vsci;
 #endif
@@ -142,7 +142,7 @@ u16 game(u16 hiscore) {
    /////
    // Main Game Loop (while character is alive)
    /////
-#ifdef DEBUG
+#ifdef DEBUGPERF
    vsci = 0;
    do {
       updateUser(c);                // Update user status (depending on keypresses)
@@ -174,15 +174,15 @@ u16 game(u16 hiscore) {
 //---- Define DEBUG constant to activate this on compilation ---
 //  Press X key to continue to next step in simulation
 //
-//#ifdef DEBUG
-//      if (g_stepByStep)
-//         wait4Key(Key_X);
-//#endif
+#ifdef DEBUG
+      if (g_stepByStep)
+         wait4Key(Key_X);
+#endif
 //-----------------END DEBUG CODE--------------------------------
    }
 #endif
 
-#ifdef DEBUG
+#ifdef DEBUGPERF
    {
       u16 k;
 
