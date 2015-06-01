@@ -43,7 +43,7 @@ typedef enum {
    es_static = 0, // Entity that does not move
    es_walk,       // Entity walking
    es_jump,       // Entity jumping
-   es_hit,        // Entity is being hit
+   es_moveFloor,  // Entity is moving a floor
    es_NUMSTATUSES // Total amount of statuses available
 } TCharacterStatus;
 

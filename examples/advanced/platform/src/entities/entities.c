@@ -39,7 +39,8 @@
       u8 moveBlock(u8 b_idx);
     void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev);
     void destroyBlock (u8 block_idx);
-    void drawEntity   (TEntity *ent);
+    void drawAnimEntity  (TEntity* e);
+    void drawBlockEntity (TEntity* e);
       u8 isOverFloor(TEntity *e);
       u8 randomCreateNewBlock(u8 y, u8 h, u8 rndinc);
 TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour);
@@ -83,10 +84,12 @@ u8* const g_SCR_VMEM   = (u8*)0xC000; // Pointer to the start of default video m
 // Define entities in the world and main character
 //
 #define g_MaxBlocks 16          // Maximum number of blocks at the same time
+#define g_MaxMovingBlocks 2     // Maximum number of blocks moving at the same time
 TEntity g_blocks[g_MaxBlocks];  // Vector with the values of the blocks
      u8 g_lastBlock;            // Last block value (next available)
      u8 g_colMinBlock;          // Minimum block in the collision range
      u8 g_colMaxBlock;          // Maximum block in the collision range
+     u8 g_movingBlocks;         // Blocks that are moving
 
 // Main Character
 const TCharacter g_Character = {
@@ -118,6 +121,7 @@ void initializeEntities() {
    TPhysics *p = ((TPhysics*)&g_Character.entity.phys); 
    G_platfColour = cpct_px2byteM0(8, 8);
    G_scrollVel = 3 * SCALE / FPS;  // Scroll down velocity, 3 px/sec
+   g_movingBlocks = 0;
 
    // Initialize blocks
    g_lastBlock = 0;                                // Block ID 
@@ -205,7 +209,19 @@ void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side) {
          }
          break;
 
-      case es_hit:
+      //-------- 
+      // Requested Action: move the floor
+      //--------
+      case es_moveFloor:
+         // If entity is over a floor, set velocity to the floor
+         if (p->floor && !p->floor->phys.vx && g_movingBlocks < g_MaxMovingBlocks) {
+            ++g_movingBlocks;
+            if (side == s_left)
+               p->floor->phys.vx = -SCALE / 2;
+            else
+               p->floor->phys.vx = SCALE / 2;
+         }
+         break;
       
       // No move selected to perform. Check if we have to stop ongoing moves
       default:
@@ -244,7 +260,7 @@ u8 moveBlock(u8 b_idx) {
    TEntity *e = &g_blocks[b_idx]; // Get next block entity
    u8 newY;                       // New calculated Y coordinate after movement
 
-   // Update entity location acording to physics
+   // Update block location acording to its Y physics
    e->phys.y += G_scrollVel;      // All blocks use this same velocity for Y axis
    newY       = e->phys.y / SCALE;
    
@@ -253,7 +269,6 @@ u8 moveBlock(u8 b_idx) {
       // Save previous entity location on screen
       e->y       = e->ny;
       e->ny      = newY;
-      e->pscreen = e->npscreen;
       
       // Check if the block has disappeared from the screen, to destroy it
       // Beware! Destroying a block moves all the rest in the array!
@@ -262,8 +277,36 @@ u8 moveBlock(u8 b_idx) {
          return 1;         // Return informing that the block has been destroyed!
       }
 
-      e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, newY);
       e->draw = 1;
+   }
+
+   // Update block location according to its X physics
+   if (e->phys.vx) {
+      e->x       = e->nx;
+      e->phys.x += e->phys.vx;
+      e->nx      = e->phys.x / SCALE;
+
+      // Is there any graphical movement?
+      if (e->x != e->nx) {
+         // Maintain into limits
+         if (e->nx <= G_minX) {
+            e->nx      = G_minX + 1; 
+            e->phys.x  = e->nx * SCALE; 
+            e->phys.vx = -e->phys.vx;
+         } else if ( e->nx + e->graph.block.w >= G_maxX ) {
+            e->nx      = G_maxX - e->graph.block.w;
+            e->phys.x  = e->nx * SCALE;  
+            e->phys.vx = -e->phys.vx;
+         }
+
+         e->draw = 1;
+      }
+   }
+
+   // Calculate new screen position, on draw
+   if (e->draw) {
+      e->pscreen  = e->npscreen;
+      e->npscreen = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
    }
 
    // Return signalling that the block has NOT been destroyed
@@ -341,10 +384,11 @@ void updateCharacterPhysics(TCharacter *c) {
          anim->status = as_pause;
       }
 
-      // Apply gravity
+      // Apply vertical gravity
       p->vy += G_gy;
-      p->vx += G_gx;
-   }
+   } 
+   // Apply horizontal gravity
+   p->vx += G_gx;
 
    // Check if there is any movement on Y axis
    if ( p->vy ) {
@@ -668,7 +712,7 @@ void drawBlockEntity (TEntity* e){
    // Check if needs to be redrawn
    if ( e->draw ) {
       u8* sp;   // Starting video mem pointer for blocks that are in the upper non-visible zone
-      u8  dy;   // Distance the block moved
+      u8  eraseh;// height to be erased 
       u8  drawh;// Height to draw of the box (taking into account invisible zones)
 
       // Get the entity values from its current animation status
@@ -680,21 +724,18 @@ void drawBlockEntity (TEntity* e){
          drawh = block->h + e->ny - G_minY;
          sp = cpct_getScreenPtr(g_SCR_VMEM, e->nx, G_minY);
       } else {
-         if (e->ny + block->h > G_maxY)
-            drawh = G_maxY - e->ny;
-         else
-            drawh = block->h;
+         if (e->ny + block->h > G_maxY) {
+            drawh  = G_maxY - e->ny;
+            eraseh = G_maxY - e->y;
+         } else {
+            drawh  = block->h;
+            eraseh = drawh;
+         }
 
-         // Blocks only move down, so trail will always be 
-         // the entire block or the moved pixels
-         dy = e->ny - e->y;
-         if (dy > block->h) dy = block->h;
-
-         // Remove trails 
-         if (dy)
-            cpct_drawSolidBox(e->pscreen, 0x00, block->w, dy);
+         // Remove previous entity
+         cpct_drawSolidBox(e->pscreen,  0x00, block->w, eraseh);
       }
-
+ 
       // Draw the entity
       if (drawh)
          cpct_drawSolidBox(sp, block->colour, block->w, drawh);
@@ -746,12 +787,21 @@ TEntity* newSolidBlock(u8 x, u8 y, u8 width, u8 height, u8 colour) {
    return newEnt;
 }
 
+///////////////////////////////////////////////////////////////////////////
+// Destroys a block, given its index, and reorders the block vector
+//
 void destroyBlock(u8 i) {
-   i8 nEnts = g_lastBlock - i - 1;
+   i8 nEnts = g_lastBlock - i - 1; // Entities to the right of the block
 
+   // If the block is moving, alow one more moving block
+   if (g_blocks[i].phys.vx)
+      --g_movingBlocks;
+
+   // If there are entities to the right of the block, move them 1 index to the left
    if (nEnts)
       cpct_memcpy(&g_blocks[i], &g_blocks[i+1], nEnts*sizeof(TEntity));
-   
+
+   // 1 less block   
    --g_lastBlock;
 }
 
@@ -760,6 +810,7 @@ void destroyBlock(u8 i) {
 // Parameters:
 //    y = y coordinate for the new block
 //    h = height of the new block
+//
 
 // Some Useful macros (help clarify code)
 #define MINPIXELSPACE   G_minY + 10

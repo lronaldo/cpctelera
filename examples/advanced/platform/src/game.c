@@ -84,6 +84,10 @@ void updateUser(TCharacter* user) {
    else if ( cpct_isKeyPressed(Key_CursorLeft) ) 
       performAction(user, es_walk, s_left);        // Move player to the left
 
+   // KEY = Cursor Down, ACTION = Move Floor
+   else if ( cpct_isKeyPressed(Key_CursorDown) ) 
+      performAction(user, es_moveFloor, user->side); // Enable moving floor
+
 //-------------------DEDUG CODE---------------------------------
 //---- Define DEBUG constant to activate this on compilation ---
 //  Keys to enter debug mode:
