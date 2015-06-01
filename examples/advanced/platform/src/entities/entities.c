@@ -261,21 +261,18 @@ void cropVelocity(i16 *v, i16 maxvel, i16 minvel) {
 //
 u8 moveBlock(u8 b_idx) {
    TEntity *e = &g_blocks[b_idx]; // Get next block entity
-   u8 newY;                       // New calculated Y coordinate after movement
+//   u8 newY;                       // New calculated Y coordinate after movement
 
    // Update block location acording to its Y physics
    e->phys.y += G_scrollVel;      // All blocks use this same velocity for Y axis
-   newY       = e->phys.y / SCALE;
+   e->y       = e->ny;
+   e->ny      = e->phys.y / SCALE;
    
    // Check if we have to move the block graphically
-   if (newY != e->ny) {
-      // Save previous entity location on screen
-      e->y       = e->ny;
-      e->ny      = newY;
-      
+   if (e->ny != e->y) {    
       // Check if the block has disappeared from the screen, to destroy it
       // Beware! Destroying a block moves all the rest in the array!
-      if (newY > G_maxY) {
+      if (e->ny > G_maxY) {
          destroyBlock(b_idx);
          return 1;         // Return informing that the block has been destroyed!
       }
@@ -303,7 +300,7 @@ u8 moveBlock(u8 b_idx) {
             e->phys.x  = e->nx * SCALE;  
             e->phys.vx = -e->phys.vx;
          }
-          e->draw = 1; // Set for redraw
+         e->draw = 1; // Set for redraw
       }
    }
 
@@ -733,7 +730,8 @@ void drawBlockEntity (TEntity* e){
          }
 
          // Remove previous entity
-         cpct_drawSolidBox(e->pscreen,  0x00, block->w, eraseh);
+         if (eraseh)
+            cpct_drawSolidBox(e->pscreen,  0x00, block->w, eraseh);
       }
  
       // Draw the entity
