@@ -1,0 +1,655 @@
+﻿{
+  "$type": "RGAS.PlatformProviders.AmstradSpriteSet, RGAS",
+  "PlusInks": {
+    "$type": "System.UInt16[], mscorlib",
+    "$values": [
+      255,
+      0,
+      1092,
+      240,
+      2032,
+      3568,
+      4000,
+      3920,
+      3842,
+      3849,
+      3855,
+      2575,
+      527,
+      95,
+      175,
+      4095
+    ]
+  },
+  "_ImageList": {
+    "$type": "System.Collections.Generic.List`1[[RGAS.SpriteBase, RGAS]], mscorlib",
+    "$values": [
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//8CAgL//////wIODv//////Ag4O//////8ODv///////wQEB/////8EBAQOB///DgQHDg4ODg4ODgcHDg4ODg4ODw8P////Dg4GAwYP/////wYDBg8P//8GAwYPDw//BgMG//8DD/8DBv///wYP/wcH////Bwf/BwcH//8HBwcA"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "39f6494b-97b5-4050-82fd-f9d4855d93d7",
+        "_name": "EMR-Mov-Der1",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//8CAgL//////wIODv//////Ag4O//////8ODv///////wQEB///////BAQHB/////8EBAcH/////w4OB///////Dg4P//////8ODgb//////w4OBv//////AwYG//////8DBv///////wMG////////Bwf///////8HBwf///8A"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "39c61fbc-7d28-4e36-95ac-c15ab4ad2f06",
+        "_name": "EMR-Mov-Der2",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//8CAgL//////wIODv//////Ag4O//////8ODv///////wQEB/////8EBAQHB///Dg4EBwcHDg4ODgcHBw4ODg4ODw8P////Dg4GAwYG/////wYGAwYG//8PDwYGAwb/Aw8P//8GA/8GD////wYD/wcH////Bwf/BwcH//8HBwcA"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "1a422db2-7f7c-4034-ae39-71c478d67c56",
+        "_name": "EMR-Mov-Der3",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//8CAgL/////////Ag4O/////////wIODv////////8ODv//////////BwQEDg4ODg7/BAcEBA4ODg4ODgQHBwcH/////w4OBwcH//////8ODg8PD///////Dg4GAwYP////////BgMGDw//////BgMGDw8P////BgMG//8DD////wMG////Bg////8HB////wcH////BwcH//8HBwf//wA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "f2ef36fe-df1f-4b45-b078-52f71901d565",
+        "_name": "EMR-Puñobajo-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//8CAgL/////////Ag4O////Dg7//wIODv//Dg4O//8ODv//Dg4O////BAQHBAQO////DgQEBwcE////Dg4OBwcH/////w4OBwcH//////8ODg8PD///////Dg4GAwYP////////BgMGDw//////BgMGDw8P////BgMG//8DD////wMG////Bg////8HB////wcH////BwcH//8HBwf//wA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "fb599615-a2bd-4c69-b5dc-762ca8ff647c",
+        "_name": "EMR-Puñoalto-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "/wICAv////////8CDg7//////wf/Ag4O/////wcH/w4O/////w8HB/8EBAf//w8PB///BAQOBw8PBv///wcODg4ODv////8HBw4ODg7/////Dw8PDw///////wYDBg////////8GAwb/////////BgP/////////BgMG/////////wMG//////////8HB///////////BwcH/////////wA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "be87c017-116c-4872-8b7e-ae34a544bb35",
+        "_name": "EMR-Patadaalta-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//8CAgL/////////Ag4O/////////wIODv////////8ODv//////////BAQH////////BAQEDgf/////DgQHDg4ODg7//w4OBwcODg4O//8ODg8PD/////8HDg4GAwYPDw8HB///BgMGDwMGBwf/BgMG////////BgMG/////////wMG//////////8HB///////////BwcH/////////wA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "48770f60-fd2f-428f-b64b-49b3f15205ac",
+        "_name": "EMR-Patadabaja-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "/////w4CAgL///8ODg4OAv//BAQHDg4C//8EBA4H/////wcODg4ODgcHAwMODg4OBwcGBgYGBg8H//8PDw8P/wA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "11584d47-814e-4a1f-9507-2ff6f8d36621",
+        "_name": "EMR-Saltovoltereta1-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "BwcH////////Bwf///////8GAwcEBP//DwYDDgQEDv8PBg4ODgcODg8GDg4HDg4CDwYODv8ODgL/Dw4O/wICAgA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "56915954-2644-4355-a71d-f474a332c11e",
+        "_name": "EMR-Saltovoltereta2-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "/w8PDw///wcPBgYGBgYHBw4ODg4DAwcHDg4ODg4H/////wcOBAT//wIODgcEBP//Ag4ODg7///8CAgIO/////wA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "5836bc36-53e9-4e37-ba48-7ac432c2f2cb",
+        "_name": "EMR-Saltovoltereta3-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "AgIC/w4OD/8CDg7/Dg4GDwIODgcODgYPDg4HDg4OBg//DgQEDgMGD///BAQHAwYP//////8HB////////wcHBwA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "be2f9fe9-7db1-437f-8653-9684d990a1e5",
+        "_name": "EMR-Saltovoltereta4-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "/////wb///8CDg7///8G/wIODg7/////AgICDg7/Bv///wQEB/////8EBAQHB/8GDgQHBwcH//8ODgcHB///Bg4ODw8P////Dg4GAwYP/////wYDBg8P//8GAwYPDw//BgMG//8DD/8DBv///wYP/wcH////Bwf/BwcH//8HBwcA"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "05a737c9-bea5-4d20-9245-1082134bfb04",
+        "_name": "EMR-Daño-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "////////////////////////////////////////////////////////////////////////////////////////////Bwf///////////8CDg7/BwcHBw8GBgb///8HAg4ODgQEBA4ODg4GBgYHBwICAg4EBAQODg4OAwMDBwcA"
+        },
+        "Width": 16,
+        "Height": 8,
+        "_guid": "db7fb9dc-bd40-49b6-a4ee-9212e4dcbb75",
+        "_name": "EMR-Ko-Der",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "////AgIC//////8ODgL//////w4OAv///////w4O//////8HBAT/////Bw4EBAT/Dg4ODg4HBA4ODg4OBwcODv///w8PDw4O//8PBgMGDg7/Dw8GAwb///8PDw8GAwb//w8D//8GAwb/Dwb///8GA/8HB////wcHBwcH//8HBwcA"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "24d6e2ab-50d8-4f96-b8e0-1fbcc8d5af6d",
+        "_name": "EMR-Mov-Izq1",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "////AgIC//////8ODgL//////w4OAv///////w4O//////8HBAT/////BwcEBP////8HBwQE//////8HDg7//////w8ODv//////Bg4O//////8GDg7//////wYGA////////wYD////////BgP///////8HB///////BwcH//8A"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "8045a74b-1f39-43c2-9217-fb4e0dc911f4",
+        "_name": "EMR-Mov-Izq2",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "////AgIC//////8ODgL//////w4OAv///////w4O//////8HBAT/////BwcEBAT/Dg4HBwcEDg4ODg4HBwcODv///w8PDw4O//8GBgMGDg7/BgYDBgb///8GAwYGDw///wMG//8PDwP/Awb///8PBv8HB////wcHBwcH//8HBwcA"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "54193e54-3824-40da-a6fa-57643da40834",
+        "_name": "EMR-Mov-Izq3",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//////8CAgL/////////Dg4C/////////w4OAv//////////Dg7//w4ODg4OBAQH//8ODg4ODgQEBwT//////wcHBwcEDv//////BwcHDg7//////w8PDw4O/////w8GAwYODv///w8PBgMG//////8PDw8GAwb/////DwP//wYDBv///w8G////BgP///8HB////wcH//8HBwf//wcHBwA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "495e229a-a21a-4a03-94c4-9c324d2dacbc",
+        "_name": "EMR-Puñobajo-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//////8CAgL//w4O////Dg4C//8ODg7//w4OAv///w4ODv//Dg7/////DgQEBwQE//////8EBwcEBA7//////wcHBw4ODv//////BwcHDg7//////w8PDw4O/////w8GAwYODv///w8PBgMG//////8PDw8GAwb/////DwP//wYDBv///w8G////BgP///8HB////wcH//8HBwf//wcHBwA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "741c440d-7b8e-4509-829e-60ddcb820dcc",
+        "_name": "EMR-Puñoalto-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "////////AgIC/wf//////w4OAv8HB/////8ODgL/BwcP/////w4O//8HDw///wcEBP///wYPDwcOBAT/////Dg4ODg4H/////w4ODg4HB///////Dw8PDw////////8PBgMG/////////wYDBv//////////Awb//////////wYDBv//////////BgP//////////wcH/////////wcHBwA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "1e0d71dc-dc9f-45cc-86d2-7fa9f2da4998",
+        "_name": "EMR-Patadaalta-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//////8CAgL/////////Dg4C/////////w4OAv//////////Dg7/////////BwQE////////Bw4EBAT///8ODg4ODgcEDv//Dg4ODgcHDg4H/////w8PDw4OBwcPDw8GAwYODgcHBgMPBgMG//////////8GAwb//////////wYDBv//////////BgP//////////wcH/////////wcHBwA="
+        },
+        "Width": 10,
+        "Height": 16,
+        "_guid": "b7ee38f2-0b51-483b-86fd-e1ab716489b8",
+        "_name": "EMR-Patadabaja-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "AgICDv////8CDg4ODv///wIODgcEBP////8HDgQE//8ODg4ODgf//w4ODg4DAwcHDwYGBgYGBwf/Dw8PD///BwA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "070f6daa-80e3-48e4-b360-6a39dfbdc1b7",
+        "_name": "EMR-Saltovoltereta1-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "//////8HBwf//////wcH////BAQHAwb//w4EBA4DBg8ODgcODg4GDwIODgcODgYPAg4O/w4OBg8CAgL/Dg4P/wA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "838e1703-ffb7-4c3d-93e6-901ae08ee5b2",
+        "_name": "EMR-Saltovoltereta2-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "B///Dw8PD/8HBwYGBgYGDwcHAwMODg4O//8HDg4ODg7//wQEDgf/////BAQHDg4C////Dg4ODgL/////DgICAgA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "0528a493-3bca-4682-a839-28d23541e207",
+        "_name": "EMR-Saltovoltereta3-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "/w8ODv8CAgIPBg4O/w4OAg8GDg4HDg4CDwYODg4HDg4PBgMOBAQO/w8GAwcEBP///wcH//////8HBwf//////wA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "3490f38c-aec1-41cc-b21b-c5ade106a0f4",
+        "_name": "EMR-Saltovoltereta4-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "////Bv//////Bv///w4OAv////8ODg4C/wb/Dg4CAgL///8HBAT//wb/BwcEBAT///8HBwcHBA4G//8HBwcODv///w8PDw4O//8PBgMGDg7/Dw8GAwb///8PDw8GAwb//w8D//8GAwb/Dwb///8GA/8HB////wcHBwcH//8HBwcA"
+        },
+        "Width": 8,
+        "Height": 16,
+        "_guid": "43ceab33-fd43-4b2b-828f-45c93a20ebd9",
+        "_name": "EMR-Daño-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "/////////////////////////////////////////////////////////////////////////////////////////////////wcH//////8H////BgYGDwcHBwf/Dg4CBwcGBgYODg4OBAQEDg4OAgcHAwMDDg4ODgQEBA4CAgIA"
+        },
+        "Width": 16,
+        "Height": 8,
+        "_guid": "92328d5d-0f8c-4302-9c5d-3bbcdf096c53",
+        "_name": "EMR-Ko-Izq",
+        "MaskDataInline": true,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "AggIAQgICAgIAQIIAggIAggCAQIBAQEBAQgCAgECAgIIAgEBAgEBAQgIAQIBAQICCAgBAgECAAAIAgECAQIAAAA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "4d38ff1e-d04f-4240-9d35-f858ffcd5120",
+        "_name": "Marco-EsqSupIzq",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "CAgICAEICAICCAgCCAIBCAEBAQECAQIIAgICAQICCAEBAQECAQECCAICAQECAQgIAAACAQIBCAgAAAIBAgECCAA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "4d0c0457-d3dc-422d-8493-23449fb51733",
+        "_name": "Marco-EsqSupDer",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "BgYCAQIBAggGBgIBAgEICAICAQECAQgIAQEBAgEBAggCAgIBAgIIAQEBAQECAQIIAggIAggCAQgICAgIAQgIAgA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "d4286406-67c3-47f8-b0fe-44642cf62d7a",
+        "_name": "Marco-EsqInfDer",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "CAIBAgECBgYICAECAQIGBggIAQIBAQICCAIBAQIBAQEBCAICAQICAggCAQIBAQEBCAECCAIICAICCAgBCAgICAA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "e79004e2-74f2-403c-bdaf-b4b456ea28f7",
+        "_name": "Marco-EsqInfIzq",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "CAICAQICAAAICAECAQIAAAgIAQIBAgAACAgCAQIBAAAICAIBAgEAAAgIAQIBAgAACAgBAgECAAAIAgIBAgIAAAA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "cd3735f9-e54c-42d8-b71e-6fd7f39fe95a",
+        "_name": "Marco-LatIzq",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "AAACAgECAggAAAIBAgEICAAAAgECAQgIAAABAgECCAgAAAECAQIICAAAAgECAQgIAAACAQIBCAgAAAICAQICCAA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "4f10335c-5680-4bab-8644-c9567cab6a8e",
+        "_name": "Marco-LatDer",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "CAgICAgICAgCCAgICAgIAgIBAQICAQECAQICAQECAgECAQECAgEBAgICAgEBAgICAAAAAAAAAAAAAAAAAAAAAAA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "02469b18-86ec-4778-9e61-fa05681b633f",
+        "_name": "Marco-LatSup",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "BgYGBgYGBgYGBgYGBgYGBgICAgEBAgICAgEBAgIBAQIBAgIBAQICAQIBAQICAQECAggICAgICAIICAgICAgICAA="
+        },
+        "Width": 8,
+        "Height": 8,
+        "_guid": "f47b7456-fbb1-42b1-be1e-46f8ef545c19",
+        "_name": "Marco-LatInf",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "CAgICAgBAQgICAgIAggICAICAgIICAgCAgEBAQIBAQIBAQECAQICAgECAgECAgIBAgEBAQECAgEBAQECAgICAgIBAQICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+        },
+        "Width": 12,
+        "Height": 8,
+        "_guid": "22bcec06-644e-4a4b-be5a-f41640f5b20e",
+        "_name": "Marco-CentSup",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "BgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGAgICAgIBAQICAgICAgEBAQECAgEBAQECAQICAgECAgECAgIBAgEBAQIBAQIBAQECAggICAICAgIICAgCCAgICAgBAQgICAgIAA=="
+        },
+        "Width": 12,
+        "Height": 8,
+        "_guid": "1c8c9fc4-2f21-4539-a651-72e6f64a1df7",
+        "_name": "Marco-CentInf",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "CAEBCAICAgICAQECAQICAQECAgECAQECCAgICAgICAgA"
+        },
+        "Width": 4,
+        "Height": 8,
+        "_guid": "1a41f1d5-77e3-47a9-a208-437ab4960b2d",
+        "_name": "Marco-CentSup2",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      },
+      {
+        "$type": "RGAS.CPCSprite, RGAS",
+        "Align256": false,
+        "GenerateVerticalMirror": false,
+        "GenerateHorizontalMirror": false,
+        "pixels": {
+          "$type": "System.Byte[], mscorlib",
+          "$value": "CAgICAgICAgCAQECAQICAQECAgECAQECAgICAggBAQgA"
+        },
+        "Width": 4,
+        "Height": 8,
+        "_guid": "72094d0d-5182-429f-89ef-885295cd49ec",
+        "_name": "Marco-CentInf2",
+        "MaskDataInline": false,
+        "UseInLevelDesigner": false
+      }
+    ]
+  },
+  "_levelList": {
+    "$type": "System.Collections.Generic.List`1[[RGAS.GameLevel, RGAS]], mscorlib",
+    "$values": []
+  },
+  "_sound": {
+    "$type": "RGAS.SoundSet, RGAS",
+    "MusicList": {
+      "$type": "System.Collections.Generic.List`1[[RGAS.AYMusic, RGAS]], mscorlib",
+      "$values": []
+    }
+  },
+  "Mode": 0,
+  "_targetPlatform": 0,
+  "Inks": {
+    "$type": "System.Byte[], mscorlib",
+    "$value": "Cw8DGA0UBhoAAgESCAUQCQ=="
+  },
+  "_formatterType": "RGAS.PlatformProviders.AmstradSpriteSet+AmstradCPCRSLibFormatter, RGAS, Version=0.9.7.0, Culture=neutral, PublicKeyToken=null"
+}
