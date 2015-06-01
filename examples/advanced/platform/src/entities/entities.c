@@ -146,6 +146,9 @@ void initializeEntities() {
    g_colMaxBlock = 2;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Getter functions
+//
         u16 getScore() { return G_score; }
 TCharacter* getCharacter() { return &g_Character; }
 
@@ -350,7 +353,7 @@ void scrollWorld() {
 
    // Expand a new block, when required, at Y coordinate G_minY-3, 
    // 3 pixels high and with ce->nx random increment
-   if ( randomCreateNewBlock(G_minY-3, 3, ce->nx) ) {
+   if ( g_blocks[0].draw && randomCreateNewBlock(G_minY-3, 3, ce->nx) ) {
       // If the block was created, increment score and check if we arrive
       // to a new zone (every 16 blocks, new zone)
       if ( !(++G_score & 0x0F) ) {
@@ -386,7 +389,12 @@ void updateCharacterPhysics(TCharacter *c) {
 
       // Apply vertical gravity
       p->vy += G_gy;
-   } 
+   } else {
+      // We are over a floor, apply innertia if floor is moving
+      p->x  += p->floor->phys.vx;   // Add floor inertia
+      p->vx += 1;                   // p->vx must be != 0 to enable horizontal velocity processing
+   }
+
    // Apply horizontal gravity
    p->vx += G_gx;
 
@@ -814,25 +822,32 @@ void destroyBlock(u8 i) {
 
 // Some Useful macros (help clarify code)
 #define MINPIXELSPACE   G_minY + 10
-#define RAND_0_31(R) (getRandomUniform((R)) & 0x1F)
+#define RAND_0_15(R) (getRandomUniform((R)) & 0x0F)
 #define RAND_0_63(R) (getRandomUniform((R)) & 0x3F)
-#define RAND_4_19(R) ((getRandomUniform((R)) & 0x0F) + 4)
 
 u8 randomCreateNewBlock(u8 y, u8 h, u8 rndinc) {
    u8 last_y = g_blocks[g_lastBlock-1].ny;   // y coordinate of the upmost block
    u8 created = 0;                           // Flag to signal if a new block was created
 
+#ifdef DEBUGNB
+   {
+      u8 str[6];
+      sprintf(str, "%2u:%2u",last_y, RAND_0_15(1));
+      cpct_drawStringM0(str, g_SCR_VMEM, 1, 0);
+   }
+#endif
+
    // If there is enough pixel space, create a random number (0-31) and,
    // if it is less than last_y (18...31), create a new platform
-   if ( (last_y > MINPIXELSPACE) && (RAND_0_31(1) < last_y) ) {
+   if ( (RAND_0_15(1) + MINPIXELSPACE) < last_y ) {
       u8 w;                          // Random Width for the new block
       u8 x = G_minX + RAND_0_63(1);  // Random X for the new block
 
       // If random x is out of range, modularize it to set it on range
       if (x >= G_maxX - 1) x = x - G_maxX + G_minX;
 
-      // Create random width for the new platform
-      w = RAND_4_19(rndinc);
+      // Create random width for the new platform (4..19)
+      w = RAND_0_15(rndinc) + 4;
       
       // If rightmost pixel of the new block exceedes range, 
       //   adjust it to the limits
@@ -848,6 +863,5 @@ u8 randomCreateNewBlock(u8 y, u8 h, u8 rndinc) {
 
 // Macros are not needed anymore
 #undef MINPIXELSPACE 
-#undef RAND1_0_31
+#undef RAND1_0_15
 #undef RAND1_0_63  
-#undef RANDnx_8_15 
