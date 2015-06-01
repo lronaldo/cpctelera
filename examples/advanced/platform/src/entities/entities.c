@@ -292,17 +292,18 @@ u8 moveBlock(u8 b_idx) {
       // Is there any graphical movement?
       if (e->x != e->nx) {
          // Maintain into limits
-         if (e->nx <= G_minX) {
+         if (e->nx < G_minX) {
+            // Crossed left boundary, bounce right
             e->nx      = G_minX + 1; 
             e->phys.x  = e->nx * SCALE; 
             e->phys.vx = -e->phys.vx;
          } else if ( e->nx + e->graph.block.w >= G_maxX ) {
+            // Crossed right boundary, bounce left
             e->nx      = G_maxX - e->graph.block.w;
             e->phys.x  = e->nx * SCALE;  
             e->phys.vx = -e->phys.vx;
          }
-
-         e->draw = 1;
+          e->draw = 1; // Set for redraw
       }
    }
 
