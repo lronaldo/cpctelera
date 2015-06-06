@@ -70,6 +70,11 @@ Section: 3rdparty software authors
  <Retro Game Asset Studio (RGAS) at http://www.cpcwiki.eu/index.php/Retro_Game_Asset_Studio>:
    * <Lachlan Keown at http://www.twitter.com/lachlankeown> (lachlankeown@gmail.com)
 
+Section: Testers & Bug Reporters
+
+ * <Martin C. Doege at https://github.com/mdoege> 
+ * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
+
 Section: Special Thanks
 
    Developers, collaborators and others that helped a great deal
@@ -81,4 +86,4 @@ Section: Special Thanks
  * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> (for developing Arkos Traker&Player and giving great support on adding it to *CPCtelera*. Also for giving general advice during development of *CPCtelera*)
  * <Pulkomandy at http://www.pushnpop.net/profile-47.html> / <Shinra Team at http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml> (for maintaining <cpcsdk at https://github.com/cpcsdk>, with tools like <iDSK at https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z> or <cpcfs at https://code.google.com/p/cpcsdk/wiki/cpcfs>, among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
  * Mochilote / <CPCMania at http://cpcmania.com> (for creating great tutorials and useful documentation in his site)
- * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)
+ * josé ángel rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)
