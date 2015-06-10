@@ -93,7 +93,7 @@
 ;; transparencies. 
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, AF', BC, DE, HL
 ;;
 ;; Required memory:
 ;;     bytes

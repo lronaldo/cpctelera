@@ -32,5 +32,5 @@
 ;;
 ;; Pointer to the actual tilset being managed (NULL if no tileset)
 ;;
-_cpct_ptileset::          .dw #0000
-_cpct_pgetTileFromArray:: .dw #0000
+.globl _cpct_ptileset
+.globl _cpct_pgetTileFromArray
