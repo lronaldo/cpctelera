@@ -5,6 +5,7 @@ Section: Donnors
    We are incredibly grateful to these people, who sent us some economic support to continue with CPCtelera and other CPC-related projects. Big most sincere thanks to all of you:
 
    21/05/2015 - Lachlan Keown
+   10/06/2015 - Tim Riemann / Octoate
 
 Section: Project authors
    
@@ -80,6 +81,7 @@ Section: Special Thanks
    Developers, collaborators and others that helped a great deal
 
  * <Lachlan Keown at http://www.twitter.com/lachlankeown> (For being incredibly kind and helpful, and adding every required modification to better integrate RGAS with *CPCtelera*)
+ * <Tim Riemann / Octoate at http://www.octoate.de> (For supporting CPCtelera and spreading news amount the community with a big smile)
  * <Cpcitor at http://github.com/cpcitor> (for his great help and advice, and for developing <cpc-dev-tool-chain at http://github.com/cpcitor/cpc-dev-tool-chain>)
  * <CPCWiki at http://cpcwiki.eu> & <Grimware at http://grimware.org/> (for providing great technical documentations and examples)
  * Raúl Simarro (for developing <CPCRSLib at http://sourceforge.net/projects/cpcrslib/> game creation library)
