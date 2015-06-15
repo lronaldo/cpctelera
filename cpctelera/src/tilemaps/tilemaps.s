@@ -24,12 +24,6 @@
 .module cpct_tilemaps
 
 ;;
-;; Compilation control directives
-;;
-;; If true, interrupts can be disabled to get function parameters faster
-.equ let_disable_interrupts_for_function_parameters, 0  
-
-;;
 ;; Pointer to the actual tilset being managed (NULL if no tileset)
 ;;
 _cpct_ptileset::          .dw #0000

@@ -44,21 +44,27 @@
 ;; contents or size. If you give a wrong pointer, your tileset has different
 ;; dimensions than required or has less/more tiles than will be used later,
 ;; rubbish can appear on the screen.
+;;     * It is *very important* to call this function previously to the use of 
+;; tilemap managing functions; otherwise, functions will access random
+;; bytes of memory as tile definitions, which will lead to drawing problems.
 ;;
 ;; Details:
 ;;    Estabilishes a internal pointer that is used by tiledrawing functions
 ;; to read tiles from the tileset. This pointer should point to the first 
 ;; byte in memory where the tileset is stored. 
 ;;
-;;    It is *very important* to call this function previously to the use of 
-;; tilemap managing functions; otherwise, functions will access random
-;; bytes of memory as tile definitions, which will lead to drawing problems.
+;;    A tileset is an array of tile definitions. Each tile defintion is an
+;; array of pixels in screen pixel format, defining the appearance of the
+;; tile in the screen. There is no specific size defined for a tile, but
+;; all the tiles must be of the same size. For instance, if 4x4 byte tiles
+;; were to be used, each tile will occupy 16-bytes.
 ;;
 ;; Destroyed Register values: 
-;;     AF, HL
+;;    C Call   - AF, HL
+;;    ASM Call - none
 ;;
 ;; Required memory:
-;;     bytes
+;;     8 bytes
 ;;
 ;; Time Measures:
 ;; (start code)

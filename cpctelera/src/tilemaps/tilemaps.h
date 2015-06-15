@@ -19,7 +19,6 @@
 //
 // Title: Tilemaps
 //
-//
 
 
 #ifndef CPCT_TILEMAPS_H
@@ -32,6 +31,6 @@ extern void cpct_setTileset         (void* tileset);
 extern void cpct_setGetTileFunction (void* getTileFunction);
 
 // Drawing tile rows
-extern void cpct_drawTileRowAligned4x8(void* pvideomem, void* tileset, void* tilearray, u8 arraysize);
+extern void cpct_drawTileRowAligned4x8(void* pvideomem, void* tilearray, u8 size);
 
 #endif
