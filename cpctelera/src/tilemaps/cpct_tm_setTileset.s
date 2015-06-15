@@ -29,7 +29,7 @@
 ;; C Definition:
 ;;    void <cpct_tm_setTileset> (void* ptileset);
 ;;
-;; Input Parameters (7 bytes):
+;; Input Parameters (2 bytes):
 ;;  (2B HL) ptileset - Pointer to the tileset 
 ;;
 ;; Assembly call (Input parameters on registers):
@@ -40,7 +40,7 @@
 ;; address where the tileset is stored (first byte).
 ;;
 ;; Known limitations:
-;;     * This function does not do any kind of checking over the tilset, its
+;;     * This function does not do any kind of checking over the tileset, its
 ;; contents or size. If you give a wrong pointer, your tileset has different
 ;; dimensions than required or has less/more tiles than will be used later,
 ;; rubbish can appear on the screen.
