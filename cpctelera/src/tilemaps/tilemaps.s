@@ -17,14 +17,23 @@
 ;;-------------------------------------------------------------------------------
 
 
-; MODULE: TileMaps
-; This module helps in the managements of tilemaps, marking 
-; touched tiles and redrawing
-;
+;; MODULE: TileMaps
+;; This module helps in the managements of tilemaps, marking 
+;; touched tiles and redrawing
+;;
 .module cpct_tilemaps
 
 ;;
-;; Pointer to the actual tilset being managed (NULL if no tileset)
+;; Variables: Tilemap Managed Structures and Functions
+;;
+;; These variables hold pointes to internal structures and functions 
+;; required by tilemap managers. Each pointer is a 16-bits value and all
+;; of them are initialized to 0x0000 by default.
+;;
+;; cpct_ptileset          - Pointer to the array containting the present set of tiles in use
+;; cpct_pgetTileFunc      - Pointer to the function that gets concrete tiles from the tileset given their indexes
+;; cpct_pgetTileIndexFunc - Pointer to the function that gets tile indexes from the present tilemap
 ;;
 _cpct_ptileset::          .dw #0000
-_cpct_pgetTileFromArray:: .dw #0000
+_cpct_pgetTileFunc::      .dw #0000
+_cpct_pgetTileIndexFunc:: .dw #0000

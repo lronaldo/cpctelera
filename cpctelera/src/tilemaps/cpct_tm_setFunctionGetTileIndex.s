@@ -21,19 +21,19 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_setGetTileFuncion
+;; Function: cpct_tm_setFunctionGetTileIndex
 ;;
 ;;    Estabilishes the function that will be used for getting individual tile
 ;; indices from a tilemap array. 
 ;;
 ;; C Definition:
-;;    void <cpct_setGetTileFunction> (void* pgetTileFunction);
+;;    void <cpct_tm_setFunctionGetTileIndex> (void* pgetTileFunc);
 ;;
 ;; Input Parameters (2 bytes):
 ;;  (2B HL) pgetTileFunction - Pointer to the function used for getting tiles_idxs from tilemap
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_setGetTileFunction_asm
+;;    > call cpct_tm_setFunctionGetTileIndex_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *pgetTileFunction* could be any 16-bits value, representing the memory 
@@ -92,13 +92,13 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_setGetTileFunction::
+_cpct_tm_setFunctionGetTileIndex::
    ;; GET Parameters from the stack (42 cycles)
    pop  af                 ;; [10] AF = Return Address
    pop  hl                 ;; [10] HL = Pointer to the getTileFromArray Function
    push hl                 ;; [11] Left Stack as it was previously
    push af                 ;; [11]
 
-_cpct_setGetTileFunction_asm::        ;; Assembly entry point
-   ld  (#_cpct_pgetTileFromArray), hl ;; [16] Store pointer to the tileset in our internal variable
-   ret                                ;; [10] Return
+_cpct_tm_setFunctionGetTileIndex_asm:: ;; Assembly entry point
+   ld  (#_cpct_pgetTileIndexFunc), hl  ;; [16] Store pointer to the tileset in our internal variable
+   ret                                 ;; [10] Return

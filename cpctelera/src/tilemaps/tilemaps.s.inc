@@ -30,7 +30,8 @@
 .equ let_disable_interrupts_for_function_parameters, 0  
 
 ;;
-;; Pointer to the actual tilset being managed (NULL if no tileset)
+;; Global values referring to the intergal tilemaps managing variables
 ;;
 .globl _cpct_ptileset
-.globl _cpct_pgetTileFromArray
+.globl _cpct_pgetTileFunc
+.globl _cpct_pgetTileIndexFunc

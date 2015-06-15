@@ -27,10 +27,11 @@
 #include <types.h>
 
 // Setting global configuration for tilemanagement
-extern void cpct_setTileset         (void* tileset);
-extern void cpct_setGetTileFunction (void* getTileFunction);
+extern void cpct_tm_setTileset              (void* ptileset);
+extern void cpct_tm_setFunctionGetTileIndex (void* pgetTileIndexFunc);
+extern void cpct_tm_setFunctionGetTile      (void* pgetTileFunc);
 
 // Drawing tile rows
-extern void cpct_drawTileRowAligned4x8(void* pvideomem, void* tilearray, u8 size);
+extern void cpct_tm_drawTileRowAligned4x8(void* pvideomem, void* tilearray, u8 size);
 
 #endif

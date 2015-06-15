@@ -21,19 +21,19 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_setTileset
+;; Function: cpct_tm_setTileset
 ;;
-;;    Estabilishes the set of tiles that will be used by tilemap managing 
-;; functions.
+;;    Estabilishes the array that contains the set of tiles that will be used 
+;; by tilemap managing functions.
 ;;
 ;; C Definition:
-;;    void <cpct_setTileset> (void* tileset);
+;;    void <cpct_tm_setTileset> (void* ptileset);
 ;;
 ;; Input Parameters (7 bytes):
 ;;  (2B HL) ptileset - Pointer to the tileset 
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_setTileset
+;;    > call cpct_tm_setTileset_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *ptileset* could be any 16-bits value, representing the memory 
@@ -77,13 +77,13 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_setTileset::
+_cpct_tm_setTileset::
    ;; GET Parameters from the stack (42 cycles)
    pop  af                 ;; [10] AF = Return Address
    pop  hl                 ;; [10] HL = Pointer to the tileset
    push hl                 ;; [11] Left Stack as it was previously
    push af                 ;; [11]
 
-_cpct_setTileset_asm::       ;; Assembly entry point
+_cpct_tm_setTileset_asm::    ;; Assembly entry point
    ld  (#_cpct_ptileset), hl ;; [16] Store pointer to the tileset in our internal variable
    ret                       ;; [10] Return
