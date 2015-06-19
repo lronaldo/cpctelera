@@ -33,5 +33,6 @@
 ;; Global values referring to the intergal tilemaps managing variables
 ;;
 .globl _cpct_ptileset
+.globl _cpct_ptilemap
 .globl _cpct_pgetTileFunc
 .globl _cpct_pgetTileIndexFunc

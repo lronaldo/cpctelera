@@ -28,6 +28,7 @@
 
 // Setting global configuration for tilemanagement
 extern void cpct_tm_setTileset              (void* ptileset);
+extern void cpct_tm_setTilemap              (void* ptilemap);
 extern void cpct_tm_setFunctionGetTileIndex (void* pgetTileIndexFunc);
 extern void cpct_tm_setFunctionGetTile      (void* pgetTileFunc);
 

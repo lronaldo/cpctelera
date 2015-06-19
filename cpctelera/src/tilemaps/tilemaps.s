@@ -31,9 +31,11 @@
 ;; of them are initialized to 0x0000 by default.
 ;;
 ;; cpct_ptileset          - Pointer to the array containting the present set of tiles in use
+;; cpct_ptilemap          - Pointer to the tilemap (2D array with indexes of tiles)
 ;; cpct_pgetTileFunc      - Pointer to the function that gets concrete tiles from the tileset given their indexes
 ;; cpct_pgetTileIndexFunc - Pointer to the function that gets tile indexes from the present tilemap
 ;;
 _cpct_ptileset::          .dw #0000
+_cpct_ptilemap::          .dw #0000
 _cpct_pgetTileFunc::      .dw #0000
 _cpct_pgetTileIndexFunc:: .dw #0000
