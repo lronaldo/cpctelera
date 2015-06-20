@@ -54,7 +54,7 @@ cd "${OBJDIR}"
 OBJDIR="${PWD}"
 
 ## Setup SDCC for building, with support for Z80 only
-${SRCDIR}/configure --prefix="${INSTALLDIR}" \
+"${SRCDIR}/configure" --prefix="${INSTALLDIR}" \
         --disable-mcs51-port \
         --disable-z180-port \
         --disable-r2k-port \
