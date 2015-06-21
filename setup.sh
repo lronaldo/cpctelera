@@ -25,7 +25,7 @@
 ## first time, before using it.                                          ##
 ###########################################################################
 
-## Main Paths: escaping SETUP_PATH directory (to get rid of spaces)
+## Main Paths
 SETUP_PATH="${PWD}"
 CPCT_MAIN_DIR="${SETUP_PATH}/cpctelera"
 CPCT_TOOLS_DIR="${CPCT_MAIN_DIR}/tools"
@@ -101,6 +101,11 @@ stageMessage "1" "CPCtelera initial tests"
 
 # Check directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking directory structure..."
+
+## Checking main path has no spaces in its name
+EnsureFilenameHasNoSpaces "$CPCT_MAIN_DIR" "CPCtelera installation path cannot have spaces in between. Please ensure CPCtelera is in a path without spaces before relaunching setup.sh. "
+
+## Checking that directories exist
 for (( i = 0; i < ${#CPCT_DIRS[@]}; i++ )); do
    EnsureExists directory "${CPCT_DIRS[$i]}"
 done

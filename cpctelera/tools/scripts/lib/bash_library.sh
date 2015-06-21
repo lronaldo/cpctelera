@@ -519,3 +519,14 @@ function bashProfileFilename {
    echo "$HOME/.bash_profile"
    return 0
 }
+
+## Ensures that a Filename has no spaces in it, outputing an
+## unrecoverable error message otherwise
+##  $1 Filename to check
+##  $2 Error message to output
+##
+function EnsureFilenameHasNoSpaces {
+   case "$1" in
+      *" "*) Error "$2 ('$1')";; 
+   esac
+}
