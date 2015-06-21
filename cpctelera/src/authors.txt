@@ -75,6 +75,7 @@ Section: Testers & Bug Reporters
 
  * <Martin C. Doege at https://github.com/mdoege> 
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
+ * <Ervin / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=82> 
 
 Section: Special Thanks
 
