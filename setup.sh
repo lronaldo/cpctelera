@@ -27,12 +27,12 @@
 
 ## Main Paths
 SETUP_PATH="${PWD}"
-CPCT_MAIN_DIR=${SETUP_PATH}/cpctelera
-CPCT_TOOLS_DIR=${CPCT_MAIN_DIR}/tools
-CPCT_SCRIPTS_DIR=${CPCT_TOOLS_DIR}/scripts
+CPCT_MAIN_DIR="${SETUP_PATH}/cpctelera"
+CPCT_TOOLS_DIR="${CPCT_MAIN_DIR}/tools"
+CPCT_SCRIPTS_DIR="${CPCT_TOOLS_DIR}/scripts"
 
 ## Bash Include files
-source ${CPCT_SCRIPTS_DIR}/lib/bash_library.sh
+source "${CPCT_SCRIPTS_DIR}/lib/bash_library.sh"
 
 ## More paths defined
 CPCT_EXAMPLES_DIR=${SETUP_PATH}/examples
@@ -101,31 +101,37 @@ stageMessage "1" "CPCtelera initial tests"
 
 # Check directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking directory structure..."
-for DIR in ${CPCT_DIRS[*]}; do
-   EnsureExists directory "$DIR"
+
+## Checking main path has no spaces in its name
+EnsureFilenameHasNoSpaces "$CPCT_MAIN_DIR" "CPCtelera installation path cannot have spaces in between. Please ensure CPCtelera is in a path without spaces before relaunching setup.sh. "
+
+## Checking that directories exist
+for (( i = 0; i < ${#CPCT_DIRS[@]}; i++ )); do
+   EnsureExists directory "${CPCT_DIRS[$i]}"
 done
 drawOK
 
 # Check file structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking important files......."
-for FILE in ${CPCT_FILES[*]}; do
-   EnsureExists file "$FILE"
+for (( i = 0; i < ${#CPCT_FILES[@]}; i++ )); do
+   EnsureExists file "${CPCT_FILES[$i]}"
 done
 drawOK
 
 # Check installed commands
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required commands..."$'\n'
-for C in $(seq 0 $((${#REQUIRED_COMMANDS[@]}-1))); do
-   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_COMMANDS[$C]}'..."
-   EnsureCommandAvailable ${REQUIRED_COMMANDS[$C]} "Command '${REQUIRED_COMMANDS[$C]}' not found installed in the system. ${COMMAND_EXPLANATION[$C]}"
+for (( i = 0; i < ${#REQUIRED_COMMANDS[@]}; i++ )); do
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_COMMANDS[$i]}'..."
+   EnsureCommandAvailable ${REQUIRED_COMMANDS[$i]} "Command '${REQUIRED_COMMANDS[$i]}' not found installed in the system. ${COMMAND_EXPLANATION[$i]}"
    drawOK
 done
 
 # Check installed libraries
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
-for C in $(seq 0 $((${#REQUIRED_LIBRARIES[@]}-1))); do
-   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_LIBRARIES[$C]}'..."
-   EnsureCPPHeaderAvailable ${REQUIRED_LIBRARIES[$C]} "Header file '${REQUIRED_LIBRARIES[$C]}' not found in the system. ${LIBRARIES_EXPLANATION[$C]}"
+for (( i = 0; i < ${#REQUIRED_LIBRARIES[@]}; i++ )); do
+#for C in $(seq 0 $((${#REQUIRED_LIBRARIES[@]}-1))); do
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_LIBRARIES[$i]}'..."
+   EnsureCPPHeaderAvailable ${REQUIRED_LIBRARIES[$i]} "Header file '${REQUIRED_LIBRARIES[$i]}' not found in the system. ${LIBRARIES_EXPLANATION[$i]}"
    drawOK
 done
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
@@ -185,11 +191,11 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera scripts path: ${COLOR_WH
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to ${COLOR_WHITE}\$PATH${COLOR_CYAN} variable in ${COLOR_WHITE}${PROFILE}${COLOR_CYAN}..."
 
 # First, eliminate previous instances of CPCTelera into PROFILE, then add new
-touch $PROFILE
+touch "$PROFILE"
 removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" "$PROFILE"
 removeTrailingBlankLines "$PROFILE"
 cat "$CPCT_TEMPLATES_BASHRC" >> "$PROFILE"
-replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" $PROFILE '#'
+replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" "$PROFILE" '#'
 drawOK
 
 ###############################################################
