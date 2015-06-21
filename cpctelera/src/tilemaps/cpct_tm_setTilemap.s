@@ -49,15 +49,23 @@
 ;; from memory, which will lead to drawing problems.
 ;;
 ;; Details:
-;;    Estabilishes a internal pointer that is used by tiledrawing functions
+;;    Establishes a internal pointer that is used by tiledrawing functions
 ;; to read map of tiles to be displayed on the screen. This pointer should point 
 ;; to the first byte in memory where the tilemap is stored. 
 ;;
-;;    A tilemap is a 2D array of indexes to tile definitions (indexes referred
-;; to elements of the tileset). Each element of the 2D array is a N-bits integer
-;; that is the index to access the tile definition on the tileset array. There
-;; is no predefined value for N-bits (could be anyone). The function pointed
-;; by <cpct_pgetTileIndexFunc> will be used to access the elements of the tilemap.
+;;    A tilemap is a 2D array of indices that refer to different tiles contained
+;; in the present tileset. It is a matrix (2D array) whose contents represent 
+;; the 2D structure of the displayed map on the screen.
+;;
+;;    Elements of a tilemap are N-bits integers, which will require an 
+;; appropriate function for accessing them. The function used to access 
+;; them can be defined using <cpct_pgetTileIndexFunc>. For instance, if 
+;; a tilemap of 2-bits integers is defined (for a tileset of 4 different 
+;; tiles, 0-3), then the function <cpct_get2Bits> could be used as element 
+;; accessors. This behaviour gives the flexibility of configuring the size 
+;; of the tilemap to the specific needs of the application.
+;;
+
 ;;
 ;; Destroyed Register values: 
 ;;    C Call   - AF, HL
@@ -80,7 +88,7 @@
 _cpct_tm_setTilemap::
    ;; GET Parameters from the stack (42 cycles)
    pop  af                 ;; [10] AF = Return Address
-   pop  hl                 ;; [10] HL = Pointer to the tileset
+   pop  hl                 ;; [10] HL = Pointer to the tilemap
    push hl                 ;; [11] Left Stack as it was previously
    push af                 ;; [11]
 
