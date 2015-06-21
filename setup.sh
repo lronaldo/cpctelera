@@ -191,7 +191,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> CPCTelera scripts path: ${COLOR_WH
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Adding scripts path to ${COLOR_WHITE}\$PATH${COLOR_CYAN} variable in ${COLOR_WHITE}${PROFILE}${COLOR_CYAN}..."
 
 # First, eliminate previous instances of CPCTelera into PROFILE, then add new
-touch $PROFILE
+touch "$PROFILE"
 removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" "$PROFILE"
 removeTrailingBlankLines "$PROFILE"
 cat "$CPCT_TEMPLATES_BASHRC" >> "$PROFILE"
