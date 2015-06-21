@@ -195,7 +195,7 @@ touch "$PROFILE"
 removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" "$PROFILE"
 removeTrailingBlankLines "$PROFILE"
 cat "$CPCT_TEMPLATES_BASHRC" >> "$PROFILE"
-replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" $PROFILE '#'
+replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" "$PROFILE" '#'
 drawOK
 
 ###############################################################
