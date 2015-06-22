@@ -84,7 +84,7 @@
 ;; Asm saving |    -30          |   -7.50
 ;; -----------------------------------------
 ;; (end code)
-;;    S = *size* (Number of total bytes to set)
+;;    BC = *array size* (Number of total bytes to set)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
