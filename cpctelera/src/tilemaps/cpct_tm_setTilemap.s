@@ -92,6 +92,6 @@ _cpct_tm_setTilemap::
    push hl                 ;; [11] Left Stack as it was previously
    push af                 ;; [11]
 
-_cpct_tm_setTilemap_asm::    ;; Assembly entry point
-   ld  (#_cpct_ptilemap), hl ;; [16] Store pointer to the tilemap in our internal variable
-   ret                       ;; [10] Return
+_cpct_tm_setTilemap_asm::       ;; Assembly entry point
+   ld  (#_cpct_tm_ptilemap), hl ;; [16] Store pointer to the tilemap in our internal variable
+   ret                          ;; [10] Return

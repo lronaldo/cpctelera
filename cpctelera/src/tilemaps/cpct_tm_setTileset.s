@@ -84,6 +84,6 @@ _cpct_tm_setTileset::
    push hl                 ;; [11] Left Stack as it was previously
    push af                 ;; [11]
 
-_cpct_tm_setTileset_asm::    ;; Assembly entry point
-   ld  (#_cpct_ptileset), hl ;; [16] Store pointer to the tileset in our internal variable
-   ret                       ;; [10] Return
+_cpct_tm_setTileset_asm::       ;; Assembly entry point
+   ld  (#_cpct_tm_ptileset), hl ;; [16] Store pointer to the tileset in our internal variable
+   ret                          ;; [10] Return

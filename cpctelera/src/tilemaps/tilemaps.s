@@ -30,12 +30,17 @@
 ;; required by tilemap managers. Each pointer is a 16-bits value and all
 ;; of them are initialized to 0x0000 by default.
 ;;
-;; cpct_ptileset          - Pointer to the array containting the present set of tiles in use
-;; cpct_ptilemap          - Pointer to the tilemap (2D array with indexes of tiles)
-;; cpct_pgetTileFunc      - Pointer to the function that gets concrete tiles from the tileset given their indexes
-;; cpct_pgetTileIndexFunc - Pointer to the function that gets tile indexes from the present tilemap
+;; cpct_tm_ptileset          - Pointer to the array containting the present set of tiles in use
+;; cpct_tm_ptilemap          - Pointer to the tilemap (2D array with indexes of tiles)
+;; cpct_tm_pgetTileFunc      - Pointer to the function that gets concrete tiles from the tileset given their indexes
+;; cpct_tm_pgetTileIndexFunc - Pointer to the function that gets tile indexes from the present tilemap
+;; cpct_tm_tilesize_x        - Horizontal size (in bytes) of a tile
+;; cpct_tm_tilesize_y        - Vertical size (in bytes) of a tile. This size takes into account all the bytes that are between 
+;;                             the start of a tile and the start of the next. For a standard screen, it should be 0x50*(pixels div 8) + 0x800*(pixels % 8)
 ;;
-_cpct_ptileset::          .dw #0000
-_cpct_ptilemap::          .dw #0000
-_cpct_pgetTileFunc::      .dw #0000
-_cpct_pgetTileIndexFunc:: .dw #0000
+_cpct_tm_ptileset::          .dw #0000
+_cpct_tm_ptilemap::          .dw #0000
+_cpct_tm_pgetTileFunc::      .dw #0000
+_cpct_tm_pgetTileIndexFunc:: .dw #0000
+_cpct_tm_tilesize_x::        .db #00
+_cpct_tm_tilesize_y::        .dw #0000
