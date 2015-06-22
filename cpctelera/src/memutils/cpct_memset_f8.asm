@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_memutils
 
-.include /memutils.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_memset_f8
@@ -38,8 +36,8 @@
 ;;
 ;; Input Parameters (5 Bytes):
 ;;  (2B HL) array - Pointer to the first byte of the array to be filled up (starting point in memory)
-;;  (2B BC) size  - Number of bytes to be set (>= 8, multiple of 8)
 ;;  (2B DE) value - 16-bit value to be set (Pair of bytes)
+;;  (2B BC) size  - Number of bytes to be set (>= 8, multiple of 8)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_memset_f8_asm
@@ -70,63 +68,56 @@
 ;; for values in the range [8-16] could underperform simple variable assignments. 
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    BC, DE, HL
 ;;
 ;; Required memory:
-;;    25 bytes
+;;    C-binding   - 41 bytes
+;;    ASM-binding - 36 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
-;;   Case     |   Cycles        | microSecs (us)
-;; -----------------------------------------
-;;   Any      | 153 + 60*(BC/8) | 38,25 + 15*BC
-;; -----------------------------------------
-;; Asm saving |    -30          |   -7.50
-;; -----------------------------------------
+;;   Case     |           Cycles             |         microSecs (us)
+;; -----------------------------------------------------------------------------------
+;;  BC < 256  | 174 + 57*(BC/8)              | 43,50 + 14.25*(BC/8)
+;; -----------------------------------------------------------------------------------
+;;  BC >= 256 | 165 + 57*(BC/8) + 9*(BC/256) | 41,25 + 14.25*(BC/8) + 2.25*(BC/256)
+;; -----------------------------------------------------------------------------------
+;; Asm saving |           -40                |           -10.00
+;; -----------------------------------------------------------------------------------
 ;; (end code)
 ;;    BC = *array size* (Number of total bytes to set)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-;; Assembly entry point
-_cpct_memset_f8_asm::
-   di                            ;; [ 4] Disable interrupts first
-   ld   (msf_restoreSP + 1), sp  ;; [20]
-   jp   msf8_asm_entry           ;; [10]
+;; Code start without calling bindings. There are other files for calling 
+;; bindings for C and ASM.
 
-;; C call entry point
-_cpct_memset_f8::
-   di                            ;; [ 4] Disable interrupts first
-   ld   (msf_restoreSP + 1), sp  ;; [20]
-   ;; Recover parameters from stack
-   pop  af           ;; [10] AF = Return address
-   pop  hl           ;; [10] HL = Array pointer
-   pop  bc           ;; [10] BC = Size of the array
-   pop  de           ;; [10] DE = value to be set
-                     ;; No need to restore them, as sp will be directly restored later on
-
-msf8_asm_entry:
    ;; Move SP to the end of the array
    add  hl, bc       ;; [11] HL += BC (HL points to the end of the array)
    ld   sp, hl       ;; [ 6] SP = HL  (SP points to the end of the array)
 
    ;; Calculate the total number of chunks to copy
-   srl b             ;; [ 8] BC = BC / 8 (using 3 right shifts)
-   rr c              ;; [ 8]
-   srl b             ;; [ 8]
-   rr c              ;; [ 8]
-   srl b             ;; [ 8]
-   rr c              ;; [ 8]
+   srl  b            ;; [ 8] BC = BC / 8 (using 3 right shifts)
+   rr   c            ;; [ 8]
+   srl  b            ;; [ 8]
+   rr   c            ;; [ 8]
+   srl  b            ;; [ 8]
+   rr   c            ;; [ 8]
 
-msf_copyloop:
+   ld   h, b         ;; [ 4] Interchange B and C
+   ld   b, c         ;; [ 4]  to use DJNZ in the inner loop
+   ld   c, h         ;; [ 4]
+
+msf8_copyloop:
    push de               ;; [11] Push a chunck of 8-bytes to memory, 2-by-2
    push de               ;; [11]
    push de               ;; [11]
    push de               ;; [11]
-   dec  bc               ;; [ 6] 1 chunck less
-   jp   nz, msf_copyloop ;; [10] Continue if there still are more chuncks (BC != 0)
+   djnz msf8_copyloop    ;; [13/8] 1 Less chunk. Continue if there still are more chuncks (B != 0)
+   dec  c                ;; [ 4] 256 less chunks (b runned up to 0, decrement c by 1)
+   jp   p, msf8_copyloop ;; [10] Continue 256 chuncks more if C >= 0 (positive)
 
-msf_restoreSP:
+msf8_restoreSP:
    ld   sp, #0000    ;; [10] Placeholder for restoring SP value before returning
    ei                ;; [ 4] Reenable interrupts
 
