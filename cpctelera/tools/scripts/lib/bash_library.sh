@@ -87,7 +87,7 @@ function clearScreen {
 ## $2: Message to write
 function machineEcho_sleep {
    local i
-   for i in $(seq 0 ${#2}); do
+   for (( i=0; i <= ${#2}; i++ )); do
       echo -n "${2:${i}:1}"
       sleep "$1"
    done
@@ -97,7 +97,7 @@ function machineEcho_sleep {
 ## $2: Message to write
 function machineEcho_no_sleep {
    local i
-   for i in $(seq 0 ${#2}); do
+   for (( i=0; i <= ${#2}; i++ )); do
       echo -n "${2:${i}:1}"
    done
 }
@@ -195,6 +195,13 @@ function processRunning {
    return $?
 }
 
+## Repeats a character N times
+## $1: Character to repeat
+## $2: times to be repeated
+##
+function repeatCharacter {
+   printf "$1"'%.0s' $(eval "echo {1.."$(($2))"}")
+}
 
 ## $1: Size (in characters, without brackets)
 ## $2: Percentage
@@ -203,6 +210,7 @@ function processRunning {
 ##
 function drawProgressBar {
    local PCT
+   local BARS
    if (( $2 > 100 )); then
       PCT=100
    elif (( $2 < 0 )); then
@@ -217,11 +225,11 @@ function drawProgressBar {
    local NUMSPACES=$(($1 - NUMBARS))
    echo -n ${3}
    if ((NUMBARS > 0)); then
-      printf ' %.0s' $(seq 1 ${NUMBARS})
+      repeatCharacter ' ' $NUMBARS
    fi
    if ((NUMSPACES > 0)); then
       echo -n ${4}
-      printf ' %.0s' $(seq 1 ${NUMSPACES})
+      repeatCharacter ' ' $NUMSPACES
    fi
    echo -n ${COLOR_NORMAL} ${PCT}%
 }

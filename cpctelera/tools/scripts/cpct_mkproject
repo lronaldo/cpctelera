@@ -71,14 +71,16 @@ TAG_LOADADDRESS="%%%CODE_LOAD_ADDRESS%%%"
 ##
 function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<project_folder> [options]"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<project_folder_name> [options]"
    echo
-   echo "${COLOR_CYAN}  Creates a fresh new project that uses CPCtelera engine. The new project is created inside\
-<project_folder>, so <project_folder> should be a new file name not existing in filesystem."
+   echo "${COLOR_CYAN}  Creates a fresh new project that uses CPCtelera engine. The script creates \
+a new folder named <project_folder_name> in the current folder. Then, the new project is created \
+inside <project_folder_name>. So, <project_folder_name> must not previously exist inside the \
+current folder."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -n | --project-name  ${COLOR_LIGHT_CYAN}<name>"
-   echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder> name. <name> \
+   echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder_name> name. <name> \
 must not contain spaces."
    echo
    echo "${COLOR_LIGHT_BLUE}  -l | --load-address ${COLOR_LIGHT_CYAN}<hexadecimal address>"
@@ -95,7 +97,9 @@ inside Amstrad CPC's memory."
 ###############################################################
 ## Check template files are present
 ##
-for F in ${ALL_TEMPLATE_FILES[*]}; do
+for (( i=0; i < ${#ALL_TEMPLATE_FILES[@]}; i++)); do
+#for F in ${ALL_TEMPLATE_FILES[*]}; do
+   F=${ALL_TEMPLATE_FILES[$i]}
    EnsureExists file "$F" "It is a template file required to create new projects. Please check that the file \
 exists and it has read permission for your user."
 done
@@ -141,8 +145,10 @@ while (( $# >= 1 )); do
             paramError "Unrecognized command line option '$1'" 7
          elif ! isEmpty "$PROJECTDIR"; then
             paramError "Unrecognized parameter '$1'. Have you already provided a <project_folder> parameter?" 6
+         elif [[ $1 =~ ^.*/.*$ ]]; then
+            paramError "'$1' is not a valid name for your project folder. Project folder names must not contain slashes '/'." 7
          elif [ -e "$1" ]; then
-            paramError "'$1' already exist in filesystem. Choose another name for your <project_folder>"
+            paramError "'$1' already exist in filesystem. Choose another name for your <project_folder>" 8
          fi
          PROJECTDIR="$1"
       ;;
