@@ -21,53 +21,54 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_tm_setFunctionGetTileIndex
+;; Function: cpct_tm_setFunctionGetTile
 ;;
 ;;    Establishes the function that will be used for getting individual tile
-;; indices from a tilemap array. 
+;; definitions (in screen pixel format) from the tileset.
 ;;
 ;; C Definition:
-;;    void <cpct_tm_setFunctionGetTileIndex> (void* pgetTileFunc);
+;;    void <cpct_tm_setFunctionGetTile> (void* pgetTileFunc);
 ;;
 ;; Input Parameters (2 bytes):
-;;  (2B HL) pgetTileFunction - Pointer to the function used for getting tiles_idxs from tilemap
+;;  (2B HL) pgetTileFunction - Pointer to the function used for getting tiles definitions from the tileset
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_tm_setFunctionGetTileIndex_asm
+;;    > call cpct_tm_setFunctionGetTile_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *pgetTileFunction* could be any 16-bits value, representing the memory 
-;; address where the code for an array access function starts.
+;; address where the code of the function starts. This function must use some 
+;; concrete parameters (passed to it stored in registers) to return a pointer
+;; to the start of the requested tile definition (in screen pixel format).
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of checking about the given function
 ;; pointer. User is responsible for giving an appropriate function pointer to
-;; a function that gets elements from an array. The function must be callable 
-;; from ASM, receiving parameters in HL (index of the element to get) and 
-;; DE (pointer to the start of the array), and returning the vale of the element got
-;; in L or HL (the value of the required index). 
+;; a function that gets tile definitions from the tileset. The function must be 
+;; callable from ASM, receiving parameters in HL (index of the element to get) 
+;; and DE (pointer to the start of the tileset), and returning the pointer to
+;; the tileset in HL. 
 ;;     * Not calling this function first to initialize the function pointer
 ;; will result in the machine being reset the first time it tries to draw
 ;; tiles on the screen (memory location 0x0000 will be called).
 ;;
 ;; Details:
 ;;    Establishes a internal pointer to a function that accesses and returns 
-;; elements from an array. This function pointer will be used when the tilemaps
-;; module accesses the elements of the tilemap (the individual tile ids) to 
-;; draw them on the screen.
+;; pointers to tile definitions (in screen pixel format) from the tileset. This 
+;; function pointer will be used when a tile definition is required; which normally
+;; happens when the tile is going to be drawn to the screen or a buffer.
 ;;
 ;;    The pointer must point to the start of the function code, to be directly
 ;; called from ASM code. The function will receive 2 parameters in 2 registers:
-;;   (2B HL) index - index of the element that must be accessed
-;;   (2B DE) array - pointer to the start of the array where the element is
-;; and must return the value of the required index in L or HL registers (depending
-;; on the returned value being 8-bits or 16-bits long).
+;;   (2B HL) index   - index of the tile that must be accessed
+;;   (2B DE) tileset - pointer to the start of the array containing the tiles (the tileset)
+;; and must return a pointer to the start of the required tile definition in HL.
 ;;
-;;    This behaviour lets the user have different tilemaps with the required
-;; proportion of bits per tile index. For instance, when managing a tileset of
-;; 16 different tiles, only 4-bits are required for each tile index in the tilemap;
-;; therefore, <cpct_get4Bits_asm> function could be used to have a tilemap that
-;; only uses 4-bits for each tile index.
+;;    This behaviour lets the user have different tilesets and also different
+;; ways to access them. Moreover, as this is a function, special behaviours 
+;; could be defined, such as returning different tiles depending on time, status
+;; or other variables. That could constitute a more living tilemap / tileset, 
+;; that opens up for developers imagination. 
 ;;
 ;;    It is *very important* to call this function previously to the use of 
 ;; tilemap managing functions; otherwise, computer will reset itself when 
@@ -92,14 +93,14 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_tm_setFunctionGetTileIndex::
+_cpct_tm_setFunctionGetTile::
    ;; GET Parameters from the stack (42 cycles)
    pop  af                 ;; [10] AF = Return Address
-   pop  hl                 ;; [10] HL = Pointer to the getTileFromArray Function
+   pop  hl                 ;; [10] HL = Pointer to the getTile Function
    push hl                 ;; [11] Left Stack as it was previously
    push af                 ;; [11]
 
-_cpct_tm_setFunctionGetTileIndex_asm::    ;; Assembly entry point
-   ld  (#_cpct_tm_pgetTileIndexFunc), hl  ;; [16] Store internal pointer to the function that 
-                                          ;;      gets tile indexes from the tilemap
-   ret                                    ;; [10] Return
+_cpct_tm_setFunctionGetTile_asm::      ;; Assembly entry point
+   ld  (#_cpct_tm_pgetTileFunc), hl    ;; [16] Store pointer internal pointer to the function 
+                                       ;;      that gets tile definitions from the tileset
+   ret                                 ;; [10] Return

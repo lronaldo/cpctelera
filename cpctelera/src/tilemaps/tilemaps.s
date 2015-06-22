@@ -30,7 +30,7 @@
 ;; required by tilemap managers. Each pointer is a 16-bits value and all
 ;; of them are initialized to 0x0000 by default.
 ;;
-;; cpct_tm_ptileset          - Pointer to the array containting the present set of tiles in use
+;; cpct_tm_ptileset          - Pointer to the array containing the present set of tiles in use
 ;; cpct_tm_ptilemap          - Pointer to the tilemap (2D array with indexes of tiles)
 ;; cpct_tm_pgetTileFunc      - Pointer to the function that gets concrete tiles from the tileset given their indexes
 ;; cpct_tm_pgetTileIndexFunc - Pointer to the function that gets tile indexes from the present tilemap

@@ -23,7 +23,7 @@
 ;;
 ;; Function: cpct_tm_setTileset
 ;;
-;;    Estabilishes the array that contains the set of tiles that will be used 
+;;    Establishes the array that contains the set of tiles that will be used 
 ;; by tilemap managing functions.
 ;;
 ;; C Definition:
@@ -42,18 +42,18 @@
 ;; Known limitations:
 ;;     * This function does not do any kind of checking over the tileset, its
 ;; contents or size. If you give a wrong pointer, your tileset has different
-;; dimensions than required or has less/more tiles than will be used later,
+;; dimensions than required or has less / more tiles than will be used later,
 ;; rubbish can appear on the screen.
 ;;     * It is *very important* to call this function previously to the use of 
 ;; tilemap managing functions; otherwise, functions will access random
 ;; bytes of memory as tile definitions, which will lead to drawing problems.
 ;;
 ;; Details:
-;;    Estabilishes a internal pointer that is used by tiledrawing functions
+;;    Establishes a internal pointer that is used by tiledrawing functions
 ;; to read tiles from the tileset. This pointer should point to the first 
 ;; byte in memory where the tileset is stored. 
 ;;
-;;    A tileset is an array of tile definitions. Each tile defintion is an
+;;    A tileset is an array of tile definitions. Each tile definition is an
 ;; array of pixels in screen pixel format, defining the appearance of the
 ;; tile in the screen. There is no specific size defined for a tile, but
 ;; all the tiles must be of the same size. For instance, if 4x4 byte tiles

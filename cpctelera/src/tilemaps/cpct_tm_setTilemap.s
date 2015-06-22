@@ -23,7 +23,7 @@
 ;;
 ;; Function: cpct_tm_setTilemap
 ;;
-;;    Estabilishes the 2D array that contains the tilemap that should be  
+;;    Establishes the 2D array that contains the tilemap that should be  
 ;; currently displayed on the screen.
 ;;
 ;; C Definition:
@@ -42,7 +42,7 @@
 ;; Known limitations:
 ;;     * This function does not do any kind of checking over the tilemap, its
 ;; contents or size. If you give a wrong pointer, your tilemap has different
-;; dimensions than required or has less/more tiles than will be used later,
+;; dimensions than required or has less / more tiles than will be used later,
 ;; rubbish can appear on the screen.
 ;;     * It is *very important* to call this function previously to the use of 
 ;; tilemap managing functions; otherwise, functions will access random tile definitions 

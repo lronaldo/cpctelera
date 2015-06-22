@@ -30,7 +30,7 @@
 .equ let_disable_interrupts_for_function_parameters, 0  
 
 ;;
-;; Global values referring to the intergal tilemaps managing variables
+;; Global values referring to the integral tilemaps managing variables
 ;;
 .globl _cpct_tm_ptileset
 .globl _cpct_tm_ptilemap
