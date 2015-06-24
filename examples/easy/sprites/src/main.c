@@ -42,7 +42,7 @@ void drawBanner() {
     u8 *pvideo_s1, *pvideo_s2;
 
     // Clear the screen filling it up with 0's
-    cpct_clearScreen(0);
+    cpct_clearScreen_f64(0);
 
     // Set Mode 0 Squared Banner palette and change to Mode 0
     cpct_setPalette  (G_banner_palette, 16);
@@ -70,7 +70,7 @@ void drawLogo() {
     u8* pvideo;
 
     // Clear the screen filling it up with 0's
-    cpct_clearScreen(0);
+    cpct_clearScreen_f64(0);
 
     // Set Mode 1 Logo palette and change to Mode 1
     cpct_setPalette(G_logo_palette, 4);
