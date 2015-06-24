@@ -87,6 +87,41 @@ extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y);
 // pattern given. It uses <cpc_memset> to do the task, just filling up 16K bytes out of
 // *COL* value, starting at 0xC000.
 //
-#define cpct_clearScreen(COL) cpct_memset((void*)0xC000, (COL), 0x4000);
+// Measures:
+//    This function takes *344172 CPU cycles* to fill the screen.
+//    This is *5.17 VSYNCs* on a 50Hz display.
+//
+#define cpct_clearScreen(COL) cpct_memset((void*)0xC000, (COL), 0x4000)
+
+//
+// Macro: cpct_clearScreen_f8
+//
+//    Macro to simplify clearing the screen: fast version (in chuncks of 8 bytes)
+//
+// C Definition:
+//   #define <cpct_clearScreen_f8> (*COL*)
+//
+// Parameters (2 bytes):
+//   (1B) COL - Colour pattern to be used for screen clearing. Typically, a 0x0000 is used 
+// to fill up all the screen with 0's (firmware colour 0). However, you may use it in 
+// combination with <cpct_px2byteM0>, <cpct_px2byteM1> or a manually created colour pattern.
+// Take into account that CPC's memory access is little-endian: this means that using
+// 0x1122 as colour pattern will fill up memory with the sequence 0x22, 0x11, 0x22, 0x11...
+//
+// Details:
+//   Fills up all the standard screen (range [0xC000-0xFFFF]) with *COL* pair of bytes, the 
+// colour pattern given. It uses <cpc_memset_f8> to do the task, just filling up 16K bytes out 
+// of *COL* value, starting at 0xC000.
+//
+// Warning:
+//   <cpc_memset_f8> disables interrupts and moves SP while operating. It also sets interrupts
+// to enabled at its end, without taking into account its previous status. Take it into 
+// account when using this macro.
+//
+// Measures:
+//    This function takes *117491 CPU cycles* to fill the screen.
+//    This is *1.77 VSYNCs* on a 50Hz display.
+//
+#define cpct_clearScreen_f8(COL) cpct_memset_f8((void*)0xC000, (COL), 0x4000)
 
 #endif
