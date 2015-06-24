@@ -71,18 +71,20 @@
 ;;    BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 41 bytes
-;;    ASM-binding - 36 bytes
+;;    C-binding   - 45 bytes
+;;    ASM-binding - 40 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
-;;   Case     |           Cycles             |         microSecs (us)
+;;   Case      |           Cycles             |         microSecs (us)
 ;; -----------------------------------------------------------------------------------
-;;  BC < 256  | 174 + 57*(BC/8)              | 43,50 + 14.25*(BC/8)
+;;  BC < 256   | 184 + 57*(BC/8)              | 46,00 + 14.25*(BC/8)
 ;; -----------------------------------------------------------------------------------
-;;  BC >= 256 | 165 + 57*(BC/8) + 9*(BC/256) | 41,25 + 14.25*(BC/8) + 2.25*(BC/256)
+;;  BC >= 256  | 175 + 57*(BC/8) + 9*(BC/256) | 43,75 + 14.25*(BC/8) + 2.25*(BC/256)
 ;; -----------------------------------------------------------------------------------
-;; Asm saving |           -40                |           -10.00
+;;  BC%256 = 0 |            +4                |            +1.00
+;; -----------------------------------------------------------------------------------
+;; Asm saving  |           -40                |           -10.00
 ;; -----------------------------------------------------------------------------------
 ;; (end code)
 ;;    BC = *array size* (Number of total bytes to set)
@@ -103,19 +105,26 @@
    rr   c            ;; [ 8]
    srl  b            ;; [ 8]
    rr   c            ;; [ 8]
+   
+   ;; C (contains NumberOfChunks % 256). That will be the number of chuncks to copy on first pass.
+   ;;    If C != 0, we copy C chuncks to memory, then 256*(B-1) chuncks to memory (Standard)
+   ;;    IF C  = 0, we only have to copy 256*(B-1). That is, we discount first pass, as it is of C=0 chunks.
+   jp  nz, standard_1st_pass ;; [10]  IF C = 0, then
+   dec  b                    ;; [ 4]    Discount first pass (C = 0 chuncks), then continue doing B-1 passes of 256 chunks
 
+standard_1st_pass:
    ld   h, b         ;; [ 4] Interchange B and C
    ld   b, c         ;; [ 4]  to use DJNZ in the inner loop
    ld   c, h         ;; [ 4]
 
-msf8_copyloop:
-   push de               ;; [11] Push a chunck of 8-bytes to memory, 2-by-2
-   push de               ;; [11]
-   push de               ;; [11]
-   push de               ;; [11]
-   djnz msf8_copyloop    ;; [13/8] 1 Less chunk. Continue if there still are more chuncks (B != 0)
-   dec  c                ;; [ 4] 256 less chunks (b runned up to 0, decrement c by 1)
-   jp   p, msf8_copyloop ;; [10] Continue 256 chuncks more if C >= 0 (positive)
+copyloop:
+   push de           ;; [11] Push a chunck of 8-bytes to memory, 2-by-2
+   push de           ;; [11]
+   push de           ;; [11]
+   push de           ;; [11]
+   djnz copyloop     ;; [13/8] 1 Less chunk. Continue if there still are more chuncks (B != 0)
+   dec  c            ;; [ 4] 256 less chunks (b runned up to 0, decrement c by 1)
+   jp   p, copyloop  ;; [10] Continue 256 chuncks more if C >= 0 (positive)
 
 msf8_restoreSP:
    ld   sp, #0000    ;; [10] Placeholder for restoring SP value before returning
