@@ -63,7 +63,7 @@
 ;;  2 - It places SP at the last 2-bytes of the array
 ;;  3 - It uses PUSH instructions to set bytes 2-by-2, in chuncks of 8 bytes, until the entire array is set
 ;;
-;;    This function works for array sizes from 2 to 65528. However, it is recommended 
+;;    This function works for array sizes from 8 to 65528. However, it is recommended 
 ;; that you use it for values much greater than 8. Depending on your code, using <cpct_memset_f> 
 ;; for values in the range [8-16] could underperform simple variable assignments. 
 ;;
@@ -78,9 +78,7 @@
 ;; (start code)
 ;;   Case      |           Cycles             |         microSecs (us)
 ;; -----------------------------------------------------------------------------------
-;;  BC < 256   | 184 + 57*(BC/8)              | 46,00 + 14.25*(BC/8)
-;; -----------------------------------------------------------------------------------
-;;  BC >= 256  | 175 + 57*(BC/8) + 9*(BC/256) | 43,75 + 14.25*(BC/8) + 2.25*(BC/256)
+;;    Any      | 184 + 57*(BC\8) + 9*(BC\256) | 43.75 + 14.25*(BC\8) + 2.25*(BC\256)
 ;; -----------------------------------------------------------------------------------
 ;;  BC%256 = 0 |            +4                |            +1.00
 ;; -----------------------------------------------------------------------------------
@@ -88,6 +86,7 @@
 ;; -----------------------------------------------------------------------------------
 ;; (end code)
 ;;    BC = *array size* (Number of total bytes to set)
+;;     \ = integer division
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 

@@ -20,18 +20,10 @@
 .include /memutils.s/
 
 ;;
-;; C Binding for cpct_memset_f8
-;;
+;; Assembly binding for cpct_memset_f64 function
+;; 
+_cpct_memset_f64_asm::
+   di                             ;; [ 4] Disable interrupts first
+   ld  (msf64_restoreSP + 1), sp  ;; [20]
 
-_cpct_memset_f8::
-   di                            ;; [ 4] Disable interrupts first
-   ld   (msf8_restoreSP + 1), sp ;; [20]
-
-   ;; Recover parameters from stack
-   pop  hl                       ;; [10] HL = Return address
-   pop  hl                       ;; [10] HL = Array pointer
-   pop  de                       ;; [10] DE = value to be set
-   pop  bc                       ;; [10] BC = Size of the array
-                                 ;; No need to restore them, as sp will be directly restored later on
-
-.include /cpct_memset_f8.asm/      ;; Include function code
+.include /cpct_memset_f64.asm/
