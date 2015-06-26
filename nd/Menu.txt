@@ -137,7 +137,9 @@ Group: Video  {
 Group: Memutils  {
 
    File: cpct_memcpy  (memutils/cpct_memcpy.s)
-   File: cpct_memset  (memutils/cpct_memset.s)
+   File: cpct_memset  (memutils/cpct_memset.asm)
+   File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
+   File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
    }  # Group: Memutils
 
 Group: Command Line Tools  {
