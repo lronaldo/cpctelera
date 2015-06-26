@@ -24,14 +24,14 @@
 ;;
 
 _cpct_memset_f8::
-   di                            ;; [ 4] Disable interrupts first
-   ld   (msf8_restoreSP + 1), sp ;; [20]
+   di                            ;; [1] Disable interrupts first
+   ld   (msf8_restoreSP + 1), sp ;; [6]
 
    ;; Recover parameters from stack
-   pop  hl                       ;; [10] HL = Return address
-   pop  hl                       ;; [10] HL = Array pointer
-   pop  de                       ;; [10] DE = value to be set
-   pop  bc                       ;; [10] BC = Size of the array
+   pop  hl                       ;; [3] HL = Return address
+   pop  hl                       ;; [3] HL = Array pointer
+   pop  de                       ;; [3] DE = value to be set
+   pop  bc                       ;; [3] BC = Size of the array
                                  ;; No need to restore them, as sp will be directly restored later on
 
 .include /cpct_memset_f8.asm/      ;; Include function code

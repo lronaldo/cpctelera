@@ -76,16 +76,17 @@
 ;;
 ;; Time Measures: 
 ;; (start code)
-;;   Case      |           Cycles             |         microSecs (us)
-;; -----------------------------------------------------------------------------------
-;;    Any      | 184 + 57*(BC\8) + 9*(BC\256) | 43.75 + 14.25*(BC\8) + 2.25*(BC\256)
-;; -----------------------------------------------------------------------------------
-;;  BC%256 = 0 |            +4                |            +1.00
-;; -----------------------------------------------------------------------------------
-;; Asm saving  |           -40                |           -10.00
-;; -----------------------------------------------------------------------------------
+;;   Case      |        microSecs (us)       |       CPU Cycles             |
+;; --------------------------------------------------------------------------
+;;    Any      | 52 + 20*CH + 3*(CH\256 - 1) | 220 + 80*CH + 12(CH\256 - 1) |
+;; --------------------------------------------------------------------------
+;;  CH%256 = 0 |           +1                |             +4               |
+;; --------------------------------------------------------------------------
+;; Asm saving  |          -12                |            -48               |
+;; --------------------------------------------------------------------------
 ;; (end code)
 ;;    BC = *array size* (Number of total bytes to set)
+;;    CH = BC \ 8 (number of *chuncks*, 1 chunck = 8 bytes)
 ;;     \ = integer division
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
@@ -94,39 +95,39 @@
 ;; bindings for C and ASM.
 
    ;; Move SP to the end of the array
-   add  hl, bc       ;; [11] HL += BC (HL points to the end of the array)
-   ld   sp, hl       ;; [ 6] SP = HL  (SP points to the end of the array)
+   add  hl, bc       ;; [3] HL += BC (HL points to the end of the array)
+   ld   sp, hl       ;; [2] SP = HL  (SP points to the end of the array)
 
    ;; Calculate the total number of chunks to copy
-   srl  b            ;; [ 8] BC = BC / 8 (using 3 right shifts)
-   rr   c            ;; [ 8]
-   srl  b            ;; [ 8]
-   rr   c            ;; [ 8]
-   srl  b            ;; [ 8]
-   rr   c            ;; [ 8]
+   srl  b            ;; [2] BC = BC / 8 (using 3 right shifts)
+   rr   c            ;; [2]
+   srl  b            ;; [2]
+   rr   c            ;; [2]
+   srl  b            ;; [2]
+   rr   c            ;; [2]
    
    ;; C (contains NumberOfChunks % 256). That will be the number of chuncks to copy on first pass.
    ;;    If C != 0, we copy C chuncks to memory, then 256*(B-1) chuncks to memory (Standard)
    ;;    IF C  = 0, we only have to copy 256*(B-1). That is, we discount first pass, as it is of C=0 chunks.
-   jp  nz, standard_1st_pass ;; [10]  IF C = 0, then
-   dec  b                    ;; [ 4]    Discount first pass (C = 0 chuncks), then continue doing B-1 passes of 256 chunks
+   jp  nz, standard_1st_pass ;; [3]  IF C = 0, then
+   dec  b                    ;; [1]    Discount first pass (C = 0 chuncks), then continue doing B-1 passes of 256 chunks
 
 standard_1st_pass:
-   ld   h, b         ;; [ 4] Interchange B and C
-   ld   b, c         ;; [ 4]  to use DJNZ in the inner loop
-   ld   c, h         ;; [ 4]
+   ld   h, b         ;; [1] Interchange B and C
+   ld   b, c         ;; [1]  to use DJNZ in the inner loop
+   ld   c, h         ;; [1]
 
 copyloop:
-   push de           ;; [11] Push a chunck of 8-bytes to memory, 2-by-2
-   push de           ;; [11]
-   push de           ;; [11]
-   push de           ;; [11]
-   djnz copyloop     ;; [13/8] 1 Less chunk. Continue if there still are more chuncks (B != 0)
-   dec  c            ;; [ 4] 256 less chunks (b runned up to 0, decrement c by 1)
-   jp   p, copyloop  ;; [10] Continue 256 chuncks more if C >= 0 (positive)
+   push de           ;; [4] Push a chunck of 8-bytes to memory, 2-by-2
+   push de           ;; [4]
+   push de           ;; [4]
+   push de           ;; [4]
+   djnz copyloop     ;; [4/3] 1 Less chunk. Continue if there still are more chuncks (B != 0)
+   dec  c            ;; [1] 256 less chunks (b runned up to 0, decrement c by 1)
+   jp   p, copyloop  ;; [3] Continue 256 chuncks more if C >= 0 (positive)
 
 msf8_restoreSP:
-   ld   sp, #0000    ;; [10] Placeholder for restoring SP value before returning
-   ei                ;; [ 4] Reenable interrupts
+   ld   sp, #0000    ;; [3] Placeholder for restoring SP value before returning
+   ei                ;; [1] Reenable interrupts
 
-   ret               ;; [10] Return  
+   ret               ;; [3] Return  

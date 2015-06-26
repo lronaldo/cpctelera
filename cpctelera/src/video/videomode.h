@@ -68,7 +68,6 @@ extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y);
 ///
 #define cpct_setBorder(HW_C) cpct_setPALColour(16, (HW_C))
 
-
 //
 // Macro: cpct_clearScreen
 //
@@ -88,8 +87,8 @@ extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y);
 // *COL* value, starting at 0xC000.
 //
 // Measures:
-//    This function takes *344172 CPU cycles* to fill the screen.
-//    This is *5.17 VSYNCs* on a 50Hz display.
+//    This function takes *98331 microseconds* to fill the screen.
+//    This is *4.924 VSYNCs* on a 50Hz display.
 //
 #define cpct_clearScreen(COL) cpct_memset((void*)0xC000, (COL), 0x4000)
 
@@ -119,8 +118,8 @@ extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y);
 // account when using this macro.
 //
 // Measures:
-//    This function takes *117491 CPU cycles* to fill the screen.
-//    This is *1.77 VSYNCs* on a 50Hz display.
+//    This function takes *41036 microseconds* to fill the screen.
+//    This is *2.086 VSYNCs* on a 50Hz display.
 //
 #define cpct_clearScreen_f8(COL) cpct_memset_f8((void*)0xC000, (COL), 0x4000)
 
@@ -151,8 +150,8 @@ extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y);
 // account when using this macro.
 //
 // Measures:
-//    This function takes *88819 CPU cycles* to fill the screen.
-//    This is *1.33 VSYNCs* on a 50Hz display.
+//    This function takes *33843 microseconds* to fill the screen.
+//    This is *1.721 VSYNCs* on a 50Hz display.
 //
 #define cpct_clearScreen_f64(COL) cpct_memset_f64((void*)0xC000, (COL), 0x4000)
 
