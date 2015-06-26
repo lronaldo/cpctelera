@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_memutils
 
-.include /memutils.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_memset
@@ -66,52 +64,31 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    25 bytes
+;;    C-binding   - 20 bytes
+;;    ASM-binding -  9 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;   Case     |   Cycles   | microSecs (us)
-;; -----------------------------------------
-;;   Any      | 108 + 21*S | 27.00 + 5.25*S
-;; -----------------------------------------
-;; Asm saving |    -60     |   -15.00
-;; -----------------------------------------
+;;   Case     | microSecs (us) | CPU Cycles |
+;; ------------------------------------------
+;;   Any      |  27 + 6*S      | 108 + 24*S |
+;; ------------------------------------------
+;; Asm saving |     -21        |    -84     |
+;; ------------------------------------------
 ;; (end code)
 ;;    S = *size* (Number of total bytes to set)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-;; Assembly call entry point
-cpct_memset_asm::
-   ld (de), a        ;; [ 7] Copy value to the first byte of the memory to be set
-   inc  de           ;; [ 6] DE points to the second byte (next to be set)
-   jp ms_asmEntry    ;; [10] Jump to assembly entry
-
-;; C call entry point
-_cpct_memset::
-   ;; Recover parameters from stack
-   ld   hl, #2       ;; [10] Make HL point to the byte where parameters start in the
-   add  hl, sp       ;; [11] ... stack (first 2 bytes are return address)
-   ld    e, (hl)     ;; [ 7] DE = Pointer to first byte in memory for memset
-   inc  hl           ;; [ 6]
-   ld    d, (hl)     ;; [ 7] 
-   inc  hl           ;; [ 6]
-   ldi               ;; [16] (HL)->(DE) Copy value to the first byte of the memory to be set
-                     ;; .... and, at the same time, do INC HL, INC DE and DEC BC
-   ld    c, (hl)     ;; [ 7] BC = Amount of bytes in memory to set to the value of A
-   inc  hl           ;; [ 6]
-   ld    b, (hl)     ;; [ 7]
-
-ms_asmEntry:
-   dec   bc          ;; [ 6] BC-- (As 1 byte has alread been copied)
+   dec   bc          ;; [2] BC-- (As 1 byte has alread been copied)
    
    ;; Set up HL and DE for a massive copy of the Value to be set
-   ld    h, d        ;; [ 4] HL = DE (2nd byte of the memory array to be filled up)
-   ld    l, e        ;; [ 4] 
-   dec   hl          ;; [ 6] HL-- (Point to the first position of the memory array to be
+   ld    h, d        ;; [1] HL = DE (2nd byte of the memory array to be filled up)
+   ld    l, e        ;; [1] 
+   dec   hl          ;; [2] HL-- (Point to the first position of the memory array to be
                      ;; .... filled up, which already contains the value to be set)
 
    ;; Copy the rest of the bytes
-   ldir              ;; [21/16] Copy the reset of the bytes, cloning the first one
+   ldir              ;; [6/5] Copy the reset of the bytes, cloning the first one
 
-   ret               ;; [10] Return  
+   ret               ;; [3] Return  
