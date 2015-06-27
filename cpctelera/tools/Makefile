@@ -28,7 +28,7 @@
 # INCLUDES
 include ../cfg/global_functions.mk
 
-TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.4.3
+TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.5.0
 TOOLSYSTEM=ToolMaker
 
 # TOOLS CONFIG
