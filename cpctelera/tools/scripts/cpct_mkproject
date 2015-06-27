@@ -58,6 +58,7 @@ LOADADDRESS=4000
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
 TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates
+CPCTELERA_DIRECTORY=$(dirname $(dirname "$SCRIPT_FULL_PATH"))
 SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/main.c
 MAKE_TEMPLATE=${TEMPLATE_DIRECTORY}/Makefile
 CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/build_config.mk
@@ -66,6 +67,7 @@ ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE})
 ## Replacement tags
 TAG_PROJECTNAME="%%%PROJECT_NAME%%%"
 TAG_LOADADDRESS="%%%CODE_LOAD_ADDRESS%%%"
+TAG_CPCTELERAPATH="%%%CPCTELERA_PATH%%%"
 
 ## Show how this script is to be used and exit
 ##
@@ -200,6 +202,21 @@ drawOK
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring z80 code load address: ${COLOR_WHITE}${LOADADDRESS}"
 replaceTag "$TAG_LOADADDRESS" "$LOADADDRESS" "$NEW_BUILD"
 drawOK
+
+# Set the appropriate CPCtelera folder for the makefile 
+# (take into account if there exists #CPCT_PATH environment variable and is correct)
+coloredMachineEcho "${COLOR_CYAN}" 0.005 '> Configuring $CPCT_PATH: '
+if [ -d "$CPCT_PATH" ]; then
+   replaceTaggedLine "$TAG_CPCTELERAPATH" '#>> Uses environment variable $(CPCT_PATH)' "$NEW_BUILD"
+   coloredMachineEcho "${COLOR_GREEN}" 0.005 "Using environment variable"
+   drawOK
+else
+   replaceTaggedLine "$TAG_CPCTELERAPATH" "CPCT_PATH:=$CPCTELERA_DIRECTORY" "$NEW_BUILD" '#'
+   coloredMachineEcho "${COLOR_GREEN}" 0.005 "$CPCTELERA_DIRECTORY"$'\n'
+   coloredMachineEcho "${COLOR_LIGHT_MAGENTA}" 0.005 '[Warning]: '
+   coloredMachineEcho "${COLOR_MAGENTA}" 0.005 "${COLOR_CYAN}"'$CPCT_PATH'"${COLOR_MAGENTA} environment variable not found or incorrect. \
+Check CPCtelera's installation (you may want to run ${COLOR_CYAN}setup.sh${COLOR_MAGENTA} again)."$'\n'
+fi
 
 # Bye Message
 stageMessage "CPCtelera" "New project created in ${COLOR_WHITE}${PROJECTDIR}/"
