@@ -46,7 +46,7 @@
 ;;  * *array* could theoretically be any 16-bit memory location. However, take into 
 ;; account that this function does no check at all, and you could mistakenly overwrite 
 ;; important parts of your program, the screen, the firmware... Use it with care.
-;;  * *size* must be greater than 31 and multiple of 32. It represents the size of the 
+;;  * *size* must be greater than 63 and multiple of 64. It represents the size of the 
 ;; array, or the number of total bytes that will be set to the *value*. This function 
 ;; sets bytes 2-by-2, in chuncks of 64 bytes, so the minimum amount of bytes to be set is 64. 
 ;; *Beware!* sizes below 64 can cause this function to *overwrite the entire memory*. 
@@ -61,7 +61,7 @@
 ;;
 ;;  1 - It saves the value of SP to recover it at the end of the function
 ;;  2 - It places SP at the last 2-bytes of the array
-;;  3 - It uses PUSH instructions to set bytes 2-by-2, in chuncks of 32 bytes, until the entire array is set
+;;  3 - It uses PUSH instructions to set bytes 2-by-2, in chuncks of 64 bytes, until the entire array is set
 ;;
 ;;    This function works for array sizes from 64 to 65472. However, it is recommended 
 ;; that you use it for values much greater than 64. 

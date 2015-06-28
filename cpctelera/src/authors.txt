@@ -78,6 +78,7 @@ Section: Testers & Bug Reporters
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
  * <Ervin / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=82> 
  * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+ * <gryken2014 at https://github.com/gryken2014>
 
 Section: Special Thanks
 
