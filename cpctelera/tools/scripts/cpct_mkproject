@@ -67,6 +67,9 @@ ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE})
 TAG_PROJECTNAME="%%%PROJECT_NAME%%%"
 TAG_LOADADDRESS="%%%CODE_LOAD_ADDRESS%%%"
 
+## Characters not valid for project name
+UNSUPPORTED_CHARACTERS='_|?*@.%;:<>,="()[]/\'
+
 ## Show how this script is to be used and exit
 ##
 function usage() {
@@ -98,7 +101,6 @@ inside Amstrad CPC's memory."
 ## Check template files are present
 ##
 for (( i=0; i < ${#ALL_TEMPLATE_FILES[@]}; i++)); do
-#for F in ${ALL_TEMPLATE_FILES[*]}; do
    F=${ALL_TEMPLATE_FILES[$i]}
    EnsureExists file "$F" "It is a template file required to create new projects. Please check that the file \
 exists and it has read permission for your user."
@@ -162,6 +164,10 @@ done
 ##
 if isEmpty "$PROJECTNAME"; then
    PROJECTNAME="$PROJECTDIR"
+fi
+CHAR=$(containsChars "$PROJECTNAME" "$UNSUPPORTED_CHARACTERS")
+if (( ${#CHAR} > 0 )); then
+   paramError "Unsuported character for an AMSDOS program ('$CHAR')" 9
 fi
 
 ###############################################################

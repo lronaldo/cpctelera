@@ -538,3 +538,34 @@ function EnsureFilenameHasNoSpaces {
       *" "*) Error "$2 ('$1')";; 
    esac
 }
+
+## Checks whether a string contains a given substring or character
+## Returns 0 if character is contained inside the string, 1 otherwise
+##  $1: String to check
+##  $2: Substring to be looked for inside $1
+##
+function containsSubstring {
+   local STR="$1"
+   local CH="$2"
+   if [[ "$STR" == *"$CH"* ]]; then
+      return 0
+   fi
+   return 1   
+}
+
+## Checks if a string contains any given character from other string. 
+## It echoes the character found if any
+##  $1 String to check
+##  $2 String with characters to look for
+##
+function containsChars {
+   local STR="$1"
+   local CHARS="$2"
+   local POS
+   ## Look for any character and get its position in STR
+   POS=$(($(expr index "$STR" "$CHARS")-1))
+
+   if (( POS > 0 )); then
+      echo "${STR:POS:1}"
+   fi
+}
