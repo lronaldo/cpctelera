@@ -209,14 +209,15 @@ function repeatCharacter {
 ## $4: ANSI color sequence for Spaces
 ##
 function drawProgressBar {
-   local PCT
+   local PCT="$2"
    local BARS
-   if (( $2 > 100 )); then
+   if (( ${#PCT} == 0 )); then
+      PCT = 0
+   fi
+   if (( PCT > 100 )); then
       PCT=100
-   elif (( $2 < 0 )); then
+   elif (( PCT < 0 )); then
       PCT=0
-   else
-      PCT=$2
    fi
    local NUMBARS=$(($1 * PCT / 100))
    if (( NUMBARS > $1 )); then
