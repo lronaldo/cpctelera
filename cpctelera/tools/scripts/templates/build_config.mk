@@ -28,10 +28,15 @@
 ###########################################################################
 
 ## CPCTELERA MAIN PATH
-##   Sets CPCTelera main path for accessing tools and configuration. If you
-##   change folder structure, change CPCT_PATH value for its absolute path.
+##   Sets CPCTelera main path for accessing tools and configuration. This 
+##   variable must point to the folder where source and tools are contained.
+##   Setup creates and environment variable that will be generally used.
+##   However, when environment variable is not available, this variable 
+##   should have the correct value for the project to compile.
+##   If you change folder structure, CPCT_PATH should reflect this change.
+##   This variable should always have the absolute path value.
 ##
-CPCT_PATH := %%%CPCTELERA_PATH%%%
+CPCT_PATH := #%%%CPCTELERA_PATH%%%
 
 ####
 ## SECTION 1: Project configuration 

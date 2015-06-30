@@ -71,6 +71,7 @@ CPCT_LIB_BUILD_LOG_TOTAL_BYTES=12120
 
 ## Substitution tags
 CPCT_TAG_MAINPATH="%%%CPCTELERA_PATH%%%"
+CPCT_TAG_SCRIPTSPATH="%%%CPCTELERA_SCRIPTS_PATH%%%"
 
 ## Required stuff for running CPCtelera
 REQUIRED_COMMANDS=(gcc g++ make bison flex)
@@ -195,7 +196,8 @@ touch "$PROFILE"
 removeLinesBetween "###CPCTELERA_START" "###CPCTELERA_END" "$PROFILE"
 removeTrailingBlankLines "$PROFILE"
 cat "$CPCT_TEMPLATES_BASHRC" >> "$PROFILE"
-replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_SCRIPTS_DIR" "$PROFILE" '#'
+replaceTag "$CPCT_TAG_MAINPATH" "$CPCT_MAIN_DIR" "$PROFILE" '#'
+replaceTag "$CPCT_TAG_SCRIPTSPATH" "$CPCT_SCRIPTS_DIR" "$PROFILE" '#'
 drawOK
 
 ###############################################################
