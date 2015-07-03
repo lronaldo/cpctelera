@@ -36,7 +36,7 @@
 ;; in Mode 2 (640x200 px, 2 colours).
 ;;
 ;; C Definition:
-;;    void <cpct_drawCharM2> (void* *video_memory*, <u8> *pen*, <i8> *ascii*)
+;;    void <cpct_drawCharM2> (void* *video_memory*, <u8> *pen*, <u8> *ascii*)
 ;;
 ;; Input Parameters (4 Bytes):
 ;;  (2B DE) video_memory - Video memory location where the character will be drawn

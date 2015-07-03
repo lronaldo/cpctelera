@@ -26,14 +26,14 @@
 //
 void main(void) {
    // Clear Screen filling it up with 0's
-   cpct_clearScreen(0)
+   cpct_clearScreen(0);
 
    // Print out some messages using printf and sizeof to know the sizes in bytes
    // ...of all the builting types in SDCC (using CPCtelera's aliases)
    // We use Firmware Screen Character Commands to change colour on screen.
    // Printing \0XX is equivalent to printing the character XX (in octal).
    // Character 15 (017 in octal) does the PEN command, and uses immediate next
-   // character as the parameter for PEN. Then, \017\003 is equivalent to PEN 3. 
+   // character as the parameter for PEN. Then, \017\003 is equivalent to PEN 3.
    //
    printf("      \017\003Welcome to \017\002CPCtelera\017\003!\017\001\n\r\n\r");
    printf("This  example  makes  use  of standard C");

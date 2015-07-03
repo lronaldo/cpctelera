@@ -5,6 +5,8 @@ Section: Donnors
    We are incredibly grateful to these people, who sent us some economic support to continue with CPCtelera and other CPC-related projects. Big most sincere thanks to all of you:
 
    21/05/2015 - Lachlan Keown
+   10/06/2015 - Tim Riemann / Octoate
+   25/06/2015 - Ervin Pajor
 
 Section: Project authors
    
@@ -74,16 +76,21 @@ Section: Testers & Bug Reporters
 
  * <Martin C. Doege at https://github.com/mdoege> 
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
+ * <Ervin / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=82> 
+ * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+ * <gryken2014 at https://github.com/gryken2014>
 
 Section: Special Thanks
 
    Developers, collaborators and others that helped a great deal
 
  * <Lachlan Keown at http://www.twitter.com/lachlankeown> (For being incredibly kind and helpful, and adding every required modification to better integrate RGAS with *CPCtelera*)
+ * <Tim Riemann / Octoate at http://www.octoate.de> (For supporting CPCtelera and spreading news amount the community with a big smile)
  * <Cpcitor at http://github.com/cpcitor> (for his great help and advice, and for developing <cpc-dev-tool-chain at http://github.com/cpcitor/cpc-dev-tool-chain>)
  * <CPCWiki at http://cpcwiki.eu> & <Grimware at http://grimware.org/> (for providing great technical documentations and examples)
  * Raúl Simarro (for developing <CPCRSLib at http://sourceforge.net/projects/cpcrslib/> game creation library)
  * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> (for developing Arkos Traker&Player and giving great support on adding it to *CPCtelera*. Also for giving general advice during development of *CPCtelera*)
  * <Pulkomandy at http://www.pushnpop.net/profile-47.html> / <Shinra Team at http://pulko.mandy.pagesperso-orange.fr/shinra/index.shtml> (for maintaining <cpcsdk at https://github.com/cpcsdk>, with tools like <iDSK at https://code.google.com/p/cpcsdk/downloads/detail?name=iDSK_015.7z> or <cpcfs at https://code.google.com/p/cpcsdk/wiki/cpcfs>, among others. For giving great advice and being helpful at every moment. Also for willing to give the best for CPC and maintain it alive)
  * Mochilote / <CPCMania at http://cpcmania.com> (for creating great tutorials and useful documentation in his site)
- * josé ángel rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)
+ * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)
+ * <Prodatron at http://www.prodatron.net/> / Symbiosis for producting such a great deal of incredible software for the Amstrad CPC and for being always helpful and kind.

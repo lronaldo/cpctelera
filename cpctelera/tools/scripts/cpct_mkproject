@@ -58,6 +58,7 @@ LOADADDRESS=4000
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
 TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates
+CPCTELERA_DIRECTORY=$(dirname $(dirname "$SCRIPT_FULL_PATH"))
 SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/main.c
 MAKE_TEMPLATE=${TEMPLATE_DIRECTORY}/Makefile
 CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/build_config.mk
@@ -66,19 +67,25 @@ ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE})
 ## Replacement tags
 TAG_PROJECTNAME="%%%PROJECT_NAME%%%"
 TAG_LOADADDRESS="%%%CODE_LOAD_ADDRESS%%%"
+TAG_CPCTELERAPATH="%%%CPCTELERA_PATH%%%"
+
+## Characters not valid for project name
+UNSUPPORTED_CHARACTERS='_|?*@.%;:<>,="()[]/\'
 
 ## Show how this script is to be used and exit
 ##
 function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<project_folder> [options]"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<project_folder_name> [options]"
    echo
-   echo "${COLOR_CYAN}  Creates a fresh new project that uses CPCtelera engine. The new project is created inside\
-<project_folder>, so <project_folder> should be a new file name not existing in filesystem."
+   echo "${COLOR_CYAN}  Creates a fresh new project that uses CPCtelera engine. The script creates \
+a new folder named <project_folder_name> in the current folder. Then, the new project is created \
+inside <project_folder_name>. So, <project_folder_name> must not previously exist inside the \
+current folder."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -n | --project-name  ${COLOR_LIGHT_CYAN}<name>"
-   echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder> name. <name> \
+   echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder_name> name. <name> \
 must not contain spaces."
    echo
    echo "${COLOR_LIGHT_BLUE}  -l | --load-address ${COLOR_LIGHT_CYAN}<hexadecimal address>"
@@ -95,7 +102,8 @@ inside Amstrad CPC's memory."
 ###############################################################
 ## Check template files are present
 ##
-for F in ${ALL_TEMPLATE_FILES[*]}; do
+for (( i=0; i < ${#ALL_TEMPLATE_FILES[@]}; i++)); do
+   F=${ALL_TEMPLATE_FILES[$i]}
    EnsureExists file "$F" "It is a template file required to create new projects. Please check that the file \
 exists and it has read permission for your user."
 done
@@ -141,8 +149,10 @@ while (( $# >= 1 )); do
             paramError "Unrecognized command line option '$1'" 7
          elif ! isEmpty "$PROJECTDIR"; then
             paramError "Unrecognized parameter '$1'. Have you already provided a <project_folder> parameter?" 6
+         elif [[ $1 =~ ^.*/.*$ ]]; then
+            paramError "'$1' is not a valid name for your project folder. Project folder names must not contain slashes '/'." 7
          elif [ -e "$1" ]; then
-            paramError "'$1' already exist in filesystem. Choose another name for your <project_folder>"
+            paramError "'$1' already exist in filesystem. Choose another name for your <project_folder>" 8
          fi
          PROJECTDIR="$1"
       ;;
@@ -156,6 +166,10 @@ done
 ##
 if isEmpty "$PROJECTNAME"; then
    PROJECTNAME="$PROJECTDIR"
+fi
+CHAR=$(containsChars "$PROJECTNAME" "$UNSUPPORTED_CHARACTERS")
+if (( ${#CHAR} > 0 )); then
+   paramError "Unsuported character for an AMSDOS program ('$CHAR')" 9
 fi
 
 ###############################################################
@@ -194,6 +208,21 @@ drawOK
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring z80 code load address: ${COLOR_WHITE}${LOADADDRESS}"
 replaceTag "$TAG_LOADADDRESS" "$LOADADDRESS" "$NEW_BUILD"
 drawOK
+
+# Set the appropriate CPCtelera folder for the makefile 
+# (take into account if there exists #CPCT_PATH environment variable and is correct)
+coloredMachineEcho "${COLOR_CYAN}" 0.005 '> Configuring $CPCT_PATH: '
+if [ -d "$CPCT_PATH" ]; then
+   replaceTaggedLine "$TAG_CPCTELERAPATH" '#>> Uses environment variable $(CPCT_PATH)' "$NEW_BUILD"
+   coloredMachineEcho "${COLOR_GREEN}" 0.005 "Using environment variable"
+   drawOK
+else
+   replaceTaggedLine "$TAG_CPCTELERAPATH" "CPCT_PATH:=$CPCTELERA_DIRECTORY" "$NEW_BUILD" '#'
+   coloredMachineEcho "${COLOR_GREEN}" 0.005 "$CPCTELERA_DIRECTORY"$'\n'
+   coloredMachineEcho "${COLOR_LIGHT_MAGENTA}" 0.005 '[Warning]: '
+   coloredMachineEcho "${COLOR_MAGENTA}" 0.005 "${COLOR_CYAN}"'$CPCT_PATH'"${COLOR_MAGENTA} environment variable not found or incorrect. \
+Check CPCtelera's installation (you may want to run ${COLOR_CYAN}setup.sh${COLOR_MAGENTA} again)."$'\n'
+fi
 
 # Bye Message
 stageMessage "CPCtelera" "New project created in ${COLOR_WHITE}${PROJECTDIR}/"

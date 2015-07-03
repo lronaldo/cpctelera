@@ -77,7 +77,7 @@ Topic: Downloading CPCtelera
 
    You can download CPCtelera from these sources
 
-   * Download <current stable version 1.0.1 at https://github.com/lronaldo/cpctelera/archive/v1.0.1.zip>
+   * Download <current stable version 1.1.1 at https://github.com/lronaldo/cpctelera/archive/v1.1.1.zip>
 
    * Get Latest version from github:
    > git clone https://github.com/lronaldo/cpctelera
@@ -110,21 +110,28 @@ _Under OSX_:
    4. - Install libboost from homebrew with this command,
    > brew install boost
 
+Some things to take into account,
+   * Some previous OSX systems may not understand the xcode-select --install command. On those systems, there usually are menu options from the XCode GUI to install Command Line Tools. If you need more advice, there is a <nice explanation on stack overflow about the XCode Command Line Tools at http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools>. 
 
 Topic: Installing CPCtelera in your system
 
    These are the steps to install CPCtelera in your system
 
-   1. - Install required <Software Requirements>
-   2. - Download and unzip <current stable version of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.0.1.zip>
-   3. - Open a terminal an enter cpctelera/ folder
+   1.  - Install required <Software Requirements>
+   2.  - Download and unzip <current stable version of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.1.1.zip> (read "some considerations" below)
+   3.  - Open a terminal an enter cpctelera/ folder. 
    > cd cpctelera/
-   4. - Launch *setup.sh* 
+   4.  - Launch *setup.sh* 
    > ./setup.sh
-   * Setup checks software dependencies. If some dependency is not met, you will receive an error message requesting you to install it and then launch *setup.sh* again.
-   5. - Close the terminal and open a new one. 
-   
+   5. - Once *setup.sh* finishes, close your terminal and open a new one for changes to be set.
+  
 CPCtelera is ready to be used in your system.
+
+   Some considerations:
+   * It is recommended to unzip CPCtelera to a folder inside your user's $HOME path (typically /home/username/ or C:\cygwin\home\username\).
+   * Once you run *setup.sh*, CPCtelera will be installed in the path you have previously unzipped it. If you move the folder to a new location, you should run *setup.sh* again.
+   * However, CPCTelera can be installed anywhere in your system, provided the path does not contain any spaces.
+   * *setup.sh* checks software dependencies. If some dependency is not met, you will receive an error message requesting you to install it and then launch *setup.sh* again.
 
 
 Section: Starting with CPCtelera

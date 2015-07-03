@@ -87,7 +87,7 @@ function clearScreen {
 ## $2: Message to write
 function machineEcho_sleep {
    local i
-   for i in $(seq 0 ${#2}); do
+   for (( i=0; i <= ${#2}; i++ )); do
       echo -n "${2:${i}:1}"
       sleep "$1"
    done
@@ -97,7 +97,7 @@ function machineEcho_sleep {
 ## $2: Message to write
 function machineEcho_no_sleep {
    local i
-   for i in $(seq 0 ${#2}); do
+   for (( i=0; i <= ${#2}; i++ )); do
       echo -n "${2:${i}:1}"
    done
 }
@@ -195,6 +195,13 @@ function processRunning {
    return $?
 }
 
+## Repeats a character N times
+## $1: Character to repeat
+## $2: times to be repeated
+##
+function repeatCharacter {
+   printf "$1"'%.0s' $(eval "echo {1.."$(($2))"}")
+}
 
 ## $1: Size (in characters, without brackets)
 ## $2: Percentage
@@ -202,13 +209,15 @@ function processRunning {
 ## $4: ANSI color sequence for Spaces
 ##
 function drawProgressBar {
-   local PCT
-   if (( $2 > 100 )); then
+   local PCT="$2"
+   local BARS
+   if (( ${#PCT} == 0 )); then
+      PCT = 0
+   fi
+   if (( PCT > 100 )); then
       PCT=100
-   elif (( $2 < 0 )); then
+   elif (( PCT < 0 )); then
       PCT=0
-   else
-      PCT=$2
    fi
    local NUMBARS=$(($1 * PCT / 100))
    if (( NUMBARS > $1 )); then
@@ -217,11 +226,11 @@ function drawProgressBar {
    local NUMSPACES=$(($1 - NUMBARS))
    echo -n ${3}
    if ((NUMBARS > 0)); then
-      printf ' %.0s' $(seq 1 ${NUMBARS})
+      repeatCharacter ' ' $NUMBARS
    fi
    if ((NUMSPACES > 0)); then
       echo -n ${4}
-      printf ' %.0s' $(seq 1 ${NUMSPACES})
+      repeatCharacter ' ' $NUMSPACES
    fi
    echo -n ${COLOR_NORMAL} ${PCT}%
 }
@@ -271,7 +280,7 @@ function superviseBackgroundProcess {
    local EXIT_STATUS
    while processRunning "$PROCPID"; do
       if isFileReadable "$LOGFILE"; then
-         BYTES=$(wc -c ${LOGFILE} | grep -Eo '[0-9]+ ')
+         BYTES=$(wc -c "${LOGFILE}" | grep -Eo '[0-9]+ ')
          PCT=$((BYTES * 100 / MAXBYTES))
          LEFT=$((BARSIZE + 2 + ${#PCT}))
          #saveCursorPos
@@ -506,15 +515,58 @@ function checkSystem {
 ## Echoes the bash profile initialization script file name
 ##
 function bashProfileFilename {
-   FILES=($HOME/.bashrc $HOME/.bash_profile $HOME/.profile)
-   for F in ${FILES[*]}; do
-      if isFileReadable $F; then
-         echo $F
+   FILES=("$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile")
+   for (( i = 0; i < ${#FILES[@]}; i++ )); do
+      F="${FILES[$i]}"
+	  if isFileReadable "$F"; then
+         echo "$F"
          return 0
       fi
    done
    ## Creates bash_profile, by default
-   touch $HOME/.bash_profile
-   echo $HOME/.bash_profile
+   touch "$HOME/.bash_profile"
+   echo "$HOME/.bash_profile"
    return 0
+}
+
+## Ensures that a Filename has no spaces in it, outputing an
+## unrecoverable error message otherwise
+##  $1 Filename to check
+##  $2 Error message to output
+##
+function EnsureFilenameHasNoSpaces {
+   case "$1" in
+      *" "*) Error "$2 ('$1')";; 
+   esac
+}
+
+## Checks whether a string contains a given substring or character
+## Returns 0 if character is contained inside the string, 1 otherwise
+##  $1: String to check
+##  $2: Substring to be looked for inside $1
+##
+function containsSubstring {
+   local STR="$1"
+   local CH="$2"
+   if [[ "$STR" == *"$CH"* ]]; then
+      return 0
+   fi
+   return 1   
+}
+
+## Checks if a string contains any given character from other string. 
+## It echoes the character found if any
+##  $1 String to check
+##  $2 String with characters to look for
+##
+function containsChars {
+   local STR="$1"
+   local CHARS="$2"
+   local POS
+   ## Look for any character and get its position in STR
+   POS=$(($(expr index "$STR" "$CHARS")-1))
+
+   if (( POS > 0 )); then
+      echo "${STR:POS:1}"
+   fi
 }
