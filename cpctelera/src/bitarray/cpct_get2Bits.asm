@@ -58,25 +58,20 @@
 ;; is not bigger than the number of bits in the array (size of the array 
 ;; multiplied by 4).
 ;;
-;;    It also stores a pointer to the byte that has been accessed (the byte
-;; where the 2-bits element was) and the 2-bit index of the element (0, 1, 2, 3)
-;; inside the accessed byte. These two values are used by <cpct_getNext2Bits>
-;; function to access the next 2 bits in a faster way.
-;;
 ;; Destroyed Register values: 
 ;;    AF, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 48 bytes
-;;    ASM-binding - 42 bytes
+;;    C-binding   - 39 bytes
+;;    ASM-binding - 33 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
 ;; Case       | Microsecs | CPU Cycles
 ;; -----------------------------------
-;; Best (3)   |    44     |   176
+;; Best (3)   |    56     |   224
 ;; -----------------------------------
-;; Worst (1)  |    48     |   192
+;; Worst (1)  |    60     |   240
 ;; -----------------------------------
 ;; ASM-saving |   -21     |   -44
 ;; -----------------------------------
@@ -100,7 +95,6 @@
    ;;
    ld    a, l                  ;; [1] A = L     
    and   #0x03                 ;; [2] A = A % 4 (A = Index of the group of two bytes [0,1,2,3])
-   ld   (g2b_bitGroupIdx), a   ;; [4] Save Group Index for function "getNext2Bits"
    xor   #0x01                 ;; [2] Change the group order to [1, 0, 3, 2] by manipulating the index
    rlca                        ;; [1] A = 2A    (Size in bytes of the jump to the code that moves the bits)
    ld   (g2b_jump_select+1), a ;; [4] Place the size in bytes in the JR instruction that jumps to the code
@@ -115,7 +109,6 @@
    rr    l           ;; [2] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
    add  hl, de       ;; [3] HL += DE => HL points to the target byte in the array 
    ld    a, (hl)     ;; [2] A = array[index] Get the byte where our 2 target bits are located
-   ld   (g2b_elementPtr), hl ;; [5] Save Byte Pointer to the element being accessed for getNext2Bits function
 
    ;; Move the 2 required bits to the least significant position (bits 0 & 1)
    ;;   This is done to make easier the opperation of returning a value from 0 to 3 (represented by the 2 bits searched).
@@ -144,7 +137,3 @@ g2b_end:
    ld    l, a     ;; [1] Set the return value in L 
 
    ret            ;; [3] Return to caller
-   
-;; Variables to be used to access the next 2 bits faster
-g2b_elementPtr::  .dw 0000
-g2b_bitGroupIdx:: .db 00
