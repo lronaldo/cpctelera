@@ -62,16 +62,16 @@
 ;;    AF, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 39 bytes
-;;    ASM-binding - 33 bytes
+;;    C-binding   - 41 bytes
+;;    ASM-binding - 35 bytes
 ;;
-;; Time Measures: 
+;; Time Measures:  
 ;; (start code)
 ;; Case       | Microsecs | CPU Cycles
 ;; -----------------------------------
-;; Best (3)   |    56     |   224
+;; Best (3)   |    50     |   200
 ;; -----------------------------------
-;; Worst (1)  |    60     |   240
+;; Worst (1)  |    56     |   224
 ;; -----------------------------------
 ;; ASM-saving |   -21     |   -44
 ;; -----------------------------------
@@ -82,22 +82,10 @@
 ;; Start of the function code (without bindings for calling)
 ;;
 
-   ;; Calculate the group of 2 bits we are selecting and setting up the
-   ;; jump to the code that selects this 2 bits for returning the appropriate
-   ;; value. The group of 2 bits could be 0, 1, 2 or 3, and is determined by
-   ;; the last 2 bits of the index of the element (HL % 4). 
-   ;; Once the group is calculated, we invert the bit 0 to reorder the 
-   ;; options this way [1, 0, 3, 2] which is optimal for making the code
-   ;; of each option take only two bytes of memory. 
-   ;; Finally, as each option takes 2 bytes of memory, we multiply the 
-   ;; calculated option by 2 (rlca) to get the size of the jump to the 
-   ;; code for the selected option.
-   ;;
-   ld    a, l                  ;; [1] A = L     
-   and   #0x03                 ;; [2] A = A % 4 (A = Index of the group of two bytes [0,1,2,3])
-   xor   #0x01                 ;; [2] Change the group order to [1, 0, 3, 2] by manipulating the index
-   rlca                        ;; [1] A = 2A    (Size in bytes of the jump to the code that moves the bits)
-   ld   (g2b_jump_select+1), a ;; [4] Place the size in bytes in the JR instruction that jumps to the code
+   ;; Store L in B to use it later for calculating the group of 2-bits
+   ;; that will be access from the target byte. The 2-bits group is
+   ;; determined by the 2 least significant bits (L % 4)
+   ld    b, l        ;; [1] B = L
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
@@ -115,20 +103,24 @@
    ;;   Once the bits are at least significant position, we only have to AND them and we are done.
    ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be returned
    ;;   inside the target byte [ 0 0 | 1 1 | 2 2 | 3 3 ].  
-g2b_jump_select:
-   jr g2b_end     ;; [3] Jump to the required operation for isolating the 2 desired bits.
-                  ;; ... The operand of this instruction is modified by previous code.
+   rr  b                 ; [2]   Check the bit 0 from L by moving it to the carry
+   jr  nc, g2b_group_2_0 ; [2/3] If C=0 the 2 last bits of B containt 10 or 00
+   rr  b                 ; [2]   C=1, the 2 last bits contain 11 or 01, move bit 1 to the carry to check
+   jr  c, g2b_end        ; [2/3] IF C=1 selected bits are 1&0 (group 3), else selected bits are 5&4 (group 1)
 
-   ;; 4 options, 2 bytes per option
+   ;; 4 options, for the 4 possible groups of 2 bits
 g2b_bits_54:
-   rlca           ;; [1] Option 1: Bits 54 moved to 10 using 4 RLCA's
+   rlca           ;; [1] Group 1: Bits 54 moved to 10 using 4 RLCA's
    rlca           ;; [1]
 g2b_bits_76:
-   rlca           ;; [1] Option 0: Bits 76 moved to 10 using 2 RLCA's
+   rlca           ;; [1] Group 0: Bits 76 moved to 10 using 2 RLCA's
    rlca           ;; [1]
-g2b_bits_10:
-   jr g2b_end     ;; [3] Option 3: Nothing to do, as we are returning bits 10,
+   jr g2b_end     ;; [3] Group 3: Nothing to do, as we are returning bits 10,
                   ;; ... so jump to the end
+g2b_group_2_0:
+   rr  b               ;; [2]   C=0, the 2 last bits contain 10 or 00, move bit 1 to the carry to check
+   jr  nc, g2b_bits_76 ;; [2/3] IF C=0 selected bits are 7&6 (group 0), else selected bits are 3&2 (group 2)
+
 g2b_bits_32:
    rrca           ;; [1] Option 2: Bits 32 moved to 10 using 2 RRCA's
    rrca           ;; [1]
