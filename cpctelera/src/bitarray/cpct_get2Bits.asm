@@ -77,7 +77,6 @@
 ;; -----------------------------------
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;;
 ;; Start of the function code (without bindings for calling)
 ;;
@@ -129,3 +128,4 @@ g2b_end:
    ld    l, a     ;; [1] Set the return value in L 
 
    ret            ;; [3] Return to caller
+
