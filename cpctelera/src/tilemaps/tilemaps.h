@@ -26,13 +26,28 @@
 
 #include <types.h>
 
+// EASY TILEMAPS
+//
+typedef struct {
+   void *ptilemap;
+   void *ptileset;
+   void *pscreen;
+   u8   map_height;
+   u8   map_width;
+   u8   tile_height;
+   u8   tile_width;
+   u8   tile_size;
+} cpct_TEasyTilemap;
+
+extern void cpct_etm_drawFullTilemap(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
+extern void cpct_etm_redrawTilemap(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
+extern void cpct_etm_(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
+
+
 // Setting global configuration for tilemanagement
 extern void cpct_tm_setTileset              (void* ptileset);
 extern void cpct_tm_setTilemap              (void* ptilemap);
 extern void cpct_tm_setFunctionGetTileIndex (void* pgetTileIndexFunc);
 extern void cpct_tm_setFunctionGetTile      (void* pgetTileFunc);
-
-// Drawing tile rows
-extern void cpct_tm_drawTileRowAligned4x8(void* pvideomem, void* tilearray, u8 size);
 
 #endif
