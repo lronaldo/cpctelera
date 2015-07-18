@@ -96,57 +96,48 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    39 bytes
+;;    C-bindings   - 39 bytes
+;;    ASM-bindings - 33 bytes 
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ---------------------------------
-;;    Any     |   261  |   65.25
-;; ---------------------------------
-;; Asm saving |   -63  |  -15.75
-;; ---------------------------------
+;;    Case    | microSecs (us) | CPU Cycles 
+;; -----------------------------------------
+;;    Any     |       80       |   160
+;; -----------------------------------------
+;; Asm saving |      -21       |   -84 
+;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawTileAligned2x4_f::
-  ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   pop  af                  ;; [10] AF = Return Address
-   pop  hl                  ;; [10] HL = Source address
-   pop  de                  ;; [10] DE = Destination address
-   push de                  ;; [11] Leave the stack as it was
-   push hl                  ;; [11]
-   push af                  ;; [11]
-
-cpct_drawTileAligned2x4_f_asm:: ;; Assembly entry point
-   ld    a, d               ;; [ 4] Save D into A for fastly doing +800h increment of DE
-   ld    b, e               ;; [ 4] Save E into B for fastly restoring DE every "loop"
-   ld    c, #9              ;; [ 7] Ensure LDIs do not modify the value of b
+   ld    a, d               ;; [1] Save D into A for fastly doing +800h increment of DE
+   ld    b, e               ;; [1] Save E into B for fastly restoring DE every "loop"
+   ld    c, #9              ;; [2] Ensure LDIs do not modify the value of b
 
    ;; First line of pixels   
-   ldi                      ;; [16] Copy 2 bytes for (HL) to (DE) and decrement BC 
-   ldi                      ;; [16]
-   add   #8                 ;; [ 7] D += 8 (To add 800h to DE, we increment previous value of D by 8...
-   ld    d, a               ;; [ 4] ... and move it into D)
-   ld    e, b               ;; [ 4] Restore the original value of E
+   ldi                      ;; [5] Copy 2 bytes for (HL) to (DE) and decrement BC 
+   ldi                      ;; [5]
+   add   #8                 ;; [2] D += 8 (To add 800h to DE, we increment previous value of D by 8...
+   ld    d, a               ;; [1] ... and move it into D)
+   ld    e, b               ;; [1] Restore the original value of E
 
    ;; Second line of pixels   
-   ldi                      ;; [16] Copy 2 bytes for (HL) to (DE) and decrement BC 
-   ldi                      ;; [16]
-   add   #8                 ;; [ 7] D += 8 (To add 800h to DE, we increment previous value of D by 8...
-   ld    d, a               ;; [ 4] ... and move it into D)
-   ld    e, b               ;; [ 4] Restore the original value of E
+   ldi                      ;; [5] Copy 2 bytes for (HL) to (DE) and decrement BC 
+   ldi                      ;; [5]
+   add   #8                 ;; [2] D += 8 (To add 800h to DE, we increment previous value of D by 8...
+   ld    d, a               ;; [1] ... and move it into D)
+   ld    e, b               ;; [1] Restore the original value of E
 
    ;; Third line of pixels   
-   ldi                      ;; [16] Copy 2 bytes for (HL) to (DE) and decrement BC 
-   ldi                      ;; [16]
-   add   #8                 ;; [ 7] D += 8 (To add 800h to DE, we increment previous value of D by 8...
-   ld    d, a               ;; [ 4] ... and move it into D)
-   ld    e, b               ;; [ 4] Restore the original value of E
+   ldi                      ;; [5] Copy 2 bytes for (HL) to (DE) and decrement BC 
+   ldi                      ;; [5]
+   add   #8                 ;; [2] D += 8 (To add 800h to DE, we increment previous value of D by 8...
+   ld    d, a               ;; [1] ... and move it into D)
+   ld    e, b               ;; [1] Restore the original value of E
 
    ;; Fourth line of pixels   
-   ldi                      ;; [16] Copy 2 bytes for (HL) to (DE) and decrement BC 
-   ldi                      ;; [16]
+   ldi                      ;; [5] Copy 2 bytes for (HL) to (DE) and decrement BC 
+   ldi                      ;; [5]
 
    ;; Return
-   ret                      ;; [10]
+   ret                      ;; [3]
