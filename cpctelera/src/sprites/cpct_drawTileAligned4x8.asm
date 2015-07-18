@@ -96,51 +96,41 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    30 bytes
+;;     C-bindings - 26 bytes
+;;   ASM-bindings - 22 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ---------------------------------
-;;    Any     |   927  |  231.75
-;; ---------------------------------
-;; Asm saving |   -63  |  -15.75
-;; ---------------------------------
+;;    Case    | microSecs (us) | CPU Cycles
+;; -----------------------------------------
+;;    Any     |      271       |    1084
+;; -----------------------------------------
+;; Asm saving |      -13       |     -52
+;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawTileAligned4x8::
-   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   pop  af                 ;; [10] AF = Return Address
-   pop  hl                 ;; [10] HL = Source address
-   pop  de                 ;; [10] DE = Destination address
-   push de                 ;; [11] Leave the stack as it was
-   push hl                 ;; [11] 
-   push af                 ;; [11] 
-
-cpct_drawTileAligned4x8_asm::    ;; Assembly entry point
-
    ;; Copy 8 lines of 4 bytes width
-   ld    a, #8             ;; [ 7] We have to draw 8 lines of sprite
-   jp dsa48_first_line     ;; [10] First line does not need to do maths to start transferring data. 
+   ld    a, #8             ;; [2] We have to draw 8 lines of sprite
+   jr dsa48_first_line     ;; [3] First line does not need to do maths to start transferring data. 
 
 dsa48_next_line:
    ;; Move to the start of the next line
-   ex   de, hl             ;; [ 4] Make DE point to the start of the next line of pixels in video memory, by adding BC
-   add  hl, bc             ;; [11] (We need to interchange HL and DE because DE does not have ADD)
-   ex   de, hl             ;; [ 4]
+   ex   de, hl             ;; [1] Make DE point to the start of the next line of pixels in video memory, by adding BC
+   add  hl, bc             ;; [3] (We need to interchange HL and DE because DE does not have ADD)
+   ex   de, hl             ;; [1]
 
 dsa48_first_line:
    ;; Draw a sprite-line of 4 bytes
-   ld   bc, #0x800         ;; [10] 800h bytes is the distance to the start of the first pixel in the next line in 
+   ld   bc, #0x800         ;; [3] 800h bytes is the distance to the start of the first pixel in the next line in 
                            ;; .... video memory (it will be decremented by 1 by each LDI)
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  | (distance is 1 byte less as we progress up)
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  | (distance is 1 byte less as we progress up)
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
 
    ;; Repeat for all the lines
-   dec   a                 ;; [ 4] A = A - 1 (1 more line completed)
-   jp   nz, dsa48_next_line;; [10] Continue to next line if A != 0 (A = Lines left)
+   dec   a                 ;; [1]   A = A - 1 (1 more line completed)
+   jr   nz, dsa48_next_line;; [2/3] Continue to next line if A != 0 (A = Lines left)
 
-   ret                     ;; [10]
+   ret                     ;; [3]
