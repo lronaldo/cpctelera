@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include /sprites.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_drawSprite
@@ -146,22 +144,23 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    168 bytes
+;;     C-bindings - 168 bytes
+;;   ASM-bindings - 160 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;  Case      |           Cycles              | microSecs (us)
+;;  Case      |   microSecs (us)       |        CPU Cycles
+;; ----------------------------------------------------------------
+;;  Best      | 32 +  (21 + 5W)H + 9HH | 128 + (84 + 20W)H + 36HH
+;;  Worst     |       Best + 9         |      Best + 36
 ;; ------------------------------------------------------------------------------
-;;  Best      |  70 + (85 + 16W)H + 31[H / 8] | 17.50+(21.25+4*W)*H + 7.75*[H/8]
-;;  Worst     | 101 + (85 + 16W)H + 31[H / 8] | 25.25+(21.25+4*W)*H + 7.75*[H/8]
+;;  W=2,H=16  |        525 /  534      |   2100 / 2136
+;;  W=4,H=32  |       1359 / 1368      |   5436 / 5472
 ;; ------------------------------------------------------------------------------
-;;  W=2,H=16  |        1493 / 1514            |   373.25 /  378.50
-;;  W=4,H=32  |        4931 / 4962            |  1232.75 / 1240.50
-;; ------------------------------------------------------------------------------
-;; Asm saving |         -84                   |   -21.00 
+;; Asm saving |         -28            |      -112
 ;; ------------------------------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes
+;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;
 ;; Credits:
 ;;    This routine was inspired in the original *cpc_PutSprite* from
@@ -172,136 +171,115 @@
 ;; http://www.cpcmania.com/Docs/Programming/Painting_pixels_introduction_to_video_memory.htm>.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawSprite::
-   ;; GET Parameters from the stack 
-.if let_disable_interrupts_for_function_parameters
-   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   ld (ds_restoreSP+1), sp    ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   di                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   pop  af                    ;; [10] AF = Return Address
-   pop  hl                    ;; [10] HL = Source Address (Sprite data array)
-   pop  de                    ;; [10] DE = Destination address (Video memory location)
-   pop  bc                    ;; [10] BC = Height/Width (B = Height, C = Width)
-ds_restoreSP:
-   ld   sp, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up 
-                              ;; .... with actual SP value previously)
-   ei                         ;; [ 4] Enable interrupts again
-.else 
-   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
-   pop  af                    ;; [10] AF = Return Address
-   pop  hl                    ;; [10] HL = Source Address (Sprite data array)
-   pop  de                    ;; [10] DE = Destination address (Video memory location)
-   pop  bc                    ;; [10] BC = Height/Width (B = Height, C = Width)
-   push bc                    ;; [11] Restore Stack status pushing values again
-   push de                    ;; [11] (Interrupt safe way, 6 cycles more)
-   push hl                    ;; [11]
-   push af                    ;; [11] 
-.endif
-
-cpct_drawSprite_asm::         ;; Assembly entry point
+;;
+;; Macro to introduce a JR 0 more clearly
+;;
+.macro jr__0
+   .DW #0x0018    ;; JR #00 (Normally used as a modifiable jump, as jr 0 is an infinite loop)
+.endm
 
    ;; Modify code using width to jump in drawSpriteWidth
-   ld    a, #126              ;; [ 7] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite * 2 (2B)
-   sub   c                    ;; [ 4]    to do as much LDIs as bytes the Sprite is wide
-   sub   c                    ;; [ 4]
-   ld (ds_drawSpriteWidth+#4), a ;; [13] Modify JR data to create the jump we need
+   ld    a, #126           ;; [2] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite * 2 (2B)
+   sub   c                 ;; [1]    to do as much LDIs as bytes the Sprite is wide
+   sub   c                 ;; [1]
+   ld (ds_drawSpriteWidth+#4), a ;; [4] Modify JR data to create the jump we need
 
-   ld    a, b               ;; [ 4] A = Height (used as counter for the number of lines we have to copy)
-   ex   de, hl              ;; [ 4] Instead of jumping over the next line, we do the inverse operation because 
-                            ;; .... it is only 4 cycles and not 10, as a JP would be)
+   ld    a, b              ;; [1] A = Height (used as counter for the number of lines we have to copy)
+   ex   de, hl             ;; [1] Instead of jumping over the next line, we do the inverse operation because 
+                           ;; .... it is only 4 cycles and not 10, as a JP would be)
 
 ds_drawSpriteWidth_next:
    ;; NEXT LINE
-   ex   de, hl             ;; [ 4] HL and DE are exchanged every line to do 16bit maths with DE. 
+   ex   de, hl             ;; [1] HL and DE are exchanged every line to do 16bit maths with DE. 
                            ;; .... This line reverses it before proceeding to copy the next line.
 ds_drawSpriteWidth:
    ;; Draw a sprite-line of n bytes
-   ld   bc, #0x800  ;; [10] 0x800 bytes is the distance in memory from one pixel line to the next within every 8 pixel lines
+   ld   bc, #0x800  ;; [3] 0x800 bytes is the distance in memory from one pixel line to the next within every 8 pixel lines
                     ;; ... Each LDI performed will decrease this by 1, as we progress through memory copying the present line
-   .DW #0x0018 ;; JR 0     ;; [12] Self modifying instruction: the '00' will be substituted by the required jump forward. 
-                           ;; ... (Note: Writting JR 0 compiles but later it gives odd linking errors)
-   ldi                     ;; [16] <| 63 LDIs, which are able to copy up to 63 bytes each time.
-   ldi                     ;; [16]  | That means that each Sprite line should be 63 bytes width at most.
-   ldi                     ;; [16]  | The JR instruction at the start makes us ignore the LDIs we don't need 
-   ldi                     ;; [16] <| (jumping over them) That ensures we will be doing only as much LDIs 
-   ldi                     ;; [16] <| as bytes our sprite is wide.
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   ldi                     ;; [16] <|
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-
-   dec   a                 ;; [ 4] Another line finished: we discount it from A
-   ret   z                 ;; [11/5] If that was the last line, we safely return
+   jr__0            ;; [3] Self modifying instruction: the '00' will be substituted by the required jump forward. 
+                    ;; ... (Note: Writting JR 0 compiles but later it gives odd linking errors)
+   ldi              ;; [5] <| 63 LDIs, which are able to copy up to 63 bytes each time.
+   ldi              ;; [5]  | That means that each Sprite line should be 63 bytes width at most.
+   ldi              ;; [5]  | The JR instruction at the start makes us ignore the LDIs we don't need 
+   ldi              ;; [5] <| (jumping over them) That ensures we will be doing only as much LDIs 
+   ldi              ;; [5] <| as bytes our sprite is wide.
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+   ldi              ;; [5] <|
+   ldi              ;; [5] <|
+   ldi              ;; [5]  |
+   ldi              ;; [5]  |
+ 
+   dec   a          ;; [1] Another line finished: we discount it from A
+   ret   z          ;; [2/4] If that was the last line, we safely return
 
    ;; Jump destination pointer to the start of the next line in video memory
-   ex   de, hl    ;; [ 4] DE has destination, but we have to exchange it with HL to be able to do 16bit maths
-   add  hl, bc    ;; [11] We add 0x800 minus the width of the sprite (BC) to destination pointer 
-   ld    b, a     ;; [ 4] Save A into B (B = A)
-   ld    a, h     ;; [ 4] We check if we have crossed video memory boundaries (which will happen every 8 lines). 
-                  ;; .... If that happens, bits 13,12 and 11 of destination pointer will be 0
-   and   #0x38    ;; [ 7] leave out only bits 13,12 and 11
-   ld    a, b     ;; [ 4] Restore A from B (A = B)
-   jp   nz, ds_drawSpriteWidth_next ;; [10] If that does not leave as with 0, we are still inside 
+   ex   de, hl      ;; [1] DE has destination, but we have to exchange it with HL to be able to do 16bit maths
+   add  hl, bc      ;; [3] We add 0x800 minus the width of the sprite (BC) to destination pointer 
+   ld    b, a       ;; [1] Save A into B (B = A)
+   ld    a, h       ;; [1] We check if we have crossed video memory boundaries (which will happen every 8 lines). 
+                    ;; .... If that happens, bits 13,12 and 11 of destination pointer will be 0
+   and   #0x38      ;; [2] leave out only bits 13,12 and 11 from new memory address (00xxx000 00000000)
+   ld    a, b       ;; [1] Restore A from B (A = B)
+   jp   nz, ds_drawSpriteWidth_next ;; [3] If any bit from {13,12,11} is not 0, we are still inside 
                                     ;; .... video memory boundaries, so proceed with next line
 
    ;; Every 8 lines, we cross the 16K video memory boundaries and have to
    ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
    ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
    ;; and our 16bit pointers cycle over it
-   ld   bc, #0xC050        ;; [10] We advance destination pointer to next line
-   add  hl, bc             ;; [11]  HL += 0xC050
-   jp ds_drawSpriteWidth_next ;; [10] Continue copying
+   ld   bc, #0xC050           ;; [3] We advance destination pointer to next line
+   add  hl, bc                ;; [3]  HL += 0xC050
+   jp ds_drawSpriteWidth_next ;; [3] Continue copying
