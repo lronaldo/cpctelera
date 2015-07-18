@@ -96,45 +96,35 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    25 bytes
+;;    C-bindings   - 23 bytes
+;;    ASM-bindings - 19 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ---------------------------------
-;;    Any     |   566  |  141.50
-;; ---------------------------------
-;; Asm saving |   -63  |  -15.75
-;; ---------------------------------
+;;    Case    | microSecs (us) | CPU Cycles
+;; ------------------------------------------
+;;    Any     |      149       |    596
+;; ------------------------------------------
+;; Asm saving |      -13       |    -52
+;; ------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawTileAligned2x8::
-  ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   pop  af                  ;; [10] AF = Return Address
-   pop  hl                  ;; [10] HL = Source address
-   pop  de                  ;; [10] DE = Destination address
-   push de                  ;; [11] Leave the stack as it was
-   push hl                  ;; [11]
-   push af                  ;; [11]
-
-cpct_drawTileAligned2x8_asm:: ;; Assembly entry point
-
    ;; Copy 8 lines of 2 bytes width (2x8 = 16 bytes)
-   ld    a, d               ;; [ 4] Save D into A for fastly doing +800h increment of DE
-   ld   bc, #16             ;; [10] BC = 16, countdown of the number of bytes remaining
-   jp   dsa28_first_line    ;; [10] First line does not need to do math to start transfering data. 
+   ld    a, d               ;; [1] Save D into A for fastly doing +800h increment of DE
+   ld   bc, #16             ;; [3] BC = 16, countdown of the number of bytes remaining
+   jr   dsa28_first_line    ;; [3] First line does not need to do math to start transfering data. 
 
 dsa28_next_line:
    ;; This 4 lines do "DE += 800h - 2h" to move DE pointer to the next pixel line at video memory
-   dec   e                  ;; [ 4] E -= 2 (We only decrement E because D is saved into A, hence,
-   dec   e                  ;; [ 4] it does not matter if E is 00 and becomes FF, cause we do not have to worry about D)
-   add   #8                 ;; [ 7] D += 8 (To add 800h to DE, we increment previous value of D by 8, and move it into D)
-   ld    d, a               ;; [ 4]
+   dec   e                  ;; [1] E -= 2 (We only decrement E because D is saved into A, hence,
+   dec   e                  ;; [1] it does not matter if E is 00 and becomes FF, cause we do not have to worry about D)
+   add   #8                 ;; [2] D += 8 (To add 800h to DE, we increment previous value of D by 8, and move it into D)
+   ld    d, a               ;; [1]
 
 dsa28_first_line:
-   ldi                      ;; [16] Copy 2 bytes for (HL) to (DE) and decrement BC 
-   ldi                      ;; [16]
-   jp   pe, dsa28_next_line ;; [10] While BC!=0, continue copying bytes (When BC=0 LDI resets P/V, otherwise, P/V is set)
+   ldi                      ;; [5] Copy 2 bytes for (HL) to (DE) and decrement BC 
+   ldi                      ;; [5]
+   jp   pe, dsa28_next_line ;; [3] While BC!=0, continue copying bytes (When BC=0 LDI resets P/V, otherwise, P/V is set)
 
-   ret                      ;; [10]
+   ret                      ;; [3]
