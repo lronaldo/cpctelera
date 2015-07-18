@@ -24,10 +24,14 @@
 ;;
 _cpct_drawTileAligned2x8_f::
   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   pop  af    ;; [3] AF = Return Address
-   pop  hl    ;; [3] HL = Source address
-   pop  de    ;; [3] DE = Destination address
-   push af    ;; [4] Put returning address in the stack again
-              ;;      as this function uses __z88dk_callee convention
+   pop  af   ;; [3] AF = Return Address
+   pop  hl   ;; [3] HL = Source address
+   pop  de   ;; [3] DE = Destination address
+
+   push de   ;; [4*2] Leave the stack as it was  
+   push hl   ;;  (Provisional while SDCC developers solve a bug with __z88dk_callee)
+
+   push af   ;; [4] Put returning address in the stack again
+             ;;      as this function uses __z88dk_callee convention
 
 .include /cpct_drawTileAligned2x8_f.asm/
