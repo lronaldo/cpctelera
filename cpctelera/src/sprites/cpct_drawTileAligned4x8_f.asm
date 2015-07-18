@@ -101,103 +101,93 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    103 bytes
+;;     C-bindings - 101 bytes
+;;   ASM-bindings -  97 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ---------------------------------
-;;    Any     |   705  |  176.25
-;; ---------------------------------
-;; Asm saving |   -63  |  -15.75
-;; ---------------------------------
+;;    Case    | microSecs (us) | CPU Cycles
+;; ------------------------------------------
+;;    Any     |      208       |    832
+;; ------------------------------------------
+;; Asm saving |      -13       |    -52
+;; ------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawTileAligned4x8_f::
-   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   pop  af                 ;; [10] AF = Return Address
-   pop  hl                 ;; [10] HL = Source address
-   pop  de                 ;; [10] DE = Destination address
-   push de                 ;; [11] Leave the stack as it was
-   push hl                 ;; [11] 
-   push af                 ;; [11] 
-
-cpct_drawTileAligned4x8_f_asm::     ;; Assembly entry point
-
    ;; Copy 8 lines of 4 bytes each (4x8 = 32 bytes)
    ;;  (Unrolled version of the loop)
-   ld    a, d              ;; [ 4] First, save DE into A and B, 
-   ld    b, e              ;; [ 4]   to ease the 800h increment step
-   ld    c, #33            ;; [ 7] Ensure that 32 LDIs do not change value of B (as they will decrement BC)
+   ld    a, d              ;; [1] First, save DE into A and B, 
+   ld    b, e              ;; [1]   to ease the 800h increment step
+   ld    c, #33            ;; [2] Ensure that 32 LDIs do not change value of B (as they will decrement BC)
 
    ;; Sprite Line 1
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
+   add  #8                 ;; [2] DE += 800h (Using previous A, B copy)
+   ld    d, a              ;; [1]
+   ld    e, b              ;; [1]
 
    ;; Sprite Line 2
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
+   add  #8                 ;; [2] DE += 800h (Using previous A, B copy)
+   ld    d, a              ;; [1]
+   ld    e, b              ;; [1]
 
    ;; Sprite Line 3
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
+   add  #8                 ;; [2] DE += 800h (Using previous A, B copy)
+   ld    d, a              ;; [1]
+   ld    e, b              ;; [1]
 
    ;; Sprite Line 4
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
+   add  #8                 ;; [2] DE += 800h (Using previous A, B copy)
+   ld    d, a              ;; [1]
+   ld    e, b              ;; [1]
 
    ;; Sprite Line 5
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
+   add  #8                 ;; [2] DE += 800h (Using previous A, B copy)
+   ld    d, a              ;; [1]
+   ld    e, b              ;; [1]
 
    ;; Sprite Line 6
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
+   add  #8                 ;; [2] DE += 800h (Using previous A, B copy)
+   ld    d, a              ;; [1]
+   ld    e, b              ;; [1]
 
    ;; Sprite Line 7
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
+   add  #8                 ;; [2] DE += 800h (Using previous A, B copy)
+   ld    d, a              ;; [1]
+   ld    e, b              ;; [1]
 
    ;; Sprite Line 8
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  |
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
 
-   ret                     ;; [10]
+   ret                     ;; [3]
