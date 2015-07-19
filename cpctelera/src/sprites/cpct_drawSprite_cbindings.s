@@ -20,7 +20,7 @@
 ;;
 ;; C bindings for <cpct_drawSprite>
 ;;
-;;   28 us, 8 bytes
+;;   16 us, 5 bytes
 ;;
 _cpct_drawSprite::
    ;; GET Parameters from the stack 
@@ -28,11 +28,7 @@ _cpct_drawSprite::
    pop  hl   ;; [3] HL = Source Address (Sprite data array)
    pop  de   ;; [3] DE = Destination address (Video memory location)
    pop  bc   ;; [3] BC = Height/Width (B = Height, C = Width)
-   
-   push bc   ;; [4*3] Leave the stack as it was 
-   push de   ;;  (Provisional while SDCC developers solve a bug with __z88dk_callee)
-   push hl
-
+ 
    push af   ;; [4] Put returning address in the stack again
              ;;      as this function uses __z88dk_callee convention
 

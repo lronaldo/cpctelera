@@ -99,16 +99,16 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;      C-bindings - 55 bytes
+;;      C-bindings - 53 bytes
 ;;    ASM-bindings - 49 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;    Case    | microSecs (us) | CPU Cycles
 ;; -----------------------------------------
-;;    Any     |      120       |    480
+;;    Any     |      112       |    448
 ;; -----------------------------------------
-;; Asm saving |      -21       |    -84
+;; Asm saving |      -13       |    -52
 ;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

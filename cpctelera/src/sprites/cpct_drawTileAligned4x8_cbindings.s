@@ -28,9 +28,6 @@ _cpct_drawTileAligned4x8::
    pop  hl   ;; [3] HL = Source address
    pop  de   ;; [3] DE = Destination address
 
-   push de   ;; [4*2] Leave the stack as it was  
-   push hl   ;;  (Provisional while SDCC developers solve a bug with __z88dk_callee)
-
    push af   ;; [4] Put returning address in the stack again
              ;;      as this function uses __z88dk_callee convention
 
