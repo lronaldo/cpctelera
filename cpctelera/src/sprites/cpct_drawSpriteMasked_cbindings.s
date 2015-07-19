@@ -20,7 +20,7 @@
 ;;
 ;; C bindings for <cpct_drawSpriteMasked>
 ;;
-;;   28 us, 8 bytes
+;;   16 us, 5 bytes
 ;;
 _cpct_drawSpriteMasked::
    ;; GET Parameters from the stack 
@@ -28,9 +28,8 @@ _cpct_drawSpriteMasked::
    pop  hl   ;; [3] HL = Source Address (Sprite data array)
    pop  de   ;; [3] DE = Destination address (Video memory location)
    pop  bc   ;; [3] BC = Height/Width (B = Height, C = Width)
-   push bc   ;; [4] Restore Stack status pushing values again
-   push de   ;; [4] (Interrupt safe way, 6 cycles more)
-   push hl   ;; [4]
-   push af   ;; [4]
+
+   push af   ;; [4] Put returning address in the stack again
+             ;;      as this function uses __z88dk_callee convention
 
 .include /cpct_drawSpriteMasked.asm/

@@ -111,19 +111,20 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    54 bytes
+;;    C-bindings - 47 bytes
+;;  ASM-bindints - 42 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |    microSecs (us)        |    CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      |  31 + (22 + 18W)H + 10HH | 124 + (88 + 72W)H + 40HH
+;;  Best      |  21 + (22 + 18W)H + 10HH | 84 + (88 + 72W)H + 40HH
 ;;  Worst     |       Best + 10          |     Best + 40
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |        969 /  979        |    3876 /  3916
-;;  W=4,H=32  |       3069 / 3079        |   12276 / 12316
+;;  W=2,H=16  |        957 /  967        |    3828 /  3868
+;;  W=4,H=32  |       3057 / 3067        |   12228 / 12268
 ;; ----------------------------------------------------------------
-;; Asm saving |          -28             |      -112
+;; Asm saving |          -16             |       -64
 ;; ----------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
@@ -148,11 +149,11 @@ dms_sprite_height_loop:
    push de         ;; [4] Save DE for later use (jump to next screen line)
 
 dms_sprite_width_loop:
-   ld    a, (de)   ;; [2] Get next background byte into A
+   ld    a ,(de)   ;; [2] Get next background byte into A
    and (hl)        ;; [2] Erase background part that is to be overwritten (Mask step 1)
    inc  hl         ;; [2] HL += 1 => Point HL to Sprite Colour information
-   or (hl)         ;; [2] Add up background and sprite information in one byte (Mask step 2)
-   ld (de), a      ;; [2] Save modified background + sprite data information into memory
+   or  (hl)        ;; [2] Add up background and sprite information in one byte (Mask step 2)
+   ld  (de), a     ;; [2] Save modified background + sprite data information into memory
    inc  de         ;; [2] Next bytes (sprite and memory)
    inc  hl         ;; [2] 
 
