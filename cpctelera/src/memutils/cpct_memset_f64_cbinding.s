@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_memutils
 
-.include /memutils.s/
-
 ;;
 ;; C Binding for cpct_memset_f64
 ;;

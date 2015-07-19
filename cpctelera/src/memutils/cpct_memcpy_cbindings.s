@@ -18,18 +18,18 @@
 .module cpct_memutils
 
 ;;
-;; C Binding for cpct_memset_f8
+;; C bindings for <cpct_memcpy>
 ;;
+;;   16 us, 5 bytes
+;;
+_cpct_memcpy::
+   ;; Get parameters from stack
+   pop  af   ;; [3] AF = Return Address
+   pop  de   ;; [3] DE = Destination address
+   pop  hl   ;; [3] HL = Source Address
+   pop  bc   ;; [3] BC = Height/Width (B = Height, C = Width)
 
-_cpct_memset_f8::
-   di                            ;; [1] Disable interrupts first
-   ld   (msf8_restoreSP + 1), sp ;; [6]
+   push af   ;; [4] Put returning address in the stack again
+             ;;      as this function uses __z88dk_callee convention
 
-   ;; Recover parameters from stack
-   pop  hl                       ;; [3] HL = Return address
-   pop  hl                       ;; [3] HL = Array pointer
-   pop  de                       ;; [3] DE = value to be set
-   pop  bc                       ;; [3] BC = Size of the array
-                                 ;; No need to restore them, as sp will be directly restored later on
-
-.include /cpct_memset_f8.asm/      ;; Include function code
+.include /cpct_memcpy.asm/

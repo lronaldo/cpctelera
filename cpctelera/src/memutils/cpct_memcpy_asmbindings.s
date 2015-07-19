@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU General Public License as published by
@@ -15,16 +15,11 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-;#####################################################################
-;### MODULE: MemUtils                                              ###
-;#####################################################################
-;### Utilities to manage memory blocks                             ###
-;#####################################################################
-;
 .module cpct_memutils
 
 ;;
-;; Compilation control directives
+;; ASM bindings for <cpct_memcpy>
 ;;
-;; If true, interrupts can be disabled to get function parameters faster
-.equ let_disable_interrupts_for_function_parameters, 0
+cpct_memcpy_asm::    ;; Assembly entry point
+
+.include /cpct_memcpy.asm/

@@ -32,7 +32,7 @@
 extern void cpct_memset    (void *array, u8  value, u16 size);
 extern void cpct_memset_f8 (void *array, u16 value, u16 size);
 extern void cpct_memset_f64(void *array, u16 value, u16 size);
-extern void cpct_memcpy    (void *to, const void *from, u16 size);
+extern void cpct_memcpy    (void *to, const void *from, u16 size) __z88dk_callee;
 
 // Stack manipulation
 extern void cpct_setStackLocation(void *memory) __z88dk_fastcall;

@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_memutils
 
-.include /memutils.s/
-
 ;;
 ;; Assembly call binding for <cpct_memset>
 ;;
