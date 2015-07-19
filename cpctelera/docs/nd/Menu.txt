@@ -91,16 +91,16 @@ Group: Keyboard  {
 
 Group: Sprites  {
 
-   File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.s)
-   File: cpct_drawSprite  (sprites/cpct_drawSprite.s)
-   File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.s)
-   File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.s)
-   File: cpct_drawTileAligned2x8  (sprites/cpct_drawTileAligned2x8.s)
-   File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.s)
-   File: cpct_drawTileAligned4x4_f  (sprites/cpct_drawTileAligned4x4_f.s)
-   File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.s)
-   File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.s)
-   File: cpct_px2byteM0  (sprites/cpct_px2byteM0.s)
+   File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.asm)
+   File: cpct_drawSprite  (sprites/cpct_drawSprite.asm)
+   File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.asm)
+   File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.asm)
+   File: cpct_drawTileAligned2x8  (sprites/cpct_drawTileAligned2x8.asm)
+   File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.asm)
+   File: cpct_drawTileAligned4x4_f  (sprites/cpct_drawTileAligned4x4_f.asm)
+   File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.asm)
+   File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.asm)
+   File: cpct_px2byteM0  (sprites/cpct_px2byteM0_cbindings.s)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
    File: Sprite Macros&amp;Constants  (sprites/sprites.h)
    }  # Group: Sprites
@@ -140,6 +140,7 @@ Group: Memutils  {
    File: cpct_memset  (memutils/cpct_memset.asm)
    File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
    File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
+   File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
    }  # Group: Memutils
 
 Group: Command Line Tools  {
