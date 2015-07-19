@@ -64,10 +64,10 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 20 bytes
-;;    ASM-binding -  9 bytes
+;;    C-binding   - 14 bytes
+;;    ASM-binding -  8 bytes
 ;;
-;; Time Measures:
+;; Time Measures: 
 ;; (start code)
 ;;   Case     | microSecs (us) | CPU Cycles |
 ;; ------------------------------------------

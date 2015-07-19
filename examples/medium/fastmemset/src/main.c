@@ -22,7 +22,7 @@
 #define SCR_VMEM  (u8*)0xC000
 
 // Funtion Pointer type, to point to memset functions that receive a pointer and 2 16-bit integers
-typedef void (*TMemsetFunc)(void*, u16, u16);
+typedef void (*TMemsetFunc)(void*, u16, u16) __z88dk_callee;
 
 //
 // Get a 16-bits colour pattern out of a sequence of 4 firmware colours (one for each mode 0 pixel)

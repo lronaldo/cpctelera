@@ -21,7 +21,6 @@
 ;; Assembly binding for cpct_memset_f8 function
 ;; 
 _cpct_memset_f8_asm::
-   di                             ;; [1] Disable interrupts first
-   ld   (msf8_restoreSP + 1), sp  ;; [6]
+
 
 .include /cpct_memset_f8.asm/

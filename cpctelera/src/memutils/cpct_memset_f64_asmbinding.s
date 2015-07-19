@@ -18,10 +18,8 @@
 .module cpct_memutils
 
 ;;
-;; Assembly binding for cpct_memset_f64 function
+;; Assembly binding for <cpct_memset_f64> function
 ;; 
 _cpct_memset_f64_asm::
-   di                             ;; [1] Disable interrupts first
-   ld  (msf64_restoreSP + 1), sp  ;; [6]
 
 .include /cpct_memset_f64.asm/

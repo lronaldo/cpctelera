@@ -71,28 +71,30 @@
 ;;    BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 45 bytes
-;;    ASM-binding - 40 bytes
+;;    C-binding   - 46 bytes
+;;    ASM-binding - 41 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
-;;   Case      |        microSecs (us)       |       CPU Cycles             |
-;; --------------------------------------------------------------------------
-;;    Any      | 52 + 20*CH + 3*(CH\256 - 1) | 220 + 80*CH + 12(CH\256 - 1) |
-;; --------------------------------------------------------------------------
-;;  CH%256 = 0 |           +1                |             +4               |
-;; --------------------------------------------------------------------------
-;; Asm saving  |          -12                |            -48               |
-;; --------------------------------------------------------------------------
+;;   Case      |   microSecs (us)  |     CPU Cycles         |
+;; ----------------------------------------------------------
+;;    Any      | 53 + 20CH + 3CHHH | 212 + 80*CH + 12(CHHH) |
+;; ----------------------------------------------------------
+;; Asm saving  |      -16          |         -64            |
+;; ----------------------------------------------------------
 ;; (end code)
-;;    BC = *array size* (Number of total bytes to set)
-;;    CH = BC \ 8 (number of *chuncks*, 1 chunck = 8 bytes)
+;;    BC   = *array size* (Number of total bytes to set)
+;;    CH   = BC \ 8 (number of *chuncks*, 1 chunck = 8 bytes)
+;;    CHHH = CH \ 256 - 1
 ;;     \ = integer division
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-;; Code start without calling bindings. There are other files for calling 
-;; bindings for C and ASM.
+;; 
+
+   ;; Save SP to restore it later, as this function makes use of it
+   di                            ;; [1] Disable interrupts first
+   ld   (msf8_restoreSP + 1), sp ;; [6] Save SP to recover it later on
 
    ;; Move SP to the end of the array
    add  hl, bc       ;; [3] HL += BC (HL points to the end of the array)
@@ -109,7 +111,7 @@
    ;; C (contains NumberOfChunks % 256). That will be the number of chuncks to copy on first pass.
    ;;    If C != 0, we copy C chuncks to memory, then 256*(B-1) chuncks to memory (Standard)
    ;;    IF C  = 0, we only have to copy 256*(B-1). That is, we discount first pass, as it is of C=0 chunks.
-   jp  nz, standard_1st_pass ;; [3]  IF C = 0, then
+   jr  nz, standard_1st_pass ;; [2/3]  IF C = 0, then
    dec  b                    ;; [1]    Discount first pass (C = 0 chuncks), then continue doing B-1 passes of 256 chunks
 
 standard_1st_pass:
