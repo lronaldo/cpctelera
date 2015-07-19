@@ -20,18 +20,18 @@
 ;;
 ;; C call binding for <cpct_memset>
 ;;
+;;   18 us, 6 bytes
+;;
 _cpct_memset::
    ;; Recover parameters from stack
-   ld   hl, #2       ;; [3] Make HL point to the byte where parameters start in the
-   add  hl, sp       ;; [3] ... stack (first 2 bytes are return address)
-   ld    e, (hl)     ;; [2] DE = Pointer to first byte in memory for memset
-   inc  hl           ;; [2]
-   ld    d, (hl)     ;; [2] 
-   inc  hl           ;; [2]
-   ldi               ;; [5] (HL)->(DE) Copy value to the first byte of the memory to be set
-                     ;; .... and, at the same time, do INC HL, INC DE and DEC BC
-   ld    c, (hl)     ;; [2] BC = Amount of bytes in memory to set to the value of A
-   inc  hl           ;; [2]
-   ld    b, (hl)     ;; [2]
+   pop  hl   ;; [3] HL = Return address
+   pop  de   ;; [3] DE = Pointer to the array to be set (1st parameter)
+   dec  sp   ;; [2] 
+   pop  af   ;; [3] A  = Value to be set (2nd parameter)
+   pop  bc   ;; [3] BC = Size of the array (3rd parameter)
+
+   push hl   ;; [4] Put returning address in the stack again
+             ;;      as this function uses __z88dk_callee convention
 
 .include /cpct_memset.asm/
+

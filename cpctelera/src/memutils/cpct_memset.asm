@@ -71,24 +71,25 @@
 ;; (start code)
 ;;   Case     | microSecs (us) | CPU Cycles |
 ;; ------------------------------------------
-;;   Any      |  27 + 6*S      | 108 + 24*S |
+;;   Any      |   28 + 6*S     | 112 + 24*S |
 ;; ------------------------------------------
-;; Asm saving |     -21        |    -84     |
+;; Asm saving |     -18        |    -72     |
 ;; ------------------------------------------
 ;; (end code)
 ;;    S = *size* (Number of total bytes to set)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-   dec   bc          ;; [2] BC-- (As 1 byte has alread been copied)
+   ld  (de), a   ;; [2] Copy the value (A) to the first byte in the array
+   dec  bc       ;; [2] BC-- (As 1 byte has alread been copied)
    
    ;; Set up HL and DE for a massive copy of the Value to be set
-   ld    h, d        ;; [1] HL = DE (2nd byte of the memory array to be filled up)
-   ld    l, e        ;; [1] 
-   dec   hl          ;; [2] HL-- (Point to the first position of the memory array to be
-                     ;; .... filled up, which already contains the value to be set)
+   ld    h, d    ;; [1] HL = DE (Points to 1st byte of the memory array to be filled up,
+   ld    l, e    ;; [1]      ... which already contains the value to be set)
+   inc  de       ;; [2] DE++ (Points to the 2nd byte of the memory array to be filled up,
+                 ;;          ... where fitst byte will be copied)
 
    ;; Copy the rest of the bytes
-   ldir              ;; [6/5] Copy the reset of the bytes, cloning the first one
+   ldir          ;; [5/6] Copy the reset of the bytes, cloning the first one
 
-   ret               ;; [3] Return  
+   ret           ;; [3] Return  
