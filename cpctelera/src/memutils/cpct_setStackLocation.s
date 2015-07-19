@@ -46,6 +46,14 @@
 ;; you want to preserve present contents of the stack, copy them to the new location
 ;; (you may use <cpct_memcpy>).
 ;;
+;;  * Take into account that local variables and return addresses are usually stored
+;; at the stack. When moving the stack, ensure that you copy all of its contents
+;; to the new location if you want to preserve them. Otherwise, you may experience
+;; unexpected behaviour.
+;;
+;;  * This function requires FIRMWARE to be DISABLED. Firmware may restore previous
+;; location of the stack, yielding unexpected behaviour (typically, program crashes).
+;;
 ;; Details:
 ;;    Changes the location of the program stack by moving the stack pointer (SP) to 
 ;; a new *memory* location. Changing the program stack location is useful to have
@@ -56,7 +64,7 @@
 ;;    DE, HL, SP
 ;;
 ;; Required memory:
-;;     bytes
+;;    4 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
