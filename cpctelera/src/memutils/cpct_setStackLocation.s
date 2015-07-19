@@ -38,7 +38,7 @@
 ;;  * *memory* has no restiction. You may place stack whereever you wanted, but you
 ;; should be cautious: contents of the stack could erase data, code or essential 
 ;; system information. If that happens, your program may crash. Have special care 
-;; with system rst vector (0x0000 - 0x003F) and firmware memory (if enabled).
+;; with system rst vector (0x0000-0x003F) and firmware memory (if enabled).
 ;;
 ;; Important notes:
 ;;  * This function only changes program stack to a new location by modifying the
@@ -72,8 +72,8 @@
 ;; -----------------------------------------
 ;;   Any      |       7        |    28
 ;; -----------------------------------------
-;;  * This function is identical called from C or from ASM
 ;; (end code)
+;;  * This function is identical called from C or from ASM
 ;;
 ;; Credits:
 ;;    This routine was first sugested and developed by Lachlan Keown (@lachlank / CPCWiki)
