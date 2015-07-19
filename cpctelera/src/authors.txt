@@ -96,3 +96,5 @@ Section: Special Thanks
  * Mochilote / <CPCMania at http://cpcmania.com> (for creating great tutorials and useful documentation in his site)
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)
  * <Prodatron at http://www.prodatron.net/> / Symbiosis for producting such a great deal of incredible software for the Amstrad CPC and for being always helpful and kind.
+ * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs)
+ 
