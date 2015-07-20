@@ -15,16 +15,21 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-;#####################################################################
-;### MODULE: MemUtils                                              ###
-;#####################################################################
-;### Utilities to manage memory blocks                             ###
-;#####################################################################
-;
-.module cpct_memutils
+.module cpct_sprites
+
 
 ;;
-;; Compilation control directives
+;; C bindings for <cpct_drawTileAligned4x8_f>
 ;;
-;; If true, interrupts can be disabled to get function parameters faster
-.equ let_disable_interrupts_for_function_parameters, 0
+;;   13 us, 4 bytes
+;;
+_cpct_drawTileAligned4x8_f::
+   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
+   pop  af   ;; [3] AF = Return Address
+   pop  hl   ;; [3] HL = Source address
+   pop  de   ;; [3] DE = Destination address
+
+   push af   ;; [4] Put returning address in the stack again
+             ;;      as this function uses __z88dk_callee convention
+
+.include /cpct_drawTileAligned4x8_f.asm/

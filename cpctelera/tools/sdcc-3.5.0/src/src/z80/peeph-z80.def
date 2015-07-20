@@ -1579,13 +1579,29 @@ replace restart {
 	ld	sp,%1
 } if notUsed('a')
 
+// Modification to impede __z88dk_callee poisoning
+// by jumping with no return address on top of parameters
+//   by Alcoholic Anonymous / CPCWiki
 replace restart {
-	call	%1
-	ret
+    push    %1
+    call    %2
+    ret
 } by {
-	jp	%1
-	; peephole 114 replaced call at end of function by jump (tail call optimization).
+    push    %1
+    call    %2
+    __z88dk_poison__
+    ret
+    ; peephole 114a prevent tail code optimization for functions taking parameters
 }
+
+replace restart {
+    call    %1
+    ret
+} by {
+    jp    %1
+    ; peephole 114b replaced call at end of function by jump (tail call optimization).
+}
+
 
 // Callee saves ix.
 replace restart {
@@ -2299,3 +2315,10 @@ replace {
 	; peephole 156 used djnz
 }
 
+// Removing __z88dk_poison__ tag used to prevent
+//  tail jump optimization on functions taking parameters
+replace {
+    __z88dk_poison__
+} by {
+    ; peephole 158: z88dk poison removal
+}

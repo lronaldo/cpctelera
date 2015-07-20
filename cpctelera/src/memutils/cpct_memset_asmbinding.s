@@ -17,14 +17,10 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_memutils
 
-.include /memutils.s/
-
 ;;
 ;; Assembly call binding for <cpct_memset>
 ;;
 cpct_memset_asm::
-   ld  (de), a       ;; [2] Copy value to the first byte of the memory to be set
-   inc  de           ;; [2] DE points to the second byte (next to be set)
 
 
 .include /cpct_memset.asm/

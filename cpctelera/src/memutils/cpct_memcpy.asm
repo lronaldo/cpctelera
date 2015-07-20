@@ -17,7 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_memutils
 
-.include /memutils.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -26,7 +25,7 @@
 ;;    Copies a bunch of bytes from one place in memory to other. 
 ;;
 ;; C Definition:
-;;    void <cpct_memcpy> (void* *to*, const void* *from*, <u16> *size*);
+;;    void <cpct_memcpy> (void* *to*, const void* *from*, <u16> *size*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 Bytes):
 ;;  (2B DE) to   - Pointer to the destination (first byte where bytes will be written)
@@ -56,47 +55,22 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    11 bytes
+;;    C-bindings - 8 bytes
+;;  ASM-bindings - 3 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;   Case     |   Cycles   | microSecs (us)
+;;   Case     | microSecs (us) | CPU Cycles
 ;; -----------------------------------------
-;;   Any      | 89 + 21*S  | 22.25 + 5.25*S
+;;   Any      |    18 + 6S     |  72 + 24S
 ;; -----------------------------------------
-;; Asm saving |    -84     |   -21.00
+;; Asm saving |      -16       |    -64
 ;; -----------------------------------------
 ;; (end code)
 ;;    S = *size* (Number of total bytes to set)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-_cpct_memcpy::
-   ;; Get parameters from stack
-.if let_disable_interrupts_for_function_parameters
-   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   ld (mcp_restoreSP+1), sp   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   di                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   pop  af                    ;; [10] AF = Return Address
-   pop  de                    ;; [10] DE = Destination address
-   pop  hl                    ;; [10] HL = Source Address
-   pop  bc                    ;; [10] BC = Array size
-mcp_restoreSP:
-   ld   sp, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   ei                         ;; [ 4] Enable interrupts again
-.else 
-   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
-   pop  af           ;; [10] AF = Return Address
-   pop  de           ;; [10] DE = Destination address
-   pop  hl           ;; [10] HL = Source Address
-   pop  bc           ;; [10] BC = Height/Width (B = Height, C = Width)
-   push bc           ;; [11] Restore Stack status pushing values again
-   push hl           ;; [11] (Interrupt safe way, 6 cycles more)
-   push de           ;; [11]
-   push af           ;; [11]
-.endif
+   ldir              ;; [5/6] Copy all bytes, from source to destination
 
-cpct_memcpy_asm::    ;; Assembly entry point
-   ldir              ;; [21/16] Copy all bytes, from source to destination
-
-   ret               ;; [10] Return  
+   ret               ;; [3] Return  

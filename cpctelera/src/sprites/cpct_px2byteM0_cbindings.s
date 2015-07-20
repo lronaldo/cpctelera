@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include /sprites.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_px2byteM0
 ;;
@@ -29,19 +27,14 @@
 ;;    <u8> <cpct_px2byteM0> (<u8> *px0*, <u8> *px1*);
 ;;
 ;; Input Parameters (2 Bytes):
-;;    (1B _) px0 - Firmware colour value for left  pixel (pixel 0) [0-15]
-;;    (1B _) px1 - Firmware colour value for right pixel (pixel 1) [0-15]
+;;    (1B H) px0 - Firmware colour value for left  pixel (pixel 0) [0-15]
+;;    (1B L) px1 - Firmware colour value for right pixel (pixel 1) [0-15]
 ;;
 ;; Returns:
 ;;    u8 - byte with *px0* and *px1* colour information in screen pixel format.
 ;;
 ;; Assembly call:
-;;    This function does not have assembly entry point. You should use C entry
-;; point and put parameters on the stack, this way:
-;;    > ld   bc, #0x0103      ;; B = *px1* = 1, C = *px0* = 3 (Firmware colours)
-;;    > push bc               ;; Put parameters on the stack
-;;    > call _cpct_px2byteM0  ;; Call the function on the C entry point
-;;    > pop  bc               ;; Recover parameter from stack to leave it at its previous state
+;;    > call cpct_px2byteM0_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *px0* and *px1* must be firmware colour values in the range [0-15]. If
@@ -75,16 +68,20 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    48 bytes (32 bytes code, 16 bytes colour conversion table)
+;;    C-bindings  - 47 bytes (31 bytes code, 16 bytes colour conversion table)
+;;   ASM-bindings - 42 bytes (26 bytes code, 16 bytes colour conversion table)
 ;;
 ;;   Note - Colour conversion table is shared with <cpct_drawCharM0>. If you use both
 ;; functions, only one copy of the colour table is loaded into memory.
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
-;; ---------------------------------
-;; Any   |  145   |  36,25 
+;; Case       | microSecs (us) |  CPU Cycles
+;; ------------------------------------------
+;; Any        |      40        |     160
+;; ------------------------------------------
+;; ASM-saving |     -11        |     -44
+;; ------------------------------------------
 ;; (end code)
 ;;    NC=Number of colours to convert
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,46 +89,55 @@
 ;; Pixel colour table defined in cpct_drawCharM0
 .globl dc_mode0_ct
 
+;;
+;; Macro that computes A = *(DE + A)
+;;  to access vales stored in tables pointed by DE
+;;
+.macro A_eq__DEplusA__
+   ;; Compute DE += A
+   add   e               ;; [1] | E += A
+   ld    e, a            ;; [1] |
+   sub   a               ;; [1] A = 0 (preserving Carry Flag)
+   adc   d               ;; [1] | D += Carry
+   ld    d, a            ;; [1] |
+
+   ;; A = *(DE + A)
+   ld    a, (de)         ;; [2] A = Value stored at the table pointed by DE 
+.endm
+
+
 _cpct_px2byteM0::
    ;; Point HL to the start of the first parameter in the stack
-   ld  hl, #2            ;; [10] HL Points to SP+2 (first 2 bytes are return address)
-   add hl, sp            ;; [11]    , to use it for getting parameters from stack
+   ld  hl, #2            ;; [3] HL Points to SP+2 (first 2 bytes are return address)
+   add hl, sp            ;; [3]    , to use it for getting parameters from stack
 
    ;;
    ;; Transform pixel 0 into Screen Pixel Format
    ;;
-   ld   de, #dc_mode0_ct ;; [10] DE points to the start of the colour table
-   ld    a, (hl)         ;; [ 7] A = Firmware colour for pixel 0 (to be added to DE, 
+   ld   de, #dc_mode0_ct ;; [3] DE points to the start of the colour table
+   ld    a, (hl)         ;; [2] A = Firmware colour for pixel 0 (to be added to DE, 
                          ;; .... as it is the index of the colour value to retrieve)
-   ;; Compute DE += Pixel 0 (A)
-   add   e               ;; [ 4] | E += A
-   ld    e, a            ;; [ 4] |
-   sub   a               ;; [ 4] A = 0 (preserving Carry Flag)
-   adc   d               ;; [ 4] | D += Carry
-   ld    d, a            ;; [ 4] |
 
-   ld    a, (de)         ;; [ 7] A = Screen format for Firmware colour of Pixel 0
-   sla   a               ;; [ 8] A <<= 1, as Screen formats in table are in Pixel Y disposition 
+   ;; Get screen format bit values for Pixel 0
+   A_eq__DEplusA__       ;; [7] A = *(DE + A)
+
+   sla   a               ;; [2] A <<= 1, as Screen formats in table are in Pixel Y disposition 
                          ;; .... (see Scheme 1 in this function's documentation)
-   ld    b, a            ;; [ 4] B = Transformed value for pixel 0
+   ld    b, a            ;; [1] B = Transformed value for pixel 0
 
    ;;
    ;; Transform pixel 1 into Screen Pixel Format
    ;;
-   ld   de, #dc_mode0_ct ;; [10] DE points to the start of the colour table
-   inc  hl               ;; [ 6] HL points to next parameter (Pixel 1)
-   ld    a, (hl)         ;; [ 7] A = Firmware colour for pixel 1 (to be added to DE, 
+   ld   de, #dc_mode0_ct ;; [3] DE points to the start of the colour table
+   inc  hl               ;; [2] HL points to next parameter (Pixel 1)
+   ld    a, (hl)         ;; [2] A = Firmware colour for pixel 1 (to be added to DE, 
                          ;; .... as it is the index of the colour value to retrieve)
-   ;; Compute DE += Pixel 1 (A)
-   add   e               ;; [ 4] | E += A
-   ld    e, a            ;; [ 4] |
-   sub   a               ;; [ 4] A = 0 (preserving Carry Flag)
-   adc   d               ;; [ 4] | D += Carry
-   ld    d, a            ;; [ 4] \
-   ld    a, (de)         ;; [ 7] A = Screen format for Firmware colour of Pixel 0
+
+   ;; Get screen format bit values for Pixel 1
+   A_eq__DEplusA__       ;; [7] A = *(DE + A)
 
    ;; Merge both values and return result
-   or    b               ;; [ 4] A = Merged value of transformed pixel values (px1 | px2)
-   ld    l, a            ;; [ 4] L = A, put return value into L
+   or    b               ;; [1] A = Merged value of transformed pixel values (px1 | px2)
+   ld    l, a            ;; [1] L = A, put return value into L
 
-   ret                   ;; [10] return
+   ret                   ;; [3] return

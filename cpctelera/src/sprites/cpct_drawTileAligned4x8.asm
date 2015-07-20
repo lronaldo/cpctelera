@@ -19,21 +19,20 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_drawTileAligned4x8_f
+;; Function: cpct_drawTileAligned4x8
 ;;
 ;;    Copies a 4x8-byte sprite to video memory (or screen buffer), assuming that
-;; location to be copied is Pixel Line 0 of a character line. This function is
-;; ~32% faster than <cpct_drawTileAligned4x8>
+;; location to be copied is Pixel Line 0 of a character line. 
 ;;
 ;; C Definition:
-;;    void <cpct_drawTileAligned4x8_f> (void* *sprite*, void* *memory*)
+;;    void <cpct_drawTileAligned4x8> (void* *sprite*, void* *memory*)
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (32-byte array with 8-bit pixel data)
 ;;  (2B DE) memory - Pointer (aligned) to the first byte in video memory where the sprite will be copied.
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_drawTileAligned4x8_f_asm
+;;    > call cpct_drawTileAligned4x8_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *sprite* must be a pointer to an array array containing sprite's pixels
@@ -66,10 +65,6 @@
 ;; 8 in mode 2).
 ;;
 ;; Details:
-;;    This function does the same operation than <cpct_drawTileAligned4x8>
-;; but using and unrolled loop. This makes this function ~32% faster, at the
-;; cost of requiring ~243% more memory for the code.
-;; 
 ;;    Copies a 4x8-byte sprite from an array with 32 screen pixel format 
 ;; bytes to video memory or a screen buffer. This function is tagged 
 ;; *aligned*, meaning that the destination byte must be *character aligned*. 
@@ -101,103 +96,41 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    103 bytes
+;;     C-bindings - 26 bytes
+;;   ASM-bindings - 22 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ---------------------------------
-;;    Any     |   705  |  176.25
-;; ---------------------------------
-;; Asm saving |   -63  |  -15.75
-;; ---------------------------------
+;;    Case    | microSecs (us) | CPU Cycles
+;; -----------------------------------------
+;;    Any     |      271       |    1084
+;; -----------------------------------------
+;; Asm saving |      -13       |     -52
+;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawTileAligned4x8_f::
-   ;; GET Parameters from the stack (Push+Pop is faster than referencing with IX)
-   pop  af                 ;; [10] AF = Return Address
-   pop  hl                 ;; [10] HL = Source address
-   pop  de                 ;; [10] DE = Destination address
-   push de                 ;; [11] Leave the stack as it was
-   push hl                 ;; [11] 
-   push af                 ;; [11] 
+   ;; Copy 8 lines of 4 bytes width
+   ld    a, #8             ;; [2] We have to draw 8 lines of sprite
+   jr dsa48_first_line     ;; [3] First line does not need to do maths to start transferring data. 
 
-cpct_drawTileAligned4x8_f_asm::     ;; Assembly entry point
+dsa48_next_line:
+   ;; Move to the start of the next line
+   ex   de, hl             ;; [1] Make DE point to the start of the next line of pixels in video memory, by adding BC
+   add  hl, bc             ;; [3] (We need to interchange HL and DE because DE does not have ADD)
+   ex   de, hl             ;; [1]
 
-   ;; Copy 8 lines of 4 bytes each (4x8 = 32 bytes)
-   ;;  (Unrolled version of the loop)
-   ld    a, d              ;; [ 4] First, save DE into A and B, 
-   ld    b, e              ;; [ 4]   to ease the 800h increment step
-   ld    c, #33            ;; [ 7] Ensure that 32 LDIs do not change value of B (as they will decrement BC)
+dsa48_first_line:
+   ;; Draw a sprite-line of 4 bytes
+   ld   bc, #0x800         ;; [3] 800h bytes is the distance to the start of the first pixel in the next line in 
+                           ;; .... video memory (it will be decremented by 1 by each LDI)
+   ldi                     ;; [5] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
+   ldi                     ;; [5]  | (distance is 1 byte less as we progress up)
+   ldi                     ;; [5]  |
+   ldi                     ;; [5] <|
 
-   ;; Sprite Line 1
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
+   ;; Repeat for all the lines
+   dec   a                 ;; [1]   A = A - 1 (1 more line completed)
+   jr   nz, dsa48_next_line;; [2/3] Continue to next line if A != 0 (A = Lines left)
 
-   ;; Sprite Line 2
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
-
-   ;; Sprite Line 3
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
-
-   ;; Sprite Line 4
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
-
-   ;; Sprite Line 5
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
-
-   ;; Sprite Line 6
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
-
-   ;; Sprite Line 7
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-   add  #8                 ;; [ 7] DE += 800h (Using previous A, B copy)
-   ld    d, a              ;; [ 4]
-   ld    e, b              ;; [ 4]
-
-   ;; Sprite Line 8
-   ldi                     ;; [16] <|Copy 4 bytes with (DE) <- (HL) and decrement BC 
-   ldi                     ;; [16]  |
-   ldi                     ;; [16]  |
-   ldi                     ;; [16] <|
-
-   ret                     ;; [10]
+   ret                     ;; [3]

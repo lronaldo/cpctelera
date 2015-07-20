@@ -70,28 +70,30 @@
 ;;    A, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 71 bytes
-;;    ASM-binding - 66 bytes
+;;    C-binding   - 72 bytes
+;;    ASM-binding - 67 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;   Case      |      microSecs (us)           |      CPU Cycles                |
-;; ------------------------------------------------------------------------------
-;;    Any      |  50 + 132*CH + 3*(CH\256 - 1) | 212 + 528*CH + 12*(CH\256 - 1) |
-;; ------------------------------------------------------------------------------
-;;  CH%256 = 0 |           +1                  |           +4                   |
-;; ------------------------------------------------------------------------------
-;; Asm saving  |          -12                  |          -48                   |
-;; ------------------------------------------------------------------------------
+;;   Case      |   microSecs (us)   |      CPU Cycles       |
+;; ----------------------------------------------------------
+;;    Any      | 47 + 132CH + 3CHHH | 188 + 528*CH + 12CHHH |
+;; ----------------------------------------------------------
+;;  CH%256 = 0 |         +1         |         +4            |
+;; ----------------------------------------------------------
+;; Asm saving  |        -16         |        -64            |
+;; ----------------------------------------------------------
 ;; (end code)
-;;    BC = *array size* (Number of total bytes to set)
-;;    CH = BC \ 64 (number of *chuncks*, 1 chunck = 64 bytes)
+;;    BC   = *array size* (Number of total bytes to set)
+;;    CH   = BC \ 64 (number of *chuncks*, 1 chunck = 64 bytes)
+;;    CHHH = CH \ 256 - 1
 ;;     \ = integer division
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-;; Code start without calling bindings. There are other files for calling 
-;; bindings for C and ASM.
+   ;; Save SP to restore it later, as this function makes use of it
+   di                             ;; [1] Disable interrupts first
+   ld   (msf64_restoreSP + 1), sp ;; [6] Save SP to recover it later on
 
    ;; Move SP to the end of the array
    add  hl, bc       ;; [3] HL += BC (HL points to the end of the array)

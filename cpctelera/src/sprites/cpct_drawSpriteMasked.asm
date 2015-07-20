@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include /sprites.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_drawSpriteMasked
@@ -113,96 +111,81 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    54 bytes
+;;    C-bindings - 47 bytes
+;;  ASM-bindints - 42 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;  Case      |           Cycles                 |      microSecs (us)
-;; ------------------------------------------------------------------------------------
-;;  Best      |  64 + 59*W*H + 54*H + 40*[H / 8] | 16 + 14.75*W*H + 13.50*H + 10*[H/8]
-;;  Worst     | 104 + 59*W*H + 54*H + 40*[H / 8] | 26 + 14.75*W*H + 13.50*H + 10*[H/8]
-;; ------------------------------------------------------------------------------------
-;;  W=2,H=16  |        2894 / 2943               |     723.50 /  733.50
-;;  W=4,H=32  |        9422 / 9462               |    2355.50 / 2365.50
-;; ------------------------------------------------------------------------------------
-;; Asm saving |         -84                      |     -21.00 
-;; ------------------------------------------------------------------------------------
+;;  Case      |    microSecs (us)        |    CPU Cycles
+;; ----------------------------------------------------------------
+;;  Best      |  21 + (22 + 18W)H + 10HH | 84 + (88 + 72W)H + 40HH
+;;  Worst     |       Best + 10          |     Best + 40
+;; ----------------------------------------------------------------
+;;  W=2,H=16  |        957 /  967        |    3828 /  3868
+;;  W=4,H=32  |       3057 / 3067        |   12228 / 12268
+;; ----------------------------------------------------------------
+;; Asm saving |          -16             |       -64
+;; ----------------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes
+;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Convenient macros to clarify the use of 
+;;   * LD IXL, C 
+;;   * LD C, IXL
+;;
+.macro ld__ixl_c
+   .DW  #0x69DD   ;; ld ixl, c 
+.endm
 
-_cpct_drawSpriteMasked::
-   ;; GET Parameters from the stack 
-.if let_disable_interrupts_for_function_parameters
-   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   ld (dms_restoreSP+1), sp   ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   di                         ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   pop  af                    ;; [10] AF = Return Address
-   pop  hl                    ;; [10] HL = Source Address (Sprite data array)
-   pop  de                    ;; [10] DE = Destination address (Video memory location)
-   pop  bc                    ;; [10] BC = Height/Width (B = Height, C = Width)
-dms_restoreSP:
-   ld   sp, #0                ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual SP value previously)
-   ei                         ;; [ 4] Enable interrupts again
-.else 
-   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
-   pop  af                    ;; [10] AF = Return Address
-   pop  hl                    ;; [10] HL = Source Address (Sprite data array)
-   pop  de                    ;; [10] DE = Destination address (Video memory location)
-   pop  bc                    ;; [10] BC = Height/Width (B = Height, C = Width)
-   push bc                    ;; [11] Restore Stack status pushing values again
-   push de                    ;; [11] (Interrupt safe way, 6 cycles more)
-   push hl                    ;; [11]
-   push af                    ;; [11]
-.endif
+.macro ld__c_ixl
+   .DW  #0x4DDD   ;; ld c, ixl
+.endm
 
-cpct_drawSpriteMasked_asm::   ;; Assembly entry point
-
-   push ix                    ;; [15] Save IX regiter before using it as temporal var
-   .DW  #0x69DD ; ld ixl, c   ;; [ 8] Save Sprite Width into IXL for later use
+   push ix         ;; [5] Save IX regiter before using it as temporal var
+   ld__ixl_c       ;; [3] Save Sprite Width into IXL for later use
 
 dms_sprite_height_loop:
-   push de                    ;; [11] Save DE for later use (jump to next screen line)
+   push de         ;; [4] Save DE for later use (jump to next screen line)
 
 dms_sprite_width_loop:
-   ld    a, (de)              ;; [ 7] Get next background byte into A
-   and (hl)                   ;; [ 7] Erase background part that is to be overwritten (Mask step 1)
-   inc  hl                    ;; [ 6] HL += 1 => Point HL to Sprite Colour information
-   or (hl)                    ;; [ 7] Add up background and sprite information in one byte (Mask step 2)
-   ld (de), a                 ;; [ 6] Save modified background + sprite data information into memory
-   inc  de                    ;; [ 6] Next bytes (sprite and memory)
-   inc  hl                    ;; [ 6] 
+   ld    a ,(de)   ;; [2] Get next background byte into A
+   and (hl)        ;; [2] Erase background part that is to be overwritten (Mask step 1)
+   inc  hl         ;; [2] HL += 1 => Point HL to Sprite Colour information
+   or  (hl)        ;; [2] Add up background and sprite information in one byte (Mask step 2)
+   ld  (de), a     ;; [2] Save modified background + sprite data information into memory
+   inc  de         ;; [2] Next bytes (sprite and memory)
+   inc  hl         ;; [2] 
 
-   dec   c                    ;; [ 4] C holds sprite width, we decrease it to count pixels in this line.
-   jp   nz,dms_sprite_width_loop;; [10] While not 0, we are still painting this sprite line 
-                              ;;      - When 0, we have to jump to next pixel line
+   dec   c         ;; [1] C holds sprite width, we decrease it to count pixels in this line.
+   jr   nz,dms_sprite_width_loop;; [2/3] While not 0, we are still painting this sprite line 
+                                ;;      - When 0, we have to jump to next pixel line
 
-   pop  de                    ;; [10] Recover DE from stack. We use it to calculate start of next pixel line on screen
+   pop  de         ;; [3] Recover DE from stack. We use it to calculate start of next pixel line on screen
 
-   dec   b                    ;; [ 4] B holds sprite height. We decrease it to count another pixel line finished
-   jp    z, dms_sprite_copy_ended;; [10] If 0, we have finished the last sprite line.
-                              ;;      - If not 0, we have to move pointers to the next pixel line
+   dec   b         ;; [1] B holds sprite height. We decrease it to count another pixel line finished
+   jr    z,dms_sprite_copy_ended;; [2/3] If 0, we have finished the last sprite line.
+                                ;;      - If not 0, we have to move pointers to the next pixel line
 
-   .DW #0x4DDD ; ld c, ixl    ;; [ 8] Restore Sprite Width into C
+   ld__c_ixl       ;; [3] Restore Sprite Width into C
 
-   ld    a, d                 ;; [ 4] Start of next pixel line normally is 0x0800 bytes away.
-   add   #0x08                ;; [ 7]    so we add it to DE (just by adding 0x08 to D)
-   ld    d, a                 ;; [ 4]
-   and   #0x38                ;; [ 7] We check if we have crossed memory boundary (every 8 pixel lines)
-   jp   nz, dms_sprite_height_loop ;; [10]  by checking the 4 bits that identify present memory line. 
+   ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
+   add   #0x08     ;; [2]    so we add it to DE (just by adding 0x08 to D)
+   ld    d, a      ;; [1]
+   and   #0x38     ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)
+   jr   nz, dms_sprite_height_loop ;; [2/3]  by checking the 4 bits that identify present memory line. 
                                    ;; ....  If 0, we have crossed boundaries
 
 dms_sprite_8bit_boundary_crossed:
-   ld    a, e                 ;; [ 4] DE = DE + 0xC050h
-   add   #0x50                ;; [ 7] -- Relocate DE pointer to the start of the next pixel line:
-   ld    e, a                 ;; [ 4] -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
-   ld    a, d                 ;; [ 4] -- which effectively is the same as moving it 1 bank backwards and then
-   adc   #0xC0                ;; [ 7] -- 50 bytes forwards (which is what we want to move it to the next pixel line)
-   ld    d, a                 ;; [ 4] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
+   ld    a, e      ;; [1] DE = DE + 0xC050h
+   add   #0x50     ;; [2] -- Relocate DE pointer to the start of the next pixel line:
+   ld    e, a      ;; [1] -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
+   ld    a, d      ;; [1] -- which effectively is the same as moving it 1 bank backwards and then
+   adc   #0xC0     ;; [2] -- 50 bytes forwards (which is what we want to move it to the next pixel line)
+   ld    d, a      ;; [1] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
 
-   jp  dms_sprite_height_loop ;; [10] Jump to continue with next pixel line
+   jr  dms_sprite_height_loop ;; [3] Jump to continue with next pixel line
 
 dms_sprite_copy_ended:
-   pop  ix                    ;; [14] Restore IX before returning
-   ret                        ;; [11] Return to caller
+   pop  ix         ;; [5] Restore IX before returning
+   ret             ;; [3] Return to caller

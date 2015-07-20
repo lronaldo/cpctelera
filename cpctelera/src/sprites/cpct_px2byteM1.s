@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include /sprites.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_px2byteM1
 ;;
@@ -89,11 +87,11 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
-;; ---------------------------------
-;; Any   |  341   |  85,25 
+;; Case  | microSecs (us) | CPU Cycles
+;; ------------------------------------
+;; Any   |      96        |   384
+;; ------------------------------------
 ;; (end code)
-;;    NC=Number of colours to convert
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Pixel colour table defined in cpct_drawCharM1
@@ -101,32 +99,32 @@
 
 _cpct_px2byteM1::
    ;; Point HL to the start of the first parameter in the stack
-   ld   hl, #2           ;; [10] HL Points to SP+2 (first 2 bytes are return address)
-   ld    c, h            ;; [ 4] C = 0 (Byte in video memory pixel format)
-   add  hl, sp           ;; [11]    , to use it for getting parameters from stack
+   ld   hl, #2           ;; [3] HL Points to SP+2 (first 2 bytes are return address)
+   ld    c, h            ;; [1] C = 0 (Byte in video memory pixel format)
+   add  hl, sp           ;; [3]    , to use it for getting parameters from stack
 
    ;;
    ;; Transform next pixel into Screen Pixel Format
    ;;
-   ld    b, #4           ;; [ 7] We have 4 pixels to mix into 1 byte, so set loop counter to 4
+   ld    b, #4           ;; [2] We have 4 pixels to mix into 1 byte, so set loop counter to 4
 px1_repeat:
-   ld   de, #dc_mode1_ct ;; [10] DE points to the start of the colour table
-   ld    a, (hl)         ;; [ 7] A = Firmware colour for next pixel (to be added to DE, 
+   ld   de, #dc_mode1_ct ;; [3] DE points to the start of the colour table
+   ld    a, (hl)         ;; [2] A = Firmware colour for next pixel (to be added to DE, 
                          ;; .... as it is the index of the colour value to retrieve)
    ;; Compute DE += Pixel 0 (A)
-   add   e               ;; [ 4] | E += A
-   ld    e, a            ;; [ 4] |
-   sub   a               ;; [ 4] A = 0 (preserving Carry Flag)
-   adc   d               ;; [ 4] | D += Carry
-   ld    d, a            ;; [ 4] |
+   add   e               ;; [1] | E += A
+   ld    e, a            ;; [1] |
+   sub   a               ;; [1] A = 0 (preserving Carry Flag)
+   adc   d               ;; [1] | D += Carry
+   ld    d, a            ;; [1] |
 
-   ld    a, (de)         ;; [ 7] A = Screen format for Firmware colour for Pixel
-   or    c               ;; [ 4] Mix (OR) pixel format with accumulated previous pixel format conversions
-   rlca                  ;; [ 4] Rotate A left, to left space for next pixel at the same 2 bits (7 and 3)
-   ld    c, a            ;; [ 4] B = Acumulated screen pixels format
-   inc  hl               ;; [ 6] HL points to next pixel in firmware colour (next parameter)
-   djnz px1_repeat       ;; [13/8] Repeat until B=0 (until 4 pixels have been converted)
+   ld    a, (de)         ;; [2] A = Screen format for Firmware colour for Pixel
+   or    c               ;; [1] Mix (OR) pixel format with accumulated previous pixel format conversions
+   rlca                  ;; [1] Rotate A left, to left space for next pixel at the same 2 bits (7 and 3)
+   ld    c, a            ;; [1] B = Acumulated screen pixels format
+   inc  hl               ;; [2] HL points to next pixel in firmware colour (next parameter)
+   djnz px1_repeat       ;; [3/4] Repeat until B=0 (until 4 pixels have been converted)
 
-   ld    l, c            ;; [ 4] L = B, put return value into L
+   ld    l, c            ;; [1] L = B, put return value into L
 
-   ret                   ;; [10] return
+   ret                   ;; [3] return

@@ -15,17 +15,11 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-;#####################################################################
-;### MODULE: Sprites                                               ###
-;#####################################################################
-;### This module contains several functions and routines to manage ###
-;### sprites and video memory in an Amstrad CPC environment.       ###
-;#####################################################################
-;
 .module cpct_sprites
 
 ;;
-;; Compilation control directives
+;; ASM bindings for <cpct_drawTileAligned2x8>
 ;;
-;; If true, interrupts can be disabled to get function parameters faster
-.equ let_disable_interrupts_for_function_parameters, 0  
+cpct_drawTileAligned2x8_asm::
+
+.include /cpct_drawTileAligned2x8.asm/
