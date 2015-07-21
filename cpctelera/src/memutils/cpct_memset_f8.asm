@@ -68,7 +68,7 @@
 ;; for values in the range [8-16] could underperform simple variable assignments. 
 ;;
 ;; Destroyed Register values: 
-;;    BC, DE, HL
+;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
 ;;    C-binding   - 46 bytes

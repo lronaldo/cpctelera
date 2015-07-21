@@ -67,7 +67,7 @@
 ;; that you use it for values much greater than 64. 
 ;;
 ;; Destroyed Register values: 
-;;    A, BC, DE, HL
+;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
 ;;    C-binding   - 72 bytes
