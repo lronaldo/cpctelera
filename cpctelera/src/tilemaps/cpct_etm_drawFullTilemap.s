@@ -41,13 +41,14 @@
 ;; contents or size. If you give a wrong pointer, your tilemap has different
 ;; dimensions than required or has less / more tiles than will be used later,
 ;; rubbish can appear on the screen.
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;
 ;;
 ;; Destroyed Register values: 
-;;    C Call   - AF, HL
-;;    ASM Call - none
+;;      AF,  BC,  DE,  HL
+;;      AF', BC', DE', HL'
 ;;
 ;; Required memory:
 ;;      bytes
@@ -85,7 +86,8 @@ _cpct_etm_drawFullTilemap::
 
    ld    h, 1(ix)      ;; [5] HL = Pointer to the tilemap (ptilemap)
    ld    l, 0(ix)      ;; [5] 
-   ld    b, 6(ix)      ;; [5] B = Map width
+   ld    a, 6(ix)      ;; [5] A = Map width
+   ld (set_HLp_nextRow+1), a ;; [4] Save Map_width into the placeholder to restore B at each height loop
    ld    c, 7(ix)      ;; [5] C = Map height
    ld    d, 5(ix)      ;; [5] DE = Pointer to video memory (place to draw)
    ld    e, 4(ix)      ;; [5] 
@@ -115,11 +117,13 @@ drawtiles_height:
    ld    d, a          ;; [1] 
 
 set_HLp_nextRow:
+   ld    b, #00    ;; [2] B = map_width (it must be restored for each new row to be drawn, #00 is a placeholder)
+
    ;; HL' = DE (HL' is the pointer to video memory which 
    ;; ... we are changing, so put the result in there
    push  de        ;; [4] Save DE (Pointer to next video memory line)
    exx             ;; [1] Change to alternate register set
-   pop   hl        ;; [3] HL' = DE, now pointing to next video memory line 
+   pop   de        ;; [3] DE' = DE, now pointing to next video memory line 
    exx             ;; [1] Back to normal register set
 
 drawtiles_width:
@@ -132,7 +136,6 @@ restore_ptileset:
 
    ;; Calculate HL' = BC' + 2A to point to a pointer to definition of the tilenum tile
    ;;    as BC' points to the start of the tileset pointer vector, and A is the index
-   ex   de, hl     ;; [1] Save HL into DE to use HL for fast math calculations  
    ld    l, a      ;; [1] <| HL' = A
    ld    h, #0     ;; [2] <|
    add  hl, hl     ;; [3] HL' = 2A
@@ -143,17 +146,16 @@ restore_ptileset:
    inc  hl         ;; [2]
    ld    h, (hl)   ;; [2] H = HSB of the tile pointer
    ld    l, a      ;; [1] HL = tile pointer
-   ex   de, hl     ;; [1]  DE holds the pointer to the tile definition, 
-                   ;;  ... HL points to video memory again
 
-   push hl                             ;; [4] Save HL'
+   push de                             ;; [4] Save DE'
    call cpct_drawTileAligned2x4_f_asm  ;; [5+59] Draw the tile
-   pop  hl                             ;; [3] Restore HL'
+   pop  de                             ;; [3] Restore DE'
 
-   inc  hl              ;; [2] HL' += 2 (HL' += tilewidth, so that HL' points to the place in 
-   inc  hl              ;; [2]   video memory where next till will be drawn
+   inc  de              ;; [2] DE' += 2 (DE' += tilewidth, so that DE' points to the place in 
+   inc  de              ;; [2]   video memory where next till will be drawn
 
    exx                  ;; [1] Back to normal Register Set
+   inc  hl              ;; [2] Point to next item in the tilemap
    djnz drawtiles_width ;; [3/4] IF B!=0, continue with next tile from this line
 
    dec  c                   ;; [1] 1 less tile row to draw
