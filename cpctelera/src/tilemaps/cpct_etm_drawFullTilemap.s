@@ -21,47 +21,77 @@
 ;;
 ;; Function: cpct_etm_drawFullTilemap
 ;;
-;;    Draws a complete tilemap of type TEasyTilemap
+;;    Draws a complete tilemap of type <cpct_TEasyTilemap>
 ;;
 ;; C Definition:
 ;;    void <cpct_etm_drawFullTilemap> (void* *ptilemap*) __z88dk_fastcall;
 ;;
 ;; Input Parameters (2 bytes):
-;;  (2B HL) ptilemap - Pointer to the TEasyTilemap structure defining the tilemap
+;;    (2B HL) ptilemap - Pointer to the <cpct_TEasyTilemap> structure defining the tilemap.
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_etm_drawFullTilemap
+;;    > call cpct_etm_drawFullTilemap_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *ptilemap* could be any 16-bits value, representing the memory 
-;; address where the tilemap structure is stored.
+;; address where the <cpct_TEasyTilemap> structure is stored. This function expects
+;; the parameter to point to a complete structure like this: if the structure is not
+;; well populated or the pointer points to other thing, the result is undefined (most
+;; likely a crash or rubbish on the screen).
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of checking over the tilemap, its
 ;; contents or size. If you give a wrong pointer, your tilemap has different
 ;; dimensions than required or has less / more tiles than will be used later,
 ;; rubbish can appear on the screen.
+;;     * Inside the structure, the pointer to the video memory *must* point to a
+;; pixel line 0 or a pixel line 4 from any character line on the screen or back buffer.
+;; To know where pixel lines 0/4 are located you may have a look at <cpct_drawSprite> 
+;; documentation.
+;;     * This function only draws 8-bytes tiles of size 2x4 (in bytes).
 ;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;     * Under hardware scroll conditions, tile drawing will fail if asked to draw
+;; near 0x?7FF or 0x?FFF addresses (at the end of each one of the 8 pixel lines), as 
+;; next screen byte at that locations is -0x7FF and not +1 bytes away.
 ;;
 ;; Details:
+;;    This function draws a complete tilemap on the screen or on a backbuffer. The function
+;; receives the tilemap as a pointer to a <cpct_TEasyTilemap> structure. This structure
+;; contains a tilemap definition (matrix of tile indexes), a tileset definition (array of
+;; pointers to tiles), a pointer to video memory or backbuffer (the location to draw) and 
+;; the height and width of the tilemap in tiles. With this complete information, the
+;; function traverses the tilemap matrix and draws tiles one by one. 
 ;;
+;;    Each tile from the tileset must be a 8-bytes, 2x4-sized tile. This function calls
+;; <cpct_drawTileAligned2x4_f> for drawing each one of the tiles. 
 ;;
 ;; Destroyed Register values: 
 ;;      AF,  BC,  DE,  HL
 ;;      AF', BC', DE', HL'
 ;;
 ;; Required memory:
-;;      bytes
+;;      94 bytes (+ 33 bytes from <cpct_drawTileAligned2x4_f>)
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ---------------------------------
-;;    Any     |    
-;; ---------------------------------
-;; Asm saving |   
-;; ---------------------------------
+;;    Case     |      microSecs (us)            |          CPU Cycles              |
+;; ---------------------------------------------------------------------------------
+;;    Any      | 70 + (10 + 104W)H + 9HO + 16HE | 280 + (40 + 416W)H + 36HO + 64HE |
+;; ---------------------------------------------------------------------------------
+;;  H=30, W=30 |       94.336 (4,68 VSYNCs)     |           377.344                |
+;;  Start=Pix0 |               0,09 secs        |                                  |
+;; ---------------------------------------------------------------------------------
+;;  H=40, W=40 |      167.354 (8,38 VSYNCs)     |           669.416                |
+;;  Start=Pix4 |               0,17 secs        |                                  |
+;; ---------------------------------------------------------------------------------
 ;; (end code)
+;; W  = Map width (number of horizontal tiles)
+;; H  = Map height (number of vertical tiles)
+;; HO = Number of odd tile rows.
+;; HE = Number of even tile rows.
+;; For HO and HE, the first row is considered odd if it starts at a pixel line 4,
+;; and it is considered even otherwise. The last row of the tilemap is never taken 
+;; into account (either for HO or HE).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Declare tile drawing function we are going to use
@@ -78,6 +108,7 @@
 .endm
 
 _cpct_etm_drawFullTilemap::
+cpct_etm_drawFullTilemap_asm::
    ;; Parameter is passed in HL (Pointer to TEasyTilemap Structure)
    push ix             ;; [5] Save IX to restore it later
    ex   de, hl         ;; [1] DE = HL 
@@ -151,16 +182,16 @@ restore_ptileset:
    call cpct_drawTileAligned2x4_f_asm  ;; [5+59] Draw the tile
    pop  de                             ;; [3] Restore DE'
 
-   inc  de              ;; [2] DE' += 2 (DE' += tilewidth, so that DE' points to the place in 
-   inc  de              ;; [2]   video memory where next till will be drawn
+   inc  de                  ;; [2] DE' += 2 (DE' += tilewidth, so that DE' points to the place in 
+   inc  de                  ;; [2]   video memory where next till will be drawn
 
-   exx                  ;; [1] Back to normal Register Set
-   inc  hl              ;; [2] Point to next item in the tilemap
-   djnz drawtiles_width ;; [3/4] IF B!=0, continue with next tile from this line
+   exx                      ;; [1] Back to normal Register Set
+   inc  hl                  ;; [2] Point to next item in the tilemap
+   djnz drawtiles_width     ;; [3/4] IF B!=0, continue with next tile from this line
 
    dec  c                   ;; [1] 1 less tile row to draw
    jr  nz, drawtiles_height ;; [2/3] If there still are some tile rows to draw (C!=0), continue
 
-drawing_end:
+   ;; Drawing end
    pop  ix         ;; [5] Restore IX before returning
    ret             ;; [3] Return

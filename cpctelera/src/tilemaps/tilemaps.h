@@ -26,17 +26,34 @@
 
 #include <types.h>
 
-// EASY TILEMAPS
+//
+// Type: cpct_TEasyTilemap
+//
+//    Structure that contains all the information about an easy Tilemap.
+//
+// C Definition:
+//    typedef struct {
+//       void *ptilemap;   // Pointer to the 2D tile-index matrix (the tilemap)
+//       void *ptileset;   // Pointer to the array of pointers to tile definitions (2x4-sized sprites)
+//       void *pscreen;    // Pointer to the location where the tilemap is to be drawn
+//       u8   map_height;  // Height of the tilemap in tiles
+//       u8   map_width;   // Width of the tilemap in tiles
+//    } cpct_TEasyTilemap;
+//
+// Details:
+//   This structure holds all the required information about an EasyTilemap. The user must
+// create and populate this structure and then it can be passed to tilemap managing 
+// functions for drawing the tilemap.
 //
 typedef struct {
-   void *ptilemap;
-   void *ptileset;
-   void *pscreen;
-   u8   map_height;
-   u8   map_width;
+   void *ptilemap;   // Pointer to the 2D tile-index matrix (the tilemap)
+   void *ptileset;   // Pointer to the array of pointers to tile definitions (2x4-sized sprites)
+   void *pscreen;    // Pointer to the location where the tilemap is to be drawn
+   u8   map_height;  // Height of the tilemap in tiles
+   u8   map_width;   // Width of the tilemap in tiles
 } cpct_TEasyTilemap;
 
-extern void cpct_etm_drawFullTilemap(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
-extern void cpct_etm_redrawTilemap(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
+// Easytilemap managing functions
+extern void cpct_etm_drawFullTilemap(const cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
 
 #endif
