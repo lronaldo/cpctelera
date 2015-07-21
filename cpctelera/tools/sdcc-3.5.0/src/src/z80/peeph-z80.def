@@ -1589,7 +1589,7 @@ replace restart {
 } by {
     push    %1
     call    %2
-    __z88dk_poison__
+    nop
     ret
     ; peephole 114a prevent tail code optimization for functions taking parameters
 }
@@ -1982,6 +1982,22 @@ replace restart {
 	jp	%3
 }
 
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// POISON REMOVE
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+barrier
+
+// Removing nop used as poison to prevent
+//  tail jump optimization on functions taking parameters
+replace {
+    nop
+} by {
+    ; poison removal
+}
+
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier
 
@@ -2313,12 +2329,4 @@ replace {
 } by {
 	djnz	%5
 	; peephole 156 used djnz
-}
-
-// Removing __z88dk_poison__ tag used to prevent
-//  tail jump optimization on functions taking parameters
-replace {
-    __z88dk_poison__
-} by {
-    ; peephole 158: z88dk poison removal
 }

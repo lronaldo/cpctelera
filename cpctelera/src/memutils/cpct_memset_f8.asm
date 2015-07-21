@@ -53,6 +53,9 @@
 ;;  * *value* could be any 16-bit value, without restrictions. It is considered as 
 ;; a pair of bytes that will be copied to every 2-bytes in the array.
 ;;
+;; Known limitations:
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
+;;
 ;; Details:
 ;;    Sets all pairs of bytes of an *array* in memory to the same given *value*. This is 
 ;; the same operation as std memset from standard C library, but with the added advantage
@@ -68,7 +71,7 @@
 ;; for values in the range [8-16] could underperform simple variable assignments. 
 ;;
 ;; Destroyed Register values: 
-;;    BC, DE, HL
+;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
 ;;    C-binding   - 46 bytes

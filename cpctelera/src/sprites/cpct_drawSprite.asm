@@ -24,7 +24,7 @@
 ;;    Copies a sprite from an array to video memory (or to a screen buffer).
 ;;
 ;; C Definition:
-;;    void <cpct_drawSprite> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*);
+;;    void <cpct_drawSprite> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel data)
@@ -70,6 +70,7 @@
 ;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;    This function copies a generic WxH bytes sprite from memory to a 

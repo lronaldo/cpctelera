@@ -60,6 +60,7 @@
 ;; firmware may be unaware of your currently selected MODE and will try to 
 ;; re-establish its own MODE. Take it into account and disable interrupts 
 ;; if you need.
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;    These 4 functions enable / disable lower or upper ROMs. By default, *CPCtelera* 

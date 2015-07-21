@@ -73,6 +73,9 @@ _cpct_akp_songLoopTimes:: .db 0
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_akp_musicPlay_asm
 ;;
+;; Known limitations:
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
+;;
 ;; Details:
 ;;    This function is to be called to start and continue playing the presently 
 ;; selected song with Arkos Tracker Player. Depending on the frequency at which 
@@ -1635,6 +1638,7 @@ PLY_FrequencyTable:
 ;; this must be taken into account. If you wanted to change the memory location
 ;; of the song, you should first open the song into Arkos Tracker and export
 ;; it again with the new desired memory location.
+;;    * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;    This function should be called fist to initialize the song that is to be 
@@ -1738,6 +1742,9 @@ PLY_Init:
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_akp_stop_asm
+;;
+;; Known limitations:
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;    This function stops the music and sound effects playing in the 3 channels. 
@@ -1876,6 +1883,9 @@ PLY_Stop:
    ;; Assembly call (Input parameters on registers):
    ;;    > call cpct_akp_SFXInit_asm
    ;;
+   ;; Known limitations:
+   ;;  * This function *will not work from ROM*, as it uses self-modifying code.
+   ;;
    ;; Parameter Restrictions:
    ;;    * *sfx_song_data* must be a song in binary AKS format. However, this song 
    ;; only needs to have instruments defined (there is not need for an actual "song"
@@ -1951,6 +1961,9 @@ PLY_Stop:
    ;; Assembly call (Input parameters on registers):
    ;;    > call cpct_akp_SFXStopAll_asm
    ;;
+   ;; Known limitations:
+   ;;  * This function *will not work from ROM*, as it uses self-modifying code.
+   ;;
    ;; Details:
    ;;    This function stops all sound FX reproduction on all the 3 sound channels.
    ;;
@@ -2020,6 +2033,9 @@ PLY_Stop:
    ;;
    ;; Assembly call (Input parameters on registers):
    ;;    > call cpct_akp_SFXPlay_asm
+   ;;
+   ;; Known limitations:
+   ;;  * This function *will not work from ROM*, as it uses self-modifying code.
    ;;
    ;; Details:
    ;;    Plays a given sound effect, along with the music, in a concrete channel 
@@ -2143,6 +2159,9 @@ PLY_Stop:
    ;; Assembly call (Input parameters on registers):
    ;;    > call cpct_akp_SFXStop_asm
    ;;
+   ;; Known limitations:
+   ;;  * This function *will not work from ROM*, as it uses self-modifying code.
+   ;;
    ;; Parameter Restrictions:
    ;;    * *stop_bitmask* must be a value that operates as a set of enabled / 
    ;; disabled bits (a bitmask). Concretely, the 3 Least Significant bits, 2, 1 
@@ -2231,6 +2250,9 @@ PLY_Stop:
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_akp_setFadeVolume_asm
+;;
+;; Known limitations:
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Parameter Restrictions:
 ;;    * *volume* must be a value in the range [0-15] for some meaning. Values 

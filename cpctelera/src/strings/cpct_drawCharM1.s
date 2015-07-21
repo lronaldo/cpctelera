@@ -69,6 +69,7 @@
 ;; crashes might happen due to side effects.
 ;;  * This function *disables interrupts* during main loop (character printing), and
 ;; re-enables them at the end.
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;    This function reads a character from ROM and draws it at a given byte-aligned 

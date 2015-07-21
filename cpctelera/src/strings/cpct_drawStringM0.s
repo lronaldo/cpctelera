@@ -70,6 +70,7 @@
 ;; crashes might happen due to side effects.
 ;;  * This function *disables interrupts* during main loop (character printing), and
 ;; re-enables them at the end.
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;    This function receives a null-terminated string and draws it to the screen in 

@@ -86,20 +86,6 @@
 
 _cpct_set2Bits::
    ;; GET Parameters from the stack
-.if let_disable_interrupts_for_function_parameters
-   ;; Way 1: Pop + Restoring SP. Faster, but consumes 4 bytes more, and requires disabling interrupts
-   ld (s2b_restoreSP+1), sp ;; [20] Save SP into placeholder of the instruction LD SP, 0, to quickly restore it later.
-   di                       ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   pop  af                  ;; [10] AF = Return Address
-   pop  de                  ;; [10] DE = Pointer to the bitarray in memory
-   pop  hl                  ;; [10] HL = Index of the bit to be set
-   pop  bc                  ;; [10] BC => C = Set Value (0-3), B = Undefined
-s2b_restoreSP:
-   ld   sp, #0              ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with actual 
-                            ;; ....                              SP value previously)
-   ei                       ;; [ 4] Enable interrupts again
-.else 
-   ;; Way 2: Pop + Push. Just 6 cycles more, but does not require disabling interrupts
    pop  af                  ;; [10] AF = Return Address
    pop  de                  ;; [10] DE = Pointer to the bitarray in memory
    pop  hl                  ;; [10] HL = Index of the bit to be set
@@ -108,7 +94,6 @@ s2b_restoreSP:
    push hl                  ;; [11] (Interrupt safe way, 6 cycles more)
    push de                  ;; [11]
    push af                  ;; [11]
-.endif
 
 cpct_set2Bits_asm::         ;; Entry point for assembly calls using registers for parameter passing
 
