@@ -34,7 +34,6 @@ typedef struct {
    void *pscreen;
    u8   map_height;
    u8   map_width;
-   u8   tile_size;
 } cpct_TEasyTilemap;
 
 extern void cpct_etm_drawFullTilemap(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
