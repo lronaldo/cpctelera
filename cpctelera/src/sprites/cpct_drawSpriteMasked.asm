@@ -25,7 +25,7 @@
 ;; using mask as transparency information, to prevent erasing the background.
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteMasked> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*);
+;;    void <cpct_drawSpriteMasked> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel and mask data)

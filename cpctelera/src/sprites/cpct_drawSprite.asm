@@ -24,7 +24,7 @@
 ;;    Copies a sprite from an array to video memory (or to a screen buffer).
 ;;
 ;; C Definition:
-;;    void <cpct_drawSprite> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*);
+;;    void <cpct_drawSprite> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel data)

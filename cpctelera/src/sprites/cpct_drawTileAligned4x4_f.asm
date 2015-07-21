@@ -25,7 +25,7 @@
 ;; location to be copied is from Pixel Line 0 to Pixel Line 3 of a character line. 
 ;;
 ;; C Definition:
-;;    void <cpct_drawTileAligned4x4_f> (void* *sprite*, void* *memory*)
+;;    void <cpct_drawTileAligned4x4_f> (void* *sprite*, void* *memory*) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (16-byte array with 8-bit pixel data)

@@ -26,7 +26,7 @@
 ;; ~26% faster than <cpct_drawTileAligned2x8>.
 ;;
 ;; C Definition:
-;;    void <cpct_drawTileAligned2x8_f> (void* *sprite*, void* *memory*)
+;;    void <cpct_drawTileAligned2x8_f> (void* *sprite*, void* *memory*) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (16-byte array with 8-bit pixel data)

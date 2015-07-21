@@ -47,7 +47,7 @@ extern void cpct_drawTileAligned4x8_f(void *sprite, void* memory) __z88dk_callee
 
 // Sprite and box drawing functions
 extern void cpct_drawSprite          (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
-extern void cpct_drawSpriteMasked    (void *sprite, void* memory, u8 width, u8 height);
+extern void cpct_drawSpriteMasked    (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height);
 
 //
