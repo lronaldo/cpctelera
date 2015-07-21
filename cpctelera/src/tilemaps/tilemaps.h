@@ -39,10 +39,4 @@ typedef struct {
 extern void cpct_etm_drawFullTilemap(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
 extern void cpct_etm_redrawTilemap(cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
 
-// Setting global configuration for tilemanagement
-extern void cpct_tm_setTileset              (void* ptileset);
-extern void cpct_tm_setTilemap              (void* ptilemap);
-extern void cpct_tm_setFunctionGetTileIndex (void* pgetTileIndexFunc);
-extern void cpct_tm_setFunctionGetTile      (void* pgetTileFunc);
-
 #endif
