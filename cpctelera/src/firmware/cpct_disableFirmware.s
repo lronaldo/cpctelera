@@ -45,6 +45,9 @@ _cpct_firmware_address:: .dw 0
 ;; Assembly call:
 ;;    > call cpct_disableFirmware_asm
 ;;
+;; Known limitations:
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
+;;
 ;; Details:
 ;;    Disables the firmware modifying the interrupt vector at memory location 
 ;; 0x38. Normally, firmware routines are called and executed at every interrupt
