@@ -46,7 +46,7 @@ Section: 3rdparty software authors
  <Arkos Tracker at http://www.grimware.org/doku.php/documentations/software/arkos.tracker/start>:
    * Main Author: <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> 
    * Other Authors / Collaborators: SuperSylvestre / Les Sucres, 
-   Augusto Ruiz Garcia (WYZ) / <Retroworks at http://www.retroworks.es>, 
+   <Augusto Ruiz at https://twitter.com/augurui> / <Retroworks at http://www.retroworks.es>, 
    Grim / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>, 
    <Lachlan Keown at http://www.twitter.com/lachlankeown>, 
    Ramlaid / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>, 
