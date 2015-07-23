@@ -17,8 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_video
   
-.include /videomode.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_getScreenPtr
 ;;
@@ -54,7 +52,7 @@
 ;; care.
 ;;
 ;; Return Value:
-;;    u8* - Pointer to the (*x*,*y*) byte in the screen memory that starts 
+;;    (HL) u8* - Pointer to the (*x*,*y*) byte in the screen memory that starts 
 ;; at *screen_start*.
 ;;
 ;; Known limitations:
@@ -88,62 +86,54 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    35 bytes
+;;    C-bindints - 32 bytes
+;;  ASM-bindints - 28 bytes
 ;;
-;; Time Measures:
+;; Time Measures: 
 ;; (start code)
-;;     Case   | Cycles  | microSecs (us)
-;; ---------------------------------------
-;;     Any    |  224    |   56.00
-;; ---------------------------------------
-;; Asm saving |  -63    |  -15.75
-;; ---------------------------------------
+;;     Case   | microSecs (us) | CPU Cycles
+;; -----------------------------------------
+;;     Any    |      53        |     212
+;; -----------------------------------------
+;; Asm saving |     -13        |     -52
+;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_getScreenPtr::
-   ;; Get Parameters from stack
-   pop  af        ;; [10] AF = Return Address
-   pop  de        ;; [10] DE = Pointer to start of screen memory
-   pop  bc        ;; [10] B = y coordinate in bytes, C = x coordinate in bytes
-   push bc        ;; [11] --- Restore stack status
-   push de        ;; [11]
-   push af        ;; [11] 
-
-cpct_getScreenPtr_asm::      ;; Assembly entry point
-   ;; Add up X coordinate to screen_memory 
-   ;; (DE += C, as DE = screen_memory, and C = x coordinate)
-   ld    a, e     ;; [ 4] / E = E + x   (As C = x)
-   add   c        ;; [ 4] |   ( If E + x > 0xFF, Carry is set. We must Add it to D )
-   ld    e, a     ;; [ 4] \
-   sub   a        ;; [ 4] A = 0 (preserving carry, and with only 4 cycles)
-   ld    h, a     ;; [ 4] H = 0 (We will need it to be 0, and profit now from having a 0 on A)
-   adc   d        ;; [ 4] | D = D + Carry 
-   ld    d, a     ;; [ 4] |   (If E + x did set carry, this will do D += 1, else D += 0)
+   ;; Add up X coordinate to screen_memory, so that DE = (screen_start + x)
+   ;; (DE += C, as DE = screen_memory, and C = x coordinate) 
+   ld    a, e     ;; [1] / E = E + x   (As C = x)
+   add   c        ;; [1] |   ( If E + x > 0xFF, Carry is set. We must Add it to D )
+   ld    e, a     ;; [1] |
+   adc   d        ;; [1] | D = D + C + Carry 
+   sub   c        ;; [1] | D = D + Carry
+   ld    d, a     ;; [1] |   (If E + x did set carry, this will do D += 1, else D += 0)
 
    ;; Let y' = [ y / 8 ] = int(y / 8) (Integer division by 8)
    ;; Calculate 80y' = (64 + 16)y' (0x50 * y')
-   ld    a, b     ;; [ 4] A = y coordinate (which is stored in b)
-   and   #0xF8    ;; [ 7] A = 8y'   ( and 0xF8 is the same as 8 * int(y / 8) = 8y' )
-   ld    l, a     ;; [ 4] HL = 8y'  (H = 0, L = 8y')
-   ld    a, b     ;; [ 4] A = y coordinate (Save for later use, freeing BC)
-   add  hl, hl    ;; [11] HL = 8y' + 8y' = 16y'
-   ld    b, h     ;; [ 4] | BC = 16y'
-   ld    c, l     ;; [ 4] |
-   add  hl, hl    ;; [11] HL = 16y' + 16y' = 32y'
-   add  hl, hl    ;; [11] HL = 32y' + 32y' = 64y'
-   add  hl, bc    ;; [11] HL = 64y' + 16y' = 80y'
+   ld    a, b     ;; [1] A = y coordinate (which is stored in b)
+   and   #0xF8    ;; [2] A = 8y'   ( and 0xF8 is the same as 8 * int(y / 8) = 8y' )
+   ld    l, a     ;; [1] | HL = 8y'  (H = 0, L = 8y')
+   ld    h, #0    ;; [2] |
+   ld    a, b     ;; [1] A = y coordinate (Save for later use, freeing BC)
+   add  hl, hl    ;; [3] HL = 8y' + 8y' = 16y'
+   ld    b, h     ;; [1] | BC = 16y'
+   ld    c, l     ;; [1] |
+   add  hl, hl    ;; [3] HL = 16y' + 16y' = 32y'
+   add  hl, hl    ;; [3] HL = 32y' + 32y' = 64y'
+   add  hl, bc    ;; [3] HL = 64y' + 16y' = 80y'
 
    ;; Calculate 2048 * (y % 8)  (0x800 * (y % 8))
-   and   #0x07    ;; [ 7]  A = y % 8  (A had y coordinate)
-   rlca           ;; [ 4]  A = 2 (y % 8)
-   rlca           ;; [ 4]  A = 4 (y % 8)
-   rlca           ;; [ 4]  A = 8 (y % 8)
-   ld    b, a     ;; [ 4] | BC = 0x100 * 8 (y % 8)
-   ld    c, #0    ;; [ 7] |
+   and   #0x07    ;; [2]  A = y % 8  (A had y coordinate)
+   rlca           ;; [1]  A = 2 (y % 8)
+   rlca           ;; [1]  A = 4 (y % 8)
+   rlca           ;; [1]  A = 8 (y % 8)
+   ;; Now [A 0x00] (Using a as HSB) would be 0x100 * A = 0x100 * 8 (y % 8 )
+   ;; So, we only have to add A to H in order to have HL += 0x100 * 8 (y % 8)
+   add   h        ;; [1]  | HL += 0x100 * 8 (y % 8)
+   ld    h, a     ;; [1]  |
 
    ;; Add up everything and return
-   add  hl, bc    ;; [11] HL = 80 * [y / 8] + 2048 * (y % 8) 
-   add  hl, de    ;; [11] HL = 80 * [y / 8] + 2048 * (y % 8) + (screen_start + x)
+   add  hl, de    ;; [3] HL = 80 * [y / 8] + 2048 * (y % 8) + (screen_start + x)
 
-   ret            ;; [10] Return
+   ret            ;; [3] Return
