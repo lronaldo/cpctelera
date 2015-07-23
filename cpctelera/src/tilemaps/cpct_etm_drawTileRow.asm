@@ -91,8 +91,8 @@
 drawtiles_width:
    ld    a, (hl)   ;; [2] A = tilenum (tile index in the tileset)
   
-restore_ptileset:  ;; set_tileset must be called before using this function
-   ld   bc, #0000  ;; [3] BC' points again to the tileset (#0000 is a placeholder for ptileset)
+dtr_restore_ptileset::  ;; set_tileset must be called before using this function
+   ld   bc, #0000       ;; [3] BC' points again to the tileset (#0000 is a placeholder for ptileset)
 
    ;; Calculate HL' = BC' + 2A to point to a pointer to definition of the tilenum tile
    ;;    as BC' points to the start of the tileset pointer vector, and A is the index
