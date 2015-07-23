@@ -76,13 +76,13 @@
 ;; (start code)
 ;;    Case     |      microSecs (us)            |          CPU Cycles              |
 ;; ---------------------------------------------------------------------------------
-;;    Any      | 42 + (22 + 103W)H + 9HO + 16HE | 168 + (88 + 412W)H + 36HO + 64HE |
+;;    Any      | 42 + (21 + 103W)H + 9HO + 16HE | 168 + (84 + 412W)H + 36HO + 64HE |
 ;; ---------------------------------------------------------------------------------
-;;  H=30, W=30 |       94.336 (4,68 VSYNCs)     |           377.344                |
-;;  Start=Pix0 |               0,09 secs        |                                  |
+;;  H=30, W=30 |       94.738 (4,69 VSYNCs)     |           378.952                |
+;;  Start=Pix0 |               0,094 secs       |                                  |
 ;; ---------------------------------------------------------------------------------
-;;  H=40, W=40 |      167.354 (8,38 VSYNCs)     |           669.416                |
-;;  Start=Pix4 |               0,17 secs        |                                  |
+;;  H=40, W=40 |      166.166 (8,32 VSYNCs)     |           664.664                |
+;;  Start=Pix4 |               0,166 secs       |                                  |
 ;; ---------------------------------------------------------------------------------
 ;; (end code)
 ;; W  = Map width (number of horizontal tiles)
@@ -147,9 +147,13 @@ set_HLp_nextRow:
 
    ;; HL' = DE (HL' is the pointer to video memory which 
    ;; ... we are changing, so put the result in there
-   push  de            ;; [4] Save DE (Pointer to next video memory line)
+   ld   a, e           ;; [1] A = E
    exx                 ;; [1] Change to alternate register set
-   pop   de            ;; [3] DE' = DE, now pointing to next video memory line 
+   ld   e, a           ;; [1] E' = A
+   exx                 ;; [1] Back to normal register set
+   ld   a, d           ;; [1] A = D
+   exx                 ;; [1] Change to alternate register set
+   ld   d, a           ;; [1] D' = A,  DE' = DE (Pointer to video memory passed to DE')
    exx                 ;; [1] Back to normal register set
 
    call cpct_etm_drawTileRow_asm ;; [7 + 103B'] Draws the next tile Row (B' holds the width of the tilerow)
