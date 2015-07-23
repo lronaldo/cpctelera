@@ -69,10 +69,9 @@
 ;;   tileset address is to be configured
 .globl dtr_restore_ptileset
 
-_cpct_setTileset::
-cpct_setTileset_asm::
+_cpct_etm_setTileset::
    ;; No need to recover parameters from the stack, as this function uses __z88dk_fastcall
    ;; convention, which means parameter is passed directly in HL
 
-   ld  (dtr_restore_ptileset + 1), hl ;; [6]
-   ret                                ;; [3] Return
+   ld  (dtr_restore_ptileset + 1), hl   ;; [6]
+   ret                                    ;; [3] Return

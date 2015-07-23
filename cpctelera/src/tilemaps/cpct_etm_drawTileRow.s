@@ -1,0 +1,160 @@
+;;-----------------------------LICENSE NOTICE------------------------------------
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;
+;;  This program is free software: you can redistribute it and/or modify
+;;  it under the terms of the GNU General Public License as published by
+;;  the Free Software Foundation, either version 3 of the License, or
+;;  (at your option) any later version.
+;;
+;;  This program is distributed in the hope that it will be useful,
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;  GNU General Public License for more details.
+;;
+;;  You should have received a copy of the GNU General Public License
+;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;-------------------------------------------------------------------------------
+.module cpct_tilemaps
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_etm_drawTileRow
+;;
+;;    Draws a row of tiles from a tilemap.
+;;
+;; C Definition:
+;;    void <cpct_etm_drawTileRow> (u8 *numtiles*, const void* *pvideomem*, 
+;;                                 const void* *ptilemap*) __z88dk_callee;
+;;
+;; Input Parameters (5 bytes):
+;;    (1B  B') numtiles  - Number of tiles from this row to draw
+;;    (2B DE') pvideomem - Pointer to the video memory byte where to draw the tile row
+;;    (2B  HL) ptilemap  - Pointer to the tilemap byte where the definition of the row starts
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_etm_drawTileRow_asm
+;;    This function requires parameters divided into the 2 sets of registers of the Z80. 2
+;; paramteres must be on the alternate register set, while 1 has to be on the main register
+;; set. An example call to this function will be:
+;; (start code)
+;;   ld hl, #ptilemap_row          ;; HL points to the tilemap row we want to draw
+;;   exx                           ;; Change to the alternate register set
+;;   ld  b, #row_width             ;; B' holds the number of tiles to draw from this row
+;;   ld de, #pvideomem             ;; DE points to the place on video memory where we are going to draw
+;;   exx                           ;; Return to the main register set (Very important to do this!)
+;;   call cpct_etm_drawTileRow_asm ;; Finally, call the function
+;; (end code)
+;;
+;; Parameter Restrictions:
+;;    * *ptilemap* and *pvideomem* could be any 16-bits value, representing the memory 
+;; addresses where the tilemap_row starts and the location on the video memory where to
+;; draw the row, respectively. This does not do any check on these parameters and, if they
+;; are badly provided, the result is undefined (most likely a crash or rubbish on the screen).
+;;    * The tilemap row pointed by *ptilemap* should be in Easytilemap's format, that is, 
+;; a 2D matrix of 8-bit number, each one representing a tile index for the tileset.
+;;    * *pvideomem* must point to a valid pixel line (0 to 4) for from video memory or
+;; from a backbuffer. To know which pixel lines are considered 0 to 4 you may have a look
+;; at <cpct_drawSprite> documentation.
+;;    * *numtiles* is expected to be the number of tiles to draw. There is no restriction 
+;; on the number and, again, the function does not do any kind of check. Providing a number
+;; of tiles greater than the tiles available in the row or greater than the space for tiles
+;; available on the screen will usually lead to graphical glitches (displaced tiles), rubbish
+;; on the screen and, occasionally a crash.
+;;
+;; Known limitations:
+;;     * This function does not do any kind of check on the parameters. It is up to the
+;; programmer to provide correct values for them.
+;;     * This function *will not propperly work* if <cpct_etm_setTileset> has not been
+;; called previously, as the tileset pointer will not have been set.
+;;     * This function only draws 8-bytes tiles of size 2x4 (in bytes). It uses 
+;; <cpct_drawTileAligned2x4_f_asm>, so this function will be included in the code and called.
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;     * Under hardware scroll conditions, tile drawing will fail if asked to draw
+;; near 0x?7FF or 0x?FFF addresses (at the end of each one of the 8 pixel lines), as 
+;; next screen byte at that locations is -0x7FF and not +1 bytes away.
+;;
+;; Details:
+;;    This function draws a row of tiles coming from a tilemap row definition. The function
+;; walks through the tilemap row retrieving tile indexes one by one, getting pointers to
+;; the tiles from the default tileset, using tile indexes, and calling <cpct_drawTileAligned2x4_f> 
+;; for each tile.
+;;
+;;    The function *needs* the tileset to have been previously set, which can be done by
+;; calling <cpct_etm_setTileset>. If this has not been done when <cpct_etm_drawTileRow> is
+;; called, then NULL (0000) is used as pointer to the tileset, yielding unexpected results.
+;;
+;; Destroyed Register values: 
+;;      AF,   B,  HL
+;;      AF', BC', DE',  HL'
+;;
+;; Required memory:
+;;      33 bytes (+ 33 bytes from <cpct_drawTileAligned2x4_f>)
+;;
+;; Time Measures:
+;; (start code)
+;;    Case     | microSecs (us) | CPU Cycles  
+;; ------------------------------------------
+;;    Any      |  21 + 103W     | 84 + 412W
+;; ------------------------------------------
+;; ASM Saving  |     -19        |    -76
+;; ------------------------------------------
+;; (end code)
+;; W  = Map width (number of horizontal tiles)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Declare tile drawing function we are going to use
+.globl cpct_drawTileAligned2x4_f_asm
+
+;; C bindings for <cpct_etm_drawTileRow>
+;;   --> Included here not to duplicate dtr_restore_ptileset
+;;
+;;    19 microSecs, 7 bytes
+;;
+_cpct_etm_drawTileRow::   
+   ;; Recover parameters from the stack
+   pop hl       ;; [3] HL = Return Address
+   pop bc       ;; [3]  B = Number of tiles in this row
+   dec sp       ;; [2] 
+   exx          ;; [1] Change to alternate Register Set
+   pop de       ;; [3] DE' = Pointer to video memory where to draw the tiles
+
+   exx          ;; [1] Return to normal register set
+   ex (sp), hl  ;; [6] HL = Pointer to the start of the tilemap row
+                ;; ... also puttin again Return Address where SP is located now
+                ;; ... as this function is using __z88dk_callee convention
+
+cpct_etm_drawTileRow_asm:: ;; Assembly entry point
+drawtiles_width:
+   ld    a, (hl)   ;; [2] A = tilenum (tile index in the tileset)
+  
+   exx             ;; [1] Change to Alternative Register Set
+
+dtr_restore_ptileset:: ;; set_tileset must be called before using this function
+   ld   bc, #0000      ;; [3] BC' points again to the tileset (#0000 is a placeholder for ptileset)
+
+   ;; Calculate HL' = BC' + 2A to point to a pointer to definition of the tilenum tile
+   ;;    as BC' points to the start of the tileset pointer vector, and A is the index
+   ld    l, a      ;; [1] <| HL' = A
+   ld    h, #0     ;; [2] <|
+   add  hl, hl     ;; [3] HL' = 2A
+   add  hl, bc     ;; [3] HL' = BC' + 2A
+
+   ;; Now make DE' = tilenum tile definition, which is pointed by (HL')
+   ld    a, (hl)   ;; [2] A = LSB of the tile pointer
+   inc  hl         ;; [2]
+   ld    h, (hl)   ;; [2] H = HSB of the tile pointer
+   ld    l, a      ;; [1] HL = tile pointer
+
+   push de                             ;; [4] Save DE'
+   call cpct_drawTileAligned2x4_f_asm  ;; [5+59] Draw the tile
+   pop  de                             ;; [3] Restore DE'
+
+   inc  de              ;; [2] DE' += 2 (DE' += tilewidth, so that DE' points to the place in 
+   inc  de              ;; [2]   video memory where next till will be drawn
+
+   exx                  ;; [1] Back to normal Register Set
+   inc  hl              ;; [2] Point to next item in the tilemap
+   djnz drawtiles_width ;; [2/3] IF A!=0, continue with next tile from this line
+
+   ret                  ;; [3] Return
