@@ -28,7 +28,7 @@
 ;;                                 const void* *ptilemap*) __z88dk_callee;
 ;;
 ;; Input Parameters (5 bytes):
-;;    (1B  B') numtiles  - Number of tiles from this row to draw
+;;    (1B   B) numtiles  - Number of tiles from this row to draw
 ;;    (2B DE') pvideomem - Pointer to the video memory byte where to draw the tile row
 ;;    (2B  HL) ptilemap  - Pointer to the tilemap byte where the definition of the row starts
 ;;

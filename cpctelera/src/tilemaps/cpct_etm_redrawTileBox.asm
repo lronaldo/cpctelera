@@ -97,7 +97,27 @@
 
 ;; Declare tile drawing function we are going to use
 .globl cpct_etm_drawTileRow_asm
-   
+
+;; Macro for multiplying 16-bits by 8 bits, doing
+;;   HL += DE * A
+;; Important: Carry MUST be 0 at the start
+;;   best:   11 us
+;;   worst: 111 us
+;;
+.macro mult_de_a
+   ;; Displaced digits multiply
+ mul:
+   rra               ;; [1]   Move next right bit to the Carry
+   jr   nc, skip_add ;; [2/3] If No Carry, this bit does not multiply, so we dont add another DE
+   add  hl, de       ;; [3]   If Carry, this bit does multiply, so we add DE to the total 
+
+ skip_add:           ;; For the next iteration, we will add 2*DE if next bit from A is on
+   sla   e           ;; [2] | DE = 2*DE 
+   rr    d           ;; [2] |
+   or    a           ;; [1] Check A while resetting Carry (8-bit digit being displaced for multiplication)
+   jr   nz, mul      ;; [2/3] If A != 0, multiplication hasn't finished yet, continue
+.endm   
+
 ;; Macros for processing HL += A taking carry into account
 ;;   5 microSecs, 5 bytes
 ;; 
@@ -108,6 +128,8 @@
    sub   l         ;; [1] A' = H + Carry  (As we subtract L')
    ld    h, a      ;; [1] | H = A' = H + Carry, finally making HL = HL + A
 .endm
+
+   push hl         ;; [4] Save width and height of the box in the stack
 
    ;; The location where the upper-left tile from the tilebox lies is calculated this way:
    ;;    TileBoxStart = 0x50 * [y/2] + 0x2000 * (y % 2) + 2*x
@@ -123,7 +145,6 @@
    add   a         ;; [1] A = 4y' + 4y' = 8y'
 
    ;; Now we need 16-bits to do the math
-   ex   de, hl     ;; [1] Save HL (width and height into DE)
    ld    h, #0     ;; [2] | HL = 8y'
    ld    l, a      ;; [1] | 
    add  hl, hl     ;; [3] HL =  8y' +  8y' = 16y'
@@ -132,48 +153,73 @@
                    ;;     |  ... same as  HL = 0x50 * int(y/2) )
 
    ;; [5/8] Second, add up 0x2000 * (y % 2)
-   bit   0, b     ;; [2]   Test value of bit 0 from y coordinate (B), to ask "y % 2 = 0?"
-   jr z, dont_add ;; [2/3] If y % 2 == 0, do nothing (no need to add 0x2000 to HL)
-   ld    a, #0x20 ;; [2] y % 2 == 1, so add 0x2000 to HL
-   add   h        ;; [1]
-   ld    h, a     ;; [1] 
+   bit   0, b      ;; [2]   Test value of bit 0 from y coordinate (B), to ask "y % 2 = 0?"
+   jr z, dont_add  ;; [2/3] If y % 2 == 0, do nothing (no need to add 0x2000 to HL)
+   ld    a, #0x20  ;; [2] y % 2 == 1, so add 0x2000 to HL
+   add   h         ;; [1]
+   ld    h, a      ;; [1] 
 
 dont_add:
    ;; [7] Third, add up 2 * x
    ld    a, c      ;; [1] A = x coordinate
    add   a         ;; [1] A = 2x (Ignore carry, because on a 80-byte wide screen x shouldn't be greater than 40)
+   ld    c, a      ;; [1] C = 2x (Save for later use)
    add__hl_a       ;; [5] HL += 2x, so finally HL = 0x50 * int(y/2) + 0x2000
 
+   ;; [13] We have to also add the start location of the tilemap in video memory
+   ld    e, 4(ix)  ;; [5] DE = Pointer to video memory
+   ld    d, 5(ix)  ;; [5]
+   add  hl, de     ;; [3] HL += BC, so HL now points to the place where first tile should be drawn
+   push hl         ;; [4] Save pointer to video memory
+
+   ;; Calculate the offset of the first tile of the box inside the tilemap
+   ;;    Offset = 2y * map_width + 2x
+   ld    h, #0     ;; [2] | HL = 2x
+   ld    l, c      ;; [1] |
+   ld    d, h      ;; [1]  | DE = 2*map_width
+   ld    e, 6(ix)  ;; [5]  |
+   sla   e         ;; [2]  |  <<- No need to look for carry, as map_width should be in [0,39]
+   ld    a, e      ;; [1] | C = 2*map_width - 2*x (jump offset to the next tile row start)
+   sub   c         ;; [1] |
+   ld    c, a      ;; [1] |
+   ld    a, b      ;; [1] A = y (in [0,49])
+   mult_de_a       ;; [11-83] HL += DE * A
+
+
 ;;; TODO > Draw tiles
-;;    (1B  A) numtiles  - Number of tiles from this row to draw
-;;    (2B DE) pvideomem - Pointer to the video memory byte where to draw the tile row
-;;    (2B HL) ptilemap  - Pointer to the tilemap byte where the definition of the row starts
+;;    (1B  B) numtiles  - Number of tiles from this row to draw
+;;    (2B DE') pvideomem - Pointer to the video memory byte where to draw the tile row
+;;    (2B  HL) ptilemap  - Pointer to the tilemap byte where the definition of the row starts
 
 drawtiles_height:
-   ld    a, d          ;; [1] DE += 0x2000 (0x800 x 4) to jump 4 pixel lines from here
-   add  #0x20          ;; [2] 
-   ld    d, a          ;; [1]
-   and  #0x38          ;; [2] Check bits 11,12,13 of D to know if we have jumped to a 
-                       ;;     ... new character line (pixel line 0, all three bits = 0)
+   ld    a, d      ;; [1] DE += 0x2000 (0x800 x 4) to jump 4 pixel lines from here
+   add  #0x20      ;; [2] 
+   ld    d, a      ;; [1]
+   and  #0x38      ;; [2] Check bits 11,12,13 of D to know if we have jumped to a 
+                   ;;     ... new character line (pixel line 0, all three bits = 0)
    jr nz, set_HLp_nextRow ;; [2/3] Not 0 => Pixel Line 4 => No need to adjust
 
    ;; We are jumping to a new pixel line 0, 
    ;; so we have to jump to the next character line (adding 0xC050)
-   ld    a, e          ;; [1] DE += 0xC050
-   add  #0x50          ;; [2] ... jump 4 lines and, as we will overflow video memory 
-   ld    e, a          ;; [1] ... add 0xC050 to move to next character line
-   ld    a, d          ;; [1]  
-   adc  #0xC0          ;; [2]
-   ld    d, a          ;; [1] 
+   ld    a, e      ;; [1] DE += 0xC050
+   add  #0x50      ;; [2] ... jump 4 lines and, as we will overflow video memory 
+   ld    e, a      ;; [1] ... add 0xC050 to move to next character line
+   ld    a, d      ;; [1]  
+   adc  #0xC0      ;; [2]
+   ld    d, a      ;; [1] 
 
-set_HLp_nextRow:
-   ld    a, #00    ;; [2] B = map_width (it must be restored for each new row to be drawn, #00 is a placeholder)
+draw_next_row:
+   ld    b, #00    ;; [2] B = map_width (it must be restored for each new row to be drawn, #00 is a placeholder)
 
    ;; HL' = DE (HL' is the pointer to video memory which 
    ;; ... we are changing, so put the result in there
-   push  de        ;; [4] Save DE (Pointer to next video memory line)
+   ld   a, e       ;; [1] A = E
    exx             ;; [1] Change to alternate register set
-   pop   de        ;; [3] DE' = DE, now pointing to next video memory line 
+   ld   e, a       ;; [1] E' = A
+   exx             ;; [1] Back to normal register set
+   ld   a, d       ;; [1] A = D
+   exx             ;; [1] Change to alternate register set
+   ld   d, a       ;; [1] D' = A,  DE' = DE (Pointer to video memory passed to DE')
    exx             ;; [1] Back to normal register set
 
    call  cpct_etm_drawTileRow_asm
