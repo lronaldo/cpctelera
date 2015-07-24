@@ -55,6 +55,7 @@ typedef struct {
 
 // Easytilemap managing functions
 extern void cpct_etm_drawFullTilemap(const cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
+extern void cpct_etm_redrawTileBox  (const void* ptilemap, u8 x, u8 y, u8 w, u8 h) __z88dk_callee;
 extern void cpct_etm_drawTileRow    (u8 numtiles, const void* video_memory, const void* ptilemap) __z88dk_callee;
 extern void cpct_etm_setTileset     (const void* ptileset) __z88dk_fastcall;
 

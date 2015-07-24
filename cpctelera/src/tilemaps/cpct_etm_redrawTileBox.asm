@@ -56,9 +56,9 @@
 ;; dimensions than required or has less / more tiles than will be used later,
 ;; rubbish can appear on the screen.
 ;;     * Inside the structure, the pointer to the video memory *must* point to a
-;; pixel line 0 or a pixel line 4 from any character line on the screen or back buffer.
-;; To know where pixel lines 0/4 are located you may have a look at <cpct_drawSprite> 
-;; documentation.
+;; pixel line 0 from any character line on the screen or back buffer. To know where 
+;; pixel lines 0 are located you may have a look at <cpct_drawSprite> documentation. 
+;; This function *does not work if pvideomem points to a pixel line 4*.
 ;;     * This function only draws 8-bytes tiles of size 2x4 (in bytes).
 ;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;     * Under hardware scroll conditions, tile drawing will fail if asked to draw
@@ -129,7 +129,17 @@
    ld    h, a      ;; [1] | H = A' = H + Carry, finally making HL = HL + A
 .endm
 
-   push hl         ;; [4] Save width and height of the box in the stack
+;;
+;; ENTRY POINT
+;;
+
+   ld    a, l                ;; [1] A = width of the box in tiles
+   ld (draw_next_row + 1), a ;; [5] Save the width into its placeholder to restore it every loop into B
+   add   a                   ;; [1] A = 2*tilebox_row_width
+   ld (tb_row_width + 1), a  ;; [5] Save 2*tilebox_row_width in its placeholder for later calculations
+   
+   ld    a, h      ;; [1] | Save tilebox height into A'
+   ex   af, af'    ;; [1] |
 
    ;; The location where the upper-left tile from the tilebox lies is calculated this way:
    ;;    TileBoxStart = 0x50 * [y/2] + 0x2000 * (y % 2) + 2*x
@@ -179,17 +189,27 @@ dont_add:
    ld    d, h      ;; [1]  | DE = 2*map_width
    ld    e, 6(ix)  ;; [5]  |
    sla   e         ;; [2]  |  <<- No need to look for carry, as map_width should be in [0,39]
-   ld    a, e      ;; [1] | C = 2*map_width - 2*x (jump offset to the next tile row start)
-   sub   c         ;; [1] |
-   ld    c, a      ;; [1] |
+   ld    c, e      ;; [1] | C = E (Save 2*map_width, as D = 0, we need it later)
    ld    a, b      ;; [1] A = y (in [0,49])
-   mult_de_a       ;; [11-83] HL += DE * A
+   mult_de_a       ;; [11-83] HL += DE * A (HL = 2*map_width*y + 2x)
+   ;; HL now points to the next tile to draw from the tilemap!
 
+   ;; Calculate number of tiles to increment to jump from the end of a row
+   ;; to the start of the next one
+   ld   a, c                   ;; [1] A = 2*map_width
+tb_row_width:
+   sub  #00                    ;; [2] A = A - 2*tilebox_row_width (A is offset jump to next row)
+   ld  (next_row_jump + 1), a  ;; [5] Save offset jump to next row in its placeholder
+
+   ;; Restore tilemap height into C
+   ex   af, af'       ;; [1] | C = tilebox height (recovered from AF')
+   ld    c, a         ;; [1] |
+
+   ;; Restore pvideomem into DE
+   pop  de            ;; [3] DE = pvideomem
+   jr   draw_next_row ;; [3] Start by drawing first row
 
 ;;; TODO > Draw tiles
-;;    (1B  B) numtiles  - Number of tiles from this row to draw
-;;    (2B DE') pvideomem - Pointer to the video memory byte where to draw the tile row
-;;    (2B  HL) ptilemap  - Pointer to the tilemap byte where the definition of the row starts
 
 drawtiles_height:
    ld    a, d      ;; [1] DE += 0x2000 (0x800 x 4) to jump 4 pixel lines from here
@@ -197,7 +217,7 @@ drawtiles_height:
    ld    d, a      ;; [1]
    and  #0x38      ;; [2] Check bits 11,12,13 of D to know if we have jumped to a 
                    ;;     ... new character line (pixel line 0, all three bits = 0)
-   jr nz, set_HLp_nextRow ;; [2/3] Not 0 => Pixel Line 4 => No need to adjust
+   jr nz, draw_next_row ;; [2/3] Not 0 => Pixel Line 4 => No need to adjust
 
    ;; We are jumping to a new pixel line 0, 
    ;; so we have to jump to the next character line (adding 0xC050)
@@ -222,7 +242,17 @@ draw_next_row:
    ld   d, a       ;; [1] D' = A,  DE' = DE (Pointer to video memory passed to DE')
    exx             ;; [1] Back to normal register set
 
+;; (B) numtiles (DE') pvideomem (HL) ptilemap
    call  cpct_etm_drawTileRow_asm
+
+   ;; Make HL point to the start of the next tilebox row
+   ld    a, l      ;; [1] | HL += offset from end of a tilebox row to
+next_row_jump:     ;;     |      the start of the next one 
+   add   #00       ;; [2] |      (HL += 2 (map_width - tilebox_row_width))
+   ld    l, a      ;; [1] |
+   adc   h         ;; [1] |
+   sub   l         ;; [1] |
+   ld    h, a      ;; [1] |
 
    dec  c                   ;; [1] 1 less tile row to draw
    jr  nz, drawtiles_height ;; [2/3] If there still are some tile rows to draw (C!=0), continue
