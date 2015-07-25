@@ -32,6 +32,7 @@
 #define CPCT_SPRITES_H
 
 #include <types.h>
+#include <sprites/transparency_tables.h>
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1);
@@ -49,6 +50,9 @@ extern void cpct_drawTileAligned4x8_f(void *sprite, void* memory) __z88dk_callee
 extern void cpct_drawSprite          (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSpriteMasked    (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height);
+extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideomem, 
+                                              u8 width, u8 height, const void* pmasktable) __z88dk_callee;
+
 
 //
 // Macro: cpct_memPage6
