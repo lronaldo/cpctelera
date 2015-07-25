@@ -24,6 +24,6 @@
 ;;
 cpct_etm_redrawTileBox_asm::
 
-   ld (restore_ix + 1), ix ;; [6] Save IX to restore it before returning
+   ld (restore_ix + 2), ix ;; [6] Save IX to restore it before returning
 
 .include  /cpct_etm_redrawTileBox.asm/

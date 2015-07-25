@@ -24,7 +24,7 @@
 ;;
 _cpct_etm_redrawTileBox::
   
-   ld (restore_ix + 1), ix ;; [6] Save IX to restore it before returning
+   ld (restore_ix + 2), ix ;; [6] Save IX to restore it before returning
    pop  hl                 ;; [3] HL = Return address
    pop  ix                 ;; [5] IX = Pointer to <cpct_TEasyTilemap> structure
    pop  bc                 ;; [3] C = x coordinate, B = y coordinate

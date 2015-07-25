@@ -113,7 +113,7 @@
 
  skip_add:           ;; For the next iteration, we will add 2*DE if next bit from A is on
    sla   e           ;; [2] | DE = 2*DE 
-   rr    d           ;; [2] |
+   rl    d           ;; [2] |
    or    a           ;; [1] Check A while resetting Carry (8-bit digit being displaced for multiplication)
    jr   nz, mul      ;; [2/3] If A != 0, multiplication hasn't finished yet, continue
 .endm   
@@ -199,6 +199,7 @@ dont_add:
    ld    d, #0     ;; [1] | DE = map_width
    ld    e, c      ;; [1] |
    ld    a, b      ;; [1] A = y 
+   cp    a         ;; [1] Reset Carry Flag (Required for multiplying)
    mult_de_a       ;; [11-83] HL += DE * A (HL = y * map_width + x)
    ;; HL now points to the next tile to draw from the tilemap!
 
