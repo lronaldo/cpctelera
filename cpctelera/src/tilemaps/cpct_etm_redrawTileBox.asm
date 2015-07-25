@@ -135,8 +135,7 @@
 
    ld    a, l                ;; [1] A = width of the box in tiles
    ld (draw_next_row + 1), a ;; [5] Save the width into its placeholder to restore it every loop into B
-   add   a                   ;; [1] A = 2*tilebox_row_width
-   ld (tb_row_width + 1), a  ;; [5] Save 2*tilebox_row_width in its placeholder for later calculations
+   ld (tb_row_width + 1), a  ;; [5] Save tilebox_row_width in its placeholder for later calculations
    
    ld    a, h      ;; [1] | Save tilebox height into A'
    ex   af, af'    ;; [1] |
@@ -179,7 +178,6 @@ dont_add:
    ;; [7] Third, add up 2 * x
    ld    a, c      ;; [1] A = x coordinate
    add   a         ;; [1] A = 2x (Ignore carry, because on a 80-byte wide screen x shouldn't be greater than 40)
-   ld    c, a      ;; [1] C = 2x (Save for later use)
    add__hl_a       ;; [5] HL += 2x, so finally HL = 0x50 * int(y/2) + 0x2000
 
    ;; [13] We have to also add the start location of the tilemap in video memory
@@ -190,26 +188,25 @@ dont_add:
 
    ;; Calculate the offset of the first tile of the box inside the tilemap and add it
    ;; to the main tilemap pointer (ptilemap)
-   ;;    Offset = 2y * map_width + 2x
+   ;;    Offset = y * map_width + x
    ;;    HL = ptilemap + Offset
    ;;
    ld    h, 1(ix)  ;; [5] | HL = ptilemap
    ld    l, 0(ix)  ;; [5] |
-   ld    a, c      ;; [1]   | HL = ptilemap + 2x
+   ld    a, c      ;; [1]   | HL = ptilemap + x
    add__hl_a       ;; [5]   |  
-   ld    d, #0     ;; [1] | DE = 2*map_width
-   ld    e, 6(ix)  ;; [5] |
-   sla   e         ;; [2] |  <<- No need to look for carry, as map_width should be in [0,39]
-   ld    c, e      ;; [1]   | C = E (Save 2*map_width, as D = 0, we need it later)
-   ld    a, b      ;; [1] A = y (in [0,49])
-   mult_de_a       ;; [11-83] HL += DE * A (HL = 2*map_width*y + 2x)
+   ld    c, 6(ix)  ;; [5] C = map_width
+   ld    d, #0     ;; [1] | DE = map_width
+   ld    e, c      ;; [1] |
+   ld    a, b      ;; [1] A = y 
+   mult_de_a       ;; [11-83] HL += DE * A (HL = y * map_width + x)
    ;; HL now points to the next tile to draw from the tilemap!
 
    ;; Calculate number of tiles to increment to jump from the end of a row
    ;; to the start of the next one
-   ld   a, c                   ;; [1] A = 2*map_width
+   ld   a, c                   ;; [1] A = map_width
 tb_row_width:
-   sub  #00                    ;; [2] A = A - 2*tilebox_row_width (A is offset jump to next row)
+   sub  #00                    ;; [2] A = A - tilebox_row_width (A is offset jump to next row)
    ld  (next_row_jump + 1), a  ;; [5] Save offset jump to next row in its placeholder
 
    ;; Restore tilemap height into C
