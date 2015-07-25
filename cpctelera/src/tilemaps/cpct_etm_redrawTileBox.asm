@@ -151,16 +151,22 @@
    ;; Calculate A = 8y', taking into account that y range is [0,49] on a regular screen
    ;; which means that bits 7 and 8 of A are irrelevant, and we can multiply by 4
    ;; without taking carry into account.
-   add   a         ;; [1] A = 2y' + 2y' = 4y'
-   add   a         ;; [1] A = 4y' + 4y' = 8y'
+   add   a         ;; [1] A = 2y' + 2y' =  4y'
+   add   a         ;; [1] A = 4y' + 4y' =  8y'
+   add   a         ;; [1] A = 8y' + 8y' = 16y' (It might procude Carry!)
+
+   ;; Move A to HL including carry, to do 16-bits math
+   ld    l, a      ;; [1]  L = 16y' (excluding Carry!)
+   ld    h, #0     ;; [2] | H = Carry
+   rl    h         ;; [2] |
 
    ;; Now we need 16-bits to do the math
-   ld    h, #0     ;; [2] | HL = 8y'
-   ld    l, a      ;; [1] | 
-   add  hl, hl     ;; [3] HL =  8y' +  8y' = 16y'
+   ld    d, h      ;; [1] | DE = HL = 16y'
+   ld    e, l      ;; [1] |
+
    add  hl, hl     ;; [3] HL = 16y' + 16y' = 32y'
-   add__hl_a       ;; [5] | HL += A     ( HL = 32y' + 8y' = 40y' ...
-                   ;;     |  ... same as  HL = 0x50 * int(y/2) )
+   add  hl, hl     ;; [3] HL = 32y' + 32y' = 64y'
+   add  hl, de     ;; [3] HL = 64y' + 16y' = 80y' = 0x50 * y' = 0x50 * [y/2]
 
    ;; [5/8] Second, add up 0x2000 * (y % 2)
    bit   0, b      ;; [2]   Test value of bit 0 from y coordinate (B), to ask "y % 2 = 0?"
@@ -182,14 +188,19 @@ dont_add:
    add  hl, de     ;; [3] HL += BC, so HL now points to the place where first tile should be drawn
    push hl         ;; [4] Save pointer to video memory
 
-   ;; Calculate the offset of the first tile of the box inside the tilemap
+   ;; Calculate the offset of the first tile of the box inside the tilemap and add it
+   ;; to the main tilemap pointer (ptilemap)
    ;;    Offset = 2y * map_width + 2x
-   ld    h, #0     ;; [2] | HL = 2x
-   ld    l, c      ;; [1] |
-   ld    d, h      ;; [1]  | DE = 2*map_width
-   ld    e, 6(ix)  ;; [5]  |
-   sla   e         ;; [2]  |  <<- No need to look for carry, as map_width should be in [0,39]
-   ld    c, e      ;; [1] | C = E (Save 2*map_width, as D = 0, we need it later)
+   ;;    HL = ptilemap + Offset
+   ;;
+   ld    h, 1(ix)  ;; [5] | HL = ptilemap
+   ld    l, 0(ix)  ;; [5] |
+   ld    a, c      ;; [1]   | HL = ptilemap + 2x
+   add__hl_a       ;; [5]   |  
+   ld    d, #0     ;; [1] | DE = 2*map_width
+   ld    e, 6(ix)  ;; [5] |
+   sla   e         ;; [2] |  <<- No need to look for carry, as map_width should be in [0,39]
+   ld    c, e      ;; [1]   | C = E (Save 2*map_width, as D = 0, we need it later)
    ld    a, b      ;; [1] A = y (in [0,49])
    mult_de_a       ;; [11-83] HL += DE * A (HL = 2*map_width*y + 2x)
    ;; HL now points to the next tile to draw from the tilemap!
