@@ -114,8 +114,8 @@
 _cpct_etm_drawTileRow::   
    ;; Recover parameters from the stack
    pop hl       ;; [3] HL = Return Address
-   pop bc       ;; [3]  B = Number of tiles in this row
    dec sp       ;; [2] 
+   pop bc       ;; [3]  B = Number of tiles in this row
    exx          ;; [1] Change to alternate Register Set
    pop de       ;; [3] DE' = Pointer to video memory where to draw the tiles
 
