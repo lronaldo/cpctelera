@@ -32,6 +32,7 @@
 #define CPCT_SPRITES_H
 
 #include <types.h>
+#include <sprites/transparency_tables.h>
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1);

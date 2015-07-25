@@ -142,13 +142,22 @@
 ;;
 ;; Convenient macros
 ;;
+.macro ld__a__ixl
+   .dw #0x7DDD    ;; Opcode for ld a, ixl
+.endm
 .macro dec__ixh
    .dw #0x25DD    ;; Opcode for dec ixh
 .endm
 .macro dec__ixl
    .dw #0x2DDD    ;; Opcode for dec ixl
 .endm
+.macro ld___ixl_00 
+   .db #0xDD, #0x2E, #0x00  ;; Opcode for ld ixl, #00, using 00 as placehoder
+.endm
 
+   ;; Save Width in a placeholder for easy recovering it later
+   ld__a__ixl              ;; [2] A = IXL = width of the sprite
+   ld (restore_ixl + 2), a ;; [4] Save IXL (widht of the sprite) in a placeholder for recovering it later
 
 dms_sprite_height_loop:
    push de         ;; [4] Save DE for later use (jump to next screen line)
@@ -166,11 +175,15 @@ dms_sprite_width_loop:
    dec__ixl        ;; [2] IXL holds sprite width, we decrease it to count pixels in this line.
    jr   nz,dms_sprite_width_loop;; [2/3] While not 0, we are still painting this sprite line 
                                 ;;      - When 0, we have to jump to next pixel line
+
+   pop  de         ;; [3] Recover DE from stack. We use it to calculate start of next pixel line on screen
+                   ;;  ... It must be restored before exiting the function, or it will be taken as return address
+
    dec__ixh        ;; [2] IXH holds sprite height. We decrease it to count another pixel line finished
    jr    z,dms_sprite_copy_ended;; [2/3] If 0, we have finished the last sprite line.
                                 ;;      - If not 0, we have to move pointers to the next pixel line
-
-   pop  de         ;; [3] Recover DE from stack. We use it to calculate start of next pixel line on screen
+restore_ixl:
+   ld___ixl_00     ;; [3] IXL = Restore IXL to the width of the sprite (00 is a placeholder)
 
    ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
    add   #0x08     ;; [2]    so we add it to DE (just by adding 0x08 to D)
