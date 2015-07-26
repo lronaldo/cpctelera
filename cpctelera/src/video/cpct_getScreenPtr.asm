@@ -105,8 +105,8 @@
    ld    a, e     ;; [1] / E = E + x   (As C = x)
    add   c        ;; [1] |   ( If E + x > 0xFF, Carry is set. We must Add it to D )
    ld    e, a     ;; [1] |
-   adc   d        ;; [1] | D = D + C + Carry 
-   sub   c        ;; [1] | D = D + Carry
+   adc   d        ;; [1] | D = D + (C + A) + Carry   (E = C + A)
+   sub   e        ;; [1] | D = D + Carry
    ld    d, a     ;; [1] |   (If E + x did set carry, this will do D += 1, else D += 0)
 
    ;; Let y' = [ y / 8 ] = int(y / 8) (Integer division by 8)
