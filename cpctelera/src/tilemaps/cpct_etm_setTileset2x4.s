@@ -21,34 +21,42 @@
 ;;
 ;; Function: cpct_etm_setTileset2x4
 ;;
-;;    Sets the tileset that will be used by EasyTilemap's tiledrawing functions.
+;;    Sets an internal pointer to the tileset that will be used when drawing
+;; tilemaps with etm-2x4 functions.
 ;;
 ;; C Definition:
-;;    void <cpct_etm_setTileset> (const void* *ptileset*) __z88dk_fastcall;
+;;    void <cpct_etm_setTileset2x4> (const void* *ptileset*) __z88dk_fastcall;
 ;;
 ;; Input Parameters (5 bytes):
 ;;    (2B HL) ptileset - Pointer to the start of the tileset (array of pointers to tile definitions)
 ;;
-;; Assembly call (Input parameters on registers):
-;;    > call cpct_etm_drawTileRow_asm
+;; Assembly call (Input parameter on HL):
+;;    > call cpct_etm_setTileset2x4_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *ptileset* could be any 16-bits value, representing the memory address where 
 ;; the tileset is stored. This function expects the parameter to point to an array of
-;; pointers to tile definitions, but does not performe any kind of check. If you provide
-;; a pointer to a different kind of data, the result will be undefined behaviour (
-;; tipically nothing or rubbish will be drawn when tilemap drawing functions get called)
+;; pointers to tile definitions (2-bytes each) , but does not performe any kind of check. 
+;; If you provide a pointer to a different kind of data, the result will be undefined 
+;; behaviour (tipically nothing or rubbish will be drawn when tilemap drawing functions 
+;; get called)
 ;;
 ;; Important details:
-;;    * This function *MUST* be called at least once previous to the use of other
-;; EasyTilemap's drawing functions (<cpct_etm_drawFullTileMap>, <cpct_etm_drawTileRow>).
-;; Otherwise, those functions will use 0000 as pointer to the tileset, which will lead
-;; to undefined behaviour (tipically nothing or rubbish will be drawn on screen).
+;;    * This function *MUST be called at least once* previous to the use of other
+;; EasyTilemap (etm) 2x4 drawing functions. Otherwise, those functions will use 0000 
+;; as pointer to the tileset, which will lead to undefined behaviour (tipically 
+;; nothing or rubbish will be drawn on screen).
 ;;
 ;; Details:
-;;    This function sets the default tileset that will be used by Easytilemap's tiledrawing
-;; functions. The function inserts the pointer value into the required functions's code
-;; to make that functions load the pointer value by default and use it.
+;;    This function sets the internal pointer tileset that will be used by Easytilemap
+;; tiledrawing functions. The function inserts the pointer value into the required 
+;; functions's code to make that functions load the pointer value by default and use it.
+;; Concretely, it modifies the internal code of the <cpct_etm_drawTileRow2x4> function.
+;; This also implies that using this function will automatically include 
+;; <cpct_etm_drawTileRow2x4>'s code in the created binary.
+;;
+;;    A tileset is an ordered array of pointers (2-bytes each) to tiles. Tiles are 
+;; expected to be defined as 2x4-bytes arrays with screen pixel data. 
 ;;
 ;; Destroyed Register values: 
 ;;      none

@@ -21,11 +21,11 @@
 ;;
 ;; Function: cpct_etm_drawTileRow2x4
 ;;
-;;    Draws some consecutive tiles from a tilemap as a row in the screen.
+;;    Draws a given number of consecutive 2x4-bytes tiles of a tilemap as a row.
 ;;
 ;; C Definition:
-;;    void <cpct_etm_drawTileRow> (u8 *numtiles*, const void* *pvideomem*, 
-;;                                 const void* *ptilemap_row*) __z88dk_callee;
+;;    void <cpct_etm_drawTileRow2x4> (<u8> *numtiles*, void* *pvideomem*, 
+;;                                    const void* *ptilemap_row*) __z88dk_callee;
 ;;
 ;; Input Parameters (5 bytes):
 ;;    (1B   B) numtiles     - Number of tiles from the tilemap to draw in a row
