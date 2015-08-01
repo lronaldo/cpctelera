@@ -26,37 +26,17 @@
 
 #include <types.h>
 
-//
-// Type: cpct_TEasyTilemap
-//
-//    Structure that contains all the information about an easy Tilemap.
-//
-// C Definition:
-//    typedef struct {
-//       void *ptilemap;   // Pointer to the 2D tile-index matrix (the tilemap)
-//       void *ptileset;   // Pointer to the array of pointers to tile definitions (2x4-sized sprites)
-//       void *pscreen;    // Pointer to the location where the tilemap is to be drawn
-//       u8   map_height;  // Height of the tilemap in tiles
-//       u8   map_width;   // Width of the tilemap in tiles
-//    } cpct_TEasyTilemap;
-//
-// Details:
-//   This structure holds all the required information about an EasyTilemap. The user must
-// create and populate this structure and then it can be passed to tilemap managing 
-// functions for drawing the tilemap.
-//
-typedef struct {
-   void *ptilemap;   // Pointer to the 2D tile-index matrix (the tilemap)
-   void *ptileset;   // Pointer to the array of pointers to tile definitions (2x4-sized sprites)
-   void *pscreen;    // Pointer to the location where the tilemap is to be drawn
-   u8   map_height;  // Height of the tilemap in tiles
-   u8   map_width;   // Width of the tilemap in tiles
-} cpct_TEasyTilemap;
-
 // Easytilemap managing functions
-extern void cpct_etm_drawFullTilemap(const cpct_TEasyTilemap* tilemap) __z88dk_fastcall;
-extern void cpct_etm_redrawTileBox  (const void* ptilemap, u8 x, u8 y, u8 w, u8 h) __z88dk_callee;
-extern void cpct_etm_drawTileRow    (u8 numtiles, const void* video_memory, const void* ptilemap) __z88dk_callee;
-extern void cpct_etm_setTileset     (const void* ptileset) __z88dk_fastcall;
+extern void cpct_etm_drawTilemap2x4_f(u8 map_width, u8 map_height, void* pvideomem, const void* ptilemap) __z88dk_callee;
+extern void cpct_etm_drawTileBox2x4  (u8 x, u8 y, u8 w, u8 h, u8 map_width, void* pvideomem, const void* ptilemap) __z88dk_callee;
+extern void cpct_etm_drawTileRow2x4  (u8 numtiles, void* video_memory, const void* ptilemap) __z88dk_callee;
+extern void cpct_etm_setTileset2x4   (const void* ptileset) __z88dk_fastcall;
+
+//
+// Macro: cpct_etm_drawTileMap2x4
+//
+#define cpct_etm_drawTilemap2x4(W, H, V, TM)    cpct_etm_drawTileBox2x4(0, 0, (W), (H), (W), (V), (TM))
+
+
 
 #endif

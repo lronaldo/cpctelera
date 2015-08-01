@@ -19,15 +19,18 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_etm_drawFullTilemap
+;; Function: cpct_etm_drawFullTilemap2x4
 ;;
 ;;    Draws a complete tilemap of type <cpct_TEasyTilemap>
 ;;
 ;; C Definition:
-;;    void <cpct_etm_drawFullTilemap> (void* *ptilemap*) __z88dk_fastcall;
+;;    void <cpct_etm_drawFullTilemap> (<u8> *map_width*, <u8> *map_height*, <u8>* *pvideomem*, <u8>* *ptilemap*) __z88dk_callee;
 ;;
-;; Input Parameters (2 bytes):
-;;    (2B HL) ptilemap - Pointer to the <cpct_TEasyTilemap> structure defining the tilemap.
+;; Input Parameters (6 bytes):
+;;    (1B  A) map_width  - Width of the tilemap in tiles
+;;    (1B  C) map_height - Height of the tilemap in tiles
+;;    (2B DE) pvidemem   - Pointer to video memory location where the tilemap is to be drawn
+;;    (2B HL) ptilemap   - Pointer to the start of the tilemap definition (2D tile-index matrix)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_etm_drawFullTilemap_asm
@@ -95,33 +98,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Declare tile drawing function we are going to use
-.globl cpct_etm_drawTileRow_asm
+.globl cpct_etm_drawTileRow2x4_asm
 
-;;
-;; Macros for using IXL and IXH in a comfortable way
-;; 
-.macro ld__ixh_d
-   .dw #0x62DD    ;; ld ixh, d
-.endm
-.macro ld__ixl_e
-   .dw #0x6BDD    ;; ld ixl, e
-.endm
-
-_cpct_etm_drawFullTilemap::
-cpct_etm_drawFullTilemap_asm::
-   ;; Parameter is passed in HL (Pointer to TEasyTilemap Structure)
-   push ix             ;; [5] Save IX to restore it later
-   ex   de, hl         ;; [1] DE = HL 
-   ld__ixh_d           ;; [2] IX = DE (IX Points to TEasyTilemap)
-   ld__ixl_e           ;; [2]
-
-   ld    h, 1(ix)      ;; [5] HL = Pointer to the tilemap (ptilemap)
-   ld    l, 0(ix)      ;; [5] 
-   ld    a, 6(ix)      ;; [5] A = Map width
    ld (set_HLp_nextRow+1), a ;; [4] Save Map_width into the placeholder to restore B at each height loop
-   ld    c, 7(ix)      ;; [5] C = Map height
-   ld    d, 5(ix)      ;; [5] DE = Pointer to video memory (place to draw)
-   ld    e, 4(ix)      ;; [5] 
 
    jr  set_HLp_nextRow ;; [3] Start drawing the first row of tiles
 
@@ -156,11 +135,10 @@ set_HLp_nextRow:
    ld   d, a           ;; [1] D' = A,  DE' = DE (Pointer to video memory passed to DE')
    exx                 ;; [1] Back to normal register set
 
-   call cpct_etm_drawTileRow_asm ;; [7 + 103B'] Draws the next tile Row (B' holds the width of the tilerow)
+   call cpct_etm_drawTileRow2x4_asm ;; [7 + 103B'] Draws the next tile Row (B' holds the width of the tilerow)
 
    dec  c                   ;; [1] 1 less tile row to draw
    jr  nz, drawtiles_height ;; [2/3] If there still are some tile rows to draw (C!=0), continue
 
-   ;; Drawing end
-   pop  ix         ;; [5] Restore IX before returning
+   ;; Drawing ends
    ret             ;; [3] Return

@@ -19,7 +19,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_etm_setTileset
+;; Function: cpct_etm_setTileset2x4
 ;;
 ;;    Sets the tileset that will be used by EasyTilemap's tiledrawing functions.
 ;;
@@ -69,7 +69,8 @@
 ;;   tileset address is to be configured
 .globl dtr_restore_ptileset
 
-_cpct_etm_setTileset::
+_cpct_etm_setTileset2x4::
+cpct_etm_setTileset2x4_asm::
    ;; No need to recover parameters from the stack, as this function uses __z88dk_fastcall
    ;; convention, which means parameter is passed directly in HL
 

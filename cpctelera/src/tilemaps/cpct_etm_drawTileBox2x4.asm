@@ -26,12 +26,15 @@
 ;; C Definition:
 ;;    void <cpct_etm_redrawTileBox> (void* *ptilemap*, u8 *x*, u8 *y*, u8 *w*, u8 *h*) __z88dk_callee;
 ;;
-;; Input Parameters (6 bytes):
-;;    (2B IX) ptilemap - Pointer to the <cpct_TEasyTilemap> structure defining the tilemap.
-;;    (1B  C) x        - x tile-coordinate of the starting tile inside the tilemap
-;;    (1B  B) y        - y tile-coordinate of the starting tile inside the tilemap
-;;    (1B  L) w        - width in tiles of the tile-box to be redrawn
-;;    (1B  H) h        - height in tiles of the tile-box to be redrawn
+;; Input Parameters (9 bytes):
+;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
+;;    (1B  C) x         - x tile-coordinate of the starting tile inside the tilemap
+;;    (1B  B) y         - y tile-coordinate of the starting tile inside the tilemap
+;;    (1B  L) w         - width in tiles of the tile-box to be redrawn
+;;    (1B  H) h         - height in tiles of the tile-box to be redrawn
+;;    Stack:
+;;    (2B) pvideomem    - Pointer to the place on video memory (or backbuffer) where to draw the tilebox
+;;    (2B) ptilemap     - Pointer to the start of the tilemap
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_etm_redrawTileBox_asm
@@ -96,7 +99,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Declare tile drawing function we are going to use
-.globl cpct_etm_drawTileRow_asm
+.globl cpct_etm_drawTileRow2x4_asm
 
 ;; Macro for multiplying 16-bits by 8 bits, doing
 ;;   HL += DE * A
@@ -133,9 +136,10 @@
 ;; ENTRY POINT
 ;;
 
+   ld (set_map_width + 1), a ;; [4] Save map_width in its placeholder for later use   
    ld    a, l                ;; [1] A = width of the box in tiles
-   ld (draw_next_row + 1), a ;; [5] Save the width into its placeholder to restore it every loop into B
-   ld (tb_row_width + 1), a  ;; [5] Save tilebox_row_width in its placeholder for later calculations
+   ld (draw_next_row + 1), a ;; [4] Save the width into its placeholder to restore it every loop into B
+   ld (tb_row_width + 1), a  ;; [4] Save tilebox_row_width in its placeholder for later calculations
    
    ld    a, h      ;; [1] | Save tilebox height into A'
    ex   af, af'    ;; [1] |
@@ -146,13 +150,14 @@
    ;;[20] First, calculate HL = 0x50 (y/2)
    ld    a, b      ;; [1] A = y coordinate
    and  #0xFE      ;; [2] A = 2y' (being y' = int(y / 2))
-   
+
    ;; Calculate A = 8y', taking into account that y range is [0,49] on a regular screen
    ;; which means that bits 7 and 8 of A are irrelevant, and we can multiply by 4
    ;; without taking carry into account.
    add   a         ;; [1] A = 2y' + 2y' =  4y'
    add   a         ;; [1] A = 4y' + 4y' =  8y'
    add   a         ;; [1] A = 8y' + 8y' = 16y' (It might procude Carry!)
+
 
    ;; Move A to HL including carry, to do 16-bits math
    ld    l, a      ;; [1]  L = 16y' (excluding Carry!)
@@ -181,23 +186,22 @@ dont_add:
    add__hl_a       ;; [5] HL += 2x, so finally HL = 0x50 * int(y/2) + 0x2000
 
    ;; [13] We have to also add the start location of the tilemap in video memory
-   ld    e, 4(ix)  ;; [5] DE = Pointer to video memory
-   ld    d, 5(ix)  ;; [5]
+   pop  de         ;; [3] DE=pvideomem (recoveded from the stack)
    add  hl, de     ;; [3] HL += BC, so HL now points to the place where first tile should be drawn
-   push hl         ;; [4] Save pointer to video memory
+   ex   de, hl     ;; [1] DE = HL (DE points to the place to draw in)
+   pop  hl         ;; [3] HL=ptilemap (recovered from the stack)
+   push de         ;; [4] Save pointer to the place in video memory where to draw in
 
    ;; Calculate the offset of the first tile of the box inside the tilemap and add it
    ;; to the main tilemap pointer (ptilemap)
    ;;    Offset = y * map_width + x
    ;;    HL = ptilemap + Offset
    ;;
-   ld    h, 1(ix)  ;; [5] | HL = ptilemap
-   ld    l, 0(ix)  ;; [5] |
    ld    a, c      ;; [1]   | HL = ptilemap + x
    add__hl_a       ;; [5]   |  
-   ld    c, 6(ix)  ;; [5] C = map_width
-   ld    d, #0     ;; [1] | DE = map_width
-   ld    e, c      ;; [1] |
+set_map_width:
+   ld   de, #0000  ;; [3] DE = map_width
+   ld    c, e      ;; [1]  C = map_width (save value to use it later)
    ld    a, b      ;; [1] A = y 
    cp    a         ;; [1] Reset Carry Flag (Required for multiplying)
    mult_de_a       ;; [11-83] HL += DE * A (HL = y * map_width + x)
@@ -218,8 +222,9 @@ tb_row_width:
    pop  de            ;; [3] DE = pvideomem
    jr   draw_next_row ;; [3] Start by drawing first row
 
-;;; TODO > Draw tiles
-
+;;
+;; Draw the tile-box
+;;
 drawtiles_height:
    ld    a, d      ;; [1] DE += 0x2000 (0x800 x 4) to jump 4 pixel lines from here
    add  #0x20      ;; [2] 
@@ -238,7 +243,7 @@ drawtiles_height:
    ld    d, a      ;; [1] 
 
 draw_next_row:
-   ld    b, #00    ;; [2] B = map_width (it must be restored for each new row to be drawn, #00 is a placeholder)
+   ld    b, #00    ;; [2] B = Width of the box (it must be restored for each new row to be drawn, #00 is a placeholder)
 
    ;; HL' = DE (HL' is the pointer to video memory which 
    ;; ... we are changing, so put the result in there
@@ -252,7 +257,7 @@ draw_next_row:
    exx             ;; [1] Back to normal register set
 
 ;; (B) numtiles (DE') pvideomem (HL) ptilemap
-   call  cpct_etm_drawTileRow_asm
+   call  cpct_etm_drawTileRow2x4_asm
 
    ;; Make HL point to the start of the next tilebox row
    ld    a, l      ;; [1] | HL += offset from end of a tilebox row to
@@ -266,7 +271,4 @@ next_row_jump:     ;;     |      the start of the next one
    dec  c                   ;; [1] 1 less tile row to draw
    jr  nz, drawtiles_height ;; [2/3] If there still are some tile rows to draw (C!=0), continue
 
-   ;; Drawing end
-restore_ix:
-   ld  ix, #0000   ;; [4] Restore IX before returning
-   ret             ;; [3] Return
+   ;; Drawing ends

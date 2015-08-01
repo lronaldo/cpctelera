@@ -18,12 +18,20 @@
 .module cpct_tilemaps
 
 ;;
-;; ASM bindings for <cpct_etm_redrawTileBox>
+;; C bindings for <cpct_etm_drawTileMap2x4_f>
 ;;
-;;   6 microSecs, 1 byte
+;;  17 microSecs, 6 bytes
 ;;
-cpct_etm_redrawTileBox_asm::
+_cpct_etm_drawTilemap2x4_f::
+   ;; Recover parameters from the stack
+   pop hl           ;; [3] HL = Return Address
+   pop bc           ;; [3]  B = map_height, C = map_width
+   pop de           ;; [3] DE = Pointer to video memory where to draw the tilemap
 
-   ld (restore_ix + 2), ix ;; [6] Save IX to restore it before returning
+   ex (sp), hl      ;; [6] HL = Pointer to the start of the tilemap
+                    ;; ... also putting again Return Address where SP is located now
+                    ;; ... as this function is using __z88dk_callee convention
+   ld   a, c        ;; [1] A = map_width
+   ld   c, b        ;; [1] C = map_height
 
-.include  /cpct_etm_redrawTileBox.asm/
+.include /cpct_etm_drawTilemap2x4_f.asm/
