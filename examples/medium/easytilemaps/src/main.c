@@ -197,7 +197,7 @@ void drawScreenTilemap(TScreenTilemap *scr) {
 
 
 /////////////////////////////////////////////////////////////////////////////////
-// Main applications code
+// Main application's code
 //
 void application(void) {
    // Screen tilemap
@@ -231,6 +231,11 @@ void application(void) {
 //  it is preferable to just set it and call the application code.
 //
 void main(void) {
-   cpct_setStackLocation((void*)0x8000);
+   // Move program's stack from 0xC000 to 0x8000. System return addresses are
+   // already stored at 0xBFFA - 0xBFFF, but we don't care about them as our
+   // program will never return to the system.
+   cpct_setStackLocation((void*)0x8000);  
+
+   // Start the application 
    application();   
 }
