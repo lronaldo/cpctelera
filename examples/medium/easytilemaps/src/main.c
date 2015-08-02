@@ -90,7 +90,7 @@ void showMessages() {
    u8 i;
    
    // Screen Messages
-   const u8* const messages[NUMMSGS] = { 
+   static const u8* const messages[NUMMSGS] = { 
       "\017\002*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-",
       "\017\003             TILEMAPS DEMO\n\r", 
       "\017\002*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-\n\r",
