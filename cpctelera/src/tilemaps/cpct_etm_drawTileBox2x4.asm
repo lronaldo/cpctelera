@@ -144,10 +144,16 @@
    ld    a, h      ;; [1] | Save tilebox height into A'
    ex   af, af'    ;; [1] |
 
-   ;; The location where the upper-left tile from the tilebox lies is calculated this way:
-   ;;    TileBoxStart = 0x50 * [y/2] + 0x2000 * (y % 2) + 2*x
+   ;; The location where the upper-left tile from the tilebox is to be drawn
+   ;; is calculated this way:
+   ;;    TileBoxStart = VideoMemTilemapStart + 0x50 * [y/2] + 0x2000 * (y % 2) + 2*x
+   ;;
+   ;;    0x50 =   80 bytes = 1 character line = 8 pixel lines = 2 tile lines (hence [y/2])
+   ;;  0x2000 = 8192 bytes = 4 pixel lines = 1 tile line (in-between a character line)
+   ;;  1 tile =    2 bytes wide, hence adding 2*x to set horizontal offset
+   ;;
 
-   ;;[20] First, calculate HL = 0x50 (y/2)
+   ;; First, calculate HL = 0x50 (y/2)
    ld    a, b      ;; [1] A = y coordinate
    and  #0xFE      ;; [2] A = 2y' (being y' = int(y / 2))
 
@@ -157,7 +163,6 @@
    add   a         ;; [1] A = 2y' + 2y' =  4y'
    add   a         ;; [1] A = 4y' + 4y' =  8y'
    add   a         ;; [1] A = 8y' + 8y' = 16y' (It might procude Carry!)
-
 
    ;; Move A to HL including carry, to do 16-bits math
    ld    l, a      ;; [1]  L = 16y' (excluding Carry!)
@@ -172,22 +177,35 @@
    add  hl, hl     ;; [3] HL = 32y' + 32y' = 64y'
    add  hl, de     ;; [3] HL = 64y' + 16y' = 80y' = 0x50 * y' = 0x50 * [y/2]
 
-   ;; [5/8] Second, add up 0x2000 * (y % 2)
-   bit   0, b      ;; [2]   Test value of bit 0 from y coordinate (B), to ask "y % 2 = 0?"
-   jr z, dont_add  ;; [2/3] If y % 2 == 0, do nothing (no need to add 0x2000 to HL)
-   ld    a, #0x20  ;; [2] y % 2 == 1, so add 0x2000 to HL
-   add   h         ;; [1]
-   ld    h, a      ;; [1] 
-
-dont_add:
-   ;; [7] Third, add up 2 * x
+   ;; Third, add up 2 * x
    ld    a, c      ;; [1] A = x coordinate
    add   a         ;; [1] A = 2x (Ignore carry, because on a 80-byte wide screen x shouldn't be greater than 40)
    add__hl_a       ;; [5] HL += 2x, so finally HL = 0x50 * int(y/2) + 0x2000
 
-   ;; [13] We have to also add the start location of the tilemap in video memory
+   ;; We have to add the start location of the tilemap in video memory
    pop  de         ;; [3] DE=pvideomem (recoveded from the stack)
    add  hl, de     ;; [3] HL += BC, so HL now points to the place where first tile should be drawn
+
+   ;; And do not forget to add displacements for pixel lines 0 and 4
+   ;;  - When map starts at pixel line 0, add 0x2000 on odd lines (to jump to pixel line 4)
+   ;;  - When map starts at pixel line 4, add 0xE050 on odd lines (to jump to next pixel line 0)
+   ;;
+   bit   0, b       ;; [2]   Test value of bit 0 from y coordinate (B), to ask "y % 2 = 0?"
+   jr    z, dont_add;; [2/3] If y % 2 == 0, do nothing (we are no a even line, no need to jump)
+   ld    a, #0x38   ;; [2]   If y % 2 != 0, need to calculate where does map start...
+   and   d          ;; [1] ... so check bits 13, 12 and 11 from DE. 
+   jr    z, pixline0;; [2/3] ... If the 3 bits are 0, we are a at a pixel line 0, go add 0x2000
+   ld   de, #0xE050 ;; [3] ... else, this is pixel line 4, add 0xE050 (jump to next pixel line 0 from pixel line 4)
+   jr   doadd       ;; [3] Go to addition line
+pixline0:
+   ld   de, #0x2000 ;; [3] DE=0x2000 for jumping to pixel line 4 from pixel line 0
+doadd:
+   add  hl, de      ;; [3] Jump to correct pixel line (0 or 4, depending on previous conditions)
+dont_add:
+
+   ;; Finally, save pointer to the place in memory where we should start drawing, and
+   ;; Load tilemap pointer to start tile calculations
+   ;;
    ex   de, hl     ;; [1] DE = HL (DE points to the place to draw in)
    pop  hl         ;; [3] HL=ptilemap (recovered from the stack)
    push de         ;; [4] Save pointer to the place in video memory where to draw in

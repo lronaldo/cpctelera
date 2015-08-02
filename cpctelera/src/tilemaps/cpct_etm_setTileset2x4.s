@@ -36,21 +36,21 @@
 ;; Parameter Restrictions:
 ;;    * *ptileset* could be any 16-bits value, representing the memory address where 
 ;; the tileset is stored. This function expects the parameter to point to an array of
-;; pointers to tile definitions (2-bytes each) , but does not performe any kind of check. 
+;; pointers to tile definitions (2-bytes each) , but does not perform any kind of check. 
 ;; If you provide a pointer to a different kind of data, the result will be undefined 
-;; behaviour (tipically nothing or rubbish will be drawn when tilemap drawing functions 
+;; behaviour (typically nothing or rubbish will be drawn when tilemap drawing functions 
 ;; get called)
 ;;
 ;; Important details:
 ;;    * This function *MUST be called at least once* previous to the use of other
 ;; EasyTilemap (etm) 2x4 drawing functions. Otherwise, those functions will use 0000 
-;; as pointer to the tileset, which will lead to undefined behaviour (tipically 
+;; as pointer to the tileset, which will lead to undefined behaviour (typically 
 ;; nothing or rubbish will be drawn on screen).
 ;;
 ;; Details:
 ;;    This function sets the internal pointer tileset that will be used by Easytilemap
-;; tiledrawing functions. The function inserts the pointer value into the required 
-;; functions's code to make that functions load the pointer value by default and use it.
+;; tile-drawing functions. The function inserts the pointer value into the required 
+;; functions' code to make that functions load the pointer value by default and use it.
 ;; Concretely, it modifies the internal code of the <cpct_etm_drawTileRow2x4> function.
 ;; This also implies that using this function will automatically include 
 ;; <cpct_etm_drawTileRow2x4>'s code in the created binary.
