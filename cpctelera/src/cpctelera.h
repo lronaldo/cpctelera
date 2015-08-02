@@ -28,6 +28,6 @@
 #include "strings/strings.h"
 #include "video/videomode.h"
 #include "audio/audio.h"
-#include "tilemaps/tilemaps.h"
+#include "tilemaps/easytilemaps.h"
 
 #endif
