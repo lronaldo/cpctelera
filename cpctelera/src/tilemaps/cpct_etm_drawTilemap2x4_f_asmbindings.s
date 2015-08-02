@@ -15,7 +15,7 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-.module cpct_tilemaps
+.module cpct_easytilemaps
 
 ;;
 ;; ASM bindings for <cpct_etm_drawTileMap2x4_f>
