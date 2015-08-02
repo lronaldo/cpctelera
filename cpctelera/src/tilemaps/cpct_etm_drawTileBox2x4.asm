@@ -123,6 +123,8 @@
 ;;      AF', BC', DE', HL'
 ;;
 ;; Required memory:
+;;      C-bindings - 143 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
+;;    ASM-bindings - 139 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
 ;;
 ;; Time Measures:
 ;; (start code)
