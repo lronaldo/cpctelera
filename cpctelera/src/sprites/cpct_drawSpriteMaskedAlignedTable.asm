@@ -44,7 +44,7 @@
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
 ;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
 ;; starting from top-left corner and going left-to-right, top-to-bottom down to the 
-;; bottom-right corner. Total amount of bytes in pixel array should be *width*x*height*. 
+;; bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*. 
 ;; You may check screen pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 
 ;; (<cpct_px2byteM1>) as for mode 2 is linear (1 bit = 1 pixel). Also, the sprite
 ;; must be 256-byte aligned. That means that if first byte of the sprite is located
@@ -92,7 +92,7 @@
 ;; next screen byte at that locations is -0x7FF and not +1 bytes away.
 ;;
 ;; Details:
-;;    This function draws a generic *width*x*height* bytes sprite either to
+;;    This function draws a generic *width* x *height* bytes sprite either to
 ;; video memory or to a back buffer, creating transparencies using a given
 ;; mask table. 
 ;; 

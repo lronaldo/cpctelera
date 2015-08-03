@@ -43,7 +43,7 @@
 ;;
 ;; Important details:
 ;;    * This function *MUST be called at least once* previous to the use of other
-;; EasyTilemap (etm) 2x4 drawing functions. Otherwise, those functions will use 0000 
+;; EasyTilemap (etm) 2x4 drawing functions. Otherwise, those functions will use NULL (0x0000)
 ;; as pointer to the tileset, which will lead to undefined behaviour (typically 
 ;; nothing or rubbish will be drawn on screen).
 ;;

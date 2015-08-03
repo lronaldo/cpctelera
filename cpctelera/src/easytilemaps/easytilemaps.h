@@ -32,7 +32,7 @@ extern void cpct_etm_drawTileRow2x4  (u8 numtiles, void* video_memory, const voi
 extern void cpct_etm_setTileset2x4   (const void* ptileset) __z88dk_fastcall;
 
 //
-// Macro: cpct_etm_drawTileMap2x4
+// Macro: cpct_etm_drawTilemap2x4
 //
 //    This macro uses <cpct_etm_drawTileBox2x4> to draw a complete tilemap. 
 //

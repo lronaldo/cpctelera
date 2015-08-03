@@ -67,10 +67,11 @@
 ;; Known limitations:
 ;;     * This function does not do any kind of check on the parameters. It is up to the
 ;; programmer to provide correct values for them.
-;;     * This function *will not properly work* if <cpct_etm_setTileset> has not been
+;;     * This function *will not properly work* if <cpct_etm_setTileset2x4> has not been
 ;; called previously, as the tileset pointer will not have been set.
 ;;     * This function only draws 8-bytes tiles of size 2x4 (in bytes). It uses 
-;; <cpct_drawTileAligned2x4_f_asm>, so this function will be included in the code and called.
+;; <cpct_drawTileAligned2x4_f> (assembly bindings), so this function will be included in the 
+;; code and called.
 ;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;     * Under hardware scroll conditions, tile drawing will fail if asked to draw
 ;; near 0x?7FF or 0x?FFF addresses (at the end of each one of the 8 pixel lines), as 
@@ -83,8 +84,8 @@
 ;; for each tile.
 ;;
 ;;    The function *needs* the tileset to have been previously set, which can be done by
-;; calling <cpct_etm_setTileset>. If this has not been done when <cpct_etm_drawTileRow> is
-;; called, then NULL (0000) is used as pointer to the tileset, yielding unexpected results.
+;; calling <cpct_etm_setTileset2x4>. If this has not been done when <cpct_etm_drawTileRow2x4> is
+;; called, then NULL (0x0000) is used as pointer to the tileset, yielding unexpected results.
 ;;
 ;; Destroyed Register values: 
 ;;      AF,   B,  HL
@@ -102,7 +103,7 @@
 ;; ASM Saving  |     -19        |    -76
 ;; ------------------------------------------
 ;; (end code)
-;; W  = Map width (number of horizontal tiles)
+;;    W - Map width (number of horizontal tiles)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Declare tile drawing function we are going to use

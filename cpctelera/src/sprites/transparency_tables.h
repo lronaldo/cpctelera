@@ -19,6 +19,9 @@
 #ifndef TRANSPARENCY_TABLES_H
 #define TRANSPARENCY_TABLES_H
 
+//
+// Title: Transparency Tables
+//
 
 #include <types.h>
 
@@ -69,10 +72,17 @@
 // require it to be 256-byte aligned or they will fail.
 // 
 //    To be able to use this table, all you have to do is defining the macro (constant value) 
-// <cpct_transparentMaskTable00M0_address> before the inclusion of <sprites/transparency_tables.h>, 
+// <cpct_transparentMaskTable00M0_address> before the inclusion of *<sprites/transparency_tables.h>*, 
 // CPCtelera's header file.
 //
-//    Once the table has been defined, you can access it through the symbol <cpct_transparentMaskTableM0>.
+//    Once the table has been defined, you can access it through the symbol <cpct_transparentMaskTable00M0>.
+//
+//
+//
+// Macro: cpct_transparentMaskTable00M0_address
+//
+//    Macro used to set the location where <cpct_transparentMaskTable00M0> must be included in memory.
+// When this macro is defined, <cpct_transparentMaskTable00M0> is included.
 //
 #ifdef cpct_transparentMaskTable00M0_address
    __at(cpct_transparentMaskTable00M0_address) const u8 cpct_transparentMaskTable00M0[256] = {

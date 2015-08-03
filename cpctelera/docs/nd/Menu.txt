@@ -104,8 +104,8 @@ Group: Sprites  {
    File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.asm)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0_cbindings.s)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
-   File: cpct_transparentMaskTable00M0  (sprites/transparency_tables.h)
    File: Sprite Macros&amp;Constants  (sprites/sprites.h)
+   File: Transparency Tables  (sprites/transparency_tables.h)
    }  # Group: Sprites
 
 Group: Strings  {
