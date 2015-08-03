@@ -21,9 +21,9 @@
 ;;
 ;; Function: cpct_drawSpriteMaskedAlignedTable
 ;;
-;;    Copies a masked sprite from an array to video memory (or to a screen buffer),
-;; using mask as transparency information, to prevent erasing the background. Mask
-;; is retrieved from a 256-byte mask table.
+;;    Draws an sprite to video memory (or to a screen buffer), making use of a 
+;; given 256-bytes mask table to create transparencies. Sprite and mask table
+;; *must be* 256-byte aligned.
 ;;
 ;; C Definition:
 ;;    void <cpct_drawSpriteMaskedAlignedTable> (const void* *psprite*, void* *pvideomem*, 
@@ -31,40 +31,33 @@
 ;;                                       const void* *pmasktable*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (2B  BC) psprite    - Source Sprite Pointer (array with pixel and mask data)
+;;  (2B  BC) psprite    - Source Sprite Pointer (aligned array with pixel and mask data)
 ;;  (2B  DE) pvideomem  - Destination video memory pointer
 ;;  (1B IXL) width      - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
 ;;  (1B IXH) height     - Sprite Height in bytes (>0)
-;;  (2B  HL) pmasktable - Pointer to the mask table used to create transparency
+;;  (2B  HL) pmasktable - Pointer to the aligned mask table used to create transparency
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_drawSpriteMaskedTable_asm
-;;
-;;  //// TODO: Review Documentation ////
-;;
-;;  <<< Mask table (256-byte aligned) required
-;;  <<< Sprite must be width-byte aligned
+;;    > call cpct_drawSpriteMaskedAlignedTable_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; along with mask data. Each mask byte will contain enabled bits as those that should
-;; be picked from the background (transparent) and disabled bits for those that will
-;; be printed from sprite colour data. Each mask data byte must precede its associated
-;; colour data byte.
 ;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
-;; starting from top-left corner and going left-to-right, top-to-bottom down to the
-;; bottom-right corner. Total amount of bytes in pixel array should be 
-;; 2 x *width* x *height* (mask data doubles array size). You may check screen 
-;; pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 (<cpct_px2byteM1>) as 
-;; for mode 2 is linear (1 bit = 1 pixel).
-;;  * *memory* could be any place in memory, inside or outside current video memory. It
+;; starting from top-left corner and going left-to-right, top-to-bottom down to the 
+;; bottom-right corner. Total amount of bytes in pixel array should be *width*x*height*. 
+;; You may check screen pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 
+;; (<cpct_px2byteM1>) as for mode 2 is linear (1 bit = 1 pixel). Also, the sprite
+;; must be 256-byte aligned. That means that if first byte of the sprite is located
+;; at 0xZZ??, last byte should also be at 0xZZ??, meaning that all the sprite remains 
+;; inside the same 256-byte page in memory.
+;;  * *pvideomem* could be any place in memory, inside or outside current video memory. It
 ;; will be equally treated as video memory (taking into account CPC's video memory 
 ;; disposition). This lets you copy sprites to software or hardware backbuffers, and
 ;; not only video memory.
-;;  * *width* must be the width of the sprite *in bytes*, *excluding mask data*, and 
-;; must be 1 or more. Using 0 as *width* parameter for this function could potentially 
-;; make the program hang or crash. Always remember that the *width* must be 
-;; expressed in bytes and *not* in pixels. The correspondence is:
+;;  * *width* must be the width of the sprite *in bytes* and must be 1 or more. 
+;; Using 0 as *width* parameter for this function could potentially make the program hang 
+;; or crash. Always remember that the *width* must be expressed in bytes and *not* in pixels. 
+;; The correspondence is:
 ;;    mode 0      - 1 byte = 2 pixels
 ;;    modes 1 / 3 - 1 byte = 4 pixels
 ;;    mode 2      - 1 byte = 8 pixels
@@ -72,6 +65,12 @@
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
+;;  * *pmasktable* must be a pointer to the mask table that will be used for calculating
+;; transparency. A mask table is expected to be 256-sized containing all the possible
+;; masks for each possible byte colour value. Also, the mask is required to be
+;; 256-byte aligned, which means it has to start at a 0x??00 address in memory to
+;; fit in a complete 256-byte memory page. <cpct_transparentMaskTable00M0> is an 
+;; example table you might want to use.
 ;;
 ;; Known limitations:
 ;;    * This function does not do any kind of boundary check or clipping. If you 
@@ -85,55 +84,52 @@
 ;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
+;;    * This function *cannot be run from ROM* as it uses self-modifying code.
+;;    * If sprite or mask table are not aligned within a memory page (256-bytes
+;; aligned), rubbish may appear on the screen.
+;;    * Under hardware scroll conditions, sprite drawing will fail if asked to draw
+;; near 0x?7FF or 0x?FFF addresses (at the end of each one of the 8 pixel lines), as 
+;; next screen byte at that locations is -0x7FF and not +1 bytes away.
 ;;
 ;; Details:
-;;    This function copies a generic WxH bytes sprite from memory to a 
-;; video-memory location (either present video-memory or software / hardware  
-;; backbuffer). The original sprite must be stored as an array (i.e. with 
+;;    This function draws a generic *width*x*height* bytes sprite either to
+;; video memory or to a back buffer, creating transparencies using a given
+;; mask table. 
+;; 
+;;    The original sprite must be stored as an array (i.e. with 
 ;; all of its pixels stored as consecutive bytes in memory). It works in
 ;; a similar way to <cpct_drawSprite>, but taking care about transparency
-;; information encoded in mask bytes. For detailed information about 
-;; how sprite copying works, and how video memory is formatted, take a 
-;; look at <cpct_drawSprite>.
+;; information. For detailed information about how sprite copying works, 
+;; and how video memory is formatted, take a look at <cpct_drawSprite>.
 ;;
-;;    For this routine to work, the sprite must contain mask information: inside 
-;; the sprite array, for each byte containing screen colour information, there 
-;; *must* be a preceding byte with mask information. So, the format is
-;; as depicted in example 1:
-;; (start code)
-;; Array storage format:  <-byte 1-> <-byte 2-> <-byte 3-> <-byte 4->
-;;                        <- mask -> <-colour-> <- mask -> <-colour->
-;; ------------------------------------------------------------------------------
-;;        u8* sprite =  {    0xFF,     0x00,       0x00,     0xC2,   .... };
-;; ------------------------------------------------------------------------------
-;; Video memory output:   <- 1st Screen byte -> <- 2nd Screen byte -> 
-;; ______________________________________________________________________________
-;;         Example 1: Definition of a masked sprite and byte format
-;; (end)
-;;     In example 1, each "Screen byte" will become 1 byte outputted to video memory
-;; resulting of the combination of 3 bytes: 1-byte mask, 1-byte sprite colour data 
-;; and 1-byte previous screen colour data. The combination of these 3 bytes results
-;; in sprite colour data being "blended" with previous screen colour data, adding
-;; sprite pixels with background pixels (the ones over transparent pixels).
+;;    The way if works is by getting sprite bytes one by one, operating
+;; with them, and copying them to video memory (or backbuffer). Each 
+;; byte got is used as index to retrieve the associated mask value from
+;; the mask table. Then, an AND operation between the byte and the mask
+;; is done to remove (set to 0) background pixels. After that, an OR
+;; operation between the new byte information and the background (the
+;; present byte at video memory location where we want to write) is
+;; performed. That effectively mixes sprite colours with background
+;; colours, after removing background pixels from the sprite.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 47 bytes
-;;  ASM-bindints - 42 bytes
+;;    C-bindings - 59 bytes
+;;  ASM-bindings - 45 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |    microSecs (us)        |    CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      |  21 + (22 + 18W)H + 10HH | 84 + (88 + 72W)H + 40HH
-;;  Worst     |       Best + 10          |     Best + 40
+;;  Best      |  28 + (22 + 18W)H + 10HH | 102 + (88 + 72W)H + 40HH
+;;  Worst     |       Best + 10          |      Best + 40
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |        957 /  967        |    3828 /  3868
-;;  W=4,H=32  |       3057 / 3067        |   12228 / 12268
+;;  W=2,H=16  |        964 /  974        |    3856 /  3896
+;;  W=4,H=32  |       3064 / 3074        |   12256 / 12296
 ;; ----------------------------------------------------------------
-;; Asm saving |          -16             |       -64
+;; Asm saving |          -32             |       -128
 ;; ----------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
