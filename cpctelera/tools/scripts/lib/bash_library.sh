@@ -512,6 +512,13 @@ function checkSystem {
    return 1
 }
 
+## Echoes a file name without its extension
+##  $1: filename
+##
+function filenameWithNoExt() {
+   echo "${1%.*}"
+}
+
 ## Echoes the bash profile initialization script file name
 ##
 function bashProfileFilename {
