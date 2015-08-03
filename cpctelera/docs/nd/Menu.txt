@@ -63,9 +63,10 @@ Group: Audio  {
 
 Group: Bitarray  {
 
-   File: cpct_get2Bits  (bitarray/cpct_get2Bits.s)
-   File: cpct_get4Bits  (bitarray/cpct_get4Bits.s)
-   File: cpct_getBit  (bitarray/cpct_getBit.s)
+   File: cpct_bitWeights  (bitarray/cpct_bitWeightsVector.s)
+   File: cpct_get2Bits  (bitarray/cpct_get2Bits.asm)
+   File: cpct_get4Bits  (bitarray/cpct_get4Bits.asm)
+   File: cpct_getBit  (bitarray/cpct_getBit.asm)
    File: cpct_set2Bits  (bitarray/cpct_set2Bits.s)
    File: cpct_set4Bits  (bitarray/cpct_set4Bits.s)
    File: cpct_setBit  (bitarray/cpct_setBit.s)
@@ -94,6 +95,7 @@ Group: Sprites  {
    File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.asm)
    File: cpct_drawSprite  (sprites/cpct_drawSprite.asm)
    File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.asm)
+   File: cpct_drawSpriteMaskedAlignedTable  (sprites/cpct_drawSpriteMaskedAlignedTable.asm)
    File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.asm)
    File: cpct_drawTileAligned2x8  (sprites/cpct_drawTileAligned2x8.asm)
    File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.asm)
@@ -102,6 +104,7 @@ Group: Sprites  {
    File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.asm)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0_cbindings.s)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
+   File: cpct_transparentMaskTable00M0  (sprites/transparency_tables.h)
    File: Sprite Macros&amp;Constants  (sprites/sprites.h)
    }  # Group: Sprites
 
@@ -124,7 +127,7 @@ Group: Video  {
    File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
    File: cpct_fw2hw  (video/cpct_fw2hw.s)
    File: cpct_getHWColour  (video/cpct_getHWColor.s)
-   File: cpct_getScreenPtr  (video/cpct_getScreenPtr.s)
+   File: cpct_getScreenPtr  (video/cpct_getScreenPtr.asm)
    File: cpct_setPALColour  (video/cpct_setPALColour.s)
    File: cpct_setPalette  (video/cpct_setPalette.s)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
@@ -150,6 +153,15 @@ Group: Command Line Tools  {
    File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
    File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
    }  # Group: Command Line Tools
+
+Group: Easytilemaps  {
+
+   File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
+   File: cpct_etm_drawTilemap2x4_f  (easytilemaps/cpct_etm_drawTilemap2x4_f.asm)
+   File: cpct_etm_drawTileRow2x4  (easytilemaps/cpct_etm_drawTileRow2x4.s)
+   File: cpct_etm_setTileset2x4  (easytilemaps/cpct_etm_setTileset2x4.s)
+   File: EasyTilemaps  (easytilemaps/easytilemaps.h)
+   }  # Group: Easytilemaps
 
 Group: Index  {
 
