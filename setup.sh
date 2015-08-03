@@ -154,7 +154,8 @@ drawOK
 
 # Build library in subshell process, then go monitoring until it finishes
 coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building cpctelera z80 lib: "
-( make -C "${CPCT_MAIN_DIR}" &> "${CPCT_LIB_BUILD_LOG}" ; exit $? ) &
+make -C "${CPCT_MAIN_DIR}" cleanall &> "${CPCT_LIB_BUILD_LOG}"
+( make -C "${CPCT_MAIN_DIR}" &>> "${CPCT_LIB_BUILD_LOG}" ; exit $? ) &
 if ! superviseBackgroundProcess "$!" "${CPCT_LIB_BUILD_LOG}" "${CPCT_LIB_BUILD_LOG_TOTAL_BYTES}" 35 0.05; then
    Error "There was an error building CPCtelera tools. Please, check '${CPCT_LIB_BUILD_LOG}' for details. Aborting. "
 fi

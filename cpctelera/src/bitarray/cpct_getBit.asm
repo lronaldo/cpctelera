@@ -61,59 +61,50 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    42 bytes (8 bytes bitWeights table, 33 bytes code)
+;;    C-bindings   - 42 bytes (34 bytes code -- 8 bytes bitWeights table)
+;;    ASM-bindings - 36 bytes (28 bytes code -- 8 bytes bitWeights table)
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case | Cycles | microSecs (us)
-;; -------------------------------
-;; Any  |   191  |  47.75
-;; -------------------------------
+;;    Case    | microsec (ms) | Cycles
+;; --------------------------------------
+;;    Any     |      55       |   220
+;; --------------------------------------
+;; ASM-Saving |     -21       |   -44 
+;; --------------------------------------
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; .bndry 8 ;; Make this vector start at a 8-byte aligned address to be able to use 8-bit arithmetic with pointers
-;; bndry does not work when generated object file is linked later on.
-cpct_bitWeights:: .db #0x01, #0x02, #0x04, #0x08, #0x10, #0x20, #0x40, #0x80
-
-_cpct_getBit::
-   ;; Get parameters from the stack
-   pop   af          ;; [10] AF = Return address
-   pop   de          ;; [10] DE = Pointer to the array in memory
-   pop   hl          ;; [10] HL = Index of the bit we want to get
-   push  hl          ;; [11] << Restore stack status
-   push  de          ;; [11]
-   push  af          ;; [11]
+.globl cpct_bitWeights
 
    ;; We only access bytes at once in memory. We need to calculate which
    ;; bit will we have to test in the target byte of our array. That will be
    ;; the remainder of INDEX/8, as INDEX/8 represents the byte to access.
-   ld    bc, #cpct_bitWeights ;; [10] BC = Pointer to the start of the bitWeights array
-   ld    a, l        ;; [ 4]
-   and   #0x07       ;; [ 7] A = L % 8       (bit number to be tested from the target byte of the array) 
-   add   c           ;; [ 4] A += C          (bit number is used as index, to increment BC, and 
+   ld    bc, #cpct_bitWeights ;; [3] BC = Pointer to the start of the bitWeights array
+   ld    a, l        ;; [1]
+   and   #0x07       ;; [2] A = L % 8       (bit number to be tested from the target byte of the array) 
+   add   c           ;; [1] A += C          (bit number is used as index, to increment BC, and 
                      ;; ....                  make BC point to its corresponding bit weight in the table)
-   ld    c, a        ;; [ 4] BC = BC + L % 8 (Most of the time BC now points to the corresponding bitweight 
+   ld    c, a        ;; [1] BC = BC + L % 8 (Most of the time BC now points to the corresponding bitweight 
                      ;; ....                  in the table, except when A += C generates carry)
-   sub   a           ;; [ 4] A  = 0          (preserving the carry, because we have to add it to B)
-   adc   b           ;; [ 4] A  = B + Carry  (Add carry to B)
-   ld    b, a        ;; [ 4] B += Carry      (Move result to B, to ensure BC now points to the bitweight)
-   ld    a, (bc)     ;; [ 7] A  = BC [L % 8]  (bit weight to be tested in the target byte of the array)
+   sub   a           ;; [1] A  = 0          (preserving the carry, because we have to add it to B)
+   adc   b           ;; [1] A  = B + Carry  (Add carry to B)
+   ld    b, a        ;; [1] B += Carry      (Move result to B, to ensure BC now points to the bitweight)
+   ld    a, (bc)     ;; [2] A  = BC [L % 8]  (bit weight to be tested in the target byte of the array)
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 8 index positions (8 bits)
    ;; So, first, we calculate INDEX/8 (HL/8) to know the target byte.
-   srl   h           ;; [ 8]
-   rr    l           ;; [ 8]
-   srl   h           ;; [ 8]
-   rr    l           ;; [ 8]
-   srl   h           ;; [ 8]
-   rr    l           ;; [ 8] HL = HL / 8 (Target byte index into the array pointed by DE)
+   srl   h           ;; [2]
+   rr    l           ;; [2]
+   srl   h           ;; [2]
+   rr    l           ;; [2]
+   srl   h           ;; [2]
+   rr    l           ;; [2] HL = HL / 8 (Target byte index into the array pointed by DE)
 
    ;; Reach the target byte and test the bit using the bit weight stored in A
-   add  hl, de       ;; [11] HL += DE => HL points to the target byte in the array 
-   and  (hl)         ;; [ 7] Test the selected bit in the target byte in the array
-   ld   l, a         ;; [ 4] Return value (0 if bit is not set, !=0 if bit is set)
+   add  hl, de       ;; [3] HL += DE => HL points to the target byte in the array 
+   and  (hl)         ;; [2] Test the selected bit in the target byte in the array
+   ld   l, a         ;; [1] Return value (0 if bit is not set, !=0 if bit is set)
 
-   ret               ;; [10] Return to caller
+   ret               ;; [3] Return to caller

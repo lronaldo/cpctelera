@@ -107,6 +107,15 @@
 ;; in sprite colour data being "blended" with previous screen colour data, adding
 ;; sprite pixels with background pixels (the ones over transparent pixels).
 ;;
+;;    The way this function works is by getting sprite bytes two by two, 
+;; operating with them, and copying them to video memory (or backbuffer). Each 
+;; two bytes got (mask + sprite colour information) are mixed with an AND 
+;; opreation to remove (set to 0) sprite background pixels. After that, an OR
+;; operation between the resulting byte and the background (the present byte 
+;; at video memory location where we want to write) is performed. That 
+;; effectively mixes sprite colours with background colours, after removing 
+;; background pixels from the sprite.
+;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;

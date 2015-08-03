@@ -46,6 +46,44 @@ extern void cpct_setVideoMemoryOffset (u8 offset);
 // Using screen coordinates to get byte pointers
 extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y) __z88dk_callee;
 
+//
+// Macro: cpct_memPage6
+//
+//    Macro that encodes a video memory page in the 6 Least Significant bits (LSb)
+// of a byte, required as parameter for <cpct_setVideoMemoryPage>
+//
+// C Definition:
+// #define <cpct_memPage6> (*PAGE*)
+//
+// Parameters (1 byte):
+// (1B) PAGE - Video memory page wanted 
+//
+// Returns:
+//  u8   - Video Memory Page encoded in the 6 LSb of the byte.
+//
+// Details:
+//  This is just a macro that shifts *PAGE* 2 bits to the right, to leave it
+// with just 6 significant bits. For more information, check functions
+// <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
+//
+#define cpct_memPage6(PAGE) ((PAGE) >> 2)
+
+//
+// Constants: Video Memory Pages
+//
+// Useful constants defining some typical Video Memory Pages to be used as 
+// parameters for <cpct_setVideoMemoryPage>
+//
+// cpct_pageCO - Video Memory Page 0xC0 (0xC0··)
+// cpct_page8O - Video Memory Page 0x80 (0x80··)
+// cpct_page4O - Video Memory Page 0x40 (0x40··)
+// cpct_page0O - Video Memory Page 0x00 (0x00··)
+//
+#define cpct_pageC0 0x30
+#define cpct_page80 0x20
+#define cpct_page40 0x10
+#define cpct_page00 0x00
+
 ///
 /// Macro: cpct_setBorder
 ///
@@ -154,5 +192,6 @@ extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y) __z88dk_callee;
 //    This is *1.721 VSYNCs* on a 50Hz display.
 //
 #define cpct_clearScreen_f64(COL) cpct_memset_f64((void*)0xC000, (COL), 0x4000)
+
 
 #endif

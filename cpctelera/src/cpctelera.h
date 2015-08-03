@@ -28,5 +28,6 @@
 #include "strings/strings.h"
 #include "video/videomode.h"
 #include "audio/audio.h"
+#include "easytilemaps/easytilemaps.h"
 
 #endif
