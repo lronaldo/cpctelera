@@ -32,6 +32,9 @@
 ;;    (2B DE) array - Pointer to the first byte of the array
 ;;    (2B HL) index - Position of the group of 2 bits to be retrieved from the array
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_get2Bits_asm
+;;
 ;; Parameter Restrictions:
 ;;    * *array* must be the memory location of the first byte of the array.
 ;; However, this function will accept any given 16-value, without performing
@@ -56,74 +59,73 @@
 ;; multiplied by 4).
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, DE, HL
 ;;
 ;; Required memory:
-;;    46 bytes 
+;;    C-binding   - 41 bytes
+;;    ASM-binding - 35 bytes
 ;;
-;; Time Measures:
+;; Time Measures:  
 ;; (start code)
-;; Case      | Cycles | microSecs (us)
+;; Case       | Microsecs | CPU Cycles
 ;; -----------------------------------
-;; Best (0)  |   171  |  42.75
+;; Best (3)   |    50     |   200
 ;; -----------------------------------
-;; Worst (2) |   209  |  52.25
+;; Worst (1)  |    56     |   224
+;; -----------------------------------
+;; ASM-saving |   -21     |   -44
 ;; -----------------------------------
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Start of the function code (without bindings for calling)
+;;
 
-_cpct_get2Bits::
-
-   ;; Get parameters from the stack
-   pop   af          ;; [10] AF = Return address
-   pop   de          ;; [10] DE = Pointer to the array in memory
-   pop   hl          ;; [10] HL = Index of the bit we want to get
-   push  hl          ;; [11] << Restore stack status
-   push  de          ;; [11]
-   push  af          ;; [11]
-
-   ld    a, l        ;; [ 4] A = L 
-   AND   #0x03       ;; [ 7] A = L % 4 (Calculate the group of 2 bytes we will be getting from the target byte: 
-                     ;; ....            the remainder of L/4)
-   ld    b, a        ;; [ 4] B = index of the group of 2 bits that we want to get from 0 to 3 ([00 11 22 33])
+   ;; Store L in B to use it later for calculating the group of 2-bits
+   ;; that will be access from the target byte. The 2-bits group is
+   ;; determined by the 2 least significant bits (L % 4)
+   ld    b, l        ;; [1] B = L
 
    ;; We need to know how many bytes do we have to 
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 4 index positions (8 bits)
    ;; So, first, we calculate INDEX/4 (HL/4) to know the target byte.
-   srl   h           ;; [ 8]
-   rr    l           ;; [ 8]
-   srl   h           ;; [ 8]
-   rr    l           ;; [ 8] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
-   add  hl, de       ;; [11] HL += DE => HL points to the target byte in the array 
-   ld    a, (hl)     ;; [ 7] A = array[index] Get the byte where our 2 target bits are located
+   srl   h           ;; [2]
+   rr    l           ;; [2]
+   srl   h           ;; [2]
+   rr    l           ;; [2] HL = HL / 4 (HL holds byte offset to advance into the array pointed by DE)
+   add  hl, de       ;; [3] HL += DE => HL points to the target byte in the array 
+   ld    a, (hl)     ;; [2] A = array[index] Get the byte where our 2 target bits are located
 
    ;; Move the 2 required bits to the least significant position (bits 0 & 1)
    ;;   This is done to make easier the opperation of returning a value from 0 to 3 (represented by the 2 bits searched).
    ;;   Once the bits are at least significant position, we only have to AND them and we are done.
    ;; The remainder of INDEX/4 is a value from 0 to 3, representing the index of the 2 bits to be returned
-   ;;   inside the target byte [ 0 0 | 1 1 | 2 2 | 3 3 ].
-   dec   b             ;; [ 4] If B=0, B-- is negative, turning on S flag
-   jp    m, g2b_B_is_0 ;; [10] IF S flag is on, B was 0
-   dec   b             ;; [ 4] B-- (second time, so B-=2)
-   jp    p, g2b_B_is_2or3 ;; [10] If S flag is off, B was > 1, else B was 1
-g2b_B_is_1:
-   rlca                ;; [ 4] <| Move bits 5 & 4 to positions 0 & 1 with 4 left rotations
-   rlca                ;; [ 4] <|
-   jp g2b_B_is_0       ;; [10] We have done 2 rotations, and jump to B_is_0, to make another 2 rotations
-g2b_B_is_2or3:
-   dec   b             ;; [ 4] B-- (third time, so B-=3)
-   jp    p, g2b_end    ;; [10] IF S flag is off, B was >2 (3), else B was 2
-g2b_B_is_2:
-   rrca                ;; [ 4] <| Move bits 2 & 3 to positions 0 & 1 with 2 right rotations
-   rrca                ;; [ 4] <|
-   .db #0xF2 ;JP P, xx ;; [10] Fake jump to gb_end (JP P, xx will be never done, as S is set. Value XX is got 
-                       ;; .... from next 2 bytes, which are RLCA;RLCA. Not jumping leaves us 3 bytes from here, at g2b_end)
-g2b_B_is_0:
-   rlca                ;; [ 4] <| Move bits 7 & 6 to positions 0 & 1 with 2 left rotations
-   rlca                ;; [ 4] <|
-g2b_end:                            ; 0:22, 1:54, 2:60 3:42
-   and   #0x03         ;; [ 7] Leave out the 2 required bits (bits 0 & 1, at least significant positions).
-   ld    l, a          ;; [ 4] Set the return value in L 
+   ;;   inside the target byte [ 0 0 | 1 1 | 2 2 | 3 3 ].  
+   rr  b                 ; [2]   Check the bit 0 from L by moving it to the carry
+   jr  nc, g2b_group_2_0 ; [2/3] If C=0 the 2 last bits of B containt 10 or 00
+   rr  b                 ; [2]   C=1, the 2 last bits contain 11 or 01, move bit 1 to the carry to check
+   jr  c, g2b_end        ; [2/3] IF C=1 selected bits are 1&0 (group 3), else selected bits are 5&4 (group 1)
 
-   ret                 ;; [10] Return to caller
+   ;; 4 options, for the 4 possible groups of 2 bits
+g2b_bits_54:
+   rlca           ;; [1] Group 1: Bits 54 moved to 10 using 4 RLCA's
+   rlca           ;; [1]
+g2b_bits_76:
+   rlca           ;; [1] Group 0: Bits 76 moved to 10 using 2 RLCA's
+   rlca           ;; [1]
+   jr g2b_end     ;; [3] Group 3: Nothing to do, as we are returning bits 10,
+                  ;; ... so jump to the end
+g2b_group_2_0:
+   rr  b               ;; [2]   C=0, the 2 last bits contain 10 or 00, move bit 1 to the carry to check
+   jr  nc, g2b_bits_76 ;; [2/3] IF C=0 selected bits are 7&6 (group 0), else selected bits are 3&2 (group 2)
+
+g2b_bits_32:
+   rrca           ;; [1] Option 2: Bits 32 moved to 10 using 2 RRCA's
+   rrca           ;; [1]
+g2b_end:           
+   and   #0x03    ;; [2] Leave out the 2 required bits (bits 0 & 1, at least significant positions).
+   ld    l, a     ;; [1] Set the return value in L 
+
+   ret            ;; [3] Return to caller
+

@@ -32,6 +32,9 @@
 ;;    (2B DE) array - Pointer to the first byte of the array
 ;;    (2B HL) index - Position of the group of 4 bits to be retrieved from the array
 ;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_get4Bits_asm
+;;
 ;; Parameter Restrictions:
 ;;    * *array* must be the memory location of the first byte of the array.
 ;; However, this function will accept any given 16-value, without performing
@@ -59,51 +62,46 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    29 bytes 
+;;    C-bindings   - 28 bytes 
+;;    ASM-bindings - 22 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case      | Cycles | microSecs (us)
-;; -----------------------------------
-;; Best (1)  |   128  |  32.00
-;; -----------------------------------
-;; Worst (0) |   151  |  37.75
-;; -----------------------------------
+;; Case      | microSecs (us) | Cycles |
+;; -------------------------------------
+;; Best (1)  |      39        |   156  |
+;; -------------------------------------
+;; Worst (0) |      42        |   168  |
+;; -------------------------------------
+;; ASM Saving|     -21        |   -44  |
+;; -------------------------------------
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-_cpct_get4Bits::
-
-   ;; Get parameters from the stack
-   pop   af            ;; [10] AF = Return address
-   pop   de            ;; [10] DE = Pointer to the array in memory
-   pop   hl            ;; [10] HL = Index of the bit we want to get
-   push  hl            ;; [11] << Restore stack status
-   push  de            ;; [11]
-   push  af            ;; [11]
-
    ;; We need to know how many bytes do we have to
    ;; jump into the array, to move HL to that point.
    ;; We advance 1 byte for each 2 index positions (8 bits)
    ;; So, first, we calculate INDEX/2 (HL/2) to know the target byte, and
    ;;  the remainder to know the group of 4bits we want [ 0000 1111 ], and 
    ;;  that will go to the Carry Flag.
-   srl   h             ;; [ 8]
-   rr    l             ;; [ 8] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
-   jp    c, g4b_getGroup1 ;; [10] IF Carry, then we want the 4bits in the group 1, 
+   srl   h             ;; [2]
+   rr    l             ;; [2] HL = HL / 2 (HL holds byte offset to advance into the array pointed by DE)
+   jr    c, g4b_getGroup1 ;; [2/3] IF Carry, then we want the 4bits in the group 1, 
 gb4_getGroup0:
-   add  hl, de         ;; [11] HL += DE => HL points to the target byte in the array 
-   ld    a, (hl)       ;; [ 7] A = Target byte
-   rrca                ;; [ 4] <| As we want the grop 0 (4 most significant bits), we rotate them
-   rrca                ;; [ 4]  | 4 times and place them in bits 0 to 3. This makes it easier to
-   rrca                ;; [ 4]  | return the value from 0 to 15, as we only will have to leave this 4
-   rrca                ;; [ 4] <| bits out with and AND
-   and   #0x0F         ;; [ 7] Leave out the 4 bits we wanted
-   ld    l, a          ;; [ 4] Move the return value to L
-   ret                 ;; [10] Return to the caller
+   add  hl, de         ;; [3] HL += DE => HL points to the target byte in the array 
+   ld    a, (hl)       ;; [2] A = Target byte
+   rrca                ;; [1] <| As we want the grop 0 (4 most significant bits), we rotate them
+   rrca                ;; [1]  | 4 times and place them in bits 0 to 3. This makes it easier to
+   rrca                ;; [1]  | return the value from 0 to 15, as we only will have to leave this 4
+   rrca                ;; [1] <| bits out with and AND
+   and   #0x0F         ;; [2] Leave out the 4 bits we wanted
+   ld    l, a          ;; [1] Move the return value to L
+
+   ret                 ;; [3] Return to the caller
+
 g4b_getGroup1:
-   add  hl, de         ;; [11] HL += DE => HL points to the target byte in the array 
-   ld    a, (HL)       ;; [ 7] A = Target byte
-   and   #0x0F         ;; [ 7] As we want group 1 (bits 0 to 3) we just need to leave these 4 bits out with an AND operation
-   ld    l, a          ;; [ 4] Move the return value to L
-   ret                 ;; [10] Return to the caller
+   add  hl, de         ;; [3] HL += DE => HL points to the target byte in the array 
+   ld    a, (hl)       ;; [2] A = Target byte
+   and   #0x0F         ;; [2] As we want group 1 (bits 0 to 3) we just need to leave these 4 bits out with an AND operation
+   ld    l, a          ;; [1] Move the return value to L
+   
+   ret                 ;; [3] Return to the caller
