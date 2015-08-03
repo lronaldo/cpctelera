@@ -1,0 +1,287 @@
+#!/bin/bash
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_png2tileset
+##    Converts a PNG file with 4x4-pixel tile definitions into a CPCtelera C-array
+## tileset along with arrays for all tiles.
+##
+## Usage:
+##    <cpct_png2tileset> [filename] [options]
+##
+## Requisites:
+##    This scripts uses Img2CPC utility by Augusto Ruiz to convert the PNG
+## file into screen pixel definitions. This requires wine to be installed under
+## Linux or MacOSX and .net framework under Windows.
+##
+## Description:
+##    This script converts a file containing 4x4-pixel tile definitions into
+## 2 files (.c and .h) ready to be passed to the C compiler for inclusion 
+## into a program. 
+##
+## Command line options:
+##    -h | --help                      - Shows help information on the terminal.
+##
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Img2CPC utility location
+IMG2CPC=${CPCT_PATH}/tools/img2cpc/Img2CPC.exe
+
+## Configuration 
+TILES_WIDTH=4
+TILES_HEIGHT=4
+TILES_BASENAME=g_tile
+MODE=0
+FILE=tiles.png
+WINE=wine
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) [options] <pngfile>"
+   echo
+   echo "${COLOR_CYAN}  Converts a PNG file with 4x4-pixel tile definitions into a CPCtelera C-array \
+tileset along with arrays for all tiles"
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -m  | --mode   <cpc_graphics_mode>"
+   echo "${COLOR_CYAN}       Sets the CPC Graphics mode the output data will be produced for (0, 1 or 2). Default: 0."
+   echo "${COLOR_LIGHT_BLUE}  -tw | --tile-width   <pixels>"
+   echo "${COLOR_CYAN}       Sets the width of a tile in pixels. Default: 4."
+   echo "${COLOR_LIGHT_BLUE}  -th | --tile-height  <pixels>"
+   echo "${COLOR_CYAN}       Sets the height of a tile in pixels. Default: 4."
+   echo "${COLOR_LIGHT_BLUE}  -h  | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+## Convert ASM Z88DK's output to CPCtelera's C arrays
+##
+function asm2c() {
+   local IN_FILE="$1"
+   local H_FILE="$2"
+   local C_FILE="$3"
+   local STATUS=comments
+   local NUMTILES
+   local TOKENS
+   local TOK
+
+   while read LINE; do
+      # Tokenize LINE
+      TOKENS=( $LINE )
+
+      # Analize depending on STATUS
+      case ${STATUS} in
+         comments)
+            if [[ "${TOKENS[0]}" == "extern" ]]; then
+               STATUS=definitions
+               processDefinition TOKENS[@] >> ${H_FILE}
+               NUMTILES=1
+            fi
+         ;;
+         definitions)
+            if [[ "${TOKENS[0]}" == "extern" ]]; then
+               processDefinition TOKENS[@] >> ${H_FILE}
+               NUMTILES=$((NUMTILES + 1))
+            elif [[ "${TOKENS[0]}" == "unsigned" ]]; then
+               echo "extern const u8* const g_tileset [$NUMTILES];" >> ${H_FILE}
+               echo "const u8* const g_tileset [$NUMTILES] = {" >> ${C_FILE}
+               STATUS=tilearray_data
+            else
+               echo "ERROR! 'unsigned char* tiles' declaration expected after extern definitions"
+               exit 1
+            fi
+         ;;
+         tilearray_data)
+            if [[ "${TOKENS[0]}" != "};" ]]; then
+               echo "   "${TOKENS[@]//_DATA/} >> ${C_FILE}
+            else
+               echo "};" >> ${C_FILE}
+               echo >> ${C_FILE}
+               STATUS=asm
+            fi           
+         ;;
+         asm)
+            TOK="${TOKENS[0]##*_D}"
+            TOK="${TOK:0:3}"
+            if [[ ${TOK} == "ATA" ]]; then
+               TOK="${TOKENS[0]//_DATA*/}"
+               TOK="${TOK#._}"
+               NUMTILES=$((TILES_WIDTH / 2))
+               echo "const u8 ${TOK}[${NUMTILES}*${TILES_HEIGHT}] = {" >> $C_FILE
+               TOK=""
+               STATUS=asm_data
+            fi
+         ;;
+         asm_data)
+            if [[ "${TOKENS[0]}" == "defb" ]]; then
+               # Print previous tokens with comma at the end
+               if [[ "$TOK" != "" ]]; then
+                  printf "   %s,\n" "${TOK}" >> "$C_FILE"
+               fi
+
+               # Clean tokens
+               for ((i=1; i < ${#TOKENS[@]}; i++)); do
+                  TOK=$(echo "${TOKENS[i]}" | sed 's/[^$0-9A-Fa-fx,]*//g')
+                  if [[ ${TOK:0:1} == "$" ]]; then
+                     if [[ ${#TOK} < 3 || ${TOK:2:1} =~ [^0-9A-Fa-f] ]]; then
+                        TOK="${TOK:0:1}0${TOK:1}"
+                     fi
+                  fi
+                  TOKENS[i]=${TOK//$/0x}
+               done
+               TOK=${TOKENS[@]:1}
+            else
+               # Print previous tokens with comma at the end
+               if [[ "$TOK" != "" ]]; then
+                  printf "   %s\n" "${TOK}" >> "$C_FILE"
+                  printf "};\n\n" >> "$C_FILE"
+               fi
+               STATUS=asm
+            fi           
+         ;;
+      esac
+   done < $IN_FILE
+}
+
+## Convert a tile definition to C extern declaration
+##
+function processDefinition() {
+   local LINE
+   local BYTESWIDTH=$((TILES_WIDTH / 2))
+   declare -a LINE=("${!1}")
+
+   echo "extern const u8 ${LINE[3]/_DATA[]/[${BYTESWIDTH}*${TILES_HEIGHT}]}"
+}
+
+## Create header for .h file
+##
+function create_h_file_header() {
+   local H_FILE=$1
+   local GENFILE=$2
+
+cat > $H_FILE <<- END_OF_HEADER
+// 
+// Tiles generated from file ${GENFILE}
+//
+END_OF_HEADER
+}
+
+## Create header for .c file
+##
+function create_c_file_header() {
+   local C_FILE=$1
+   local GENFILE=$2
+
+cat > $C_FILE <<- END_OF_HEADER
+// 
+// Tile definitions generated from file ${GENFILE}
+//
+END_OF_HEADER
+
+}
+
+##############################################################
+###############################################################
+## Check command line parameters
+##
+
+if (( $# < 1 )); then
+   usage
+fi
+
+while (( $# >= 1 )); do
+   case $1 in
+      ## Get tile width
+      "-m" | "--mode")
+         if [[ "$2" != "0" && "$2" != "1" && "$2" != "2" ]]; then
+            paramError "Parameter -m (--mode) must be followed by a valid Amstrad CPC mode (0, 1 or 2)."
+         fi
+         MODE=$2
+         shift
+      ;;
+      ## Get tile width
+      "-tw" | "--tile-width")
+         if ! isInt "$2"; then
+            paramError "Parameter -tw (--tile-width) must be followed by an integer representing the width of a tile in bytes."
+         fi
+         TILES_WIDTH=$2
+         shift
+      ;;
+      ## Get tile height
+      "-th" | "--tile-height")
+         if ! isInt "$2"; then
+            paramError "Parameter -th (--tile-height) must be followed by an integer representing the hieght of a tile in bytes."
+         fi
+         TILES_HEIGHT=$2
+         shift
+      ;;
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Get main parameter (ProjectDir)
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         elif ! isEmpty "$FILENAME"; then
+            paramError "Unrecognized parameter '$1'. Have you already provided a <filename> parameter?" 6
+         else
+            EnsureExists file "$1"
+         fi
+         FILE="$1"
+      ;;
+   esac
+   shift
+done
+
+###############################################################
+###############################################################
+## Convert image and compile z88dk's output assembly to 
+## CPCtelera's C Array.
+##
+
+## On cygwin there is no need to use wine
+if checkSystem cygwin; then
+   WINE=""
+fi
+
+## Pass img2cpc to convert to Z88DK's ASM
+echo "Converting tiles to code using Img2CPC..."
+TMP_Z88DK_FILE=$(createTempFile).h
+${WINE} ${IMG2CPC} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o=${TMP_Z88DK_FILE} /bn=${TILES_BASENAME} "${FILE}"
+
+## Convert ASM to C
+H_FILE=$(filenameWithNoExt $FILE).h 
+C_FILE=$(filenameWithNoExt $FILE).c
+create_h_file_header "$H_FILE" "$FILE"
+create_c_file_header "$C_FILE" "$FILE"
+asm2c "$OUTPUT_FILE" "$H_FILE" "$C_FILE"
+
+## Remove temporal file reated
+rm "$TMP_Z88DK_FILE"
