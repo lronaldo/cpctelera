@@ -269,6 +269,9 @@ done
 ## On cygwin there is no need to use wine
 if checkSystem cygwin; then
    WINE=""
+else
+   EnsureCommandAvailable wine "wine has not been found on the system, and it's required for\
+running this script. Please, install wine or check the installation and run this script again."
 fi
 
 ## Pass img2cpc to convert to Z88DK's ASM
@@ -281,7 +284,7 @@ H_FILE=$(filenameWithNoExt $FILE).h
 C_FILE=$(filenameWithNoExt $FILE).c
 create_h_file_header "$H_FILE" "$FILE"
 create_c_file_header "$C_FILE" "$FILE"
-asm2c "$OUTPUT_FILE" "$H_FILE" "$C_FILE"
+asm2c "$TMP_Z88DK_FILE" "$H_FILE" "$C_FILE"
 
 ## Remove temporal file reated
 rm "$TMP_Z88DK_FILE"
