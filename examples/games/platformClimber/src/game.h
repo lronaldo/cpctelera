@@ -30,7 +30,7 @@
 #include <types.h>
 
 // 
-// Forward declara TCharacter struct (as we use a pointer in updateUser,
+// Forward declarated TCharacter struct (as we use a pointer in updateUser,
 //   and compiler must now its existance, but not its definition details).
 //
 extern struct Character;
