@@ -150,13 +150,13 @@ to convert the file tiles.png: "
 function exitCleanup() {
    ## Restore original Img2CPC config
    if [ -f "$IMG2CPC_TMP" ]; then
-      printf "Restoring Img2CPC config..."
+      echo "${COLOR_CYAN}Restoring ${COLOR_NORMAL}Img2CPC${COLOR_CYAN} config"
       mv "$IMG2CPC_TMP" "$IMG2CPC_CFG"
-      echo "OK!"
    fi
 
    ## Remove temporal files
    if [ -f "$IMG2CPC_Z88DK_TMP" ]; then
+      echo "${COLOR_CYAN}Removing temporal files"
       rm "$IMG2CPC_Z88DK_TMP"
    fi
 }
@@ -460,12 +460,30 @@ fi
 if [ ! -f $IMG2CPC ]; then
    Error "'$IMG2CPC' does not exist or is not readable. This file is required for cpct_img2tileset \
 to work properly. Please, check CPCtelera's tools installation and ensure Img2CPC is correctly installed."
-elif [ -f $IMG2CPC_CFG -a ! -w $IMG2CPC_CFG ]; then
-   askSimpleQuestion y n "WARNING: '$IMG2CPC_CFG' is not writeable. This script requires it to be writeable to perform \
-palette operations. \nDo you want this script to try to make it writeable? (y/n)" ANSWER
+elif [ ! -x $IMG2CPC ]; then
+   echo "${COLOR_LIGHT_YELLOW}WARNING:${COLOR_CYAN}"
+   echo "   '$IMG2CPC' is not executable. Execution permission is required to convert images to code.${COLOR_LIGHT_CYAN}"
+   echo
+   askSimpleQuestion y n "Do you want this script to try to make it executable? (y/n)" ANSWER
+   echo "${COLOR_NORMAL}"
    echo
    if [[ "$ANSWER" == "n" ]]; then
-      echo "'$IMG2CPC_CFG' has not been modified. This script cannot continue. Aborting. "
+      paramError "'$IMG2CPC' has not been modified. This script cannot continue. Aborting. "
+   fi
+   echo "Changing '$IMG2CPC' execution permission... "
+   if ! chmod +x "$IMG2CPC"; then
+      Error "Your user has not got enough privileges to change $IMG2CPC' execution permission. Please, change it \
+manually and run this script again."
+   fi
+elif [ -f $IMG2CPC_CFG -a ! -w $IMG2CPC_CFG ]; then
+   echo "${COLOR_LIGHT_YELLOW}WARNING:${COLOR_CYAN}"
+   echo "   '$IMG2CPC_CFG' is not writeable. Write permission is required to perform palette operations.${COLOR_LIGHT_CYAN}"
+   echo
+   askSimpleQuestion y n "Do you want this script to try to make it writeable? (y/n)" ANSWER
+   echo
+   echo "${COLOR_NORMAL}"
+   if [[ "$ANSWER" == "n" ]]; then
+      paramError "'$IMG2CPC_CFG' has not been modified. This script cannot continue. Aborting. "
    fi
    echo "Changing '$IMG2CPC_CFG' write permission... "
    if ! chmod +w "$IMG2CPC_CFG"; then
@@ -485,9 +503,13 @@ trap exitCleanup EXIT
 
 ## On cygwin there is no need to use wine
 if checkSystem cygwin; then
+   ## Do CYGWIN required stuff
+   EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
+running this script. Please, check cygwin installation and run this script again."
    WINE=""
-   IMG2CPC_Z88DK_TMP_WINE="$IMG2CPC_Z88DK_TMP"
+   IMG2CPC_Z88DK_TMP_WINE="$(cygpath -w ${IMG2CPC_Z88DK_TMP} 2> /dev/null)" 
 else
+   ## Do Linux/MacOSX required stuff (wine configuration)
    EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
 running this script. Please, install wine or check the installation and run this script again."
    EnsureCommandAvailable winepath "winepath has not been found on the system, and it's required \
@@ -497,13 +519,19 @@ again. On some old wine installations you may want to create an alias for winepa
    IMG2CPC_Z88DK_TMP_WINE="$(winepath -w ${IMG2CPC_Z88DK_TMP} 2> /dev/null)" 
 fi
 
+echo
+echo "${COLOR_LIGHT_YELLOW}PROCESSING FILE '${COLOR_NORMAL}$FILE${COLOR_CYAN}'"
+echo
+
 ## Pass img2cpc to convert to Z88DK's ASM
-echo "Converting tiles to assembly code using Img2CPC (this may take a while)..."
+echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 1${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Converting tiles \
+to assembly code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN} (this may take a while)..."
 generateConfigForImg2CPC
 ${WINE} ${IMG2CPC} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o="${IMG2CPC_Z88DK_TMP_WINE}" /bn=${TILES_BASENAME} "${FILE}" &> /dev/null
 
 ## Convert ASM to C
-echo "Translating assembly code into CPCtelera's C-arrays..."
+echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 2${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Translating assembly \
+code into ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C-arrays..."
 H_FILE=$(filenameWithNoExt $FILE).h 
 C_FILE=$(filenameWithNoExt $FILE).c
 create_h_file_header "$H_FILE" "$FILE"
@@ -512,3 +540,12 @@ asm2c "$IMG2CPC_Z88DK_TMP" "$H_FILE" "$C_FILE"
 
 ## Cleanup everything on exiting
 exitCleanup
+
+## Success message
+echo
+echo "${COLOR_LIGHT_GREEN} SUCCESS!"
+echo
+echo "${COLOR_CYAN}Files '${COLOR_NORMAL}$C_FILE${COLOR_CYAN}' and '${COLOR_NORMAL}$H_FILE${COLOR_CYAN}' \
+have been created with ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s codification of tiles/sprites from \
+'${COLOR_NORMAL}$FILE${COLOR_CYAN}'.${COLOR_NORMAL}"
+echo
