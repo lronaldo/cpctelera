@@ -22,25 +22,49 @@
 ###########################################################################
 
 ##
-## File: cpct_png2tileset
-##    Converts a PNG file with 4x4-pixel tile definitions into a CPCtelera C-array
-## tileset along with arrays for all tiles.
+## File: cpct_img2tileset
+##
+##    Converts an image file with a set of tile or sprite images into a 
+## CPCtelera C-array tileset along with arrays for all tiles/sprites.
 ##
 ## Usage:
-##    <cpct_png2tileset> [filename] [options]
+##    <cpct_img2tileset> [options] [image_file]
 ##
 ## Requisites:
 ##    This scripts uses Img2CPC utility by Augusto Ruiz to convert the PNG
-## file into screen pixel definitions. This requires wine to be installed under
-## Linux or MacOSX and .net framework under Windows.
+## file into screen pixel definitions. This requires wine and winepath to be 
+## installed under Linux or MacOSX and .net framework 2.0. or greater under Windows.
 ##
 ## Description:
-##    This script converts a file containing 4x4-pixel tile definitions into
-## 2 files (.c and .h) ready to be passed to the C compiler for inclusion 
-## into a program. 
+##    This script converts an image file containing a set of tile or sprite definitions
+## of the same size into 2 files (.c and .h) ready to be passed to the C compiler 
+## for inclusion into a program. 
+##    By default, this script converts the image into 4x4-pixel tiles. This means that
+## the script splits the whole image into 4x4-pixel individual images and converts each
+## one of them into a tile. You may change sizes by using -tw / -th command line modifiers. 
+##    To do the conversion, the script calls Img2CPC.exe Windows utility, which 
+## reads pixels one by one and transform them into the closest colour value from the
+## defined Amstrad CPC palette. If no palette is given to this script, standard
+## Amstrad CPC palette is used (the one that is set when a CPC computer starts).
+##    Provided image file may be a PNG, JPG, BMP, GIF or TIFF file. 
 ##
 ## Command line options:
-##    -h | --help                      - Shows help information on the terminal.
+##    -pf | --palette-firmware <palete_array> - Sets the Amstrad CPC palette 
+##               to be used for the conversion as an array of firmware colour values (up to 16, 
+##               in mode 0). Values must be passed inside '{' '}' and separated by spaces. 
+##               Following example sets mode 1 palette to Black, white, red and green colours, 
+##               to convert the file tiles.png,
+##
+##                        > cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png
+##
+##    -bn | --tiles-basename  <name>          - Sets the basename that will be used as C identifier 
+##                                              for tiles or sprites. Default: g_tile
+##    -m  | --mode <cpc_graphics_mode>        - Sets the CPC Graphics mode the output data will 
+##                                              be produced for (0, 1 or 2). Default: 0.
+##    -tw | --tile-width   <pixels>           - Sets the width of a tile in pixels. Default: 4.
+##    -th | --tile-height  <pixels>           - Sets the height of a tile in pixels. Default: 4.
+##    -h  | --help                            - Shows help information on the terminal.
+##
 ##
 
 ## Bash Include files
@@ -48,26 +72,66 @@ source $(dirname $0)/lib/bash_library.sh
 
 ## Img2CPC utility location
 IMG2CPC=${CPCT_PATH}/tools/img2cpc/Img2CPC.exe
+IMG2CPC_CFG=${CPCT_PATH}/tools/img2cpc/Img2CPC.exe.config
+IMG2CPC_TMP=${CPCT_PATH}/tools/img2cpc/Img2CPC.exe.config.backup
+IMG2CPC_Z88DK_TMP=${CPCT_PATH}/tools/img2cpc/z88dk_asm_tmp_output.h
 
 ## Configuration 
+CPCCOLOURS=(       0,0,0     0,0,128     0,0,255     128,0,0   128,0,128   128,0,255 \
+                 255,0,0   255,0,128   255,0,255     0,128,0   0,128,128   0,128,255 \
+               128,128,0 128,128,128 128,128,255   255,128,0 255,128,128 255,128,255 \
+                 0,255,0   0,255,128   0,255,255   128,255,0 128,255,128 128,255,255 \
+               255,255,0 255,255,128 255,255,255 )
+PALETTE=( 1 24 20 6 26 0 2 8 10 12 14 16 18 22 24 16 )
 TILES_WIDTH=4
 TILES_HEIGHT=4
 TILES_BASENAME=g_tile
 MODE=0
-FILE=tiles.png
 WINE=wine
+BASEPATH=${PWD}
+## Simbols used as 'parentheses' delimiters for passing arrays as parameters
+LPAR="{"
+RPAR="}"
 
 ## Show how this script is to be used and exit
 ##
 function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) [options] <pngfile>"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) [options] <image_file>"
    echo
-   echo "${COLOR_CYAN}  Converts a PNG file with 4x4-pixel tile definitions into a CPCtelera C-array \
-tileset along with arrays for all tiles"
+   echo "${COLOR_CYAN}    Converts an image file with a set of tile or sprite images into a \
+CPCtelera C-array tileset along with arrays for all tiles/sprites."
+   echo 
+   echo "${COLOR_LIGHT_YELLOW}Requisites:"
+   echo "${COLOR_CYAN}    This scripts uses Img2CPC utility by Augusto Ruiz to convert the PNG \
+file into screen pixel definitions. This requires wine and winepath to be installed under Linux \
+or MacOSX and .net framework 2.0. or greater under Windows."
+   echo 
+   echo "${COLOR_LIGHT_YELLOW}Description:"
+   echo "${COLOR_CYAN}    This script converts an image file containing a set of tile or sprite \
+definitions of the same size into 2 files (.c and .h) ready to be passed to the C compiler for \
+inclusion into a program."
+   echo "    By default, this script converts the image into 4x4-pixel tiles. This means that \
+the script splits the whole image into 4x4-pixel individual images and converts each one of them \
+into a tile. You may change sizes by using -tw / -th command line modifiers."
+   echo "    To do the conversion, the script calls Img2CPC.exe Windows utility, which reads pixels \
+one by one and transform them into the closest colour value from the defined Amstrad CPC palette. If \
+no palette is given to this script, standard Amstrad CPC palette is used (the one that is set when a \
+CPC computer starts)."
+   echo "    Provided image file may be a PNG, JPG, BMP, GIF or TIFF file. "
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo 
+   echo "${COLOR_LIGHT_BLUE}  -pf | --palette-firmware <palete_array> "
+   echo "${COLOR_CYAN}       Sets the Amstrad CPC palette to be used for the conversion as an array \
+of firmware colour values (up to 16, in mode 0). Values must be passed inside '$LPAR' '$RPAR' and \
+separated by spaces. Following example sets mode 1 palette to Black, white, red and green colours, \
+to convert the file tiles.png: "
+   echo
+   echo "          ${COLOR_WHITE}cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png"
+   echo
+   echo "${COLOR_LIGHT_BLUE}  -bn | --tiles-basename  <name>"
+   echo "${COLOR_CYAN}       Sets the basename that will be used as C identifier for tiles or sprites. Default: g_tile"
    echo "${COLOR_LIGHT_BLUE}  -m  | --mode   <cpc_graphics_mode>"
    echo "${COLOR_CYAN}       Sets the CPC Graphics mode the output data will be produced for (0, 1 or 2). Default: 0."
    echo "${COLOR_LIGHT_BLUE}  -tw | --tile-width   <pixels>"
@@ -78,6 +142,59 @@ tileset along with arrays for all tiles"
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
    exit 1
+}
+
+
+## Ensures that files are not messed up if the script fails
+##
+function exitCleanup() {
+   ## Restore original Img2CPC config
+   if [ -f "$IMG2CPC_TMP" ]; then
+      printf "Restoring Img2CPC config..."
+      mv "$IMG2CPC_TMP" "$IMG2CPC_CFG"
+      echo "OK!"
+   fi
+
+   ## Remove temporal files
+   if [ -f "$IMG2CPC_Z88DK_TMP" ]; then
+      rm "$IMG2CPC_Z88DK_TMP"
+   fi
+}
+
+## Exports present palette to Img2CPC palette format
+##
+function exportPaletteToImg2CPC() {
+   local i
+   local IDX
+   for (( i=0; i < ${#PALETTE[@]}-1; i++ )); do
+      IDX=${PALETTE[$i]}
+      printf "%s#" ${CPCCOLOURS[$IDX]}
+   done
+   echo ${CPCCOLOURS[${PALETTE[15]}]}
+}
+
+## Generates a new config file to be used with Img2CPC
+## using present palette
+##
+function generateConfigForImg2CPC() {
+   # First, save previous config file
+   cp "$IMG2CPC_CFG" "$IMG2CPC_TMP"
+
+#---- Config File Write starts
+#-----------------------------
+   cat > "$IMG2CPC_CFG" << ConfigFileDocument
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+   <!-- cpct_img2tileset Generated Palette -->
+   <add key="PaletteColors" value="$(exportPaletteToImg2CPC)"/>
+   <!-- Palette Transparent Color Index -->
+   <add key="TransparentColor" value="0"/>
+ </appSettings>
+</configuration>
+ConfigFileDocument
+#-----------------------------
+#---- Config File Write ends
 }
 
 ## Convert ASM Z88DK's output to CPCtelera's C arrays
@@ -217,26 +334,100 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Get a palette as an array of firmware values
+      "-pf" | "--palette-firmware")
+         ## Error messages
+         PALETTEERROR="Parameter -pf (--palette-firmware) must be followed by an array \
+            of firmware colour values (integers from 0 to 26) separated by spaces and \
+            enclosed into '$LPAR' '$RPAR'. An example setting palette colours 0 to 3 could be \
+            this one: $LPAR 1 20 4 5 $RPAR "
+         INTEGERERROR="is not an integer value between 0 and 26. $PALETTEERROR"
+
+         ## Set Palette to 0's
+         PALETTE=( 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 )
+
+         ## Check initial parenthesis
+         shift
+         NEXT=$1
+         if [[ "${NEXT:0:1}" != "$LPAR" ]]; then
+            paramError "$PALETTEERROR" 12
+         elif (( ${#NEXT} > 1 )); then
+            NEXT=${NEXT:1}
+         else
+            shift
+            NEXT=$1
+         fi
+
+         ## Go through all palette values
+         i=0
+         RPAR_FOUND=0
+         while (( ! RPAR_FOUND )); do
+            ## Check for parenthesis first
+            if (( ${#NEXT} > 1 )) && [[ "${NEXT:(-1)}" == "$RPAR" ]]; then
+               RPAR_FOUND=1
+               NEXT=${NEXT:0:-1}
+            fi
+            if [[ "$NEXT" == "$RPAR" ]]; then
+               RPAR_FOUND=1
+            elif isEmpty "$NEXT"; then
+               paramError "Closing '$RPAR' not found while processing palette array."
+            elif ! isInt "$NEXT" || (( NEXT < 0 || NEXT > 26 )); then
+               paramError "'$NEXT' $INTEGERERROR" 13
+            else
+               ## Insert new palette element only if we have not exceeded size
+               if (( i > 15 )); then
+                  paramError "Palette array exceeds maximum size. It must have 16 values at most."
+               fi               
+               PALETTE[$i]="$NEXT"
+   
+               ## Move to next value
+               i=$((i+1))
+               shift
+               NEXT="$1"
+            fi
+         done
+      ;;
+      ## Get basename for tiles
+      "-bn" | "--tiles-basename")
+
+         ## Basename for tiles must be a valid C identifier
+         if isEmpty "$2"; then
+            paramError "Parameter -bn (--tiles-basename) must be followed by a valid C identifier." 4
+         elif [[ "${2:0:1}" =~ [^A-Za-z_] ]]; then
+            paramError "Parameter -bn (--tiles-basename) must be followed by a valid C identifier, starting by an alphabetic character or '_'." 5
+         elif [[ "$2" =~ .*[^0-9A-Za-z_].* ]]; then
+            paramError "Parameter -bn (--tiles-basename) must be followed by a valid C identifier, only containing alphanumeric characters or '_'." 6
+         fi
+
+         TILES_BASENAME="$2"
+         shift
+      ;;
       ## Get tile width
       "-m" | "--mode")
+
+         ## CPC Mode must be 0, 1 or 2
          if [[ "$2" != "0" && "$2" != "1" && "$2" != "2" ]]; then
-            paramError "Parameter -m (--mode) must be followed by a valid Amstrad CPC mode (0, 1 or 2)."
+            paramError "Parameter -m (--mode) must be followed by a valid Amstrad CPC mode (0, 1 or 2)." 7
          fi
          MODE=$2
          shift
       ;;
       ## Get tile width
       "-tw" | "--tile-width")
+
+         ## Tile width must be an integer
          if ! isInt "$2"; then
-            paramError "Parameter -tw (--tile-width) must be followed by an integer representing the width of a tile in bytes."
+            paramError "Parameter -tw (--tile-width) must be followed by an integer representing the width of a tile in bytes." 8
          fi
          TILES_WIDTH=$2
          shift
       ;;
       ## Get tile height
       "-th" | "--tile-height")
+
+         ## Tile height must be an integer
          if ! isInt "$2"; then
-            paramError "Parameter -th (--tile-height) must be followed by an integer representing the hieght of a tile in bytes."
+            paramError "Parameter -th (--tile-height) must be followed by an integer representing the hieght of a tile in bytes." 9
          fi
          TILES_HEIGHT=$2
          shift
@@ -245,12 +436,12 @@ while (( $# >= 1 )); do
       "-h" | "--help")
          usage
       ;;
-      ## Get main parameter (ProjectDir)
+      ## Get main parameter (filename)
       *)
          if isCommandLineOption "$1"; then
-            paramError "Unrecognized command line option '$1'" 7
-         elif ! isEmpty "$FILENAME"; then
-            paramError "Unrecognized parameter '$1'. Have you already provided a <filename> parameter?" 6
+            paramError "Unrecognized command line option '$1'" 10
+         elif ! isEmpty "$FILE"; then
+            paramError "Unrecognized parameter '$1'. Have you already provided a <filename> parameter?" 11
          else
             EnsureExists file "$1"
          fi
@@ -260,31 +451,64 @@ while (( $# >= 1 )); do
    shift
 done
 
+## File parameter must have been passed (not empty)
+if isEmpty "$FILE"; then
+   paramError "A <filename> parameter is required." 12
+fi
+
+## Check Img2CPC
+if [ ! -f $IMG2CPC ]; then
+   Error "'$IMG2CPC' does not exist or is not readable. This file is required for cpct_img2tileset \
+to work properly. Please, check CPCtelera's tools installation and ensure Img2CPC is correctly installed."
+elif [ -f $IMG2CPC_CFG -a ! -w $IMG2CPC_CFG ]; then
+   askSimpleQuestion y n "WARNING: '$IMG2CPC_CFG' is not writeable. This script requires it to be writeable to perform \
+palette operations. \nDo you want this script to try to make it writeable? (y/n)" ANSWER
+   echo
+   if [[ "$ANSWER" == "n" ]]; then
+      echo "'$IMG2CPC_CFG' has not been modified. This script cannot continue. Aborting. "
+   fi
+   echo "Changing '$IMG2CPC_CFG' write permission... "
+   if ! chmod +w "$IMG2CPC_CFG"; then
+      Error "Your user has not got enough privileges to change $IMG2CPC_CFG' write permission. Please, change it \
+manually and run this script again."
+   fi
+fi
+
 ###############################################################
 ###############################################################
 ## Convert image and compile z88dk's output assembly to 
 ## CPCtelera's C Array.
 ##
 
+## Set a trap on EXIT signal for ensuring everything is cleaned up on exit
+trap exitCleanup EXIT
+
 ## On cygwin there is no need to use wine
 if checkSystem cygwin; then
    WINE=""
+   IMG2CPC_Z88DK_TMP_WINE="$IMG2CPC_Z88DK_TMP"
 else
-   EnsureCommandAvailable wine "wine has not been found on the system, and it's required for\
+   EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
 running this script. Please, install wine or check the installation and run this script again."
+   EnsureCommandAvailable winepath "winepath has not been found on the system, and it's required \
+for running this script. Please, install it or check the installation of wine and run this script \
+again. On some old wine installations you may want to create an alias for winepath to the command \
+'wine winepath'."
+   IMG2CPC_Z88DK_TMP_WINE="$(winepath -w ${IMG2CPC_Z88DK_TMP} 2> /dev/null)" 
 fi
 
 ## Pass img2cpc to convert to Z88DK's ASM
-echo "Converting tiles to code using Img2CPC..."
-TMP_Z88DK_FILE=$(createTempFile).h
-${WINE} ${IMG2CPC} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o=${TMP_Z88DK_FILE} /bn=${TILES_BASENAME} "${FILE}"
+echo "Converting tiles to assembly code using Img2CPC (this may take a while)..."
+generateConfigForImg2CPC
+${WINE} ${IMG2CPC} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o="${IMG2CPC_Z88DK_TMP_WINE}" /bn=${TILES_BASENAME} "${FILE}" &> /dev/null
 
 ## Convert ASM to C
+echo "Translating assembly code into CPCtelera's C-arrays..."
 H_FILE=$(filenameWithNoExt $FILE).h 
 C_FILE=$(filenameWithNoExt $FILE).c
 create_h_file_header "$H_FILE" "$FILE"
 create_c_file_header "$C_FILE" "$FILE"
-asm2c "$TMP_Z88DK_FILE" "$H_FILE" "$C_FILE"
+asm2c "$IMG2CPC_Z88DK_TMP" "$H_FILE" "$C_FILE"
 
-## Remove temporal file reated
-rm "$TMP_Z88DK_FILE"
+## Cleanup everything on exiting
+exitCleanup
