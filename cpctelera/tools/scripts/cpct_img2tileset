@@ -87,6 +87,7 @@ TILES_WIDTH=4
 TILES_HEIGHT=4
 TILES_BASENAME=g_tile
 MODE=0
+MODEFACTOR=( 2 4 8 )
 WINE=wine
 BASEPATH=${PWD}
 ## Simbols used as 'parentheses' delimiters for passing arrays as parameters
@@ -157,7 +158,7 @@ function exitCleanup() {
    ## Remove temporal files
    if [ -f "$IMG2CPC_Z88DK_TMP" ]; then
       echo "${COLOR_CYAN}Removing temporal files"
-      rm "$IMG2CPC_Z88DK_TMP"
+#      rm "$IMG2CPC_Z88DK_TMP"
    fi
 }
 
@@ -249,7 +250,7 @@ function asm2c() {
             if [[ ${TOK} == "ATA" ]]; then
                TOK="${TOKENS[0]//_DATA*/}"
                TOK="${TOK#._}"
-               NUMTILES=$((TILES_WIDTH / 2))
+               NUMTILES=$((TILES_WIDTH / ${MODEFACTOR[$MODE]} ))
                echo "const u8 ${TOK}[${NUMTILES}*${TILES_HEIGHT}] = {" >> $C_FILE
                TOK=""
                STATUS=asm_data
@@ -290,7 +291,7 @@ function asm2c() {
 ##
 function processDefinition() {
    local LINE
-   local BYTESWIDTH=$((TILES_WIDTH / 2))
+   local BYTESWIDTH=$((TILES_WIDTH / ${MODEFACTOR[$MODE]} ))
    declare -a LINE=("${!1}")
 
    echo "extern const u8 ${LINE[3]/_DATA[]/[${BYTESWIDTH}*${TILES_HEIGHT}]}"
@@ -304,8 +305,10 @@ function create_h_file_header() {
 
 cat > $H_FILE <<- END_OF_HEADER
 // 
-// Tiles generated from file ${GENFILE}
+// Tiles generated from file ${GENFILE##*/}
 //
+#include <types.h>
+
 END_OF_HEADER
 }
 
@@ -313,12 +316,15 @@ END_OF_HEADER
 ##
 function create_c_file_header() {
    local C_FILE=$1
-   local GENFILE=$2
+   local H_FILE=$2
+   local GENFILE=$3
 
 cat > $C_FILE <<- END_OF_HEADER
 // 
-// Tile definitions generated from file ${GENFILE}
+// Tile definitions generated from file ${GENFILE##*/}
 //
+#include "${H_FILE##*/}"
+
 END_OF_HEADER
 
 }
@@ -525,9 +531,10 @@ echo
 
 ## Pass img2cpc to convert to Z88DK's ASM
 echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 1${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Converting tiles \
-to assembly code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN} (this may take a while)..."
+to assembly code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN} (Size ${COLOR_LIGHT_YELLOW}${TILES_WIDTH}x${TILES_HEIGHT}${COLOR_CYAN} \
+pixels, MODE ${COLOR_LIGHT_YELLOW}${MODE}${COLOR_CYAN})..."
 generateConfigForImg2CPC
-${WINE} ${IMG2CPC} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o="${IMG2CPC_Z88DK_TMP_WINE}" /bn=${TILES_BASENAME} "${FILE}" &> /dev/null
+${WINE} ${IMG2CPC} /m=${MODE} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o="${IMG2CPC_Z88DK_TMP_WINE}" /bn=${TILES_BASENAME} "${FILE}" &> /dev/null
 
 ## Convert ASM to C
 echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 2${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Translating assembly \
@@ -535,7 +542,7 @@ code into ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C-arrays..."
 H_FILE=$(filenameWithNoExt $FILE).h 
 C_FILE=$(filenameWithNoExt $FILE).c
 create_h_file_header "$H_FILE" "$FILE"
-create_c_file_header "$C_FILE" "$FILE"
+create_c_file_header "$C_FILE" "$H_FILE" "$FILE"
 asm2c "$IMG2CPC_Z88DK_TMP" "$H_FILE" "$C_FILE"
 
 ## Cleanup everything on exiting
