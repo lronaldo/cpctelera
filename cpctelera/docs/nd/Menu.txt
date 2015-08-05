@@ -164,6 +164,13 @@ Group: Easytilemaps  {
    File: EasyTilemaps  (easytilemaps/easytilemaps.h)
    }  # Group: Easytilemaps
 
+Group: Random  {
+
+   File: cpct_getRandomUniform_u8_f  (random/cpct_getRandomUniform_u8_f.s)
+   File: cpct_setRandomSeedUniform_u8  (random/cpct_setRandomSeedUniform_u8.s)
+   File: Random  (random/random.h)
+   }  # Group: Random
+
 Group: Index  {
 
    Constant Index: Constants
