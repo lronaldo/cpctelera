@@ -57,7 +57,9 @@ Section: Donors
    We are *incredibly grateful to these people*, who sent us some economic support to continue with CPCtelera and other CPC-related projects. Big most sincere thanks and respects to all of you,
 
    21/05/2015 - Lachlan Keown
-
+   10/06/2015 - Tim Riemann / Octoate
+   25/06/2015 - Ervin Pajor
+   13/07/2015 - Roald Strauss
 
 Section: Supporting CPCtelera
    We, as authors of CPCtelera, have started this journey to create a usable, free, convenient and up-to-date game engine. There are lots of things to do and improve in order to achieve our goals. If you want to help us, we are more than happy. Any kind of help is always welcome, but we prefer any of these ways,
