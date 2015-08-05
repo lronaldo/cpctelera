@@ -149,6 +149,7 @@ Group: Memutils  {
 Group: Command Line Tools  {
 
    File: cpct_bin2c  (no auto-title, commandline/cpct_bin2c)
+   File: cpct_img2tileset  (commandline/cpct_img2tileset)
    File: cpct_mkproject  (no auto-title, commandline/cpct_mkproject)
    File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
    File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
@@ -162,6 +163,13 @@ Group: Easytilemaps  {
    File: cpct_etm_setTileset2x4  (easytilemaps/cpct_etm_setTileset2x4.s)
    File: EasyTilemaps  (easytilemaps/easytilemaps.h)
    }  # Group: Easytilemaps
+
+Group: Random  {
+
+   File: cpct_getRandomUniform_u8_f  (random/cpct_getRandomUniform_u8_f.s)
+   File: cpct_setRandomSeedUniform_u8  (random/cpct_setRandomSeedUniform_u8.s)
+   File: Random  (random/random.h)
+   }  # Group: Random
 
 Group: Index  {
 
