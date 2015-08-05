@@ -79,7 +79,7 @@ Topic: Downloading CPCtelera
 
    You can download CPCtelera from these sources
 
-   * Download <current stable version 1.1.1 at https://github.com/lronaldo/cpctelera/archive/v1.1.1.zip>
+   * Download <current stable version 1.2 at https://github.com/lronaldo/cpctelera/archive/v1.2.zip>
 
    * Get Latest version from github:
    > git clone https://github.com/lronaldo/cpctelera
