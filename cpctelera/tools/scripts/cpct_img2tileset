@@ -88,6 +88,7 @@ TILES_HEIGHT=4
 TILES_BASENAME=g_tile
 MODE=0
 MODEFACTOR=( 2 4 8 )
+MODECOLOURS=( 16 4 2 )
 WINE=wine
 BASEPATH=${PWD}
 ## Simbols used as 'parentheses' delimiters for passing arrays as parameters
@@ -157,8 +158,8 @@ function exitCleanup() {
 
    ## Remove temporal files
    if [ -f "$IMG2CPC_Z88DK_TMP" ]; then
-      echo "${COLOR_CYAN}Removing temporal files"
-#      rm "$IMG2CPC_Z88DK_TMP"
+      echo "${COLOR_CYAN}Removing temporal files${COLOR_NORMAL}"
+      rm "$IMG2CPC_Z88DK_TMP"
    fi
 }
 
@@ -208,6 +209,10 @@ function asm2c() {
    local NUMTILES
    local TOKENS
    local TOK
+   local FILESIZE="$(fileSize "$IN_FILE")"
+   local TOTALREAD=0
+   local PCT
+   local LEFT
 
    while read LINE; do
       # Tokenize LINE
@@ -284,6 +289,13 @@ function asm2c() {
             fi           
          ;;
       esac
+
+      ## Show progressbar
+      TOTALREAD=$((TOTALREAD + ${#LINE}))
+      PCT=$((TOTALREAD * 100 / FILESIZE))
+      LEFT=$((20 + 2 + ${#PCT}))
+      drawProgressBar "20" "${PCT}" ${COLOR_INVERTED_GREEN} ${COLOR_INVERTED_WHITE}
+      cursorLeft $LEFT
    done < $IN_FILE
 }
 
@@ -452,6 +464,7 @@ while (( $# >= 1 )); do
             EnsureExists file "$1"
          fi
          FILE="$1"
+         IMG2CPC_Z88DK_TMP="$(pwd "$FILE")/z88dk_asm_tmp_output.h"
       ;;
    esac
    shift
@@ -514,6 +527,7 @@ if checkSystem cygwin; then
 running this script. Please, check cygwin installation and run this script again."
    WINE=""
    IMG2CPC_Z88DK_TMP_WINE="$(cygpath -w ${IMG2CPC_Z88DK_TMP} 2> /dev/null)" 
+   FILE_WINE="$(cygpath -w ${FILE} 2> /dev/null)" 
 else
    ## Do Linux/MacOSX required stuff (wine configuration)
    EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
@@ -523,18 +537,28 @@ for running this script. Please, install it or check the installation of wine an
 again. On some old wine installations you may want to create an alias for winepath to the command \
 'wine winepath'."
    IMG2CPC_Z88DK_TMP_WINE="$(winepath -w ${IMG2CPC_Z88DK_TMP} 2> /dev/null)" 
+   FILE_WINE="$(winepath -w ${FILE} 2> /dev/null)" 
 fi
 
+## Start processing and print useful information
 echo
 echo "${COLOR_LIGHT_YELLOW}PROCESSING FILE '${COLOR_NORMAL}$FILE${COLOR_CYAN}'"
+echo
+echo "${COLOR_GREEN}CPC Mode : ${COLOR_LIGHT_YELLOW}${MODE}${COLOR_CYAN}"
+echo "${COLOR_GREEN}Tile Size: ${COLOR_LIGHT_YELLOW}${TILES_WIDTH}x${TILES_HEIGHT}${COLOR_CYAN} pixels"
+printf "${COLOR_GREEN}Palette  : ${COLOR_LIGHT_YELLOW}"
+for((i=0; i < ${MODECOLOURS[$MODE]}; i++)); do
+   printf "%s " ${PALETTE[$i]}
+done
+echo "${COLOR_CYAN}(Firmware values)${COLOR_NORMAL}"
 echo
 
 ## Pass img2cpc to convert to Z88DK's ASM
 echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 1${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Converting tiles \
-to assembly code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN} (Size ${COLOR_LIGHT_YELLOW}${TILES_WIDTH}x${TILES_HEIGHT}${COLOR_CYAN} \
-pixels, MODE ${COLOR_LIGHT_YELLOW}${MODE}${COLOR_CYAN})..."
+to assembly code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
 generateConfigForImg2CPC
-${WINE} ${IMG2CPC} /m=${MODE} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o="${IMG2CPC_Z88DK_TMP_WINE}" /bn=${TILES_BASENAME} "${FILE}" &> /dev/null
+${WINE} ${IMG2CPC} /m=${MODE} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o="${IMG2CPC_Z88DK_TMP_WINE}" /bn=${TILES_BASENAME} "${FILE_WINE}" &> /dev/null
+
 
 ## Convert ASM to C
 echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 2${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Translating assembly \

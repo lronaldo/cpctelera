@@ -577,3 +577,11 @@ function containsChars {
       echo "${STR:POS:1}"
    fi
 }
+
+## Echoes the size of a given file in bytes. 
+##  Does not check that file exists or is readable
+##  $1 File
+##
+function fileSize {
+   echo $(wc -c < "${1}" | grep -Eo '[0-9]+')
+}
