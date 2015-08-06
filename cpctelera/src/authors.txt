@@ -85,6 +85,7 @@ Section: Testers & Bug Reporters
  * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
  * <gryken2014 at https://github.com/gryken2014>
  * Roald Strauss (<mr_lou / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=96>)
+ * Toni Ramírez
 
 Section: Special Thanks
 
