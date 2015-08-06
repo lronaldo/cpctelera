@@ -164,6 +164,7 @@ void main(void) {
    cpct_setVideoMode(0);            // We will be using mode 0
    cpct_setPalette(g_palette, 5);   // We are only using 5 first palette colours
    cpct_setBorder(g_palette[0]);    // Set the border to the background colour (colour 0)
+   cpct_clearScreen_f64(0x5555);    // Fastly fillup the screen with a background pattern
 
    // Loop forever
    while (1) {
