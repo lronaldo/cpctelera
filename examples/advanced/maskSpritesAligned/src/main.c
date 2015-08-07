@@ -103,7 +103,7 @@ void main(void) {
 
       // Wait for VSYNC before drawing to the screen to reduce flickering
       // We also wait for several VSYNC to make it move slow, or it will be too fast
-      waitNVSYNCs(10);
+      waitNVSYNCs(2);
 
       // Redraw a tilebox over the alien to erase it (redrawing background over it)
       cpct_etm_drawTileBox2x4(a->tx, a->ty, ALIEN_WIDTH_TILES, ALIEN_HEIGHT_TILES, 
