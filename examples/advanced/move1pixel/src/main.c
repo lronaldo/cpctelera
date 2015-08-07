@@ -49,47 +49,60 @@ typedef struct {
 } TEntity;
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// Shift all pixels of a sprite to the right
+//
+void shiftSpritePixelsRight(u8* sprite, u8 size) {
+   u8 prev_rightpixel,
+      rightpixel;       // Values of the right-pixel of a byte, and the right-pixel of the previous byte
+
+   // Shift all bits to the right, to move sprite 1 pixel to the right    
+   prev_rightpixel = 0;
+   do {
+      // Save the right pixel value of this byte (even bits)
+      rightpixel      = *sprite & 0b01010101;
+      // Mix the right pixel of the previous byte (that now is left pixel) with 
+      // the left pixel of the present byte (that now should be right pixel)
+      *sprite         = (prev_rightpixel << 1) | ((*sprite & 0b10101010) >> 1);
+      // Saved right pixel is stored as the previous byte right pixel, for next iteration
+      prev_rightpixel = rightpixel;
+      ++sprite;
+   } while(--size);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Shift all pixels of a sprite to the left
+//
+void shiftSpritePixelsLeft(u8* sprite, u8 size) {
+   u8* next_byte = sprite + 1; // Maintain a pointer to the next byte of the sprite 
+   
+   // Shift all bits to the left, to move sprite 1 pixel to the left
+   // Assuming leftmost column is free (zeroed)
+   // Iterate up to the next-to-last byte, as the last byte is a special case
+   while (--size) {
+      // Each byte is the mix of its right pixel (even bits) shifted to the left
+      // to become left pixel, and the left pixel of the next byte shifted to the right,
+      // to become right pixel.
+      *sprite = ((*sprite & 0b01010101) << 1) | ((*(next_byte) & 0b10101010) >> 1);
+      ++sprite; ++next_byte;
+   }
+   // Last byte has its right pixel shifted to the left to become left pixel, and
+   // zeros added as new right pixel
+   *sprite = (*sprite & 0b01010101) << 1;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // Shift an sprite to draw it at an even or odd location
 //
 void shiftSprite(TEntity *e) {
-   u8 i;               // Counter to iterate through the sprite array
-   u8 *sp = e->sprite; // Pointer to sprite values
-
    // Depending on its present status, shifting will be to the left or to the right
    // We always assume that the original sprite had its rightmost pixel column free (zeroed)
    if (e->shift == ON_EVEN_PIXEL) {     
-      u8 prev_rightpixel,
-         rightpixel;       // Values of the right-pixel of a byte, and the right-pixel of the previous byte
-
-      // Shift all bits to the right, to move sprite 1 pixel to the right    
-      prev_rightpixel = 0;
-      for (i=e->w * e->h; i > 0; --i, ++sp) {
-         // Save the right pixel value of this byte (even bits)
-         rightpixel      = *sp & 0b01010101;
-         // Mix the right pixel of the previous byte (that now is left pixel) with 
-         // the left pixel of the present byte (that now should be right pixel)
-         *sp             = (prev_rightpixel << 1) | ((*sp & 0b10101010) >> 1);
-         // Saved right pixel is stored as the previous byte right pixel, for next iteration
-         prev_rightpixel = rightpixel;
-      }
-
-      // Update shifting status
+      // Shift sprite right & update shifting status
+      shiftSpritePixelsRight(e->sprite, e->w * e->h);
       e->shift = ON_ODD_PIXEL;
    } else {
-      // Shift all bits to the left, to move sprite 1 pixel to the left
-      // Assuming leftmost column is free (zeroed)
-      // Iterate up to the next-to-last byte, as the last byte is a special case
-      for (i=e->w * e->h - 1; i > 0; --i, ++sp) {
-         // Each byte is the mix of its right pixel (even bits) shifted to the left
-         // to become left pixel, and the left pixel of the next byte shifted to the right,
-         // to become right pixel.
-         *sp = ((*sp & 0b01010101) << 1) | ((*(sp+1) & 0b10101010) >> 1);
-      }
-      // Last byte has its right pixel shifted to the left to become left pixel, and
-      // zeros added as new right pixel
-      *sp = *sp & 0b01010101 << 1;
-
-      // Update shifting status
+      // Shift sprite left & update shifting status
+      shiftSpritePixelsLeft(e->sprite, e->w * e->h);
       e->shift = ON_EVEN_PIXEL;
    }
 }
@@ -135,7 +148,7 @@ void checkUserInput(TEntity *e) {
    // Checking also that we do not exit from boundaries
    if (cpct_isKeyPressed(Key_CursorLeft) && e->nx > 0) {
       e->nx--;
-   } else if (cpct_isKeyPressed(Key_CursorRight) && e->nx + e->w < SCR_WIDTH_PIXELS) {
+   } else if (cpct_isKeyPressed(Key_CursorRight) && e->nx + e->w*PIXELS_PER_BYTE < SCR_WIDTH_PIXELS) {
       e->nx++;
    }
    if (cpct_isKeyPressed(Key_CursorUp) && e->ny > 0) {
