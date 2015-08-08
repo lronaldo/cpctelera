@@ -18,12 +18,22 @@ public:
 						  ZigZag(false) { };
 
 	enum OutputFormat { ASSEMBLER, BINARY, PURE_C };
+	enum OutputPalette { NONE, FIRMWARE, HARDWARE };
 
-	inline const char* ToString(OutputFormat f) {
+	inline static const char* ToString(OutputFormat f) {
 		switch(f) {
 			case ASSEMBLER: return "asm";
 			case BINARY: return "bin";
 			case PURE_C: return "c";
+			default: return "unknown";
+		}
+	}
+
+	inline static const char* ToString(OutputPalette p) {
+		switch(p) {
+			case NONE: return "none";
+			case FIRMWARE: return "firmware";
+			case HARDWARE: return "hardware";
 			default: return "unknown";
 		}
 	}
@@ -40,6 +50,7 @@ public:
 	vector<int> ScanlineOrder;
 	bool ZigZag;
 	bool InterlaceMasks;
+	OutputPalette PaletteFormat;
 
 	OutputFormat ParseFormat(const string &formatString) {
 		string fmtLower(formatString);

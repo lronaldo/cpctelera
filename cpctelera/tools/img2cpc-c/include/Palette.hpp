@@ -30,6 +30,11 @@ public:
 
 	static vector<Color> Firmware;
 	static map <int, Color&> Hardware;
+
+
+	vector<int> GetPaletteAsFW();
+	vector<int> GetPaletteAsHW();
+
 };
 
 #endif
