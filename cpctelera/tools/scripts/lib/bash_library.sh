@@ -506,6 +506,22 @@ function checkSystem {
                return 0
             fi
          ;;
+         "cygwin32") 
+            if [[ "$SYS" =~ "CYGWIN" ]]; then
+               SYS=$(uname -a)
+               if [[ ! "$SYS" =~ "x86_64" ]]; then
+                  return 0
+               fi
+            fi
+         ;;
+         "cygwin64") 
+            if [[ "$SYS" =~ "CYGWIN" ]]; then
+               SYS=$(uname -a)
+               if [[ "$SYS" =~ "x86_64" ]]; then
+                  return 0
+               fi
+            fi
+         ;;
       esac
       shift
    done
