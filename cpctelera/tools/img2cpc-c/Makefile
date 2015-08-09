@@ -1,0 +1,39 @@
+CC=gcc
+CXX=g++
+CXXFLAGS=-std=c++11 -O3 -Werror -Wall -fsigned-char
+LDLIBS=-lfreeimage
+
+INCDIR=include
+SRCDIR=src
+OBJDIR=build
+
+vpath %.hpp $(INCDIR)
+vpath %.cpp $(SRCDIR)
+vpath %.cc $(SRCDIR)
+vpath %.o $(OBJDIR)
+
+HEADERS = $(wildcard $(INCDIR)/*)
+SRCS = $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/*.cpp)
+OBJS = $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cc,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
+APPNAME = img2cpc
+
+all: $(APPNAME)
+
+$(APPNAME): $(OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
+
+build/%.o: %.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c -I$(INCDIR) $<
+
+build/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c -I$(INCDIR) $<
+
+showVars:
+	$(info %.o)
+	$(info $(HEADERS))
+	$(info $(SRCS))
+	$(info $(OBJS))
+
+clean:
+	$(RM) $(OBJDIR)/*
+	$(RM) $(APPNAME)
