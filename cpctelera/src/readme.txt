@@ -91,15 +91,15 @@ Topic: Software Requirements
 _Under Linux_:
    Install these packages on your Linux distribution. Although they are pretty standard, names may slightly vary on some distributions.
 
-   * *gcc*, *g++*, *make* (included in package *build-essential*)
-   * *bison*, *flex*, *libboost-dev*
+   * Commands: *gcc*, *g++*, *make*, *bison*, *flex*
+   * Libraries: *libboost-dev*, *libfreeimage-dev*
 
 _Under Windows_:
    
    Under Windows <Cygwin at http://www.cygwin.com> is required for CPCtelera to work. You may download Cygwin 32 / 64 and install it along with these packages (you may launch cygwin's setup.exe at any time to install them),
 
-   * *gcc-core*, *gcc-g++*, *make*
-   * *bison*, *flex*, *libboost-devel*, *libintl-devel*
+   * *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*
+   * *libboost-devel*, *libintl-devel*
 
 _Under OSX_:
 
@@ -109,10 +109,11 @@ _Under OSX_:
    2. - Install <Homebrew at http://brew.sh/> if you didn't have it.
    3. - Open a terminal and install XCode Command Line tools with this command,
    > xcode-select --install
-   4. - Install libboost from homebrew with this command,
+   4. - Install libboost and freeimage from homebrew with these commands,
    > brew install boost
+   > brew install freeimage
 
-Some things to take into account,
+Some things to take into account on OSX,
    * Some previous OSX systems may not understand the xcode-select --install command. On those systems, there usually are menu options from the XCode GUI to install Command Line Tools. If you need more advice, there is a <nice explanation on stack overflow about the XCode Command Line Tools at http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools>. 
 
 Topic: Installing CPCtelera in your system

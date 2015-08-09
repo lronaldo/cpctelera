@@ -77,6 +77,10 @@ Section: 3rdparty software authors
  <Img2CPC at http://www.cpcwiki.eu/index.php/Img2CPC>: 
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> (augusto.ruiz@gmail.com)
 
+ <libfreeimage at http://freeimage.sourceforge.net/>:
+   * <Hervé Drolon at mailto:drolon@infonie.fr>
+   * <Floris van den Berg at flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
+
 Section: Testers & Bug Reporters
 
  * <Martin C. Doege at https://github.com/mdoege> 
