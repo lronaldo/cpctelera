@@ -178,6 +178,10 @@ public:
 			if(numColors > 0) {
 				ofs << "extern const u8 " << options.BaseName << "_palette[" << numColors << "];" << endl << endl;
 			}
+         ofs << "extern u8* const " << options.BaseName << "_tilemap[" << numTiles << "];" << endl;
+         if(options.Palette.TransparentIndex >= 0 && !options.InterlaceMasks) {
+            ofs << "exterb u8* const " << options.BaseName << "_masks_tilemap[" << numTiles << "];" << endl;
+         }
 
 			for(Tile t : tiles) {
 				int numBytes = t.Data.size();
