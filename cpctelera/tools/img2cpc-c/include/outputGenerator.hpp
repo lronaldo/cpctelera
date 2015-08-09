@@ -40,7 +40,7 @@ public:
 		if(numColors > 0) {
 			ofs << "; Palette uses " << ConversionOptions::ToString(options.PaletteFormat) << " values." << endl;
 			ofs << options.BaseName << "_palette:" << endl << "DEFB ";
-			for(int i=0;i<numColors;++i) {
+			for(unsigned int i=0;i<numColors;++i) {
 				if(i > 0) {
 					ofs << ", ";
 				}
@@ -211,7 +211,7 @@ public:
 			ofs << "// Palette uses " << ConversionOptions::ToString(options.PaletteFormat) << " values." << endl;
 
 			ofs << "const u8 " << options.BaseName << "_palette[" << numColors << "] = { ";
-			for(int i=0;i<numColors;++i) {
+			for(unsigned int i=0;i<numColors;++i) {
 				if(i > 0) {
 					ofs << ", ";
 				}
@@ -223,7 +223,7 @@ public:
 		unsigned int numTiles = tiles.size();
 		if(numTiles > 0) {
 			ofs << "u8* const " << options.BaseName << "_tilemap[" << numTiles << "] = { " << endl << "\t";
-			for(int i=0; i<numTiles; ++i) {
+			for(unsigned int i=0; i<numTiles; ++i) {
 				if(i > 0) {
 					ofs << ", ";
 				}
@@ -232,7 +232,7 @@ public:
 			ofs << endl << "};" << endl;
 			if(options.Palette.TransparentIndex >= 0 && !options.InterlaceMasks) {
 				ofs << "u8* const " << options.BaseName << "_masks_tilemap[" << numTiles << "] = { " << endl << "\t";
-				for(int i=0; i<numTiles; ++i) {
+				for(unsigned int i=0; i<numTiles; ++i) {
 					if(i > 0) {
 						ofs << ", ";
 					}
