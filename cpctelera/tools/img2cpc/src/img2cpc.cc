@@ -27,6 +27,9 @@ int initializeParser(ezOptionParser &parser) {
   parser.add("", 0, 1, 0, "Specifies transparent color (as index in palette).", "-t", "--transparentColor");
   parser.add("", 0, 0, 0, "Interlaced masks. Mask values will be interlaced with pixel values.", "-im", "--interlacedMasks");
 
+  parser.add("", 0, 0, 0, "Output palette (hardware values)", "-ophw");
+  parser.add("", 0, 0, 0, "Output palette (firmware values)", "-opfw");
+
   parser.add("", 0, 0, 0, "Generates PNG images to check tile output.", "-g", "--generatePNG");
 
 	parser.add("", 0, 0, 0, "Help. Show usage.", "--help");
@@ -69,6 +72,7 @@ int processImage(const string& filename, ConversionOptions &convOptions, ezOptio
       break;
     case ConversionOptions::PURE_C: 
       generator.GenerateC(tiles, convOptions);
+      generator.GenerateH(tiles, convOptions);
       break;
   }
 
@@ -112,7 +116,6 @@ int extractPalette(ezOptionParser &options, TPalette &palette) {
       result = -1;
     }
   }
-
   return result;
 }
 
@@ -120,6 +123,13 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
   int result = 0;
   result = extractPalette(options, convOptions.Palette);
   if(!result) {
+      convOptions.PaletteFormat = ConversionOptions::NONE;
+      if(options.isSet("-ophw")) {
+        convOptions.PaletteFormat = ConversionOptions::HARDWARE;
+      } else if(options.isSet("-opfw")) {
+        convOptions.PaletteFormat = ConversionOptions::FIRMWARE;
+      }
+
     //convOptions.Palette.Dump();
     if(options.isSet("-w")) {
       options.get("-w")->getInt(convOptions.TileWidth); 

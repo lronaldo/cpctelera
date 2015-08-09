@@ -13,7 +13,42 @@ int TPalette::getNearestIndex(Color &color) {
 		}
 	}
 	return paletteIdx;
-}
+};
+
+vector<int> TPalette::GetPaletteAsFW() {
+	vector<int> result;
+	for(Color color : this->Current) {
+		double currentDistance = numeric_limits<double>::max();
+		int fwColor = -1;
+		for(int fwIdx=0,lFwIdx=TPalette::Firmware.size(); fwIdx<lFwIdx; ++fwIdx) {
+			double dist = color.Distance(this->Current[fwIdx]);
+			if(dist < currentDistance) {
+				currentDistance = dist;
+				fwColor = fwIdx;
+			}
+		}
+		result.push_back(fwColor);
+	}
+	return result;
+};
+
+vector<int> TPalette::GetPaletteAsHW() {
+	vector<int> result;
+	for(Color color : this->Current) {
+		double currentDistance = numeric_limits<double>::max();
+		int hwColor = -1;
+		map<int, Color&>::const_iterator it;
+		for(it=TPalette::Hardware.begin(); it!=TPalette::Hardware.end();++it) {
+			double dist = color.Distance(it->second);
+			if(dist < currentDistance) {
+				currentDistance = dist;
+				hwColor = it->first;
+			}
+		}
+		result.push_back(hwColor);
+	}
+	return result;
+};
 
 int TPalette::ParseFW(vector<string> &fwIndices) {
 	int fwIndicesSize = fwIndices.size();
@@ -34,7 +69,7 @@ int TPalette::ParseFW(vector<string> &fwIndices) {
       }
     }
     return 0;
-}
+};
 
 int TPalette::ParseHW(vector<string> &hwIndices) {
 	int hwIndicesSize = hwIndices.size();
@@ -57,7 +92,7 @@ int TPalette::ParseHW(vector<string> &hwIndices) {
       }
     }
     return 0;
-}
+};
 
 int TPalette::ParseRGB(vector<string> &rgbValues) {
 	//cout << "RGB!!";
@@ -74,7 +109,7 @@ int TPalette::ParseRGB(vector<string> &rgbValues) {
       this->Current.push_back(currentColor);
     }
     return 0;
-}
+};
 
 int TPalette::ParseFile(string &fileName) {
 	ifstream file(fileName, ifstream::binary);
@@ -82,7 +117,7 @@ int TPalette::ParseFile(string &fileName) {
 	file >> root;
 
 	return this->FromJSON(root);
-}
+};
 
 int TPalette::FromJSON(Json::Value &root) { 
 	string type = root.get("type","rgb").asString();
@@ -125,7 +160,7 @@ int TPalette::FromJSON(Json::Value &root) {
 	}
 
 	return 0;
-}
+};
 
 Json::Value TPalette::ToJSON() {
 	Json::Value result;
@@ -139,7 +174,7 @@ Json::Value TPalette::ToJSON() {
 	result["transparent"] = this->TransparentIndex;
 
 	return result;
-}
+};
 
 void TPalette::Dump() {
 	cout << "[" << endl;
@@ -155,7 +190,7 @@ void TPalette::Dump() {
       this->Current[this->TransparentIndex].Dump(); 
       cout << endl;
   	}
-}
+};
 
 vector<Color> TPalette::Firmware = {
 	Color(0, 0, 0),

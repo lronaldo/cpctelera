@@ -103,7 +103,7 @@ ColorAndMaskValues TileExtractor::getColorAndMask(FIBITMAP* bmp, int x, int y, b
 vector<unsigned char> TileExtractor::extractPixels(FIBITMAP* bmp, int x, int y, bool flip) {
   vector<unsigned char> result;
   for(unsigned int offset = 0; offset < this->ModeIncrement; ++offset) {
-    if (((x + offset) < this->TileWidth) && ((x + offset) >= 0))
+    if ((x + offset) < this->TileWidth)
     {
         int sourceX = (flip) ? this->TileWidth - x - this->ModeIncrement + offset : x + offset;
         RGBQUAD rgb;
