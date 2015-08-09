@@ -43,6 +43,9 @@ CPCT_TOOLS_2CDT_DIR=${CPCT_TOOLS_DIR}/2cdt
 CPCT_TOOLS_HEX2BIN_DIR=${CPCT_TOOLS_DIR}/hex2bin-2.0
 CPCT_TOOLS_IDSK_DIR=${CPCT_TOOLS_DIR}/iDSK-0.13
 CPCT_TOOLS_SDCC_DIR=${CPCT_TOOLS_DIR}/sdcc-3.5.0
+CPCT_TOOLS_IMG2CPC_DIR=${CPCT_TOOLS_DIR}/img2cpc
+CPCT_TOOLS_RGAS_DIR=${CPCT_TOOLS_DIR}/rgas-1.0
+CPCT_TOOLS_ARKOS_DIR=${CPCT_TOOLS_DIR}/arkosTracker-1.0
 CPCT_TEMPLATES_DIR=${CPCT_SCRIPTS_DIR}/templates
 
 ## Main Makefiles and other files
@@ -57,7 +60,8 @@ CPCT_TEMPLATES_BASHRC=${CPCT_TEMPLATES_DIR}/bashrc.tmpl
 ## All directories and files
 CPCT_DIRS=("${CPCT_MAIN_DIR}" "${CPCT_LOGS_DIR}" "${CPCT_EXAMPLES_DIR}" "${CPCT_TOOLS_DIR}"
            "${CPCT_SRC_DIR}" "${CPCT_CFG_DIR}" "${CPCT_TOOLS_2CDT_DIR}" "${CPCT_TOOLS_HEX2BIN_DIR}" 
-           "${CPCT_TOOLS_IDSK_DIR}" "${CPCT_TOOLS_SDCC_DIR}" "${CPCT_TEMPLATES_DIR}")
+           "${CPCT_TOOLS_IDSK_DIR}" "${CPCT_TOOLS_SDCC_DIR}" "${CPCT_TEMPLATES_DIR}"
+           "${CPCT_TOOLS_IMG2CPC_DIR}" "${CPCT_TOOLS_RGAS_DIR}" "${CPCT_TOOLS_ARKOS_DIR}")
 CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAKEFILE}" 
             "${CPCT_TEMPLATES_CFG}" "${CPCT_TEMPLATES_MAKEFILE}" "${CPCT_TEMPLATES_MAIN}")
 
@@ -82,12 +86,18 @@ COMMAND_EXPLANATION[3]="bison is required to compile SDCC. Please, install it an
 COMMAND_EXPLANATION[4]="flex is required to compile SDCC. Please, install it an run setup again."
 
 REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
+LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
+
 ## libintl.h is not required in Mac OSX
 if ! checkSystem "osx"; then
    REQUIRED_LIBRARIES+=( "libintl.h" )
+   LIBRARIES_EXPLANATION+=( "Libintl (development) is required to build SDCC, which makes use of internationalization. Please, install intltool / libintl-dev / libint-devel or similar in your system and run setup again." )
 fi
-LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
-LIBRARIES_EXPLANATION[1]="${REQUIRED_LIBRARIES[1]} is required to build SDCC, which makes use of internationalization. Please, install intltool / libintl-dev / libint-devel or similar in your system and run setup again."
+## Freeimage is not required in Cygwin (binaries already included)
+if ! checkSystem "cygwin"; then
+   REQUIRED_LIBRARIES+=( "FreeImage.h" )
+   LIBRARIES_EXPLANATION+=( "Freeimage (development) is required to build Img2CPC. Please, install freeimage / libfreeimage-dev / freeimage-devel or similar in your system and run setup again." )
+fi
 
 ###############################################################
 ###############################################################
