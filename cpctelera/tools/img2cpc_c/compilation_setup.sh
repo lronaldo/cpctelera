@@ -12,7 +12,7 @@ if checkSystem cygwin; then
    ## Setup for cygwin
    echo "[img2cpc]: Setting up compilation for Cygwin"
    rm -f lib/libfreeimage.a 
-   cp Makefile.cygwin Makefile
+   cp Makefile.cygwin Makefile.this
    if checkSystem cygwin64; then
       echo "[img2cpc]: linking Cygwin64 specific libraries."
       ln -s libfreeimage64.a lib/libfreeimage.a
@@ -21,6 +21,6 @@ if checkSystem cygwin; then
       ln -s libfreeimage32.a lib/libfreeimage.a
    fi
 else
-   echo "[img2cpc]: Setting up compilation Linux/MacOSX"
-   cp Makefile.others Makefile
+   echo "[img2cpc]: Setting up compilation for Linux/MacOSX"
+   cp Makefile.others Makefile.this
 fi
