@@ -105,7 +105,7 @@ int TPalette::ParseRGB(vector<string> &rgbValues) {
     }
     for(string val : rgbValues) {
       long int intValue = strtol(val.c_str(), nullptr, 0);
-      Color currentColor((intValue & 0xFF0000) >> 16, (intValue & 0xFF00) >> 8, (intValue & 0xFF));
+      Color currentColor((unsigned char)((intValue & 0xFF0000) >> 16), (unsigned char)((intValue & 0xFF00) >> 8), (unsigned char)(intValue & 0xFF));
       this->Current.push_back(currentColor);
     }
     return 0;
