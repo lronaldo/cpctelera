@@ -601,3 +601,15 @@ function containsChars {
 function fileSize {
    echo $(wc -c < "${1}" | grep -Eo '[0-9]+')
 }
+
+## Takes a list of values and outputs them separated by commas
+##  $@: Values
+##
+function valuesToCommaList() {
+   local i
+   local VALUES=( $@ )
+   for (( i=0; i < ${#VALUES[@]}-1; i++ )); do
+      printf "%s," ${VALUES[$i]}
+   done
+   echo "${VALUES[$i]}"
+}

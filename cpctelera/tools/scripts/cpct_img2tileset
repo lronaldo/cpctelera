@@ -32,8 +32,8 @@
 ##
 ## Requisites:
 ##    This scripts uses Img2CPC utility by Augusto Ruiz to convert the PNG
-## file into screen pixel definitions. This requires wine and winepath to be 
-## installed under Linux or MacOSX and .net framework 2.0. or greater under Windows.
+## file into screen pixel definitions. This requires freeimage libraries to be
+## installed under Linux and MacOSX (they are already included for Windows/Cygwin)
 ##
 ## Description:
 ##    This script converts an image file containing a set of tile or sprite definitions
@@ -42,10 +42,10 @@
 ##    By default, this script converts the image into 4x4-pixel tiles. This means that
 ## the script splits the whole image into 4x4-pixel individual images and converts each
 ## one of them into a tile. You may change sizes by using -tw / -th command line modifiers. 
-##    To do the conversion, the script calls Img2CPC.exe Windows utility, which 
-## reads pixels one by one and transform them into the closest colour value from the
-## defined Amstrad CPC palette. If no palette is given to this script, standard
-## Amstrad CPC palette is used (the one that is set when a CPC computer starts).
+##    To do the conversion, the script calls Img2CPC, which reads pixels one by one 
+## and transform them into the closest colour value from the defined Amstrad CPC palette. 
+## If no palette is given to this script, standard Amstrad CPC palette is used (the one 
+## that is set when a CPC computer starts).
 ##    Provided image file may be a PNG, JPG, BMP, GIF or TIFF file. 
 ##
 ## Command line options:
@@ -71,17 +71,9 @@
 source $(dirname $0)/lib/bash_library.sh
 
 ## Img2CPC utility location
-IMG2CPC=${CPCT_PATH}/tools/img2cpc/Img2CPC.exe
-IMG2CPC_CFG=${CPCT_PATH}/tools/img2cpc/Img2CPC.exe.config
-IMG2CPC_TMP=${CPCT_PATH}/tools/img2cpc/Img2CPC.exe.config.backup
-IMG2CPC_Z88DK_TMP=${CPCT_PATH}/tools/img2cpc/z88dk_asm_tmp_output.h
+IMG2CPC=${CPCT_PATH}/tools/img2cpc/bin/img2cpc
 
 ## Configuration 
-CPCCOLOURS=(       0,0,0     0,0,128     0,0,255     128,0,0   128,0,128   128,0,255 \
-                 255,0,0   255,0,128   255,0,255     0,128,0   0,128,128   0,128,255 \
-               128,128,0 128,128,128 128,128,255   255,128,0 255,128,128 255,128,255 \
-                 0,255,0   0,255,128   0,255,255   128,255,0 128,255,128 128,255,255 \
-               255,255,0 255,255,128 255,255,255 )
 PALETTE=( 1 24 20 6 26 0 2 8 10 12 14 16 18 22 24 16 )
 TILES_WIDTH=4
 TILES_HEIGHT=4
@@ -89,8 +81,7 @@ TILES_BASENAME=g_tile
 MODE=0
 MODEFACTOR=( 2 4 8 )
 MODECOLOURS=( 16 4 2 )
-WINE=wine
-BASEPATH=${PWD}
+
 ## Simbols used as 'parentheses' delimiters for passing arrays as parameters
 LPAR="{"
 RPAR="}"
@@ -106,8 +97,8 @@ CPCtelera C-array tileset along with arrays for all tiles/sprites."
    echo 
    echo "${COLOR_LIGHT_YELLOW}Requisites:"
    echo "${COLOR_CYAN}    This scripts uses Img2CPC utility by Augusto Ruiz to convert the PNG \
-file into screen pixel definitions. This requires wine and winepath to be installed under Linux \
-or MacOSX and .net framework 2.0. or greater under Windows."
+file into screen pixel definitions. This requires freeimage libraries to be \
+installed under Linux and MacOSX (they are already included for Windows/Cygwin)"
    echo 
    echo "${COLOR_LIGHT_YELLOW}Description:"
    echo "${COLOR_CYAN}    This script converts an image file containing a set of tile or sprite \
@@ -116,10 +107,10 @@ inclusion into a program."
    echo "    By default, this script converts the image into 4x4-pixel tiles. This means that \
 the script splits the whole image into 4x4-pixel individual images and converts each one of them \
 into a tile. You may change sizes by using -tw / -th command line modifiers."
-   echo "    To do the conversion, the script calls Img2CPC.exe Windows utility, which reads pixels \
-one by one and transform them into the closest colour value from the defined Amstrad CPC palette. If \
-no palette is given to this script, standard Amstrad CPC palette is used (the one that is set when a \
-CPC computer starts)."
+   echo "    To do the conversion, the script calls Img2CPC, which reads pixels one by one \
+and transform them into the closest colour value from the defined Amstrad CPC palette. \
+If no palette is given to this script, standard Amstrad CPC palette is used (the one \
+that is set when a CPC computer starts)."
    echo "    Provided image file may be a PNG, JPG, BMP, GIF or TIFF file. "
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
@@ -144,201 +135,6 @@ to convert the file tiles.png: "
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
    exit 1
-}
-
-
-## Ensures that files are not messed up if the script fails
-##
-function exitCleanup() {
-   ## Restore original Img2CPC config
-   if [ -f "$IMG2CPC_TMP" ]; then
-      echo "${COLOR_CYAN}Restoring ${COLOR_NORMAL}Img2CPC${COLOR_CYAN} config"
-      mv "$IMG2CPC_TMP" "$IMG2CPC_CFG"
-   fi
-
-   ## Remove temporal files
-   if [ -f "$IMG2CPC_Z88DK_TMP" ]; then
-      echo "${COLOR_CYAN}Removing temporal files${COLOR_NORMAL}"
-      rm "$IMG2CPC_Z88DK_TMP"
-   fi
-}
-
-## Exports present palette to Img2CPC palette format
-##
-function exportPaletteToImg2CPC() {
-   local i
-   local IDX
-   for (( i=0; i < ${#PALETTE[@]}-1; i++ )); do
-      IDX=${PALETTE[$i]}
-      printf "%s#" ${CPCCOLOURS[$IDX]}
-   done
-   echo ${CPCCOLOURS[${PALETTE[15]}]}
-}
-
-## Generates a new config file to be used with Img2CPC
-## using present palette
-##
-function generateConfigForImg2CPC() {
-   # First, save previous config file
-   cp "$IMG2CPC_CFG" "$IMG2CPC_TMP"
-
-#---- Config File Write starts
-#-----------------------------
-   cat > "$IMG2CPC_CFG" << ConfigFileDocument
-<?xml version="1.0" encoding="utf-8" ?>
-<configuration>
-  <appSettings>
-   <!-- cpct_img2tileset Generated Palette -->
-   <add key="PaletteColors" value="$(exportPaletteToImg2CPC)"/>
-   <!-- Palette Transparent Color Index -->
-   <add key="TransparentColor" value="0"/>
- </appSettings>
-</configuration>
-ConfigFileDocument
-#-----------------------------
-#---- Config File Write ends
-}
-
-## Convert ASM Z88DK's output to CPCtelera's C arrays
-##
-function asm2c() {
-   local IN_FILE="$1"
-   local H_FILE="$2"
-   local C_FILE="$3"
-   local STATUS=comments
-   local NUMTILES
-   local TOKENS
-   local TOK
-   local FILESIZE="$(fileSize "$IN_FILE")"
-   local TOTALREAD=0
-   local PCT
-   local LEFT
-
-   while read LINE; do
-      # Tokenize LINE
-      TOKENS=( $LINE )
-
-      # Analize depending on STATUS
-      case ${STATUS} in
-         comments)
-            if [[ "${TOKENS[0]}" == "extern" ]]; then
-               STATUS=definitions
-               processDefinition TOKENS[@] >> ${H_FILE}
-               NUMTILES=1
-            fi
-         ;;
-         definitions)
-            if [[ "${TOKENS[0]}" == "extern" ]]; then
-               processDefinition TOKENS[@] >> ${H_FILE}
-               NUMTILES=$((NUMTILES + 1))
-            elif [[ "${TOKENS[0]}" == "unsigned" ]]; then
-               echo "extern const u8* const g_tileset [$NUMTILES];" >> ${H_FILE}
-               echo "const u8* const g_tileset [$NUMTILES] = {" >> ${C_FILE}
-               STATUS=tilearray_data
-            else
-               echo "ERROR! 'unsigned char* tiles' declaration expected after extern definitions"
-               exit 1
-            fi
-         ;;
-         tilearray_data)
-            if [[ "${TOKENS[0]}" != "};" ]]; then
-               echo "   "${TOKENS[@]//_DATA/} >> ${C_FILE}
-            else
-               echo "};" >> ${C_FILE}
-               echo >> ${C_FILE}
-               STATUS=asm
-            fi           
-         ;;
-         asm)
-            TOK="${TOKENS[0]##*_D}"
-            TOK="${TOK:0:3}"
-            if [[ ${TOK} == "ATA" ]]; then
-               TOK="${TOKENS[0]//_DATA*/}"
-               TOK="${TOK#._}"
-               NUMTILES=$((TILES_WIDTH / ${MODEFACTOR[$MODE]} ))
-               echo "const u8 ${TOK}[${NUMTILES}*${TILES_HEIGHT}] = {" >> $C_FILE
-               TOK=""
-               STATUS=asm_data
-            fi
-         ;;
-         asm_data)
-            if [[ "${TOKENS[0]}" == "defb" ]]; then
-               # Print previous tokens with comma at the end
-               if [[ "$TOK" != "" ]]; then
-                  printf "   %s,\n" "${TOK}" >> "$C_FILE"
-               fi
-
-               # Clean tokens
-               for ((i=1; i < ${#TOKENS[@]}; i++)); do
-                  TOK=$(echo "${TOKENS[i]}" | sed 's/[^$0-9A-Fa-fx,]*//g')
-                  if [[ ${TOK:0:1} == "$" ]]; then
-                     if [[ ${#TOK} < 3 || ${TOK:2:1} =~ [^0-9A-Fa-f] ]]; then
-                        TOK="${TOK:0:1}0${TOK:1}"
-                     fi
-                  fi
-                  TOKENS[i]=${TOK//$/0x}
-               done
-               TOK=${TOKENS[@]:1}
-            else
-               # Print previous tokens with comma at the end
-               if [[ "$TOK" != "" ]]; then
-                  printf "   %s\n" "${TOK}" >> "$C_FILE"
-                  printf "};\n\n" >> "$C_FILE"
-               fi
-               STATUS=asm
-            fi           
-         ;;
-      esac
-
-      ## Show progressbar
-      TOTALREAD=$((TOTALREAD + ${#LINE}))
-      PCT=$((TOTALREAD * 100 / FILESIZE))
-      LEFT=$((20 + 2 + ${#PCT}))
-      drawProgressBar "20" "${PCT}" ${COLOR_INVERTED_GREEN} ${COLOR_INVERTED_WHITE}
-      cursorLeft $LEFT
-   done < $IN_FILE
-}
-
-## Convert a tile definition to C extern declaration
-##
-function processDefinition() {
-   local LINE
-   local BYTESWIDTH=$((TILES_WIDTH / ${MODEFACTOR[$MODE]} ))
-   declare -a LINE=("${!1}")
-
-   echo "extern const u8 ${LINE[3]/_DATA[]/[${BYTESWIDTH}*${TILES_HEIGHT}]}"
-}
-
-## Create header for .h file
-##
-function create_h_file_header() {
-   local H_FILE=$1
-   local GENFILE=$2
-
-cat > $H_FILE <<- END_OF_HEADER
-// 
-// Tiles generated from file ${GENFILE##*/}
-//
-#include <types.h>
-
-END_OF_HEADER
-}
-
-## Create header for .c file
-##
-function create_c_file_header() {
-   local C_FILE=$1
-   local H_FILE=$2
-   local GENFILE=$3
-
-cat > $C_FILE <<- END_OF_HEADER
-// 
-// Tile definitions generated from file ${GENFILE##*/}
-//
-#include "${H_FILE##*/}"
-
-END_OF_HEADER
-
 }
 
 ##############################################################
@@ -464,7 +260,7 @@ while (( $# >= 1 )); do
             EnsureExists file "$1"
          fi
          FILE="$1"
-         IMG2CPC_Z88DK_TMP="$(pwd "$FILE")/z88dk_asm_tmp_output.h"
+         IMG2CPC_OUTPUT="$(filenameWithNoExt "$FILE")"
       ;;
    esac
    shift
@@ -494,51 +290,12 @@ elif [ ! -x $IMG2CPC ]; then
       Error "Your user has not got enough privileges to change $IMG2CPC' execution permission. Please, change it \
 manually and run this script again."
    fi
-elif [ -f $IMG2CPC_CFG -a ! -w $IMG2CPC_CFG ]; then
-   echo "${COLOR_LIGHT_YELLOW}WARNING:${COLOR_CYAN}"
-   echo "   '$IMG2CPC_CFG' is not writeable. Write permission is required to perform palette operations.${COLOR_LIGHT_CYAN}"
-   echo
-   askSimpleQuestion y n "Do you want this script to try to make it writeable? (y/n)" ANSWER
-   echo
-   echo "${COLOR_NORMAL}"
-   if [[ "$ANSWER" == "n" ]]; then
-      paramError "'$IMG2CPC_CFG' has not been modified. This script cannot continue. Aborting. "
-   fi
-   echo "Changing '$IMG2CPC_CFG' write permission... "
-   if ! chmod +w "$IMG2CPC_CFG"; then
-      Error "Your user has not got enough privileges to change $IMG2CPC_CFG' write permission. Please, change it \
-manually and run this script again."
-   fi
 fi
 
 ###############################################################
 ###############################################################
-## Convert image and compile z88dk's output assembly to 
-## CPCtelera's C Array.
+## Convert image to CPCtelera's C Array.
 ##
-
-## Set a trap on EXIT signal for ensuring everything is cleaned up on exit
-trap exitCleanup EXIT
-
-## On cygwin there is no need to use wine
-if checkSystem cygwin; then
-   ## Do CYGWIN required stuff
-   EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
-running this script. Please, check cygwin installation and run this script again."
-   WINE=""
-   IMG2CPC_Z88DK_TMP_WINE="$(cygpath -w ${IMG2CPC_Z88DK_TMP} 2> /dev/null)" 
-   FILE_WINE="$(cygpath -w ${FILE} 2> /dev/null)" 
-else
-   ## Do Linux/MacOSX required stuff (wine configuration)
-   EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
-running this script. Please, install wine or check the installation and run this script again."
-   EnsureCommandAvailable winepath "winepath has not been found on the system, and it's required \
-for running this script. Please, install it or check the installation of wine and run this script \
-again. On some old wine installations you may want to create an alias for winepath to the command \
-'wine winepath'."
-   IMG2CPC_Z88DK_TMP_WINE="$(winepath -w ${IMG2CPC_Z88DK_TMP} 2> /dev/null)" 
-   FILE_WINE="$(winepath -w ${FILE} 2> /dev/null)" 
-fi
 
 ## Start processing and print useful information
 echo
@@ -553,30 +310,18 @@ done
 echo "${COLOR_CYAN}(Firmware values)${COLOR_NORMAL}"
 echo
 
-## Pass img2cpc to convert to Z88DK's ASM
-echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 1${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Converting tiles \
-to assembly code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
-generateConfigForImg2CPC
-${WINE} ${IMG2CPC} /m=${MODE} /w=${TILES_WIDTH} /h=${TILES_HEIGHT} /o="${IMG2CPC_Z88DK_TMP_WINE}" /bn=${TILES_BASENAME} "${FILE_WINE}" &> /dev/null
-
-
-## Convert ASM to C
-echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}STEP 2${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Translating assembly \
-code into ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C-arrays..."
-H_FILE=$(filenameWithNoExt $FILE).h 
-C_FILE=$(filenameWithNoExt $FILE).c
-create_h_file_header "$H_FILE" "$FILE"
-create_c_file_header "$C_FILE" "$H_FILE" "$FILE"
-asm2c "$IMG2CPC_Z88DK_TMP" "$H_FILE" "$C_FILE"
-
-## Cleanup everything on exiting
-exitCleanup
+## Pass img2cpc to convert to CPCtelera's C Arrays
+echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}PROCESS${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Converting tiles \
+to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
+${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]})" -of c -m "$MODE" \
+-w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" \
+-o "$IMG2CPC_OUTPUT" "${FILE}"
 
 ## Success message
 echo
 echo "${COLOR_LIGHT_GREEN} SUCCESS!"
 echo
-echo "${COLOR_CYAN}Files '${COLOR_NORMAL}$C_FILE${COLOR_CYAN}' and '${COLOR_NORMAL}$H_FILE${COLOR_CYAN}' \
+echo "${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.h${COLOR_CYAN}' \
 have been created with ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s codification of tiles/sprites from \
 '${COLOR_NORMAL}$FILE${COLOR_CYAN}'.${COLOR_NORMAL}"
 echo
