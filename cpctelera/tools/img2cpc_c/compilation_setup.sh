@@ -15,10 +15,10 @@ if checkSystem cygwin; then
    cp Makefile.cygwin Makefile
    if checkSystem cygwin64; then
       echo "[img2cpc]: linking Cygwin64 specific libraries."
-      ln -s lib/libfreeimage64.a lib/libfreeimage.a
+      ln -s libfreeimage64.a lib/libfreeimage.a
    else
       echo "[img2cpc]: linking Cygwin32 specific libraries."
-      ln -s lib/libfreeimage32.a lib/libfreeimage.a
+      ln -s libfreeimage32.a lib/libfreeimage.a
    fi
 else
    echo "[img2cpc]: Setting up compilation Linux/MacOSX"
