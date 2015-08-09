@@ -1,0 +1,14 @@
+# Paleta en src/config_rgb.json, salida en formato C, mode 0, fichero de salida gfx.c, generar PNGs, nombre base: tile, tiles de 32x32.
+./img2cpc -p src/config_rgb.json -of c -m 0 -o gfx.c -g -bn tile -h 32 -w 32 bee.png
+
+# Paleta en src/config_rgb.json, el color transparente es el 0, salida en formato C, mode 0, fichero de salida gfx.c, generar PNGs, nombre base: tile, tiles de 32x32.
+./img2cpc -p src/config_rgb.json -t 0 -of c -m 0 -o gfx.c -g -bn tile -h 32 -w 32 bee.png
+
+# Paleta en src/config_rgb.json, el color transparente es el 12, salida en formato ASM, mode 0, fichero de salida gfx.s, 1 unico tile.
+./img2cpc -p src/config_rgb.json -t 12 -of asm -m 0 -o gfx.s RYU_STAND_0.png
+
+# Paleta en src/config_rgb.json, el color transparente es el 12, salida en formato ASM, mode 0, fichero de salida gfx.s, datos en zigzag, 1 unico tile.
+./img2cpc -p src/config_rgb.json -t 12 -of asm -m 0 -o gfx.s -z RYU_STAND_0.png
+
+# Paleta en src/config_rgb.json, el color transparente es el 12, salida en formato ASM, mode 0, fichero de salida gfx.s, datos en zigzag, orden de scanlines: 0,1,2,3,7,6,5,4, 1 unico tile.
+./img2cpc -p src/config_rgb.json -t 12 -of asm -m 0 -o gfx.s -z -s 0,1,2,3,7,6,5,4 RYU_STAND_0.png
