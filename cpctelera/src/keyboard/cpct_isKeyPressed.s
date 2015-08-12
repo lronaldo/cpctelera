@@ -28,21 +28,22 @@
 ;;    <u8> <cpct_isKeyPressed> (<cpct_keyID> *key*);
 ;;
 ;; Input Parameters (2 Bytes):
-;;  (2B C A) key - A 16-bit value containing a Matrix Line(1B, C) and a Bit Mask(1B, A).
+;;   (2B HL) key - A 16-bit value containing a Matrix-Line(1B, L) and a BitMask(1B, H).
 ;; 
 ;; Assembly call (Input parameters on registers):
-;;    Check <cpct_isKeyPressed_asm> specific assembly function.
+;;    > call cpct_isKeyPressed_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *key* must be a valid <cpct_keyID>, containing a Matrix Line (1st byte, 0-9) and a 
-;; Bit Mask (2nd byte, only 1 bit enabled). All keyID values are defined in 
-;; <cpct_keyID> enum. Giving any other value is possible, but returned value
+;;  * *key* (HL) must be a valid <cpct_keyID>, containing a Matrix Line (1st byte, 
+;; 0-9) and a Bit Mask (2nd byte, only 1 bit enabled). All keyID values are defined 
+;; in <cpct_keyID> enum. Giving any other value is possible, but returned value
 ;; would be meaningless. If given value asks for a Matrix Line greater than 9,
 ;; unexpected results may happen.
 ;;
 ;; Return value:
-;;    u8 - *false* (0, if not pressed) or *true* (>0, if pressed). Take into
-;; account that *true* is not 1, but any non-0 number.
+;;    <u8> - *false* (0, if not pressed) or *true* (>0, if pressed). Take into
+;; account that *true* is not 1, but any non-0 number. Return value is placed 
+;; in registers A and L (same value for both)
 ;;
 ;; Details:
 ;;    Checks if a concrete key is pressed or not. It does it looking   
@@ -60,37 +61,34 @@
 ;;    A, D, BC, HL
 ;;
 ;; Required memory:
-;;    17 bytes
+;;       12 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case | Cycles | microSecs (us)
-;; -------------------------------
-;; Any  |   95   |    23.25 
-;; -------------------------------
+;;   Case      | microSecs (us) | CPU Cycles 
+;; -------------------------------------------
+;; Any         |      14        |    56 
+;; -------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Keyboard Status Buffer defined in an external file
 .globl _cpct_keyboardStatusBuffer
 
+;; Using __z88dk_fastcall calling convention. Parameter is passed directly in HL
 _cpct_isKeyPressed::
-   ;; Get Parameters from stack
-   ld   hl, #2                      ;; [10] HL = SP + 2 (Place where parameters start) 
-   ld    b,  h                      ;; [ 4] B = 0 (We need B to be 0 later, and here we save 3 cycles against a ld B, #0)
-   add  hl, sp                      ;; [11]
-   ld    c, (hl)                    ;; [ 7] C = First Parameter (KeyID - Matrix Line)
-   inc  hl                          ;; [ 6] 
-   ld    a, (hl)                    ;; [ 7] A = Second Parameter (KeyID - Bit Mask)  
-   ld    d, a                       ;; [ 4] D = A, save the Bit Mask into D for later use
-
-   ld   hl,#_cpct_keyboardStatusBuffer;; [10] Make HL Point to &keyboardStatusBuffer
-   add  hl, bc                      ;; [11] Make HL Point to &keyboardStatusBuffer + Matrix Line (C) 
-                                    ;; ...  (As B is already 0, so BC = C)
-   xor (hl)                         ;; [ 7] A = XOR operation between Key's Bit Mask (A) and the Matrix Line of the Key (HL)
-                                    ;; .... Inverts the value of the bit associated to the given key that represents 
-                                    ;; .... because 1 represents not pressed and 0 pressed, but we want the inverse
-   and   d                          ;; [ 4] AND with the Bit Mask: leaves out only the bit associated to the key
-
-   ld    l, a                       ;; [ 4] Place the return value in L (0=not pressed, >0=pressed)
-   ret                              ;; [10] Return
+cpct_isKeyPressed_asm::
+   ld    a, h     ;; [1] A = BitMask with only 1 bit ON: the one that identifies the key (<TargetKey>)
+   ld    d, a     ;; [1] D = A (Save BitMask for later use)
+   ld    h, #0    ;; [2] H = 0 (HL = L, so that we can add the matrix line as offset from the start of the buffer)
+   ld   bc, #_cpct_keyboardStatusBuffer ;; [3] BC Points to the start of the KeyboardStatusBuffer
+   add  hl, bc    ;; [3] HL += BC (HL Points to the byte that contains the key
+                  ;; ... we are looking for. Let's call it <TargetByte> )
+   xor (hl)       ;; [2] A = <TargetByte> but with the bit of the key we want inverted (because 
+                  ;; ... bytes store 1's for non-pressed keys and 0's for pressed, and we want
+                  ;; ... the inverse if this)
+   and   d        ;; [1] A = Only the bit representing the <TargetKey> is left after doing and 
+                  ;; ... AND operation with the BitMask. The bit will have a 1 if <TargetKey> 
+                  ;; ... was pressed, and a 0 otherwise
+   ld    l, a     ;; [1] L = Return value (0 = <TargetKey> not pressed, 1 = pressed)
+   ret            ;; [3] Return

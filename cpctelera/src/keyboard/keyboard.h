@@ -44,7 +44,7 @@ typedef enum cpct_e_keyID cpct_keyID;
 ///
 extern void cpct_scanKeyboard   ();
 extern void cpct_scanKeyboard_f ();
-extern   u8 cpct_isKeyPressed   (cpct_keyID key);
+extern   u8 cpct_isKeyPressed   (cpct_keyID key) __z88dk_fastcall;
 
 //
 // Array: cpct_keyboardStatusBuffer

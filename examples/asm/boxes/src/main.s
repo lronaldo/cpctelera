@@ -77,10 +77,10 @@ _main::
 loop:
    call cpct_scanKeyboard_f_asm  ;; Scan the keyboard
 
-   ld   bc, #Key_Space           ;; BC = Space KeyID
+   ld   hl, #Key_Space           ;; BC = Space KeyID
    call cpct_isKeyPressed_asm    ;; Check for Space being pressed or not
    or   a                        ;; If Space is presses, A != 0
-   jp   z, loop                  ;; When A=0, Space not pressed, Loop again
+   jr   z, loop                  ;; When A=0, Space not pressed, Loop again
 
    ;; Draw a Box
    ld   de, #0xC325  ;; DE = Pointer to video memory location where the box will be drawn
@@ -104,4 +104,4 @@ loop:
    call cpct_drawSolidBox_asm ;; Call the box drawing function
 
 forever:
-   jp forever        ;; Infinite waiting loop
+   jr forever        ;; Infinite waiting loop
