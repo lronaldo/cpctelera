@@ -82,8 +82,9 @@ Group: Firmware  {
 
 Group: Keyboard  {
 
+   File: cpct_isAnyKeyPressed  (keyboard/cpct_isAnyKeyPressed.s)
+   File: cpct_isAnyKeyPressed_f  (keyboard/cpct_isAnyKeyPressed_f.s)
    File: cpct_isKeyPressed  (keyboard/cpct_isKeyPressed.s)
-   File: cpct_isKeyPressed_asm  (keyboard/cpct_isKeyPressed_asm.s)
    File: cpct_scanKeyboard  (keyboard/cpct_scanKeyboard.s)
    File: cpct_scanKeyboard_f  (keyboard/cpct_scanKeyboard_f.s)
    File: Keyboard Mappings&amp;Constants  (keyboard/keyboard.h)
