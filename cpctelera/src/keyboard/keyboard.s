@@ -92,9 +92,9 @@ _cpct_keyboardStatusBuffer:: .ds 10
 .equ Key_T            ,#0x0806
 .equ Joy1_Right       ,#0x0806
 .equ Key_G            ,#0x1006
-.equ Joy1_Fire2       ,#0x1006
+.equ Joy1_Fire1       ,#0x1006
 .equ Key_F            ,#0x2006
-.equ Joy1_Fire1       ,#0x2006
+.equ Joy1_Fire2       ,#0x2006
 .equ Key_B            ,#0x4006
 .equ Joy1_Fire3       ,#0x4006
 .equ Key_V            ,#0x8006
