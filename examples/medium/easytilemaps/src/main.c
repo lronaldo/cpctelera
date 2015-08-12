@@ -124,7 +124,7 @@ void readKeyboardInput(TScreenTilemap *scr){
    // Read keyboard continuously until the user perfoms an action
    while(1) {
       // Scan Keyboard
-      cpct_scanKeyboard(); 
+      cpct_scanKeyboard_f(); 
 
       // Check all the user keys one by one and, if one of them is pressed
       // perform the action and return to the application

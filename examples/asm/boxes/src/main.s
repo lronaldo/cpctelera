@@ -40,7 +40,7 @@ str_press: .asciz "Please, press Space key.";
 .globl cpct_memset_asm
 .globl cpct_drawSolidBox_asm
 .globl cpct_isKeyPressed_asm  
-.globl cpct_scanKeyboard_f_asm 
+.globl cpct_scanKeyboard_asm 
 .globl cpct_drawStringM1_f_asm
 .globl cpct_disableFirmware_asm
 .globl cpct_getScreenPtr_asm
@@ -75,7 +75,7 @@ _main::
 
    ;; Wait for the user to press a Key
 loop:
-   call cpct_scanKeyboard_f_asm  ;; Scan the keyboard
+   call cpct_scanKeyboard_asm    ;; Scan the keyboard
 
    ld   hl, #Key_Space           ;; BC = Space KeyID
    call cpct_isKeyPressed_asm    ;; Check for Space being pressed or not
