@@ -86,7 +86,7 @@ void updateUser(TEntity* user) {
 //       * Cursor down      : Fist
 //       * Space            : Get Hit
 //       * 1                : Die
-//       * w                : Win
+//       * 2                : Win
 //
 void main(void) {
    TEntity* persea;
