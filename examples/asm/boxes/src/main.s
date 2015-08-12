@@ -27,7 +27,7 @@
 ;; treated as code and executed!)
 .include "keyboard/keyboard.s"
 
-str_press: .asciz "Please, press Space key.";
+str_press: .asciz "Please, press any key.";
 
 ;;
 ;; Start of _CODE area
@@ -39,7 +39,7 @@ str_press: .asciz "Please, press Space key.";
 ;; (The linker will know what to do with them)
 .globl cpct_memset_asm
 .globl cpct_drawSolidBox_asm
-.globl cpct_isKeyPressed_asm  
+.globl cpct_isAnyKeyPressed_asm  
 .globl cpct_scanKeyboard_asm 
 .globl cpct_drawStringM1_f_asm
 .globl cpct_disableFirmware_asm
@@ -77,10 +77,9 @@ _main::
 loop:
    call cpct_scanKeyboard_asm    ;; Scan the keyboard
 
-   ld   hl, #Key_Space           ;; BC = Space KeyID
-   call cpct_isKeyPressed_asm    ;; Check for Space being pressed or not
-   or   a                        ;; If Space is presses, A != 0
-   jr   z, loop                  ;; When A=0, Space not pressed, Loop again
+   call cpct_isAnyKeyPressed_asm ;; Check for any key being pressed
+   or   a                        ;; If A key is pressed, A != 0
+   jr   z, loop                  ;; When A=0, No key is pressed, Loop again
 
    ;; Draw a Box
    ld   de, #0xC325  ;; DE = Pointer to video memory location where the box will be drawn

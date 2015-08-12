@@ -87,7 +87,12 @@ void main(void) {
    u8 penColour=1;                 // Pen colour for the characters
 
    // Infinite scrolling loop
+   cpct_drawStringM1("Hold any key to pause scroll", SCR_MEMORY_START, 1, 3);
    while (1) {
+      // When holding a key, wait for release (Loop scanning the keyboard
+      // until no single key is pressed)
+      do { cpct_scanKeyboard_f(); } while( cpct_isAnyKeyPressed_f() );
+
       // Draw next character at the rightmost character location of the
       // character line being scrolled
       cpct_drawCharM1_f(pNextCharLocation, penColour, 0, text[nextChar]);
