@@ -20,22 +20,41 @@
 
 #include <types.h>
 
+///////////////////////////////////////////////////////////////////////////////////
+////
+//// PUBLIC CONSTANTS, STRUCTURES AND DATA
+////
+///////////////////////////////////////////////////////////////////////////////////
 
-// Mazes 
-extern const u8 g_maze[8][40*50];
-
-// Connections between mazes (255 = no connection)
-extern const u8 g_mazeConnections[8][4];
+// Some sizes
+#define MAZE_WIDTH_TILES   40
+#define MAZE_HEIGHT_TILES  50
+#define MAZE_SIZE_TILES    (MAZE_WIDTH_TILES * MAZE_HEIGHT_TILES)
+#define NUM_MAZES           8
 
 //
 // Identifiers for the 4 connection boundaries of a maze
 //
 typedef enum {
    CONNECT_UP    = 0,
-   CONNECT_DOWN  = 1,
-   CONNECT_LEFT  = 2,
-   CONNECT_RIGHT = 3
+   CONNECT_DOWN,
+   CONNECT_LEFT,
+   CONNECT_RIGHT,
+   NUM_CONNECTIONS
 } EConnection;
 
+// Mazes 
+extern const u8 g_maze[NUM_MAZES][MAZE_SIZE_TILES];
+
+// Connections between mazes (255 = no connection)
+extern const u8 g_mazeConnections[NUM_MAZES][NUM_CONNECTIONS];
+
+///////////////////////////////////////////////////////////////////////////////////
+////
+//// PUBLIC FUNCTIONS
+////
+///////////////////////////////////////////////////////////////////////////////////
+void maze_initialize(u8 init_maze_id);
+void maze_draw(u8* screen);
 
 #endif

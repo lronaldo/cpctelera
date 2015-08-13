@@ -2,6 +2,8 @@
 #ifndef _CHARACTER1_H_
 #define _CHARACTER1_H_
 
+#include <types.h>
+
 extern const u8 character1_0[72];
 extern const u8 character1_1[72];
 extern const u8 character1_2[72];

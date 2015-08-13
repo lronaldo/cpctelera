@@ -1,4 +1,5 @@
 // Data created with Img2CPC - (c) Retroworks - 2007-2015
+#include "character1.h"
 
 // Tile character1_0: 12x12 pixels, 6x12 bytes.
 const u8 character1_0[72] = {

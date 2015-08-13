@@ -1,5 +1,7 @@
 // Data created with Img2CPC - (c) Retroworks - 2007-2015
-u8* const g_tile_tilemap[36] = { 
+#include "tiles.h"
+
+u8* const g_tileset[36] = { 
 	g_tile_0, g_tile_1, g_tile_2, g_tile_3, g_tile_4, g_tile_5, g_tile_6, g_tile_7, g_tile_8, g_tile_9, g_tile_10, g_tile_11, g_tile_12, g_tile_13, g_tile_14, g_tile_15, g_tile_16, g_tile_17, g_tile_18, g_tile_19, g_tile_20, g_tile_21, g_tile_22, g_tile_23, g_tile_24, g_tile_25, g_tile_26, g_tile_27, g_tile_28, g_tile_29, g_tile_30, g_tile_31, g_tile_32, g_tile_33, g_tile_34, g_tile_35
 };
 

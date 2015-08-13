@@ -17,6 +17,8 @@
 //------------------------------------------------------------------------------
 
 #include "mazes.h"
+#include "../sprites/tiles.h"
+#include <cpctelera.h>
 
 // ~20K
 // 8 Mazes, 2000 bytes / maze = 16000 bytes
@@ -24,7 +26,7 @@
 // Tileset = 36*2 = 72 b
 // MaskTable = 256 b 
 // Characters = 4*648b = 2592 b
-const u8 g_maze[8][40*50] = {
+const u8 g_maze[NUM_MAZES][MAZE_SIZE_TILES] = {
    { 
      #include "maze0.csv"
    },{
@@ -52,7 +54,7 @@ const u8 g_maze[8][40*50] = {
 //          |6 7  |
 //          -------
 //
-const u8 g_mazeConnections[8][4] = {
+const u8 g_mazeConnections[NUM_MAZES][NUM_CONNECTIONS] = {
    // Up  | Down | Left | Right
    //-------------------------
    { 255,     3,   255,     1   },  // Maze 0 connections
@@ -64,3 +66,22 @@ const u8 g_mazeConnections[8][4] = {
    {   3,   255,   255,     7   },  // Maze 6 connections
    {   4,   255,     6,   255   }   // Maze 7 connections
 };
+
+
+// Present maze (the one on screen)
+u8* m_presentMaze;
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// Initializes mazes module
+//
+void maze_initialize(u8 init_maze_id) {
+   m_presentMaze = (u8*)g_maze[init_maze_id];
+   cpct_etm_setTileset2x4(g_tileset);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// Draws the present maze completely (normally used for first time draw, on entering)
+//
+void maze_draw(u8* screen) {
+   cpct_etm_drawTilemap2x4(MAZE_WIDTH_TILES, MAZE_HEIGHT_TILES, screen, m_presentMaze);
+}

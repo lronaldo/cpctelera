@@ -29,7 +29,7 @@ typedef enum {
    ST_HITRIGHT ,     // Hitting right
    ST_HITUP    ,     // Hitting up
    ST_HITDOWN  ,     // Hitting down
-   ST_DEAD           // Being dead
+   ST_DEAD,          // Being dead
    ST_NUMSTATUSES    // Total actions
 } EEntityStatus;
 
@@ -46,16 +46,22 @@ typedef struct {
 //
 u8* const g_scrbuffers[2] = { (u8*)0xC000, (u8*)0x8000 };
 
-u8* const g_entities[10];
+
+
+//u8* const g_entities[10];
 
 
 void application(){
+   maze_initialize(0);
+   maze_draw(g_scrbuffers[0]);
 
    // Loop forever
    while (1);   
 }
 
 void main(void) {
-   cpct_setStackLocation(0x8000);
+   cpct_setStackLocation((u8*)0x8000);
+   cpct_disableFirmware();
+   cpct_setVideoMode(0);
    application();
 }
