@@ -1594,6 +1594,22 @@ replace restart {
     ; peephole 114a prevent tail code optimization for functions taking parameters
 }
 
+// 2nd Modification to impede __z88dk_callee poisoning
+// by jumping with no return address on top of parameters
+replace restart {
+    push    %1
+    inc     %2
+    call    %3
+    ret
+} by {
+    push    %1
+    inc     %2
+    call    %3
+    nop
+    ret
+    ; peephole 114c prevent tail code optimization for functions taking parameters
+}
+
 replace restart {
     call    %1
     ret
