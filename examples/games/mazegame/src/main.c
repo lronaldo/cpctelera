@@ -46,20 +46,34 @@ typedef struct {
    u8 **sprite_set;      // Set of sprites for different actions of the entity
 } TEntity;
 
-// Screen Buffers
-//   0xC000 - Main Screen Buffer
-//   0x8000 - BackBuffer (Requires moving program stack, that originally is at 0xBFFF)
+// We always draw over the backbuffer
+u8* const g_backBuffer = (u8*)0x8000;
+
+//////////////////////////////////////////////////////////////
+// Switch Front and Back Screen Buffers
+//   Backbuffer is shown on screen,
+//   Frontbuffer is removed from screen and treated as new backbuffer
 //
-u8* const g_scrbuffers[2] = { (u8*)0xC000, (u8*)0x8000 };
+void switchScreenBuffers() {
+   u8** backbuf = (u8**)(&g_backBuffer);
 
-
+   // Check which is present backbuffer and then switch
+   if (g_backBuffer == (u8*)0x8000) {
+      *backbuf = (u8*)0xC000;
+      cpct_setVideoMemoryPage(cpct_page80);
+   } else {
+      *backbuf = (u8*)0x8000;
+      cpct_setVideoMemoryPage(cpct_pageC0);
+   }
+}
 
 //u8* const g_entities[10];
 
 
 void application(){
    maze_initialize(0);
-   maze_draw(g_scrbuffers[0]);
+   maze_draw(g_backBuffer);
+   switchScreenBuffers();
 
    // Loop forever
    while (1);   
