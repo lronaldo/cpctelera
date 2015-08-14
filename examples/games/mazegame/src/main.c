@@ -20,6 +20,11 @@
 #include "mazes/mazes.h"
 #include "sprites/sprites.h"
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// STRUCTURES
+//
+
+// Entity statuses
 typedef enum {
    ST_WALKLEFT  = 0, // Walking to the left
    ST_WALKRIGHT,     // Walking to the right
@@ -33,11 +38,12 @@ typedef enum {
    ST_NUMSTATUSES    // Total actions
 } EEntityStatus;
 
+// Entity information (Location, status and sprites)
 typedef struct {
-   u8 maze;                         // Maze where the entity is located
-   u8 tx, ty;                       // Upper-left tile of the entity over the tilemap
-   EEntityStatus status;            // Status of the entity
-   u8 *sprite_set[ST_NUMSTATUSES];  // Set of sprites for different actions of the entity
+   u8 maze;              // Maze where the entity is located
+   u8 tx, ty;            // Upper-left tile of the entity over the tilemap
+   EEntityStatus status; // Status of the entity
+   u8 **sprite_set;      // Set of sprites for different actions of the entity
 } TEntity;
 
 // Screen Buffers
