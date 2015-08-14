@@ -28,7 +28,7 @@
 ;;    void <cpct_setVideoMemoryPage> (<u8> *page_6LSb*);
 ;;
 ;; Input Parameters (4 bytes):
-;;    (1B A) page_6LSb - New starting page for Video Memory (Only 6 Least Significant bits are used)
+;;    (1B L) page_6LSb - New starting page for Video Memory (Only 6 Least Significant bits are used)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_setVideoMemoryPage_asm
@@ -91,34 +91,26 @@
 ;; (end)
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, HL
+;;    F, BC, HL
 ;;
 ;; Required memory:
-;;    14 bytes
+;;    9 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ------------------------------------
-;;     Any    |   76   |   19.00
-;; ------------------------------------
-;; Asm saving |  -28   |   -7.00
-;; ------------------------------------
+;;    Case    |  microSecs (us) | CPU Cycles
+;; -------------------------------------------
+;;     Any    |   15            |    60
+;; -------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_setVideoMemoryPage::
-   ;; Get the parameter from the stack
-   ld   hl, #2       ;; [10] HL = SP + 2 (Place where parameter is)
-   add  hl, sp       ;; [11]
-   ld    a, (hl)     ;; [ 7] A = First Parameter (Video Memory Page to Set)
-
 cpct_setVideoMemoryPage_asm::  ;; Assembly entry point
-
    ;; Select R12 Register from the CRTC and Write there the selected Video Memory Page
-   ld   bc, #0xBC0C  ;; [10] 0xBC = Port for selecting CRTC Register, 0x0C = Selecting R12
-   out (c), c        ;; [12] Select the R12 Register (0x0C to port 0xBC)
-   inc   b           ;; [ 4] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
-   out (c), a        ;; [12] Write Selected Video Memory Page to R12 (A to port 0xBD)
+   ld   bc, #0xBC0C  ;; [3] 0xBC = Port for selecting CRTC Register, 0x0C = Selecting R12
+   out (c), c        ;; [4] Select the R12 Register (0x0C to port 0xBC)
+   inc   b           ;; [1] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
+   out (c), l        ;; [4] Write Selected Video Memory Page to R12 (A to port 0xBD)
 
-   ret               ;; [10] Return
+   ret               ;; [3] Return
