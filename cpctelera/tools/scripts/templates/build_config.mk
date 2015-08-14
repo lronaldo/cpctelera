@@ -58,6 +58,7 @@ OBJDIR  := obj
 # File extensions
 C_EXT   := c
 ASM_EXT := s
+BIN_EXT := bin
 OBJ_EXT := rel
 
 # BINARY CONFIG
@@ -107,8 +108,11 @@ OBJSUBDIRS := $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DI
 # Calculate all source files
 CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
 ASMFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
+BIN2CFILES := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
 
 # Calculate all object files
-C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(CFILES)))
+BIN_OBJFILES := $(patsubst %.$(BIN_EXT), %.$(C_EXT), $(BIN2CFILES))
+CFILES       := $(filter-out $(BIN_OBJFILES), $(CFILES))
+C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(CFILES) $(BIN_OBJFILES)))
 ASM_OBJFILES := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
 OBJFILES		 := $(C_OBJFILES) $(ASM_OBJFILES)

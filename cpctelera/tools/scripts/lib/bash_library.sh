@@ -613,3 +613,13 @@ function valuesToCommaList() {
    done
    echo "${VALUES[$i]}"
 }
+
+## Check if a given value is a valid C identifier or not
+##   $1: value to check as being valid C identifier
+##
+function checkValidCIdentifier() {
+   if [[ $1 =~ ^[A-Za-z_]{1}[A-Za-z0-9_]*$ ]] && [[ $(containsChars "$1" "ñ") == "" ]]; then
+         return 0
+   fi
+   return 1
+}
