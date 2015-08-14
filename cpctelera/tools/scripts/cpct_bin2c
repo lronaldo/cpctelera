@@ -37,9 +37,13 @@
 ##    The converted output is outputted to the standard output.
 ##
 ## Command line options:
-##    -b | --bytes-per-line [numbytes] - Establishes the number of bytes to 
+##    -h  | --include-header [file]     - Include a header file at the top of
+## the generated output
+##    -an | --array-name [identifier]   - Sets the identifier that will be used
+## for the array that will be generated. G_[file] is used by default.
+##    -b  | --bytes-per-line [numbytes] - Establishes the number of bytes to 
 ## write at each array line in C. 16 by default
-##    -h | --help                      - Shows help information on the terminal.
+##    -h  | --help                      - Shows help information on the terminal.
 ##
 
 
@@ -50,16 +54,22 @@ source $(dirname $0)/lib/bash_library.sh
 ##
 function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<filename>"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<filename> [options]"
    echo
    echo "${COLOR_CYAN}  Converts any given binary file into a C array containing \
 all the bytes of the binary in hexadecimal format"
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo 
-   echo "${COLOR_LIGHT_BLUE}  -b | --bytes-per-line <numbytes>"
+   echo "${COLOR_LIGHT_BLUE}  -h | --include-header ${COLOR_NORMAL}<file>"
+   echo "${COLOR_CYAN}       Include a header file at the top of the generated output."
+   echo
+   echo "${COLOR_LIGHT_BLUE} -an | --array-name ${COLOR_NORMAL}<identifier>"
+   echo "${COLOR_CYAN}       Sets the identifier that will be used. G_<filename> is used by default."
+   echo
+   echo "${COLOR_LIGHT_BLUE}  -b | --bytes-per-line ${COLOR_NORMAL}<numbytes>"
    echo "${COLOR_CYAN}       Establishes the number of bytes to write at each array line in C. 16 by default."
-   echo ${COLOR_NORMAL}
+   echo
    echo "${COLOR_LIGHT_BLUE}  -h | --help"
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
@@ -71,6 +81,8 @@ all the bytes of the binary in hexadecimal format"
 ## Check command line parameters
 ##
 FILENAME=
+ARRAYNAME=
+INCLUDE=
 BYTESPERLINE=16
 
 if (( $# < 1 )); then
@@ -79,6 +91,22 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Add an include header file in the output
+      "-h" | "--include-header")
+         if (( $# < 2 )); then
+            paramError "Modifier -h (--include-header) requires filename as include file parameter."
+         fi
+         INCLUDE="$2"
+         shift
+      ;;
+      ## Get a name for the generated array
+      "-an" | "--array-name")
+         if ! checkValidCIdentifier "$2"; then
+            paramError "Modifier -an (--array-name) requires a valid C identifier as name for the array."
+         fi
+         ARRAYNAME="$2"
+         shift
+      ;;
       ## Get number of bytes
       "-b" | "--bytes-per-line")
          if ! isInt "$2"; then
@@ -114,16 +142,23 @@ done
 ## Create a temporary file to store binary conversion previous to output
 TMPFILE=$(createTempFile)
 
-## Extract the name of the file without extension as IDENTIFIER for C
-IDENTIFIER=$(basename "$FILENAME") 
-IDENTIFIER=${IDENTIFIER%.*}
+## Extract the name of the file without extension as identifier for C, if no arrayname was provided
+if (( ${#ARRAYNAME} < 1 )); then
+   ARRAYNAME=$(basename "$FILENAME") 
+   ARRAYNAME=G_${ARRAYNAME%.*}
+fi
 
 ## Calculate the total amount of bytes to be converted (in the binary file)
 BYTES=$(wc -c < "$FILENAME")
 
 ## Output the C Array declaration and the number of bytes to stdout
 echo "// File $FILENAME converted using cpct_bin2c"
-echo "const unsigned char G_${IDENTIFIER}[${BYTES}] = {"
+if (( ${#INCLUDE} > 0 )); then
+   echo
+   echo "#include <${INCLUDE}>"
+   echo
+fi
+echo "const unsigned char ${ARRAYNAME}[${BYTES}] = {"
 
 ## Convert binary file to bytes in hexadecimal and store in a temporary file
 od -An -t x1 -v "$FILENAME" > $TMPFILE

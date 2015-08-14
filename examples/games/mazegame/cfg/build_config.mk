@@ -28,15 +28,11 @@
 ###########################################################################
 
 ## CPCTELERA MAIN PATH
-##   Sets CPCTelera main path for accessing tools and configuration. This 
-##   variable must point to the folder where source and tools are contained.
-##   Setup creates and environment variable that will be generally used.
-##   However, when environment variable is not available, this variable 
-##   should have the correct value for the project to compile.
-##   If you change folder structure, CPCT_PATH should reflect this change.
-##   This variable should always have the absolute path value.
+##   Sets CPCTelera main path for accessing tools and configuration. If you
+##   change folder structure, change CPCT_PATH value for its absolute path.
 ##
-CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
+THIS_FILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+CPCT_PATH      := $(THIS_FILE_PATH)../../../../cpctelera/
 
 ####
 ## SECTION 1: Project configuration 
@@ -48,8 +44,8 @@ CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := %%%PROJECT_NAME%%%
-Z80CODELOC := 0x%%%CODE_LOAD_ADDRESS%%%
+PROJNAME   := mazegame
+Z80CODELOC := 0x040
 
 # Folders 
 SRCDIR  := src
@@ -58,7 +54,6 @@ OBJDIR  := obj
 # File extensions
 C_EXT   := c
 ASM_EXT := s
-BIN_EXT := bin
 OBJ_EXT := rel
 
 # BINARY CONFIG
@@ -108,11 +103,8 @@ OBJSUBDIRS := $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DI
 # Calculate all source files
 CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
 ASMFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
-BIN2CFILES := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
 
 # Calculate all object files
-BIN_OBJFILES := $(patsubst %.$(BIN_EXT), %.$(C_EXT), $(BIN2CFILES))
-CFILES       := $(filter-out $(BIN_OBJFILES), $(CFILES))
-C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(BIN_OBJFILES) $(CFILES)))
+C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(CFILES)))
 ASM_OBJFILES := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
 OBJFILES		 := $(C_OBJFILES) $(ASM_OBJFILES)

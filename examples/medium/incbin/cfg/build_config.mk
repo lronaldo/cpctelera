@@ -36,7 +36,7 @@
 ##   If you change folder structure, CPCT_PATH should reflect this change.
 ##   This variable should always have the absolute path value.
 ##
-CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
+#>> Uses environment variable $(CPCT_PATH)
 
 ####
 ## SECTION 1: Project configuration 
@@ -48,8 +48,8 @@ CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := %%%PROJECT_NAME%%%
-Z80CODELOC := 0x%%%CODE_LOAD_ADDRESS%%%
+PROJNAME   := incbin
+Z80CODELOC := 0x4000
 
 # Folders 
 SRCDIR  := src
