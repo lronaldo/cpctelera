@@ -40,7 +40,7 @@ extern   u8 cpct_getHWColour  (u8 firmware_colour);
 extern void cpct_setPALColour (u8 pen, u8 hw_ink);
 
 // Functions to modify video memory location
-extern void cpct_setVideoMemoryPage   (u8 page_codified_in_6LSb);
+extern void cpct_setVideoMemoryPage   (u8 page_codified_in_6LSb) __z88dk_fastcall;
 extern void cpct_setVideoMemoryOffset (u8 offset);
 
 // Using screen coordinates to get byte pointers
