@@ -41,7 +41,7 @@ extern void cpct_setPALColour (u8 pen, u8 hw_ink);
 
 // Functions to modify video memory location
 extern void cpct_setVideoMemoryPage   (u8 page_codified_in_6LSb) __z88dk_fastcall;
-extern void cpct_setVideoMemoryOffset (u8 offset);
+extern void cpct_setVideoMemoryOffset (u8 offset) __z88dk_fastcall;
 
 // Using screen coordinates to get byte pointers
 extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y) __z88dk_callee;

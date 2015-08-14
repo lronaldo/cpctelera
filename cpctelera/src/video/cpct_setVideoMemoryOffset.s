@@ -28,7 +28,7 @@
 ;;    void <cpct_setVideoMemoryOffset> (<u8> *offset*)
 ;;
 ;; Input Parameters (4 bytes):
-;;    (1B A) offset - New starting offset for Video Memory (8 Least Significant bits)
+;;    (1B L) offset - New starting offset for Video Memory (8 Least Significant bits)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_setVideoMemoryOffset_asm
@@ -91,34 +91,26 @@
 ;; similarly at every place it were located).
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, HL
+;;    F, BC, HL
 ;;
 ;; Required memory:
-;;    14 bytes
+;;    9 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles | microSecs (us)
-;; ------------------------------------
-;;     Any    |   76   |   19.00
-;; ------------------------------------
-;; Asm saving |  -28   |   -7.00
-;; ------------------------------------
+;;    Case    | microSecs (us) | CPU Cycles
+;; -----------------------------------------
+;;     Any    |     15         |    60
+;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_setVideoMemoryOffset::
-   ;; Get the parameter from the stack
-   ld   hl, #2       ;; [10] HL = SP + 2 (Place where parameter is)
-   add  hl, sp       ;; [11]
-   ld    a, (hl)     ;; [ 7] A = First Parameter (Video Memory Offset to Establish)
-
 cpct_setVideoMemoryOffset_asm::     ;; Assembly entry point
-
    ;; Select R13 Register from the CRTC and Write there the selected Video Memory Offset
-   ld   bc, #0xBC0D  ;; [10] 0xBC = Port for selecting CRTC Register, 0x0D = Selecting R13
-   out (c), c        ;; [12] Select the R13 Register (0x0D to port 0xBC)
-   inc   b           ;; [ 4] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
-   out (c), a        ;; [12] Write Selected Video Memory Offset to R13 (A to port 0xBD)
+   ld   bc, #0xBC0D  ;; [3] 0xBC = Port for selecting CRTC Register, 0x0D = Selecting R13
+   out (c), c        ;; [4] Select the R13 Register (0x0D to port 0xBC)
+   inc   b           ;; [1] Change Output port to 0xBD (B = 0xBC + 1 = 0xBD)
+   out (c), l        ;; [4] Write Selected Video Memory Offset to R13 (A to port 0xBD)
 
-   ret               ;; [10] Return 
+   ret               ;; [3] Return 
