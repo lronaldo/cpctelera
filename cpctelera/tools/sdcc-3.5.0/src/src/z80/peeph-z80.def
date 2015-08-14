@@ -3,7 +3,7 @@
 // Some of these peepholes could be potentially moved to peeph.def, but a
 // GBZ80 expert should have a look at them before.
 //
-// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2012
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2015
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -1579,45 +1579,13 @@ replace restart {
 	ld	sp,%1
 } if notUsed('a')
 
-// Modification to impede __z88dk_callee poisoning
-// by jumping with no return address on top of parameters
-//   by Alcoholic Anonymous / CPCWiki
 replace restart {
-    push    %1
-    call    %2
-    ret
+	call    %1
+	ret
 } by {
-    push    %1
-    call    %2
-    nop
-    ret
-    ; peephole 114a prevent tail code optimization for functions taking parameters
-}
-
-// 2nd Modification to impede __z88dk_callee poisoning
-// by jumping with no return address on top of parameters
-replace restart {
-    push    %1
-    inc     %2
-    call    %3
-    ret
-} by {
-    push    %1
-    inc     %2
-    call    %3
-    nop
-    ret
-    ; peephole 114c prevent tail code optimization for functions taking parameters
-}
-
-replace restart {
-    call    %1
-    ret
-} by {
-    jp    %1
-    ; peephole 114b replaced call at end of function by jump (tail call optimization).
-}
-
+	jp  %1
+	; peephole 114 replaced call at end of function by jump (tail call optimization).
+} if symmParmStack(%1)
 
 // Callee saves ix.
 replace restart {
@@ -1674,7 +1642,7 @@ replace restart {
 	ld	a, %2 (%3)
 	adc	a, #%4
 	; peephole 119 loaded %6 from a directly instead of going through %1.
-} if notUsed(%1)
+} if notUsed(%1), notSame(%6 'a')
 
 replace restart {
 	ld	%1, a
@@ -1996,22 +1964,6 @@ replace restart {
 	jp	NZ,%2
 	; peephole 145 removed redundant zeroing of a (which has just been tested to be #0x00).
 	jp	%3
-}
-
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-// POISON REMOVE
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-
-barrier
-
-// Removing nop used as poison to prevent
-//  tail jump optimization on functions taking parameters
-replace {
-    nop
-} by {
-    ; poison removal
 }
 
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
@@ -2344,5 +2296,6 @@ replace {
 	jr	NZ,	%5	
 } by {
 	djnz	%5
-	; peephole 156 used djnz
+	; peephole 158 used djnz
 }
+

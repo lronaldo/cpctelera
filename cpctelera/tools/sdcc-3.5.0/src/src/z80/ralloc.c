@@ -1720,7 +1720,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   for (dic = ic->prev; dic; dic = dic->prev)
     {
       /* PENDING: Don't pack across function calls. */
-      if (dic->op == CALL || dic->op == PCALL || dic->op == INLINEASM)
+      if (dic->op == CALL || dic->op == PCALL || dic->op == INLINEASM || dic->op == CRITICAL || dic->op == ENDCRITICAL)
         {
           dic = NULL;
           break;

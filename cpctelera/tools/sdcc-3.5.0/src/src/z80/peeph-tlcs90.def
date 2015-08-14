@@ -3,7 +3,7 @@
 // Some of these peepholes could be potentially moved to peeph.def, but a
 // GBZ80 expert should have a look at them before.
 //
-// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2012
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2015
 //
 // This program is free software; you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by the
@@ -1580,12 +1580,12 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
-	call	%1
+	call    %1
 	ret
 } by {
-	jp	%1
+	jp  %1
 	; peephole 114 replaced call at end of function by jump (tail call optimization).
-}
+} if symmParmStack(%1)
 
 // Callee saves ix.
 replace restart {
@@ -1596,7 +1596,7 @@ replace restart {
 	pop	ix
 	jp	%1
 	; peephole115 replaced call at end of function by jump moving call beyond pop ix (tail call optimization).
-}
+} if symmParmStack(%1)
 
 replace restart {
 	ld	%1,#%2
@@ -1642,7 +1642,7 @@ replace restart {
 	ld	a, %2 (%3)
 	adc	a, #%4
 	; peephole 119 loaded %6 from a directly instead of going through %1.
-} if notUsed(%1)
+} if notUsed(%1), notSame(%6 'a')
 
 replace restart {
 	ld	%1, a
@@ -1914,6 +1914,15 @@ replace restart {
 	jp	M,%2
 	; peephole 141 used sign flag instead of testing bit 7.
 }
+
+replace restart {
+	dec %1
+	ld	a, %1
+	or	a, a
+} by {
+	dec %1
+	; peephole 141a removed redundant transfer and flag setting in a
+} if notUsed('a')
 
 replace restart {
 	ld	%1,a
@@ -2244,6 +2253,9 @@ replace restart {
 	; peephole 152 replaced jump by return.
 } if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
+// Replace jp by ret before replacing jp by jr outside of jump tables, since using ret can reduce the number of references to jump labels.
+barrier
+
 replace {
 	jp	%5
 } by {
@@ -2278,4 +2290,12 @@ replace {
 	jr	NC,%5
 	; peephole 157 changed absolute to relative conditional jump.
 } if labelInRange(%5)
+
+replace {
+	dec b
+	jr	NZ,	%5	
+} by {
+	djnz	%5
+	; peephole 158 used djnz
+}
 

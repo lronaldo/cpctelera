@@ -128,3 +128,14 @@ define COMPILEASMFILE
 $(1): $(2)
 	$(Z80ASM) $(Z80ASMFLAGS) $(Z80CCINCLUDE) $(1) $(2) 
 endef
+
+#################
+# BINFILE2C: General rule to convert binary files into C Arrays using cpct_bin2c
+#
+# $(1): C File to be created  (with its relative path)
+# $(2): Binary source file to be converted (with its relative path)
+#
+define BINFILE2C
+$(1): $(2)
+	$(BIN2C) $(2) -h "cpctelera.h" > $(1)
+endef

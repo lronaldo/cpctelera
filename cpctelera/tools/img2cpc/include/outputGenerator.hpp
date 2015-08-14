@@ -172,15 +172,16 @@ public:
 
 			ofs << "#ifndef _" << sanitizedFileName << "_" << endl;
 			ofs << "#define _" << sanitizedFileName << "_" << endl << endl;
+         ofs << "#include <cpctelera.h>" << endl << endl;
 
 			vector<int> palette = GetPaletteValues(options);
 			unsigned int numColors = palette.size();
 			if(numColors > 0) {
 				ofs << "extern const u8 " << options.BaseName << "_palette[" << numColors << "];" << endl << endl;
 			}
-         ofs << "extern u8* const " << options.BaseName << "_tilemap[" << numTiles << "];" << endl;
+         ofs << "extern u8* const " << options.BaseName << "_tileset[" << numTiles << "];" << endl;
          if(options.Palette.TransparentIndex >= 0 && !options.InterlaceMasks) {
-            ofs << "exterb u8* const " << options.BaseName << "_masks_tilemap[" << numTiles << "];" << endl;
+            ofs << "exterb u8* const " << options.BaseName << "_masks_tileset[" << numTiles << "];" << endl;
          }
 
 			for(Tile t : tiles) {
@@ -207,7 +208,8 @@ public:
 		string fileName = ss.str();
 		
 		ofstream ofs(fileName);
-		ofs << "// Data created with Img2CPC - (c) Retroworks - 2007-2015" << endl;
+		ofs << "// Data created with Img2CPC - (c) Retroworks - 2007-2015" << endl << endl;
+      ofs << "#include \""<< options.OutputFileName <<".h\"" << endl;
 		
 		vector<int> palette = GetPaletteValues(options);
 		unsigned int numColors = palette.size();
@@ -226,7 +228,7 @@ public:
 
 		unsigned int numTiles = tiles.size();
 		if(numTiles > 0) {
-			ofs << "u8* const " << options.BaseName << "_tilemap[" << numTiles << "] = { " << endl << "\t";
+			ofs << "u8* const " << options.BaseName << "_tileset[" << numTiles << "] = { " << endl << "\t";
 			for(unsigned int i=0; i<numTiles; ++i) {
 				if(i > 0) {
 					ofs << ", ";
@@ -235,7 +237,7 @@ public:
 			}
 			ofs << endl << "};" << endl;
 			if(options.Palette.TransparentIndex >= 0 && !options.InterlaceMasks) {
-				ofs << "u8* const " << options.BaseName << "_masks_tilemap[" << numTiles << "] = { " << endl << "\t";
+				ofs << "u8* const " << options.BaseName << "_masks_tileset[" << numTiles << "] = { " << endl << "\t";
 				for(unsigned int i=0; i<numTiles; ++i) {
 					if(i > 0) {
 						ofs << ", ";
