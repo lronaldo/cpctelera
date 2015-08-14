@@ -62,13 +62,17 @@
 ;;    * (*x*, *y*) represent the coordinates, in tiles, of the upper-left corner of 
 ;; the tilebox to be drawn. These coordinates are relative to the upper-left corner of
 ;; the tilemap (its first tile). They are not checked to be inside the tilemap, and 
-;; providing bad coordinates leads to undefined behaviour. On a standard mode screen,
-;; *x* would be in the range [1,40] and *y* in the range [1,50].
+;; providing bad coordinates leads to undefined behaviour. Supported ranges for this
+;; coordinates are: *x* in [1,127] and *y* in [1,63] (However, y >= 50 will be outside
+;; normal screen, because 50*4 = 200 pixels, which is the height of a normal screen).
 ;;    * (*w*, *h*) represent the width and height, in tiles, of the tilebox being
 ;; drawn. Same as (*x*, *y*), these values are not checked and values drawing outside
 ;; the tilemap or beyond the screen could be provided, and would lead to undefined behaviour. 
 ;;    * *map_width* is expected to be the width of the tilemap in tiles. Do not confuse
 ;; this value with *w*, that represents the width of the tilebox (please note the difference).
+;; Maximum width of the tilemap is 255 tiles, as it is a <u8> value. However, take into 
+;; account that maps wider than 127 tiles can represent a problem, as the initial *x* 
+;; parameter of this function cannot be greater than 127. 
 ;;    * *pvideomem* should be a pointer to the video memory or backbuffer address where
 ;; the upper-left corner of the tilemap is drawn. Please note that it should point to the
 ;; start of the tilemap, and *NOT* the start of the tilebox, in video memory or backbuffer.
@@ -243,7 +247,7 @@
 
    ;; Third, add up 2 * x
    ld    a, c      ;; [1] A = x coordinate
-   add   a         ;; [1] A = 2x (Ignore carry, because on a 80-byte wide screen x shouldn't be greater than 40)
+   add   a         ;; [1] A = 2x (Ignore carry, because x will be in the range [1,127])
    add__hl_a       ;; [5] HL += 2x, so finally HL = 0x50 * int(y/2) + 0x2000
 
    ;; We have to add the start location of the tilemap in video memory

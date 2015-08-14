@@ -45,10 +45,15 @@
 ;; the tilemap. This location *must be* a pixel line 0 or pixel line 4, otherwise
 ;; the function may crash your program. To know what a pixel line 0/4 means, please
 ;; have a look at <cpct_drawSprite> documentation.
-;;    * *map_width* represents the width of the tilemap in tiles and is expected to
-;; be in the range [1, 40]
+;;    * *map_width* represents the width of the tilemap in tiles. Theoretically any
+;; width between 0 and 255 is possible. However, if width of the map times 4 is greater
+;; than the screen width, unexpected behaviour may happen, as memory locations outside
+;; video memory could be overwritten. 
 ;;    * *map_height* represents the height of the tilemap in tiles and is expected to
-;; be in the range [1, 50]
+;; be in the range [1, 50], as 50*4 = 200 pixels, which is the size of a normal screen.
+;; However, any size between 1 and 255 is theoretically possible. Anyway, this is not
+;; recommended as it will usually lead to undefined behaviour, because memory locations
+;; outside video memory could be overwritten.
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of checking over the tilemap, its
