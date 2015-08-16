@@ -32,29 +32,22 @@
 #define MAZE_SIZE_TILES    (MAZE_WIDTH_TILES * MAZE_HEIGHT_TILES)
 #define NUM_MAZES           8
 
-//
-// Identifiers for the 4 connection boundaries of a maze
-//
-typedef enum {
-   CONNECT_UP    = 0,
-   CONNECT_DOWN,
-   CONNECT_LEFT,
-   CONNECT_RIGHT,
-   NUM_CONNECTIONS
-} EConnection;
-
 // Mazes 
 extern const u8 g_maze[NUM_MAZES][MAZE_SIZE_TILES];
 
-// Connections between mazes (255 = no connection)
-extern const u8 g_mazeConnections[NUM_MAZES][NUM_CONNECTIONS];
+// Maze coordinates: Bitvector 
+// Each maze has 2 coordinates (x,y) , x,y € [0,3], so 2 bits
+// are required for each coordinate, 4 bits for each maze, 
+// then 1 byte = 2 mazes. Then we need NUM_MAZES / 2 bytes.
+extern const u8 g_mazeCoordinates[NUM_MAZES / 2];
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////
 //// PUBLIC FUNCTIONS
 ////
 ///////////////////////////////////////////////////////////////////////////////////
-void maze_initialize(u8 init_maze_id);
+void maze_initialize(u8 maze_id);
+void maze_setPresent(u8 maze_id);
 void maze_draw(u8* screen);
 
 #endif

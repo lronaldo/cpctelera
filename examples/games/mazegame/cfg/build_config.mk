@@ -54,6 +54,8 @@ OBJDIR  := obj
 # File extensions
 C_EXT   := c
 ASM_EXT := s
+TMX_EXT := tmx
+CSV_EXT := csv
 OBJ_EXT := rel
 
 # BINARY CONFIG
@@ -103,8 +105,14 @@ OBJSUBDIRS := $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DI
 # Calculate all source files
 CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
 ASMFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
+TMXFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(TMX_EXT)))
 
 # Calculate all object files
+TMX_OBJFILES := $(patsubst %.$(TMX_EXT), %.$(CSV_EXT), $(TMXFILES))
 C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(CFILES)))
 ASM_OBJFILES := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
-OBJFILES		 := $(C_OBJFILES) $(ASM_OBJFILES)
+OBJFILES		 := $(TMX_OBJFILES) $(C_OBJFILES) $(ASM_OBJFILES)
+
+# Convert TMX OBJFILES
+%.$(CSV_EXT): %.$(TMX_EXT) 
+	cpct_tmx2csv $? > $@

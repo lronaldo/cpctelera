@@ -47,24 +47,25 @@ const u8 g_maze[NUM_MAZES][MAZE_SIZE_TILES] = {
 };
 
 //
-// Connections between mazes (255 = no connection)
-//  Layout: -------
-//          |0 1 2|
-//          |3 4 5|
-//          |6 7  |
-//          -------
+// Maze coordinates define connections between
+// mazes. World is defined as 4x4 circular layout.
+//  Layout: \x 0 1 2 3
+//          y ---------
+//          0 |0 1 2 -|
+//          1 |3 4 5 -|
+//          2 |6 7 - -|
+//          3 |- - - -|
+//            ---------
 //
-const u8 g_mazeConnections[NUM_MAZES][NUM_CONNECTIONS] = {
-   // Up  | Down | Left | Right
-   //-------------------------
-   { 255,     3,   255,     1   },  // Maze 0 connections
-   { 255,     4,     0,     2   },  // Maze 1 connections
-   { 255,     5,     1,   255   },  // Maze 2 connections
-   {   0,     6,   255,     4   },  // Maze 3 connections
-   {   1,     7,     3,     5   },  // Maze 4 connections
-   {   2,   255,     4,   255   },  // Maze 5 connections
-   {   3,   255,   255,     7   },  // Maze 6 connections
-   {   4,   255,     6,   255   }   // Maze 7 connections
+const u8 g_mazeConnections[NUM_MAZES / 2] = { 
+//   -m0--m1-   
+   0b00000100, // m0 = (0,0), m1 = (1,0)
+//   -m2--m3-   
+   0b10000001, // m2 = (2,0), m3 = (0,1)
+//   -m4--m5-   
+   0b01011001, // m4 = (1,1), m5 = (2,1)
+//   -m6--m7-   
+   0b00100110  // m6 = (0,2), m7 = (1,2)
 };
 
 
@@ -75,8 +76,15 @@ u8* m_presentMaze;
 // Initializes mazes module
 //
 void maze_initialize(u8 init_maze_id) {
-   m_presentMaze = (u8*)g_maze[init_maze_id];
+   maze_setPresent(init_maze_id);
    cpct_etm_setTileset2x4(g_tileset);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// Changes the present maze
+//
+void maze_setPresent(u8 maze_id) {
+   m_presentMaze = (u8*)g_maze[maze_id];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
