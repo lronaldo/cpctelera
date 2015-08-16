@@ -65,7 +65,7 @@ CDT     := $(PROJNAME).cdt
 DSK     := $(PROJNAME).dsk
 
 # TARGETs for compilation (if you only want one of them, remove the other)
-TARGET  := $(CDT) $(DSK)
+TARGET  := mazes $(CDT) $(DSK)
 
 ####
 ## SECTION 2: TOOL PATH CONFIGURATION
@@ -111,8 +111,5 @@ TMXFILES   := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(TMX_EXT)))
 TMX_OBJFILES := $(patsubst %.$(TMX_EXT), %.$(CSV_EXT), $(TMXFILES))
 C_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(CFILES)))
 ASM_OBJFILES := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
-OBJFILES		 := $(TMX_OBJFILES) $(C_OBJFILES) $(ASM_OBJFILES)
+OBJFILES		 := $(C_OBJFILES) $(ASM_OBJFILES)
 
-# Convert TMX OBJFILES
-%.$(CSV_EXT): %.$(TMX_EXT) 
-	cpct_tmx2csv $? > $@

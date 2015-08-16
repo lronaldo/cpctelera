@@ -36,3 +36,11 @@ include cfg/build_config.mk
 ## USE GLOBAL MAKEFILE (general rules for building CPCtelera projects)
 ##
 include $(CPCT_PATH)/cfg/global_main_makefile.mk
+
+
+# Convert TMX OBJFILES
+.PHONY: mazes
+mazes: $(TMX_OBJFILES)
+
+%.$(CSV_EXT): %.$(TMX_EXT) 
+	cpct_tmx2csv $? > $@
