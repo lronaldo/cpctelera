@@ -623,3 +623,83 @@ function checkValidCIdentifier() {
    fi
    return 1
 }
+
+## Gets the first token from a string. Token is a group of characters, 
+## starting from string character 0, and ending before the first appearance
+## of a given SPACE character or string (whitespace, $2).
+##   $1: String to extract the token from
+##   $2: Whitespace character.
+##
+## Echoes the token if Whitespace is found, or the complete string otherwise
+## 
+function getStringToken() {
+   local STRING="$1"
+   local SPACE="$2"
+   local IDX
+   
+   IDX=$(expr index "$STRING" "$SPACE"); 
+   if (( $IDX != 0 )); then
+      echo ${STRING:0:${IDX}-1}
+   else
+      echo $STRING
+   fi   
+}
+
+## Checks that a program version is greater than other using version strings
+## in the format "M.m.r", being M (Mayor), m (minor) and r (revision) integers
+##   $1: Version number string to check. This one has to be greater than $2
+##   $2: Version number string used as threshold.
+##  Returns TRUE(0) if $1 >= $2,
+##          FALSE(1) if $1 < $2,
+##          ERROR(-1) if version format string is not correct
+## 
+function versionGreaterOREqualThan() {
+   local V="$1"
+   local VTH="$2"
+   local V_DIGIT
+   local VTH_DIGIT
+
+   ## Check string validity
+   if [[ ! $V =~ ^[0-9\.]+$ ]] || [[ ! $VTH =~ ^[0-9\.]+$ ]]; then
+      return -1
+   fi
+
+   ## Loop checking versions
+   while (( ${#V} && ${#VTH} )); do
+      ## Extract next Digit from V
+      V_DIGIT=$(getStringToken "$V" ".")
+      V=${V:${#V_DIGIT}+1}
+
+      ## Extract next Digit from VTH
+      VTH_DIGIT=$(getStringToken "$VTH" ".")
+      VTH=${VTH:${#VTH_DIGIT}+1}
+
+      ## Check numbers
+      if [[ "$VTH_DIGIT" > "$V_DIGIT" ]]; then
+         return 1
+      elif [[ "$VTH_DIGIT" < "$V_DIGIT" ]]; then
+         return 0
+      fi
+   done
+
+   return 0
+}
+
+## Check if GCC Version is grater or equal than a given version value
+## Version value is given as a string in the format "M.m.r"
+##   $1: Version threshold
+## Returns TRUE(0) if GCC Version >= $1, 
+##         FALSE(1) if GCC Version < $1, 
+##         ERROR(-1) if GCC Version cannot be identified
+##
+function checkMinimumGCCVersion() {
+   local VTH="$1"
+   local V=$(gcc -dumpversion)
+   if (( $? != 0 )); then
+      return -1  ## ERROR: GCC Version undetected
+   fi
+   if versionGreaterOREqualThan "$V" "$VTH"; then
+      return 0   ## TRUE: GCC Version equal or over minimum
+   fi
+   return 1      ## FALSE: GCC Version below minimum
+}

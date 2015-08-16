@@ -79,11 +79,17 @@ CPCT_TAG_SCRIPTSPATH="%%%CPCTELERA_SCRIPTS_PATH%%%"
 
 ## Required stuff for running CPCtelera
 REQUIRED_COMMANDS=(gcc g++ make bison flex)
-COMMAND_EXPLANATION[0]="gcc compiler is required to compile tools. Please install it or build-essentials and run setup again."
-COMMAND_EXPLANATION[1]="g++ compiler is required to compile tools. Please install it or build-essentials and run setup again."
-COMMAND_EXPLANATION[2]="make is required for all CPCtelera's build systems. Please, install it an run setup again."
-COMMAND_EXPLANATION[3]="bison is required to compile SDCC. Please, install it an run setup again."
-COMMAND_EXPLANATION[4]="flex is required to compile SDCC. Please, install it an run setup again."
+COMMAND_EXPLANATION[0]="${REQUIRED_COMMANDS[0]} compiler is required to compile tools. Please \
+install it or build-essentials and run setup again."
+COMMAND_EXPLANATION[1]="${REQUIRED_COMMANDS[1]} compiler is required to compile tools. Please \
+install it or build-essentials and run setup again."
+COMMAND_EXPLANATION[2]="${REQUIRED_COMMANDS[2]} is required for all CPCtelera's build systems. \
+Please, install it and run setup again."
+COMMAND_EXPLANATION[3]="${REQUIRED_COMMANDS[3]} is required to compile SDCC. Please, install it \
+and run setup again."
+COMMAND_EXPLANATION[4]="${REQUIRED_COMMANDS[4]} is required to compile SDCC. Please, install it \
+and run setup again."
+GCC_MINIMUM_VERSION="4.6"
 
 REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
 LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
@@ -136,6 +142,24 @@ for (( i = 0; i < ${#REQUIRED_COMMANDS[@]}; i++ )); do
    EnsureCommandAvailable ${REQUIRED_COMMANDS[$i]} "Command '${REQUIRED_COMMANDS[$i]}' not found installed in the system. ${COMMAND_EXPLANATION[$i]}"
    drawOK
 done
+
+# Check Command versions
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking command versions..."$'\n'
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> GNU GCC/G++ Version >= $GCC_MINIMUM_VERSION..."
+checkMinimumGCCVersion "$GCC_MINIMUM_VERSION"
+case "$?" in
+   1) Error "CPCtelera requires GCC $GCC_MINIMUM_VERSION or greater. Please, update \
+your GCC version and run setup again." 
+   ;;
+   -1) Error "It was impossible to determine your GCC version. Either your GCC version \
+is too old (previous to 1999) or something is wrong with your GCC installation. Please \
+check your GCC installation and update your version to $GCC_MINIMUM_VERSION or greater \
+and run setup again."
+   ;;
+   *) drawOK 
+   ;;
+esac
+
 
 # Check installed libraries
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
