@@ -37,10 +37,11 @@ include cfg/build_config.mk
 ##
 include $(CPCT_PATH)/cfg/global_main_makefile.mk
 
-
 # Convert TMX OBJFILES
 .PHONY: mazes
 mazes: $(TMX_OBJFILES)
 
 %.$(CSV_EXT): %.$(TMX_EXT) 
 	cpct_tmx2csv $? > $@
+	@$(RM) obj/mazes/mazes.rel
+	@$(call PRINT,$(PROJNAME),"Re-generated maze $@")
