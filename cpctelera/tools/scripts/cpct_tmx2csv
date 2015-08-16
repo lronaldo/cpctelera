@@ -1,0 +1,156 @@
+#!/bin/bash
+
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_tmx2csv
+##    Script for generating csv files with maps defined in tmx files 
+## (from tiled map editor).
+##
+## Usage:
+##    <cpct_tmx2csv> [file] [options]
+##
+## Known limitations:
+##    * This script will *only* work with tmx files saved as CSV format. 
+## Output format must be selected as CSV in tilemap properties.
+##
+## Description:
+##    This script converts tmx files saved in CSV format to csv files
+## ready to be included in C source files using #include directive.
+## It also reindexes tile ids starting from 0 (as in tmx files tile ids
+## start from 1).
+##
+##    Conversion is output to the screen.
+##
+## Command line options:
+##    -h  | --help                      - Shows help information on the terminal.
+##
+
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<filename> [options]"
+   echo
+   echo "${COLOR_CYAN}    Script for generating csv files with maps defined in tmx files \
+(from tiled map editor)."
+   echo
+   echo "${COLOR_CYAN}    This script converts tmx files saved in CSV format to csv files \
+ready to be included in C source files using #include directive. It also reindexes tile ids \
+starting from 0 (as in tmx files tile ids start from 1)."
+   echo 
+   echo "${COLOR_CYAN}    Conversion is output to the screen."
+   echo
+   echo "${COLOR_LIGHT_YELLOW}KNOWN LIMITATIONS"
+   echo "${COLOR_CYAN}    This script will ${COLOR_LIGHT_BLUE}only${COLOR_CYAN} work with \
+tmx files saved as ${COLOR_LIGHT_BLUE}CSV format${COLOR_CYAN}. Output format must be selected \
+as ${COLOR_LIGHT_BLUE}CSV${COLOR_CYAN} in tilemap properties."
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+##############################################################
+###############################################################
+## Check command line parameters
+##
+FILENAME=
+
+if (( $# < 1 )); then
+   usage
+fi
+
+while (( $# >= 1 )); do
+   case $1 in
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Get main parameter (ProjectDir)
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         elif ! isEmpty "$FILENAME"; then
+            paramError "Unrecognized parameter '$1'. Have you already provided a <filename> parameter?" 6
+         else
+            EnsureExists file "$1"
+         fi
+         FILENAME="$1"
+      ;;
+   esac
+   shift
+done
+
+###############################################################
+###############################################################
+## Read and convert file
+##
+
+## Output the C Array declaration and the number of bytes to stdout
+echo "//"
+echo "// File $FILENAME converted to csv using cpct_tmx2csv [$(date +"%Y%m%d %T %Z")]"
+echo "//"
+
+## Convert binary to C Array and output to stdout
+STATUS=filestart
+while read LINE; do
+   case $STATUS in
+      ## Looking for start of CSV values. 
+      filestart)  
+         re=^.*\\bdata\\b.*\\bencoding\\b.*\\bcsv\\b.*$
+         if [[ $LINE =~ $re ]]; then
+            ## Found line that signals data start, change to convertingbytes status
+            ## and set token separator to comma, as we have comma separated values
+            STATUS=convertingbytes
+            IFS=","
+         fi
+      ;;
+      ## Converting comma separated values into tiles
+      convertingbytes)
+         re=^.*\\bdata\\b.*$
+         if [[ $LINE =~ $re ]]; then
+            ## Found line signaling end of data, move to endconversion status
+            STATUS=endconversion
+         else
+            ## Next line of data values, output it converting integers
+            BYTES=( $LINE )
+            for A in ${BYTES[@]}; do
+               printf "%s," $((A - 1))
+            done
+            echo
+         fi        
+      ;;
+      *) 
+         ## We've finished converting data, end
+         break;
+      ;;
+   esac
+done < $FILENAME
