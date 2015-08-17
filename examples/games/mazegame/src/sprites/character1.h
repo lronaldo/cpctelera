@@ -2,16 +2,17 @@
 #ifndef _CHARACTER1_H_
 #define _CHARACTER1_H_
 
-#include <types.h>
+#include <cpctelera.h>
 
-extern const u8 character1_0[72];
-extern const u8 character1_1[72];
-extern const u8 character1_2[72];
-extern const u8 character1_3[72];
-extern const u8 character1_4[72];
-extern const u8 character1_5[72];
-extern const u8 character1_6[72];
-extern const u8 character1_7[72];
-extern const u8 character1_8[72];
+extern u8* const g_player_tileset[9];
+extern const u8 g_player_0[72];
+extern const u8 g_player_1[72];
+extern const u8 g_player_2[72];
+extern const u8 g_player_3[72];
+extern const u8 g_player_4[72];
+extern const u8 g_player_5[72];
+extern const u8 g_player_6[72];
+extern const u8 g_player_7[72];
+extern const u8 g_player_8[72];
 
 #endif

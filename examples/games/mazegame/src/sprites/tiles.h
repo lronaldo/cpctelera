@@ -2,9 +2,9 @@
 #ifndef _TILES_H_
 #define _TILES_H_
 
-#include <types.h>
+#include <cpctelera.h>
 
-extern u8* const g_tileset[36];
+extern u8* const g_tile_tileset[36];
 extern const u8 g_tile_0[8];
 extern const u8 g_tile_1[8];
 extern const u8 g_tile_2[8];
