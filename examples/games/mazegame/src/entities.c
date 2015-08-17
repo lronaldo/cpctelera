@@ -18,6 +18,7 @@
 
 #include "entities.h"
 #include "sprites/sprites.h"
+#include "mazes/mazes.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////
@@ -45,6 +46,8 @@ void ent_initialize() {
    m_player->maze       = 0;
    m_player->tx         = 5;
    m_player->ty         = 5;
+   m_player->nx         = 5;
+   m_player->ny         = 5;
    m_player->status     = ST_WALKLEFT;
    m_player->sprite_set = g_player_tileset;
 }
@@ -61,16 +64,40 @@ TEntity* ent_getEntity(u8 id) __z88dk_fastcall {
 //
 void ent_drawAll(u8* screen) __z88dk_fastcall  {
    u8* sprite = m_player->sprite_set[ m_player->status ];
-   screen = cpct_getScreenPtr(screen, 2*m_player->tx, 4*m_player->ty);
+
+   screen = cpct_getScreenPtr(screen, 2*m_player->nx, 4*m_player->ny);
    //cpct_drawSpriteMaskedAlignedTable(sprite, screen, 6, 12, cpct_transparentMaskTable00M0);
    cpct_drawSprite(sprite, screen, 6, 12);
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Clears all entities
+//
+void ent_clearAll(u8* screen) __z88dk_fastcall {
+   maze_drawBox(m_player->tx, m_player->ty, 3, 3, screen);
+   m_player->tx = m_player->nx;
+   m_player->ty = m_player->ny;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Move an entity 
 //
 void ent_move(TEntity*e, i8 vx, i8 vy) {
-   e->tx += vx;
-   e->ty += vy;
+   e->nx = e->tx + vx;
+   e->ny = e->ty + vy;
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+// Move entity changing animation
+//
+void ent_doAction(TEntity*e, EEntityStatus action) {
+   i8 vx=0, vy=0;
+   e->status = action;
+   switch (action) {
+      case ST_WALKLEFT:  vx=-1; break;
+      case ST_WALKRIGHT: vx= 1; break;
+      case ST_WALKUP:    vy=-1; break;
+      case ST_WALKDOWN:  vy= 1; break;
+   }
+   ent_move(e, vx, vy);
+}

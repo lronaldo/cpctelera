@@ -18,6 +18,7 @@
 
 #include "mazes.h"
 #include "../sprites/tiles.h"
+#include "../entities.h"
 #include <cpctelera.h>
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -130,8 +131,15 @@ u8* maze_getMaze(u8 maze_id) __z88dk_fastcall {
 u8* maze_moveTo(TMazeMovement movement) __z88dk_fastcall {
    u8 id;
    
+   // Special movement cases for left and right borders
+   if      (movement == MM_LEFT && (m_presentMazeLocation & 0x03) == 0 )
+      movement = 3;
+   else if (movement == MM_RIGHT && (m_presentMazeLocation & 0x03) == 3 )
+      movement = 13;
+
    // Returns a pointer to a concrete maze, given its id. 
    m_presentMazeLocation = (m_presentMazeLocation + (u8)movement) & 0x0F;  // Module 16
+
    id = cpct_get4Bits(m_mazeSpace, m_presentMazeLocation);
    m_presentMaze = ms_mazes[ id ];
    return m_presentMaze;
@@ -149,4 +157,40 @@ u8* maze_getPresent() {
 //
 void maze_draw(u8* screen) __z88dk_fastcall {
    cpct_etm_drawTilemap2x4(MAZE_WIDTH_TILES, MAZE_HEIGHT_TILES, screen, m_presentMaze);
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Checks if there is any solid tile inside a box (collision detection)
+//
+u8 maze_isAnySolidTile(u8 x, u8 y, u8 w, u8 h) {
+   u8* tile = m_presentMaze + y*MAZE_WIDTH_TILES + x;
+
+   while(h--) {
+      x = w;
+      while (x--) {
+         if (*tile++ < SOLID_TILES)
+            return 1;
+      }
+      tile += MAZE_WIDTH_TILES - w;
+   }
+   return 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Checks if there is any solid tile inside a box (collision detection)
+//
+u8 maze_checkEntityCollision(TEntity *e, EEntityStatus dir) {
+   switch (dir) {
+      case ST_WALKLEFT:  return maze_isAnySolidTile(e->tx-1, e->ty,   1, 3);
+      case ST_WALKRIGHT: return maze_isAnySolidTile(e->tx+3, e->ty,   1, 3);
+      case ST_WALKUP:    return maze_isAnySolidTile(e->tx,   e->ty-1, 3, 1);
+      case ST_WALKDOWN:  return maze_isAnySolidTile(e->tx,   e->ty+3, 3, 1);
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Draws a maze tilebox to clear something
+//
+void maze_drawBox(u8 x, u8 y, u8 w, u8 h, u8* screen) {
+   cpct_etm_drawTileBox2x4(x, y, w, h, MAZE_WIDTH_TILES, screen, m_presentMaze);
 }

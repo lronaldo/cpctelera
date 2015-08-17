@@ -45,7 +45,7 @@ typedef enum {
 typedef struct {
    u8 maze;              // Maze where the entity is located
    u8 tx, ty;            // Upper-left tile of the entity over the tilemap
-   u8 vx, vy;            // Movement velocity in tiles
+   u8 nx, ny;            // Next Upper-left tile of the entity (where it will move)
    EEntityStatus status; // Status of the entity
    u8 **sprite_set;      // Set of sprites for different actions of the entity
 } TEntity;
@@ -57,7 +57,9 @@ typedef struct {
 ///////////////////////////////////////////////////////////////////////////////////
     void ent_initialize();
     void ent_drawAll(u8* screen) __z88dk_fastcall;
+    void ent_clearAll(u8* screen) __z88dk_fastcall;
 TEntity* ent_getEntity(u8 id) __z88dk_fastcall;
     void ent_move(TEntity* e, i8 vx, i8 vy);
+    void ent_doAction(TEntity*e, EEntityStatus action);
 
 #endif

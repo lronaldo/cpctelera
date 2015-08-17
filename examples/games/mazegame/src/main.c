@@ -58,31 +58,41 @@ void switchScreenBuffers() {
    }
 }
 
+#define NUMACTIONS 4
 u8 readUserInput() {
+   // Keys and actions
+   static const cpct_keyID keys[NUMACTIONS] = {
+      Key_CursorLeft, Key_CursorRight, Key_CursorUp, Key_CursorDown
+   };
+   static const EEntityStatus actions[NUMACTIONS] = {
+      ST_WALKLEFT, ST_WALKRIGHT, ST_WALKUP, ST_WALKDOWN
+   };
+
    cpct_scanKeyboard(); // Scan and update keyboard information to its present status
 
    // Only check infividual keys if at least one is pressed
    if (cpct_isAnyKeyPressed()) {
-      if (cpct_isKeyPressed(Key_CursorLeft))
-         ent_move(g_player, -1,  0);
-      else if (cpct_isKeyPressed(Key_CursorRight))
-         ent_move(g_player,  1,  0);
-      else if (cpct_isKeyPressed(Key_CursorUp))
-         ent_move(g_player,  0, -1);
-      else if (cpct_isKeyPressed(Key_CursorDown))
-         ent_move(g_player,  0,  1);
-
-      return 1;
+      u8 i=NUMACTIONS;
+      while(i--) {
+         if ( cpct_isKeyPressed(keys[i]) && !maze_checkEntityCollision(g_player, actions[i])) {
+            ent_doAction(g_player, actions[i]);
+            return 1;
+         }
+      }
    }
 
    return 0;
 }
 
-void redrawScreen() {
-   maze_draw(g_backBuffer);
+void redrawScreen(u8 drawmap) __z88dk_fastcall {
+   if (drawmap) 
+      maze_draw(g_backBuffer);
    ent_drawAll(g_backBuffer);
    cpct_waitVSYNC();
-   switchScreenBuffers();   
+   switchScreenBuffers();
+   ent_clearAll(g_backBuffer);
+   if (drawmap) 
+      maze_draw(g_backBuffer);
 }
 
 void game(){
@@ -91,25 +101,34 @@ void game(){
    g_player = ent_getEntity(0);
 
    // Loop forever
-   redrawScreen();
+   redrawScreen(1);
    while (1) {
+      u8 drawmap = 0;
       if (readUserInput()) {
          // Check limits
          if (!g_player->tx) {
             maze_moveTo(MM_LEFT);
             g_player->tx = 36;
+            g_player->nx = 36;
+            drawmap = 1;
          } else if (g_player->tx > 36) {
             maze_moveTo(MM_RIGHT);
             g_player->tx = 1;
+            g_player->nx = 1;
+            drawmap = 1;
          } else if (!g_player->ty) {
             maze_moveTo(MM_UP);
             g_player->ty = 46;
+            g_player->ny = 46;
+            drawmap = 1;
          } else if (g_player->ty > 46) {
             maze_moveTo(MM_DOWN);
             g_player->ty = 1;
+            g_player->ny = 1;
+            drawmap = 1;
          }
 
-         redrawScreen();
+         redrawScreen(drawmap);
       }
    }
 }

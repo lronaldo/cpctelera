@@ -19,6 +19,7 @@
 #define MAZES_H
 
 #include <types.h>
+#include "../entities.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////
@@ -26,11 +27,12 @@
 ////
 ///////////////////////////////////////////////////////////////////////////////////
 
-// Some sizes
+// Some constants
 #define MAZE_WIDTH_TILES   40
 #define MAZE_HEIGHT_TILES  50
 #define MAZE_SIZE_TILES    (MAZE_WIDTH_TILES * MAZE_HEIGHT_TILES)
 #define NUM_MAZES           8
+#define SOLID_TILES        12
 
 //
 // Movements from maze to maze 
@@ -44,6 +46,7 @@ typedef enum {
    MM_UP    = 12  // (x + 12) % 16 = (x - 4) % 16
 } TMazeMovement;
 
+
 ///////////////////////////////////////////////////////////////////////////////////
 ////
 //// PUBLIC FUNCTIONS
@@ -54,5 +57,7 @@ void maze_initialize(u8 maze_id) __z88dk_fastcall;
  u8* maze_getPresent();
  u8* maze_moveTo(TMazeMovement movement) __z88dk_fastcall;
 void maze_draw(u8* screen) __z88dk_fastcall;
+  u8 maze_checkEntityCollision(TEntity *e, EEntityStatus dir);
+void maze_drawBox(u8 x, u8 y, u8 w, u8 h, u8* screen);
 
 #endif
