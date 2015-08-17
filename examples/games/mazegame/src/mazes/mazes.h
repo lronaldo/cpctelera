@@ -32,22 +32,27 @@
 #define MAZE_SIZE_TILES    (MAZE_WIDTH_TILES * MAZE_HEIGHT_TILES)
 #define NUM_MAZES           8
 
-// Mazes 
-extern const u8 g_maze[NUM_MAZES][MAZE_SIZE_TILES];
-
-// Maze coordinates: Bitvector 
-// Each maze has 2 coordinates (x,y) , x,y € [0,3], so 2 bits
-// are required for each coordinate, 4 bits for each maze, 
-// then 1 byte = 2 mazes. Then we need NUM_MAZES / 2 bytes.
-extern const u8 g_mazeCoordinates[NUM_MAZES / 2];
+//
+// Movements from maze to maze 
+//   These are performed in a circular 4x4 world, so
+//   they are module 16 movements.
+//
+typedef enum {
+   MM_RIGHT =  1, // x + 1
+   MM_LEFT  = 15, // (x + 15) % 16 = (x - 1) % 16
+   MM_DOWN  =  4, // x + 4
+   MM_UP    = 12  // (x + 12) % 16 = (x - 4) % 16
+} TMazeMovement;
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////
 //// PUBLIC FUNCTIONS
 ////
 ///////////////////////////////////////////////////////////////////////////////////
-void maze_initialize(u8 maze_id);
-void maze_setPresent(u8 maze_id);
-void maze_draw(u8* screen);
+void maze_initialize(u8 maze_id) __z88dk_fastcall;
+ u8* maze_getMaze(u8 maze_id) __z88dk_fastcall;
+ u8* maze_getPresent();
+ u8* maze_moveTo(TMazeMovement movement) __z88dk_fastcall;
+void maze_draw(u8* screen) __z88dk_fastcall;
 
 #endif

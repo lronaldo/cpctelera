@@ -20,35 +20,63 @@
 #include "../sprites/tiles.h"
 #include <cpctelera.h>
 
+///////////////////////////////////////////////////////////////////////////////////
+////
+//// ATTRIBUTES
+////    CONSTANTS, STRUCTURES AND DATA
+////
+
 // ~20K
 // 8 Mazes, 2000 bytes / maze = 16000 bytes
 // Tiles = 36 * 8 = 288 b
 // Tileset = 36*2 = 72 b
 // MaskTable = 256 b 
 // Characters = 4*648b = 2592 b
-const u8 g_maze[NUM_MAZES][MAZE_SIZE_TILES] = {
-   { 
-     #include "maze0.csv"
-   },{
-     #include "maze1.csv"
-   },{
-     #include "maze2.csv"
-   },{
-     #include "maze3.csv"
-   },{
-     #include "maze4.csv"
-   },{
-     #include "maze5.csv"
-   },{
-     #include "maze6.csv"
-   },{
-     #include "maze7.csv"
-   }
+const u8 m_maze0[MAZE_SIZE_TILES] = {
+   #include "maze0.csv" 
+};
+const u8 m_maze1[MAZE_SIZE_TILES] = { 
+   #include "maze1.csv" 
+};
+const u8 m_maze2[MAZE_SIZE_TILES] = { 
+   #include "maze2.csv" 
+};
+const u8 m_maze3[MAZE_SIZE_TILES] = { 
+   #include "maze3.csv" 
+};
+const u8 m_maze4[MAZE_SIZE_TILES] = { 
+   #include "maze4.csv" 
+};
+const u8 m_maze5[MAZE_SIZE_TILES] = { 
+   #include "maze5.csv" 
+};
+const u8 m_maze6[MAZE_SIZE_TILES] = { 
+   #include "maze6.csv" 
+};
+const u8 m_maze7[MAZE_SIZE_TILES] = { 
+   #include "maze7.csv" 
 };
 
+// Create array of pointers to mazes. With this, getting a pointer to a concrete
+// maze is much faster, as calculating the location of a pointer inside
+// this array is just multiplying by 2 (the size of a pointer), whereas calculating 
+// the location of a maze inside m_mazes array is multipying by 2000 (which takes 
+// 16 bytes of code and lot of CPU Cycles)
+static u8* const ms_mazes[NUM_MAZES] = { 
+   m_maze0, m_maze1, m_maze2, m_maze3, 
+   m_maze4, m_maze5, m_maze6, m_maze7
+};
+
+
+// Maze space: Bitvector 
+// We have 8 different mazes, and we would need a way to 
+// identify a void location so 9 possibilities. Then, we
+// will use 4 bits for each location. Then we create a 
+// circular world with 4x4 possible locations. So, we 
+// require 4x4 location, 4 bits for each (1/2 byte), 
+// making 4x4/2 bytes.
+// 0-7 represent a maze id. F represents void location 
 //
-// Maze coordinates define connections between
-// mazes. World is defined as 4x4 circular layout.
 //  Layout: \x 0 1 2 3
 //          y ---------
 //          0 |0 1 2 -|
@@ -57,39 +85,68 @@ const u8 g_maze[NUM_MAZES][MAZE_SIZE_TILES] = {
 //          3 |- - - -|
 //            ---------
 //
-const u8 g_mazeConnections[NUM_MAZES / 2] = { 
-//   -m0--m1-   
-   0b00000100, // m0 = (0,0), m1 = (1,0)
-//   -m2--m3-   
-   0b10000001, // m2 = (2,0), m3 = (0,1)
-//   -m4--m5-   
-   0b01011001, // m4 = (1,1), m5 = (2,1)
-//   -m6--m7-   
-   0b00100110  // m6 = (0,2), m7 = (1,2)
+const u8 m_mazeSpace[4*4 / 2] =  {
+//   01    23   
+//--------------|
+   0x01, 0x2F, // 0  
+   0x34, 0x5F, // 1
+   0x67, 0xFF, // 2
+   0xFF, 0xFF  // 3
 };
-
 
 // Present maze (the one on screen)
 u8* m_presentMaze;
+u8  m_presentMazeLocation;
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+////
+//// PUBLIC FUNCTION MEMBERS
+////
+
+///////////////////////////////////////////////////////////////////////////////////
 // Initializes mazes module
 //
-void maze_initialize(u8 init_maze_id) {
-   maze_setPresent(init_maze_id);
+void maze_initialize(u8 init_maze_id) __z88dk_fastcall {
+   m_presentMazeLocation = 0;
+   m_presentMaze = maze_getMaze(init_maze_id);
    cpct_etm_setTileset2x4(g_tileset);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// Changes the present maze
+///////////////////////////////////////////////////////////////////////////////////
+// Returns a pointer to a given maze, knowing its id
 //
-void maze_setPresent(u8 maze_id) {
-   m_presentMaze = (u8*)g_maze[maze_id];
+u8* maze_getMaze(u8 maze_id) __z88dk_fastcall {
+   // Returns a pointer to a concrete maze, given its id. 
+   return ms_mazes[maze_id];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+// Changes present maze, moving to one of the mazes that is touching its
+//  boundaries. 
+// Warning: Does not check if changing to a non-valid location
+// Movements: +15 Left  +12 Up
+//             +1 Right  +4 Down
+//
+u8* maze_moveTo(TMazeMovement movement) __z88dk_fastcall {
+   u8 id;
+   
+   // Returns a pointer to a concrete maze, given its id. 
+   m_presentMazeLocation = (m_presentMazeLocation + (u8)movement) & 0x0F;  // Module 16
+   id = cpct_get4Bits(m_mazeSpace, m_presentMazeLocation);
+   m_presentMaze = ms_mazes[ id ];
+   return m_presentMaze;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Returns the present maze
+//
+u8* maze_getPresent() {
+   return m_presentMaze;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
 // Draws the present maze completely (normally used for first time draw, on entering)
 //
-void maze_draw(u8* screen) {
+void maze_draw(u8* screen) __z88dk_fastcall {
    cpct_etm_drawTilemap2x4(MAZE_WIDTH_TILES, MAZE_HEIGHT_TILES, screen, m_presentMaze);
 }

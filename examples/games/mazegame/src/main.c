@@ -69,14 +69,40 @@ void switchScreenBuffers() {
 
 //u8* const g_entities[10];
 
+u8 readUserInput() {
+   cpct_scanKeyboard(); // Scan and update keyboard information to its present status
+
+   // Only check infividual keys if at least one is pressed
+   if (cpct_isAnyKeyPressed()) {
+      if (cpct_isKeyPressed(Key_CursorLeft))
+         maze_moveTo(MM_LEFT);
+      else if (cpct_isKeyPressed(Key_CursorRight))
+         maze_moveTo(MM_RIGHT);
+      else if (cpct_isKeyPressed(Key_CursorUp))
+         maze_moveTo(MM_UP);
+      else if (cpct_isKeyPressed(Key_CursorDown))
+         maze_moveTo(MM_DOWN);
+
+      return 1;
+   }
+
+   return 0;
+}
 
 void application(){
    maze_initialize(0);
+
    maze_draw(g_backBuffer);
    switchScreenBuffers();
 
    // Loop forever
-   while (1);   
+   while (1) {
+      if (readUserInput()) {
+         maze_draw(g_backBuffer);
+         cpct_waitVSYNC();
+         switchScreenBuffers();
+      }
+   }
 }
 
 void main(void) {
