@@ -14,10 +14,17 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//------------------------------------------------------------------------------
-#ifndef SPRITES_H
-#define SPRITES_H
+//-----------------------------------------------------------------------
+#ifndef _SPRITES_H_
+#define _SPRITES_H_
 
+#include <cpctelera.h>
+
+// Address and extern declaration for transparency tables
+#define cpct_transparentMaskTable00M0_address 0x2100
+extern __at(cpct_transparentMaskTable00M0_address) const u8 cpct_transparentMaskTable00M0[256];
+
+// Character 1 externs
 #include "character1.h"
 
 #endif

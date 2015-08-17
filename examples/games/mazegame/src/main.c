@@ -19,32 +19,22 @@
 #include <cpctelera.h>
 #include "mazes/mazes.h"
 #include "sprites/sprites.h"
+#include "entities.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// STRUCTURES
-//
-
-// Entity statuses
-typedef enum {
-   ST_WALKLEFT  = 0, // Walking to the left
-   ST_WALKRIGHT,     // Walking to the right
-   ST_WALKUP   ,     // Walking up
-   ST_WALKDOWN ,     // Walking down
-   ST_HITLEFT  ,     // Hitting left
-   ST_HITRIGHT ,     // Hitting right
-   ST_HITUP    ,     // Hitting up
-   ST_HITDOWN  ,     // Hitting down
-   ST_DEAD,          // Being dead
-   ST_NUMSTATUSES    // Total actions
-} EEntityStatus;
-
-// Entity information (Location, status and sprites)
-typedef struct {
-   u8 maze;              // Maze where the entity is located
-   u8 tx, ty;            // Upper-left tile of the entity over the tilemap
-   EEntityStatus status; // Status of the entity
-   u8 **sprite_set;      // Set of sprites for different actions of the entity
-} TEntity;
+// palette = 
+const u8 g_palette[9] = { 
+// HW    //  FW (Colour)
+//-----------------------
+   0x14, //   0 (Black)
+   0x15, //   2 (Bright Blue)
+   0x0C, //   6 (Bright Red)
+   0x0D, //   8 (Bright Magenta)
+   0x1E, //  12 (Yellow)
+   0x07, //  16 (Pink)
+   0x13, //  20 (Bright Cyan)
+   0x0A, //  24 (Bright Yellow)
+   0x0B  //  26 (White)
+};
 
 // We always draw over the backbuffer
 u8* const g_backBuffer = (u8*)0x8000;
@@ -67,8 +57,6 @@ void switchScreenBuffers() {
    }
 }
 
-//u8* const g_entities[10];
-
 u8 readUserInput() {
    cpct_scanKeyboard(); // Scan and update keyboard information to its present status
 
@@ -89,10 +77,12 @@ u8 readUserInput() {
    return 0;
 }
 
-void application(){
+void game(){
    maze_initialize(0);
+   ent_initialize();
 
    maze_draw(g_backBuffer);
+   ent_draw(g_backBuffer);
    switchScreenBuffers();
 
    // Loop forever
@@ -109,5 +99,8 @@ void main(void) {
    cpct_setStackLocation((u8*)0x8000);
    cpct_disableFirmware();
    cpct_setVideoMode(0);
-   application();
+   cpct_setPalette(g_palette, 9);
+   cpct_setBorder(g_palette[0]);
+
+   game();
 }
