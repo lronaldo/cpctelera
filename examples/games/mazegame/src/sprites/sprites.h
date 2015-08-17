@@ -21,7 +21,7 @@
 #include <cpctelera.h>
 
 // Address and extern declaration for transparency tables
-#define cpct_transparentMaskTable00M0_address 0x2100
+#define cpct_transparentMaskTable00M0_address 0x0100
 extern __at(cpct_transparentMaskTable00M0_address) const u8 cpct_transparentMaskTable00M0[256];
 
 // Character 1 externs

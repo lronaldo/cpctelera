@@ -38,6 +38,7 @@ const u8 g_palette[9] = {
 
 // We always draw over the backbuffer
 u8* const g_backBuffer = (u8*)0x8000;
+TEntity* g_player;
 
 //////////////////////////////////////////////////////////////
 // Switch Front and Back Screen Buffers
@@ -63,13 +64,13 @@ u8 readUserInput() {
    // Only check infividual keys if at least one is pressed
    if (cpct_isAnyKeyPressed()) {
       if (cpct_isKeyPressed(Key_CursorLeft))
-         maze_moveTo(MM_LEFT);
+         ent_move(g_player, -1,  0);
       else if (cpct_isKeyPressed(Key_CursorRight))
-         maze_moveTo(MM_RIGHT);
+         ent_move(g_player,  1,  0);
       else if (cpct_isKeyPressed(Key_CursorUp))
-         maze_moveTo(MM_UP);
+         ent_move(g_player,  0, -1);
       else if (cpct_isKeyPressed(Key_CursorDown))
-         maze_moveTo(MM_DOWN);
+         ent_move(g_player,  0,  1);
 
       return 1;
    }
@@ -77,20 +78,38 @@ u8 readUserInput() {
    return 0;
 }
 
+void redrawScreen() {
+   maze_draw(g_backBuffer);
+   ent_drawAll(g_backBuffer);
+   cpct_waitVSYNC();
+   switchScreenBuffers();   
+}
+
 void game(){
    maze_initialize(0);
    ent_initialize();
-
-   maze_draw(g_backBuffer);
-   ent_draw(g_backBuffer);
-   switchScreenBuffers();
+   g_player = ent_getEntity(0);
 
    // Loop forever
+   redrawScreen();
    while (1) {
       if (readUserInput()) {
-         maze_draw(g_backBuffer);
-         cpct_waitVSYNC();
-         switchScreenBuffers();
+         // Check limits
+         if (!g_player->tx) {
+            maze_moveTo(MM_LEFT);
+            g_player->tx = 36;
+         } else if (g_player->tx > 36) {
+            maze_moveTo(MM_RIGHT);
+            g_player->tx = 1;
+         } else if (!g_player->ty) {
+            maze_moveTo(MM_UP);
+            g_player->ty = 46;
+         } else if (g_player->ty > 46) {
+            maze_moveTo(MM_DOWN);
+            g_player->ty = 1;
+         }
+
+         redrawScreen();
       }
    }
 }
