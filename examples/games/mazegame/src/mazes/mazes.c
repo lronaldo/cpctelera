@@ -108,9 +108,19 @@ u8  m_presentMazeLocation;
 // Initializes mazes module
 //
 void maze_initialize(u8 init_maze_id) __z88dk_fastcall {
+   static const mazedoors[NUM_MAZES] = {
+      MD_DOWN|MD_RIGHT,       MD_LEFT|MD_DOWN|MD_RIGHT,       MD_LEFT|MD_DOWN,
+      MD_UP|MD_DOWN|MD_RIGHT, MD_UP|MD_DOWN|MD_RIGHT|MD_LEFT, MD_UP|MD_LEFT,
+      MD_UP|MD_RIGHT,         MD_UP|MD_LEFT
+   };
+   u8 i;
+
    m_presentMazeLocation = 0;
    m_presentMaze = maze_getMaze(init_maze_id);
    cpct_etm_setTileset2x4(g_tile_tileset);
+   i=8;
+   while(i--)
+      maze_setDoors(maze_getMaze(i), mazedoors[i]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -185,6 +195,8 @@ u8 maze_checkEntityCollision(TEntity *e, EEntityStatus dir) {
       case ST_WALKRIGHT: return maze_isAnySolidTile(e->tx+3, e->ty,   1, 3);
       case ST_WALKUP:    return maze_isAnySolidTile(e->tx,   e->ty-1, 3, 1);
       case ST_WALKDOWN:  return maze_isAnySolidTile(e->tx,   e->ty+3, 3, 1);
+      default:
+         return 0;
    }
 }
 
@@ -193,4 +205,43 @@ u8 maze_checkEntityCollision(TEntity *e, EEntityStatus dir) {
 //
 void maze_drawBox(u8 x, u8 y, u8 w, u8 h, u8* screen) {
    cpct_etm_drawTileBox2x4(x, y, w, h, MAZE_WIDTH_TILES, screen, m_presentMaze);
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Set door status for a given maze
+//
+void maze_setDoors(u8* maze, u8 doorStatus) {
+   // Offset of the first tile of each door
+   const u16 offsetLeftDoor  = (MAZE_HEIGHT_TILES/2 - 2)*MAZE_WIDTH_TILES;
+   const u16 offsetRightDoor = (MAZE_HEIGHT_TILES/2 - 1)*MAZE_WIDTH_TILES - 1;
+   const u16 offsetUpDoor    = MAZE_WIDTH_TILES/2 - 2;
+   const u16 offsetDownDoor  = (MAZE_HEIGHT_TILES-1)*MAZE_WIDTH_TILES + offsetUpDoor;
+   const u8 open  = 29;
+   const u8 close = 0;
+   u8* tile, value, i;
+
+   // Set Upper door status
+   tile = maze + offsetUpDoor;
+   value = (doorStatus & MD_UP) ? open : close;
+   for (i=4; i; --i, ++tile)
+      *tile = value; 
+
+
+   // Set Left door status
+   tile = maze + offsetLeftDoor;
+   value = (doorStatus & MD_LEFT) ? open : close;
+   for (i=4; i; --i, tile += MAZE_WIDTH_TILES)
+      *tile = value; 
+
+   // Set Right door status
+   tile = maze + offsetRightDoor;
+   value = (doorStatus & MD_RIGHT) ? open : close;
+   for (i=4; i; --i, tile += MAZE_WIDTH_TILES)
+      *tile = value; 
+
+   // Set Lower door status
+   tile = maze + offsetDownDoor;
+   value = (doorStatus & MD_DOWN) ? open : close;
+   for (i=4; i; --i, ++tile)
+      *tile = value; 
 }

@@ -46,6 +46,16 @@ typedef enum {
    MM_UP    = 12  // (x + 12) % 16 = (x - 4) % 16
 } TMazeMovement;
 
+//
+// Describes bits identifying open doors in a maze
+//
+typedef enum {
+   MD_LEFT  = 0b0001,  
+   MD_RIGHT = 0b0010,
+   MD_UP    = 0b0100,
+   MD_DOWN  = 0b1000
+} TMazeDoorFlags;
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////
@@ -59,5 +69,6 @@ void maze_initialize(u8 maze_id) __z88dk_fastcall;
 void maze_draw(u8* screen) __z88dk_fastcall;
   u8 maze_checkEntityCollision(TEntity *e, EEntityStatus dir);
 void maze_drawBox(u8 x, u8 y, u8 w, u8 h, u8* screen);
+void maze_setDoors(u8* maze, u8 doorStatus);
 
 #endif

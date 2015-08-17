@@ -106,22 +106,22 @@ void game(){
       u8 drawmap = 0;
       if (readUserInput()) {
          // Check limits
-         if (!g_player->tx) {
+         if (!g_player->nx) {
             maze_moveTo(MM_LEFT);
             g_player->tx = 36;
             g_player->nx = 36;
             drawmap = 1;
-         } else if (g_player->tx > 36) {
+         } else if (g_player->nx > 36) {
             maze_moveTo(MM_RIGHT);
             g_player->tx = 1;
             g_player->nx = 1;
             drawmap = 1;
-         } else if (!g_player->ty) {
+         } else if (!g_player->ny) {
             maze_moveTo(MM_UP);
             g_player->ty = 46;
             g_player->ny = 46;
             drawmap = 1;
-         } else if (g_player->ty > 46) {
+         } else if (g_player->ny > 46) {
             maze_moveTo(MM_DOWN);
             g_player->ty = 1;
             g_player->ny = 1;
