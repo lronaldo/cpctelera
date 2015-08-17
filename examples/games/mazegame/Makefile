@@ -38,10 +38,28 @@ include cfg/build_config.mk
 include $(CPCT_PATH)/cfg/global_main_makefile.mk
 
 # Convert TMX OBJFILES
-.PHONY: mazes
+.PHONY: mazes tiles
 mazes: $(TMX_OBJFILES)
 
 %.$(CSV_EXT): %.$(TMX_EXT) 
 	cpct_tmx2csv $? > $@
 	@$(RM) obj/mazes/mazes.rel
 	@$(call PRINT,$(PROJNAME),"Re-generated maze $@")
+
+ASSETSDIR=src/assets/
+SPRITESDIR=src/sprites/
+TILESFILE=tiles.png
+TILESBASENAME=g_tile
+PLAYERFILE=character1.png
+PLAYERBASENAME=g_player
+PALETTE=0 2 6 8 12 16 20 24 26
+
+tiles: 
+	cd $(ASSETSDIR) && cpct_img2tileset -bn $(TILESBASENAME) -m 0 -tw 4 -th 4 -pf { $(PALETTE) } $(TILESFILE)
+	mv $(ASSETSDIR)$(TILESFILE:.png=.c) $(SPRITESDIR)
+	mv $(ASSETSDIR)$(TILESFILE:.png=.h) $(SPRITESDIR)
+
+player: 
+	cd $(ASSETSDIR) && cpct_img2tileset -bn $(PLAYERBASENAME) -m 0 -tw 12 -th 12 -pf { $(PALETTE) } $(PLAYERFILE)
+	mv $(ASSETSDIR)$(PLAYERFILE:.png=.c) $(SPRITESDIR)$(PLAYERFILE:.png=.c.inc)
+	mv $(ASSETSDIR)$(PLAYERFILE:.png=.h) $(SPRITESDIR)
