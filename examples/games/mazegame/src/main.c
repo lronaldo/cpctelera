@@ -67,21 +67,22 @@ u8 readUserInput() {
    static const EEntityStatus actions[NUMACTIONS] = {
       ST_WALKLEFT, ST_WALKRIGHT, ST_WALKUP, ST_WALKDOWN
    };
+   u8 ret = 0;
 
    cpct_scanKeyboard(); // Scan and update keyboard information to its present status
 
    // Only check infividual keys if at least one is pressed
    if (cpct_isAnyKeyPressed()) {
-      u8 i=NUMACTIONS;
-      while(i--) {
+      u8 i=NUMACTIONS-1;
+      do {
          if ( cpct_isKeyPressed(keys[i]) && !maze_checkEntityCollision(g_player, actions[i])) {
             ent_doAction(g_player, actions[i]);
-            return 1;
+            ret = 1;
          }
-      }
+      } while (i--);
    }
 
-   return 0;
+   return ret;
 }
 
 void redrawScreen() {

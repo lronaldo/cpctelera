@@ -82,8 +82,8 @@ void ent_clearAll(u8* screen) __z88dk_fastcall {
 // Move an entity 
 //
 void ent_move(TEntity*e, i8 vx, i8 vy) {
-   e->nx = e->tx + vx;
-   e->ny = e->ty + vy;
+   e->nx = e->nx + vx;
+   e->ny = e->ny + vy;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

@@ -252,25 +252,25 @@ void maze_setDoors(u8* maze, u8 doorStatus) {
 void maze_checkPlayerEntersNewMaze(TEntity* ply) __z88dk_fastcall {
 
    // Check if the player enters the maze to the left
-   if (!ply->tx) {
+   if (!ply->nx) {
       maze_moveTo(MM_LEFT);
       ply->tx = ply->nx = RIGHT_LIMIT;
       m_redrawTimes = 2;
    
    // Check if the player enters the maze to the right
-   } else if (ply->tx > RIGHT_LIMIT) {
+   } else if (ply->nx > RIGHT_LIMIT) {
       maze_moveTo(MM_RIGHT);
       ply->tx = ply->nx = 1;
       m_redrawTimes = 2;
 
    // Check if the player enters the maze to the upside
-   } else if (!ply->ty) {
+   } else if (!ply->ny) {
       maze_moveTo(MM_UP);
       ply->ty = ply->ny = DOWN_LIMIT;
       m_redrawTimes = 2;
 
    // Check if the player enters the maze to the downside
-   } else if (ply->ty > DOWN_LIMIT) {
+   } else if (ply->ny > DOWN_LIMIT) {
       maze_moveTo(MM_DOWN);
       ply->ty = ply->ny = 1;
       m_redrawTimes = 2;
