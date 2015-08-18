@@ -41,13 +41,12 @@ u8 m_numEnts;
 // Initialize entities
 //
 void ent_initialize() {
-   m_player = (m_entities + 0);
-   m_numEnts = 1;
-   m_player->maze       = 0;
-   m_player->tx         = 5;
-   m_player->ty         = 5;
-   m_player->nx         = 5;
-   m_player->ny         = 5;
+   m_player       = (m_entities + 0);
+   m_numEnts      = 1;
+   m_player->maze = 0;
+   m_player->tx = m_player->ty = 5;
+   m_player->nx = m_player->ny = 5;
+   m_player->w  = m_player->w  = 3;
    m_player->status     = ST_WALKLEFT;
    m_player->sprite_set = g_player_tileset;
 }

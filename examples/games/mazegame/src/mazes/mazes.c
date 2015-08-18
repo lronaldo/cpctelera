@@ -98,6 +98,7 @@ const u8 m_mazeSpace[4*4 / 2] =  {
 // Present maze (the one on screen)
 u8* m_presentMaze;
 u8  m_presentMazeLocation;
+u8  m_redrawTimes;
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////
@@ -121,6 +122,7 @@ void maze_initialize(u8 init_maze_id) __z88dk_fastcall {
    i=8;
    while(i--)
       maze_setDoors(maze_getMaze(i), mazedoors[i]);
+   m_redrawTimes = 2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -209,6 +211,7 @@ void maze_drawBox(u8 x, u8 y, u8 w, u8 h, u8* screen) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Set door status for a given maze
+//  Doors are set to be 4 tiles wide
 //
 void maze_setDoors(u8* maze, u8 doorStatus) {
    // Offset of the first tile of each door
@@ -220,8 +223,8 @@ void maze_setDoors(u8* maze, u8 doorStatus) {
    };
    const u8 open  = OPEN_DOOR_TILE;
    const u8 close = CLOSED_DOOR_TILE;
-   u8*  tile, value, doorbit, increment=1;
-   u16* offset = offsets;
+   u8*        tile, value, doorbit, increment=1;
+   u16 const* offset = offsets;
 
    // Doorbit starts being 0b1000 and goes shifting right 
    // until it reaches 0. Each of the 4 bits refer to one
@@ -234,5 +237,52 @@ void maze_setDoors(u8* maze, u8 doorStatus) {
       *tile = value; tile += increment;
       *tile = value; 
       if (doorbit & 0b100) increment = MAZE_WIDTH_TILES;
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Checks if the user has touched map limits and triggers map changing and redraws
+//  Only works if player moves 1 tile at a time
+//
+
+// Right and down tiles that signal entering a new maze when they are passed
+#define RIGHT_LIMIT (MAZE_WIDTH_TILES - PLAYER_WIDTH_TILES - 1)
+#define DOWN_LIMIT  (MAZE_HEIGHT_TILES - PLAYER_HEIGHT_TILES - 1)
+
+void maze_checkPlayerEntersNewMaze(TEntity* ply) __z88dk_fastcall {
+
+   // Check if the player enters the maze to the left
+   if (!ply->tx) {
+      maze_moveTo(MM_LEFT);
+      ply->tx = ply->nx = RIGHT_LIMIT;
+      m_redrawTimes = 2;
+   
+   // Check if the player enters the maze to the right
+   } else if (ply->tx > RIGHT_LIMIT) {
+      maze_moveTo(MM_RIGHT);
+      ply->tx = ply->nx = 1;
+      m_redrawTimes = 2;
+
+   // Check if the player enters the maze to the upside
+   } else if (!ply->ty) {
+      maze_moveTo(MM_UP);
+      ply->ty = ply->ny = DOWN_LIMIT;
+      m_redrawTimes = 2;
+
+   // Check if the player enters the maze to the downside
+   } else if (ply->ty > DOWN_LIMIT) {
+      maze_moveTo(MM_DOWN);
+      ply->ty = ply->ny = 1;
+      m_redrawTimes = 2;
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// Redraws the maze only when required
+//
+void maze_redraw(u8* screen) __z88dk_fastcall {
+   if (m_redrawTimes) {
+      maze_draw(screen);
+      m_redrawTimes--;
    }
 }

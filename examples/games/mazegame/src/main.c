@@ -84,15 +84,12 @@ u8 readUserInput() {
    return 0;
 }
 
-void redrawScreen(u8 drawmap) __z88dk_fastcall {
-   if (drawmap) 
-      maze_draw(g_backBuffer);
+void redrawScreen() {
+   maze_redraw(g_backBuffer);
    ent_drawAll(g_backBuffer);
    cpct_waitVSYNC();
    switchScreenBuffers();
    ent_clearAll(g_backBuffer);
-   if (drawmap) 
-      maze_draw(g_backBuffer);
 }
 
 void game(){
@@ -101,34 +98,11 @@ void game(){
    g_player = ent_getEntity(0);
 
    // Loop forever
-   redrawScreen(1);
+   redrawScreen();
    while (1) {
-      u8 drawmap = 0;
       if (readUserInput()) {
-         // Check limits
-         if (!g_player->nx) {
-            maze_moveTo(MM_LEFT);
-            g_player->tx = 36;
-            g_player->nx = 36;
-            drawmap = 1;
-         } else if (g_player->nx > 36) {
-            maze_moveTo(MM_RIGHT);
-            g_player->tx = 1;
-            g_player->nx = 1;
-            drawmap = 1;
-         } else if (!g_player->ny) {
-            maze_moveTo(MM_UP);
-            g_player->ty = 46;
-            g_player->ny = 46;
-            drawmap = 1;
-         } else if (g_player->ny > 46) {
-            maze_moveTo(MM_DOWN);
-            g_player->ty = 1;
-            g_player->ny = 1;
-            drawmap = 1;
-         }
-
-         redrawScreen(drawmap);
+         maze_checkPlayerEntersNewMaze(g_player);
+         redrawScreen();
       }
    }
 }

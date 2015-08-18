@@ -27,6 +27,10 @@
 ////
 ///////////////////////////////////////////////////////////////////////////////////
 
+// Some values
+#define PLAYER_WIDTH_TILES  3
+#define PLAYER_HEIGHT_TILES 3
+
 // Entity statuses
 typedef enum {
    ST_WALKLEFT  = 0, // Walking to the left
@@ -46,9 +50,11 @@ typedef struct {
    u8 maze;              // Maze where the entity is located
    u8 tx, ty;            // Upper-left tile of the entity over the tilemap
    u8 nx, ny;            // Next Upper-left tile of the entity (where it will move)
+   u8  w, h;             // Width and height of the entity in tiles
    EEntityStatus status; // Status of the entity
    u8 **sprite_set;      // Set of sprites for different actions of the entity
 } TEntity;
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 ////
