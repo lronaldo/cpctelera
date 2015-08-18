@@ -212,36 +212,27 @@ void maze_drawBox(u8 x, u8 y, u8 w, u8 h, u8* screen) {
 //
 void maze_setDoors(u8* maze, u8 doorStatus) {
    // Offset of the first tile of each door
-   const u16 offsetLeftDoor  = (MAZE_HEIGHT_TILES/2 - 2)*MAZE_WIDTH_TILES;
-   const u16 offsetRightDoor = (MAZE_HEIGHT_TILES/2 - 1)*MAZE_WIDTH_TILES - 1;
-   const u16 offsetUpDoor    = MAZE_WIDTH_TILES/2 - 2;
-   const u16 offsetDownDoor  = (MAZE_HEIGHT_TILES-1)*MAZE_WIDTH_TILES + offsetUpDoor;
-   const u8 open  = 29;
-   const u8 close = 0;
-   u8* tile, value, i;
+   static const u16 offsets[4] = {
+     (MAZE_HEIGHT_TILES-1)*MAZE_WIDTH_TILES + MAZE_WIDTH_TILES/2 - 2,   // Lower door
+     MAZE_WIDTH_TILES/2 - 2,                                            // Upper door
+     (MAZE_HEIGHT_TILES/2 - 1)*MAZE_WIDTH_TILES - 1,                    // Right door
+     (MAZE_HEIGHT_TILES/2 - 2)*MAZE_WIDTH_TILES                         // Left door
+   };
+   const u8 open  = OPEN_DOOR_TILE;
+   const u8 close = CLOSED_DOOR_TILE;
+   u8*  tile, value, doorbit, increment=1;
+   u16* offset = offsets;
 
-   // Set Upper door status
-   tile = maze + offsetUpDoor;
-   value = (doorStatus & MD_UP) ? open : close;
-   for (i=4; i; --i, ++tile)
+   // Doorbit starts being 0b1000 and goes shifting right 
+   // until it reaches 0. Each of the 4 bits refer to one
+   // of the 4 doors (LEFT = 0001, RIGHT = 0010, UP = 0100, DOWN = 1000)
+   for (doorbit = MD_DOWN; doorbit; doorbit >>= 1) {
+      tile = maze + *offset++;
+      value = (doorStatus & doorbit) ? open : close;
+      *tile = value; tile += increment;
+      *tile = value; tile += increment;
+      *tile = value; tile += increment;
       *tile = value; 
-
-
-   // Set Left door status
-   tile = maze + offsetLeftDoor;
-   value = (doorStatus & MD_LEFT) ? open : close;
-   for (i=4; i; --i, tile += MAZE_WIDTH_TILES)
-      *tile = value; 
-
-   // Set Right door status
-   tile = maze + offsetRightDoor;
-   value = (doorStatus & MD_RIGHT) ? open : close;
-   for (i=4; i; --i, tile += MAZE_WIDTH_TILES)
-      *tile = value; 
-
-   // Set Lower door status
-   tile = maze + offsetDownDoor;
-   value = (doorStatus & MD_DOWN) ? open : close;
-   for (i=4; i; --i, ++tile)
-      *tile = value; 
+      if (doorbit & 0b100) increment = MAZE_WIDTH_TILES;
+   }
 }

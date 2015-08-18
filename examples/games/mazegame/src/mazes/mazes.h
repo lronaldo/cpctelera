@@ -33,6 +33,8 @@
 #define MAZE_SIZE_TILES    (MAZE_WIDTH_TILES * MAZE_HEIGHT_TILES)
 #define NUM_MAZES           8
 #define SOLID_TILES        12
+#define OPEN_DOOR_TILE     29
+#define CLOSED_DOOR_TILE    0
 
 //
 // Movements from maze to maze 
@@ -50,10 +52,10 @@ typedef enum {
 // Describes bits identifying open doors in a maze
 //
 typedef enum {
-   MD_LEFT  = 0b0001,  
-   MD_RIGHT = 0b0010,
-   MD_UP    = 0b0100,
-   MD_DOWN  = 0b1000
+   MD_LEFT   = 0b0001,  
+   MD_RIGHT  = 0b0010,
+   MD_UP     = 0b0100,
+   MD_DOWN   = 0b1000
 } TMazeDoorFlags;
 
 
