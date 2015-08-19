@@ -145,26 +145,34 @@ done
 
 # Check Command versions
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking command versions..."$'\n'
-coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> GNU GCC/G++ Version >= $GCC_MINIMUM_VERSION..."
-checkMinimumGCCVersion "$GCC_MINIMUM_VERSION"
-case "$?" in
-   1) Error "CPCtelera requires GCC $GCC_MINIMUM_VERSION or greater. Please, update \
-your GCC version and run setup again." 
-   ;;
-   -1) Error "It was impossible to determine your GCC version. Either your GCC version \
-is too old (previous to 1999) or something is wrong with your GCC installation. Please \
-check your GCC installation and update your version to $GCC_MINIMUM_VERSION or greater \
-and run setup again."
-   ;;
-   *) drawOK 
-   ;;
-esac
 
+## Different check depending if the main compiler is CLang or GCC
+if isClangDefaultCompiler; then
+   ## Checks for CLang Compiler
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Clang has C++11 support..."
+   ensureClangHasRequiredFeatures
+   drawOK
+else
+   ## Checks for GCC Compiler
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> GNU GCC/G++ Version >= $GCC_MINIMUM_VERSION..."
+   checkMinimumGCCVersion "$GCC_MINIMUM_VERSION"
+   case "$?" in
+      1) Error "CPCtelera requires GCC $GCC_MINIMUM_VERSION or greater. Please, update \
+   your GCC version and run setup again." 
+      ;;
+      -1) Error "It was impossible to determine your GCC version. Either your GCC version \
+   is too old (previous to 1999) or something is wrong with your GCC installation. Please \
+   check your GCC installation and update your version to $GCC_MINIMUM_VERSION or greater \
+   and run setup again."
+      ;;
+      *) drawOK 
+      ;;
+   esac
+fi
 
 # Check installed libraries
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'
 for (( i = 0; i < ${#REQUIRED_LIBRARIES[@]}; i++ )); do
-#for C in $(seq 0 $((${#REQUIRED_LIBRARIES[@]}-1))); do
    coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Looking for '${REQUIRED_LIBRARIES[$i]}'..."
    EnsureCPPHeaderAvailable ${REQUIRED_LIBRARIES[$i]} "Header file '${REQUIRED_LIBRARIES[$i]}' not found in the system. ${LIBRARIES_EXPLANATION[$i]}"
    drawOK
