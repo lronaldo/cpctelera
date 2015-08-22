@@ -139,3 +139,18 @@ define BINFILE2C
 $(1): $(2)
 	$(BIN2C) $(2) -h "cpctelera.h" > $(1)
 endef
+
+#################
+# ADDBINFILETODSK: General rule to include a binary file into a DSK automatically
+#
+# $(1): DSK file where the binary will be included
+# $(2): Binary file to be included 
+# $(3): Blank object file generated to flag that this inclusion is already done (and not repeat it)
+#
+define ADDBINFILETODSK
+$(3): $(2)
+	@$(IDSK) $(1) -i $(2) -t 1 -f &> /dev/null
+	@touch $(3)
+	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
+
+endef

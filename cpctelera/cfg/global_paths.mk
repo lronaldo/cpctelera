@@ -76,6 +76,7 @@ IDSK     := $(IDSK_PATH)iDSK
 BIN2C    := $(SCRIPTS_PATH)cpct_bin2c
 
 ## SHELL TOOLS ALIASES
+TOUCH := touch
 MKDIR := mkdir -p
 RM    := rm -f
 TEE   := tee

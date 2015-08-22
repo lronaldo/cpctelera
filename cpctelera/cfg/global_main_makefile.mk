@@ -38,6 +38,8 @@ all: $(OBJSUBDIRS) $(TARGET)
 $(foreach OF, $(BIN_OBJFILES), $(eval $(call BINFILE2C, $(OF), $(OF:%.$(C_EXT)=%.$(BIN_EXT)))))
 $(foreach OF, $(C_OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(C_EXT))))))
 $(foreach OF, $(ASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(ASM_EXT))))))
+## Generate an Add-BIN-to-DSK rule for each Binary file in DSKFILESDIR
+$(foreach SF, $(DSKINCSRCFILES), $(eval $(call ADDBINFILETODSK, $(DSK), $(SF), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(SF)).$(DSKINC_EXT))))
 
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
 $(IHXFILE): $(OBJFILES) 
@@ -70,6 +72,11 @@ $(BINADDRLOG): $(BINFILE)
 	@$(call PRINT,$(PROJNAME),"Creating Cassette File $@")
 	@$(call CREATECDT,$<,$(notdir $<),$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,$(PROJNAME),"Successfully created $@")
+
+## Include files in DSKFILESDIR to DSK, print a message and generate a flag file DSKINC
+$(DSKINC): $(DSK) $(DSKINCOBJFILES)
+	@$(call PRINT,$(PROJNAME),"All files added to $(DSK). Disc ready.")
+	@touch $(DSKINC)
 
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
 $(OBJSUBDIRS): 
