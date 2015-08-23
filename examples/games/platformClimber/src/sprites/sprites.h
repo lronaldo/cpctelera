@@ -30,7 +30,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+// Palette
 extern const u8 G_palette[16];
+
+// Main Character Sprites
 extern const u8 G_EMRright[4*16];
 extern const u8 G_EMRright2[2*16];
 extern const u8 G_EMRright3[4*16];
@@ -47,5 +50,9 @@ extern const u8 G_EMRjumpleft3[4*8];
 extern const u8 G_EMRjumpleft4[4*8];
 extern const u8 G_EMRhitright[4*16];
 extern const u8 G_EMRhitleft[4*16];
+
+// Credits sprite
+extern const u8 G_credits[20*27];
+
 
 #endif

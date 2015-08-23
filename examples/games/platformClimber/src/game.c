@@ -1,5 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+//  Copyright (C) 2015 Dardalorth / Fremos / Carlio
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -51,6 +52,10 @@ void initializeGameScreen(u16 hiscore) {
    pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  24);
    sprintf(str, "%5u", hiscore);
    cpct_drawStringM0(str, pscr, 15, 8);
+
+   // Draw Credits
+   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60, 172);
+   cpct_drawSprite(G_credits, pscr, 20, 27);
 
    // Draw tiled frame around playing area
    drawFrame(g_SCR_VMEM, 0);
