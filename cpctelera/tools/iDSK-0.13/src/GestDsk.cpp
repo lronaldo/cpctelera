@@ -473,39 +473,40 @@ int DSK::FileIsIn( string FileName ) {
 // la taille est determine par le nombre de NbPages
 // regarder pourquoi different d'une autre DSK
 int DSK::CopieFichier( unsigned char * BufFile, char * NomFic, int TailleFic, int MaxBloc ) {
-    int j, l, Bloc, PosFile, NbPages = 0, PosDir, TaillePage;
-    FillBitmap();
-    StDirEntry * DirLoc = GetNomDir( NomFic ); 	//Construit l'entrée pour mettre dans le catalogue
+   int j, l, Bloc, PosFile, NbPages = 0, PosDir, TaillePage;
+   FillBitmap();
+   StDirEntry * DirLoc = GetNomDir( NomFic ); 	//Construit l'entrée pour mettre dans le catalogue
 
-    for ( PosFile = 0; PosFile < TailleFic; ) { //Pour chaque bloc du fichier
-        PosDir = RechercheDirLibre(); 		//Trouve une entrée libre dans le CAT
-        if ( PosDir != -1 ) {
-            DirLoc->User = 0;			//Remplit l'entrée : User 0
-            DirLoc->NumPage = ( unsigned char )NbPages++;	// Numéro de l'entrée dans le fichier
-            TaillePage = (TailleFic - PosFile + 127) >> 7 ;	// Taille de la page (on arrondit par le haut)
-            if ( TaillePage > 128 )				// Si y'a plus de 16k il faut plusieurs pages
-                TaillePage = 128;
-			
-            DirLoc->NbPages = ( unsigned char )TaillePage;
-            l = ( DirLoc->NbPages + 7 ) >> 3; //Nombre de blocs=TaillePage/8 arrondi par le haut
-            memset( DirLoc->Blocks, 0, 16 );
-            for ( j = 0; j < l; j++ ) { //Pour chaque bloc de la page
-                Bloc = RechercheBlocLibre( MaxBloc );	//Met le fichier sur la disquette
-                if ( Bloc ) {
-                    DirLoc->Blocks[ j ] = ( unsigned char )Bloc;
-                    WriteBloc( Bloc, &BufFile[ PosFile ] );
-                    PosFile += 1024;	// Passe au bloc suivant
-		}
-                else
-                    return( ERR_NO_BLOCK );
-				
-	    }
-            SetInfoDirEntry( PosDir, DirLoc );
-	}
-        else
-            return( ERR_NO_DIRENTRY );
-	}
-    return( ERR_NO_ERR );
+   for ( PosFile = 0; PosFile < TailleFic; ) { //Pour chaque bloc du fichier
+      PosDir = RechercheDirLibre(); 		//Trouve une entrée libre dans le CAT
+      if ( PosDir != -1 ) {
+         DirLoc->User = 0;			//Remplit l'entrée : User 0
+         DirLoc->NumPage = ( unsigned char )NbPages++;	// Numéro de l'entrée dans le fichier
+         TaillePage = (TailleFic - PosFile + 127) >> 7 ;	// Taille de la page (on arrondit par le haut)
+         if ( TaillePage > 128 )				// Si y'a plus de 16k il faut plusieurs pages
+            TaillePage = 128;
+
+         DirLoc->NbPages = ( unsigned char )TaillePage;
+         l = ( DirLoc->NbPages + 7 ) >> 3; //Nombre de blocs=TaillePage/8 arrondi par le haut
+         memset( DirLoc->Blocks, 0, 16 );
+         for ( j = 0; j < l; j++ ) { //Pour chaque bloc de la page
+            Bloc = RechercheBlocLibre( MaxBloc );	//Met le fichier sur la disquette
+            if ( Bloc ) {
+               DirLoc->Blocks[ j ] = ( unsigned char )Bloc;
+               WriteBloc( Bloc, &BufFile[ PosFile ] );
+               PosFile += 1024;	// Passe au bloc suivant
+            }
+            else
+               return( ERR_NO_BLOCK );
+	
+         }
+         SetInfoDirEntry( PosDir, DirLoc );
+	   }
+      else
+         return( ERR_NO_DIRENTRY );
+   }
+
+   return( ERR_NO_ERR );
 }
 
 
@@ -859,8 +860,10 @@ bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int e
 	unsigned long Lg;
 	bool ret;
 	FILE* Hfile;
-	if ( NULL==(cFileName = (char*)malloc(16*sizeof(char))) )
-		return false;
+
+// Unrequired!
+//	if ( NULL==(cFileName = (char*)malloc(16*sizeof(char))) )
+//		return false;
 	
 	cFileName = GetNomAmsdos(basename((char *)Masque.c_str()));
 	if ((  Hfile = fopen(Masque.c_str(),"r")) == NULL )
@@ -868,22 +871,26 @@ bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int e
 		cout << "Impossible d'ouvrir le fichier " << Masque << " !" << endl;
 		return false;
 	}
-        Lg=fread(Buff,1, 0x20000 ,Hfile);
+
+   Lg=fread(Buff,1, 0x20000 ,Hfile);
 	fclose( Hfile );
-        bool AjouteEntete = false;
-        StAmsdos * e = ( StAmsdos * )Buff;
-        // Attention : longueur > 64Ko !
-        if ( Lg > 0x10080 ) {
-		free(cFileName);
+
+   bool AjouteEntete = false;
+   StAmsdos * e = ( StAmsdos * )Buff;
+
+   // Attention : longueur > 64Ko !
+   if ( Lg > 0x10080 ) {
+// Unrequired!
+//		free(cFileName);
 		return false;
 	}
 		
-        //
-        // Regarde si le fichier contient une en-tete ou non
-        //
-        bool IsAmsdos = CheckAmsdos( Buff );
+   //
+   // Regarde si le fichier contient une en-tete ou non
+   //
+   bool IsAmsdos = CheckAmsdos( Buff );
       
-      	if ( ! IsAmsdos ) {
+  	if ( ! IsAmsdos ) {
 		// Creer une en-tete amsdos par defaut
 		cout << "Création automatique d'une en-tête pour le fichier ...\n";
 		e = CreeEnteteAmsdos( cFileName, ( unsigned short )Lg );
@@ -905,10 +912,11 @@ bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int e
 	}
 	else
 		cout << "Le fichier a déjà une en-tête\n";
-        //
-        // En fonction du mode d'importation...
-        //
-        switch( TypeModeImport ) {
+
+   //
+   // En fonction du mode d'importation...
+   //
+   switch( TypeModeImport ) {
 		case MODE_ASCII :
 			//
 			// Importation en mode ASCII
@@ -931,15 +939,14 @@ bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int e
 				//
 				AjouteEntete = true;
 		break;
-				
+			
 	}
 		
-        //
-        // Si fichier ok pour etre import
-        //
-        if ( AjouteEntete ) {
-        	// Ajoute l'en-tete amsdos si necessaire
-        	
+   //
+   // Si fichier ok pour etre import
+   //
+   if ( AjouteEntete ) {
+     	// Ajoute l'en-tete amsdos si necessaire        	
 		memmove( &Buff[ sizeof( StAmsdos ) ], Buff, Lg );
                	memcpy( Buff, e, sizeof( StAmsdos ) );
                	Lg += sizeof( StAmsdos );
@@ -947,7 +954,7 @@ bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int e
 
 	//if (MODE_BINAIRE) ClearAmsdos(Buff); //Remplace les octets inutilisés par des 0 dans l'en-tête
 
-        if ( CopieFichier( Buff,cFileName,Lg,256) != ERR_NO_ERR )
+   if ( CopieFichier( Buff,cFileName,Lg,256) != ERR_NO_ERR )
 		ret = false;
 	else 
 		ret = true;	

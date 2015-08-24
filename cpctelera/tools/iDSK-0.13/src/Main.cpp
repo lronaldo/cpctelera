@@ -165,33 +165,36 @@ int main(int argc, char** argv) {
     		exit(EXIT_FAILURE);
     	}
 
-	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); iter++)
-	{
-		char* nomBase=basename((char*)iter->c_str());
+   	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); iter++)
+   	{
+   		char* nomBase=basename((char*)iter->c_str());
     		string amsdosfile = GetNomAmsdos( nomBase );
     		int Indice;
-    		if ( ( Indice = MyDsk.FileIsIn( amsdosfile ) ) != -1 && !Force_Overwrite) {
-    			cerr << "(" << amsdosfile <<") Fichier existe, voulez vous ajouter quand meme ? (O/Oui)(N/Non) :";
-    			string answer ;
-    			cin >> uppercase >> answer;
-    			if ( answer != "O" && answer != "N" ) {
-    				cerr << "Soyez plus explicite ;)."<<endl;
-    				continue;
-    			}
-    			if ( answer == "O" )
-    				MyDsk.RemoveFile(Indice);
-    			else {
-    				cerr<<"Import aborde, Dsk non modifiee."<<endl;
-    				cout << MyDsk.ReadDskDir();
-    				exit(EXIT_SUCCESS);
-    			}
-		}
-		else if(Force_Overwrite)
-			MyDsk.RemoveFile(Indice);
+         if ( ( Indice = MyDsk.FileIsIn( amsdosfile ) ) != -1 ) {
+            if ( !Force_Overwrite ) {
+               cerr << "(" << amsdosfile <<") Fichier existe, voulez vous ajouter quand meme ? (O/Oui)(N/Non) :";
+               string answer ;
+               cin >> uppercase >> answer;
+               if ( answer != "O" && answer != "N" ) {
+                  cerr << "Soyez plus explicite ;)."<<endl;
+                  continue;
+               }
+               if ( answer == "O" )
+                  MyDsk.RemoveFile(Indice);
+               else {
+                  cerr<<"Import aborde, Dsk non modifiee."<<endl;
+                  cout << MyDsk.ReadDskDir();
+                  exit(EXIT_SUCCESS);
+               }
+            } else {  // Force_Overwrite = true
+               std::cerr << "Removing file!\n";
+               MyDsk.RemoveFile(Indice);
+            }
+         }
 	
     		cerr << "Fichier Amsdos : "<< nomBase << endl;
 	
-		MyDsk.PutFileInDsk(*iter,AmsdosType,loadAdress,exeAdress);
+		   MyDsk.PutFileInDsk(*iter,AmsdosType,loadAdress,exeAdress);
     	}
 	if ( MyDsk.WriteDsk (DskFile) )
 		cout << MyDsk.ReadDskDir(); 
@@ -264,26 +267,30 @@ void help(void)
   cout <<endl;
   cout << "--------------------------------------------------------------------------------" << endl;
   cout << "################################################################################"<< endl;
-  cout <<  VERSION <<" (auteurs  : Demoniak, Sid, PulkoMandy), Contact SiD@Gmail.CoM" << endl;
+  cout <<  VERSION <<" (by Demoniak, Sid, PulkoMandy), http://github.com/cpcsdk " << endl;
   cout << "################################################################################"<< endl;
   cout << endl;
   cout << "Usage : " << endl;
-  cout << "\t"<< PROGNAME << " <fichier DSK> [OPTION] [fichiers a traiter]" << endl;
-  cout << "OPTIONS :" << endl;
-  cout << "-l : list le contenu du catalogue ex: -l mon_dsk.dsk" << endl;
-  cout << "-i : importe un fichier (-t type 0 pour un fichier ASCII et 1 pour un BINAIRE) ex: -i mon_fichier.bin -t 1 -s mon_fichier.dsk" << endl; 
-  cout << "-e : donne l'adresse d'execution du fichier (en hexadecimal) a inserer ex: -i mon_fichier.bin -e C000 -t 1 -s mon_fichier.dsk" << endl;
-  cout <<"-c : donne l'adresse de chargement du fichier(en hexadecimal)  a inserer ex: -i mon_fichier.bin -e C000 -c 4000 -t 1 -s mon_fichier.dsk" << endl;
-  cout << "-g : exporte un fichier ex: -g mon-fichier.bas -s mon_fichie.dsk"<<endl;
-  cout << "-r : enlève un fichier" << endl;
-  cout << "-n : cree une nouvelle image dsk ex: -n mon_fichier.dsk" << endl;
-  cout << "-z : desassemble un binaire ex: -z mon-fichier.bin -s mon_fichier.dsk" << endl;
-  cout << "-b : liste un fichier Basic ex: -b mon-fichier.bas -s mon_fichier.dsk" << endl;
-  cout << "-d : liste un fichier Dams  ex: -d mon-fichier.dms -s mon_fichier.dsk" << endl;
-  cout << "-h : liste un fichier en Hexadecimale ex: -h mon-fichier.bin -s mon_fichier.dsk" << endl;
-  cout << "-f : force l'écrasement lorsqu'un fichier existe déjà" << endl;
+  cout << "\t"<< PROGNAME << " <DSKfile> [OPTIONS] [files to process]" << endl;
+  cout << "OPTIONS :                              EXAMPLE" << endl;
+  cout << " -l : List disk catalog                 iDSK floppy.dsk -l" << endl;
+  cout << " -g : export ('Get') file               iDSK floppy.dsk -g myprog.bas"<<endl;
+  cout << " -r : Remove file                       iDSK floppy.dsk -r myprog.bas" << endl;
+  cout << " -n : create New dsk file               iDSK floppy2.dsk -n" << endl;
+  cout << " -z : disassemble a binary file         iDSK floppy.dsk -z myprog.bin" << endl;
+  cout << " -b : list a Basic file                 iDSK floppy.dsk -b myprog.bas" << endl;
+  cout << " -d : list a Dams file                  iDSK floppy.dsk -d myprog.dms" << endl;
+  cout << " -h : list a binary file as Hexadecimal iDSK floppy.dsk -h myprog.bin" << endl;
+  cout << " -i : Import file                       iDSK floppy.dsk -i myprog.bas" << endl
+      <<  " -t : fileType (0=ASCII/1=BINARY)           ... -t 1" << endl; 
+  cout << " -e : hex Execute address of file           ... -e C000 -t 1" << endl;
+  cout << " -c : hex loading address of file           ... -e C000 -c 4000 -t 1" << endl;
+  cout << " -f : Force overwriting if file exists      ... -f" << endl
+       << " -o : insert a read-Only file               ... -o" << endl
+       << " -s : insert a System file                  ... -s" << endl
+       << " -u : insert file with User number          ... -u 3" << endl;
   cout << "--------------------------------------------------------------------------------" << endl;
-  cout << "*/\\/\\/SiD oF ImPAct/\\/\\/*" << endl;
+  cout << "Please report bugs ! - Demoniak/Sid/PulkoMandy" << endl;
   exit (0);
 }
 
