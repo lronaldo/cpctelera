@@ -34,6 +34,34 @@ CPCT_SCRIPTS_DIR="${CPCT_TOOLS_DIR}/scripts"
 ## Bash Include files
 source "${CPCT_SCRIPTS_DIR}/lib/bash_library.sh"
 
+## Describe the use of the setup script and exit
+##
+function usage {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options]"
+   echo
+   echo "${COLOR_CYAN}  Setups all the environment and installs CPCtelera. It first compiles \
+all the tools included with CPCtelera, its Z80 library and code examples. Finally, it modifies \
+your .bashrc or .bash_profile to include CPCT_PATH environment variable, which is used by \
+CPCtelera projects to use the tools and link with the library."
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -eme | --enable-machine-echo"
+   echo "${COLOR_LIGHT_BLUE}  -dme | --disable-machine-echo"
+   echo "${COLOR_CYAN}       Enables or disables pauses between character writes that emulate \
+classical machine echo to screen or printer. Enabled by default, except under Cygwin."
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -cri | --clean-reinstall"
+   echo "${COLOR_CYAN}       Cleans all previous builds of CPCtelera before compiling and \
+setting up tools, library and examples."
+   echo
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
 ## More paths defined
 CPCT_EXAMPLES_DIR=${SETUP_PATH}/examples
 CPCT_SRC_DIR=${CPCT_MAIN_DIR}/src
@@ -69,9 +97,12 @@ CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAK
 CPCT_EXAMPLES_BUILD_LOG=${CPCT_LOGS_DIR}/examples_building.log
 CPCT_TOOLS_BUILD_LOG=${CPCT_LOGS_DIR}/tool_building.log
 CPCT_LIB_BUILD_LOG=${CPCT_LOGS_DIR}/library_building.log
-CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES=47461
+CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES_CLEAN=12034
+CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES=52074
+CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES_CLEAN=21976
 CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES=343034
-CPCT_LIB_BUILD_LOG_TOTAL_BYTES=18289
+CPCT_LIB_BUILD_LOG_TOTAL_BYTES_CLEAN=319
+CPCT_LIB_BUILD_LOG_TOTAL_BYTES=18417
 
 ## Substitution tags
 CPCT_TAG_MAINPATH="%%%CPCTELERA_PATH%%%"
@@ -104,6 +135,42 @@ if ! checkSystem "cygwin"; then
    REQUIRED_LIBRARIES+=( "FreeImage.h" )
    LIBRARIES_EXPLANATION+=( "Freeimage (development) is required to build Img2CPC. Please, install freeimage / libfreeimage-dev / freeimage-devel or similar in your system and run setup again." )
 fi
+
+## On cygwin, machine echo is disabled by default as it is too slow
+if checkSystem "cygwin"; then
+   disableMachineEchoSleep
+fi
+
+##
+## Setup Control Variables and 
+## Process Command line parameters
+##
+CLEANREINSTALL=false
+while (( $# >= 1 )); do
+   case $1 in
+      ## Disable Machine Echo
+      "-eme" | "--enable-machine-echo")
+         enableMachineEchoSleep
+      ;;
+      ## Disable Machine Echo
+      "-dme" | "--disable-machine-echo")
+         disableMachineEchoSleep
+      ;;
+      ## Get number of bytes
+      "-cri" | "--clean-reinstall")
+         CLEANREINSTALL=true
+      ;;
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Unrecognized parameter / command line option
+      *)
+         paramError "Unrecognized parameter / command line option '$1'" 7
+      ;;
+   esac
+   shift
+done
 
 ###############################################################
 ###############################################################
@@ -184,35 +251,54 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "Everything seems to be OK."$'\n'
 ## Build CPCtelera tools, library and examples
 ##
 stageMessage "2" "Building CPCtelera tools, z80 library and examples"
-coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC (This might take a while, depending on your system):"$'\n'
+coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Proceeding to build required tools to build and manage CPCtelera and other software for Amstrad CPC (This might take a while, depending on your system)."$'\n'
+
+# Clean previous installations, if the user requested it
+if $CLEANREINSTALL; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">> Cleaning previous installation to perform a clean reinstall..."$'\n'
+   
+   ## Cleaning tools
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Cleaning previosly built tools:    "
+   makeWithProgressSupervision "$CPCT_TOOLS_DIR" "$CPCT_TOOLS_BUILD_LOG" cleanall \
+                              "$CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES_CLEAN"  35  0.05  \
+                    "There was an error cleaning previous build of CPCtelera's tools" 
+
+   ## Cleaning library
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Cleaning previosly built z80 lib:  "
+   makeWithProgressSupervision "$CPCT_MAIN_DIR" "$CPCT_LIB_BUILD_LOG" cleanall \
+                             "$CPCT_LIB_BUILD_LOG_TOTAL_BYTES_CLEAN"  35  0.05  \
+               "There was an error cleaning previous build of CPCtelera's Z80 Library" 
+
+   ## Cleaning examples
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Cleaning previosly built examples: "
+   makeWithProgressSupervision "$CPCT_EXAMPLES_DIR" "$CPCT_EXAMPLES_BUILD_LOG" cleanall \
+                                 "$CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES_CLEAN"  35  0.1  \
+               "There was an error cleaning previous build of CPCtelera's examples" 
+
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 ">> Previous install is clean. Proceeding to rebuild..."$'\n'
+fi
 
 # Build tools in subshell process, then go monitoring until it finishes
-coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building compilation tools: "
-( make -C "${CPCT_TOOLS_DIR}" &> "${CPCT_TOOLS_BUILD_LOG}" ; exit $? ) &
-if ! superviseBackgroundProcess "$!" "${CPCT_TOOLS_BUILD_LOG}" "${CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES}" 35 0.3; then
-   Error "There was an error building CPCtelera tools. Please, check '${CPCT_TOOLS_BUILD_LOG}' for details. Aborting. "
-fi
-drawOK
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building compilation tools:        "
+makeWithProgressSupervision "$CPCT_TOOLS_DIR" "$CPCT_TOOLS_BUILD_LOG" "" \
+                           "$CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES"  35  0.3  \
+                         "There was an error building CPCtelera tools"
 
 # Build library in subshell process, then go monitoring until it finishes
-coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building cpctelera z80 lib: "
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> Building cpctelera z80 lib:        "
 make -C "${CPCT_MAIN_DIR}" cleanall &> "${CPCT_LIB_BUILD_LOG}"
-( make -C "${CPCT_MAIN_DIR}" >> "${CPCT_LIB_BUILD_LOG}" 2>&1 ; exit $? ) &
-if ! superviseBackgroundProcess "$!" "${CPCT_LIB_BUILD_LOG}" "${CPCT_LIB_BUILD_LOG_TOTAL_BYTES}" 35 0.05; then
-   Error "There was an error building CPCtelera tools. Please, check '${CPCT_LIB_BUILD_LOG}' for details. Aborting. "
-fi
-drawOK
+makeWithProgressSupervision "$CPCT_MAIN_DIR" "$CPCT_LIB_BUILD_LOG" "" \
+                          "$CPCT_LIB_BUILD_LOG_TOTAL_BYTES"  35  0.1  \
+                     "There was an error building CPCtelera z80 library"
 
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> Bulding procedure finished. "$'\n'
 coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library are now ready to be used on your system."$'\n'
 
 # Build examples in subshell process, then go monitoring until it finishes
-coloredMachineEcho $'\n'"${COLOR_CYAN}" 0.005 ">>> Building cpctelera examples:"
-( make -C "${CPCT_EXAMPLES_DIR}" &> "${CPCT_EXAMPLES_BUILD_LOG}" ; exit $? ) &
-if ! superviseBackgroundProcess "$!" "${CPCT_EXAMPLES_BUILD_LOG}" "${CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES}" 35 0.1; then
-   Error "There was an error building CPCtelera examples. Please, check '${CPCT_EXAMPLES_BUILD_LOG}' for details. Aborting. "
-fi
-drawOK
+coloredMachineEcho $'\n'"${COLOR_CYAN}" 0.005 ">>> Building cpctelera examples:       "
+makeWithProgressSupervision "$CPCT_EXAMPLES_DIR" "$CPCT_EXAMPLES_BUILD_LOG" "" \
+                              "$CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES"  35  0.1  \
+                               "There was an error building CPCtelera examples."
 
 ###############################################################
 ###############################################################

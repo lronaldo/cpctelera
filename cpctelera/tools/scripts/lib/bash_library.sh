@@ -45,6 +45,9 @@ COLOR_CYAN=$'\033[0;36;49m'
 COLOR_WHITE=$'\033[0;37;49m'
 COLOR_NORMAL=$'\033[0;39;49m'
 
+## Control variables
+ENABLED_MACHINE_ECHO_SLEEP=true
+
 ## Show a big error message for an unrecoverable error and exit
 ## $1: Error Message
 ## $2: Number of error that will be returned to shell
@@ -105,10 +108,11 @@ function machineEcho_no_sleep {
 ## Select specific machineEcho mode depending
 ## on the system we are being executed
 function machineEcho {
-  if checkSystem "cygwin"; then
-    machineEcho_no_sleep "$1" "$2" 
-  else
+  if $ENABLED_MACHINE_ECHO_SLEEP; then
+#  if checkSystem "cygwin"; then
     machineEcho_sleep "$1" "$2"
+  else
+    machineEcho_no_sleep "$1" "$2" 
   fi
 }
 
@@ -118,6 +122,18 @@ function machineEcho {
 function coloredMachineEcho {
    echo -n "$1"
    machineEcho $2 "$3"
+}
+
+## Disables sleeps between character output when doing Machine Echo
+## 
+function disableMachineEchoSleep {
+   ENABLED_MACHINE_ECHO_SLEEP=false
+}
+
+## Enable sleeps between character output when doing Machine Echo
+## 
+function enableMachineEchoSleep {
+   ENABLED_MACHINE_ECHO_SLEEP=true
 }
 
 ## Welcome to CPCtelera
@@ -803,4 +819,38 @@ function checkMinimumGCCVersion() {
       return 0   ## TRUE: GCC Version equal or over minimum
    fi
    return 1      ## FALSE: GCC Version below minimum
+}
+
+## Launches a Makefile using GNU Make and supervises progress, 
+## outputting a Progress Bar. If the building fails, it aborts
+## the process launching an error.
+##    $1: Directory where Makefile is
+##    $2: Log file that will be created about the compilation
+##    $3: Parameters for GNU Make (for cleaning, mainly)
+##    $4: Expected total number of bytes the log should have at the end (for ProgressBar percentage)
+##    $5: Size of the ProgressBar in characters
+##    $6: Delay between checks of the status of the process (for supervision)
+##    $7: Error message to ouput when compilation fails.
+##
+function makeWithProgressSupervision {
+   local MAKEDIR="$1"
+   local MAKELOG="$2"
+   local MAKEPARAMS="$3"
+   local LOGTOTALBYTES="$4"
+   local PBARSIZE="$5"
+   local CHECKDELAY="$6"
+   local ERRORMSG="$7"
+
+   ## Take into account if we have parameters for passing to GNU Make or not
+   if [[ "$MAKEPARAMS" != "" ]]; then
+      ( make -C "$MAKEDIR" "$MAKEPARAMS" > "$MAKELOG" 2>&1 ; exit $? ) &
+   else 
+      ( make -C "$MAKEDIR" > "$MAKELOG" 2>&1 ; exit $? ) &
+   fi
+
+   ## Supervise the Making Process
+   if ! superviseBackgroundProcess "$!" "$MAKELOG" "$LOGTOTALBYTES" "$PBARSIZE" "$CHECKDELAY"; then
+      Error "${ERRORMSG}. Please, check '${MAKELOG}' for details. Aborting. "
+   fi
+   drawOK
 }
