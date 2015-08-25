@@ -324,7 +324,7 @@ your CLang installation has no support for required C++11 features. "
 	      #endif
 	   
 	      // Checkinf if C++11 Ranged fors is available
-	      #ifndef __has_feature(cxx_range_for)
+	      #if __has_feature(cxx_range_for)
 	         val &= 0b11111101;   // It is available, set identifier bit to 0        
 	      #endif
 	         
@@ -334,7 +334,7 @@ your CLang installation has no support for required C++11 features. "
 	oooooooooooooooooooooooooo
 
    ## Compile the test program
-   gcc "$SRCTMP" -o "$OUTTMP" 2> "$ERRTMP"
+   g++ -std=c++0x -O3 -Wall -fsigned-char "$SRCTMP" -o "$OUTTMP" 2> "$ERRTMP"
 
    ## Check if there was an error
    if [ -s "$ERRTMP" ]; then
