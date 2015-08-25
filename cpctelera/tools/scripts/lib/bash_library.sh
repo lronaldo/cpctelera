@@ -109,7 +109,6 @@ function machineEcho_no_sleep {
 ## on the system we are being executed
 function machineEcho {
   if $ENABLED_MACHINE_ECHO_SLEEP; then
-#  if checkSystem "cygwin"; then
     machineEcho_sleep "$1" "$2"
   else
     machineEcho_no_sleep "$1" "$2" 
