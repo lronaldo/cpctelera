@@ -354,8 +354,9 @@ your CLang installation has no support for required C++11 features. "
    ## Check if there was an error
    if [ -s "$ERRTMP" ]; then
       ERROR_MSG="${MSG_CLANGINSTALLED}${MSG_UPGRADE}"
-   else
-      case $(${OUTTMP}) in
+    else
+        ${OUTTMP}
+        case $? in
          0) ERROR_MSG=""
          ;;
          2) ERROR_MSG="${MSG_CLANGINSTALLED} This installation does not support C++11 \
