@@ -306,4 +306,4 @@ fi
 
 # Launch Winape with appropriate path for DSK file
 FILEPATH=$(getMySystemPath "$FILE")
-${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" 
+${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" &> /dev/null &
