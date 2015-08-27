@@ -54,7 +54,7 @@
 ##
 
 # WinAPE Full Path
-WAPE=/home/ronaldo/cpctelera/cpctelera/tools/scripts/../winape/WinApe.exe
+WAPE=/path/to/WinApe
 
 # Script configuration
 CPCT_TOOLS_FOLDER=$(dirname $0)/..
