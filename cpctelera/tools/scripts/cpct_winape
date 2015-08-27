@@ -63,6 +63,7 @@ WINAPE_EXE=WinApe.exe
 WINAPE_INI=WinAPE.ini
 WINAPE_ZIP=${CPCT_TOOLS_FOLDER}/winape.zip
 WINAPE_DIR=${CPCT_TOOLS_FOLDER}/winape
+WINE=wine
 
 # Command line parameter variables
 FILE=""
@@ -296,6 +297,11 @@ done
 # First, check WinAPE installation
 checkWinapeInstallation "$WAPE"
 
+# On CygWin, there is no need for wine
+if checkSystem cygwin; then
+   WINE=""
+fi
+
 # Launch Winape with appropriate path for DSK file
 FILEPATH=$(getPath "$FILE")
-wine "$WAPE" "$FILEPATH" "$MODIFIER" &> /dev/null &
+${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" &> /dev/null &
