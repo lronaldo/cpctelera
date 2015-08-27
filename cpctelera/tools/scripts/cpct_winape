@@ -54,7 +54,7 @@
 ##
 
 # WinAPE Full Path
-WAPE=/path/to/WinAPE
+WAPE=/home/ronaldo/cpctelera/cpctelera/tools/scripts/../winape/WinApe.exe
 
 # Script configuration
 CPCT_TOOLS_FOLDER=$(dirname $0)/..
@@ -112,14 +112,14 @@ operation, wget and unzip commands are required (the should be installed in the 
 ## Echoes the transformed path throw the screen
 ##  $1: System path
 ##
-function getPath {
+function getMySystemPath {
    local THIS_SYSTEM_PATH
 
    if checkSystem cygwin; then
       ## Do CYGWIN required stuff
       EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
 running this script. Please, check cygwin installation and run this script again."
-      THIS_SYSTEM_PATH="$(cygpath -w ${1} 2> /dev/null)" 
+      THIS_SYSTEM_PATH="$(cygpath -a -w ${1} 2> /dev/null)" 
    else
       ## Do Linux/MacOSX required stuff (wine configuration)
       EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
@@ -297,11 +297,13 @@ done
 # First, check WinAPE installation
 checkWinapeInstallation "$WAPE"
 
-# On CygWin, there is no need for wine
+# On CygWin, there is no need for wine, but WinAPE.exe 
+# must be executable by Cygwin
 if checkSystem cygwin; then
    WINE=""
+   chmod +x "$WAPE"
 fi
 
 # Launch Winape with appropriate path for DSK file
-FILEPATH=$(getPath "$FILE")
-${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" &> /dev/null &
+FILEPATH=$(getMySystemPath "$FILE")
+${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" 
