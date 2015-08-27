@@ -1,0 +1,301 @@
+#!/bin/bash
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_winape
+##    This script lets the user execute winape from command line and automatically
+## run a file from a DSK at will. 
+##
+## Usage:
+##    <cpct_winape> [options] [DSKFile]
+##
+## Description:
+##    This script automatically launches WinAPE either directly or using wine, 
+## depending on the system where it is executed (OSX and Linux will use wine, 
+## Windows/Cygwin will execute directly). The script also lets the user give a
+## DSK file as parameter to be automatically loaded into WinAPE's FD1. It also
+## automatically RUNs the main program inside the DSK file.
+##    
+##    If WinAPE is not installed on the system or not propperly configured to
+## be used with this script, the script prompts the user and helps to configure
+## and/or to install WinAPE. Users can either give the script the path of their own
+## WinAPE installations or ask the script to automatically download and install
+## it inside CPCtelera's tool folder. For this last operation, wget and unzip 
+## commands are required (the should be installed in the system).
+##
+## Command line options:
+##    -n | --no-execute              - Lauches WinAPE but does not automatically RUN any
+## DSK program.
+##    -h | --help                    - Shows help information on the terminal.
+##
+
+##
+## Global configuration
+##
+
+# WinAPE Full Path
+WAPE=/home/ronaldo/trabajo/git/cpctelera/cpctelera/tools/scripts/../winape/WinApe.exe
+
+# Script configuration
+CPCT_TOOLS_FOLDER=$(dirname $0)/..
+WWW_WINAPE=http://winape.net/download/WinAPE20A18.zip
+WINAPE_EXE=WinApe.exe
+WINAPE_INI=WinAPE.ini
+WINAPE_ZIP=${CPCT_TOOLS_FOLDER}/winape.zip
+WINAPE_DIR=${CPCT_TOOLS_FOLDER}/winape
+
+# Command line parameter variables
+FILE=""
+MODIFIER="/A"
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK File]"
+   echo
+   echo "${COLOR_CYAN}  Lets the user execute winape from command line and automatically \
+run a file from a DSK at will."
+
+   echo "${COLOR_CYAN}  Creates a fresh new project that uses CPCtelera engine. The script creates \
+a new folder named <project_folder_name> in the current folder. Then, the new project is created \
+inside <project_folder_name>. So, <project_folder_name> must not previously exist inside the \
+current folder."
+   echo
+   echo "${COLOR_CYAN}  This script automatically launches WinAPE either directly or using wine, \
+depending on the system where it is executed (OSX and Linux will use wine, Windows/Cygwin will \
+execute directly). The script also lets the user give a DSK file as parameter to be automatically \
+loaded into WinAPE's FD1. It also automatically RUNs the main program inside the DSK file."
+   echo
+   echo "${COLOR_CYAN}  If WinAPE is not installed on the system or not propperly configured to \
+be used with this script, the script prompts the user and helps to configure and/or to install \
+WinAPE. Users can either give the script the path of their own WinAPE installations or ask the \
+script to automatically download and install it inside CPCtelera's tool folder. For this last \
+operation, wget and unzip commands are required (the should be installed in the system)."
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
+   echo "${COLOR_CYAN}       Lauches WinAPE but does not automatically RUN any DSK program."
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+
+## Transforms a Linux Path into a Cygwin/Wine path.
+## Echoes the transformed path throw the screen
+##  $1: System path
+##
+function getPath {
+   local THIS_SYSTEM_PATH
+
+   if checkSystem cygwin; then
+      ## Do CYGWIN required stuff
+      EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
+running this script. Please, check cygwin installation and run this script again."
+      THIS_SYSTEM_PATH="$(cygpath -w ${1} 2> /dev/null)" 
+   else
+      ## Do Linux/MacOSX required stuff (wine configuration)
+      EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
+running this script. Please, install wine or check the installation and run this script again."
+      EnsureCommandAvailable winepath "winepath has not been found on the system, and it's required \
+for running this script. Please, install it or check the installation of wine and run this script \
+again. On some old wine installations you may want to create an alias for winepath to the command \
+'wine winepath'."
+      THIS_SYSTEM_PATH="$(winepath -w ${1} 2> /dev/null)" 
+   fi
+
+   echo "$THIS_SYSTEM_PATH"
+}
+
+## Insert new WinAPE path into this script
+##  $1: New path to WinAPE.exe
+##
+function setWinapePath {
+   local TAG="^WAPE="
+   local WPATH="$1"
+
+   echo "${COLOR_LIGHT_YELLOW}Setting New Path for WinAPE to \
+'${COLOR_WHITE}${1}${COLOR_LIGHT_YELLOW}'...${COLOR_NORMAL}"
+   replaceTag "${TAG}.*$" "${TAG:1}${WPATH}" "$0" "#"
+   chmod +x "$0"
+   WAPE="${1}"
+}
+
+## Aborts the program showing a message to clarify that no configuration has been updated
+##
+function exitNoConfig {
+   echo
+   echo "${COLOR_LIGHT_YELLOW}No configuration has been modified."
+   echo "${COLOR_CYAN}You will have to configure WinAPE launch script later on if you wanted to use it."
+   echo "${COLOR_RED}Aborting installation. ${COLOR_NORMAL}"
+   exit -1
+}
+
+## Shows a colored error message on screen
+##  $1: Message to show
+##
+function showErrorMsg {
+   echo "${COLOR_RED}[Error]${COLOR_CYAN} ${1}${COLOR_NORMAL}"
+}
+
+## Configure personal WinAPE installation
+##
+function configurePersonalWinapeInstallation {
+   local VALID=false
+
+   while ! $VALID; do
+      ## WinAPE is installed, ask for path
+      echo
+      echo   "${COLOR_CYAN}This script will help you configure your own WinAPE installation."
+      echo
+      echo   "Please, provide ${COLOR_LIGHT_CYAN}full path${COLOR_CYAN} for \
+${COLOR_LIGHT_CYAN}${WINAPE_EXE}${COLOR_CYAN}, or leave it blank if you prefer to exit now and  \
+configure this script later on."
+      printf "${COLOR_LIGHT_BLUE}Path to ${COLOR_LIGHT_CYAN}${WINAPE_EXE}${COLOR_LIGHT_BLUE}: ${COLOR_NORMAL}"
+      read -e -r WINAPE
+      if [[ "$WINAPE" == "" ]]; then
+         exitNoConfig
+      elif [ -f "$WINAPE" ]; then
+         setWinapePath "$WINAPE"
+         VALID=true
+      else 
+         showErrorMsg "'${COLOR_WHITE}$WINAPE${COLOR_CYAN}' does not refer to a valid, readable file."
+         echo
+      fi
+   done   
+}
+
+## Create a new installation of WinAPE inside CPCtelera tools folder
+##  Returns 0 on install success, errorCode otherwise
+##
+function installWinapeInCPCtelera {
+   local ERRORMSG="is not installed on the system and is required to automatically download and install \
+WinAPE. Please, install it and run this script again or install WinAPE and provide the path manually. "
+   
+   ## Check required commands are installed
+   if ! isCommandAvailable "wget"; then
+      showErrorMsg "Command '${COLOR_WHITE}wget${COLOR_CYAN}' $ERRORMSG" 
+      return 1
+   elif ! isCommandAvailable "unzip"; then
+      showErrorMsg "Command '${COLOR_WHITE}unzip${COLOR_CYAN}' $ERRORMSG" 
+      return 2
+   fi
+
+   echo
+   echo "${COLOR_CYAN}This script can automatically ${COLOR_LIGHT_CYAN}download and install WinAPE\
+${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder for you."
+   echo
+   askSimpleQuestion y Y n N "${COLOR_LIGHT_BLUE}Do want WinAPE to be ${COLOR_LIGHT_CYAN}downloaded \
+& installed${COLOR_LIGHT_BLUE} (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?" ANS
+   echo ${COLOR_LIGHT_WHITE}$ANS
+   if [[ "$ANS" == "y" || "$ANS" == "Y" ]]; then
+      echo "${COLOR_CYAN} Downloading WinAPE from (${COLOR_WHITE}${WWW_WINAPE}${COLOR_CYAN})...${COLOR_NORMAL}"
+      wget -nv --show-progress -O "$WINAPE_ZIP" "$WWW_WINAPE"
+      echo "${COLOR_CYAN}Unpacking WinAPE...${COLOR_NORMAL}"
+      unzip -o -q "$WINAPE_ZIP" -d "$WINAPE_DIR" 
+      rm "$WINAPE_ZIP"
+      setWinapePath "${WINAPE_DIR}/${WINAPE_EXE}"
+
+      ## If system is not Cygwin, turn off DirectX Stretch feature from WinAPE, 
+      ## as it does not work well under wine
+      if ! checkSystem cygwin; then
+         echo "${COLOR_CYAN}Disabling DirectX Stretch WinAPE feature...${COLOR_NORMAL}"
+         replaceTag "^\[Configuration\]" \
+                    "\[Configuration\]\nDirectX Stretch=false\n" "${WINAPE_DIR}/${WINAPE_INI}"
+      fi
+      echo "${COLOR_LIGHT_CYAN}WinAPE${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
+${WINAPE_DIR}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
+      echo
+   else 
+      exitNoConfig
+   fi
+
+   return 0
+}
+
+## Check Winape Installation
+##  $1: Path to WinAPE.exe
+function checkWinapeInstallation {
+   local WINAPE="$1"
+      
+   ## Check if WinAPE.exe is installed
+   if [ ! -f "$WINAPE" ]; then
+      ## Winape is not installed
+      echo
+      echo "${COLOR_GREEN}%%%%%%%%%%%%%%%%%%%%%%%%%"
+      echo "${COLOR_GREEN}%% ${COLOR_LIGHT_WHITE}WinAPE laucher script"
+      echo "${COLOR_GREEN}%%%%%%%%%%%%%%%%%%%%%%%%%"
+      echo
+      echo "${COLOR_LIGHT_CYAN}[Warning]${COLOR_LIGHT_YELLOW} WinAPE is not configured for your system yet."
+      echo
+      echo "${COLOR_CYAN}Proceeding to install/configure WinAPE on your system."
+      echo
+      askSimpleQuestion y Y n N "${COLOR_LIGHT_BLUE}Do you ${COLOR_LIGHT_CYAN}already${COLOR_LIGHT_BLUE} \
+have WinAPE installed (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?${COLOR_NORMAL}" ANS
+      echo ${COLOR_LIGHT_WHITE}$ANS
+      if [[ "$ANS" == "y" || "$ANS" == "Y" ]]; then
+         configurePersonalWinapeInstallation
+      elif ! installWinapeInCPCtelera; then
+         echo "${COLOR_RED}Aborting installation. ${COLOR_NORMAL}"
+         exit -1
+      fi
+   fi
+}
+
+# Proccess command line parameters
+while [ "$#" -gt "0" ]; do
+   case "$1" in
+      "-n" | "--no-execute")
+        MODIFIER=""
+      ;;
+      "-h" | "--help")
+        usage
+      ;;
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         elif [[ "$FILE" == "" ]]; then
+            if [ ! -f "$1" ]; then
+               paramError "'$1' is not a valid readable file (a DSK file was expected)." 8
+            fi
+            FILE="${1}"
+         else
+            paramError "'${1}' unexpected parameter. Are you trying to provide more than one DSK file?"
+         fi
+      ;; 
+   esac
+   shift
+done
+
+# First, check WinAPE installation
+checkWinapeInstallation "$WAPE"
+
+# Launch Winape with appropriate path for DSK file
+FILEPATH=$(getPath "$FILE")
+wine "$WAPE" "$FILEPATH" "$MODIFIER" &> /dev/null &

@@ -42,6 +42,7 @@ COLOR_RED=$'\033[0;31;49m'
 COLOR_GREEN=$'\033[0;32;49m'
 COLOR_MAGENTA=$'\033[0;35;49m'
 COLOR_CYAN=$'\033[0;36;49m'
+COLOR_YELLOW=$'\033[0;33;49m'
 COLOR_WHITE=$'\033[0;37;49m'
 COLOR_NORMAL=$'\033[0;39;49m'
 
@@ -250,13 +251,26 @@ function drawProgressBar {
    echo -n ${COLOR_NORMAL} ${PCT}%
 }
 
-## $1: Command to check for in the system
-## $2: Error Message
+#### Checks if a given command is available on the system. 
+## If the command is not available, aborts execution with an error message.
+##  $1: Command to check for in the system
+##  $2: Error Message
 ##
 function EnsureCommandAvailable {
    if ! command -v "$1" >/dev/null 2>&1; then
       Error "$2"
    fi
+}
+
+#### Checks if a given command is available on the system. 
+## Returns 0 if the command is available, 1 otherwise
+##  $1: Command to check for in the system
+##
+function isCommandAvailable {
+   if ! command -v "$1" >/dev/null 2>&1; then
+      return 1
+   fi
+   return 0
 }
 
 ## $1: Header file name
