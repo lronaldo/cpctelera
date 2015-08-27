@@ -129,7 +129,7 @@ Group: Video  {
    File: cpct_fw2hw  (video/cpct_fw2hw.s)
    File: cpct_getHWColour  (video/cpct_getHWColor.s)
    File: cpct_getScreenPtr  (video/cpct_getScreenPtr.asm)
-   File: cpct_setPALColour  (video/cpct_setPALColour.s)
+   File: cpct_setPALColour  (video/cpct_setPALColour.asm)
    File: cpct_setPalette  (video/cpct_setPalette.s)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
@@ -154,6 +154,7 @@ Group: Command Line Tools  {
    File: cpct_mkproject  (no auto-title, commandline/cpct_mkproject)
    File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
    File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
+   File: cpct_winape  (commandline/cpct_winape)
    }  # Group: Command Line Tools
 
 Group: Easytilemaps  {
