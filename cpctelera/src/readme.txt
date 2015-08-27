@@ -96,7 +96,7 @@ _Under Linux_:
 
    Next are recommented packages. They are not required for CPCtelera to work, but some included tool may require them:
 
-   * Commands: *wget*, *unzip*
+   * Commands: *wget*, *unzip*, *wine*
 
 _Under Windows_:
    
@@ -118,8 +118,9 @@ _Under OSX_:
    3. - Open a terminal and install XCode Command Line tools with this command,
    > xcode-select --install
    4. - Install libboost and freeimage from homebrew with these commands,
-   > brew install boost
-   > brew install freeimage
+   > brew install boost freeimage
+   5. - Optionally, install recommended packages, that some tools included with CPCtelera may require
+   > brew install wine wget
 
 Some things to take into account on OSX,
    * Some previous OSX systems may not understand the xcode-select --install command. On those systems, there usually are menu options from the XCode GUI to install Command Line Tools. If you need more advice, there is a <nice explanation on stack overflow about the XCode Command Line Tools at http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools>. 
