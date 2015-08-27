@@ -94,12 +94,20 @@ _Under Linux_:
    * Commands: *gcc*, *g++*, *make*, *bison*, *flex*
    * Libraries: *libboost-dev*, *libfreeimage-dev*
 
+   Next are recommented packages. They are not required for CPCtelera to work, but some included tool may require them:
+
+   * Commands: *wget*, *unzip*
+
 _Under Windows_:
    
    Under Windows <Cygwin at http://www.cygwin.com> is required for CPCtelera to work. You may download Cygwin 32 / 64 and install it along with these packages (you may launch cygwin's setup.exe at any time to install them),
 
    * *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*
    * *libboost-devel*, *libintl-devel*
+
+   Next are recommented packages. They are not required for CPCtelera to work, but some included tool may require them:
+
+   * Commands: *wget*, *unzip*
 
 _Under OSX_:
 
