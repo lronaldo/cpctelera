@@ -95,6 +95,49 @@ define CREATEDSK
 endef
 
 #################
+# CREATEEMPTYDSK: Creates an empty dsk file if the file doesn't exist previously.
+#   If the file already existed, nothing is done.
+#
+# $(1): DSK file name to be created
+#
+define CREATEEMPTYDSK
+	if [ ! -e $(1) ]; then \
+  		$(IDSK) $(1) -n; \
+  	fi
+endef
+
+#################
+# ADDCODEFILETODSK: General rule to include a compiled binary file of a program into a 
+#    DSK automatically. It takes into account memory load point and entry point for the binary
+#
+# $(1): DSK file where the binary will be included
+# $(2): Binary file to be included 
+# $(3): Memory address where binary will be loaded (LOAD ADDRESS)
+# $(4): Memory address where main program starts (RUN ADDRESS)
+# $(5): Blank object file generated to flag that this inclusion is already done (not to repeat it)
+#
+define ADDCODEFILETODSK
+	@$(IDSK) $(1) -i $(2) -e $(4) -c $(3) -t 1 -f &> /dev/null
+	@touch $(5)
+	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
+endef
+
+#################
+# ADDBINFILETODSK: General rule to include a binary file into a DSK automatically
+#
+# $(1): DSK file where the binary will be included
+# $(2): Binary file to be included 
+# $(3): Blank object file generated to flag that this inclusion is already done (not to repeat it)
+#
+define ADDBINFILETODSK
+$(3): $(2)
+	@$(IDSK) $(1) -i $(2) -t 1 -f &> /dev/null
+	@touch $(3)
+	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
+
+endef
+
+#################
 # CREATECDT: Create a CDT file with the BINARY added to it and converted to AMSDOS BINARY
 #
 # $(1): Binary file to be inserted in the CDT
@@ -138,19 +181,4 @@ endef
 define BINFILE2C
 $(1): $(2)
 	$(BIN2C) $(2) -h "cpctelera.h" > $(1)
-endef
-
-#################
-# ADDBINFILETODSK: General rule to include a binary file into a DSK automatically
-#
-# $(1): DSK file where the binary will be included
-# $(2): Binary file to be included 
-# $(3): Blank object file generated to flag that this inclusion is already done (and not repeat it)
-#
-define ADDBINFILETODSK
-$(3): $(2)
-	@$(IDSK) $(1) -i $(2) -t 1 -f &> /dev/null
-	@touch $(3)
-	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
-
 endef
