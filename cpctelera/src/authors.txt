@@ -90,6 +90,7 @@ Section: Testers & Bug Reporters
  * <gryken2014 at https://github.com/gryken2014>
  * Roald Strauss (<mr_lou / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=96>)
  * Toni Ramírez
+ * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / CPCWiki
 
 Section: Special Thanks
 
