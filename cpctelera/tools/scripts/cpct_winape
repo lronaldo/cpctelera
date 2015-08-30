@@ -217,7 +217,7 @@ ${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder 
    echo ${COLOR_LIGHT_WHITE}$ANS
    if [[ "$ANS" == "y" || "$ANS" == "Y" ]]; then
       echo "${COLOR_CYAN} Downloading WinAPE from (${COLOR_WHITE}${WWW_WINAPE}${COLOR_CYAN})...${COLOR_NORMAL}"
-      wget -nv --show-progress -O "$WINAPE_ZIP" "$WWW_WINAPE"
+      wget -nv --progress=bar -O "$WINAPE_ZIP" "$WWW_WINAPE"
       echo "${COLOR_CYAN}Unpacking WinAPE...${COLOR_NORMAL}"
       unzip -o -q "$WINAPE_ZIP" -d "$WINAPE_DIR" 
       rm "$WINAPE_ZIP"
