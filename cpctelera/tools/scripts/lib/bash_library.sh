@@ -252,26 +252,28 @@ function drawProgressBar {
 }
 
 #### Checks if a given command is available on the system. 
+## Returns 0 if the command is available, 1 otherwise
+##  $1: Command to check for in the system
+##
+function isCommandAvailable {
+   if command -v "$1" >/dev/null 2>&1; then
+      return 0
+   fi
+   return 1
+}
+
+#### Checks if a given command is available on the system. 
 ## If the command is not available, aborts execution with an error message.
 ##  $1: Command to check for in the system
 ##  $2: Error Message
 ##
 function EnsureCommandAvailable {
-   if ! command -v "$1" >/dev/null 2>&1; then
+   isCommandAvailable "$1"
+   if [[ "$?" != "0" ]]; then
       Error "$2"
    fi
 }
 
-#### Checks if a given command is available on the system. 
-## Returns 0 if the command is available, 1 otherwise
-##  $1: Command to check for in the system
-##
-function isCommandAvailable {
-   if ! command -v "$1" >/dev/null 2>&1; then
-      return 1
-   fi
-   return 0
-}
 
 ## $1: Header file name
 ## $2: Error message
