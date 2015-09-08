@@ -107,19 +107,14 @@ operation, wget and unzip commands are required (the should be installed in the 
    exit 1
 }
 
-
-## Transforms a Linux Path into a Cygwin/Wine path.
-## Echoes the transformed path throw the screen
-##  $1: System path
+## Ensures that wine / cygpath is installed, as it will be required for execution.
+## If something is missing, it aborts the script with an error message
 ##
-function getMySystemPath {
-   local THIS_SYSTEM_PATH
-
+function ensureExecutionPrerequisitesAreInstalled {
    if checkSystem cygwin; then
       ## Do CYGWIN required stuff
       EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
 running this script. Please, check cygwin installation and run this script again."
-      THIS_SYSTEM_PATH="$(cygpath -a -w ${1} 2> /dev/null)" 
    else
       ## Do Linux/MacOSX required stuff (wine configuration)
       EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
@@ -128,10 +123,21 @@ running this script. Please, install wine or check the installation and run this
 for running this script. Please, install it or check the installation of wine and run this script \
 again. On some old wine installations you may want to create an alias for winepath to the command \
 'wine winepath'."
-      THIS_SYSTEM_PATH="$(winepath -w ${1} 2> /dev/null)" 
    fi
+}
 
-   echo "$THIS_SYSTEM_PATH"
+## Transforms a Linux Path into a Cygwin/Wine path.
+##    Returns the transformed path through a given global variable
+##  $1: System path
+##
+function getMySystemPath {
+   if checkSystem cygwin; then
+      ## Do CYGWIN required stuff
+      echo "$(cygpath -a -w ${1} 2> /dev/null)" 
+   else
+      ## Do Linux/MacOSX required stuff (wine configuration)
+      echo "$(winepath -w ${1} 2> /dev/null)" 
+   fi
 }
 
 ## Insert new WinAPE path into this script
@@ -305,5 +311,6 @@ if checkSystem cygwin; then
 fi
 
 # Launch Winape with appropriate path for DSK file
+ensureExecutionPrerequisitesAreInstalled
 FILEPATH=$(getMySystemPath "$FILE")
 ${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" &> /dev/null &
