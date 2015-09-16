@@ -8,14 +8,14 @@
 
 using namespace std;
 
-#define		DSK_RECORD_SIZE			128
+#define        DSK_RECORD_SIZE            128
 
-#define     AMSDOS_EMPTY_BYTE		0xE5
+#define        AMSDOS_EMPTY_BYTE        0xE5
 
 typedef enum { HDR_NONE=0, HDR_AMSDOS=1 } HeaderType;
 
 // RAW catalog: it stores in the first sector the following info for each file:
-// 	  Side (1byte), 
+//       Side (1byte), 
 //    Initial Track (1 byte) - track where the file starts, 
 //    Initial Sector Offset (1 byte) - counting from the first sector based on the disk type, 
 //    Length in bytes (3 bytes)
@@ -43,59 +43,59 @@ typedef uint32_t u32;
 #pragma pack(push,1)
 
 struct u24 {
-	u16 low;
-	u8  hi;
+    u16 low;
+    u8  hi;
 };
 
 struct XDPB {
-	u16 			recordsPerTrack;	// (spt) Number of 128-byte records on each track;
-	u8 				blockShift;			// (bsh) log2 BLS - 7
-	u8 				blockMask;			// (blm) BLS / 128 - 1
-	u8 				extentMask;			// (exm) Extent mask. DSM < 256 ? BLS/1024 - 1 : BLS/2048 - 1 
-	u16 			numBlocks;			// (dsm) Total size of disk in blocks excluding reserved tracks.
-	u16 			dirEntries;			// (drm) Total number of directory entries - 1
-    u8 				allocationLo;		// (al01) Bit significant representation of number of directory blocks (#0080 => 1, #00C0 => 2)
-    u8 				allocationHi;		// (al01) Bit significant representation of number of directory blocks (#0080 => 1, #00C0 => 2)
-    u16 			checksumLength;		// (cks) Length of checksum vector. Normally drm/4 + 1, but if checksumming not required, 0
-    u16 			reservedTracks;		// (off) Number of reserved tracks. This is also the track the directory starts.
-    u8 				firstSectorNumber;	// First sector number.
-    u8 				sectorsPerTrack;	// Sectors per track.
-    u8 				gapRW;				// Gap length (read/write)
-    u8 				gapF;				// Gap length (format)
-    u8 				fillerByte;			// Filler Byte (for formatting)
-    u8 				logSectSize; 		// Log2(sectorSize)-7
-    u8 				sectSizeInRecords;	// Sector size in records
+    u16                recordsPerTrack;    // (spt) Number of 128-byte records on each track;
+    u8                 blockShift;            // (bsh) log2 BLS - 7
+    u8                 blockMask;            // (blm) BLS / 128 - 1
+    u8                 extentMask;            // (exm) Extent mask. DSM < 256 ? BLS/1024 - 1 : BLS/2048 - 1 
+    u16                numBlocks;            // (dsm) Total size of disk in blocks excluding reserved tracks.
+    u16                dirEntries;            // (drm) Total number of directory entries - 1
+    u8                 allocationLo;        // (al01) Bit significant representation of number of directory blocks (#0080 => 1, #00C0 => 2)
+    u8                 allocationHi;        // (al01) Bit significant representation of number of directory blocks (#0080 => 1, #00C0 => 2)
+    u16                checksumLength;        // (cks) Length of checksum vector. Normally drm/4 + 1, but if checksumming not required, 0
+    u16                reservedTracks;        // (off) Number of reserved tracks. This is also the track the directory starts.
+    u8                 firstSectorNumber;    // First sector number.
+    u8                 sectorsPerTrack;    // Sectors per track.
+    u8                 gapRW;                // Gap length (read/write)
+    u8                 gapF;                // Gap length (format)
+    u8                 fillerByte;            // Filler Byte (for formatting)
+    u8                 logSectSize;         // Log2(sectorSize)-7
+    u8                 sectSizeInRecords;    // Sector size in records
 };
 
 /* DSK Format: http://cpctech.cpc-live.com/docs/dsk.html */
 /* See the description of the Extended DSK format at http://cpctech.cpc-live.com/docs/extdsk.html */
 struct DskHeader {
-    u8               Id[34];          // "EXTENDED CPC DSK File\r\nDisk-Info\r\n"
-    u8 		         Creator[14];     // "DSKGEN-C      "
-    u8               Tracks;
-    u8               Sides;
-    u16              Unused;          // 0x1300 = 256 + ( 512 * Sector Count )
-    u8 				 TrackSizes[204]; // TrackSize is (FileSize + sizeof(DskTrack)) / 256.
-    								  // If the disk is two sided, the order is Track 0 Side 0, Track 0 Side 1, Track 1 Side 0... 
-    								  // (alternating sides).
+    u8                  Id[34];          // "EXTENDED CPC DSK File\r\nDisk-Info\r\n"
+    u8                  Creator[14];     // "DSKGEN-C      "
+    u8                  Tracks;
+    u8                  Sides;
+    u16                 Unused;          // 0x1300 = 256 + ( 512 * Sector Count )
+    u8                  TrackSizes[204]; // TrackSize is (FileSize + sizeof(DskTrack)) / 256.
+                                      // If the disk is two sided, the order is Track 0 Side 0, Track 0 Side 1, Track 1 Side 0... 
+                                      // (alternating sides).
 };
 
 struct DskSector {
-    u8        Track;				// C
-    u8        Side;					// H
-    u8        Sector;				// R
-    u8        Size;					// N
-    u8        FDCStatusReg1;		// ST1
-    u8        FDCStatusReg2;		// ST2
-    u16       SizeInBytes;
-    u8*	      Data;
+    u8           Track;                // C
+    u8           Side;                    // H
+    u8           Sector;                // R
+    u8           Size;                    // N
+    u8           FDCStatusReg1;        // ST1
+    u8           FDCStatusReg2;        // ST2
+    u16          SizeInBytes;
+    u8*          Data;
 };
 
 #define DSK_SECTORS_IN_TRACK_HEADER 29
 
 struct DskTrack {
     u8               Id[13];         // "Track-Info\r\n"
-    u8 				 IdPadding[3];	 // Not used
+    u8               IdPadding[3];     // Not used
     u8               Track;
     u8               Side;
     u8               Padding[2];
@@ -103,7 +103,7 @@ struct DskTrack {
     u8               SectCount;      // 9
     u8               Gap3;           // 0x4E
     u8               FillerByte;     // 0xE5
-	struct DskSector Sectors[DSK_SECTORS_IN_TRACK_HEADER];
+    struct DskSector Sectors[DSK_SECTORS_IN_TRACK_HEADER];
 };
 
 struct CatalogEntryAmsdos {
@@ -119,12 +119,12 @@ struct CatalogEntryAmsdos {
 };
 
 struct CatalogEntryRaw {
-	u8		  EmptyByte;			// This byte always set to E5, so that CAT shows empty disc.
+    u8        EmptyByte;            // This byte always set to E5, so that CAT shows empty disc.
     u8        Side;
     u8        InitialTrack;
     u8        InitialSectorOffset;
-    u16 	  LengthInBytes;
-	u8        Padding[2];
+    u16       LengthInBytes;
+    u8        Padding[2];
 };
 
 struct AmsdosHeader {
