@@ -1,6 +1,6 @@
 {
     "sides": 2,
-    "catalog": "cpm",
+    "catalog": "raw",
     "diskType": "data",
     "boot": null,
     "files": [

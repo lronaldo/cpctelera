@@ -184,6 +184,9 @@ void Dsk::addToCatalog(FileToProcess &file) {
 		rawEntry->InitialSectorOffset = this->_currentSector;
 		rawEntry->LengthInBytes = file.Length;
 		this->_currentCatEntryIdx++;
+
+		this->_catRaw[1].Padding[0] = (this->_currentCatEntryIdx - 2) % 256;
+		this->_catRaw[1].Padding[1] = (this->_currentCatEntryIdx - 2) / 256;
 	}
 	else if (this->_catalogType == CAT_CPM) {
 		// We will need one catalog entry per 16 blocks.

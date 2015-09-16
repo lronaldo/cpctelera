@@ -800,7 +800,7 @@ bool ezOptionValidator::isValid(const std::string * valueAsString) {
     }
   } else {
     if (op == IN) { 
-		  int i=0;
+          int i=0;
       if (insensitive) {
         std::string valueAsStringLower(*valueAsString);
         ToLowerASCII(valueAsStringLower);
