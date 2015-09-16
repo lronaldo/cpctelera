@@ -31,12 +31,12 @@ void showUsage(ezOptionParser &options) {
 }
 
 int extractOptions(ezOptionParser &switches, Options &options) {
+	switches.get("-o")->getString(options.OutputFileName);
 	if(switches.isSet("--config")) {
 		string configFile;
 		switches.get("--config")->getString(configFile);
 		options.ParseFile(configFile);
 	} else {
-		switches.get("-o")->getString(options.OutputFileName);
 		string tmpStr;
 		switches.get("-c")->getString(tmpStr);
 		options.SetCatalogType(tmpStr);

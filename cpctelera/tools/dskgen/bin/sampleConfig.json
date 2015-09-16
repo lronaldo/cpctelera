@@ -1,0 +1,15 @@
+{
+    "sides": 2,
+    "catalog": "cpm",
+    "diskType": "data",
+    "boot": null,
+    "files": [
+        {
+            "path": "samplefile.bin",
+            "header": "amsdos",
+            "amsdosType": "bin",
+            "loadAddress": 256,
+            "executionAddress": 1451
+        }
+    ]
+}
