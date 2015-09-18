@@ -217,9 +217,11 @@ while (( $# >= 1 )); do
                PALETTE[$i]="$NEXT"
    
                ## Move to next value
-               i=$((i+1))
-               shift
-               NEXT="$1"
+               if (( ! RPAR_FOUND )); then
+                  i=$((i+1))
+                  shift
+                  NEXT="$1"
+               fi
             fi
          done
       ;;
