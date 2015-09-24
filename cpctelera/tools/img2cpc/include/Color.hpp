@@ -12,7 +12,7 @@ public:
 	unsigned char G;
 	unsigned char B;
 
-   Color(): R(0),G(0),B(0) {};
+	Color(): Color(0,0,0) {};
 
 	Color(const unsigned char r, 
 		  const unsigned char g, 

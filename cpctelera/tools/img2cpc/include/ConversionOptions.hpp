@@ -10,31 +10,32 @@ using namespace std;
 
 class ConversionOptions {
 public:
-	ConversionOptions() : TileWidth(-1), 
-						  TileHeight(-1),  
-						  Format(ASSEMBLER),
-						  Mode(0),
-						  ScanlineOrder {0,1,2,3,4,5,6,7},
-						  ZigZag(false) { };
+	ConversionOptions() : TileWidth(-1),
+		TileHeight(-1),
+		Format(ASSEMBLER),
+		Mode(0),
+		ScanlineOrder{ 0,1,2,3,4,5,6,7 },
+		ZigZag(false) { };
 
-	enum OutputFormat { ASSEMBLER, BINARY, PURE_C };
+	enum OutputFormat { ASSEMBLER, ASSEMBLER_ASXXXX, BINARY, PURE_C };
 	enum OutputPalette { NONE, FIRMWARE, HARDWARE };
 
 	inline static const char* ToString(OutputFormat f) {
-		switch(f) {
-			case ASSEMBLER: return "asm";
-			case BINARY: return "bin";
-			case PURE_C: return "c";
-			default: return "unknown";
+		switch (f) {
+		case ASSEMBLER: return "asm";
+		case ASSEMBLER_ASXXXX: return "s";
+		case BINARY: return "bin";
+		case PURE_C: return "c";
+		default: return "unknown";
 		}
 	}
 
 	inline static const char* ToString(OutputPalette p) {
-		switch(p) {
-			case NONE: return "none";
-			case FIRMWARE: return "firmware";
-			case HARDWARE: return "hardware";
-			default: return "unknown";
+		switch (p) {
+		case NONE: return "none";
+		case FIRMWARE: return "firmware";
+		case HARDWARE: return "hardware";
+		default: return "unknown";
 		}
 	}
 
@@ -52,15 +53,19 @@ public:
 	bool InterlaceMasks;
 	OutputPalette PaletteFormat;
 
+	bool CreateTileset;
+	bool OneFilePerSourceFile;
+
 	OutputFormat ParseFormat(const string &formatString) {
 		string fmtLower(formatString);
 		transform(fmtLower.begin(), fmtLower.end(), fmtLower.begin(), ::tolower);
-		
+
 		//cout << fmtLower << endl;
 
-		if(fmtLower == "asm") this->Format = ASSEMBLER;
-		else if(fmtLower == "bin") this->Format = BINARY;
-		else if(fmtLower == "c") this->Format = PURE_C;
+		if (fmtLower == "asm") this->Format = ASSEMBLER;
+		else if(fmtLower == "s") this->Format = ASSEMBLER_ASXXXX;
+		else if (fmtLower == "bin") this->Format = BINARY;
+		else if (fmtLower == "c") this->Format = PURE_C;
 
 		return this->Format;
 	};
@@ -75,7 +80,7 @@ public:
 		root["mode"] = this->Mode;
 		root["outputFileName"] = this->OutputFileName;
 		root["scanlineOrder"] = Json::Value();
-		for(int s : this->ScanlineOrder) {
+		for (int s : this->ScanlineOrder) {
 			root["scanlineOrder"].append(s);
 		}
 		root["zigZag"] = this->ZigZag;
@@ -92,8 +97,8 @@ public:
 		this->OutputFileName = root["outputFileName"].asString();
 		this->ScanlineOrder.clear();
 		Json::Value scanlines = root["scanlineOrder"];
-		for ( int i=0, li=scanlines.size(); i<li; ++i) {
-		   this->ScanlineOrder.push_back(scanlines[i].asInt());
+		for (int i = 0, li = scanlines.size(); i<li; ++i) {
+			this->ScanlineOrder.push_back(scanlines[i].asInt());
 		}
 		this->ZigZag = root["zigzag"].asBool();
 	};

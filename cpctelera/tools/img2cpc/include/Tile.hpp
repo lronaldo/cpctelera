@@ -21,6 +21,7 @@ public:
 	int TileHeight;
 	int TileWidthInBytes;
 	TPalette Palette;
+	string SourceFileName;
 
 	void Dump() {
 		cout << "{ " << endl

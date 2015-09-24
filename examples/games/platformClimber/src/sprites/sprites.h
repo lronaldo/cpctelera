@@ -21,6 +21,7 @@
 #define _SPRITES_H_
 
 #include <types.h>
+#include "credits.h"    // File generated from credits.png. See Makefile and build_config.mk
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,9 +51,5 @@ extern const u8 G_EMRjumpleft3[4*8];
 extern const u8 G_EMRjumpleft4[4*8];
 extern const u8 G_EMRhitright[4*16];
 extern const u8 G_EMRhitleft[4*16];
-
-// Credits sprite
-extern const u8 G_credits[20*27];
-
 
 #endif

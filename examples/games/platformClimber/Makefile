@@ -36,3 +36,26 @@ include cfg/build_config.mk
 ## USE GLOBAL MAKEFILE (general rules for building CPCtelera projects)
 ##
 include $(CPCT_PATH)cfg/global_main_makefile.mk
+
+##-------------------------------------------------------------------------------------------------------------------
+## Generate code from assets automatically
+##   - Convert assets/credits.png into src/sprites/credits.c and src/sprites/credits.h using cpct_img2tileset
+##   - Check build_config.mk and look for GENERATED_ASSETS variable. It makes credits.c be a required input for 
+##     compilation, triggering this rule
+##-------------------------------------------------------------------------------------------------------------------
+
+# FW_PALETE    - Firmware palette used in this game is required to convert the PNG sprite into C-arrays
+# CODE_OUT_DIR - Folder where code files will be placed after converting PNG
+# ASSETS_DIR   - Folder where assets are placed (PNG files should be there)
+FW_PALETTE   = { 11 15 3 24 13 20 6 26 0 2 1 18 8 5 16 9 }
+CODE_OUT_DIR = $(SRCDIR)/sprites
+ASSETS_DIR   = assets
+
+# Credits.c depends on credits.png. Each tiem credits.png is updated, this rule will be 
+# automatically triggered to update corresponding code.
+$(CODE_OUT_DIR)/credits.c: $(ASSETS_DIR)/credits.png
+	@## Enter assets folder and generate code with cpct_img2tileset 
+	@cd $(ASSETS_DIR) && cpct_img2tileset -tw 40 -th 27 -bn G -pf $(FW_PALETTE) -m 0 -nt credits.png
+	@## Move generated code files to corresponding code folder
+	@mv $(ASSETS_DIR)/credits.c $(CODE_OUT_DIR)
+	@mv $(ASSETS_DIR)/credits.h $(CODE_OUT_DIR)
