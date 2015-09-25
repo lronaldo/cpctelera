@@ -8,6 +8,7 @@ Section: Donnors
    10/06/2015 - Tim Riemann / Octoate
    25/06/2015 - Ervin Pajor
    13/07/2015 - Roald Strauss
+   23/09/2015 - Arnaud Bouche
 
 Section: Project authors
    
