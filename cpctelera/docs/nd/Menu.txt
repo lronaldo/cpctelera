@@ -154,6 +154,7 @@ Group: Command Line Tools  {
    File: cpct_mkproject  (no auto-title, commandline/cpct_mkproject)
    File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
    File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
+   File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
    File: cpct_winape  (commandline/cpct_winape)
    }  # Group: Command Line Tools
 
