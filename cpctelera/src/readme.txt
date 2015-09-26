@@ -103,13 +103,13 @@ _Under Windows_:
    
    Under Windows <Cygwin at http://www.cygwin.com> is required for CPCtelera to work. You may download Cygwin 32 / 64 and install it along with these packages (you may launch cygwin's setup.exe at any time to install them),
 
-   * *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*
-   * *libboost-devel*, *libintl-devel*
-   * *wget*, *unzip*
+   * Commands: *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*, *wget*, *unzip*
+   * Libraries: *libboost-devel*, *libintl-devel*
+   * 
 
-   *IMPORTANT NOTE*.
+IMPORTANT NOTE:
 
-   Windows users have reported some common issues installing CPCtelera. Please, have a look at this list if you have any problem:
+   Windows users have reported some common issues installing CPCtelera. Please, have a look at this list if you have any problem,
 
    * _Antivirus and scanning software_. This kind of software is causing random issues that cause Cygwin and CPCtelera not to operate properly. Common problems include failing to compile and/or execute programs, privilege problems on executing programs and random crashes of Cygwin. If you experience this problems, try disabling your antivirus or scanning software. Once being sure that this is the reason for your problems, you may want to configure your software not to interfere with Cygwin.
    * _Windows 8/10 privilege problems_. Under some unclarified circumstances, some users have privilege problems executing Cygwin sofware, and that affects CPCtelera. In this cases, the most common workaround is launching Cygwin terminal with administrator privileges.
