@@ -6,7 +6,7 @@ LIBDIR=lib
 
 CC=gcc
 CXX=g++
-CXXFLAGS=-std=c++11 -O3 -Werror -Wall -fsigned-char
+CXXFLAGS=-std=c++0x -O3 -Werror -Wall -fsigned-char
 LDLIBS=
 
 vpath %.hpp $(INCDIR)
