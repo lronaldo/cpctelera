@@ -92,6 +92,7 @@ Section: Testers & Bug Reporters
  * Roald Strauss (<mr_lou / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=96>)
  * Toni Ramírez
  * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / CPCWiki
+ * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / CPCWiki
 
 Section: Special Thanks
 
