@@ -565,7 +565,7 @@ static void genAddLit (iCode *ic, int lit)
 
                       emitpcode(POC_MOVLW, popGetLit(lit & 0xff));
                       emitpcode(POC_ADDFW,  popGet(AOP(left),offset));
-                      emitpcode(POC_MOVWF, popGet(AOP(left),offset));
+                      emitpcode(POC_MOVWF, popGet(AOP(result),offset));
 
                       clear_carry = 0;
                     }

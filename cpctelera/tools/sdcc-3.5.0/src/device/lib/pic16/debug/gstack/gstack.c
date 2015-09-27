@@ -26,23 +26,23 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-extern WREG;
-extern FSR1L;
-extern FSR1H;
-extern FSR0L;
-extern FSR0H;
-extern STATUS;
-extern POSTINC0;
-extern POSTDEC1;
-extern PREINC1;
-extern TOSL;
-extern TOSH;
-extern TOSU;
-extern PCL;
-extern PCLATH;
-extern PCLATU;
-extern stack;
-extern stack_end;
+extern int WREG;
+extern int FSR1L;
+extern int FSR1H;
+extern int FSR0L;
+extern int FSR0H;
+extern int STATUS;
+extern int POSTINC0;
+extern int POSTDEC1;
+extern int PREINC1;
+extern int TOSL;
+extern int TOSH;
+extern int TOSU;
+extern int PCL;
+extern int PCLATH;
+extern int PCLATU;
+extern int stack;
+extern int stack_end;
 
 #pragma udata access _wreg_store _status_store _fsr0_store
 #pragma udata access _gstack_begin _gstack_end _init_ok

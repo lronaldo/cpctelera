@@ -28,22 +28,22 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------
 
-  $Id: crt0iz.c 8191 2012-11-02 14:53:46Z molnarkaroly $
+  $Id: crt0iz.c 9317 2015-09-13 08:19:01Z spth $
 */
 
 /*
  * based on Microchip MPLAB-C18 startup files
  */
 
-extern stack_end;
-extern TBLPTRU;
-extern TBLPTRH;
-extern TBLPTRL;
-extern FSR0L;
-extern FSR0H;
-extern TABLAT;
-extern POSTINC0;
-extern POSTDEC0;
+extern int stack_end;
+extern int TBLPTRU;
+extern int TBLPTRH;
+extern int TBLPTRL;
+extern int FSR0L;
+extern int FSR0H;
+extern int TABLAT;
+extern int POSTINC0;
+extern int POSTDEC0;
 
 #if 1
 /* Global variable for forcing gplink to add _cinit section. */

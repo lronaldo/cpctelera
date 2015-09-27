@@ -251,6 +251,12 @@ enum {
   E_Z88DK_FASTCALL_PARAMETERS   = 222, /* invalid number of parameters in __z88dk_fastcall */
   E_Z88DK_FASTCALL_PARAMETER    = 223, /* invalid parameter type in __z88dk_fastcall */
   W_REPEAT_QUALIFIER            = 224, /* the same qualifier appears more than once */
+  W_NO_TYPE_SPECIFIER           = 225, /* type specifier missing in declaration */
+  E_NO_TYPE_SPECIFIER           = 226, /* type specifier missing in declaration */
+  E_MULTIPLE_DEFAULT_IN_GENERIC = 227, /* multiple default expressions in generic association */
+  E_MULTIPLE_MATCHES_IN_GENERIC = 228, /* multiple matching expressions in generic association */
+  E_NO_MATCH_IN_GENERIC         = 229, /* no matching expression in generic association */
+  W_LABEL_WITHOUT_STATEMENT     = 230, /* label without statement, not allowed in standard C */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -1331,17 +1331,10 @@ constCharVal (unsigned char v)
   SPEC_SCLS (val->type) = S_LITERAL;
   SPEC_CONST (val->type) = 1;
 
-  SPEC_NOUN (val->type) = V_CHAR;
+  SPEC_NOUN (val->type) = V_INT;
+  SPEC_USIGN (val->type) = 0;
 
-  if (options.unsigned_char)
-    {
-      SPEC_USIGN (val->type) = 1;
-      SPEC_CVAL (val->type).v_uint = (unsigned char) v;
-    }
-  else
-    {
-      SPEC_CVAL (val->type).v_int = (signed char) v;
-    }
+  SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
 
   return val;
 }

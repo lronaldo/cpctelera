@@ -14,6 +14,7 @@ SHELL           = /bin/sh
 CC              = @CCACHE@ @CC@
 CPP             = @CCACHE@ @CPP@
 CXX             = @CCACHE@ @CXX@
+AR              = @AR@
 RANLIB          = @RANLIB@
 INSTALL         = @INSTALL@
 YACC            = @YACC@

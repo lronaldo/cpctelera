@@ -26,9 +26,9 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-extern WREG;
-extern TXREG;
-extern TXSTA;
+extern int WREG;
+extern int TXREG;
+extern int TXSTA;
 
 /* note that USART should already been initialized */
 void

@@ -396,7 +396,7 @@ struct
   { W_SAVE_RESTORE, ERROR_LEVEL_PEDANTIC,
      "unmatched #pragma save and #pragma restore", 0 },
   { E_INVALID_CRITICAL, ERROR_LEVEL_ERROR,
-     "not allowed in a critical section", 0 },
+     "not allowed in a critical section or critical function", 0 },
   { E_NOT_ALLOWED, ERROR_LEVEL_ERROR,
      "%s not allowed here", 0 },
   { E_BAD_TAG, ERROR_LEVEL_ERROR,
@@ -505,6 +505,18 @@ struct
     "ivalid parameter type in __z88dk_fastcall", 0 },
   { W_REPEAT_QUALIFIER, ERROR_LEVEL_WARNING,
     "duplicate specifier '%s'", 0 },
+  { W_NO_TYPE_SPECIFIER, ERROR_LEVEL_WARNING,
+    "no type specifier for '%s'", 0 },
+  { E_NO_TYPE_SPECIFIER, ERROR_LEVEL_ERROR,
+    "no type specifier for '%s'", 0 },
+  { E_MULTIPLE_DEFAULT_IN_GENERIC, ERROR_LEVEL_ERROR,
+    "multiple default expressions in generic association", 0 },
+  { E_MULTIPLE_MATCHES_IN_GENERIC, ERROR_LEVEL_ERROR,
+    "multiple matching expressions in generic association", 0 },
+  { E_NO_MATCH_IN_GENERIC, ERROR_LEVEL_ERROR,
+    "no matching expression in generic association", 0 },
+  { W_LABEL_WITHOUT_STATEMENT, ERROR_LEVEL_WARNING,
+    "label without statement", 0},
 };
 
 /* -------------------------------------------------------------------------------

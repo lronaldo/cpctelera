@@ -259,6 +259,17 @@ enum dwarf_line_number_hp_sfc_ops
     DW_LNE_HP_SFC_associate = 3
   };
 
+/* Type codes for location list entries.
+   Extension for Fission.  See http://gcc.gnu.org/wiki/DebugFission.  */
+
+enum dwarf_location_list_entry_type
+  {
+    DW_LLE_GNU_end_of_list_entry = 0,
+    DW_LLE_GNU_base_address_selection_entry = 1,
+    DW_LLE_GNU_start_end_entry = 2,
+    DW_LLE_GNU_start_length_entry = 3
+  };
+
 #define DW_CIE_ID	  0xffffffff
 #define DW64_CIE_ID	  0xffffffffffffffffULL
 #define DW_CIE_VERSION	  1
@@ -365,6 +376,20 @@ enum dwarf_macro_record_type
 
 #define DW_EH_PE_indirect	0x80
 
+/* Codes for the debug sections in a dwarf package (.dwp) file.
+   Extensions for Fission.  See http://gcc.gnu.org/wiki/DebugFissionDWP.  */
+enum dwarf_sect
+  {
+    DW_SECT_INFO = 1,
+    DW_SECT_TYPES = 2,
+    DW_SECT_ABBREV = 3,
+    DW_SECT_LINE = 4,
+    DW_SECT_LOC = 5,
+    DW_SECT_STR_OFFSETS = 6,
+    DW_SECT_MACINFO = 7,
+    DW_SECT_MACRO = 8,
+    DW_SECT_MAX = 8
+  };
 
 #ifdef __cplusplus
 extern "C" {

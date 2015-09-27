@@ -158,42 +158,28 @@ malloc (unsigned int size)
 
             #define HEADER_SIZE sizeof(MEMHEADER)
 
-            MEMHEADER __xdata * _sdcc_first_memheader = NULL;
+            #define __sdcc_first_memheader ((MEMHEADER __xdata * ) __sdcc_heap)
 
-            extern __xdata char _sdcc_heap[];
-            extern const unsigned int _sdcc_heap_size;
-
-            static void init_dynamic_memory(void)
-            {
-              char __xdata * heap = (char __xdata *)_sdcc_heap;
-              unsigned int size = _sdcc_heap_size;
-
-              if ( !heap ) //Reserved memory starts at 0x0000 but that's NULL...
-              {             //So, we lost one byte!
-                heap++;
-                size--;
-              }
-              _sdcc_first_memheader = (MEMHEADER __xdata * ) heap;
-              //Reserve a mem for last header
-              _sdcc_first_memheader->next = (MEMHEADER __xdata * )(heap + size - sizeof(MEMHEADER __xdata *));
-              _sdcc_first_memheader->next->next = (MEMHEADER __xdata * ) NULL; //And mark it as last
-              _sdcc_first_memheader->len        = 0;    //Empty and ready.
-            }
+            extern __xdata char __sdcc_heap[];
+            extern __xdata void * const __sdcc_last_memheader;
 
             void __xdata * malloc (unsigned int size)
             {
-              register MEMHEADER __xdata * current_header;
-              register MEMHEADER __xdata * new_header;
-              register void __xdata * ret;
+              MEMHEADER __xdata * current_header;
+              MEMHEADER __xdata * new_header;
+              void __xdata * ret;
 
-              if (size>(0xFFFF-HEADER_SIZE))
-                return (void __xdata *) NULL; //To prevent overflow in next line
               size += HEADER_SIZE; //We need a memory for header too
+              if (size <= HEADER_SIZE)
+                return (void __xdata *) NULL; //Overflow or requested size was 0
 
-              if (!_sdcc_first_memheader)
-                init_dynamic_memory();
+              if (!__sdcc_first_memheader->next)
+              {
+                //Reserve a mem for last header
+                __sdcc_first_memheader->next = (MEMHEADER __xdata * )__sdcc_last_memheader;
+              }
 
-              current_header = _sdcc_first_memheader;
+              current_header = __sdcc_first_memheader;
               CRITICAL
               {
                 while (1)

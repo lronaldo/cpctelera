@@ -108,7 +108,7 @@ isRelativeAddr(const char *what, const char *mode)
 static int
 isLabel(const char *what)
 {
-  const char *end;	
+  const char *end;    
   end = strchr(what, '+');
   if(!end)
     end = what + strlen(what);
@@ -557,7 +557,7 @@ stm8MightRead(const lineNode *pl, const char *what)
       if (ISINST (pl->line, "adc")
         || ISINST (pl->line, "add")
         || ISINST (pl->line, "and")
-        || ISINST (pl->line, "bcp")
+        || ISINST (pl->line, "bcp") && !ISINST (pl->line, "bcpl")
         || ISINST (pl->line, "cp")
         || ISINST (pl->line, "div")
         || ISINST (pl->line, "exg")
@@ -656,6 +656,16 @@ stm8MightRead(const lineNode *pl, const char *what)
         || (ISINST (pl->line, "ld") && !ISINST (pl->line, "ldw"))
         || ISINST (pl->line, "xor")))
           return TRUE;
+
+      if (ISINST (pl->line, "ld"))
+        {
+          char buf[64], *p;
+          strcpy (buf, pl->line);
+          if (!!(p = strstr (buf, "0x")) || !!(p = strstr (buf, "0X")))
+            p[0] = p[1] = ' ';
+          if (!!(p = strchr (buf, '(')) && !!strchr (p, extra))
+            return TRUE;
+        }
     }
 
   if(ISINST(pl->line, "ret"))

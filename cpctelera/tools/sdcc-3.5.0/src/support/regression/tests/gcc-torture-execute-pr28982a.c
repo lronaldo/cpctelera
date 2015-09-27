@@ -63,7 +63,7 @@ float input[NITER * NVARS];
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka)
+#if !defined(__SDCC_mcs51) 
   int i;
 
   for (i = 0; i < NVARS; i++)

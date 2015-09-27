@@ -658,7 +658,9 @@ OPT_DISABLE_MCS51
 non_free_lib_dir_suffix
 lib_dir_suffix
 non_free_include_dir_suffix
+non_free_inclib_dir_suffix
 include_dir_suffix
+inclib_dir_suffix
 LIB_TYPE
 sdccconf_h_dir_separator
 C99_FLAG
@@ -786,7 +788,9 @@ CCC
 CXXCPP
 sdccconf_h_dir_separator
 LIB_TYPE
+inclib_dir_suffix
 include_dir_suffix
+non_free_inclib_dir_suffix
 non_free_include_dir_suffix
 lib_dir_suffix
 non_free_lib_dir_suffix
@@ -1460,8 +1464,13 @@ Some influential environment variables:
   sdccconf_h_dir_separator
               needed in sdccconf.h: either "/" (default) or "\\"
   LIB_TYPE    library type: LIB, SDCCLIB, AR or RANLIB (default)
+  inclib_dir_suffix
+              appended to datadir to define SDCC's include/lib directory
   include_dir_suffix
               appended to datadir to define SDCC's include directory
+  non_free_inclib_dir_suffix
+              appended to datadir to define SDCC's non-free include/lib
+              directory
   non_free_include_dir_suffix
               appended to datadir to define SDCC's non-free include directory
   lib_dir_suffix
@@ -3432,7 +3441,8 @@ else
   ac_save_c_werror_flag=$ac_c_werror_flag
    ac_c_werror_flag=yes
    ac_cv_prog_cc_g=no
-#   CFLAGS="-g"
+   #CFLAGS="-g"
+   CFLAGS="-O3 -fsigned-char"
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3447,7 +3457,8 @@ _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
   ac_cv_prog_cc_g=yes
 else
-  CFLAGS=""
+  #CFLAGS=""
+  CFLAGS="-O3 -fsigned-char"
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3463,7 +3474,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 
 else
   ac_c_werror_flag=$ac_save_c_werror_flag
-	 CFLAGS="-g"
+	 #CFLAGS="-g"
 	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3494,8 +3505,8 @@ elif test $ac_cv_prog_cc_g = yes; then
     #CFLAGS="-g -O2"
     CFLAGS="-O3 -fsigned-char"
   else
-    CFLAGS=""
     #CFLAGS="-g"
+    CFLAGS=""
   fi
 else
   if test "$GCC" = yes; then
@@ -3919,8 +3930,8 @@ else
   ac_save_cxx_werror_flag=$ac_cxx_werror_flag
    ac_cxx_werror_flag=yes
    ac_cv_prog_cxx_g=no
-    #CXXFLAGS="-g"
-    CXXFLAGS=""
+   #CXXFLAGS="-g"
+   CXXFLAGS=""
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -3980,7 +3991,7 @@ if test "$ac_test_CXXFLAGS" = set; then
 elif test $ac_cv_prog_cxx_g = yes; then
   if test "$GXX" = yes; then
     #CXXFLAGS="-g -O2"
-    CXXFLAGS="-O3"
+    CXXFLAGS="-O3 -fsigned-char"
   else
     #CXXFLAGS="-g"
     CXXFLAGS=""
@@ -3988,8 +3999,9 @@ elif test $ac_cv_prog_cxx_g = yes; then
 else
   if test "$GXX" = yes; then
     #CXXFLAGS="-O2"
-    CXXFLAGS="-O3"
+    CXXFLAGS="-O3 -fsigned-char"
   else
+    #CXXFLAGS=
     CXXFLAGS=
   fi
 fi
@@ -5737,6 +5749,11 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+case "${host}" in
+  *x86_64*cygwin*)
+    LDFLAGS="$LDFLAGS -Wl,--stack,4194304"
+esac
+
 # Checking whether byte ordering is bigendian
 # ===========================================================================
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether byte ordering is bigendian" >&5
@@ -5997,8 +6014,18 @@ fi
 # *nix default: "sdcc/include"
 
 
+if test "${inclib_dir_suffix}" = ""; then
+    inclib_dir_suffix="sdcc"
+fi
+
+
 if test "${include_dir_suffix}" = ""; then
-    include_dir_suffix="sdcc/include"
+    include_dir_suffix="${inclib_dir_suffix}/include"
+fi
+
+
+if test "${non_free_inclib_dir_suffix}" = ""; then
+    non_free_inclib_dir_suffix="sdcc/non-free"
 fi
 
 # non_free_include_dir_suffix:
@@ -6006,21 +6033,21 @@ fi
 
 
 if test "${non_free_include_dir_suffix}" = ""; then
-    non_free_include_dir_suffix="sdcc/non-free/include"
+    non_free_include_dir_suffix="${non_free_inclib_dir_suffix}/include"
 fi
 
 # lib_dir_suffix:
 # *nix default: "sdcc/lib"
 
 if test "${lib_dir_suffix}" = ""; then
-    lib_dir_suffix="sdcc/lib"
+    lib_dir_suffix="${inclib_dir_suffix}/lib"
 fi
 
 # non_free_lib_dir_suffix:
 # *nix default: "sdcc/non-free/lib"
 
 if test "${non_free_lib_dir_suffix}" = ""; then
-    non_free_lib_dir_suffix="sdcc/non-free/lib"
+    non_free_lib_dir_suffix="${non_free_inclib_dir_suffix}/lib"
 fi
 
 # docdir:
@@ -9400,12 +9427,14 @@ sdcc ${VERSION} is now configured for
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 
   Install paths:
-    binary files:       ${exec_prefix}
-    include files:      ${datadir}/${include_dir_suffix}
+    binary files:           ${exec_prefix}
+    include/library files:  ${datadir}/${inclib_dir_suffix}
+    include files:          ${datadir}/${include_dir_suffix}
+    library files:          ${datadir}/${lib_dir_suffix}
+    non-free files:         ${datadir}/${non_free_inclib_dir_suffix}
     non-free include files: ${datadir}/${non_free_include_dir_suffix}
-    library files:      ${datadir}/${lib_dir_suffix}
     non-free library files: ${datadir}/${non_free_lib_dir_suffix}
-    documentation:      ${docdir}
+    documentation:          ${docdir}
 
     prefix:             ${prefix}
     datadir:            ${datadir}
@@ -9466,12 +9495,14 @@ sdcc ${VERSION} is now configured for
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 
   Install paths:
-    binary files:       ${exec_prefix}
-    include files:      ${datadir}/${include_dir_suffix}
+    binary files:           ${exec_prefix}
+    include/library files:  ${datadir}/${inclib_dir_suffix}
+    include files:          ${datadir}/${include_dir_suffix}
+    library files:          ${datadir}/${lib_dir_suffix}
+    non-free files:         ${datadir}/${non_free_inclib_dir_suffix}
     non-free include files: ${datadir}/${non_free_include_dir_suffix}
-    library files:      ${datadir}/${lib_dir_suffix}
     non-free library files: ${datadir}/${non_free_lib_dir_suffix}
-    documentation:      ${docdir}
+    documentation:          ${docdir}
 
     prefix:             ${prefix}
     datadir:            ${datadir}

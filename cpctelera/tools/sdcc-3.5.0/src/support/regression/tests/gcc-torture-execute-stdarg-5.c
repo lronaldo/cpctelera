@@ -135,7 +135,7 @@ testTortureExecute (void)
 {
 #if defined(__SDCC_pic16)
   //broken, skip
-#elif defined(__SDCC_mcs51) && defined(INLINED_yes)
+#elif defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO) && !defined(__SDCC_USE_XSTACK) && defined(INLINED_yes)
   //broken, skip
 #else
   f1 (3, 16.0, 128L, 32.0);

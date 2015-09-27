@@ -322,7 +322,7 @@ get()
 
         if ((c = *ip) != 0)
                 ++ip;
-        return (c & 0x007F);
+        return (c & 0x00FF);
 }
 
 /*)Function     VOID    unget(c)

@@ -23,7 +23,7 @@ endif
 ifeq ($(enable_ds390_port),yes)
 S390		= s51.src
 else
-S51		=
+S390		=
 endif
 
 ifeq ($(enable_avr_port),yes)
@@ -41,25 +41,25 @@ endif
 ifeq ($(enable_z180_port),yes)
 SZ180		= z80.src
 else
-SZ80		=
+SZ180		=
 endif
 
 ifeq ($(enable_gbz80_port),yes)
 SGBZ80		= z80.src
 else
-SZ80		=
+SGBZ80		=
 endif
 
 ifeq ($(enable_r2k_port),yes)
 SR2K		= z80.src
 else
-SZ80		=
+SR2K		=
 endif
 
 ifeq ($(enable_r3ka_port),yes)
 SR3KA		= z80.src
 else
-SZ80		=
+SR3KA		=
 endif
 
 ifeq ($(enable_hc08_port),yes)
@@ -71,7 +71,7 @@ endif
 ifeq ($(enable_s08_port),yes)
 SS08		= hc08.src
 else
-SHC08		=
+SS08		=
 endif
 
 ifeq ($(enable_xa_port),yes)

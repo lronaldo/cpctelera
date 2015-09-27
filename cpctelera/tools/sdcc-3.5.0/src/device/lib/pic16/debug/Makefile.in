@@ -20,7 +20,7 @@ am__make_dryrun = \
   { \
     am__dry=no; \
     case $$MAKEFLAGS in \
-      *\\[\ \  ]*) \
+      *\\[\ \	]*) \
         echo 'am--echo: ; @echo "AM"  OK' | $(MAKE) -f - 2>/dev/null \
           | grep '^AM OK$$' >/dev/null || am__dry=yes;; \
       *) \

@@ -28,6 +28,10 @@ testArrayAccess(void)
   ASSERT(array_const_int [idx] == TI(2));
   ASSERT(array_const_long[idx] == TL(2));
 
+  ASSERT(idx[array_const_char] == TC(2));
+  ASSERT(idx[array_const_int ] == TI(2));
+  ASSERT(idx[array_const_long] == TL(2));
+
   ASSERT(array_const_char[2] == TC(2));
   ASSERT(array_const_int [2] == TI(2));
   ASSERT(array_const_long[2] == TL(2));
@@ -51,3 +55,4 @@ testArrayAccess(void)
   ASSERT(array_int [idx2] == (TI(3) | 0x8080));
   ASSERT(array_long[idx2] == (TL(3) | 0x80808080));
 }
+

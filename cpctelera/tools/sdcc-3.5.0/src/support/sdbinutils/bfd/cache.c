@@ -1,7 +1,6 @@
 /* BFD library -- caching of file descriptors.
 
-   Copyright 1990, 1991, 1992, 1993, 1994, 1996, 2000, 2001, 2002,
-   2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1990-2014 Free Software Foundation, Inc.
 
    Hacked by Steve Chamberlain of Cygnus Support (steve@cygnus.com).
 
@@ -31,7 +30,7 @@ SECTION
 	regard to the underlying operating system's file descriptor
 	limit (often as low as 20 open files).  The module in
 	<<cache.c>> maintains a least recently used list of
-	<<BFD_CACHE_MAX_OPEN>> files, and exports the name
+	<<bfd_cache_max_open>> files, and exports the name
 	<<bfd_cache_lookup>>, which runs around and makes sure that
 	the required BFD is open. If not, then it chooses a file to
 	close, closes it and opens the one wanted, returning its file
@@ -67,9 +66,35 @@ enum cache_flag {
 };
 
 /* The maximum number of files which the cache will keep open at
-   one time.  */
+   one time.  When needed call bfd_cache_max_open to initialize.  */
 
-#define BFD_CACHE_MAX_OPEN 10
+static int max_open_files = 0;
+
+/* Set max_open_files, if not already set, to 12.5% of the allowed open
+   file descriptors, but at least 10, and return the value.  */
+static int
+bfd_cache_max_open (void)
+{
+  if (max_open_files == 0)
+    {
+      int max;
+#ifdef HAVE_GETRLIMIT
+      struct rlimit rlim;
+      if (getrlimit (RLIMIT_NOFILE, &rlim) == 0
+	  && rlim.rlim_cur != (rlim_t) RLIM_INFINITY)
+	max = rlim.rlim_cur / 8;
+      else
+#endif /* HAVE_GETRLIMIT */
+#ifdef _SC_OPEN_MAX
+	max = sysconf (_SC_OPEN_MAX) / 8;
+#else
+	max = 10;
+#endif /* _SC_OPEN_MAX */
+      max_open_files = max < 10 ? 10 : max;
+    }
+
+  return max_open_files;
+}
 
 /* The number of BFD files we have open.  */
 
@@ -187,7 +212,7 @@ close_one (void)
 /* Called when the macro <<bfd_cache_lookup>> fails to find a
    quick answer.  Find a file descriptor for @var{abfd}.  If
    necessary, it open it.  If there are already more than
-   <<BFD_CACHE_MAX_OPEN>> files open, it tries to close one first, to
+   <<bfd_cache_max_open>> files open, it tries to close one first, to
    avoid running out of file descriptors.  It will return NULL
    if it is unable to (re)open the @var{abfd}.  */
 
@@ -285,7 +310,7 @@ cache_bread_1 (struct bfd *abfd, void *buf, file_ptr nbytes)
   if (nread == (file_ptr)-1)
     {
       bfd_set_error (bfd_error_system_call);
-      return -1;
+      return nread;
     }
 #else
   nread = fread (buf, 1, nbytes, f);
@@ -295,7 +320,7 @@ cache_bread_1 (struct bfd *abfd, void *buf, file_ptr nbytes)
   if (nread < nbytes && ferror (f))
     {
       bfd_set_error (bfd_error_system_call);
-      return -1;
+      return nread;
     }
 #endif
   if (nread < nbytes)
@@ -437,7 +462,7 @@ cache_bmmap (struct bfd *abfd ATTRIBUTE_UNUSED,
         {
           *map_addr = ret;
           *map_len = pg_len;
-          ret += offset & pagesize_m1;
+          ret = (char *) ret + (offset & pagesize_m1);
         }
     }
 #endif
@@ -466,7 +491,7 @@ bfd_boolean
 bfd_cache_init (bfd *abfd)
 {
   BFD_ASSERT (abfd->iostream != NULL);
-  if (open_files >= BFD_CACHE_MAX_OPEN)
+  if (open_files >= bfd_cache_max_open ())
     {
       if (! close_one ())
 	return FALSE;
@@ -553,7 +578,7 @@ bfd_open_file (bfd *abfd)
 {
   abfd->cacheable = TRUE;	/* Allow it to be closed later.  */
 
-  if (open_files >= BFD_CACHE_MAX_OPEN)
+  if (open_files >= bfd_cache_max_open ())
     {
       if (! close_one ())
 	return NULL;

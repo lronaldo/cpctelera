@@ -2993,12 +2993,35 @@ genFunction (iCode *ic)
   if (IFFUNC_ISCRITICAL (ftype))
       genCritical (NULL);
 
+  // Workaround for hardware bug: Undocumented bit 6 of the condition code register needs to be cleared before div/divw. It is set during div/divw execution, and then reset. Without the workaround, the div and divw inside interrupt routines will give wrong results when the interrupt itself occured while another div or divw was executed.
+  // For more information see sections titled "Unexpected DIV/DIVW instruction result in ISR" in various STM8 errata notes (apparently all STM8 are affected).
+  // The workaround here is the one recommended by STM in the erratum. There might be better ways to do it.
+  if (IFFUNC_ISISR (sym->type) && !sym->div_flag_safe)
+    {
+      D (emit2 (";", "Reset bit 6 of reg CC. Hardware bug workaround."));
+#if 0
+      // The workaorund recommended by STM. 6 bytes, 7 cycles (5 nominally, two more due to pipeline stalls)
+      emit2 ("push", "cc");
+      emit2 ("pop", "a");
+      emit2 ("and", "a, #0xbf");
+      emit2 ("push", "a");
+      emit2 ("pop", "cc");
+      cost (6, 5);
+#else
+      // The workaround obtained by further investigation of RFE #449. Experiments on STM8S208MB and STM8L152C6 show that div resets bit 6 of cc.
+      if (!optimize.codeSize)
+        emit3 (A_CLR, ASMOP_A, 0);	// Zero accumulator to reduce cycle cost in following division.
+      emit2 ("div", "x, a");	// According to measurements on the STM8S208MB and STM8L152C6, div takes 2-3 cycles for divisions by zero and 2-17 cycles in general.
+      cost (1, 3);
+#endif
+    }
+
   if (stm8_extend_stack) // Setup for extended stack access.
     {
       G.stack.size = stm8_call_stack_size + (sym->stack ? sym->stack : 0);
-      D (emit2(";", "Setup y for extended stack access."));
-      emit2("ldw", "y, sp");
-      emit2("subw", "y, #%ld", G.stack.size - 256);
+      D (emit2 (";", "Setup y for extended stack access."));
+      emit2 ("ldw", "y, sp");
+      emit2 ("subw", "y, #%ld", G.stack.size - 256);
       cost (6, 3);
     }
 
@@ -5685,7 +5708,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  // div can be cheper than a sequence of shifts.
+  // div can be cheaper than a sequence of shifts.
   if (!sign && shCount < 8 &&
     (shCount > 3 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, X_IDX) || size == 1 && aopInReg (shiftop, 0, XL_IDX) && xh_zero) ||
     shCount * 2 > 4 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, Y_IDX) || size == 1 && aopInReg (shiftop, 0, YL_IDX) && yh_zero)))
@@ -5702,7 +5725,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  // divw can be cheper than a sequence of shifts.
+  // divw can be cheaper than a sequence of shifts.
   if (!sign && size == 2 && shCount > 5 && regDead (Y_IDX, ic) && aopInReg (shiftop, 0, X_IDX))
     {
       emit2 ("ldw", "y, #0x%04x", 1 << shCount);

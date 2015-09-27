@@ -139,3 +139,27 @@ testCondOpPtrTypes2(void)
   ASSERT (deref2 (cond ? vp1 : testarray) == 3);
   ASSERT (deref2 (cond ? vp1 : ip1) == 7);
 }
+
+int
+foo0(int a, int b, int c)
+{
+  return a > 10 ? ++b, ++c : b + c;
+}
+
+int
+foo1(int a, int b, int c, int d)
+{
+  return a > 20 ? ++b, ++c, ++d + b + c : b < 100 ? c + ++d : c - --d;
+}
+
+void
+testBug2412(void)
+{
+  ASSERT (foo0 (2, 4, 5) == 9);
+  ASSERT (foo0 (72, 84, 5) == 6);
+  ASSERT (foo0 (7, 84, 75) == 159);
+
+  ASSERT (foo1 (110, 12, 13, 15) == 43);
+  ASSERT (foo1 (18, 12, 13, 15) == 29);
+  ASSERT (foo1 (12, 129, 13, 13) == 1);
+}

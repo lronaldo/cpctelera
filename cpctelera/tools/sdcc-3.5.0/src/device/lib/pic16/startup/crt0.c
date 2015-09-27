@@ -30,8 +30,8 @@
  * based on Microchip MPLAB-C18 startup files
  */
 
-extern stack_end;
-extern TBLPTRU;
+extern int stack_end;
+extern int TBLPTRU;
 
 /* external reference to the user's main routine */
 extern void main (void);

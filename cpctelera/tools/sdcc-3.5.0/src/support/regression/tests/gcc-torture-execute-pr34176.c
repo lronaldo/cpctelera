@@ -5,8 +5,9 @@
 #include <testfwk.h>
 
 #ifdef __SDCC
-#pragma std_c99
+#pragma std_c89
 #pragma disable_warning 85
+#pragma disable_warning 225
 #endif
 
 #include <string.h>

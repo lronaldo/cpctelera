@@ -594,6 +594,7 @@ pexecute
 target_header_dir
 CHECK
 LIBOBJS
+NOASANFLAG
 PICFLAG
 INSTALL_DATA
 INSTALL_SCRIPT
@@ -666,7 +667,7 @@ PACKAGE_TARNAME
 PACKAGE_NAME
 PATH_SEPARATOR
 SHELL'
-ac_subst_files=''
+ac_subst_files='host_makefile_frag'
 ac_user_opts='
 enable_option_checking
 with_target_subdir
@@ -675,8 +676,8 @@ with_cross_host
 with_newlib
 enable_maintainer_mode
 enable_multilib
-enable_largefile
 enable_install_libiberty
+enable_largefile
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1303,8 +1304,8 @@ Optional Features:
                           enable make rules and dependencies not useful
                           (and sometimes confusing) to the casual installer
   --enable-multilib       build many library versions (default)
+  --enable-install-libiberty       Install headers and library for end users
   --disable-largefile     omit support for large files
-  --enable-install-libiberty       Install headers for end users
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2783,6 +2784,35 @@ if test $cross_compiling = no && test $multilib = yes \
    && test "x${with_multisubdir}" != x ; then
    cross_compiling=maybe
 fi
+
+# We may wish to install the target headers somewhere.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to install libiberty headers and static library" >&5
+$as_echo_n "checking whether to install libiberty headers and static library... " >&6; }
+
+# Check whether --enable-install-libiberty was given.
+if test "${enable_install_libiberty+set}" = set; then :
+  enableval=$enable_install_libiberty; enable_install_libiberty=$enableval
+else
+  enable_install_libiberty=no
+fi
+
+# Option parsed, now set things appropriately.
+case x"$enable_install_libiberty" in
+  xyes|x)
+    target_header_dir=libiberty
+    ;;
+  xno)
+    target_header_dir=
+    ;;
+  *)
+    # This could be sanity-checked in various ways...
+    target_header_dir="${enable_install_libiberty}"
+    ;;
+esac
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_install_libiberty" >&5
+$as_echo "$enable_install_libiberty" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: target_header_dir = $target_header_dir" >&5
+$as_echo "$as_me: target_header_dir = $target_header_dir" >&6;}
 
 
 ac_ext=c
@@ -4833,20 +4863,20 @@ if [ -n "${with_build_subdir}" ]; then
   enable_shared=no
 fi
 
-####frag=
-####case "${host}" in
-####  rs6000-ibm-aix3.1 | rs6000-ibm-aix)
-####                        frag=mh-aix ;;
-####  *-*-cxux7*)		frag=mh-cxux7 ;;
-####  *-*-freebsd2.1.*)	frag=mh-fbsd21 ;;
-####  *-*-freebsd2.2.[[012]])	frag=mh-fbsd21 ;;
-####  i370-*-opened*)       frag=mh-openedition ;;
-####  i[[34567]]86-*-windows*)	frag=mh-windows ;;
-####esac
+frag=
+case "${host}" in
+  rs6000-ibm-aix3.1 | rs6000-ibm-aix)
+                        frag=mh-aix ;;
+  *-*-cxux7*)		frag=mh-cxux7 ;;
+  *-*-freebsd2.1.*)	frag=mh-fbsd21 ;;
+  *-*-freebsd2.2.[012])	frag=mh-fbsd21 ;;
+  i370-*-opened*)       frag=mh-openedition ;;
+  i[34567]86-*-windows*)	frag=mh-windows ;;
+esac
 
-####if [[ -n "${frag}" ]]; then
-####  frag=${libiberty_topdir}/libiberty/config/$frag
-####fi
+if [ -n "${frag}" ]; then
+  frag=${libiberty_topdir}/libiberty/config/$frag
+fi
 
 
 
@@ -4865,7 +4895,9 @@ case "${host}" in
     hppa*64*-*-hpux*)
 	# PIC is the default for 64-bit PA HP-UX.
 	;;
-    i[34567]86-*-cygwin* | i[34567]86-*-mingw* | x86_64-*-mingw*)
+    i[34567]86-*-cygwin* | x86_64-*-cygwin*)
+	;;
+    i[34567]86-*-mingw* | x86_64-*-mingw*)
 	;;
     i[34567]86-*-interix[3-9]*)
 	# Interix 3.x gcc -fpic/-fPIC options generate broken code.
@@ -4894,9 +4926,6 @@ case "${host}" in
     # Some targets support both -fPIC and -fpic, but prefer the latter.
     # FIXME: Why?
     i[34567]86-*-* | x86_64-*-*)
-	PICFLAG=-fpic
-	;;
-    m68k-*-*)
 	PICFLAG=-fpic
 	;;
     # FIXME: Override -fPIC default in libgcc only?
@@ -4932,31 +4961,43 @@ case "${enable_shared}" in
   "") shared=no ;;
   *) shared=yes ;;
 esac
+
+# ...unless --enable-host-shared was passed from top-level config:
+if [ "${enable_host_shared}" = "yes" ]; then
+  shared=yes
+fi
+
 if [ "${shared}" != "yes" ]; then
   PICFLAG=
 fi
 
 
-####echo "# Warning: this fragment is automatically generated" > temp-frag
+NOASANFLAG=
+case " ${CFLAGS} " in
+  *\ -fsanitize=address\ *) NOASANFLAG=-fno-sanitize=address ;;
+esac
 
-####if [[ -n "${frag}" ]] && [[ -f "${frag}" ]]; then
-####  echo "Appending ${frag} to xhost-mkfrag"
-####  echo "# Following fragment copied from ${frag}" >> temp-frag
-####  cat ${frag} >> temp-frag
-####fi
 
-##### record if we want to build shared libs.
-####if [[ "${shared}" = "yes" ]]; then
-####  echo enable_shared = yes >> temp-frag
-####else
-####  echo enable_shared = no >> temp-frag
-####fi
+echo "# Warning: this fragment is automatically generated" > temp-frag
 
-####frag=xhost-mkfrag
-####${CONFIG_SHELL-/bin/sh} ${libiberty_topdir}/move-if-change temp-frag xhost-mkfrag
+if [ -n "${frag}" ] && [ -f "${frag}" ]; then
+  echo "Appending ${frag} to xhost-mkfrag"
+  echo "# Following fragment copied from ${frag}" >> temp-frag
+  cat ${frag} >> temp-frag
+fi
 
-####host_makefile_frag=${frag}
-####AC_SUBST_FILE(host_makefile_frag)
+# record if we want to build shared libs.
+if [ "${shared}" = "yes" ]; then
+  echo enable_shared = yes >> temp-frag
+else
+  echo enable_shared = no >> temp-frag
+fi
+
+frag=xhost-mkfrag
+${CONFIG_SHELL-/bin/sh} ${libiberty_topdir}/move-if-change temp-frag xhost-mkfrag
+
+host_makefile_frag=${frag}
+
 
 # It's OK to check for header files.  Although the compiler may not be
 # able to link anything, it had better be able to at least compile
@@ -5340,6 +5381,7 @@ funcs="$funcs strchr"
 funcs="$funcs strdup"
 funcs="$funcs strncasecmp"
 funcs="$funcs strndup"
+funcs="$funcs strnlen"
 funcs="$funcs strrchr"
 funcs="$funcs strstr"
 funcs="$funcs strtod"
@@ -5380,8 +5422,8 @@ if test "x" = "y"; then
     random realpath rename rindex \
     sbrk setenv setproctitle setrlimit sigsetmask snprintf spawnve spawnvpe \
      stpcpy stpncpy strcasecmp strchr strdup \
-     strerror strncasecmp strndup strrchr strsignal strstr strtod strtol \
-     strtoul strverscmp sysconf sysctl sysmp \
+     strerror strncasecmp strndup strnlen strrchr strsignal strstr strtod \
+     strtol strtoul strverscmp sysconf sysctl sysmp \
     table times tmpnam \
     vasprintf vfprintf vprintf vsprintf \
     wait3 wait4 waitpid
@@ -5475,7 +5517,6 @@ fi
 
 setobjs=
 CHECK=
-target_header_dir=
 if test -n "${with_target_subdir}"; then
 
   # We are being configured as a target library.  AC_REPLACE_FUNCS
@@ -5663,6 +5704,12 @@ esac
 esac
 
     case " $LIBOBJS " in
+  *" strnlen.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS strnlen.$ac_objext"
+ ;;
+esac
+
+    case " $LIBOBJS " in
   *" strverscmp.$ac_objext "* ) ;;
   *) LIBOBJS="$LIBOBJS strverscmp.$ac_objext"
  ;;
@@ -5683,7 +5730,7 @@ esac
 
     for f in $funcs; do
       case "$f" in
-	asprintf | basename | bcmp | bcopy | bzero | clock | ffs | getpagesize | index | insque | mempcpy | mkstemps | random | rindex | sigsetmask | stpcpy | stpncpy | strdup | strndup | strverscmp | vasprintf | waitpid)
+	asprintf | basename | bcmp | bcopy | bzero | clock | ffs | getpagesize | index | insque | mempcpy | mkstemps | random | rindex | sigsetmask | stpcpy | stpncpy | strdup | strndup | strnlen | strverscmp | vasprintf | waitpid)
 	  ;;
 	*)
 	  n=HAVE_`echo $f | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
@@ -5751,29 +5798,6 @@ _ACEOF
     ;;
 
   esac
-
-  # We may wish to install the target headers somewhere.
-  # Check whether --enable-install-libiberty was given.
-if test "${enable_install_libiberty+set}" = set; then :
-  enableval=$enable_install_libiberty; enable_install_libiberty=$enableval
-else
-  enable_install_libiberty=no
-fi
-
-  # Option parsed, now set things appropriately.
-  case x"$enable_install_libiberty" in
-    xyes|x)
-      target_header_dir=libiberty
-      ;;
-    xno)
-      target_header_dir=
-      ;;
-    *)
-      # This could be sanity-checked in various ways...
-      target_header_dir="${enable_install_libiberty}"
-      ;;
-  esac
-
 
 else
 
@@ -6934,8 +6958,7 @@ LIBOBJS="$L"
 
 
 # We need multilib support, but only if configuring for the target.
-####AC_CONFIG_FILES([Makefile testsuite/Makefile])
-ac_config_files="$ac_config_files Makefile"
+ac_config_files="$ac_config_files Makefile testsuite/Makefile"
 
 ac_config_commands="$ac_config_commands default"
 
@@ -7639,6 +7662,7 @@ do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h:config.in" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "testsuite/Makefile") CONFIG_FILES="$CONFIG_FILES testsuite/Makefile" ;;
     "default") CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
 
   *) as_fn_error "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -7686,7 +7710,24 @@ $debug ||
 # This happens for instance with `./config.status config.h'.
 if test -n "$CONFIG_FILES"; then
 
-
+if $AWK 'BEGIN { getline <"/dev/null" }' </dev/null 2>/dev/null; then
+  ac_cs_awk_getline=:
+  ac_cs_awk_pipe_init=
+  ac_cs_awk_read_file='
+      while ((getline aline < (F[key])) > 0)
+	print(aline)
+      close(F[key])'
+  ac_cs_awk_pipe_fini=
+else
+  ac_cs_awk_getline=false
+  ac_cs_awk_pipe_init="print \"cat <<'|#_!!_#|' &&\""
+  ac_cs_awk_read_file='
+      print "|#_!!_#|"
+      print "cat " F[key] " &&"
+      '$ac_cs_awk_pipe_init
+  # The final `:' finishes the AND list.
+  ac_cs_awk_pipe_fini='END { print "|#_!!_#|"; print ":" }'
+fi
 ac_cr=`echo X | tr X '\015'`
 # On cygwin, bash can eat \r inside `` if the user requested igncr.
 # But we know of no other shell where ac_cr would be empty at this
@@ -7704,6 +7745,17 @@ fi
 echo 'BEGIN {' >"$tmp/subs1.awk" &&
 _ACEOF
 
+# Create commands to substitute file output variables.
+{
+  echo "cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1" &&
+  echo 'cat >>"\$tmp/subs1.awk" <<\\_ACAWK &&' &&
+  echo "$ac_subst_files" | sed 's/.*/F["&"]="$&"/' &&
+  echo "_ACAWK" &&
+  echo "_ACEOF"
+} >conf$$files.sh &&
+. ./conf$$files.sh ||
+  as_fn_error "could not make $CONFIG_STATUS" "$LINENO" 5
+rm -f conf$$files.sh
 
 {
   echo "cat >conf$$subs.awk <<_ACEOF" &&
@@ -7780,7 +7832,7 @@ _ACAWK
 cat >>"\$tmp/subs1.awk" <<_ACAWK &&
   for (key in S) S_is_set[key] = 1
   FS = ""
-
+  \$ac_cs_awk_pipe_init
 }
 {
   line = $ 0
@@ -7798,10 +7850,16 @@ cat >>"\$tmp/subs1.awk" <<_ACAWK &&
     } else
       len += 1 + keylen
   }
-
+  if (nfields == 3 && !substed) {
+    key = field[2]
+    if (F[key] != "" && line ~ /^[	 ]*@.*@[	 ]*$/) {
+      \$ac_cs_awk_read_file
+      next
+    }
+  }
   print line
 }
-
+\$ac_cs_awk_pipe_fini
 _ACAWK
 _ACEOF
 cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
@@ -8134,7 +8192,12 @@ s&@abs_top_builddir@&$ac_abs_top_builddir&;t t
 s&@INSTALL@&$ac_INSTALL&;t t
 $ac_datarootdir_hack
 "
-eval sed \"\$ac_sed_extra\" "$ac_file_inputs" | $AWK -f "$tmp/subs.awk" >$tmp/out \
+eval sed \"\$ac_sed_extra\" "$ac_file_inputs" |
+if $ac_cs_awk_getline; then
+  $AWK -f "$tmp/subs.awk"
+else
+  $AWK -f "$tmp/subs.awk" | $SHELL
+fi >$tmp/out \
   || as_fn_error "could not create $ac_file" "$LINENO" 5
 
 test -z "$ac_datarootdir_hack$ac_datarootdir_seen" &&

@@ -43,6 +43,7 @@
 #define FLT_MAX_10_EXP  (+38)
 
 /* the following deal with IEEE single-precision numbers */
+#if defined(__SDCC_FLOAT_LIB)
 #define EXCESS		126
 #define SIGNBIT		((unsigned long)0x80000000)
 #define __INFINITY	((unsigned long)0x7F800000)
@@ -52,6 +53,7 @@
 #define MANT(fp)	(((fp) & (unsigned long)0x007FFFFF) | HIDDEN)
 #define NORM            0xff000000
 #define PACK(s,e,m)	((s) | ((unsigned long)(e) << 23) | (m))
+#endif
 
 float __uchar2fs (unsigned char);
 float __schar2fs (signed char);

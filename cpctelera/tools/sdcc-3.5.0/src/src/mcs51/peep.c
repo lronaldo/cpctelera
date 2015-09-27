@@ -505,9 +505,9 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
                   }
 
                 /* it's a normal function return */
-                if (IS_SYMOP (IC_LEFT ((*pl)->ic)) &&
+                if (!((*pl)->ic) || (IS_SYMOP (IC_LEFT ((*pl)->ic)) &&
                     IS_FUNC (OP_SYM_TYPE(IC_LEFT ((*pl)->ic))) &&
-                    FUNC_CALLEESAVES (OP_SYM_TYPE(IC_LEFT ((*pl)->ic))))
+                    FUNC_CALLEESAVES (OP_SYM_TYPE(IC_LEFT ((*pl)->ic)))))
                   return S4O_ABORT;
                 else
                   return S4O_TERM;

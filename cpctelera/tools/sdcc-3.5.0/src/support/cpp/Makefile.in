@@ -44,7 +44,7 @@ LDFLAGS = @LDFLAGS@
 
 AWK = @AWK@
 CC = @CC@
-AR = ar
+AR = @AR@
 AR_FLAGS = rc
 RANLIB = @RANLIB@
 SHELL = /bin/sh

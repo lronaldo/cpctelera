@@ -81,6 +81,8 @@ void PA (ast * t);
 int inInitMode = 0;
 memmap *GcurMemmap = NULL;      /* points to the memmap that's currently active */
 struct dbuf_s *codeOutBuf;
+extern int inCriticalFunction;
+extern int inCriticalBlock;
 
 int
 ptt (ast * tree)
@@ -639,7 +641,7 @@ resolveSymbols (ast * tree)
       /* if not found in the symbol table */
       /* mark it as undefined & assume it */
       /* is an integer in data space      */
-      if (!csym && !tree->opval.val->sym->implicit)
+      if (!csym && !tree->opval.val->sym->implicit && !tree->opval.val->type)
         {
           /* if this is a function name then */
           /* mark it as returning an int     */
@@ -1329,7 +1331,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
 
   /* if this is a pointer & right is a literal array then */
   /* just assignment will do                              */
-  if (IS_PTR (type) && ((IS_LITERAL (iexpr->etype) || SPEC_SCLS (iexpr->etype) == S_CODE) && IS_ARRAY (iexpr->ftype)))
+  if (IS_PTR (type) && ((IS_LITERAL (iexpr->etype) || (IS_SPEC (iexpr->etype) && SPEC_SCLS (iexpr->etype) == S_CODE)) && IS_ARRAY (iexpr->ftype)))
     return newNode ('=', sym, iexpr);
 
   /* left side is an array so we have to assign each element */
@@ -1355,7 +1357,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
     }
 
-  if ((IS_LITERAL (iexpr->etype) || SPEC_SCLS (iexpr->etype) == S_CODE) && IS_ARRAY (iexpr->ftype))
+  if ((IS_LITERAL (iexpr->etype) || (IS_SPEC (iexpr->etype) && SPEC_SCLS (iexpr->etype) == S_CODE)) && IS_ARRAY (iexpr->ftype))
     {
       /* for each character generate an assignment */
       /* to the array element */
@@ -3146,7 +3148,15 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*        array node          */
       /*----------------------------*/
     case '[':
-      /* first check if this is an array or a pointer */
+      /* Swap trees if right side is array or a pointer */
+      if (IS_ARRAY (RTYPE (tree)) || IS_PTR (RTYPE (tree)))
+        {
+          ast *tTree = tree->left;
+          tree->left = tree->right;
+          tree->right = tTree;
+        }
+
+      /* check if this is an array or a pointer */
       if ((!IS_ARRAY (LTYPE (tree))) && (!IS_PTR (LTYPE (tree))))
         {
           werrorfl (tree->filename, tree->lineno, E_NEED_ARRAY_PTR, "[]");
@@ -4933,13 +4943,67 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       TETYPE (tree) = getSpec (TTYPE (tree));
       return tree;
 
-    case ':':
-      /* if they don't match we have a problem */
+    case GENERIC:
+      {
+        sym_link *type = tree->left->ftype;
+        ast *assoc_list;
+        ast *default_expr = 0;
+        ast *found_expr = 0;
 
+        for(assoc_list = tree->right; assoc_list; assoc_list = assoc_list->left)
+          {
+            ast *const assoc = assoc_list->right;
+            if (!assoc->left)
+              {
+                if (default_expr)
+                  {
+                    werror (E_MULTIPLE_DEFAULT_IN_GENERIC);
+                    goto errorTreeReturn;
+                  }
+                default_expr = assoc->right;
+              }
+            else
+              {
+                sym_link *assoc_type;
+                wassert (IS_AST_LINK (assoc->left));
+                assoc_type = assoc->left->opval.lnk;
+                checkTypeSanity (assoc_type, "_Generic");
+
+                if (compareType (type, assoc->left->opval.lnk) > 0)
+                  {
+                    if (found_expr)
+                      {
+                        werror (E_MULTIPLE_MATCHES_IN_GENERIC);
+                        goto errorTreeReturn;
+                      }
+                    found_expr = assoc->right;
+                  }
+              }
+          }
+        if (!found_expr)
+          found_expr = default_expr;
+
+        if (!found_expr)
+          {
+            werror (E_NO_MATCH_IN_GENERIC);
+            goto errorTreeReturn;
+          }
+        
+        tree = found_expr;
+      }
+      return tree;
+
+    case GENERIC_ASSOC_LIST:
+      return tree;
+
+    case GENERIC_ASSOCIATION:
+      return tree;
+
+    case ':':
       if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) &&
-          (compareType (RTYPE (tree), LTYPE (tree)) == 0) &&
-          !(IS_ARRAY(LTYPE (tree)) && IS_INTEGRAL(RTYPE (tree))) &&
-          !(IS_ARRAY(RTYPE (tree)) && IS_INTEGRAL(LTYPE (tree))))
+        (compareType (RTYPE (tree), LTYPE (tree)) == 0) &&
+        !(IS_ARRAY(LTYPE (tree)) && IS_INTEGRAL(RTYPE (tree))) &&
+        !(IS_ARRAY(RTYPE (tree)) && IS_INTEGRAL(LTYPE (tree))))
         {
           werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "conditional operator", " ");
           goto errorTreeReturn;
@@ -4947,6 +5011,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op);
       TETYPE (tree) = getSpec (TTYPE (tree));
+
       return tree;
 
 #if 0                           // assignment operators are converted by the parser
@@ -5143,6 +5208,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*       function call        */
       /*----------------------------*/
     case CALL:
+      if (IFFUNC_ISCRITICAL (LTYPE(tree)) && (inCriticalFunction || inCriticalBlock))
+        werror (E_INVALID_CRITICAL);
 
       /* undo any explicit pointer dereference; PCALL will handle it instead */
       if (IS_FUNC (LTYPE (tree)) && tree->left->type == EX_OP)
@@ -6759,6 +6826,9 @@ expandInlineFuncs (ast * tree, ast * block)
       if (csym)
         func = csym;
 
+      if ((inCriticalFunction || inCriticalBlock) && IFFUNC_ISCRITICAL (func->type))
+        werrorfl (tree->left->filename, tree->left->lineno, E_INVALID_CRITICAL);
+
       /* Is this an inline function that we can inline? */
       if (IFFUNC_ISINLINE (func->type) && func->funcTree)
         {
@@ -6871,12 +6941,16 @@ expandInlineFuncs (ast * tree, ast * block)
               /* {{inline_function_code}}, retsym                         */
 
               tree->opval.op = ',';
+              if (IFFUNC_ISCRITICAL (func->type))
+                inlinetree = newNode (CRITICAL, inlinetree, NULL);
               tree->left = inlinetree;
               tree->right = newAst_VALUE (symbolVal (retsym));
             }
           else
             {
               tree->opval.op = NULLOP;
+              if (IFFUNC_ISCRITICAL (func->type))
+                inlinetree = newNode (CRITICAL, inlinetree, NULL);
               tree->left = NULL;
               tree->right = inlinetree;
             }

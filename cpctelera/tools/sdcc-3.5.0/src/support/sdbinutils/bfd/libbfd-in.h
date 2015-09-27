@@ -1,10 +1,7 @@
 /* libbfd.h -- Declarations used by bfd library *implementation*.
    (This include file is not for users of the library.)
 
-   Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 1990-2014 Free Software Foundation, Inc.
 
    Written by Cygnus Support.
 
@@ -96,6 +93,8 @@ struct areltdata
   bfd_size_type extra_size;	/* BSD4.4: extra bytes after the header.  */
   char *filename;		/* Null-terminated.  */
   file_ptr origin;		/* For element of a thin archive.  */
+  void *parent_cache;		/* Where and how to find this member.  */
+  file_ptr key;
 };
 
 #define arelt_size(bfd) (((struct areltdata *)((bfd)->arelt_data))->parsed_size)
@@ -160,8 +159,6 @@ extern bfd *_bfd_generic_get_elt_at_index
   (bfd *, symindex);
 bfd * _bfd_new_bfd
   (void);
-void _bfd_delete_bfd
-  (bfd *);
 bfd_boolean _bfd_free_cached_info
   (bfd *);
 
@@ -232,7 +229,9 @@ int bfd_generic_stat_arch_elt
 /* Generic routines to use for BFD_JUMP_TABLE_GENERIC.  Use
    BFD_JUMP_TABLE_GENERIC (_bfd_generic).  */
 
-#define _bfd_generic_close_and_cleanup bfd_true
+#define _bfd_generic_close_and_cleanup _bfd_archive_close_and_cleanup
+extern bfd_boolean _bfd_archive_close_and_cleanup
+  (bfd *);
 #define _bfd_generic_bfd_free_cached_info bfd_true
 extern bfd_boolean _bfd_generic_new_section_hook
   (bfd *, asection *);
@@ -400,8 +399,13 @@ extern bfd_boolean _bfd_vms_lib_ia64_mkarchive (bfd *abfd);
 #define _bfd_nosymbols_get_lineno \
   ((alent *(*) (bfd *, asymbol *)) bfd_nullvoidptr)
 #define _bfd_nosymbols_find_nearest_line \
-  ((bfd_boolean (*) (bfd *, asection *, asymbol **, bfd_vma, const char **, \
-		     const char **, unsigned int *)) \
+  ((bfd_boolean (*) (bfd *, asymbol **, asection *, bfd_vma,		\
+		     const char **, const char **, unsigned int *,	\
+		     unsigned int *))					\
+   bfd_false)
+#define _bfd_nosymbols_find_line \
+  ((bfd_boolean (*) (bfd *, asymbol **, asymbol *,	\
+		     const char **, unsigned int *))	\
    bfd_false)
 #define _bfd_nosymbols_find_inliner_info \
   ((bfd_boolean (*) (bfd *, const char **, const char **, unsigned int *)) \
@@ -472,8 +476,6 @@ extern bfd_boolean _bfd_generic_set_section_contents
    bfd_false)
 #define _bfd_nolink_bfd_link_hash_table_create \
   ((struct bfd_link_hash_table *(*) (bfd *)) bfd_nullvoidptr)
-#define _bfd_nolink_bfd_link_hash_table_free \
-  ((void (*) (struct bfd_link_hash_table *)) bfd_void)
 #define _bfd_nolink_bfd_link_add_symbols \
   ((bfd_boolean (*) (bfd *, struct bfd_link_info *)) bfd_false)
 #define _bfd_nolink_bfd_link_just_syms \
@@ -523,8 +525,8 @@ extern bfd_boolean _bfd_stab_section_find_nearest_line
 
 /* Find the nearest line using DWARF 1 debugging information.  */
 extern bfd_boolean _bfd_dwarf1_find_nearest_line
-  (bfd *, asection *, asymbol **, bfd_vma, const char **,
-   const char **, unsigned int *);
+  (bfd *, asymbol **, asection *, bfd_vma,
+   const char **, const char **, unsigned int *);
 
 struct dwarf_debug_section
 {
@@ -539,21 +541,9 @@ extern const struct dwarf_debug_section dwarf_debug_sections[];
 
 /* Find the nearest line using DWARF 2 debugging information.  */
 extern bfd_boolean _bfd_dwarf2_find_nearest_line
-  (bfd *, const struct dwarf_debug_section *, asection *, asymbol **, bfd_vma,
-   const char **, const char **, unsigned int *, unsigned int *, unsigned int,
-   void **);
-
-/* Find the line using DWARF 2 debugging information.  */
-extern bfd_boolean _bfd_dwarf2_find_line
-  (bfd *, asymbol **, asymbol *, const char **,
-   unsigned int *, unsigned int *, unsigned int, void **);
-
-bfd_boolean _bfd_generic_find_line
-  (bfd *, asymbol **, asymbol *, const char **, unsigned int *);
-
-bfd_boolean _bfd_generic_find_nearest_line_discriminator
-  (bfd *, asection *, asymbol **, bfd_vma, const char **, const char **,
-   unsigned int *, unsigned int *);
+  (bfd *, asymbol **, asymbol *, asection *, bfd_vma,
+   const char **, const char **, unsigned int *, unsigned int *,
+   const struct dwarf_debug_section *, unsigned int, void **);
 
 /* Find inliner info after calling bfd_find_nearest_line. */
 extern bfd_boolean _bfd_dwarf2_find_inliner_info
@@ -561,7 +551,8 @@ extern bfd_boolean _bfd_dwarf2_find_inliner_info
 
 /* Read DWARF 2 debugging information. */
 extern bfd_boolean _bfd_dwarf2_slurp_debug_info
-  (bfd *, bfd *, const struct dwarf_debug_section *, asymbol **, void **);
+  (bfd *, bfd *, const struct dwarf_debug_section *, asymbol **, void **,
+   bfd_boolean);
 
 /* Clean up the data used to handle DWARF 2 debugging information. */
 extern void _bfd_dwarf2_cleanup_debug_info
@@ -590,7 +581,7 @@ extern struct bfd_link_hash_table *_bfd_generic_link_hash_table_create
 
 /* Generic link hash table destruction routine.  */
 extern void _bfd_generic_link_hash_table_free
-  (struct bfd_link_hash_table *);
+  (bfd *);
 
 /* Generic add symbol routine.  */
 extern bfd_boolean _bfd_generic_link_add_symbols
@@ -605,7 +596,9 @@ extern bfd_boolean _bfd_generic_link_add_symbols_collect
 /* Generic archive add symbol routine.  */
 extern bfd_boolean _bfd_generic_link_add_archive_symbols
   (bfd *, struct bfd_link_info *,
-   bfd_boolean (*) (bfd *, struct bfd_link_info *, bfd_boolean *));
+   bfd_boolean (*) (bfd *, struct bfd_link_info *,
+		    struct bfd_link_hash_entry *, const char *,
+		    bfd_boolean *));
 
 /* Forward declaration to avoid prototype errors.  */
 typedef struct bfd_link_hash_entry _bfd_link_hash_entry;
@@ -704,6 +697,10 @@ extern bfd_boolean _bfd_write_merged_section
 
 extern bfd_vma _bfd_merged_section_offset
   (bfd *, asection **, void *, bfd_vma);
+
+/* Tidy up when done.  */
+
+extern void _bfd_merge_sections_free (void *);
 
 /* Create a string table.  */
 extern struct bfd_strtab_hash *_bfd_stringtab_init

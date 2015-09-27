@@ -1,6 +1,5 @@
 /* SEC_MERGE support.
-   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-   Free Software Foundation, Inc.
+   Copyright (C) 2001-2014 Free Software Foundation, Inc.
    Written by Jakub Jelinek <jakub@redhat.com>.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -884,4 +883,18 @@ _bfd_merged_section_offset (bfd *output_bfd ATTRIBUTE_UNUSED, asection **psec,
 
   *psec = entry->secinfo->sec;
   return entry->u.index + (secinfo->contents + offset - p);
+}
+
+/* Tidy up when done.  */
+
+void
+_bfd_merge_sections_free (void *xsinfo)
+{
+  struct sec_merge_info *sinfo;
+
+  for (sinfo = (struct sec_merge_info *) xsinfo; sinfo; sinfo = sinfo->next)
+    {
+      bfd_hash_table_free (&sinfo->htab->table);
+      free (sinfo->htab);
+    }
 }

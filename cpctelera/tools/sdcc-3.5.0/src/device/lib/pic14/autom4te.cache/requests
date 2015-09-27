@@ -12,7 +12,7 @@
                       [
                         '/home/sdcc-builder/local-cf-x86/share/autoconf/autoconf/autoconf.m4f',
                         'aclocal.m4',
-                        'configure.in'
+                        'configure.ac'
                       ],
                       {
                         '_LT_AC_TAGCONFIG' => 1,
