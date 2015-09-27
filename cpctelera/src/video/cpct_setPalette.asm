@@ -15,15 +15,7 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-;#####################################################################
-;### MODULE: SetVideoMode                                          ###
-;#####################################################################
-;### Routines to establish and control video modes                 ###
-;#####################################################################
-;
 .module cpct_video
-
-.include /videomode.s/
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_setPalette
@@ -31,11 +23,11 @@
 ;;    Changes the hardware palette colour values (selecting new ones).
 ;;
 ;; C Definition:
-;;    void <cpct_setPalette> (<u8>* *colour_array*, <u8> *size*)
+;;    void <cpct_setPalette> (<u8>* *colour_array*, <u16> *size*)
 ;;
-;; Input Parameters (3 Bytes):
-;;  (2B DE) colour_array  - Pointer to a byte array containing new hardware colour values [0 - 31]
-;;  (1B A ) size          - [1 - 16] Number of colours to change
+;; Input Parameters (4 Bytes):
+;;  (2B HL) colour_array  - Pointer to a byte array containing new hardware colour values [0 - 31]
+;;  (2B DE) size          - [1 - 16] Number of colours to change
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_setPalette_asm
@@ -43,9 +35,9 @@
 ;; Parameter Restrictions:
 ;;  * *colour_array* must be an array of unsigned 8-bit values (u8), each one
 ;; in the [0-31] range.
-;;  * *size* must be between 1 and 16. A size of 0 will be treated as 16, and any
-;; value greater than 16 will be modularized into [1-16] range (using only least
-;; significant 4 bits)
+;;  * *size* must be between 1 and 16. A size of 0 will be treated as 256, and any
+;; value greater than 16 will cause undefined behaviour, probably leading to program
+;; crashes.
 ;;
 ;; Requirements:
 ;;    This function requires the CPC *firmware* to be *DISABLED*. Otherwise, it
@@ -117,20 +109,21 @@
 ;;    AF, BC, DE, HL 
 ;;
 ;; Required memory:
-;;    35 bytes
+;;      C-bindings - 23 bytes
+;;    ASM-bindings - 19 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    | Cycles      | microSecs (us)
+;;    Case    | microSecs (us) | CPU Cycles
 ;; ---------------------------------------------
-;;     Any    | 101 + 78*NC | 25,25 + 19,50*NC
+;;     Any    |   22 + 20*NC   |  88 + 80*NC
 ;; ---------------------------------------------
-;; Asm saving |    -54      |    -13.50
+;; Asm saving |      -13       |    -52
 ;; ---------------------------------------------
+;; NC =  4    |      102       |    408
+;; NC = 16    |      342       |   1368
 ;; (end)
 ;;    NC=Number of colours to be set
-;;
-;;  Example - On setting NC=16 colours: 1349 cycles (337.25 us)
 ;;
 ;; Credits:
 ;;    This function has been constructed with great help from the
@@ -139,40 +132,23 @@
 ;; http://www.grimware.org/doku.php/documentations/devices/gatearray
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_setPalette::
-   ;; Getting parameters from stack
-   ld  hl, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
-   add hl, sp               ;; [11]
-   ld   e, (hl)             ;; [ 7] DE = First parameter, pointer to the array that contains desired color IDs 
-   inc  hl                  ;; [ 6]      (should get it in little endian order, E, then D)
-   ld   d, (hl)             ;; [ 7]
-   inc  hl                  ;; [ 6]
-   ld   a, (hl)             ;; [ 7] A = Second parameter, Number of colours to set (up to 16) 
+   dec   e                  ;; [1] E = number of colours - 1 = Palette index of the last colour to be set 
+   add  hl, de              ;; [3] HL += DE (HL Points to the end of the palette array)
 
-cpct_setPalette_asm::       ;; Assembly entry point
-   ex   de, hl              ;; [ 4] HL = DE, We will use HL to point to the array and get colour ID values
-   dec  a                   ;; [ 4] A -= 1 (We leave A as 1 colour less to convert 16 into 15 and 
-                            ;; ....         be able to use AND to ensure no more than 16 colours are passed)
-   and  #0x0F               ;; [ 7] A %= 16, A will be 15 at most, that is, the number of colours to set minus 1
-   inc  a                   ;; [ 4] A += 1 Restore the 1 to leave A as the number of colours to set
-   ld   e, a                ;; [ 4] E = A, E will have the number of colours to set 
-   ld   d, #0               ;; [ 7] D = 0, D will count from 0 to E 
-
-   ld   b, #GA_port_byte    ;; [ 7] BC = Gate Array Port (0x7F), to send commands using OUT
+   ld    b, #GA_port_byte   ;; [2] BC = Gate Array Port (0x7F), to send commands using OUT
 svp_setPens_loop:
-   ld   a, d                ;; [ 4] A = D, A has index of the next PEN to be established
-  ;OR   #PAL_PENR           ;; [ 7] A = (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). 
+   ;ld    a, e              ;; ;[1] A = E, A has index of the next PEN to be established
+   ;OR   #PAL_PENR          ;; ;[2] A = (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). 
                             ;; .... As PENR command is 000, nothing to be done here.
-   out (c),a                ;; [11] GA Command: Select PENR. A = Command + Parameter (PENR + PEN number to select)
+   out (c), e               ;; [4] GA Command: Select PENR. E = Command + Parameter (PENR + PEN number to select)
 
-   ld   a, (hl)             ;; [ 7] Get Color value (INK) for the selected PEN from array
-   and  #0x1F               ;; [ 7] Leave out only the 5 Least significant bits (3 MSB can cause problems)
-   or   #PAL_INKR           ;; [ 7] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for PEN number (n). 
-   out (c),a                ;; [11] GA Command: Set INKR. A = Command + Parameter 
+   ld    a, (hl)            ;; [2] Get Color value (INK) for the selected PEN from array
+   and   #0x1F              ;; [2] Leave out only the 5 Least significant bits (3 MSB can cause problems)
+   or    #PAL_INKR          ;; [2] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for PEN number (n). 
+   out (c), a               ;; [4] GA Command: Set INKR. A = Command + Parameter 
                             ;; .... (INKR + INK to be set for selected PEN number)
-   inc  hl                  ;; [ 6] HL += 1, Point to the next INK in the array
-   inc  d                   ;; [ 4] D += 1, Next PEN index to be set 
-   dec  e                   ;; [ 4] E -= 1, count how many PENs still to be set
-   jp nz, svp_setPens_loop  ;; [10] If more than 0 PENs to be set, continue
+   dec   hl                 ;; [2] HL -= 1, Point to the next INK in the array
+   dec   e                  ;; [1] E -= 1, Next Palette index to be set (counting backwards)
+   jp    p, svp_setPens_loop;; [3] If more than 0 PENs to be set, continue
 
-   ret                      ;; [10] Return
+   ret                      ;; [3] Return
