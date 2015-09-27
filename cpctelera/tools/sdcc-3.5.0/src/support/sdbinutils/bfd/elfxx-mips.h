@@ -1,6 +1,5 @@
 /* MIPS ELF specific backend routines.
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
-   Free Software Foundation, Inc.
+   Copyright (C) 2002-2014 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -23,6 +22,8 @@
 #include "elf/internal.h"
 #include "elf/mips.h"
 
+extern bfd_boolean _bfd_mips_elf_mkobject
+  (bfd *);
 extern bfd_boolean _bfd_mips_elf_new_section_hook
   (bfd *, asection *);
 extern void _bfd_mips_elf_symbol_processing
@@ -85,8 +86,8 @@ extern bfd_boolean _bfd_mips_elf_ignore_discarded_relocs
 extern bfd_boolean _bfd_mips_elf_is_target_special_symbol
   (bfd *abfd, asymbol *sym);
 extern bfd_boolean _bfd_mips_elf_find_nearest_line
-  (bfd *, asection *, asymbol **, bfd_vma, const char **,
-   const char **, unsigned int *);
+  (bfd *, asymbol **, asection *, bfd_vma,
+   const char **, const char **, unsigned int *, unsigned int *);
 extern bfd_boolean _bfd_mips_elf_find_inliner_info
   (bfd *, const char **, const char **, unsigned int *);
 extern bfd_boolean _bfd_mips_elf_set_section_contents
@@ -107,6 +108,8 @@ extern bfd_boolean _bfd_mips_elf_merge_private_bfd_data
   (bfd *, bfd *);
 extern bfd_boolean _bfd_mips_elf_set_private_flags
   (bfd *, flagword);
+extern const char * _bfd_mips_fp_abi_string
+  (int);
 extern bfd_boolean _bfd_mips_elf_print_private_bfd_data
   (bfd *, void *);
 extern bfd_boolean _bfd_mips_elf_discard_info
@@ -145,11 +148,17 @@ extern bfd_boolean _bfd_mips_elf_ignore_undef_symbol
   (struct elf_link_hash_entry *);
 extern void _bfd_mips_elf_use_plts_and_copy_relocs
   (struct bfd_link_info *);
+extern void _bfd_mips_elf_insn32
+  (struct bfd_link_info *, bfd_boolean);
 extern bfd_boolean _bfd_mips_elf_init_stubs
   (struct bfd_link_info *,
    asection *(*) (const char *, asection *, asection *));
 extern bfd_vma _bfd_mips_elf_plt_sym_val
   (bfd_vma, const asection *, const arelent *rel);
+extern long _bfd_mips_elf_get_synthetic_symtab
+  (bfd *, long, asymbol **, long, asymbol **, asymbol **);
+extern bfd_boolean _bfd_mips_elf_gc_mark_extra_sections
+  (struct bfd_link_info *, elf_gc_mark_hook_fn);
 extern void _bfd_mips_post_process_headers
   (bfd *abfd, struct bfd_link_info *link_info);
 

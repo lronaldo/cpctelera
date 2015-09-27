@@ -40,6 +40,7 @@ int lineno = 1;                 /* current line number */
 int block;
 int scopeLevel;
 int seqPoint;
+int inCriticalPair = 0;
 
 symbol *returnLabel;            /* function return label */
 symbol *entryLabel;             /* function entry  label */
@@ -3385,6 +3386,10 @@ geniCodeCall (operand * left, ast * parms, int lvl)
       return operandFromValue (valueFromLit (0));
     }
 
+  // not allow call a critical function
+  if (inCriticalPair && FUNC_ISCRITICAL (ftype))
+    werror (E_INVALID_CRITICAL);
+
   /* take care of parameters with side-effecting
      function calls in them, this is required to take care
      of overlaying function parameters */
@@ -3985,6 +3990,7 @@ geniCodeCritical (ast * tree, int lvl)
   /* the stack. Otherwise, it will be saved in op. */
 
   /* Generate a save of the current interrupt state & disable */
+  inCriticalPair = 1;
   ic = newiCode (CRITICAL, NULL, NULL);
   IC_RESULT (ic) = op;
   ADDTOCHAIN (ic);
@@ -3998,6 +4004,7 @@ geniCodeCritical (ast * tree, int lvl)
   /* Generate a restore of the original interrupt state */
   ic = newiCode (ENDCRITICAL, NULL, op);
   ADDTOCHAIN (ic);
+  inCriticalPair = 0;
 }
 
 /*-----------------------------------------------------------------*/

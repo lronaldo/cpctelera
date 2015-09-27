@@ -541,8 +541,6 @@ lkfopen(void)
                                         switch(a_bytes) {
                                         default:
                                         case 2: frmt = "s19"; break;
-                                        case 3: frmt = "s28"; break;
-                                        case 4: frmt = "s37"; break;
                                         }
                                         fp = afile(bp->b_fspec, frmt, 1);
                                 } else

@@ -31,17 +31,17 @@
  * therefore we choose return type void here. Generic pointer is expected
  * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
 
-extern POSTINC0;
-extern INDF0;
-extern FSR0L;
-extern FSR0H;
-extern WREG;
-extern TBLPTRL;
-extern TBLPTRH;
-extern TBLPTRU;
-extern TABLAT;
-extern PRODL;
-extern __eeprom_gptrget2;
+extern int POSTINC0;
+extern int INDF0;
+extern int FSR0L;
+extern int FSR0H;
+extern int WREG;
+extern int TBLPTRL;
+extern int TBLPTRH;
+extern int TBLPTRU;
+extern int TABLAT;
+extern int PRODL;
+extern int __eeprom_gptrget2;
 
 void _gptrget2(void) __naked
 {

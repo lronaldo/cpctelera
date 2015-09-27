@@ -26,7 +26,7 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-extern WREG;
+extern int WREG;
 
 /* note that USART should already been initialized */
 void

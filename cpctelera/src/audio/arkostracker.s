@@ -2020,16 +2020,16 @@ PLY_Stop:
    ;;
    ;; C Definition:
    ;;    void <cpct_akp_SFXPlay> (<u8> *sfx_num*, <u8> *volume*, <u8> *note*, 
-   ;; <u8> *speed*, <u16> *inverted_pitch*, <u8> *channel_num*)
+   ;; <u8> *speed*, <u16> *inverted_pitch*, <u8> *channel_bitmask*)
    ;;
    ;; Input Parameters (7 bytes):
-   ;;  (1B L ) sfx_num        - Number of the instrument in the SFX Song (>0), same as the number given to the 
+   ;;  (1B L ) sfx_num         - Number of the instrument in the SFX Song (>0), same as the number given to the 
    ;; instrument in Arkos Tracker.
-   ;;  (1B H ) volume         - Volume [0-15], 0 = off, 15 = maximum volume.
-   ;;  (1B E ) note           - Note to be played with the given instrument [0-143]
-   ;;  (1B D ) speed          - Speed (0 = As original, [1-255] = new Speed (1 is fastest))
-   ;;  (2B BC) inverted_pitch - Inverted Pitch (-0xFFFF -> 0xFFFF). 0 is no pitch. The higher the pitch, the lower the sound.
-   ;;  (1B A ) channel_num    - Number of Channel where to reproduce the FX (0, 1, 2)
+   ;;  (1B H ) volume          - Volume [0-15], 0 = off, 15 = maximum volume.
+   ;;  (1B E ) note            - Note to be played with the given instrument [0-143]
+   ;;  (1B D ) speed           - Speed (0 = As original, [1-255] = new Speed (1 is fastest))
+   ;;  (2B BC) inverted_pitch  - Inverted Pitch (-0xFFFF -> 0xFFFF). 0 is no pitch. The higher the pitch, the lower the sound.
+   ;;  (1B A ) channel_bitmask - Bitmask representing channels to use for reproducing the sound (Ch.A = 001 (1), Ch.B = 010 (2), Ch.C = 100 (4))
    ;;
    ;; Assembly call (Input parameters on registers):
    ;;    > call cpct_akp_SFXPlay_asm

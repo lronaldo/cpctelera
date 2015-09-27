@@ -75,21 +75,21 @@ MEMHEADER
 
 #endif
 
-extern MEMHEADER __xdata * _sdcc_prev_memheader;
+extern MEMHEADER __xdata * __sdcc_prev_memheader;
 
 // apart from finding the header
 // this function also finds it's predecessor
-extern MEMHEADER __xdata * _sdcc_find_memheader(void __xdata * p);
+extern MEMHEADER __xdata * __sdcc_find_memheader(void __xdata * p);
 
 void __xdata * realloc (void * p, size_t size)
 {
-  register MEMHEADER __xdata * pthis;
-  register MEMHEADER __xdata * pnew;
-  register void __xdata * ret;
+  MEMHEADER __xdata * pthis;
+  MEMHEADER __xdata * pnew;
+  void __xdata * ret;
 
   CRITICAL
   {
-    pthis = _sdcc_find_memheader(p);
+    pthis = __sdcc_find_memheader(p);
     if (pthis)
     {
       if (size > (0xFFFF-HEADER_SIZE))
@@ -107,13 +107,13 @@ void __xdata * realloc (void * p, size_t size)
         }
         else
         {
-          if ((_sdcc_prev_memheader) &&
+          if ((__sdcc_prev_memheader) &&
               ((((unsigned int)pthis->next) -
-                ((unsigned int)_sdcc_prev_memheader) -
-                _sdcc_prev_memheader->len) >= size))
+                ((unsigned int)__sdcc_prev_memheader) -
+                __sdcc_prev_memheader->len) >= size))
           {
-            pnew = (MEMHEADER __xdata * )((char __xdata *)_sdcc_prev_memheader + _sdcc_prev_memheader->len);
-            _sdcc_prev_memheader->next = pnew;
+            pnew = (MEMHEADER __xdata * )((char __xdata *)__sdcc_prev_memheader + __sdcc_prev_memheader->len);
+            __sdcc_prev_memheader->next = pnew;
 
 #if _SDCC_MALLOC_TYPE_MLH
             pthis->next->prev = pnew;

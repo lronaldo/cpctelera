@@ -1,3 +1,362 @@
+2015-09-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_calloc.c,
+	* device/lib/_free.c,
+	* device/lib/_heap.c,
+	* device/lib/_malloc.c,
+	* device/lib/_realloc.c: renamed all _sdcc_* to __sdcc_*,
+	  removed register keywords,
+	  changed _sdcc_heap_size to __sdcc_last_memheader,
+	  removed init_dynamic_memory() and other optimizations
+	* support/regression/tests/malloc.c: added test for size overflow
+
+2015-09-21 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/gcc-torture-execute-pr28982a.c:
+	  Enabled for the r2k and r3ka ports.
+
+2015-09-20 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/z80/gen.c:
+	  Fix bugs in genOr() and genXor() while operands are longlong.
+	* support/regression/tests/longlong.c:
+	  Enable more tests.
+
+2015-09-16 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y:
+	* src/SDCCast.c:
+	* src/SDCCerr.c:
+	* src/SDCCicode.c:
+	  Disable nested critical block / function call, support return in inline critical functions.
+	* support/regression/tests/critical.c:
+	  Improve test case.
+	* support/regression/tests/malloc.c:
+	  fix a small spot.
+
+2015-09-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/malloc.c:
+	  More testing of memory management.
+
+2015-09-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/malloc.c:
+	  More testing of memory management.
+
+2015-09-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pic16/*
+	  Fix delarations to make pic16 lib compile again.
+
+2015-09-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pic14/genarith.c:
+	  Fix bug #2417 by applying patch by Juho Salminen.
+
+2015-09-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2385.c:
+	  Regression test for bug #2385.
+
+2015-09-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/critical.c:
+	  Improve test case.
+	* src/SDCC.y:
+	  Fix a bug: inline critical functions are inlined as non-critical.
+
+2015-09-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/generic.c:
+	  More testcases for _Generic.
+	* src/z80/gen.c,
+	  support/regression/tests/critical.c:
+	  Fix bug #2416.
+
+2015-09-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peep.c:
+	  Fix handling of bcpl in notUsed().
+
+2015-09-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pic14/peeph.def:
+	  Fix bug #2415.
+	* src/stm8/peeph.def:
+	  Implement some rules for bit complement.
+	* src/SDCCval.c,
+	  support/regression/tests/generic.c:
+	  Fix bug #2411.
+	* src/pic16/main.c:
+	  Use zero-initializing crt0 by default.
+
+2015-08-27 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sim/ucsim/packages_in.mk:
+	  Fix a bug: simulator sz80 is not built if only z80 port is enabled.
+
+2015-08-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/peep.c:
+	  Fix a bug in peephole rule condition notUsed().
+
+2015-08-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/bug-2188.c:
+	* src/SDCCast.c:
+	  Apply patch #248 by Pavel Pisa <pisa@cmp.felk.cvut.cz>.
+
+2015-08-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure.ac:
+	* configure:
+	  Correct build failure on sparc64-netbsd.
+
+2015-08-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/condopptr.c:
+	  Add more test.
+	* src/SDCC.y:
+	  Improve conditional expression.
+	* configure.ac:
+	* configure:
+	  Correct spots in previous commit.
+
+2015-08-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure.ac:
+	* configure:
+	  Extend stack size on cygwin64.
+
+2015-08-15 Ben Shi <powerstudio1st AT 163 DOT com>
+
+        * src/SDCCast.c:
+          Fix a bug in storage class check.
+        * support/regression/tests/gcc-torture-execute-20020402-3.c:
+          Enable test case.
+
+2015-08-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  support/regression/tests/array.c:
+	  Implement RFE #454 for index[array] access.
+	* src/SDCC.y,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c:
+	  Emit warning for non-standard label without statement.
+	* support/regression/tests/generic.c:
+	  Disable test for host, since older host compilers are still in use.
+
+2015-08-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/regression/tests/generic.c,
+	  doc/sdccman.lyx:
+	  Implement C11 generic selections.
+
+2015-08-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/regression/tests/gcc-torture-execute-920721-3.c,
+	  support/regression/tests/gcc-torture-execute-pr34176.c,
+	  support/regression/tests/implicit_int.c:
+	  Diagnostic for implicit int.
+
+2015-08-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fix bug #2408.
+	* src/z80/peeph-r2k.def,
+	* src/z80/peeph-tlcs90.def:
+	  Synced with z80 peepholes.
+
+2015-08-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fix bug #2407 using fix suggested by alvin.
+
+2015-08-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Cheaper stm8 division workaround (RFE #449).
+	* doc/sdccman.lyx:
+	  Update standard compliance documentation to reflect recently implemented feature.
+
+2015-08-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCCralloc.hpp,
+	  src/stm8/gen.c:
+	  Static code analysis to omit stm8 division workaround when safe to do so (RFE #448).
+
+2015-07-31 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/gcc-torture-execute-stdarg-5.c:
+	  Improve test case.
+
+2015-07-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Workaround for for stm8 division hardware bug.
+
+2015-07-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/cpp/configure.ac:
+	* support/cpp/configure:
+	* support/cpp/Makefile.in:
+	* Makefile.common.in:
+	  Fix small spots.
+
+2015-07-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lklex.c:
+	  Support unicode character in sdld's command line.
+	* sdas/linksrc/lkbank.c:
+	  Remove unsupported ".s28" and ".s37" file extensions.
+
+2015-07-12 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure.in:
+	* debugger/mcs51/configure:
+	* debugger/mcs51/configure.in:
+	* device/lib/pic14/Makefile.in:
+	* device/lib/pic14/aclocal.m4:
+	* device/lib/pic14/config.h.in:
+	* device/lib/pic14/configure.in:
+	* device/lib/pic14/libm/Makefile.in:
+	* device/lib/pic14/libsdcc/enhanced/Makefile.in:
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in:
+	* device/lib/pic14/libsdcc/regular/Makefile.in:
+	* device/non-free/lib/pic14/configure:
+	* device/non-free/lib/pic14/configure.in:
+	* sim/ucsim/configure.in:
+	* support/cpp/configure:
+	* support/cpp/configure.in:
+	* support/packihx/configure:
+	* support/packihx/configure.in:
+	  Move all configure.in to configure.ac and update with autoconf 2.69.
+
+2015-07-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Fix comments.
+	* device/lib/stm8/_mulint.s:
+	  Faster, smaller integer multiplication.
+
+2015-07-08 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/sdbinutils/bfd/asxxxx.c:
+	  Fix a bug in check .rel format while there are comments.
+
+2015-07-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure:
+	* configure.in:
+	* device/include/Makefile.in:
+	* support/sdbinutils/Makefile.in:
+	* support/sdbinutils/binutils/Makefile.in:
+	  Make "make install" and "make uninstall" more clear.
+
+2015-07-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/sdbinutils/binutils/*
+	  Fix bug #2394 and do not ship files generated by yacc.
+
+2015-07-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c:
+	  Patch from z88dk to allow comments in between rule and condition.
+
+2015-07-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge upstream binutils 2.25 by merging binutils branch into trunk.
+
+2015-07-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/mcs51/peep.c:
+	  Add NULL pointer check.
+
+2015-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c:
+	  Adjust buffer sizes RFE #441.
+
+2015-06-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c,
+	  doc/sdccman.lyx,
+	  support/regression/tests/version.c:
+	  Implement patchlevel macro RFE #441.
+
+2015-06-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/sdbinutils/*
+	  Merge upstream binutils 2.25.
+
+2015-06-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/sdbinutils/*
+	  Import more parts of upstream binutils 2.23.2.
+
+2015-06-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/sdbinutils/*
+	  Import more parts of upstream binutils 2.23.2.
+
+2015-06-26 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* device/include/float.h:
+	  Hide sdcc library private macros.
+	* support/sdbinutils/include/objalloc.h:
+	* support/sdbinutils/libiberty/objalloc.c:
+	  Apply patches from GNU.
+
+2015-06-25 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure:
+	* configure.in:
+	* device/non-free/include/Makefile.in:
+	  Fix the bug "make uninstall" left empty directory. 
+	* src/SDCCBBlock.c:
+	  Apply patch #158 to fix bug #1693.
+	* support/regression/tests/version.c:
+	  Fix the failure in "make test-host".
+
+2015-06-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c,
+	  doc/sdccman.lyx,
+	  support/regression/tests/version.c:
+	  Implement version macros RFE #441.
+
+2015-06-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/collate-results.py:
+	  Fix the bug that an abnormal stop in reg-rest can not be detected.
+
+2015-06-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c:
+	  Fix bug #2389.
+	* src/SDCCglue.c,
+	  src/SDCCmain.c,
+	  src/SDCCutil.c,
+	  src/SDCCutil.h:
+	  Remove build date from version string to make reproducible builds easier.
+
+2015-06-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* Small Device C Compiler 3.5.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 3.5.1
+
 2015-06-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/scripts/gen_known_bugs.pl: fixed by Raphael Neider for changed
@@ -34401,4 +34760,4 @@
 	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
 	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
 
-$Revision: 9253 $
+$Revision: 9329 $

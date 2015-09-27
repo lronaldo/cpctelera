@@ -779,7 +779,7 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
       if (ebbs[i]->sch == NULL)
         continue;
 
-      if (ebbs[i]->noPath && (ebbs[i]->entryLabel != entryLabel && ebbs[i]->entryLabel != returnLabel))
+      if (ebbs[i]->noPath && optimize.label4 && (ebbs[i]->entryLabel != entryLabel && ebbs[i]->entryLabel != returnLabel))
         {
           iCode *ic = NULL;
           bool foundNonlabel = 0;

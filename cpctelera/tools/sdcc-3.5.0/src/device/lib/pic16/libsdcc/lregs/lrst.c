@@ -29,9 +29,9 @@
 /* FSR0 points to first register to store, WREG holds the register count
  */
  
-extern POSTDEC1;
-extern POSTINC0;
-extern WREG;
+extern int POSTDEC1;
+extern int POSTINC0;
+extern int WREG;
 
 void _lr_store(void) __naked
 {

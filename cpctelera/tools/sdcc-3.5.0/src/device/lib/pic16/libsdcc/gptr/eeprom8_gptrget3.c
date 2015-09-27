@@ -30,14 +30,14 @@
  * therefore we choose return type void here. Generic pointer is expected
  * to be in (WREG, PRODL, FSR0L), so function arguments are void, too */
 
-extern EEADR;
-extern EECON1;
-extern EEDATA;
-extern FSR0L;
-extern INTCON;
-extern PRODH;
-extern PRODL;
-extern TBLPTRL;
+extern int EEADR;
+extern int EECON1;
+extern int EEDATA;
+extern int FSR0L;
+extern int INTCON;
+extern int PRODH;
+extern int PRODL;
+extern int TBLPTRL;
 
 void
 __eeprom8_gptrget3(void) __naked

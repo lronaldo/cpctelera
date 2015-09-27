@@ -833,6 +833,9 @@ asxxxx_is_rel (bfd *abfd, unsigned int *p_lineno)
   int c;
   bfd_boolean error = FALSE;
 
+__begin_check:
+  error = FALSE;
+
   /* [XDQ][HL][234] */
   switch (c = asxxxx_get_byte (abfd, &error))
     {
@@ -851,7 +854,7 @@ asxxxx_is_rel (bfd *abfd, unsigned int *p_lineno)
       /* eat the rest of line */
       if (! asxxxx_skip_line (abfd, &c, p_lineno, &error))
         return FALSE;
-      break;
+      goto __begin_check;
 
     case 'X':
       SET_RADIX (abfd, RADIX_HEX);
@@ -1058,6 +1061,7 @@ asxxxx_print_symbol (bfd *abfd,
     }
 }
 
+#define asxxxx_find_line                            _bfd_nosymbols_find_line
 #define asxxxx_close_and_cleanup                    _bfd_generic_close_and_cleanup
 #define asxxxx_bfd_free_cached_info                 _bfd_generic_bfd_free_cached_info
 #define asxxxx_new_section_hook                     _bfd_generic_new_section_hook

@@ -978,7 +978,7 @@ _pic16_setDefaultOptions (void)
   pic16_options.ivt_loc = 0x000000;
   pic16_options.nodefaultlibs = 0;
   pic16_options.dumpcalltree = 0;
-  pic16_options.crt_name = "crt0i.o";       /* the default crt to link */
+  pic16_options.crt_name = "crt0iz.o";       /* the default crt to link */
   pic16_options.no_crt = 0;         /* use crt by default */
   pic16_options.ip_stack = 1;       /* set to 1 to enable ipop/ipush for stack */
   pic16_options.gstack = 0;

@@ -28,20 +28,20 @@
 
 #include <float.h>
 
-extern convert_frac;
-extern convert_int;
+extern int convert_frac;
+extern int convert_int;
 
 /* char x_ftoa(float, __data char *, unsigned char, unsigned char); */
 
 
-extern POSTDEC1;
-extern PLUSW2;
-extern FSR0L;
-extern FSR0H;
-extern PREINC1;
-extern PREINC2;
-extern FSR2L;
-extern FSR2H;
+extern int POSTDEC1;
+extern int PLUSW2;
+extern int FSR0L;
+extern int FSR0H;
+extern int PREINC1;
+extern int PREINC2;
+extern int FSR2L;
+extern int FSR2H;
 
 #define _vv0x00	0x00
 #define _vv0x01	0x01

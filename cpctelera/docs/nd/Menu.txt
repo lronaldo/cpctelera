@@ -126,11 +126,11 @@ Group: Video  {
 
    File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
    File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
-   File: cpct_fw2hw  (video/cpct_fw2hw.s)
+   File: cpct_fw2hw  (video/cpct_fw2hw.asm)
    File: cpct_getHWColour  (video/cpct_getHWColor.s)
    File: cpct_getScreenPtr  (video/cpct_getScreenPtr.asm)
    File: cpct_setPALColour  (video/cpct_setPALColour.asm)
-   File: cpct_setPalette  (video/cpct_setPalette.s)
+   File: cpct_setPalette  (video/cpct_setPalette.asm)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
    File: cpct_setVideoMode  (video/cpct_setVideoMode.s)
@@ -154,6 +154,7 @@ Group: Command Line Tools  {
    File: cpct_mkproject  (no auto-title, commandline/cpct_mkproject)
    File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
    File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
+   File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
    File: cpct_winape  (commandline/cpct_winape)
    }  # Group: Command Line Tools
 

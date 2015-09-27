@@ -29,16 +29,16 @@
 /* write address is expected to be in WREG:PRODL:FSR0L while
  * write value is in TBLPTRH:TBLPTRL:PRODH:[stack] */
 
-extern EEADR;
-extern EEADRH;
-extern EECON1;
-extern EEDATA;
-extern FSR0H;
-extern FSR0L;
-extern INTCON;
-extern PREINC1;
-extern PRODL;
-extern __eeprom16_write;
+extern int EEADR;
+extern int EEADRH;
+extern int EECON1;
+extern int EEDATA;
+extern int FSR0H;
+extern int FSR0L;
+extern int INTCON;
+extern int PREINC1;
+extern int PRODL;
+extern int __eeprom16_write;
 
 void
 __eeprom16_gptrput1(void) __naked

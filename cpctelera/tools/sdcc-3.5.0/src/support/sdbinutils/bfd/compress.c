@@ -1,6 +1,5 @@
 /* Compressed section support (intended for debug sections).
-   Copyright 2008, 2010, 2011, 2012
-   Free Software Foundation, Inc.
+   Copyright (C) 2008-2014 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -25,6 +24,7 @@
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
+#include "safe-ctype.h"
 
 #ifdef HAVE_ZLIB_H
 static bfd_boolean
@@ -45,19 +45,20 @@ decompress_contents (bfd_byte *compressed_buffer,
   strm.next_in = (Bytef*) compressed_buffer + 12;
   strm.avail_out = uncompressed_size;
 
+  BFD_ASSERT (Z_OK == 0);
   rc = inflateInit (&strm);
-  while (strm.avail_in > 0)
+  while (strm.avail_in > 0 && strm.avail_out > 0)
     {
       if (rc != Z_OK)
-	return FALSE;
+	break;
       strm.next_out = ((Bytef*) uncompressed_buffer
                        + (uncompressed_size - strm.avail_out));
       rc = inflate (&strm, Z_FINISH);
       if (rc != Z_STREAM_END)
-	return FALSE;
+	break;
       rc = inflateReset (&strm);
     }
-  rc = inflateEnd (&strm);
+  rc |= inflateEnd (&strm);
   return rc == Z_OK && strm.avail_out == 0;
 }
 #endif
@@ -79,7 +80,7 @@ DESCRIPTION
 	field was allocated using bfd_malloc() or equivalent.  If zlib
 	is not installed on this machine, the input is unmodified.
 
-	Return @code{TRUE} if the full section contents is compressed 
+	Return @code{TRUE} if the full section contents is compressed
 	successfully.
 */
 
@@ -148,7 +149,7 @@ SYNOPSIS
 DESCRIPTION
 	Read all data from @var{section} in BFD @var{abfd}, decompress
 	if needed, and store in @var{*ptr}.  If @var{*ptr} is NULL,
-	return @var{*ptr} with memory malloc'd by this function.  
+	return @var{*ptr} with memory malloc'd by this function.
 
 	Return @code{TRUE} if the full section contents is retrieved
 	successfully.
@@ -161,11 +162,9 @@ bfd_get_full_section_contents (bfd *abfd, sec_ptr sec, bfd_byte **ptr)
   bfd_byte *p = *ptr;
 #ifdef HAVE_ZLIB_H
   bfd_boolean ret;
-  bfd_size_type compressed_size;
-  bfd_size_type uncompressed_size;
-  bfd_size_type rawsize;
+  bfd_size_type save_size;
+  bfd_size_type save_rawsize;
   bfd_byte *compressed_buffer;
-  bfd_byte *uncompressed_buffer;
 #endif
 
   if (abfd->direction != write_direction && sec->rawsize != 0)
@@ -199,45 +198,44 @@ bfd_get_full_section_contents (bfd *abfd, sec_ptr sec, bfd_byte **ptr)
       return FALSE;
 #else
       /* Read in the full compressed section contents.  */
-      uncompressed_size = sec->size;
-      compressed_size = sec->compressed_size;
-      compressed_buffer = (bfd_byte *) bfd_malloc (compressed_size);
+      compressed_buffer = (bfd_byte *) bfd_malloc (sec->compressed_size);
       if (compressed_buffer == NULL)
 	return FALSE;
-      rawsize = sec->rawsize;
+      save_rawsize = sec->rawsize;
+      save_size = sec->size;
       /* Clear rawsize, set size to compressed size and set compress_status
 	 to COMPRESS_SECTION_NONE.  If the compressed size is bigger than
 	 the uncompressed size, bfd_get_section_contents will fail.  */
       sec->rawsize = 0;
-      sec->size = compressed_size;
+      sec->size = sec->compressed_size;
       sec->compress_status = COMPRESS_SECTION_NONE;
       ret = bfd_get_section_contents (abfd, sec, compressed_buffer,
-				      0, compressed_size);
+				      0, sec->compressed_size);
       /* Restore rawsize and size.  */
-      sec->rawsize = rawsize;
-      sec->size = uncompressed_size;
+      sec->rawsize = save_rawsize;
+      sec->size = save_size;
       sec->compress_status = DECOMPRESS_SECTION_SIZED;
       if (!ret)
 	goto fail_compressed;
 
-      uncompressed_buffer = (bfd_byte *) bfd_malloc (uncompressed_size);
-      if (uncompressed_buffer == NULL)
+      if (p == NULL)
+	p = (bfd_byte *) bfd_malloc (sz);
+      if (p == NULL)
 	goto fail_compressed;
 
-      if (!decompress_contents (compressed_buffer, compressed_size,
-				uncompressed_buffer, uncompressed_size))
+      if (!decompress_contents (compressed_buffer, sec->compressed_size, p, sz))
 	{
 	  bfd_set_error (bfd_error_bad_value);
-	  free (uncompressed_buffer);
+	  if (p != *ptr)
+	    free (p);
 	fail_compressed:
 	  free (compressed_buffer);
 	  return FALSE;
 	}
 
       free (compressed_buffer);
-      sec->contents = uncompressed_buffer;
-      sec->compress_status = COMPRESS_SECTION_DONE;
-      /* Fall thru */
+      *ptr = p;
+      return TRUE;
 #endif
 
     case COMPRESS_SECTION_DONE:
@@ -258,6 +256,29 @@ bfd_get_full_section_contents (bfd *abfd, sec_ptr sec, bfd_byte **ptr)
 
 /*
 FUNCTION
+	bfd_cache_section_contents
+
+SYNOPSIS
+	void bfd_cache_section_contents
+	  (asection *sec, void *contents);
+
+DESCRIPTION
+	Stash @var(contents) so any following reads of @var(sec) do
+	not need to decompress again.
+*/
+
+void
+bfd_cache_section_contents (asection *sec, void *contents)
+{
+  if (sec->compress_status == DECOMPRESS_SECTION_SIZED)
+    sec->compress_status = COMPRESS_SECTION_DONE;
+  sec->contents = contents;
+  sec->flags |= SEC_IN_MEMORY;
+}
+
+
+/*
+FUNCTION
 	bfd_is_section_compressed
 
 SYNOPSIS
@@ -272,11 +293,29 @@ bfd_boolean
 bfd_is_section_compressed (bfd *abfd, sec_ptr sec)
 {
   bfd_byte compressed_buffer [12];
+  unsigned int saved = sec->compress_status;
+  bfd_boolean compressed;
+
+  /* Don't decompress the section.  */
+  sec->compress_status = COMPRESS_SECTION_NONE;
 
   /* Read the zlib header.  In this case, it should be "ZLIB" followed
      by the uncompressed section size, 8 bytes in big-endian order.  */
-  return (bfd_get_section_contents (abfd, sec, compressed_buffer, 0, 12)
-	  && CONST_STRNEQ ((char*) compressed_buffer, "ZLIB"));
+  compressed = (bfd_get_section_contents (abfd, sec, compressed_buffer, 0, 12)
+		&& CONST_STRNEQ ((char*) compressed_buffer, "ZLIB"));
+
+  /* Check for the pathalogical case of a debug string section that
+     contains the string ZLIB.... as the first entry.  We assume that
+     no uncompressed .debug_str section would ever be big enough to
+     have the first byte of its (big-endian) size be non-zero.  */
+  if (compressed
+      && strcmp (sec->name, ".debug_str") == 0
+      && ISPRINT (compressed_buffer[4]))
+    compressed = FALSE;
+
+  /* Restore compress_status.  */
+  sec->compress_status = saved;
+  return compressed;
 }
 
 /*

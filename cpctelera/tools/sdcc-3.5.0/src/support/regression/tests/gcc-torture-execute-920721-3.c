@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-static inline fu (unsigned short data)
+static inline int fu (unsigned short data)
 {
   return data;
 }
@@ -19,7 +19,7 @@ void ru(int i)
    if(fu(++i)!=7)ASSERT(0);
 }
 
-static inline fs (signed short data)
+static inline int fs (signed short data)
 {
   return data;
 }

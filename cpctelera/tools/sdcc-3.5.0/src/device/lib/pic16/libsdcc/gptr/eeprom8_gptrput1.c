@@ -29,14 +29,14 @@
 /* write address is expected to be in WREG:PRODL:FSR0L while
  * write value is in TBLPTRH:TBLPTRL:PRODH:[stack] */
 
-extern EEADR;
-extern EECON1;
-extern EEDATA;
-extern FSR0H;
-extern FSR0L;
-extern INTCON;
-extern PREINC1;
-extern __eeprom8_write;
+extern int EEADR;
+extern int EECON1;
+extern int EEDATA;
+extern int FSR0H;
+extern int FSR0L;
+extern int INTCON;
+extern int PREINC1;
+extern int __eeprom8_write;
 
 void
 __eeprom8_gptrput1(void) __naked

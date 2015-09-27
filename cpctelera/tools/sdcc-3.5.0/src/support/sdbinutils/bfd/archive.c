@@ -1,7 +1,5 @@
 /* BFD back-end for archive files (libraries).
-   Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-   2012  Free Software Foundation, Inc.
+   Copyright (C) 1990-2014 Free Software Foundation, Inc.
    Written by Cygnus Support.  Mostly Gumby Henkel-Wallace's fault.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -42,11 +40,17 @@ DESCRIPTION
 	have to read the entire archive if you don't want
 	to!  Read it until you find what you want.
 
+	A BFD returned by <<bfd_openr_next_archived_file>> can be
+	closed manually with <<bfd_close>>.  If you do not close it,
+	then a second iteration through the members of an archive may
+	return the same BFD.  If you close the archive BFD, then all
+	the member BFDs will automatically be closed as well.
+
 	Archive contents of output BFDs are chained through the
-	<<next>> pointer in a BFD.  The first one is findable through
-	the <<archive_head>> slot of the archive.  Set it with
-	<<bfd_set_archive_head>> (q.v.).  A given BFD may be in only one
-	open output archive at a time.
+	<<archive_next>> pointer in a BFD.  The first one is findable
+	through the <<archive_head>> slot of the archive.  Set it with
+	<<bfd_set_archive_head>> (q.v.).  A given BFD may be in only
+	one open output archive at a time.
 
 	As expected, the BFD archive code is more general than the
 	archive code of any given environment.  BFD archives may
@@ -136,6 +140,7 @@ SUBSECTION
 #include "safe-ctype.h"
 #include "hashtab.h"
 #include "filenames.h"
+#include "bfdlink.h"
 
 #ifndef errno
 extern int errno;
@@ -362,6 +367,10 @@ _bfd_add_bfd_to_archive_cache (bfd *arch_bfd, file_ptr filepos, bfd *new_elt)
   cache->arbfd = new_elt;
   *htab_find_slot (hash_table, (const void *) cache, INSERT) = cache;
 
+  /* Provide a means of accessing this from child.  */
+  arch_eltdata (new_elt)->parent_cache = hash_table;
+  arch_eltdata (new_elt)->key = filepos;
+
   return TRUE;
 }
 
@@ -370,6 +379,13 @@ _bfd_find_nested_archive (bfd *arch_bfd, const char *filename)
 {
   bfd *abfd;
   const char *target;
+
+  /* PR 15140: Don't allow a nested archive pointing to itself.  */
+  if (filename_cmp (filename, arch_bfd->filename) == 0)
+    {
+      bfd_set_error (bfd_error_malformed_archive);
+      return NULL;
+    }
 
   for (abfd = arch_bfd->nested_archives;
        abfd != NULL;
@@ -507,7 +523,7 @@ _bfd_generic_read_ar_hdr_mag (bfd *abfd, const char *mag)
       parsed_size -= namelen;
       extra_size = namelen;
 
-      allocptr = (char *) bfd_zalloc (abfd, allocsize);
+      allocptr = (char *) bfd_zmalloc (allocsize);
       if (allocptr == NULL)
 	return NULL;
       filename = (allocptr
@@ -515,6 +531,7 @@ _bfd_generic_read_ar_hdr_mag (bfd *abfd, const char *mag)
 		  + sizeof (struct ar_hdr));
       if (bfd_bread (filename, namelen, abfd) != namelen)
 	{
+	  free (allocptr);
 	  if (bfd_get_error () != bfd_error_system_call)
 	    bfd_set_error (bfd_error_no_more_archived_files);
 	  return NULL;
@@ -550,7 +567,7 @@ _bfd_generic_read_ar_hdr_mag (bfd *abfd, const char *mag)
 
   if (!allocptr)
     {
-      allocptr = (char *) bfd_zalloc (abfd, allocsize);
+      allocptr = (char *) bfd_zmalloc (allocsize);
       if (allocptr == NULL)
 	return NULL;
     }
@@ -633,7 +650,10 @@ _bfd_get_elt_at_filepos (bfd *archive, file_ptr filepos)
 	{
 	  filename = _bfd_append_relative_path (archive, filename);
 	  if (filename == NULL)
-	    return NULL;
+	    {
+	      free (new_areldata);
+	      return NULL;
+	    }
 	}
 
       if (new_areldata->origin > 0)
@@ -645,13 +665,13 @@ _bfd_get_elt_at_filepos (bfd *archive, file_ptr filepos)
 	  if (ext_arch == NULL
 	      || ! bfd_check_format (ext_arch, bfd_archive))
 	    {
-	      bfd_release (archive, new_areldata);
+	      free (new_areldata);
 	      return NULL;
 	    }
 	  n_nfd = _bfd_get_elt_at_filepos (ext_arch, new_areldata->origin);
 	  if (n_nfd == NULL)
 	    {
-	      bfd_release (archive, new_areldata);
+	      free (new_areldata);
 	      return NULL;
 	    }
 	  n_nfd->proxy_origin = bfd_tell (archive);
@@ -673,7 +693,7 @@ _bfd_get_elt_at_filepos (bfd *archive, file_ptr filepos)
 
   if (n_nfd == NULL)
     {
-      bfd_release (archive, new_areldata);
+      free (new_areldata);
       return NULL;
     }
 
@@ -686,7 +706,7 @@ _bfd_get_elt_at_filepos (bfd *archive, file_ptr filepos)
   else
     {
       n_nfd->origin = n_nfd->proxy_origin;
-      n_nfd->filename = filename;
+      n_nfd->filename = xstrdup (filename);
     }
 
   n_nfd->arelt_data = new_areldata;
@@ -697,7 +717,8 @@ _bfd_get_elt_at_filepos (bfd *archive, file_ptr filepos)
   if (_bfd_add_bfd_to_archive_cache (archive, filepos, n_nfd))
     return n_nfd;
 
-  bfd_release (archive, new_areldata);
+  free (new_areldata);
+  n_nfd->arelt_data = NULL;
   return NULL;
 }
 
@@ -837,11 +858,7 @@ bfd_generic_archive_p (bfd *abfd)
 	  first->target_defaulted = FALSE;
 	  if (bfd_check_format (first, bfd_object)
 	      && first->xvec != abfd->xvec)
-	    {
-	      bfd_set_error (bfd_error_wrong_object_format);
-	      bfd_ardata (abfd) = tdata_hold;
-	      return NULL;
-	    }
+	    bfd_set_error (bfd_error_wrong_object_format);
 	  /* And we ought to close `first' here too.  */
 	}
     }
@@ -884,7 +901,7 @@ do_slurp_bsd_armap (bfd *abfd)
   if (mapdata == NULL)
     return FALSE;
   parsed_size = mapdata->parsed_size;
-  bfd_release (abfd, mapdata);	/* Don't need it any more.  */
+  free (mapdata);
 
   raw_armap = (bfd_byte *) bfd_zalloc (abfd, parsed_size);
   if (raw_armap == NULL)
@@ -960,7 +977,7 @@ do_slurp_coff_armap (bfd *abfd)
   if (mapdata == NULL)
     return FALSE;
   parsed_size = mapdata->parsed_size;
-  bfd_release (abfd, mapdata);	/* Don't need it any more.  */
+  free (mapdata);
 
   if (bfd_bread (int_buf, 4, abfd) != 4)
     {
@@ -1053,7 +1070,7 @@ do_slurp_coff_armap (bfd *abfd)
 	    ardata->first_file_filepos +=
 	      (tmp->parsed_size + sizeof (struct ar_hdr) + 1) & ~(unsigned) 1;
 	  }
-	bfd_release (abfd, tmp);
+	free (tmp);
       }
   }
 
@@ -1170,15 +1187,17 @@ bfd_slurp_bsd_armap_f2 (bfd *abfd)
 
   if (mapdata->parsed_size < HPUX_SYMDEF_COUNT_SIZE + BSD_STRING_COUNT_SIZE)
     {
+      free (mapdata);
     wrong_format:
       bfd_set_error (bfd_error_wrong_format);
     byebye:
-      bfd_release (abfd, mapdata);
       return FALSE;
     }
   left = mapdata->parsed_size - HPUX_SYMDEF_COUNT_SIZE - BSD_STRING_COUNT_SIZE;
 
   amt = mapdata->parsed_size;
+  free (mapdata);
+
   raw_armap = (bfd_byte *) bfd_zalloc (abfd, amt);
   if (raw_armap == NULL)
     goto byebye;
@@ -1280,7 +1299,9 @@ _bfd_slurp_extended_name_table (bfd *abfd)
       if (bfd_ardata (abfd)->extended_names == NULL)
 	{
 	byebye:
-	  bfd_release (abfd, namedata);
+	  free (namedata);
+	  bfd_ardata (abfd)->extended_names = NULL;
+	  bfd_ardata (abfd)->extended_names_size = 0;
 	  return FALSE;
 	}
 
@@ -1297,11 +1318,12 @@ _bfd_slurp_extended_name_table (bfd *abfd)
 	 text, the entries in the list are newline-padded, not null
 	 padded. In SVR4-style archives, the names also have a
 	 trailing '/'.  DOS/NT created archive often have \ in them
-	 We'll fix all problems here..  */
+	 We'll fix all problems here.  */
       {
 	char *ext_names = bfd_ardata (abfd)->extended_names;
 	char *temp = ext_names;
 	char *limit = temp + namedata->parsed_size;
+
 	for (; temp < limit; ++temp)
 	  {
 	    if (*temp == ARFMAG[1])
@@ -1317,8 +1339,7 @@ _bfd_slurp_extended_name_table (bfd *abfd)
       bfd_ardata (abfd)->first_file_filepos +=
 	(bfd_ardata (abfd)->first_file_filepos) % 2;
 
-      /* FIXME, we can't release namedata here because it was allocated
-	 below extended_names on the objalloc...  */
+      free (namedata);
     }
   return TRUE;
 }
@@ -1886,7 +1907,7 @@ bfd_ar_hdr_from_filesystem (bfd *abfd, const char *filename, bfd *member)
     }
 
   amt = sizeof (struct ar_hdr) + sizeof (struct areltdata);
-  ared = (struct areltdata *) bfd_zalloc (abfd, amt);
+  ared = (struct areltdata *) bfd_zmalloc (amt);
   if (ared == NULL)
     return NULL;
   hdr = (struct ar_hdr *) (((char *) ared) + sizeof (struct areltdata));
@@ -2339,6 +2360,10 @@ _bfd_compute_and_write_armap (bfd *arch, unsigned int elength)
 			  map = new_map;
 			}
 
+		      if (strcmp (syms[src_count]->name, "__gnu_lto_slim") == 0)
+			(*_bfd_error_handler)
+			  (_("%s: plugin needed to handle lto object"),
+			   bfd_get_filename (current));
 		      namelen = strlen (syms[src_count]->name);
 		      amt = sizeof (char *);
 		      map[orl_count].name = (char **) bfd_alloc (arch, amt);
@@ -2476,7 +2501,7 @@ bsd_write_armap (bfd *arch,
 	  bfd_set_error (bfd_error_file_truncated);
 	  return FALSE;
 	}
-      
+
       last_elt = current;
       H_PUT_32 (arch, map[count].namidx, buf);
       H_PUT_32 (arch, firstreal, buf + BSD_SYMDEF_OFFSET_SIZE);
@@ -2678,6 +2703,64 @@ coff_write_armap (bfd *arch,
       if (bfd_bwrite ("", 1, arch) != 1)
 	return FALSE;
     }
+
+  return TRUE;
+}
+
+static int
+archive_close_worker (void **slot, void *inf ATTRIBUTE_UNUSED)
+{
+  struct ar_cache *ent = (struct ar_cache *) *slot;
+
+  bfd_close_all_done (ent->arbfd);
+  return 1;
+}
+
+bfd_boolean
+_bfd_archive_close_and_cleanup (bfd *abfd)
+{
+  if (bfd_read_p (abfd) && abfd->format == bfd_archive)
+    {
+      bfd *nbfd;
+      bfd *next;
+      htab_t htab;
+
+      /* Close nested archives (if this bfd is a thin archive).  */
+      for (nbfd = abfd->nested_archives; nbfd; nbfd = next)
+	{
+	  next = nbfd->archive_next;
+	  bfd_close (nbfd);
+	}
+
+      htab = bfd_ardata (abfd)->cache;
+      if (htab)
+	{
+	  htab_traverse_noresize (htab, archive_close_worker, NULL);
+	  htab_delete (htab);
+	  bfd_ardata (abfd)->cache = NULL;
+	}
+    }
+  if (arch_eltdata (abfd) != NULL)
+    {
+      struct areltdata *ared = arch_eltdata (abfd);
+      htab_t htab = (htab_t) ared->parent_cache;
+
+      if (htab)
+	{
+	  struct ar_cache ent;
+	  void **slot;
+
+	  ent.ptr = ared->key;
+	  slot = htab_find_slot (htab, &ent, NO_INSERT);
+	  if (slot != NULL)
+	    {
+	      BFD_ASSERT (((struct ar_cache *) *slot)->arbfd == abfd);
+	      htab_clear_slot (htab, slot);
+	    }
+	}
+    }
+  if (abfd->is_linker_output)
+    (*abfd->link.hash->hash_table_free) (abfd);
 
   return TRUE;
 }

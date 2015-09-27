@@ -217,6 +217,36 @@ replace restart {
 } if notUsed(%1), notUsed('a')
 
 replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	xor	a, #0x01
+	ld	(%1), a
+} by {
+	bcpl	%2, #0
+	; peephole 12a-0 replaced xor by bcpl.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	xor	a, #0x20
+	ld	(%1), a
+} by {
+	bcpl	%2, #5
+	; peephole 12a-5 replaced xor by bcpl.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	xor	a, #0x80
+	ld	(%1), a
+} by {
+	bcpl	%2, #7
+	; peephole 12a-7 replaced xor by bcpl.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
 	addw	sp, #%1
 	addw	sp, #%2
 } by {
@@ -620,7 +650,7 @@ replace restart {
 	ld	a, xl
 } by {
 	rrwa	x
-	; peephole r3 used rlwa.
+	; peephole r3 used rrwa.
 } if notUsed('xl')
 
 replace restart {
@@ -628,7 +658,7 @@ replace restart {
 	ld	a, yl
 } by {
 	rrwa	y
-	; peephole r4 used rlwa.
+	; peephole r4 used rrwa.
 } if notUsed('yl')
 
 // Barrier, so nothing else ever sees the jump-on-false optmiization.

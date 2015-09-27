@@ -30,13 +30,13 @@
 /* write address is expected to be in WREG:PRODL:FSR0L while
  * write value is in TBLPTRH:TBLPTRL:PRODH:[stack] */
  
-extern FSR0H;
-extern POSTINC0;
-extern PREINC1;
-extern PRODH;
-extern PRODL;
-extern WREG;
-extern __eeprom_gptrput2;
+extern int FSR0H;
+extern int POSTINC0;
+extern int PREINC1;
+extern int PRODH;
+extern int PRODL;
+extern int WREG;
+extern int __eeprom_gptrput2;
 
 void _gptrput2(void) __naked
 {

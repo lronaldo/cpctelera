@@ -22,6 +22,7 @@ libdir          = @libdir@
 datadir         = @datadir@
 datarootdir     = @datarootdir@
 includedir      = @includedir@
+inclibdir       = @inclibdir@
 mandir          = @mandir@
 man1dir         = $(mandir)/man1
 man2dir         = $(mandir)/man2
@@ -30,8 +31,10 @@ VPATH           = @srcdir@
 srcdir          = @srcdir@
 
 include_dir_suffix = @include_dir_suffix@
+inclib_dir_suffix = @inclib_dir_suffix@
 
 sdcc_includedir = $(DESTDIR)$(datadir)/$(include_dir_suffix)
+sdcc_inclibdir = $(DESTDIR)$(datadir)/$(inclib_dir_suffix)
 
 CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir)
 
@@ -108,6 +111,7 @@ install: all installdirs
 # --------------------------------
 uninstall:
 	rm -rf $(sdcc_includedir)
+	rm -rf $(sdcc_inclibdir)
 
 
 # Performing self-test

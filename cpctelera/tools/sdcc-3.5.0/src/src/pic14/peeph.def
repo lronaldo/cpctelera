@@ -285,14 +285,6 @@ replace restart {
 }
 
 replace restart {
-        comf    %1,w
-        movwf   %1
-} by {
-        ;     peep 12 - Removed redundant move
-        comf    %1,f
-}
-
-replace restart {
 	clrf	%1
 	rlf	%1,f
 	movlw	0x01

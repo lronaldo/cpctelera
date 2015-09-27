@@ -4,10 +4,6 @@
 
 #include <testfwk.h>
 
-#ifdef __SDCC
-#pragma std_c99
-#endif
-
 #pragma disable_warning 93 // Using float for double.
 
 #include <stdarg.h>
@@ -126,30 +122,20 @@ testTortureExecute (void)
 {
 #ifndef __SDCC_pic16
   f1 (3, 16.0, 128L, 32.0);
-  if (x != 176L)
-    ASSERT (0);
+  ASSERT (x == 176L);
   f2 (6, 5, 7L, 18.0, 19.0, 17L, 64.0);
-  if (x != 100L || y != 30L)
-    ASSERT (0);
-  if (f3 (0) != 0)
-    ASSERT (0);
-  if (f3 (1, 18L) != 19L)
-    ASSERT (0);
-  if (f3 (2, 18L, 100L) != 120L)
-    ASSERT (0);
-  if (f3 (3, 18L, 100L, 300L) != 421L)
-    ASSERT (0);
-  if (f3 (4, 18L, 71L, 64L, 86L) != 243L)
-    ASSERT (0);
+  ASSERT (x == 100L && y == 30L);
+  ASSERT (f3 (0) == 0);
+  ASSERT (f3 (1, 18L) == 19L);
+  ASSERT (f3 (2, 18L, 100L) == 120L);
+  ASSERT (f3 (3, 18L, 100L, 300L) == 421L);
+  ASSERT (f3 (4, 18L, 71L, 64L, 86L) == 243L);
   f4 (4, 6.0, 9.0, 16L, 18.0);
-  if (x != 43L || y != 6L)
-    ASSERT (0);
+  ASSERT (x == 43L && y == 6L);
   f4 (5, 7.0, 21.0, 1.0, 17L, 126.0);
 
-// Fails on z80 and related
-  if (x != 144L || y != 28L)
-    ASSERT (0);
+// Failed on z80 and related before #7265
+  ASSERT (x == 144L && y == 28L);
 #endif
   return;
 }
-

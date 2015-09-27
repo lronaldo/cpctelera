@@ -51,21 +51,21 @@ struct _MEMHEADER
 
 /* These variables are defined through the crt0 functions. */
 /* Base of this variable is the first byte of the heap. */
-extern MEMHEADER _sdcc_heap_start;
+extern MEMHEADER __sdcc_heap_start;
 /* Address of this variable is the last byte of the heap. */
-extern char _sdcc_heap_end;
+extern char __sdcc_heap_end;
 
-MEMHEADER * _sdcc_prev_memheader;
+MEMHEADER * __sdcc_prev_memheader;
 // apart from finding the header
 // this function also finds it's predecessor
 MEMHEADER *
-_sdcc_find_memheader(void * p)
+__sdcc_find_memheader(void * p)
 {
-  register MEMHEADER * pthis;
+  MEMHEADER * pthis;
   if (!p)
     return NULL;
   pthis = (MEMHEADER * )((char *)  p - HEADER_SIZE); //to start of header
-  _sdcc_prev_memheader = pthis->prev;
+  __sdcc_prev_memheader = pthis->prev;
 
   return (pthis);
 }
@@ -120,26 +120,26 @@ free (void *p)
 
             #define HEADER_SIZE sizeof(MEMHEADER)
 
-            //Static here means: can be accessed from this module only
-            extern MEMHEADER __xdata * _sdcc_first_memheader;
+            extern __xdata char __sdcc_heap[];
+            #define __sdcc_first_memheader ((MEMHEADER __xdata * ) __sdcc_heap)
 
-            MEMHEADER __xdata * _sdcc_prev_memheader;
+            MEMHEADER __xdata * __sdcc_prev_memheader;
             // apart from finding the header
             // this function also finds it's predecessor
-            MEMHEADER __xdata * _sdcc_find_memheader(void __xdata * p)
+            MEMHEADER __xdata * __sdcc_find_memheader(void __xdata * p)
             {
-              register MEMHEADER __xdata * pthis;
-              register MEMHEADER __xdata * cur_header;
+              MEMHEADER __xdata * pthis;
+              MEMHEADER __xdata * cur_header;
 
               if (!p)
                 return NULL;
               pthis = (MEMHEADER __xdata *) p;
               pthis -= 1; //to start of header
-              cur_header = _sdcc_first_memheader;
-              _sdcc_prev_memheader = NULL;
+              cur_header = __sdcc_first_memheader;
+              __sdcc_prev_memheader = NULL;
               while (cur_header && pthis != cur_header)
               {
-                _sdcc_prev_memheader = cur_header;
+                __sdcc_prev_memheader = cur_header;
                 cur_header = cur_header->next;
               }
               return (cur_header);
@@ -147,20 +147,20 @@ free (void *p)
 
             void free (void * p)
             {
-              register MEMHEADER __xdata * pthis;
+              MEMHEADER __xdata * pthis;
 
               CRITICAL
               {
-                pthis = _sdcc_find_memheader(p);
+                pthis = __sdcc_find_memheader(p);
                 if (pthis) //For allocated pointers only!
                 {
-                  if (!_sdcc_prev_memheader)
+                  if (!__sdcc_prev_memheader)
                   {
                     pthis->len = 0;
                   }
                   else
                   {
-                    _sdcc_prev_memheader->next = pthis->next;
+                    __sdcc_prev_memheader->next = pthis->next;
                   }
                 }
               }

@@ -44,7 +44,7 @@
 
 void __xdata * calloc (size_t nmemb, size_t size)
 {
-  register void __xdata * ptr;
+  void __xdata * ptr;
 
   ptr = malloc(nmemb * size);
   if (ptr)

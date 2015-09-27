@@ -1,6 +1,5 @@
 /* PPC ELF support for BFD.
-   Copyright 1995, 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2007, 2008,
-   2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
 
    By Michael Meissner, Cygnus Support, <meissner@cygnus.com>,
    from information in the System V Application Binary Interface,
@@ -176,7 +175,8 @@ END_RELOC_NUMBERS (R_PPC_max)
 #define DT_PPC_GOT		(DT_LOPROC)
 
 /* Specify that tls descriptors should be optimized.  */
-#define DT_PPC_TLSOPT		(DT_LOPROC + 1)
+#define DT_PPC_OPT		(DT_LOPROC + 1)
+#define PPC_OPT_TLS		1
 
 /* Processor specific flags for the ELF header e_flags field.  */
 

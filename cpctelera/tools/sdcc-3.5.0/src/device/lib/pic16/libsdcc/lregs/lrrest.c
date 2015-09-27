@@ -29,9 +29,9 @@
 /* FSR0 points to last register to store, WREG holds the register count
  */
  
-extern PREINC1;
-extern POSTDEC0;
-extern WREG;
+extern int PREINC1;
+extern int POSTDEC0;
+extern int WREG;
 
 void _lr_restore(void) __naked
 {

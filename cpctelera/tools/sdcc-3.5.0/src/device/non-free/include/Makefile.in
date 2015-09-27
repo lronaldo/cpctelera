@@ -30,6 +30,7 @@ VPATH           = @srcdir@
 srcdir          = @srcdir@
 
 non_free_include_dir_suffix = @non_free_include_dir_suffix@
+non_free_inclib_dir_suffix = @non_free_inclib_dir_suffix@
 
 sdcc_includedir    = $(DESTDIR)$(datadir)/$(non_free_include_dir_suffix)
 
@@ -58,6 +59,7 @@ install: all installdirs
 # --------------------------------
 uninstall:
 	rm -rf $(sdcc_includedir)
+	rm -rf $(DESTDIR)$(datadir)/$(non_free_inclib_dir_suffix)
 
 
 # Performing self-test

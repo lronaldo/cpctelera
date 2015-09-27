@@ -46,7 +46,8 @@ int xstackPtr = 0;      /* xstack pointer          */
 int reentrant = 0;
 int blockNo   = 0;      /* sequential block number  */
 int currBlockno=0;
-int inCritical= 0;
+int inCriticalFunction = 0;
+int inCriticalBlock = 0;
 int seqPointNo= 1;      /* sequence point number */
 int ignoreTypedefType=0;
 extern int yylex();
@@ -104,6 +105,7 @@ bool uselessDecl = TRUE;
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
 %token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
+%token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
 %type <yyint> Interrupt_storage
@@ -131,6 +133,7 @@ bool uselessDecl = TRUE;
 %type <asts> expression_statement selection_statement iteration_statement
 %type <asts> jump_statement function_body else_statement string_literal_val
 %type <asts> critical_statement asm_statement label
+%type <asts> generic_selection generic_assoc_list generic_association
 %type <dsgn> designator designator_list designation designation_opt
 %type <ilist> initializer initializer_list
 %type <yyint> unary_operator assignment_operator struct_or_union
@@ -188,19 +191,28 @@ function_definition
              /* assume it to be 'int'       */
              addDecl($1,0,newIntLink());
              $1 = createFunctionDecl($1);
+             if (FUNC_ISCRITICAL ($1->type))
+               inCriticalFunction = 1;
          }
       function_body  {
                                    $$ = createFunction($1,$3);
+                                   if (FUNC_ISCRITICAL ($1->type))
+                                     inCriticalFunction = 0;
+
                                }
    | declaration_specifiers function_declarator
          {
               pointerTypes($2->type,copyLinkChain($1));
               addDecl($2,0,$1);
               $2 = createFunctionDecl($2);
+              if (FUNC_ISCRITICAL ($2->type))
+                inCriticalFunction = 1;
          }
      function_body
                                 {
                                     $$ = createFunction($2,$4);
+                                    if (FUNC_ISCRITICAL ($2->type))
+                                      inCriticalFunction = 0;
                                 }
    ;
 
@@ -299,10 +311,25 @@ primary_expr
    | CONSTANT        { $$ = newAst_VALUE ($1); }
    | string_literal_val
    | '(' expr ')'    { $$ = $2; }
+   | generic_selection
+   ;
+
+generic_selection
+   : GENERIC '(' assignment_expr ',' generic_assoc_list ')' { $$ = newNode (GENERIC, $3, $5); }
+   ;
+
+generic_assoc_list
+   : generic_association { $$ = newNode  (GENERIC_ASSOC_LIST, NULL, $1); }
+   | generic_assoc_list ',' generic_association { $$ = newNode  (GENERIC_ASSOC_LIST, $1, $3); }
+   ;
+
+generic_association
+   : type_name ':' assignment_expr { $$ = newNode  (GENERIC_ASSOCIATION, newAst_LINK($1), $3); }
+   | DEFAULT ':' assignment_expr { $$ = newNode  (GENERIC_ASSOCIATION,NULL,$3); }
    ;
 
 string_literal_val
-    : STRING_LITERAL {
+   : STRING_LITERAL {
                        int cnt = 1;
                        int max = 253, min = 1;
                        char fb[256];
@@ -457,7 +484,7 @@ logical_or_expr
 
 conditional_expr
    : logical_or_expr
-   | logical_or_expr '?' { seqPointNo++;} logical_or_expr ':' conditional_expr
+   | logical_or_expr '?' { seqPointNo++;} expr ':' conditional_expr
                      {
                         $$ = newNode(':',$4,$6);
                         $$ = newNode('?',$1,$$);
@@ -1703,7 +1730,9 @@ statement
 
 critical
    : CRITICAL   {
-                   inCritical++;
+                   if (inCriticalFunction || inCriticalBlock)
+                     werror(E_INVALID_CRITICAL);
+                   inCriticalBlock = 1;
                    STACK_PUSH(continueStack,NULL);
                    STACK_PUSH(breakStack,NULL);
                    $$ = NULL;
@@ -1714,8 +1743,8 @@ critical_statement
    : critical statement  {
                    STACK_POP(breakStack);
                    STACK_POP(continueStack);
-                   inCritical--;
                    $$ = newNode(CRITICAL,$2,NULL);
+                   inCriticalBlock = 0;
                 }
    ;
 
@@ -1727,6 +1756,7 @@ labeled_statement
        /* closing brace as part of the rule to avoid an */
        /* unacceptably large number of shift/reduce conflicts */
        /* and then reinsert it to be parsed a second time. */
+       werror(W_LABEL_WITHOUT_STATEMENT);
        $$ = $1;
        yychar = '}';
      };
@@ -1975,9 +2005,14 @@ expr_opt
 
 jump_statement
    : GOTO identifier ';'   {
-                              $2->islbl = 1;
-                              $$ = newAst_VALUE(symbolVal($2));
-                              $$ = newNode(GOTO,$$,NULL);
+                              if (inCriticalBlock) {
+                                werror(E_INVALID_CRITICAL);
+                                $$ = NULL;
+                              } else {
+                                $2->islbl = 1;
+                                $$ = newAst_VALUE(symbolVal($2));
+                                $$ = newNode(GOTO,$$,NULL);
+                              }
                            }
    | CONTINUE ';'          {
        /* make sure continue is in context */
@@ -2004,7 +2039,7 @@ jump_statement
    }
    | RETURN ';'            {
        seqPointNo++;
-       if (inCritical) {
+       if (inCriticalBlock) {
            werror(E_INVALID_CRITICAL);
            $$ = NULL;
        } else {
@@ -2013,7 +2048,7 @@ jump_statement
    }
    | RETURN expr ';'       {
        seqPointNo++;
-       if (inCritical) {
+       if (inCriticalBlock) {
            werror(E_INVALID_CRITICAL);
            $$ = NULL;
        } else {

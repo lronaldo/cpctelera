@@ -1752,6 +1752,11 @@ top:
       bp += 2;
       while ((ISCHARSPACE (*bp) || *bp == '\n') && *bp)
         bp++;
+      while ((ISCHARSPACE (*bp) || *bp == '\n' || (*bp == '/' && *(bp+1) == '/')) && *bp)
+      {
+        ++bp;
+	    if (*bp == '/') while (*bp && *bp != '\n') ++bp;
+      }
       if (!*bp)
         {
           fprintf (stderr, "expected condition name\n");

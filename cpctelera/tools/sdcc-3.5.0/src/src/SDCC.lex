@@ -172,6 +172,7 @@ static void checkCurrFile (const char *s);
 "__addressmod"          { count (); return ADDRESSMOD; }
 "_Static_assert"        { count (); return STATIC_ASSERT; }
 "_Alignas"              { count (); return ALIGNAS; }
+"_Generic"              { count (); return GENERIC; }
 {L}({L}|{D})*           {
   if (!options.dollars_in_ident && strchr (yytext, '$'))
     {

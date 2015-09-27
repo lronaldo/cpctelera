@@ -115,10 +115,6 @@ char *strncatz (char *dest, const char *src, size_t n);
  */
 const char *getBuildNumber (void);
 
-/* return SDCC build date
- */
-const char *getBuildDate (void);
-
 /* return environment used to build SDCC
  */
 const char *getBuildEnvironment (void);
