@@ -194,6 +194,7 @@ void performAction(TCharacter *c, TCharacterStatus move, TCharacterSide side) {
 
             // Nothing to do on other cases
             default:
+            ;
          }
          break;
       
