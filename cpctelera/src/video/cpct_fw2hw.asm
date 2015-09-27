@@ -23,8 +23,6 @@
 ;
 .module cpct_video
    
-.include /videomode.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_fw2hw
 ;;
@@ -61,40 +59,28 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;;    Case    |   Cycles    |  microSecs (us)
+;;    Case    |  microSecs (us) | CPU Cycles
 ;; ---------------------------------------------
-;;   Best     |  68 + 61*NC |  17.00 + 15.25*NC
-;;   Worst    |  68 + 65*NC |  17.00 + 16.25*NC
+;;   Any      |  16 + 18*NC     |  64 + 72*NC
 ;; ---------------------------------------------
-;; Asm saving |     -58     |      24.50
+;; Asm saving |     -13         |    -52
 ;; ---------------------------------------------
-;; NC= 8      |  556 /  588 |  139.00 / 147.00
-;; NC=16      | 1044 / 1108 |  261.00 / 277.00 
+;; NC= 4      |      88         |    352 
+;; NC=16      |     304         |   1216 
 ;; (end code)
 ;;    NC=Number of colours to convert
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-_cpct_fw2hw::
-   ld   hl, #2              ;; [10] HL = SP + 2 (Place where parameters start) 
-   ld    b, h               ;; [ 4] B = 0, (BC = C) so that we can use BC as counter
-   add  hl, sp              ;; [11]
-   ld    e, (hl)            ;; [ 7] DE = Pointer to colour array
-   inc  hl                  ;; [ 6]
-   ld    d, (hl)            ;; [ 7]
-   inc  hl                  ;; [ 6]
-   ld    c, (hl)            ;; [ 7] C = Number of colours to convert 
-
-cpct_fw2hw_asm:             ;; Assembly entry point 
-
 f2h_colour_loop:
-   ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the firmware2hw_colour array
-   ld    a, (de)            ;; [ 7] A = Next colour to convert
-   add   l                  ;; [ 4] HL += A (HL Points to the table value correspondant to A)
-   ld    l, a               ;; [ 4] |  
-   jp   nc, f2h_ncarry      ;; [10] |   (8-bits sum: only when L+A generates carry, H must be incremented)
-   inc   h                  ;; [ 4] \
+   ld   hl, #cpct_firmware2hw_colour ;; [3] HL points to the start of the firmware2hw_colour array
+   ld    a, (de)            ;; [2] A = Next colour to convert
+   add   l                  ;; [1] HL += A (HL Points to the table value correspondant to A)
+   ld    l, a               ;; [1] | < L += A
+   adc   h                  ;; [1] | < Add Carry to H
+   sub   l                  ;; [1] | |
+   ld    h, a               ;; [1] | |
 f2h_ncarry:
-   ldi                      ;; [16] (DE) = (HL) overwrite firmware colour value with hardware colour (and HL++, DE++)
-   jp   pe, f2h_colour_loop ;; [10] IF BC != 0, continue converting, else end
+   ldi                      ;; [5] (DE) = (HL) overwrite firmware colour value with hardware colour (and HL++, DE++, BC--)
+   jp   pe, f2h_colour_loop ;; [3] IF BC != 0, continue converting, else end
    
-   ret                      ;; [10] Return
+   ret                      ;; [3] Return
