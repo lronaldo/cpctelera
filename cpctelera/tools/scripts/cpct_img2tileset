@@ -42,6 +42,10 @@
 ##    By default, this script converts the image into 4x4-pixel tiles. This means that
 ## the script splits the whole image into 4x4-pixel individual images and converts each
 ## one of them into a tile. You may change sizes by using -tw / -th command line modifiers. 
+##    Generated output contains screen-pixel-format defined arrays with all the individual
+## sprites extracted from the image file. It also contains an aditional array, named _tileset,
+## with pointers to all generated tiles/sprites. This tileset array may be optinally not 
+## generated with -nt | --no-tileset modifier.
 ##    To do the conversion, the script calls Img2CPC, which reads pixels one by one 
 ## and transform them into the closest colour value from the defined Amstrad CPC palette. 
 ## If no palette is given to this script, standard Amstrad CPC palette is used (the one 
@@ -57,6 +61,8 @@
 ##
 ##                        > cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png
 ##
+##    -nt | --no-tileset                      - Do not generate a tileset array containing pointers to
+##                                              generated sprites/tiles.
 ##    -im | --interlaced-masks <transp_idx>   - Generates transparent sprites with interlaced masks
 ##                                              using <trasnp_idx> as the index of the palette colour to
 ##                                              be considered transparent
@@ -111,6 +117,10 @@ inclusion into a program."
    echo "    By default, this script converts the image into 4x4-pixel tiles. This means that \
 the script splits the whole image into 4x4-pixel individual images and converts each one of them \
 into a tile. You may change sizes by using -tw / -th command line modifiers."
+   echo "    Generated output contains screen-pixel-format defined arrays with all the individual \
+sprites extracted from the image file. It also contains an aditional array, named _tileset, \
+with pointers to all generated tiles/sprites. This tileset array may be optinally not generated \
+with -nt | --no-tileset modifier."
    echo "    To do the conversion, the script calls Img2CPC, which reads pixels one by one \
 and transform them into the closest colour value from the defined Amstrad CPC palette. \
 If no palette is given to this script, standard Amstrad CPC palette is used (the one \
@@ -127,6 +137,8 @@ to convert the file tiles.png: "
    echo
    echo "          ${COLOR_WHITE}cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png"
    echo
+   echo "${COLOR_LIGHT_BLUE}  -nt | --no-tileset"
+   echo "${COLOR_CYAN}       Do not generate a tileset array containing pointers to generated sprites/tiles."
    echo "${COLOR_LIGHT_BLUE}  -bn | --tiles-basename  <name>"
    echo "${COLOR_CYAN}       Sets the basename that will be used as C identifier for tiles or sprites. Default: g_tile"
    echo "${COLOR_LIGHT_BLUE}  -im | --interlaced-masks <transp_idx>"
@@ -155,6 +167,10 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Do not generate tilesets
+      "-nt" | "--no-tileset")
+         GENTILESET="-nt"
+      ;;
       ## Generate interlaced masks with a transparent colour
       "-im" | "--interlaced-masks")
          
@@ -339,7 +355,7 @@ echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}PROCESS${COLOR_LIGHT_RED}]${COLOR_
 to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
 ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]})" -of c -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" \
--o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS "${FILE}"
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $GENTILESET "${FILE}"
 
 ## Success message
 echo
