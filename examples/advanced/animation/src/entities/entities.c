@@ -226,21 +226,22 @@ i8 updateAnimation(TAnimation* anim) {
       if ( ! --anim->time ) {
          TAnimFrame* frame;
 
-         // Next frame
+         // Check next frame
          newframe = 1;
-         frame = anim->frames[ ++anim->frame_id ];
+         frame = anim->frames[ ++anim->frame_id ]; 
 
          // If frame is not null, we have a new frame, else animation may have ended or may recycle
          if (frame) {
-            // New frame values
-            anim->time = frame->time;
+            // It is a valid frame, so set new frame values
+            anim->time = frame->time;  // Get animation cycles for this frame
          } else if ( anim->status == as_cycle ) {
             // Recycle to first frame
-            anim->frame_id = 0;
-            anim->time     = anim->frames[0]->time;
+            anim->frame_id = 0;        // Next frame_id is first one of this animation
+            anim->time     = anim->frames[0]->time; // Restore animation cycles for the first frame
          } else {
             // End animation
-            anim->status = as_end;
+            anim->status = as_end;  // Animation set to end status
+            --anim->frame_id;       // frame_id decremented to leave animation permanently on last frame
          }
       }
    }
@@ -268,6 +269,8 @@ void updateEntity(TEntity *ent) {
          if (frame->width + ent->x > g_SCR_WIDTH) {
             moveEntityX(ent, -1);
          }
+      } else if (anim->frame_id == 0xFF) {
+         cpct_drawSolidBox((u8*)0xC000, 0xFF, 4, 8);
       } else {
          ent->status = es_stop;
       }
