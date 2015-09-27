@@ -55,7 +55,9 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    59 bytes (32 bytes code, 27 bytes colour conversion table)
+;;     C-bindings - 19 bytes
+;;   ASM-bindings - 15 bytes
+;;   + 27 bytes colour conversion table
 ;;
 ;; Time Measures:
 ;; (start code)
