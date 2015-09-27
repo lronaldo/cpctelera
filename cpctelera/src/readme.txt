@@ -99,13 +99,16 @@ _Under Linux_:
 
    * Commands: *wget*, *unzip*, *wine*
 
+NOTE for ARM and Raspberry Pi users:
+
+   On Raspbian and other ARM Linux OSes, the package *texinfo* is often required. We recommend you to install it beforehand. If your compilation fails, it may be due this package lacking in your system.
+
 _Under Windows_:
    
    Under Windows <Cygwin at http://www.cygwin.com> is required for CPCtelera to work. You may download Cygwin 32 / 64 and install it along with these packages (you may launch cygwin's setup.exe at any time to install them),
 
    * Commands: *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*, *wget*, *unzip*
    * Libraries: *libboost-devel*, *libintl-devel*
-   * 
 
 IMPORTANT NOTE:
 
