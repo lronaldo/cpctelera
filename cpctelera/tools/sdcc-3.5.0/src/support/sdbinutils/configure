@@ -2747,7 +2747,8 @@ extra_host_args=
 build_libs="build-libiberty"
 
 # these tools are built for the build environment
-build_tools="build-texinfo build-flex build-bison build-m4 build-fixincludes"
+#build_tools="build-texinfo build-flex build-bison build-m4 build-fixincludes"
+build_tools="build-flex build-bison build-m4 build-fixincludes"
 
 # these libraries are used by various programs built for the host environment
 #
