@@ -28,8 +28,24 @@
 INSTALLDIRS=bin share
 SRCDIR=src
 OBJDIR=obj
+MAIN_MAKE=$(OBJDIR)/Makefile
+TMP_MAIN_MAKE=$(OBJDIR)/Makefile.tmp.replace
+SDBINUTILS_TAG=\(-C ..SDCC_SDBINUTILS.$$\)
+SDBINUTILS_REPLACE=\1 MAKEINFO=true
 CONFIG=configure_sdcc_for_z80.sh
 TARGET=sdcc
+
+## Function to replace a tag in a file with another information
+##
+##  $(1) Searched tag
+##  $(2) Replacement
+##  $(3) File where to search for the tag
+##  $(4) Temporal file for operating
+##
+define replaceTag
+	cat "$(3)" | sed "s/$(1)/$(2)/g" > $(4)
+	mv "$(4)" "$(3)"
+endef
 
 # TARGETS
 .PHONY: all clean cleanall $(TARGET)
@@ -41,8 +57,10 @@ all: $(TARGET)
 sdcc:
 	@echo "Configuring SDCC for z80..."
 	cd $(SRCDIR) && ./$(CONFIG)
+	@echo "Inserting MAKEINFO=true into main Makefile..."
+	@$(call replaceTag,$(SDBINUTILS_TAG),$(SDBINUTILS_REPLACE),$(MAIN_MAKE),$(TMP_MAIN_MAKE))
 	@echo "Compiling SDCC for z80..."
-	$(MAKE) -C $(OBJDIR)
+	$(MAKE) -C $(OBJDIR) 
 	$(MAKE) -C $(OBJDIR) install
 
 # CLEANING TARGETS
