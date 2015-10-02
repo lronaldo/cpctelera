@@ -1,4 +1,5 @@
 #include "Dsk.hpp"
+#include <cmath>
 
 Dsk::Dsk(u8 numSides, const struct XDPB& params, CatalogType catType) {
     this->_numSides = numSides;
