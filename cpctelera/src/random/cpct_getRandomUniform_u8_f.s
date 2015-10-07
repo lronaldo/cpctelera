@@ -47,7 +47,7 @@
 ;;
 ;; Important details:
 ;;    * This function uses a previous seed to calculate next pseudo-random byte, and 
-;; stores returned byte - 1 as seed for the next time. If you want a reproducible sequence
+;; stores returned byte minus 1 as seed for the next time. If you want a reproducible sequence
 ;; you may set the seed using <cpct_setRandomSeedUniform_u8> to ensure that all calls
 ;; to this function (using 0 as parameter) always return the same sequence. You also 
 ;; may use this as a way to randomize the sequence, by starting with a seed that comes out
