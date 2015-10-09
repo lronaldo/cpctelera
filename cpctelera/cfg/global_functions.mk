@@ -151,6 +151,39 @@ define CREATECDT
 endef
 
 #################
+# CREATEBLANKCDT: Create a Blank CDT file
+#
+# $(1): CDT file to be created
+#
+define CREATEBLANKCDT
+	@$(2CDT) -n . $(1) > /dev/null
+endef
+
+#################
+# ADDBASICFILETOCDT: Adds a BASIC file to a CDT file
+#
+# $(1): CDT file where the BASIC file will be added
+# $(2): BASIC file to be added (path to it in the filesystem)
+# $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
+#
+define ADDBASICFILETOCDT
+	@$(2CDT) -F 0 $(2) -r $(3) $(1) > /dev/null
+endef
+
+#################
+# ADDBINARYFILETOCDT: Adds a BINARY file to a CDT file
+#
+# $(1): CDT file where the BINARY file will be added
+# $(2): Binary file to be inserted in the CDT
+# $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
+# $(4): Memory address where binary will be loaded (LOAD ADDRESS)
+# $(5): Memory address where main program starts (RUN ADDRESS)
+#
+define ADDBINARYFILETOCDT
+	@$(2CDT) -X 0x$(5) -L 0x$(4) -r $(3) $(2) $(1) > /dev/null
+endef
+
+#################
 # COMPILECFILE: General rule to compile a C file for Z80, having source file and object file in different places
 #
 # $(1): Object file to be created  (with its relative path)
