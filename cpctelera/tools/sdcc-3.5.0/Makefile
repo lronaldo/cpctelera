@@ -61,7 +61,7 @@ sdcc:
 	@$(call replaceTag,$(SDBINUTILS_TAG),$(SDBINUTILS_REPLACE),$(MAIN_MAKE),$(TMP_MAIN_MAKE))
 	@echo "Compiling SDCC for z80..."
 	$(MAKE) -C $(OBJDIR) 
-	$(MAKE) -C $(OBJDIR) install
+	$(MAKE) -C $(OBJDIR) install MAKEINFO=true
 
 # CLEANING TARGETS
 cleanall: clean
