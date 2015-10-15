@@ -29,6 +29,9 @@
 extern void cpct_reenableFirmware();
 extern void cpct_disableFirmware();
 
+// Setting a user defined interrupt handler routine
+extern void cpct_setInterruptHandler( void(*intHandler)(void) ) __z88dk_fastcall;
+
 // Upper and Lower ROM control
 extern void cpct_enableLowerROM();
 extern void cpct_disableLowerROM();

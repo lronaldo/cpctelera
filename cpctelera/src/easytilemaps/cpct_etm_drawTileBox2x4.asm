@@ -35,7 +35,7 @@
 ;;    (1B  L) w         - width in tiles of the tile-box to be redrawn
 ;;    (1B  H) h         - height in tiles of the tile-box to be redrawn
 ;;    * Always received on the stack
-;;    (2B) pvideomem    - Pointer to the place on video memory (or backbuffer) where to draw the tilebox
+;;    (2B) pvideomem    - Pointer to upper left corner of the *tilemap* in video memory.
 ;;    (2B) ptilemap     - Pointer to the start of the tilemap
 ;;
 ;; Assembly call (Input parameters on registers):
