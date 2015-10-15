@@ -62,14 +62,28 @@
 ;;    A, HL
 ;;
 ;; Required memory:
-;;    xx bytes
+;;    36 bytes (17 bytes function + 19 bytes for safe interrupt wrapper code)
 ;;
 ;; Time Measures:
+;;  * This first measure is the time required for cpct_setInterruptHandler to 
+;; execute: that is, the time for setting up the hook for the system to call
+;; user defined code.
 ;; (start code)
 ;; Case | microSecs (us) | CPU Cycles
 ;; -------------------------------------
 ;; Any  |      23        |    92
 ;; -------------------------------------
+;; (end code)
+;;  * This second measure is the time overhead required for safely calling 
+;; user defined function. That is, time required by the wrapper code to save
+;; registers, call user's *intHandler*, restoring the registers and returning.
+;; This overhead is to be assumed each time interrupt handler is called, so 
+;; up to 6 times per frame, 300 times per second.
+;; (start code)
+;; Case      | microSecs (us) | CPU Cycles
+;; ------------------------------------------
+;; Overhead  |      48        |    144
+;; ------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
