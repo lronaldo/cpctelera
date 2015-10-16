@@ -71,7 +71,7 @@
 ;; (start code)
 ;; Case | microSecs (us) | CPU Cycles
 ;; -------------------------------------
-;; Any  |      23        |    92
+;; Any  |      23        |    92 
 ;; -------------------------------------
 ;; (end code)
 ;;  * This second measure is the time overhead required for safely calling 

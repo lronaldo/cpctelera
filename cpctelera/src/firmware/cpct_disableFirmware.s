@@ -15,13 +15,6 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-;#####################################################################
-;### MODULE: Firmware and ROM routines                             ###
-;#####################################################################
-;### Routines to disable CPC Firmware and reenable it when needed, ###
-;### and managing Upper and Lower ROMs.                            ###
-;#####################################################################
-;
 .module cpct_firmware
 
 .include /firmware.s/
@@ -85,10 +78,10 @@ _cpct_firmware_address:: .dw 0
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case | Cycles | microSecs (us)
-;; -------------------------------
-;; Any  |   84   |   21
-;; -------------------------------
+;; Case | microSecs (us) | CPU Cycles
+;; --------------------------------------
+;; Any  |      25        |    100
+;; --------------------------------------
 ;; (end code)
 ;;
 ;; Credits:                                                       
@@ -97,15 +90,15 @@ _cpct_firmware_address:: .dw 0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_disableFirmware::
-cpct_disableFirmware_asm::    ;; Assembly entry point
-   di                         ;; [ 4] Disable interrupts
-   ld   hl, (firmware_RST_jp) ;; [16] Obtain firmware ROM code pointer and store it for restoring it later
-   ld (_cpct_firmware_address),hl ;; [16]
+cpct_disableFirmware_asm::        ;; Assembly entry point
+   di                             ;; [1] Disable interrupts
+   ld   hl, (firmware_RST_jp)     ;; [5] Obtain firmware ROM code pointer and store it for restoring it later
+   ld (_cpct_firmware_address),hl ;; [5]
 
-   im    1                    ;; [ 8] Set Interrupt Mode 1 (CPU will jump to 0x38 when a interrupt occurs)
-   ld   hl, #0xC9FB           ;; [10] FB C9 (take into account little endian) => EI : RET
+   im    1                        ;; [2] Set Interrupt Mode 1 (CPU will jump to 0x38 when a interrupt occurs)
+   ld   hl, #0xC9FB               ;; [3] FB C9 (take into account little endian) => EI : RET
 
-   ld (firmware_RST_jp), hl   ;; [16] Setup new "interrupt handler" and enable interrupts again
-   ei                         ;; [ 4] 
+   ld (firmware_RST_jp), hl       ;; [5] Setup new "interrupt handler" and enable interrupts again
+   ei                             ;; [1] 
 
-   ret                        ;; [10] Return
+   ret                            ;; [3] Return
