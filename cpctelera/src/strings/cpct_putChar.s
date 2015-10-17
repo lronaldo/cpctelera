@@ -40,6 +40,11 @@
 ;; Known limitations:
 ;;    *Firmware* must be *ENABLED* to be able to use this function.
 ;; 
+;; Side-effects:
+;;    Calling this function with firmware disabled yields undefined behaviour, but 
+;; normally leads to firmware being reenabled (unless 0xBB5A has been overwritten
+;; previously).
+;; 
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
@@ -48,25 +53,27 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case   | Cycles   | microSecs (us)
-;; ----------------------------------
-;; C Call | 49 + PC  | 12,25 + PCus
-;; Any    | 25 + PC  |  6,25 + PCus
+;; Case   | microSecs(us) | CPU Cycles
+;; -------------------------------------
+;; C Call |   16 + PC     |   64 + PC
+;; -------------------------------------
+;; Any    |    9 + PC     |   36 + PC
+;; -------------------------------------
 ;; (end code)
 ;;    PC = Time used in the call to firmware Print Charater function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _putchar::
 _putchar_rr_s:: 
-   ld   hl, #2    ;; [10] HL points to SP+2 (place where parameters start) 
-   add  hl, sp    ;; [11]
-   ld    a, (hl)  ;; [ 7] A = Character to be printed out
+   ld   hl, #2    ;; [3] HL points to SP+2 (place where parameters start) 
+   add  hl, sp    ;; [3]
+   ld    a, (hl)  ;; [2] A = Character to be printed out
 
-   call  0xBB5A   ;; [11] Firmware function for printing characters
-   ret            ;; [10]
+   call  0xBB5A   ;; [5] Firmware function for printing characters
+   ret            ;; [3]
 
 _putchar_rr_dbs::
-   ld    a,e      ;; [ 4] A = Character to be printed out
+   ld    a,e      ;; [1] A = Character to be printed out
 
-   call  0xBB5A   ;; [11] Firmware function for printing characters
-   ret            ;; [10]
+   call  0xBB5A   ;; [5] Firmware function for printing characters
+   ret            ;; [3]
