@@ -61,19 +61,19 @@
 ;; Destroyed Register values: 
 ;;    AF, DE, HL
 ;;
-;; Required memory:
-;;    C-binding   - 41 bytes
+;; Required memory: 
+;;    C-binding   - 38 bytes
 ;;    ASM-binding - 35 bytes
 ;;
 ;; Time Measures:  
 ;; (start code)
 ;; Case       | Microsecs | CPU Cycles
 ;; -----------------------------------
-;; Best (3)   |    50     |   200
+;; Best (3)   |    41     |   164
 ;; -----------------------------------
-;; Worst (1)  |    56     |   224
+;; Worst (1)  |    47     |   188
 ;; -----------------------------------
-;; ASM-saving |   -21     |   -44
+;; ASM-saving |   -12     |   -48
 ;; -----------------------------------
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

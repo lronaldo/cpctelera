@@ -17,13 +17,18 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_bitarray
 
+;;
+;; C-bindings for calling function <cpct_getBit>
+;;
+;;  12 microSecs, 3 bytes
+;;
 _cpct_getBit::
-   ;; Get parameters from the stack
-   pop   af          ;; [3] AF = Return address
-   pop   de          ;; [3] DE = Pointer to the array in memory
-   pop   hl          ;; [3] HL = Index of the bit we want to get
-   push  hl          ;; [4] << Restore stack status
-   push  de          ;; [4]
-   push  af          ;; [4]
+   ;; Recover parameters from the stack
+   pop hl           ;; [3] HL = Return Address
+   pop de           ;; [3] DE = Pointer to the array in memory
+   ex (sp), hl      ;; [6] HL = Index of the bit we want to get
+                    ;; ... also putting again Return Address where SP is located now
+                    ;; ... as this function is using __z88dk_callee convention
+
 
 .include /cpct_getBit.asm/

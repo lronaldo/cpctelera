@@ -61,16 +61,19 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings   - 42 bytes (34 bytes code -- 8 bytes bitWeights table)
-;;    ASM-bindings - 36 bytes (28 bytes code -- 8 bytes bitWeights table)
+;;      C-bindings - 31 bytes
+;;    ASM-bindings - 28 bytes
+;;      bitWeights - +8 bytes vector required by both bindings. Take into 
+;; account that this vector is included only once if you use different 
+;; functions referencing to it.
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;    Case    | microsec (ms) | Cycles
 ;; --------------------------------------
-;;    Any     |      55       |   220
+;;    Any     |      44       |   176
 ;; --------------------------------------
-;; ASM-Saving |     -21       |   -44 
+;; ASM-Saving |     -12       |   -48
 ;; --------------------------------------
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
