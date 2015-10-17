@@ -34,7 +34,7 @@
 #include <types.h>
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
-extern   u8 cpct_px2byteM0 (u8 px0, u8 px1);
+extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;
 extern   u8 cpct_px2byteM1 (u8 px0, u8 px1, u8 px2, u8 px3);
 
 // Tile drawing functions
