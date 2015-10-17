@@ -95,9 +95,7 @@
 ;;
 ;; Colour table
 ;;
-;; Bndry does not work when file is linked after being compiled.
-;;.bndry 16   ;; Make this vector start at a 16-byte aligned address to be able to use 8-bit arithmetic with pointers
-dc_mode0_ct:: .db 0x00, 0x40, 0x04, 0x44, 0x10, 0x50, 0x14, 0x54, 0x01, 0x41, 0x05, 0x45, 0x11, 0x51, 0x15, 0x55
+.globl dc_mode0_ct
 
 _cpct_drawCharM0::
    ;; GET Parameters from the stack 
