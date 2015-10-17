@@ -63,8 +63,8 @@
 ##
 ##    -nt | --no-tileset                      - Do not generate a tileset array containing pointers to
 ##                                              generated sprites/tiles.
-##    -im | --interlaced-masks <transp_idx>   - Generates transparent sprites with interlaced masks
-##                                              using <trasnp_idx> as the index of the palette colour to
+##    -im | --interlaced-masks                - Generates transparent sprites with interlaced masks
+##                                              using 0 as the index of the palette colour to
 ##                                              be considered transparent
 ##    -bn | --tiles-basename  <name>          - Sets the basename that will be used as C identifier 
 ##                                              for tiles or sprites. Default: g_tile
@@ -141,8 +141,8 @@ to convert the file tiles.png: "
    echo "${COLOR_CYAN}       Do not generate a tileset array containing pointers to generated sprites/tiles."
    echo "${COLOR_LIGHT_BLUE}  -bn | --tiles-basename  <name>"
    echo "${COLOR_CYAN}       Sets the basename that will be used as C identifier for tiles or sprites. Default: g_tile"
-   echo "${COLOR_LIGHT_BLUE}  -im | --interlaced-masks <transp_idx>"
-   echo "${COLOR_CYAN}       Generates transparent sprites with interlaced masks using <trasnp_idx> \
+   echo "${COLOR_LIGHT_BLUE}  -im | --interlaced-masks"
+   echo "${COLOR_CYAN}       Generates transparent sprites with interlaced masks using 0 \
 as the index of the palette colour to be considered transparent."
    echo "${COLOR_LIGHT_BLUE}  -m  | --mode   <cpc_graphics_mode>"
    echo "${COLOR_CYAN}       Sets the CPC Graphics mode the output data will be produced for (0, 1 or 2). Default: 0."
@@ -174,17 +174,7 @@ while (( $# >= 1 )); do
       ## Generate interlaced masks with a transparent colour
       "-im" | "--interlaced-masks")
          
-         ## check that palette index for transparent colour is ok
-         if isEmpty "$2"; then
-            paramError "Parameter -im (--interlaced-masks) must be followed by a valid palette index." 11
-         elif ! isInt "$2"; then
-            paramError "Transparent index <transp_idx> used with -im (--interlaced-masks) must be an integer value." 12
-         elif (( $2 < 0 || $2 > 15 )); then
-            paramError "Transparent index <transp_idx> used with -im (--interlaced-masks) must be between 0 and 15." 13
-         fi
-
-         INTERLACED_MASKS="-im -t $2"
-         shift
+         INTERLACED_MASKS="-im -t 0"
       ;;
       ## Get a palette as an array of firmware values
       "-pf" | "--palette-firmware")
