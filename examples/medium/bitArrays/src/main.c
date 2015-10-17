@@ -98,13 +98,13 @@ void main (void) {
     //
     for (i = 0; i < 80; ++i) {
       // Set Bit i to 1
-      cpct_setBit(array1, i, 1);
+      cpct_setBit(array1, 1, i);
 
       // Print the complete array at the top of the screen
       printArray((u8*)0xC000, array1, 80, f_getbit); 
       
       // Reset again the bit to 0 an iterate
-      cpct_setBit(array1, i, 0);
+      cpct_setBit(array1, 0, i);
     }
 
     //
@@ -114,13 +114,13 @@ void main (void) {
     for (j = 3; j > 0; --j) { 
       for (i = 0; i < 80; ++i) {
         // Set the index i to the value j (1 to 3)
-        cpct_set2Bits(array2, i, j);
+        cpct_set2Bits(array2, j, i);
 
         // Print the complete array
         printArray((u8*)0xC0A0, array2, 80, f_get2bits);
 
         // Reset the value of the item to 0 again
-        cpct_set2Bits(array2, i, 0);
+        cpct_set2Bits(array2, 0, i);
       }
     }
 
@@ -135,7 +135,7 @@ void main (void) {
         u8 value = (i + j) & 0x0F;
 
         // Set next 4-bits element (i) to the calculated value and print the array
-        cpct_set4Bits(array4, i, value);
+        cpct_set4Bits(array4, value, i);
         printArray((u8*)0xC140, array4, 80, f_get4bits);
       }
     }
@@ -145,7 +145,7 @@ void main (void) {
     //
     for (i = 0; i < 80; ++i) {
       // Set next bit i to 1  
-      cpct_setBit(array1, i, 1);
+      cpct_setBit(array1, 1, i);
 
       // Print the complete array1 again
       printArray((u8*)0xC000, array1, 80, f_getbit); 
@@ -157,7 +157,7 @@ void main (void) {
     for (j = 3; j > 0; --j) { 
       for (i = 0; i < 80; ++i) {
         // Set next bit i to j (3, 2, 1)  
-        cpct_set2Bits(array2, i, j);
+        cpct_set2Bits(array2, j, i);
 
         // Print the complete array again
         printArray((u8*)0xC0A0, array2, 80, f_get2bits); 
