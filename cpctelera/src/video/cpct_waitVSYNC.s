@@ -65,10 +65,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles    | microSecs (us)
-;; ----------------------------------
-;; Best  | 40        |  10,00
-;; Any   | 17 + 28*L |  3,00 + 7,00*L
+;; Case  | microSecs (us) | CPU Cycles
+;; ----------------------------------------
+;; Best  |      12        |      48
+;; ----------------------------------------
+;; Any   |    6 + 7*L     |   24 + 28*L
+;; ----------------------------------------
 ;; (end code)
 ;;    L=Number of times loop is executed
 ;;
@@ -80,11 +82,11 @@
 
 _cpct_waitVSYNC::
 cpct_waitVSYNC_asm::	;; Assembly entry point
-   ld  b, #PPI_PORT_B;; [ 7] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
+   ld  b, #PPI_PORT_B;; [2] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
 
 wvs_wait:
-   in  a,(c)         ;; [12] A = Status register got from PPI port B
-   rra               ;; [ 4] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
-   jr  nc, wvs_wait  ;; [12/7] No Carry means No VSYNC, so loop While No Carry
+   in  a,(c)         ;; [4] A = Status register got from PPI port B
+   rra               ;; [1] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
+   jr  nc, wvs_wait  ;; [2/3] No Carry means No VSYNC, so loop While No Carry
 
-   ret               ;; [10] Carry Set, VSYNC Active, Return
+   ret               ;; [3] Carry Set, VSYNC Active, Return
