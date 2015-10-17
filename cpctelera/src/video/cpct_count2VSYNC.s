@@ -49,11 +49,16 @@
 ;; still available between the end of your calculations and the VSYNC.
 ;;
 ;;    The value returned by this function refers to the number of loop iteration
-;; waiting for VSYNC. If you wanted to know the total amount of CPU cycles, you
-;; can do this calculation,
+;; waiting for VSYNC. If you wanted to know the total amount of CPU cycles or 
+;; microseconds, you can do this calculations,
 ;; (start code)
-;;    availableCycles = 22 + 34 * cpct_count2VSYNC(); 
+;;    availableMicroSecs = 14 + 9 * cpct_count2VSYNC(); 
+;;    availableCycles    =  4 * availableMicroSecs;
 ;; (end)
+;;   Take into account that VSYNC occurs with a frequency of *19968 microseconds* 
+;; (roughtly 20 millisenonds, 1/50 seconds) which corresponds to *79872 CPU Cycles*.
+;; That is, in effect, the available time for calculations during every frame
+;; drawn on the scren.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, HL, BC
@@ -63,10 +68,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles    | microSecs (us)
-;; ----------------------------------
-;; Best  | 56        | 14,00
-;; Any   | 22 + 34*L |  5,50 + 8,50*L
+;; Case  | microSecs(us) | CPU Cycles
+;; -------------------------------------
+;; Best  |      17       |     68
+;; -------------------------------------
+;; Any   |    9 + 9L     |  36 + 36L
+;; -------------------------------------
 ;; (end code)
 ;;    L=Number of times loop is executed
 ;;
@@ -77,14 +84,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_count2VSYNC::
-cpct_count2VSYNC_asm::		;; Assembly entry point
-   ld    b, #PPI_PORT_B;; [ 7] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
-   ld   hl, #0       ;; [10] HL=0 HL will be the loop iterations counter, as it is directly used as return value in C
+cpct_count2VSYNC_asm::	
+   ld    b, #PPI_PORT_B ;; [2] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
+   ld   hl, #0          ;; [3] HL=0 HL will be the loop iterations counter, as it is directly used as return value in C
 
 wvs_wait:
-   inc  hl           ;; [ 6] HL++ counting new iteration of the waiting loop
-   in    a,(c)       ;; [12] A = Status register got from PPI port B
-   rra               ;; [ 4] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
-   jr   nc, wvs_wait ;; [12/7] No Carry means No VSYNC, so loop While No Carry
+   inc  hl              ;; [2] HL++ counting new iteration of the waiting loop
+   in    a,(c)          ;; [4] A = Status register got from PPI port B
+   rra                  ;; [1] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
+   jr   nc, wvs_wait    ;; [2/3] No Carry means No VSYNC, so loop While No Carry
 
-   ret               ;; [10] Carry Set, VSYNC Active, Return
+   ret                  ;; [3] Carry Set, VSYNC Active, Return
