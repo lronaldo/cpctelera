@@ -67,17 +67,20 @@ Group: Bitarray  {
    File: cpct_get2Bits  (bitarray/cpct_get2Bits.asm)
    File: cpct_get4Bits  (bitarray/cpct_get4Bits.asm)
    File: cpct_getBit  (bitarray/cpct_getBit.asm)
-   File: cpct_set2Bits  (bitarray/cpct_set2Bits.s)
-   File: cpct_set4Bits  (bitarray/cpct_set4Bits.s)
-   File: cpct_setBit  (bitarray/cpct_setBit.s)
+   File: cpct_set2Bits  (bitarray/cpct_set2Bits.asm)
+   File: cpct_set4Bits  (bitarray/cpct_set4Bits.asm)
+   File: cpct_setBit  (bitarray/cpct_setBit.asm)
    }  # Group: Bitarray
 
 Group: Firmware  {
 
    File: cpct_disableFirmware  (firmware/cpct_disableFirmware.s)
+   File: cpct_mode_rom_status  (firmware/cpc_mode_rom_status.s)
    File: cpct_reenableFirmware  (firmware/cpct_reenableFirmware.s)
+   File: cpct_removeInterruptHandler  (firmware/cpct_removeInterruptHandler.s)
+   File: cpct_setInterruptHandler  (firmware/cpct_setInterruptHandler.s)
    File: Enabling / disabling ROMs  (firmware/cpct_enableDisableROMs.s)
-   File: Firmware&amp;ROM variables  (firmware/firmware.s)
+   File: Firmware&amp;ROM constants  (firmware/firmware.s)
    }  # Group: Firmware
 
 Group: Keyboard  {
@@ -103,7 +106,7 @@ Group: Sprites  {
    File: cpct_drawTileAligned4x4_f  (sprites/cpct_drawTileAligned4x4_f.asm)
    File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.asm)
    File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.asm)
-   File: cpct_px2byteM0  (sprites/cpct_px2byteM0_cbindings.s)
+   File: cpct_px2byteM0  (sprites/cpct_px2byteM0.asm)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
    File: Sprite Macros&amp;Constants  (sprites/sprites.h)
    File: Transparency Tables  (sprites/transparency_tables.h)
@@ -119,6 +122,8 @@ Group: Strings  {
    File: cpct_drawStringM1  (strings/cpct_drawStringM1.s)
    File: cpct_drawStringM1_f  (strings/cpct_drawStringM1_f.s)
    File: cpct_drawStringM2  (strings/cpct_drawStringM2.s)
+   File: dc_mode0_ct  (strings/cpct_dc_mode0_ct.s)
+   File: dc_mode1_ct  (strings/cpct_dc_mode1_ct.s)
    File: putchar  (strings/cpct_putChar.s)
    }  # Group: Strings
 
@@ -126,11 +131,11 @@ Group: Video  {
 
    File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
    File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
-   File: cpct_fw2hw  (video/cpct_fw2hw.s)
-   File: cpct_getHWColour  (video/cpct_getHWColor.s)
+   File: cpct_fw2hw  (video/cpct_fw2hw.asm)
+   File: cpct_getHWColour  (video/cpct_getHWColour.s)
    File: cpct_getScreenPtr  (video/cpct_getScreenPtr.asm)
-   File: cpct_setPALColour  (video/cpct_setPALColour.s)
-   File: cpct_setPalette  (video/cpct_setPalette.s)
+   File: cpct_setPALColour  (video/cpct_setPALColour.asm)
+   File: cpct_setPalette  (video/cpct_setPalette.asm)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
    File: cpct_setVideoMode  (video/cpct_setVideoMode.s)
@@ -154,6 +159,8 @@ Group: Command Line Tools  {
    File: cpct_mkproject  (no auto-title, commandline/cpct_mkproject)
    File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
    File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
+   File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
+   File: cpct_winape  (commandline/cpct_winape)
    }  # Group: Command Line Tools
 
 Group: Easytilemaps  {
