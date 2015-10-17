@@ -26,7 +26,7 @@
 #define SPR_H  44
 
 //
-// EXAMPLE: Measuring free cycles after moving an sprite
+// EXAMPLE: Measuring free microseconds per frame after drawing a sprite
 //
 void main(void) {
    u8  i;                        // Loop index
@@ -65,6 +65,7 @@ void main(void) {
       // Wait to next VSYNC signal, calculating the amount of free microseconds (time we wait for VSYNC)
       // As documented on <cpct_count2VSYNC>, function returns number of loop iterations (L), and 
       // microseconds shall be calculated as ms = 14 + 9*L (CPU Cycles will then be 4*ms)
+      // With this, we measure exact time it takes for us to draw the sprite
       ms = 14 + 9 * cpct_count2VSYNC();
 
       // Print 5 digits on the upper right corner of the screen, 
