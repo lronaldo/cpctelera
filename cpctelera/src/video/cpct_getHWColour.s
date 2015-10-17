@@ -31,17 +31,16 @@
 ;;    Converts a firmware colour value into its equivalent hardware one.
 ;;
 ;; C Definition:
-;;    <u8> <cpct_getHWColour> (<u8> *firmware_colour*)
+;;    <u8> <cpct_getHWColour> (<u16> *firmware_colour*)
 ;;
-;; Input Parameters (1 Bytes):
-;;    (1B BC) firmware_colour - [0-26] Firmware colour value to be converted (Similar to BASIC's INK value)
+;; Input Parameters (2 Bytes):
+;;    (2B HL) firmware_colour - [0-26] Firmware colour value to be converted (Similar to BASIC's INK value)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_getHWColour_asm
-;;    * BC = *firmware_colour* implies that B = 0 and C = *firmware_colour*
 ;;
 ;; Parameter Restrictions:
-;;    * *firmware_colour* must be in the range [0-26], otherwise, return value will be unexpected.
+;;    * *firmware_colour* must be in the range [0-26], otherwise, return value will be undefined.
 ;;
 ;; Return Value:
 ;;    <u8> - [0-31] Hardware colour value corresponding to *firmware_colour* provided.
@@ -51,34 +50,25 @@
 ;; value. You can find this equivalences in the table 1 of the <cpct_setPalette> explanation.
 ;;
 ;; Destroyed Register values:
-;;    BC, HL
+;;    HL, DE
 ;;
 ;; Required memory:
-;;    40 bytes (13 bytes code, 27 bytes colour conversion table)
+;;      6 bytes
+;;   + 27 bytes cpct_firmware2hw_colour conversion table
 ;;
 ;; Time Measures:
 ;; (start code)
-;;     Case   | Cycles  | microSecs (us)
-;; ---------------------------------------
-;;     Any    |   63    |   15.75
-;; ---------------------------------------
-;; Asm saving |  -32    |   -8.00
-;; ---------------------------------------
+;;     Case   | microSecs(us) | CPU Cycles
+;; -----------------------------------------
+;;     Any    |      11       |     44
+;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_getHWColour::
-   ld   hl, #2               ;; [10] HL = SP + 2 (Place where parameters start) 
-   ld    b, h                ;; [ 4] B = 0, to be able to use C as an incremente for HL (adding BC)
-   add  hl, sp               ;; [11]
-   ld    c, (hl)             ;; [ 7] A = Firmware INK colour value 
-
 cpct_getHWColour_asm::       ;; Assembly entry point
+   ld   de, #cpct_firmware2hw_colour ;; [3] DE points to the start of the colour table
+   add  hl, de                       ;; [3] HL += DE, HL points to the exact hardware color value to return
 
-   ld   hl, #cpct_firmware2hw_colour ;; [10] HL points to the start of the colour table
-   add  hl, bc               ;; [11] HL += C (as B=0), HL points to the exact hardware color value to return
-
-   ld    l, (hl)             ;; [ 7] L = Return value (hardware colour for firmware colour supplied)
-   ld    h, b                ;; [ 4] H = 0, to leave HL just with the value of L
-
-   ret                      ;; [10] Return
+   ld    l, (hl)            ;; [2] L = Return value (hardware colour for firmware colour supplied)
+   ret                      ;; [3] Return

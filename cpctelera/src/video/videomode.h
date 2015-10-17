@@ -36,7 +36,7 @@ extern  u16 cpct_count2VSYNC  ();
 // Palette functions
 extern void cpct_fw2hw        (void *fw_colour_array, u16 size) __z88dk_callee;
 extern void cpct_setPalette   (u8* ink_array, u16 ink_array_size) __z88dk_callee;
-extern   u8 cpct_getHWColour  (u8 firmware_colour);
+extern   u8 cpct_getHWColour  (u16 firmware_colour) __z88dk_fastcall;
 extern void cpct_setPALColour (u8 pen, u8 hw_ink) __z88dk_callee;
 
 // Functions to modify video memory location
