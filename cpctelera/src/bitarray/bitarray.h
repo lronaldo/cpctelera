@@ -33,13 +33,13 @@
 #include <types.h>
 
 // Get bit functions
-extern   u8 cpct_getBit  (void *array, u16 pos);
-extern   u8 cpct_get2Bits(void *array, u16 pos);
-extern   u8 cpct_get4Bits(void *array, u16 pos);
+extern   u8 cpct_getBit  (void *array, u16 pos) __z88dk_callee;
+extern   u8 cpct_get2Bits(void *array, u16 pos) __z88dk_callee;
+extern   u8 cpct_get4Bits(void *array, u16 pos) __z88dk_callee;
 
 // Set bit functions
-extern void cpct_setBit  (void *array, u16 pos, u8 value);
-extern void cpct_set2Bits(void *array, u16 pos, u8 value);
-extern void cpct_set4Bits(void *array, u16 pos, u8 value);
+extern void cpct_setBit  (void *array, u16 value, u16 pos) __z88dk_callee;
+extern void cpct_set2Bits(void *array, u16 value, u16 pos) __z88dk_callee;
+extern void cpct_set4Bits(void *array, u16 value, u16 pos) __z88dk_callee;
 
 #endif
