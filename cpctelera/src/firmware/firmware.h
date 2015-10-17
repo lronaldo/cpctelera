@@ -26,8 +26,8 @@
 #define CPCT_FIRMWARE_ED_H
 
 // Enabling and disabling Firmware
-extern void cpct_reenableFirmware();
-extern void cpct_disableFirmware();
+extern void cpct_reenableFirmware(u16 firmware_ROM_code) __z88dk_fastcall;
+extern  u16 cpct_disableFirmware();
 
 // Setting a user defined interrupt handler routine
 extern void cpct_setInterruptHandler( void(*intHandler)(void) ) __z88dk_fastcall;

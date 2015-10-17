@@ -85,50 +85,52 @@
 ;;    AF, BC, HL
 ;;
 ;; Required memory:
-;;    122 bytes
+;;    33 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles | microSecs (us)
-;; -------------------------------
-;; Best  |   86   |   21.50
-;; -------------------------------
-;; Worst |   96   |   24.00
-;; -------------------------------
+;; Case  | microSecs(us) | CPU Cycles
+;; -----------------------------------
+;; Best  |      23       |     92
+;; -----------------------------------
+;; Worst |      26       |    104
+;; -----------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+.globl _cpct_mode_rom_status
+
 _cpct_enableLowerROM::
 cpct_enableLowerROM_asm::
-   ld   hl, #0xFBE6          ;; [10] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
-   jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0xFBE6          ;; [3] HL = Machine Code. E6 FB = AND #0b11111011 = Reset Bit 3 (Enable Lower ROM, 0 = enabled)
+   jr mrs_modifyROMstatus    ;; [3] Jump to ROM-Modification Code
 
 _cpct_disableLowerROM::
 cpct_disableLowerROM_asm::
-   ld   hl, #0x04F6          ;; [10] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
-   jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0x04F6          ;; [3] HL = Machine Code. F6 04 = OR #0b00000100 = Set Bit 3 (Disable Lower ROM, 0 = enabled)
+   jr mrs_modifyROMstatus    ;; [3] Jump to ROM-Modification Code
 
 _cpct_enableUpperROM::
 cpct_enableUpperROM_asm::
-   ld   hl, #0xF7E6          ;; [10] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
-   jp mrs_modifyROMstatus    ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0xF7E6          ;; [3] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
+   jr mrs_modifyROMstatus    ;; [3] Jump to ROM-Modification Code
 
 _cpct_disableUpperROM::
 cpct_disableUpperROM_asm::
-   ld   hl, #0x08F6          ;; [10] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
-   ;jp  mrs_modifyROMstatus  ;; [10] Jump to ROM-Modification Code
+   ld   hl, #0x08F6          ;; [3] HL = Machine Code. F6 08 = OR #0b00001000 = Set Bit 4 (Disable Upper ROM, 0 = enabled)
+   ;jp  mrs_modifyROMstatus  ;; [3] Jump to ROM-Modification Code
 
 mrs_modifyROMstatus:
-   ld  (mrs_operation), hl   ;; [16] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
-   ld   hl, #_cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
-   ld    a, (hl)             ;; [ 7] A = mode_rom_status (present value)
+   ld  (mrs_operation), hl   ;; [5] Modify Machine Code that makes the operation (AND/OR) to set/reset ROM bits
+   ld   hl, #_cpct_mode_rom_status ;; [3] HL points to present MODE, INT.GEN and ROM selection byte.
+   ld    a, (hl)             ;; [2] A = mode_rom_status (present value)
 mrs_operation:
-   and  #0b11111011          ;; [ 7] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
-   ld    b, #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
-   out (c), a                ;; [12] GA Command: Set Video Mode and ROM status (100)
+   and  #0b11111011          ;; [2] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
+   ld    b, #GA_port_byte    ;; [2] B = Gate Array Port (0x7F)
+   out (c), a                ;; [4] GA Command: Set Video Mode and ROM status (100)
 
-   ld (hl), a                ;; [ 7] Save new Mode and ROM status for later use if required
+   ld (hl), a                ;; [2] Save new Mode and ROM status for later use if required
 
-   ret                       ;; [10] Return
+   ret                       ;; [3] Return
 
 

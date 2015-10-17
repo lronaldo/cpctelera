@@ -19,12 +19,6 @@
 
 .include /firmware.s/
 
-;; 1-byte storage for MODE, INT. GENERATOR and ROM status (with default value)
-_cpct_mode_rom_status:: .db #0x9D
-
-;; 2-byte storage for firmware address
-_cpct_firmware_address:: .dw 0
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_disableFirmware
@@ -33,13 +27,14 @@ _cpct_firmware_address:: .dw 0
 ;; CPU interrupt.
 ;;
 ;; C Definition:
-;;    void <cpct_disableFirmware> ()
+;;    u16 <cpct_disableFirmware> ()
 ;;
 ;; Assembly call:
 ;;    > call cpct_disableFirmware_asm
 ;;
-;; Known limitations:
-;;  * This function *will not work from ROM*, as it uses self-modifying code.
+;; Return value:
+;;    <u16> - Present interrupt handler code (normally, pointer to firmware ROM code).
+;; This value should be stored to restore it later, if required.
 ;;
 ;; Details:
 ;;    Disables the firmware modifying the interrupt vector at memory location 
@@ -49,9 +44,10 @@ _cpct_firmware_address:: .dw 0
 ;; 0x38 by 0xC9FB, (0xFB = EI, 0xC9 = RET), which basically does nothing 
 ;; at each interruption (restores interrupts and returns).
 ;;
-;;    Before inserting 0xC9FB at 0x38, the 2 bytes lying there at saved in
-;; <cpct_firmware_address> variable. This permits restoring firmware function
-;; copying this bytes again to 0x38, as <cpct_reenableFirmware> does.
+;;    Before inserting 0xC9FB at 0x38, the 2 bytes lying there are saved into DE.
+;; These 2 bytes are returned to the caller, to let them be stored and restored 
+;; later on, if normal firmware operation (or previous interrupt handler) is 
+;; required. <cpct_reenableFirmware> may be used for this restoring operation.
 ;;
 ;;    Disabling the firmware is useful for several reasons:
 ;;    - Firmware code gets executed 6 times per frame (1 at each interrupt) when 
@@ -74,13 +70,13 @@ _cpct_firmware_address:: .dw 0
 ;;    HL
 ;;
 ;; Required memory:
-;;    20 bytes
+;;    16 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;; Case | microSecs (us) | CPU Cycles
 ;; --------------------------------------
-;; Any  |      25        |    100
+;; Any  |      22        |     88
 ;; --------------------------------------
 ;; (end code)
 ;;
@@ -93,12 +89,13 @@ _cpct_disableFirmware::
 cpct_disableFirmware_asm::        ;; Assembly entry point
    di                             ;; [1] Disable interrupts
    ld   hl, (firmware_RST_jp)     ;; [5] Obtain firmware ROM code pointer and store it for restoring it later
-   ld (_cpct_firmware_address),hl ;; [5]
+   ex   de, hl                    ;; [1] DE = HL (Save present firmware ROM code pointer)
 
    im    1                        ;; [2] Set Interrupt Mode 1 (CPU will jump to 0x38 when a interrupt occurs)
    ld   hl, #0xC9FB               ;; [3] FB C9 (take into account little endian) => EI : RET
 
    ld (firmware_RST_jp), hl       ;; [5] Setup new "interrupt handler" and enable interrupts again
-   ei                             ;; [1] 
+   ei                             ;; [1]
+   ex   de, hl                    ;; [1] HL = Present firmware ROM code pointer (return value)
 
    ret                            ;; [3] Return

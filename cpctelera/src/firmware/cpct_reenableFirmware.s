@@ -33,28 +33,39 @@
 ;;    Reenables previously disabled Amstrad CPC firmware.
 ;;
 ;; C Definition:
-;;    void <cpct_reenableFirmware> ()
+;;    void <cpct_reenableFirmware> (<u16> firmware_ROM_code) __z88dk_fastcall;
 ;;
 ;; Assembly call:
 ;;    > call cpct_reenableFirmware_asm
+;;
+;; Input Parameters (2 Bytes):
+;;   (2B HL) *firmware_ROM_code* - 2 bytes with previous code stored at 0x0038 interrupt
+;; vector to be restored.
+;;
+;; Parameter Restrictions:
+;;    * *firmware_ROM_code* is a 16bits value that should have been previously obtained
+;; calling <cpct_disableFirmware>. This 16bits value should be the code that calls
+;; ROM firmware every time an interrupt happens. This code is placed at 0x0038, which is
+;; the interrupt vector that is executed on interrupt mode 1.
 ;;
 ;; Details:
 ;;    Restores normal operation of Amstrad CPC firmware after having been disabled.
 ;; Do not try to call this function before disabling firmware. If you do, the most
 ;; normal result is getting your Amstrad CPC resetted.
 ;;
+;;
 ;; Destroyed Register values: 
 ;;    HL
 ;;
 ;; Required memory:
-;;    9 bytes
+;;    6 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case | Cycles | microSecs (us)
-;; -------------------------------
-;; Any  |   50   |   14.50
-;; -------------------------------
+;; Case | microSecs(us) | CPU Cycles
+;; -----------------------------------
+;; Any  |      10       |     40
+;; -----------------------------------
 ;; (end code)
 ;;
 ;; Credits:                                                       
@@ -63,11 +74,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_reenableFirmware::
-cpct_reenableFirmware_asm::   ;; Assembly entry point
-   di                         ;; [ 4] Disable interrupts
-
-   ld   hl,(_cpct_firmware_address) ;; [16] Restore previously saved pointer to ROM code
-   ld (firmware_RST_jp), hl   ;; [16]
-
-   ei                         ;; [ 4] Reenable interrupts and return
-   ret                        ;; [10]
+cpct_reenableFirmware_asm::
+   di                         ;; [1] Disable interrupts
+   ld (firmware_RST_jp), hl   ;; [5] HL = previous interrupt vector code (firmware ROM pointer)
+   ei                         ;; [1] Reenable interrupts and return
+   ret                        ;; [3] Return
