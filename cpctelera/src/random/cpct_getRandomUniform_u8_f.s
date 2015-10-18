@@ -76,7 +76,7 @@
 ;;      AF, C, L
 ;;
 ;; Required memory:
-;;      2 bytes
+;;      17 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
