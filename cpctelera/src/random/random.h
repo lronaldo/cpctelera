@@ -19,12 +19,21 @@
 //
 // Title: Random
 //
-
 #ifndef RANDOM_H
 #define RANDOM_H
 
-// Fast Uniform Random byte generator
-extern u8   cpct_getRandomUniform_u8_f  (u8 newseed) __z88dk_fastcall;
-extern void cpct_setRandomSeedUniform_u8(u8 entropy_byte) __z88dk_fastcall;
+//
+// Uniform Random Generators
+//
+// Based on simple linear congruential algebra
+extern u8   cpct_getRandomUniform_u8_f  (u8 entropy_byte) __z88dk_fastcall;
+extern void cpct_setRandomSeedUniform_u8(u8      newseed) __z88dk_fastcall;
+
+// Based on Galois Linear-Feedback Shift Register
+#include "glfsr16taps.h"
+extern void cpct_setSeed_glfsr16     (u16 newseed) __z88dk_fastcall;
+extern void cpct_setTaps_glfsr16     (u16    taps) __z88dk_fastcall;
+extern u8   cpct_getRandomu8_glfsr16 ();
+extern u16  cpct_getRandomu16_glfsr16();
 
 #endif
