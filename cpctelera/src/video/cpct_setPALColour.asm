@@ -39,7 +39,7 @@
 ;;    > call cpct_setPALColour_asm
 ;;
 ;; Parameter Restrictions:
-;;    - *pen* must be <= 16. Values [0-15] are normal palette colours, whilest index 16
+;;    - *pen* must be <= 16. Values [0-15] are normal palette colours, while index 16
 ;; refers to the Screen Border. Giving pen > 16 may yield unexpected behaviour.
 ;;    - *hw_ink* must be <= 31.
 ;;
