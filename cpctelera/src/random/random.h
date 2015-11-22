@@ -25,6 +25,7 @@
 //
 // Uniform Random Generators
 //
+
 // Based on simple linear congruential algebra
 extern u8   cpct_getRandomUniform_u8_f  (u8 entropy_byte) __z88dk_fastcall;
 extern void cpct_setRandomSeedUniform_u8(u8      newseed) __z88dk_fastcall;
@@ -41,5 +42,26 @@ extern u32  cpct_mxor32_seed;
 extern u32  cpct_nextRandom_mxor_u32 (u32 seed) __z88dk_fastcall;
 extern u8   cpct_getRandom_mxor_u8   ();
 extern u16  cpct_getRandom_mxor_u16  ();
+extern u32  cpct_getRandom_mxor_u32  ();
+extern void cpct_setSeed_mxor32      (u32 newseed) __z88dk_fastcall;
+
+///
+/// Macros: Simple aliases for most common random generators
+///
+///   This macros are designed to simplify the user interface for generating
+/// random numbers. Most of the time, a Marsaglia XOR-shift RNG is best
+/// choice for generating random numbers
+///
+///  cpct_randu8  - returns a random  <u8> value ( 8-bits)
+///  cpct_randu16 - returns a random <u16> value (16-bits)
+///  cpct_randu32 - returns a random <u32> value (32-bits)
+///  cpct_rand    - alias for cpct_randu8
+///  cpct_srand   - sets the seed for the random number generator (32 bits)
+///
+#define cpct_rand8  cpct_getRandom_mxor_u8
+#define cpct_rand16 cpct_getRandom_mxor_u16
+#define cpct_rand32 cpct_getRandom_mxor_u32
+#define cpct_rand   cpct_rand8
+#define cpct_srand  cpct_setSeed_mxor32
 
 #endif
