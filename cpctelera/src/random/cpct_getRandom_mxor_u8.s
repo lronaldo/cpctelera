@@ -34,12 +34,26 @@
 ;;    * This function *cannot be used from ROM*, as is uses self-modifying code.
 ;;
 ;; Details:
+;;    This function uses <cpct_nextRandom_mxor_u32> to produce a stream of random 
+;; bytes in groups of 4. Then, it returns each one of the last 4 random bytes produced
+;; previous to calling <cpct_nextRandom_mxor_u32> again. It uses <cpct_mxor32_seed> as
+;; storage buffer for the last 4 random bytes got from <cpct_nextRandom_mxor_u32>.
+;;
+;;    It is important to know that this function will have 2 different behaviors:
+;;    * [*available*] 3 out of every 4 calls, it will only return the next random-byte from the buffer
+;; (<cpct_mxor32_seed>).
+;;    * [*production*] 1 out of every 4 calls, it will also call <cpct_nextRandom_mxor_u32> to produce
+;; 4 new random bytes.
+;;    This behaviour is reflected in the time measures.
 ;;
 ;; Destroyed Register values: 
 ;;      AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;      35 bytes
+;;    75 bytes divided in, 
+;;    *  36 bytes (this function's code)
+;;    * +35 bytes (from <cpct_nextRandom_mxor_u32> function's code)
+;;    *  +4 bytes (from <cpct_mxor32_seed>)
 ;;
 ;; Time Measures:
 ;; (start code)
