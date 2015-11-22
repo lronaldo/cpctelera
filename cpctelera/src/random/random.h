@@ -37,6 +37,8 @@ extern u8   cpct_getRandomu8_glfsr16 ();
 extern u16  cpct_getRandomu16_glfsr16();
 
 // Based on Marsaglia's XOR shift algorithm
+extern u32  cpct_mxor32_seed;
 extern u32  cpct_nextRandom_mxor_u32 (u32 seed) __z88dk_fastcall;
+extern u8   cpct_getRandom_mxor_u8   ();
 
 #endif
