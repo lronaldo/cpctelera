@@ -38,6 +38,9 @@ Some makefile code and ideas:
 Arkos player original code:
    * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>
 
+Random number generation:
+   * George Marsaglia
+
 (see logos_composite_long.png)
 
 Section: 3rdparty software authors
@@ -109,5 +112,6 @@ Section: Special Thanks
  * Mochilote / <CPCMania at http://cpcmania.com> (for creating great tutorials and useful documentation in his site)
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)
  * <Prodatron at http://www.prodatron.net/> / Symbiosis for producting such a great deal of incredible software for the Amstrad CPC and for being always helpful and kind.
- * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs)
+ * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs, Z80 programming and random number generators)
+ * <Z88DK at http://www.z88dk.org/forum/> developers for sharing their really nice Z80 codebase.
  
