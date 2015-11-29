@@ -74,10 +74,9 @@ Group: Bitarray  {
 
 Group: Firmware  {
 
-   File: cpct_disableFirmware  (firmware/cpct_disableFirmware.s)
    File: cpct_mode_rom_status  (firmware/cpc_mode_rom_status.s)
    File: cpct_reenableFirmware  (firmware/cpct_reenableFirmware.s)
-   File: cpct_removeInterruptHandler  (firmware/cpct_removeInterruptHandler.s)
+   File: cpct_removeInterruptHandler.s  (firmware/cpct_removeInterruptHandler.s)
    File: cpct_setInterruptHandler  (firmware/cpct_setInterruptHandler.s)
    File: Enabling / disabling ROMs  (firmware/cpct_enableDisableROMs.s)
    File: Firmware&amp;ROM constants  (firmware/firmware.s)
@@ -181,6 +180,9 @@ Group: Random  {
    File: cpct_getRandomUniform_u8_f  (random/cpct_getRandomUniform_u8_f.s)
    File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
    File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
+   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
+   File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
+   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
    File: cpct_setRandomSeedUniform_u8  (random/cpct_setRandomSeedUniform_u8.s)
    File: cpct_setSeed_glfsr16  (random/cpct_setSeed_flfsr.s)
    File: cpct_setSeed_mxor  (random/cpct_setSeed_mxor.s)
