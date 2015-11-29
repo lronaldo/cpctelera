@@ -30,52 +30,57 @@
 ;;
 ;; Function: cpct_reenableFirmware
 ;;
-;;    Reenables previously disabled Amstrad CPC firmware.
+;;    Re-enables previously disabled Amstrad CPC firmware.
 ;;
 ;; C Definition:
-;;    void <cpct_reenableFirmware> (<u16> firmware_ROM_code) __z88dk_fastcall;
+;;    void <cpct_reenableFirmware> (<u16> firmware_ROM_pointer) __z88dk_fastcall;
 ;;
 ;; Assembly call:
 ;;    > call cpct_reenableFirmware_asm
 ;;
 ;; Input Parameters (2 Bytes):
-;;   (2B HL) *firmware_ROM_code* - 2 bytes with previous code stored at 0x0038 interrupt
-;; vector to be restored.
+;;   (2B HL) *firmware_ROM_pointer* - 2 bytes with previous pointer stored at 0x0039.
+;; This is the address where firmware ROM code starts.
 ;;
 ;; Parameter Restrictions:
-;;    * *firmware_ROM_code* is a 16bits value that should have been previously obtained
-;; calling <cpct_disableFirmware>. This 16bits value should be the code that calls
-;; ROM firmware every time an interrupt happens. This code is placed at 0x0038, which is
-;; the interrupt vector that is executed on interrupt mode 1.
+;;    * *firmware_ROM_pointer* is a 16bits value that should have been previously obtained
+;; calling <cpct_disableFirmware> or <cpct_removeInterruptHandler>. This 16bits value should
+;; be the pointer to the firmware ROM code that must be called every time an interrupt happens.
+;; This pointer is placed at 0x0039, along with a JP instruction (0xC3) at 0x0038. Being the
+;; CPU in interrupt mode 1, a jump to 0x0038 address is produced 6 times per frame, 300
+;; times per second.
 ;;
 ;; Details:
 ;;    Restores normal operation of Amstrad CPC firmware after having been disabled.
 ;; Do not try to call this function before disabling firmware. If you do, the most
 ;; normal result is getting your Amstrad CPC resetted.
 ;;
+;;    This function could also be used to change the present interrupt handler. However,
+;; take into account that it does not create a safe wrapper for the given interrupt
+;; handler. Use it with care in this case.
 ;;
 ;; Destroyed Register values: 
 ;;    HL
 ;;
 ;; Required memory:
-;;    6 bytes
+;;    11 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;; Case | microSecs(us) | CPU Cycles
 ;; -----------------------------------
-;; Any  |      10       |     40
+;; Any  |      16       |     64
 ;; -----------------------------------
 ;; (end code)
-;;
-;; Credits:                                                       
-;;    This function was coded copying and modifying cpc_disableFirmware 
-;; from CPCRSLib by Raul Simarro.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+.equ JP_opcode, 0xC3
 
 _cpct_reenableFirmware::
 cpct_reenableFirmware_asm::
    di                         ;; [1] Disable interrupts
-   ld (firmware_RST_jp), hl   ;; [5] HL = previous interrupt vector code (firmware ROM pointer)
+   ld a, #JP_opcode           ;; [2] A = 0xC3, opcode for JP instruction
+   ld (firmware_RST_jp), a    ;; [4] Put JP instruction at 0x0038, to create a jump to the pointer at 0x0039
+   ld (firmware_RST_jp+1), hl ;; [5] HL = previous interrupt handler pointer (firmware ROM pointer)
    ei                         ;; [1] Reenable interrupts and return
    ret                        ;; [3] Return
