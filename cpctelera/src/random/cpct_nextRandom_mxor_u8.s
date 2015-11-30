@@ -62,7 +62,8 @@
 ;;   The sequence calculated by this function is based on a modified version of 
 ;; <Marsaglia's XOR-shift generator at http://www.jstatsoft.org/article/view/v008i14/xorshift.pdf> 
 ;; using the tuple (3, 1, 1) for 8-bit values. This tuple is implemented really fast 
-;; on a Z80 (as <originally showed by Patrik Rak at http://www.worldofspectrum.org/forums/discussion/23070/redirect/p1>). 
+;; on a Z80 (<Patrik Rak originally showed a similar implementation for tuple (1, 1, 3) at 
+;; http://www.worldofspectrum.org/forums/discussion/23070/redirect/p1>). 
 ;; Assuming that the 32-bits state s is composed of 4 8-bits numbers s=(x, z, y, w), 
 ;; this algorithm produces a new state s'=(x',z',y',w') doing these operations:
 ;; (start code)
