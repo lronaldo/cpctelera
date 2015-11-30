@@ -140,7 +140,6 @@ cpct_nextRandom_mxor_u8_asm::
 
    ret         ;; [3] New state is returned in DE:HL, being L the 8 random bits generated
 
-
 ;;;
 ;;; Little better quality random (same algorithm, with tuple (5, 3 ,2))
 ;;;
