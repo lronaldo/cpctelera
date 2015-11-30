@@ -152,9 +152,9 @@ cpct_nextRandom_mxor_u8_asm::
 ;;   x' = y;
 ;;   y' = z;
 ;;   z' = w;
-;;   t  = x ^ (x << 5);
+;;   t  = x ^ (x << 2);
 ;;   t  = t ^ (t >> 3);
-;;   w' = w ^ (w << 2) ^ t;
+;;   w' = w ^ (w << 5) ^ t;
 ;; (end code)
 ;; INPUT:
 ;;  DE:HL == xz yw  (32 bits state)
@@ -182,8 +182,8 @@ cpct_nextRandom_mxor_u8_asm::
 ;;   
 ;;   rra         ;; 1
 ;;   srl  a      ;; 2
-;;   srl  a      ;; 2  A = t << 3
-;;   xor  h      ;; 1  A = t ^ (t << 3) = t'
+;;   srl  a      ;; 2  A = t >> 3
+;;   xor  h      ;; 1  A = t ^ (t >> 3) = t'
 ;;   xor  c      ;; 1  A = w ^ (w << 5) ^ t' = w'
 ;;
 ;;   ld   h, l   ;; 1  H = y' = z
