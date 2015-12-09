@@ -9,6 +9,7 @@ Section: Donnors
    25/06/2015 - Ervin Pajor
    13/07/2015 - Roald Strauss
    23/09/2015 - Arnaud Bouche
+   24/11/2015 - Toni Ramirez
 
 Section: Project authors
    
@@ -83,7 +84,10 @@ Section: 3rdparty software authors
 
  <libfreeimage at http://freeimage.sourceforge.net/>:
    * <Hervé Drolon at mailto:drolon@infonie.fr>
-   * <Floris van den Berg at flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
+   * <Floris van den Berg at mailto:flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
+
+<WinApe emulator at http://winape.net>: 
+   * <Richard Wilson at mailto:rich@bitwise-systems.com>
 
 Section: Testers & Bug Reporters
 
