@@ -44,6 +44,8 @@ extern u8   cpct_getRandom_mxor_u8   ();
 extern u16  cpct_getRandom_mxor_u16  ();
 extern u32  cpct_getRandom_mxor_u32  ();
 extern void cpct_setSeed_mxor        (u32 newseed) __z88dk_fastcall;
+extern u8   cpct_getRandom_xsp40_u8  ();
+extern void cpct_setSeed_xsp40_u8    (u16 seed8, u32 seed32) __z88dk_callee;
 
 ///
 /// Macros: Simple aliases for most common random generators
