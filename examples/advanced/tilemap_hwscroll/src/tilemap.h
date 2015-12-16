@@ -24,12 +24,12 @@
 #define NUMTILES        4
 #define SCR_TILE_WIDTH 40
 #define MAP_WIDTH     120
-#define MAP_HEIGHT     48
+#define MAP_HEIGHT     46
 #define SCR_HEIGHT    200
 #define SCR_WIDTH      80
 
 // Define Palette
-extern const u8 g_palette[4];
+extern const u8 g_palette[13];
 
 // Declaration of the tilemap
 extern const u8 g_tilemap[MAP_WIDTH * MAP_HEIGHT];

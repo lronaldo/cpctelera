@@ -82,8 +82,14 @@ void scrollScreenTilemap(TScreenTilemap *scr, i16 scroll) {
    // When scrolling to the right, erase the character (2x8) bytes that scrolls-out
    // through the top-left corner of the screen. Othewise, this pixel values will 
    // loop and appear through the bottom-down corner later on.
+   // When scrolling to the left, erase the character that appears on the left, just
+   // below the visible tilemap
    if (scroll > 0) 
-      cpct_drawSolidBox(scr->pVideo - 2, 0, 2, 8);
+      cpct_drawSolidBox(scr->pVideo - 2, 0, 2, 8);  // top-left scrolled-out char
+   else {
+      u8* br_char = cpct_getScreenPtr(scr->pVideo, 0, 4*MAP_HEIGHT);
+      cpct_drawSolidBox(br_char, 0, 2, 8);  // bottom-right scrolled-out char
+   }
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +99,7 @@ void initialize_CPC() {
    // Initialize the application
    cpct_disableFirmware();        // Firmware must be disabled for this application to work
    cpct_setVideoMode(0);          // Set Mode 0 (160x200, 16 Colours)
-   cpct_setPalette(g_palette, 4); // Set Palette 
+   cpct_setPalette(g_palette, 13); // Set Palette 
    cpct_setBorder(0x14);          // Set the border and background colours to black
    cpct_setPALColour(0, 0x14);    // 
 

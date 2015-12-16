@@ -21,11 +21,20 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 // Palette: Global colours used in this example
 //
-const u8 g_palette[4] = { 
-   0x14,    // 0  - White (Grey)
-   0x00,    // 13 - Black
-   0x0A,    // 26 - Bright Yellow
-   0x1C     // 3  - Red
+const u8 g_palette[13] = { 
+   0x14,    //  0 - Black
+   0x0C,    //  6 - Bright Red
+   0x00,    // 13 - While (Grey)
+   0x06,    // 10 - Cyan
+   0x1E,    // 12 - Yellow
+   0x1C,    //  3 - Red
+   0x16,    //  9 - Green
+   0x12,    // 18 - Bright Green
+   0x0B,    // 26 - Bright White
+   0x0E,    // 15 - Orange
+   0x03,    // 25 - Pastel Yellow
+   0x04,    //  1 - Blue
+   0x1F,    // 14 - Pastel Blue
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////

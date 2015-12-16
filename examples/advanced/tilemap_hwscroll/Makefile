@@ -60,7 +60,7 @@ src/tilemap.csv: src/tilemap.tmx
 
 ## Rule for generating the tileset
 ##
-PALETTE=0 13 24 3
+PALETTE=0 6 13 10 12 3 9 18 26 15 25 1 14
 obj/tiles.tls.ok: src/tiles.png
 	@$(call PRINT,$(PROJNAME),"Generating tileset from $?...")
 	@cpct_img2tileset -bn g -m 0 -tw 4 -th 4 -pf { $(PALETTE) } $?
