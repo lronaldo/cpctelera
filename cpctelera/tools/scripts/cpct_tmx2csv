@@ -130,7 +130,7 @@ while read LINE; do
             ## Found line that signals data start, change to convertingbytes status
             ## and set token separator to comma, as we have comma separated values
             STATUS=convertingbytes
-            IFS=","
+            IFS="${IFS},"$'\r'
          fi
       ;;
       ## Converting comma separated values into tiles
