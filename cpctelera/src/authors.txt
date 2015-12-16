@@ -42,6 +42,9 @@ Arkos player original code:
 Random number generation:
    * George Marsaglia
 
+Graphics:
+   * <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
+
 (see logos_composite_long.png)
 
 Section: 3rdparty software authors
