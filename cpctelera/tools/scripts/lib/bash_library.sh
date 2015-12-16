@@ -489,7 +489,10 @@ function contains {
 ## $1: value to be tested
 ##
 function isInt {
-   return $(test "$1" -eq "$1" > /dev/null 2>&1);
+   if [[ $1 =~ ^[-+]?[0-9]+$ ]]; then
+      return 0
+   fi
+   return 1
 }
 
 ## Check if a given value is an hexadecimal value or not

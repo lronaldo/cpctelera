@@ -143,9 +143,10 @@ while read LINE; do
             ## Next line of data values, output it converting integers
             BYTES=( $LINE )
             for A in ${BYTES[@]}; do
-               printf "%s," $((A - 1))
+               if isInt "$A"; then
+                  printf "%s," $((A - 1))
+               fi
             done
-            echo
          fi        
       ;;
       *) 
