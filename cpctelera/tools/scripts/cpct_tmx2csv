@@ -125,7 +125,7 @@ while read LINE; do
    case $STATUS in
       ## Looking for start of CSV values. 
       filestart)  
-         re=^.*\\bdata\\b.*\\bencoding\\b.*\\bcsv\\b.*$
+         re="^.*\<data\>.*\<encoding\>.*\<csv\>.*$"
          if [[ $LINE =~ $re ]]; then
             ## Found line that signals data start, change to convertingbytes status
             ## and set token separator to comma, as we have comma separated values
@@ -135,7 +135,7 @@ while read LINE; do
       ;;
       ## Converting comma separated values into tiles
       convertingbytes)
-         re=^.*\\bdata\\b.*$
+         re="^.*\<data\>.*$"
          if [[ $LINE =~ $re ]]; then
             ## Found line signaling end of data, move to endconversion status
             STATUS=endconversion
