@@ -38,11 +38,11 @@ MKDIR=mkdir
 define MAKERULE
 $(1): $(1)/Makefile
 	$(call PRINT,$(TOOLSYSTEM),"Building $(1)...")
-	@$(MAKE) -C $(1)
+	@$(MAKE) -j -C $(1)
 endef
 
 define MAKETOOL
-	@$(MAKE) -C $(1) $(2)
+	@$(MAKE) -j -C $(1) $(2)
 
 endef
 
