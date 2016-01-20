@@ -51,6 +51,9 @@
 #include <sstream>
 #include <fstream>
 
+// PATCH for libboost 1.60
+#include <boost/type_traits/ice.hpp>
+
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
 #include <boost/graph/connected_components.hpp>
