@@ -52,8 +52,16 @@ mkdir -p "${OBJDIR}"
 cd "${OBJDIR}"
 OBJDIR="${PWD}"
 
+# Set LDFLAGS accordingly for static build on Cygwin
+if [[ "$(uname)" =~ "CYGWIN" ]]; then 
+   ADDFLAGS="-static-libstdc++"; 
+else
+   ADDFLAGS=""
+fi
+
 ## Setup SDCC for building, with support for Z80 only
 "${SRCDIR}/configure" --prefix="${INSTALLDIR}" \
+        LDFLAGS="${ADDFLAGS}" \
         --disable-avr-port \
         --disable-xa-port \
         --disable-mcs51-port \
@@ -70,7 +78,7 @@ OBJDIR="${PWD}"
         --disable-tlcs90-port \
         --disable-st7-port \
         --disable-stm8-port \
-        --disable-ucsim
+        --disable-ucsim 
 
 ## Check if SDCC is configured
 if [ $? -ne 0 ]; then

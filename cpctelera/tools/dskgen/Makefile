@@ -23,7 +23,7 @@ SRCS = $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/*.cpp)
 OBJS = $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cc,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
 APPNAME = $(BINDIR)/dskgen
 
-all: $(APPNAME)
+all: cygwinstaticbuild $(APPNAME)
 
 $(APPNAME): $(BINDIR) $(OBJDIR) $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
@@ -33,6 +33,9 @@ $(OBJDIR)/%.o: %.cc
 
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c -I$(INCDIR) $<
+
+cygwinstaticbuild:
+	$(eval LDLIBS+=$(shell if [[ "$$(uname)" =~ "CYGWIN" ]]; then echo '-static-libstdc++'; fi))
 
 showVars:
 	$(info %.o)
