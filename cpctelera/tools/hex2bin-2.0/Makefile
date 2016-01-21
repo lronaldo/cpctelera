@@ -15,12 +15,14 @@ TGT_FILES = $(foreach F, hex2bin mot2bin, $(TGTDIR)/$(F))
 
 CPFLAGS = -std=gnu99 -O3 -fsigned-char -Wall -pedantic
 # Compile
-all: objectdir $(TGT_FILES)
+all: $(TGT_FILES)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	gcc -c $(CPFLAGS) $< -o $@
 
-objectdir:
+$(SRCDIR)/%.c: $(OBJDIR)
+	
+$(OBJDIR):
 	@echo "Creating directory $(OBJDIR)..."
 	mkdir -p $(OBJDIR)
 
