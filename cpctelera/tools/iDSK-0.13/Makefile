@@ -11,13 +11,15 @@ LDLIBS  =
 .PHONY: clean cleanall
 
 # Compile (Add -static-libstdc++ only on Cygwin)
-$(TARGET): $(OBJDIR) $(OBJFILES) Makefile
+$(TARGET): $(OBJFILES) Makefile
 	$(eval LDLIBS+=$(shell if [[ "$$(uname)" =~ "CYGWIN" ]]; then echo '-static-libstdc++'; fi))
 	$(COMP) $(CPFLAGS) $(LDLIBS) -o $(TARGET) $(OBJFILES)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(COMP) -c $(CPFLAGS) $< -o $@
 
+$(SRCDIR)/%.cpp: $(OBJDIR)
+	
 $(OBJDIR): 
 	@echo "Creating directory $(OBJDIR)..."
 	@mkdir -p $(OBJDIR)
