@@ -28,8 +28,8 @@
 ;;
 ;; Input Parameters (5 Bytes):
 ;;  (2B DE) array - Pointer to the first byte of the array to be filled up (starting point in memory)
-;;  (2B BC) size  - Number of bytes to be set (>= 2)
 ;;  (1B A ) value - 8-bit value to be set
+;;  (2B BC) size  - Number of bytes to be set (>= 2)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_memset_asm
