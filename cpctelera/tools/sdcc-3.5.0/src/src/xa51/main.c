@@ -334,6 +334,7 @@ PORT xa51_port =
   _xa51_setDefaultOptions,
   xa51_assignRegisters,
   _xa51_getRegName,
+  0,
   _xa51_keywords,
   _xa51_genAssemblerPreamble,
   _xa51_genAssemblerEnd,

@@ -29,6 +29,7 @@ H       [a-fA-F0-9]
 E       [Ee][+-]?{D}+
 FS      (f|F|l|L)
 IS      (u|U|l|L)*
+CP      (L|u|U)
 HASH    (#|%:)
 
 %{
@@ -63,12 +64,11 @@ static struct dbuf_s asmbuff; /* reusable _asm buffer */
 
 /* forward declarations */
 int yyerror (char *s);
-static const char *stringLiteral (void);
+static const char *stringLiteral (char);
 static void count (void);
 static void count_char (int);
 static int process_pragma (const char *);
 static int check_type (void);
-static int isTargetKeyword (const char *s);
 static void checkCurrFile (const char *s);
 %}
 
@@ -167,6 +167,7 @@ static void checkCurrFile (const char *s);
 "_Noreturn"             { count (); return NORETURN;}
 "restrict"              { count (); TKEYWORD99 (RESTRICT); }
 "__smallc"              { count (); return SMALLC; }
+"__preserves_regs"      { count (); return PRESERVES_REGS; }
 "__z88dk_fastcall"      { count (); TKEYWORD (Z88DK_FASTCALL); }
 "__z88dk_callee"        { count (); TKEYWORD (Z88DK_CALLEE); }
 "__addressmod"          { count (); return ADDRESSMOD; }
@@ -193,11 +194,15 @@ static void checkCurrFile (const char *s);
 0[xX]{H}+{IS}?          { count (); yylval.val = constVal (yytext); return CONSTANT; }
 0[0-7]*{IS}?            { count (); yylval.val = constVal (yytext); return CONSTANT; }
 [1-9]{D}*{IS}?          { count (); yylval.val = constVal (yytext); return CONSTANT; }
-'(\\.|[^\\'])+'         { count (); yylval.val = charVal (yytext); return CONSTANT; /* ' make syntax highlighter happy */ }
+{CP}?'(\\.|[^\\'])+'    { count (); yylval.val = charVal (yytext); return CONSTANT; /* ' make syntax highlighter happy */ }
 {D}+{E}{FS}?            { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}*"."{D}+({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}+"."{D}*({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
-\"                      { count (); yylval.yystr = stringLiteral (); return STRING_LITERAL; }
+\"                      { count (); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral ('L'); return STRING_LITERAL; }
+"u8\""                  { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"u\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('u'); return STRING_LITERAL; }
+"U\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('U'); return STRING_LITERAL; }
 ">>="                   { count (); yylval.yyint = RIGHT_ASSIGN; return RIGHT_ASSIGN; }
 "<<="                   { count (); yylval.yyint = LEFT_ASSIGN; return LEFT_ASSIGN; }
 "+="                    { count (); yylval.yyint = ADD_ASSIGN; return ADD_ASSIGN; }
@@ -386,7 +391,7 @@ check_type (void)
  */
 
 static const char *
-stringLiteral (void)
+stringLiteral (char enc)
 {
 #define STR_BUF_CHUNCK_LEN  1024
   int ch;
@@ -397,7 +402,19 @@ stringLiteral (void)
   else
     dbuf_set_length(&dbuf, 0);
 
-  dbuf_append_char(&dbuf, '"');
+  switch (enc)
+    {
+    case 'u': // UTF-16
+      dbuf_append_str(&dbuf, "u\"");
+      break;
+    case 'L':
+    case 'U': // UTF-32
+      enc = 'U';
+      dbuf_append_str(&dbuf, "U\"");
+      break;
+    default: // UTF-8 or whatever else the source character set is encoded in
+      dbuf_append_char(&dbuf, '"');
+    }
 
   /* put into the buffer till we hit the first \" */
 
@@ -507,6 +524,51 @@ stringLiteral (void)
           if (ch == EOF)
             goto out;
 
+          if (ch == 'u' || ch == 'U' || ch == 'L') /* Could be an utf-16 or utf-32 wide string literal prefix */
+            {
+              int ch2;
+
+              if (!(options.std_c11 || options.std_c95 && ch == 'L'))
+                {
+                  werror (ch == 'L' ? E_WCHAR_STRING_C95 : E_WCHAR_STRING_C11);
+                  unput(ch);
+                  goto out;
+                }
+
+              ch2 = input();
+              if (ch2 != '"')
+                unput (ch2);
+              else /* It is an utf-16 or utf-32 wide string literal prefix */
+                {
+                  if (!enc) 
+                    {
+                      dbuf_prepend_char(&dbuf, ch == 'L' ? 'U' : ch);
+                      enc = ch;
+                    }
+                  count_char(ch);
+                  count_char(ch2);
+                  break;
+                }
+            }
+
+          if (ch == 'u') /* Could be an utf-8 wide string literal prefix */
+            {
+              ch = input();
+              if (ch != '8')
+                {
+                  unput(ch);
+                  unput('u');
+                  goto out;
+                }
+              ch = input();
+              if (ch != '"')
+                {
+                  unput(ch);
+                  unput('8');
+                  unput('u');
+                  goto out;
+                }
+            }
           if (ch != '"')
             {
               unput(ch);
@@ -1088,41 +1150,6 @@ process_pragma (const char *s)
       werror(W_UNKNOWN_PRAGMA, s);
       return 0;
     }
-}
-
-/* will return 1 if the string is a part
-   of a target specific keyword */
-static int
-isTargetKeyword (const char *s)
-{
-  int i;
-
-  if (port->keywords == NULL)
-    return 0;
-
-  if (s[0] == '_' && s[1] == '_')
-    {
-      /* Keywords in the port's array have either 0 or 1 underscore, */
-      /* so skip over the appropriate number of chars when comparing */
-      for (i = 0 ; port->keywords[i] ; i++ )
-        {
-          if (port->keywords[i][0] == '_' &&
-              strcmp(port->keywords[i],s+1) == 0)
-            return 1;
-          else if (strcmp(port->keywords[i],s+2) == 0)
-            return 1;
-        }
-    }
-  else
-    {
-      for (i = 0 ; port->keywords[i] ; i++ )
-        {
-          if (strcmp(port->keywords[i],s) == 0)
-            return 1;
-        }
-    }
-
-  return 0;
 }
 
 int

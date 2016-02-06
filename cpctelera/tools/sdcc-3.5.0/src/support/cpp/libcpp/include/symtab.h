@@ -19,11 +19,8 @@ along with this program; see the file COPYING3.  If not see
 #ifndef LIBCPP_SYMTAB_H
 #define LIBCPP_SYMTAB_H
 
-#if defined(__APPLE__) && defined(__MACH__)
-#include "libiberty/obstack.h"
-#else
 #include "obstack.h"
-#endif
+
 #ifndef GTY
 #define GTY(x) /* nothing */
 #endif
@@ -55,12 +52,12 @@ struct ht
   hashnode *entries;
   /* Call back, allocate a node.  */
   hashnode (*alloc_node) (hash_table *);
-  /* Call back, allocate something that hangs off a node like a cpp_macro.
+  /* Call back, allocate something that hangs off a node like a cpp_macro.  
      NULL means use the usual allocator.  */
   void * (*alloc_subobject) (size_t);
 
-  unsigned int nslots;          /* Total slots in the entries array.  */
-  unsigned int nelements;       /* Number of live elements.  */
+  unsigned int nslots;		/* Total slots in the entries array.  */
+  unsigned int nelements;	/* Number of live elements.  */
 
   /* Link to reader, if any.  For the benefit of cpplib.  */
   struct cpp_reader *pfile;
@@ -80,7 +77,7 @@ extern hash_table *ht_create (unsigned int order);
 extern void ht_destroy (hash_table *);
 
 extern hashnode ht_lookup (hash_table *, const unsigned char *,
-                           size_t, enum ht_lookup_option);
+			   size_t, enum ht_lookup_option);
 extern hashnode ht_lookup_with_hash (hash_table *, const unsigned char *,
                                      size_t, unsigned int,
                                      enum ht_lookup_option);
@@ -99,7 +96,7 @@ extern void ht_purge (hash_table *, ht_cb, const void *);
 
 /* Restore the hash table.  */
 extern void ht_load (hash_table *ht, hashnode *entries,
-                     unsigned int nslots, unsigned int nelements, bool own);
+		     unsigned int nslots, unsigned int nelements, bool own);
 
 /* Dump allocation statistics to stderr.  */
 extern void ht_dump_statistics (hash_table *);

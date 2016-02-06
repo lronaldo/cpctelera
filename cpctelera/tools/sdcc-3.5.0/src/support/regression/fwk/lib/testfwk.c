@@ -69,7 +69,7 @@ __prints (const char *s)
 }
 
 void
-__printn (int n)
+__printd (int n)
 {
   if (0 == n)
     {
@@ -102,6 +102,30 @@ __printn (int n)
     }
 }
 
+void
+__printu (unsigned int n)
+{
+  if (0 == n)
+    {
+      _putchar('0');
+    }
+  else
+    {
+      static char MEMSPACE_BUF buf[6];
+      char MEMSPACE_BUF *p = &buf[sizeof (buf) - 1];
+
+      buf[sizeof(buf) - 1] = '\0';
+  
+      while (0 != n)
+        {
+          *--p = '0' + __mod (n, 10);
+          n = __div (n, 10);
+        }
+
+      __prints(p);
+    }
+}
+
 #ifndef NO_VARARGS
 void
 __printf (const char *szFormat, ...)
@@ -122,11 +146,18 @@ __printf (const char *szFormat, ...)
                 break;
               }
 
-            case 'u':
+            case 'd':
               {
                 int i = va_arg (ap, int);
-               __printn (i);
-               break;
+                __printd (i);
+                break;
+             }
+
+            case 'u':
+              {
+                unsigned int i = va_arg (ap, unsigned int);
+                __printu (i);
+                break;
              }
 
            case '%':
@@ -182,7 +213,7 @@ __fail (__code const char *szMsg, __code const char *szCond, __code const char *
   __prints(" at ");
   __prints(szFile);
   _putchar(':');
-  __printn(line);
+  __printd(line);
   _putchar('\n');
 
   __numFailures++;
@@ -200,17 +231,17 @@ main (void)
   __runSuite();
 
   __prints("--- Summary: ");
-  __printn(__numFailures);
+  __printd(__numFailures);
   _putchar('/');
-  __printn(__numTests);
+  __printd(__numTests);
   _putchar('/');
-  __printn(__numCases);
+  __printd(__numCases);
   __prints(": ");
-  __printn(__numFailures);
+  __printd(__numFailures);
   __prints(" failed of ");
-  __printn(__numTests);
+  __printd(__numTests);
   __prints(" tests in ");
-  __printn(__numCases);
+  __printd(__numCases);
   __prints(" cases.\n");
 
   _exitEmu();

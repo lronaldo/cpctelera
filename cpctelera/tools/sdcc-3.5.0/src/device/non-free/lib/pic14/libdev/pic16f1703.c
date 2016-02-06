@@ -2,9 +2,9 @@
  * This definitions of the PIC16F1703 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:42 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -262,6 +262,9 @@ __at(0x0299) __sfr CCPR2H;
 
 __at(0x029A) __sfr CCP2CON;
 __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
+
+__at(0x029A) __sfr ECCP2CON;
+__at(0x029A) volatile __ECCP2CONbits_t ECCP2CONbits;
 
 __at(0x030C) __sfr SLRCONA;
 __at(0x030C) volatile __SLRCONAbits_t SLRCONAbits;

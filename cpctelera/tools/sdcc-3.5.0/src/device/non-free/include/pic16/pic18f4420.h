@@ -2,9 +2,9 @@
  * This declarations of the PIC18F4420 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:42:03 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:18 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -1180,13 +1180,13 @@ typedef union
 
   struct
     {
-    unsigned RE                 : 3;
+    unsigned TRISE              : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned TRISE              : 3;
+    unsigned RE                 : 3;
     unsigned                    : 5;
     };
   } __TRISEbits_t;
@@ -2774,7 +2774,7 @@ typedef union
 
   struct
     {
-    unsigned LVV                : 4;
+    unsigned LVDL               : 4;
     unsigned                    : 4;
     };
 
@@ -2786,7 +2786,7 @@ typedef union
 
   struct
     {
-    unsigned LVDL               : 4;
+    unsigned LVV                : 4;
     unsigned                    : 4;
     };
   } __HLVDCONbits_t;
@@ -2860,13 +2860,13 @@ typedef union
 
   struct
     {
-    unsigned LVV                : 4;
+    unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned HLVDL              : 4;
+    unsigned LVV                : 4;
     unsigned                    : 4;
     };
 

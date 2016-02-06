@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1455 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:44 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:40 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -135,6 +135,7 @@
 #define PWM2DCL_ADDR            0x0614
 #define PWM2DCH_ADDR            0x0615
 #define PWM2CON_ADDR            0x0616
+#define PWM2CON0_ADDR           0x0616
 #define CWG1DBR_ADDR            0x0691
 #define CWG1DBF_ADDR            0x0692
 #define CWG1CON0_ADDR           0x0693
@@ -1356,8 +1357,8 @@ typedef union
     unsigned ADFVR1             : 1;
     unsigned CDAFVR0            : 1;
     unsigned CDAFVR1            : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned TSRNG              : 1;
+    unsigned TSEN               : 1;
     unsigned FVRRDY             : 1;
     unsigned FVREN              : 1;
     };
@@ -1382,6 +1383,8 @@ extern __at(0x0117) volatile __FVRCONbits_t FVRCONbits;
 #define _ADFVR1                 0x02
 #define _CDAFVR0                0x04
 #define _CDAFVR1                0x08
+#define _TSRNG                  0x10
+#define _TSEN                   0x20
 #define _FVRRDY                 0x40
 #define _FVREN                  0x80
 
@@ -2469,6 +2472,33 @@ extern __at(0x0616) volatile __PWM2CONbits_t PWM2CONbits;
 
 
 //==============================================================================
+//        PWM2CON0 Bits
+
+extern __at(0x0616) __sfr PWM2CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM2POL              : 1;
+  unsigned PWM2OUT              : 1;
+  unsigned PWM2OE               : 1;
+  unsigned PWM2EN               : 1;
+  } __PWM2CON0bits_t;
+
+extern __at(0x0616) volatile __PWM2CON0bits_t PWM2CON0bits;
+
+#define _PWM2CON0_PWM2POL       0x10
+#define _PWM2CON0_PWM2OUT       0x20
+#define _PWM2CON0_PWM2OE        0x40
+#define _PWM2CON0_PWM2EN        0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        CWG1DBR Bits
 
 extern __at(0x0691) __sfr CWG1DBR;
@@ -3463,6 +3493,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define ADFVR1                  FVRCONbits.ADFVR1               // bit 1
 #define CDAFVR0                 FVRCONbits.CDAFVR0              // bit 2
 #define CDAFVR1                 FVRCONbits.CDAFVR1              // bit 3
+#define TSRNG                   FVRCONbits.TSRNG                // bit 4
+#define TSEN                    FVRCONbits.TSEN                 // bit 5
 #define FVRRDY                  FVRCONbits.FVRRDY               // bit 6
 #define FVREN                   FVRCONbits.FVREN                // bit 7
 

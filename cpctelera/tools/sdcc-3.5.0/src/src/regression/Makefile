@@ -65,7 +65,7 @@ TARGETPIC = 18f452
 CFLAGS	= -mpic16 -p$(TARGETPIC)
 DIR = pic16
 endif
-CFLAGS += -Wl,-q
+CFLAGS += -Wl,-q --no-warn-non-free
 CFLAGS += -Wl,--map
 CFLAGS += -I $(SDCC_SRC)/device/include/$(DIR) -I $(SDCC_SRC)/device/non-free/include/$(DIR)
 CFLAGS += -L $(SDCC_BIN)/device/lib/build/$(DIR) -L $(SDCC_BIN)/device/non-free/lib/build/$(DIR)

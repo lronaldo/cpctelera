@@ -290,7 +290,7 @@ static int cvt_extract_destination(parsedPattern *pp)
 /*     containing the status register.                             */
 /*-----------------------------------------------------------------*/
 
-static pCodeOp *cvt_extract_status(char *reg, char *bit)
+static pCodeOp *cvt_extract_status(const char *reg, char *bit)
 {
   int len;
 
@@ -495,13 +495,13 @@ static void * cvt_altpat_mnem1a(void *pp,pCodeWildBlock *pcwb)
 
     switch(cmd_id) {
     case NOTBITSKIP:
-      PCW(pc)->mustNotBeBitSkipInst = 1;
+      PCW(pc)->mustNotBeBitSkipInst = TRUE;
       break;
     case BITSKIP:
-      PCW(pc)->mustBeBitSkipInst = 1;
+      PCW(pc)->mustBeBitSkipInst = TRUE;
       break;
     case INVERTBITSKIP:
-      PCW(pc)->invertBitSkipInst = 1;
+      PCW(pc)->invertBitSkipInst = TRUE;
     }
     return pc;
   }
@@ -1075,7 +1075,7 @@ static void dump1Token(pCodeTokens tt)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-static int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
+static int pcComparePattern(pCodeToken *pct, const char *pat, int max_tokens)
 {
   int i=0;
 
@@ -1108,7 +1108,7 @@ static int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-static int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
+static int altComparePattern(const char *pct, parsedPattern *pat, int max_tokens)
 {
   int i=0;
 
@@ -1439,7 +1439,7 @@ pCode *pic16_AssembleLine(char *line, int peeps)
 /*-----------------------------------------------------------------*/
 /* peepRuleCondition                                               */
 /*-----------------------------------------------------------------*/
-static void   peepRuleCondition(char *cond, pCodePeep *pcp)
+static void peepRuleCondition(const char *cond, pCodePeep *pcp)
 {
   if(!cond || !pcp)
     return;
@@ -1459,7 +1459,7 @@ static void   peepRuleCondition(char *cond, pCodePeep *pcp)
 static void initpCodeWildBlock(pCodeWildBlock *pcwb)
 {
 
-  //  pcwb = Safe_calloc(1,sizeof(pCodeWildBlock));
+  //  pcwb = Safe_alloc(sizeof(pCodeWildBlock));
 
   if(!pcwb)
     return;
@@ -1494,7 +1494,7 @@ static void postinit_pCodeWildBlock(pCodeWildBlock *pcwb)
 static void initpCodePeep(pCodePeep *pcp)
 {
 
-  //  pcwb = Safe_calloc(1,sizeof(pCodeWildBlock));
+  //  pcwb = Safe_alloc(sizeof(pCodeWildBlock));
 
   if(!pcp)
     return;
@@ -1541,10 +1541,10 @@ void  pic16_peepRules2pCode(peepRule *rules)
 
     //DFPRINTF((stderr,"\nRule:\n\n"));
 
-    pcps = Safe_calloc(1,sizeof(pCodePeepSnippets));
+    pcps = Safe_alloc(sizeof(pCodePeepSnippets));
     peepSnippets = DLL_append((DLList*)peepSnippets,(DLList*)pcps);
 
-    currentRule = pcps->peep  = Safe_calloc(1,sizeof(pCodePeep));
+    currentRule = pcps->peep  = Safe_alloc(sizeof(pCodePeep));
     initpCodePeep(currentRule);
 
     /* Convert the target block */
@@ -2159,8 +2159,8 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
   case PO_NONE:
   case PO_STR:
   case PO_REL_ADDR:
-        pcopnew = Safe_calloc(1, sizeof (pCodeOp));
-        memcpy(pcopnew, pcop, sizeof (pCodeOp));
+        pcopnew = Safe_malloc(sizeof(pCodeOp));
+        memcpy(pcopnew, pcop, sizeof(pCodeOp));
         break;
 
   case PO_W:
@@ -2181,33 +2181,33 @@ pCodeOp *pic16_pCodeOpCopy(pCodeOp *pcop)
   case PO_DIR:
     //DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
     /* XXX: might also be pCodeOpReg2 -- that's why the two structs are identical */
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-    memcpy (pcopnew, pcop, sizeof(pCodeOpReg));
+    pcopnew = Safe_malloc(sizeof(pCodeOpReg));
+    memcpy(pcopnew, pcop, sizeof(pCodeOpReg));
     break;
 
   case PO_LITERAL:
     //DFPRINTF((stderr,"pCodeOpCopy lit\n"));
     /* XXX: might also be pCodeOpLit2, that's why the two structs are identical... */
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
-    memcpy (pcopnew, pcop, sizeof(pCodeOpLit));
+    pcopnew = Safe_malloc(sizeof(pCodeOpLit));
+    memcpy(pcopnew, pcop, sizeof(pCodeOpLit));
     break;
 
   case PO_IMMEDIATE:
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
-    memcpy (pcopnew, pcop, sizeof(pCodeOpImmd));
+    pcopnew = Safe_malloc(sizeof(pCodeOpImmd));
+    memcpy(pcopnew, pcop, sizeof(pCodeOpImmd));
     break;
 
   case PO_GPR_BIT:
   case PO_CRY:
   case PO_BIT:
-    pcopnew = Safe_calloc(1, sizeof (pCodeOpRegBit));
-    memcpy (pcopnew, pcop, sizeof (pCodeOpRegBit));
+    pcopnew = Safe_malloc(sizeof(pCodeOpRegBit));
+    memcpy(pcopnew, pcop, sizeof(pCodeOpRegBit));
     break;
 
   case PO_LABEL:
     //DFPRINTF((stderr,"pCodeOpCopy label\n"));
-    pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
-    memcpy (pcopnew, pcop, sizeof (pCodeOpLabel));
+    pcopnew = Safe_malloc(sizeof(pCodeOpLabel));
+    memcpy(pcopnew, pcop, sizeof(pCodeOpLabel));
     break;
 
   case PO_WILD:

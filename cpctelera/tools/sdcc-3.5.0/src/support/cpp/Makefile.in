@@ -69,7 +69,7 @@ OUTPUT_OPTION = @OUTPUT_OPTION@
 STAMP = echo timestamp >
 
 # Where to find some libiberty headers.
-LIBIBERTY_DIR = $(srcdir)/libiberty
+LIBIBERTY_DIR = $(srcdir)/../sdbinutils/include
 LIBCPP_DIR = $(srcdir)/libcpp
 OBSTACK_H   = $(LIBIBERTY_DIR)/obstack.h
 SPLAY_TREE_H= $(LIBIBERTY_DIR)/splay-tree.h
@@ -277,71 +277,20 @@ traditional.o: $(LIBCPP_DIR)/traditional.c $(CONFIG_H) $(LIBCPP_DEPS)
 ##########################
 # Libiberty
 
-MY_LIBIBERTY_BITS = alloca.o concat.o fopen_unlocked.o getpwd.o hashtab.o hex.o \
-		    lbasename.o md5.o obstack.o safe-ctype.o splay-tree.o \
-		    vasprintf.o xexit.o xmalloc.o xmemdup.o xstrdup.o \
-		    xstrerror.o
+LIBIBERTY = ../sdbinutils/libiberty/libiberty.a
 
-alloca.o: $(LIBIBERTY_DIR)/alloca.c $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-concat.o: $(LIBIBERTY_DIR)/concat.c $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-fopen_unlocked.o: $(LIBIBERTY_DIR)/fopen_unlocked.c $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-getpwd.o: $(LIBIBERTY_DIR)/getpwd.c $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-hashtab.o: $(LIBIBERTY_DIR)/hashtab.c $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-hex.o: $(LIBIBERTY_DIR)/hex.c $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-lbasename.o: $(LIBIBERTY_DIR)/lbasename.c $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-md5.o: $(LIBIBERTY_DIR)/md5.c $(LIBIBERTY_DIR)/obstack.h $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-obstack.o: $(LIBIBERTY_DIR)/obstack.c $(LIBIBERTY_DIR)/obstack.h $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-safe-ctype.o: $(LIBIBERTY_DIR)/safe-ctype.c $(LIBIBERTY_DIR)/safe-ctype.h $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-splay-tree.o: $(LIBIBERTY_DIR)/splay-tree.c $(LIBIBERTY_DIR)/splay-tree.h $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-vasprintf.o: $(LIBIBERTY_DIR)/vasprintf.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-xexit.o: $(LIBIBERTY_DIR)/xexit.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-xmalloc.o: $(LIBIBERTY_DIR)/xmalloc.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-xmemdup.o: $(LIBIBERTY_DIR)/xmemdup.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-xstrdup.o: $(LIBIBERTY_DIR)/xstrdup.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
-
-xstrerror.o: $(LIBIBERTY_DIR)/xstrerror.c  $(CONFIG_H) $(LIBCPP_DEPS)
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+$(LIBIBERTY):
+	cd ../sdbinutils/libiberty/ && if [ -e Makefile ]; then $(MAKE); else ./configure && $(MAKE); fi
 
 ##########################
 # Sdcpp
 
 SDCC_OBJS = sdcpp.o sdcpp-opts.o sdcpp-diagnostic.o c-ppoutput.o cppdefault.o prefix.o version.o opts.o opts-common.o options.o c-incpath.o
 
-$(TARGET): $(SDCC_OBJS) $(MY_LIBIBERTY_BITS) libcpp.a $(LIBDEPS)
+$(TARGET): $(SDCC_OBJS) $(LIBIBERTY) libcpp.a $(LIBDEPS)
 	mkdir -p $(dir $@)
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(SDCC_OBJS) \
-	$(MY_LIBIBERTY_BITS) libcpp.a $(LIBS)
+	libcpp.a $(LIBIBERTY) $(LIBS)
 
 sdcpp.o: sdcpp.c $(CONFIG_H) $(SYSTEM_H) options.h
 

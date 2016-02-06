@@ -2,9 +2,9 @@
  * This definitions of the PIC18F26J50 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:44 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:02 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -249,6 +249,9 @@ __at(0x0F73) volatile __SSP2STATbits_t SSP2STATbits;
 
 __at(0x0F74) __sfr SSP2ADD;
 __at(0x0F74) volatile __SSP2ADDbits_t SSP2ADDbits;
+
+__at(0x0F74) __sfr SSP2MSK;
+__at(0x0F74) volatile __SSP2MSKbits_t SSP2MSKbits;
 
 __at(0x0F75) __sfr SSP2BUF;
 
@@ -505,6 +508,9 @@ __at(0x0FC7) volatile __SSPSTATbits_t SSPSTATbits;
 
 __at(0x0FC8) __sfr SSP1ADD;
 __at(0x0FC8) volatile __SSP1ADDbits_t SSP1ADDbits;
+
+__at(0x0FC8) __sfr SSP1MSK;
+__at(0x0FC8) volatile __SSP1MSKbits_t SSP1MSKbits;
 
 __at(0x0FC8) __sfr SSPADD;
 __at(0x0FC8) volatile __SSPADDbits_t SSPADDbits;

@@ -51,16 +51,16 @@ testMul(void)
 
     i = 5;
 
-    LOG(("i*5 == 25 = %u\n", (int)(i*5)));
+    LOG(("i*5 == 25 = %d\n", (int)(i*5)));
     result = i*5;
     ASSERT(result == 25);
-    LOG(("i*-4 == -20 = %u\n", (int)(i*-4)));
+    LOG(("i*-4 == -20 = %d\n", (int)(i*-4)));
     ASSERT(i*-4 == -20);
     i = -10;
 #ifndef __SDCC_pic16
-    LOG(("i*12 == -120 = %u\n", (int)(i*12)));
+    LOG(("i*12 == -120 = %d\n", (int)(i*12)));
     ASSERT(i*12 == -120);
-    LOG(("i*-3 == 30 = %u\n", (int)(i*-3)));
+    LOG(("i*-3 == 30 = %d\n", (int)(i*-3)));
     ASSERT(i*-3 == 30);
 #endif
 }
@@ -75,16 +75,16 @@ testDiv(void)
     {attr} {storage} signed {type} i;
 
     i = 100;
-    LOG(("i/5 == 20 = %u\n", (int)i/5));
+    LOG(("i/5 == 20 = %d\n", (int)i/5));
     ASSERT(i/5 == 20);
-    LOG(("i/-4 == -25 = %u\n", (int)i/-4));
+    LOG(("i/-4 == -25 = %d\n", (int)i/-4));
     mark();
     ASSERT(i/-4 == -25);
 
     i = -50;
-    LOG(("i/25 == -2 = %u\n", (int)i/25));
+    LOG(("i/25 == -2 = %d\n", (int)i/25));
     ASSERT(i/25 == -2);
-    LOG(("i/-12 == 4 = %u\n", (int)i/-12));
+    LOG(("i/-12 == 4 = %d\n", (int)i/-12));
     ASSERT(i/-12 == 4);
     //power of 2
     ASSERT(i/4 == -12);

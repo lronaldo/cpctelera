@@ -441,7 +441,7 @@ lnkarea(void)
                                         ap->a_addr = rloc[locIndex];
                         }
                         else if (ap->a_bset == 0) {
-                                if (TARGET_IS_6808 && ap->a_flag & A_NOLOAD) {
+                                if ((TARGET_IS_6808 || TARGET_IS_STM8) && ap->a_flag & A_NOLOAD) {
                                         locIndex = 2;
                                         ap->a_addr = 0;
                                 }
@@ -1078,6 +1078,10 @@ a_uint lnksect2 (struct area *tap, int locIndex)
                                                 fprintf(stderr, ErrMsg, taxp->a_size, taxp->a_size>1?"s":"", tap->a_id);
                                                 lkerr++;
                                         }
+
+                                        /* avoid redundant processing SSEG */
+                                        if (fchar == 'S')
+                                                break;
                                 }
                         }
                         else if (fchar=='T') /*Bit addressable bytes in internal RAM*/

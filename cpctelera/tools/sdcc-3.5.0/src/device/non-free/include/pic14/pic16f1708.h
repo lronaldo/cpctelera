@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1708 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:49 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:43 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -161,6 +161,7 @@
 #define CCPR2L_ADDR             0x0298
 #define CCPR2H_ADDR             0x0299
 #define CCP2CON_ADDR            0x029A
+#define ECCP2CON_ADDR           0x029A
 #define CCPTMRS_ADDR            0x029E
 #define SLRCONA_ADDR            0x030C
 #define SLRCONB_ADDR            0x030D
@@ -188,9 +189,11 @@
 #define PWM3DCL_ADDR            0x0617
 #define PWM3DCH_ADDR            0x0618
 #define PWM3CON_ADDR            0x0619
+#define PWM3CON0_ADDR           0x0619
 #define PWM4DCL_ADDR            0x061A
 #define PWM4DCH_ADDR            0x061B
 #define PWM4CON_ADDR            0x061C
+#define PWM4CON0_ADDR           0x061C
 #define COG1PHR_ADDR            0x0691
 #define COG1PHF_ADDR            0x0692
 #define COG1BLKR_ADDR           0x0693
@@ -1266,9 +1269,9 @@ typedef union
     unsigned ADPREF1            : 1;
     unsigned ADNREF             : 1;
     unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned ADCS0              : 1;
+    unsigned ADCS1              : 1;
+    unsigned ADCS2              : 1;
     unsigned ADFM               : 1;
     };
 
@@ -1277,6 +1280,13 @@ typedef union
     unsigned ADPREF             : 2;
     unsigned                    : 6;
     };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned ADCS               : 3;
+    unsigned                    : 1;
+    };
   } __ADCON1bits_t;
 
 extern __at(0x009E) volatile __ADCON1bits_t ADCON1bits;
@@ -1284,6 +1294,9 @@ extern __at(0x009E) volatile __ADCON1bits_t ADCON1bits;
 #define _ADPREF0                0x01
 #define _ADPREF1                0x02
 #define _ADNREF                 0x04
+#define _ADCS0                  0x10
+#define _ADCS1                  0x20
+#define _ADCS2                  0x40
 #define _ADFM                   0x80
 
 //==============================================================================
@@ -1697,14 +1710,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned DAC1PSS            : 2;
+    unsigned DACPSS             : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned DACPSS             : 2;
+    unsigned DAC1PSS            : 2;
     unsigned                    : 4;
     };
 
@@ -3343,6 +3356,65 @@ extern __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
 
 
 //==============================================================================
+//        ECCP2CON Bits
+
+extern __at(0x029A) __sfr ECCP2CON;
+
+typedef union
+  {
+  struct
+    {
+    unsigned CCP2M0             : 1;
+    unsigned CCP2M1             : 1;
+    unsigned CCP2M2             : 1;
+    unsigned CCP2M3             : 1;
+    unsigned DC2B0              : 1;
+    unsigned DC2B1              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned CCP2Y              : 1;
+    unsigned CCP2X              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned CCP2M              : 4;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned DC2B               : 2;
+    unsigned                    : 2;
+    };
+  } __ECCP2CONbits_t;
+
+extern __at(0x029A) volatile __ECCP2CONbits_t ECCP2CONbits;
+
+#define _ECCP2CON_CCP2M0        0x01
+#define _ECCP2CON_CCP2M1        0x02
+#define _ECCP2CON_CCP2M2        0x04
+#define _ECCP2CON_CCP2M3        0x08
+#define _ECCP2CON_DC2B0         0x10
+#define _ECCP2CON_CCP2Y         0x10
+#define _ECCP2CON_DC2B1         0x20
+#define _ECCP2CON_CCP2X         0x20
+
+//==============================================================================
+
+
+//==============================================================================
 //        CCPTMRS Bits
 
 extern __at(0x029E) __sfr CCPTMRS;
@@ -4134,6 +4206,32 @@ extern __at(0x0619) volatile __PWM3CONbits_t PWM3CONbits;
 
 
 //==============================================================================
+//        PWM3CON0 Bits
+
+extern __at(0x0619) __sfr PWM3CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM3POL              : 1;
+  unsigned PWM3OUT              : 1;
+  unsigned                      : 1;
+  unsigned PWM3EN               : 1;
+  } __PWM3CON0bits_t;
+
+extern __at(0x0619) volatile __PWM3CON0bits_t PWM3CON0bits;
+
+#define _PWM3CON0_PWM3POL       0x10
+#define _PWM3CON0_PWM3OUT       0x20
+#define _PWM3CON0_PWM3EN        0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        PWM4DCL Bits
 
 extern __at(0x061A) __sfr PWM4DCL;
@@ -4220,6 +4318,32 @@ extern __at(0x061C) volatile __PWM4CONbits_t PWM4CONbits;
 #define _PWM4POL                0x10
 #define _PWM4OUT                0x20
 #define _PWM4EN                 0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        PWM4CON0 Bits
+
+extern __at(0x061C) __sfr PWM4CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM4POL              : 1;
+  unsigned PWM4OUT              : 1;
+  unsigned                      : 1;
+  unsigned PWM4EN               : 1;
+  } __PWM4CON0bits_t;
+
+extern __at(0x061C) volatile __PWM4CON0bits_t PWM4CON0bits;
+
+#define _PWM4CON0_PWM4POL       0x10
+#define _PWM4CON0_PWM4OUT       0x20
+#define _PWM4CON0_PWM4EN        0x80
 
 //==============================================================================
 
@@ -4903,13 +5027,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned LC1MODE            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC1MODE            : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
   } __CLC1CONbits_t;
@@ -5015,13 +5139,13 @@ typedef union
 
   struct
     {
-    unsigned D1S                : 5;
+    unsigned LC1D1S             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned LC1D1S             : 5;
+    unsigned D1S                : 5;
     unsigned                    : 3;
     };
   } __CLC1SEL0bits_t;
@@ -5135,13 +5259,13 @@ typedef union
 
   struct
     {
-    unsigned LC1D3S             : 5;
+    unsigned D3S                : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned D3S                : 5;
+    unsigned LC1D3S             : 5;
     unsigned                    : 3;
     };
   } __CLC1SEL2bits_t;
@@ -5195,13 +5319,13 @@ typedef union
 
   struct
     {
-    unsigned D4S                : 5;
+    unsigned LC1D4S             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned LC1D4S             : 5;
+    unsigned D4S                : 5;
     unsigned                    : 3;
     };
   } __CLC1SEL3bits_t;
@@ -5471,13 +5595,13 @@ typedef union
 
   struct
     {
-    unsigned LC2MODE            : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned LC2MODE            : 3;
     unsigned                    : 5;
     };
   } __CLC2CONbits_t;
@@ -5763,13 +5887,13 @@ typedef union
 
   struct
     {
-    unsigned LC2D4S             : 5;
+    unsigned D4S                : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned D4S                : 5;
+    unsigned LC2D4S             : 5;
     unsigned                    : 3;
     };
   } __CLC2SEL3bits_t;
@@ -6151,13 +6275,13 @@ typedef union
 
   struct
     {
-    unsigned D1S                : 5;
+    unsigned LC3D1S             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned LC3D1S             : 5;
+    unsigned D1S                : 5;
     unsigned                    : 3;
     };
   } __CLC3SEL0bits_t;
@@ -6699,6 +6823,9 @@ extern __at(0x0FEF) __sfr TOSH;
 #define ADPREF0                 ADCON1bits.ADPREF0              // bit 0
 #define ADPREF1                 ADCON1bits.ADPREF1              // bit 1
 #define ADNREF                  ADCON1bits.ADNREF               // bit 2
+#define ADCS0                   ADCON1bits.ADCS0                // bit 4
+#define ADCS1                   ADCON1bits.ADCS1                // bit 5
+#define ADCS2                   ADCON1bits.ADCS2                // bit 6
 #define ADFM                    ADCON1bits.ADFM                 // bit 7
 
 #define TRIGSEL0                ADCON2bits.TRIGSEL0             // bit 4

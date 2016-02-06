@@ -2,9 +2,9 @@
  * This declarations of the PIC12LF1552 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:47 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:34 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -109,9 +109,13 @@
 #define AADCAP_ADDR             0x0719
 #define AADRES0_ADDR            0x071A
 #define AADRES0L_ADDR           0x071A
+#define AD1RES0_ADDR            0x071A
+#define ADRES0_ADDR             0x071A
 #define AADRES0H_ADDR           0x071B
 #define AADRES1_ADDR            0x071C
 #define AADRES1L_ADDR           0x071C
+#define AD1RES1_ADDR            0x071C
+#define ADRES1_ADDR             0x071C
 #define AADRES1H_ADDR           0x071D
 #define STATUS_SHAD_ADDR        0x0FE4
 #define WREG_SHAD_ADDR          0x0FE5
@@ -1812,9 +1816,13 @@ extern __at(0x0719) volatile __AADCAPbits_t AADCAPbits;
 
 extern __at(0x071A) __sfr AADRES0;
 extern __at(0x071A) __sfr AADRES0L;
+extern __at(0x071A) __sfr AD1RES0;
+extern __at(0x071A) __sfr ADRES0;
 extern __at(0x071B) __sfr AADRES0H;
 extern __at(0x071C) __sfr AADRES1;
 extern __at(0x071C) __sfr AADRES1L;
+extern __at(0x071C) __sfr AD1RES1;
+extern __at(0x071C) __sfr ADRES1;
 extern __at(0x071D) __sfr AADRES1H;
 
 //==============================================================================

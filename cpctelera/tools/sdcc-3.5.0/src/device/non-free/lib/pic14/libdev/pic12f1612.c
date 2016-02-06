@@ -2,9 +2,9 @@
  * This definitions of the PIC12F1612 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:45 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:34 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -87,6 +87,10 @@ __at(0x0019) __sfr T1GCON;
 __at(0x0019) volatile __T1GCONbits_t T1GCONbits;
 
 __at(0x001A) __sfr T2TMR;
+
+__at(0x001A) __sfr TMR2;
+
+__at(0x001B) __sfr PR2;
 
 __at(0x001B) __sfr T2PR;
 
@@ -206,19 +210,11 @@ __at(0x020C) volatile __WPUAbits_t WPUAbits;
 __at(0x028C) __sfr ODCONA;
 __at(0x028C) volatile __ODCONAbits_t ODCONAbits;
 
-__at(0x0291) __sfr CCP1RL;
-__at(0x0291) volatile __CCP1RLbits_t CCP1RLbits;
-
 __at(0x0291) __sfr CCPR1;
 
 __at(0x0291) __sfr CCPR1L;
-__at(0x0291) volatile __CCPR1Lbits_t CCPR1Lbits;
-
-__at(0x0292) __sfr CCP1RH;
-__at(0x0292) volatile __CCP1RHbits_t CCP1RHbits;
 
 __at(0x0292) __sfr CCPR1H;
-__at(0x0292) volatile __CCPR1Hbits_t CCPR1Hbits;
 
 __at(0x0293) __sfr CCP1CON;
 __at(0x0293) volatile __CCP1CONbits_t CCP1CONbits;
@@ -226,13 +222,11 @@ __at(0x0293) volatile __CCP1CONbits_t CCP1CONbits;
 __at(0x0294) __sfr CCP1CAP;
 __at(0x0294) volatile __CCP1CAPbits_t CCP1CAPbits;
 
-__at(0x0298) __sfr CCP2RL;
-__at(0x0298) volatile __CCP2RLbits_t CCP2RLbits;
-
 __at(0x0298) __sfr CCPR2;
 
-__at(0x0299) __sfr CCP2RH;
-__at(0x0299) volatile __CCP2RHbits_t CCP2RHbits;
+__at(0x0298) __sfr CCPR2L;
+
+__at(0x0299) __sfr CCPR2H;
 
 __at(0x029A) __sfr CCP2CON;
 __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
@@ -257,6 +251,10 @@ __at(0x0393) __sfr IOCAF;
 
 __at(0x0413) __sfr T4TMR;
 
+__at(0x0413) __sfr TMR4;
+
+__at(0x0414) __sfr PR4;
+
 __at(0x0414) __sfr T4PR;
 
 __at(0x0415) __sfr T4CON;
@@ -272,6 +270,10 @@ __at(0x0418) __sfr T4RST;
 __at(0x0418) volatile __T4RSTbits_t T4RSTbits;
 
 __at(0x041A) __sfr T6TMR;
+
+__at(0x041A) __sfr TMR6;
+
+__at(0x041B) __sfr PR6;
 
 __at(0x041B) __sfr T6PR;
 
@@ -515,32 +517,6 @@ __at(0x0DAE) volatile __SMT2SIGbits_t SMT2SIGbits;
 
 __at(0x0DAF) __sfr SMT2WIN;
 __at(0x0DAF) volatile __SMT2WINbits_t SMT2WINbits;
-
-__at(0x0F8C) __sfr ICDIO;
-__at(0x0F8C) volatile __ICDIObits_t ICDIObits;
-
-__at(0x0F8D) __sfr ICDCON0;
-__at(0x0F8D) volatile __ICDCON0bits_t ICDCON0bits;
-
-__at(0x0F91) __sfr ICDSTAT;
-__at(0x0F91) volatile __ICDSTATbits_t ICDSTATbits;
-
-__at(0x0F96) __sfr ICDINSTL;
-__at(0x0F96) volatile __ICDINSTLbits_t ICDINSTLbits;
-
-__at(0x0F97) __sfr ICDINSTH;
-__at(0x0F97) volatile __ICDINSTHbits_t ICDINSTHbits;
-
-__at(0x0F9C) __sfr ICDBK0CON;
-__at(0x0F9C) volatile __ICDBK0CONbits_t ICDBK0CONbits;
-
-__at(0x0F9D) __sfr ICDBK0L;
-__at(0x0F9D) volatile __ICDBK0Lbits_t ICDBK0Lbits;
-
-__at(0x0F9E) __sfr ICDBK0H;
-__at(0x0F9E) volatile __ICDBK0Hbits_t ICDBK0Hbits;
-
-__at(0x0FE3) __sfr BSRICDSHAD;
 
 __at(0x0FE4) __sfr STATUS_SHAD;
 __at(0x0FE4) volatile __STATUS_SHADbits_t STATUS_SHADbits;

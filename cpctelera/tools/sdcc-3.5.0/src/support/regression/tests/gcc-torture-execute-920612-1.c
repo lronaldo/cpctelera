@@ -17,7 +17,7 @@ f(int j)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && (__GNUC__ < 5))
+#if !(defined (__GNUC__) && (__GNUC__ < 6))
   if(f ((~0U) >> 1))
     ASSERT(0);
   return;

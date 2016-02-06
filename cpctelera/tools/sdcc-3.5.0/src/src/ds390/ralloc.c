@@ -1157,7 +1157,7 @@ willCauseSpill (int nr, int rt)
 /* position as the operand otherwise chaos results                 */
 /*-----------------------------------------------------------------*/
 static int
-positionRegs (symbol * result, symbol * opsym)
+positionRegs (symbol * result, symbol * opsym, int chOp)
 {
   int count = min (result->nRegs, opsym->nRegs);
   int i, j = 0, shared = 0;
@@ -1166,30 +1166,37 @@ positionRegs (symbol * result, symbol * opsym)
   /* if the result has been spilt then cannot share */
   if (opsym->isspilt)
     return 0;
-again:
-  shared = 0;
-  /* first make sure that they actually share */
-  for (i = 0; i < count; i++)
+
+  for (;;)
     {
-      for (j = 0; j < count; j++)
-        {
+      shared = 0;
+      /* first make sure that they actually share */
+      for (i = 0; i < count; i++)
+        for (j = 0; j < count; j++)
           if (result->regs[i] == opsym->regs[j] && i != j)
             {
               shared = 1;
               goto xchgPositions;
             }
-        }
-    }
 xchgPositions:
-  if (shared)
-    {
-      reg_info *tmp = result->regs[i];
-      result->regs[i] = result->regs[j];
-      result->regs[j] = tmp;
-      change++;
-      goto again;
+      if (shared)
+        if (!chOp)
+          {
+            reg_info *tmp = result->regs[i];
+            result->regs[i] = result->regs[j];
+            result->regs[j] = tmp;
+            change++;
+          }
+        else
+          {
+            reg_info *tmp = opsym->regs[i];
+            opsym->regs[i] = opsym->regs[j];
+            opsym->regs[j] = tmp;
+            change++;
+          }
+      else
+        return change;
     }
-  return change;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1496,12 +1503,12 @@ serialRegAssign (eBBlock ** ebbs, int count)
                 {
                   if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->nRegs)
                     {
-                      positionRegs (OP_SYMBOL (IC_RESULT (ic)), OP_SYMBOL (IC_LEFT (ic)));
+                      positionRegs (OP_SYMBOL (IC_RESULT (ic)), OP_SYMBOL (IC_LEFT (ic)), 0);
                     }
                   /* do the same for the right operand */
                   if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->nRegs)
                     {
-                      positionRegs (OP_SYMBOL (IC_RESULT (ic)), OP_SYMBOL (IC_RIGHT (ic)));
+                      positionRegs (OP_SYMBOL (IC_RESULT (ic)), OP_SYMBOL (IC_RIGHT (ic)), 0);
                     }
                 }
 
@@ -1692,11 +1699,11 @@ fillGaps ()
                       /* if left is assigned to registers */
                       if (IS_SYMOP (IC_LEFT (ic)) && bitVectBitValue (_G.totRegAssigned, OP_SYMBOL (IC_LEFT (ic))->key))
                         {
-                          pdone += (positionRegs (sym, OP_SYMBOL (IC_LEFT (ic))) > 0);
+                          pdone += (positionRegs (sym, OP_SYMBOL (IC_LEFT (ic)), 0) > 0);
                         }
                       if (IS_SYMOP (IC_RIGHT (ic)) && bitVectBitValue (_G.totRegAssigned, OP_SYMBOL (IC_RIGHT (ic))->key))
                         {
-                          pdone += (positionRegs (sym, OP_SYMBOL (IC_RIGHT (ic))) > 0);
+                          pdone += (positionRegs (sym, OP_SYMBOL (IC_RIGHT (ic)), 0) > 0);
                         }
                       if (pdone > 1)
                         break;
@@ -1717,7 +1724,7 @@ fillGaps ()
                       /* if result is assigned to registers */
                       if (IS_SYMOP (IC_RESULT (ic)) && bitVectBitValue (_G.totRegAssigned, OP_SYMBOL (IC_RESULT (ic))->key))
                         {
-                          pdone += (positionRegs (sym, OP_SYMBOL (IC_RESULT (ic))) > 0);
+                          pdone += (positionRegs (sym, OP_SYMBOL (IC_RESULT (ic)), 0) > 0);
                         }
                       if (pdone > 1)
                         break;
@@ -3272,6 +3279,32 @@ packRegisters (eBBlock ** ebpp, int blockno)
     }
 }
 
+/*------------------------------------------------------------------------*/
+/* positionRegsReverse - positioning registers from end to begin to avoid */
+/* conflict among result, left and right operands in some extrem cases    */
+/*------------------------------------------------------------------------*/
+static void
+positionRegsReverse (eBBlock ** ebbs, int count)
+{
+  int i;
+  iCode *ic;
+
+  for (i = count - 1; i >= 0; i--)
+    for (ic = ebbs[i]->ech; ic; ic = ic->prev)
+      {
+        if (IC_LEFT (ic) && IS_SYMOP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->nRegs &&
+            IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic))->nRegs)
+          {
+            positionRegs (OP_SYMBOL (IC_RESULT (ic)), OP_SYMBOL (IC_LEFT (ic)), 1);    
+          }
+        if (IC_RIGHT (ic) && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->nRegs &&
+            IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic))->nRegs)
+          {
+            positionRegs (OP_SYMBOL (IC_RESULT (ic)), OP_SYMBOL (IC_RIGHT (ic)), 1);    
+          }
+      }
+}
+
 /*-----------------------------------------------------------------*/
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
@@ -3323,6 +3356,7 @@ ds390_assignRegisters (ebbIndex * ebbi)
   ds390_nRegs = 8;
   freeAllRegs ();
   fillGaps ();
+  positionRegsReverse (ebbs, count);
   ds390_nRegs = 12 + ds390_nBitRegs;
 
   /* if stack was extended then tell the user */

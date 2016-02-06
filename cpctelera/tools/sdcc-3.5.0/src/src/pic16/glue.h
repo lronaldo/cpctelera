@@ -29,8 +29,9 @@
 
 extern set *pic16_localFunctions;
 
-void pic16glue (void);
-unsigned int pic16aopLiteral (value *val, int offset);
-int pic16_stringInSet(const char *str, set **world, int autoAdd);
+extern void pic16_pCodeInitRegisters(void);
+extern void pic16glue (void);
+extern unsigned int pic16aopLiteral (value *val, int offset);
+extern int pic16_stringInSet(const char *str, set **world, int autoAdd);
 
 #endif

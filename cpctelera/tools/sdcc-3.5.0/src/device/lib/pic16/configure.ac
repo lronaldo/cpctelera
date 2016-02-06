@@ -3,6 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT([pic16lib], [0.3], [tecodev AT users sourceforge net])
+#AM_INIT_AUTOMAKE([foreign subdir-objects])
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([debug/gstack/gstack.c])
 AC_CONFIG_HEADER([config.h])

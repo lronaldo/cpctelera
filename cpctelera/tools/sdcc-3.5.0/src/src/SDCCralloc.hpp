@@ -51,8 +51,11 @@
 #include <sstream>
 #include <fstream>
 
-// PATCH for libboost 1.60
-#include <boost/type_traits/ice.hpp>
+// Workaround for boost bug #11880
+#include <boost/version.hpp>
+#if BOOST_VERSION == 106000
+   #include <boost/type_traits/ice.hpp>
+#endif
 
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
@@ -166,6 +169,8 @@ struct assignment
 
     for (i = local.begin(), ai = a.local.begin();; ++i, ++ai)
       {
+        if (i == i_end && ai == ai_end)
+          return(false);
         if (i == i_end)
           return(true);
         if (ai == ai_end)

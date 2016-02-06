@@ -52,7 +52,9 @@ extern "C" {
 #endif
 
 int dbuf_append_str(struct dbuf_s *dbuf, const char *str);
+int dbuf_prepend_str(struct dbuf_s *dbuf, const char *str);
 int dbuf_append_char(struct dbuf_s *dbuf, char chr);
+int dbuf_prepend_char(struct dbuf_s *dbuf, char chr);
 int dbuf_vprintf(struct dbuf_s *dbuf, const char *format, va_list args);
 int dbuf_printf (struct dbuf_s *dbuf, const char *format, ...) ATTRIBUTE_PRINTF(2, 3);
 size_t dbuf_getline(struct dbuf_s *dbuf, FILE *infp);

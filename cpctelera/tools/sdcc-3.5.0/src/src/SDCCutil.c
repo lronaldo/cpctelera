@@ -44,6 +44,17 @@
 
 #include "version.h"
 
+/** C99 isblank implementation for Visual C++ 2010
+*/
+
+#if defined(_MSC_VER) && (_MSC_VER < 1800)
+int
+isblank(int c)
+{
+  return (c == ' ' || c == '\t');
+}
+#endif
+
 /** Given an array of name, value string pairs creates a new hash
     containing all of the pairs.
 */
@@ -823,7 +834,7 @@ free_pragma_token (struct pragma_token_s *token)
     /param src Pointer to 'x' from start of hex character value
 */
 
-unsigned char
+unsigned long int
 hexEscape (const char **src)
 {
   char *s;
@@ -838,16 +849,10 @@ hexEscape (const char **src)
       /* no valid hex found */
       werror (E_INVALID_HEX);
     }
-  else
-    {
-      if (value > 255)
-        {
-          werror (W_ESC_SEQ_OOR_FOR_CHAR);
-        }
-    }
+
   *src = s;
 
-  return (unsigned char) value;
+  return value;
 }
 
 /*------------------------------------------------------------------*/
@@ -856,16 +861,16 @@ hexEscape (const char **src)
 /* adjust src to point at the last proccesed char                   */
 /*------------------------------------------------------------------*/
 
-unsigned char
+unsigned long int
 universalEscape (const char **str, unsigned int n)
 {
   unsigned int digits;
-  unsigned value = 0;
+  unsigned long value = 0;
   const char *s = *str;
 
-  if (!options.std_c99)
+  if (!options.std_c95)
     {
-      werror (W_UNIVERSAL_C99);
+      werror (W_UNIVERSAL_C95);
     }
 
   ++*str;                       /* Skip over the 'u'  or 'U' */
@@ -879,19 +884,15 @@ universalEscape (const char **str, unsigned int n)
         }
       else if ((**str | 0x20) >= 'a' && (**str | 0x20) <= 'f')
         {
-          value = (value << 4) + (**str - ('a' + 10));
+          value = (value << 4) + (**str - 'a' + 10);
           ++*str;
         }
       else
           break;
     }
-  if (digits != n)
+  if (digits != n || value < 0x00a0 && value != 0x0024 && value != 0x0040 && value != 0x0060 || value >= 0xd800 && 0xdfff >= value)
     {
       werror (E_INVALID_UNIVERSAL, s);
-    }
-  else if (value > 255)
-    {
-      werror (W_ESC_SEQ_OOR_FOR_CHAR);
     }
 
   return value;
@@ -903,7 +904,7 @@ universalEscape (const char **str, unsigned int n)
 /* adjust src to point at the last proccesed char                   */
 /*------------------------------------------------------------------*/
 
-unsigned char
+unsigned long int
 octalEscape (const char **str)
 {
   int digits;
@@ -921,13 +922,7 @@ octalEscape (const char **str)
           break;
         }
     }
-  if (digits)
-    {
-      if (value > 255 /* || (**str>='0' && **str<='7') */ )
-        {
-          werror (W_ESC_SEQ_OOR_FOR_CHAR);
-        }
-    }
+
   return value;
 }
 
@@ -964,7 +959,8 @@ copyStr (const char *src, size_t *size)
         }
       else if (*src == '\\')
         {
-          int c;
+          unsigned long int c;
+          bool universal = FALSE;
 
           if (begin)
             {
@@ -1022,11 +1018,13 @@ copyStr (const char *src, size_t *size)
 
             case 'u':
               c = universalEscape (&src, 4);
+              universal = TRUE;
               --src;
               break;
 
             case 'U':
               c = universalEscape (&src, 8);
+              universal = TRUE;
               --src;
               break;
 
@@ -1038,7 +1036,36 @@ copyStr (const char *src, size_t *size)
               c = *src;
               break;
             }
-          dbuf_append_char (&dbuf, c);
+          if (universal) // Encode one utf-32 character to utf-8
+            {
+              char s[5] = "\0\0\0\0";
+              if (c < 0x80)
+                s[0] = c;
+              else if (c < 0x800)
+                {
+                  s[0] = (c >> 6) & 0x1f | 0xc0;
+                  s[1] = (c >> 0) & 0x3f | 0x80;
+                }
+              else if (c < 0x10000)
+                {
+                  s[0] = (c >> 12) & 0x0f | 0xe0;
+                  s[1] = (c >> 6) & 0x3f  | 0x80;
+                  s[2] = (c >> 0) & 0x3f  | 0x80;
+                }
+              else if (c < 0x110000)
+                {
+                  s[0] = (c >> 18) & 0x07 | 0xf0;
+                  s[1] = (c >> 12) & 0x3f | 0x80;
+                  s[2] = (c >> 6) & 0x3f  | 0x80;
+                  s[3] = (c >> 0) & 0x3f  | 0x80;
+                }
+              else
+                wassert (0);
+              dbuf_append_str (&dbuf, s);
+            }
+          else
+            dbuf_append_char (&dbuf, c);
+
           ++src;
         }
       else
@@ -1118,4 +1145,47 @@ char *setPrefixSuffix(const char *arg)
   strcat (cmd, p);
 
   return cmd;
+}
+
+char *formatInlineAsm (char *asmStr)
+{
+  char *p, *q;
+
+  if (!asmStr)
+    return NULL;
+  else
+    q = asmStr;
+
+  for (;;)
+    {
+      // omit leading space or tab
+      while (*q == '\t' || *q == ' ')
+        q++;
+      // then record the head of current line
+      p = q;
+      // search for CL or reach the end
+      while (*q != '\n' && *q != '\r' && *q != 0)
+        q++;
+      // omit more CL characters
+      while (*q == '\n' || *q == '\r')
+        q++;
+      // replace the first with tab
+      while (p != q)
+        if (*p == '\t') // '\t' appears first then no need to do
+          {
+            break;
+          }
+        else if (*p == ' ') // find the first space then replace it with tab
+          {
+            *p = '\t';
+            break;
+          }
+        else // go on to search
+          {
+            p++;
+          }
+      // check if end
+      if (*q == 0)
+        return asmStr;
+    }
 }

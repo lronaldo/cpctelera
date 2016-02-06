@@ -59,9 +59,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	$(LYX) -e text $(notdir $<);
 
 %.pdf: %.tex %.dvi %.ind
-	$(DVIPDFM) $*
-# pdflatex creates documents for acrobat reader >= 5.0	
-#	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDFM) $*
+	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDFM) $*
 
 #%.ps:  %.pdf
 #	$(DVIPS) $*

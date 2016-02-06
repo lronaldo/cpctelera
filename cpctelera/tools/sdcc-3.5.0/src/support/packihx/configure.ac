@@ -35,6 +35,12 @@ type_name()
     echo "long long"
 }
 
+# Try to append a c99 flag
+AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" != "no"; then
+  CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
+fi
+
 AC_MSG_CHECKING(type name for byte)
 TYPE_BYTE=`type_name 1`
 AC_MSG_RESULT($TYPE_BYTE)

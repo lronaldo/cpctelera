@@ -13,18 +13,10 @@
   \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
 \renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 \pdfoptionpdfminorversion=3
-\usepackage[
-  pdftitle={SDCC Compiler User Guide},
-  pdfauthor={SDCC development team},
-  pdfsubject={installation, user manual},
-  pdfkeywords={68hc08 8032 8051 ansi iso c compiler assembler CPU DS390 embedded development free Floating Point Arithmetic Freescale GPL HC08 S08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Z180 Zilog Rabbit},
-  pdfpagemode=UseOutlines,
-  colorlinks=true,
-  linkcolor=blue] {hyperref}
 %
 \sloppy
-\tolerance=500          
-\emergencystretch=30pt 
+\tolerance=500
+\emergencystretch=30pt
 %
 \date{}
 \end_preamble
@@ -32,7 +24,7 @@
 \maintain_unincluded_children false
 \language english
 \language_package default
-\inputencoding default
+\inputencoding utf8
 \fontencoding global
 \font_roman times
 \font_sans helvet
@@ -51,7 +43,20 @@
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_title "SDCC Compiler User Guide"
+\pdf_author "SDCC development team"
+\pdf_subject "installation, user manual"
+\pdf_keywords "68hc08 8032 8051 ansi iso c compiler assembler CPU DS390 embedded development free Floating Point Arithmetic Freescale GPL HC08 S08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Z180 Zilog Rabbit"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize letterpaper
 \use_geometry true
 \use_package amsmath 1
@@ -157,17 +162,17 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 3.5.1
+SDCC 3.5.5
 \begin_inset Newline newline
 \end_inset
 
 
 \size footnotesize
-$Date:: 2015-08-12 #$ 
+$Date:: 2016-02-02 #$ 
 \begin_inset Newline newline
 \end_inset
 
-$Revision: 9295 $
+$Revision: 9493 $
 \end_layout
 
 \begin_layout Standard
@@ -6951,13 +6956,34 @@ msys
 
 \end_inset
 
-tools (
+msys (
 \begin_inset Flex URL
 status collapsed
 
 \begin_layout Plain Layout
 
 http://www.mingw.org/wiki/msys
+\end_layout
+
+\end_inset
+
+) or msys2
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+msys2
+\end_layout
+
+\end_inset
+
+(
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://msys2.github.io
 \end_layout
 
 \end_inset
@@ -9205,6 +9231,7 @@ Floating point support
 
 not supported.
  Instead a warning is emitted, and float is used instead.
+ long double is not supported.
 \end_layout
 
 \begin_layout Itemize
@@ -9285,6 +9312,54 @@ Functions are not reentrant unless explicitly declared as such or --stack-auto
 \end_layout
 
 \begin_layout Subsection
+ISO C95
+\end_layout
+
+\begin_layout Standard
+Use 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c95
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c95
+\end_layout
+
+\end_inset
+
+
+\series default
+ to compile in this mode.
+\end_layout
+
+\begin_layout Subsection
 ISO C99
 \end_layout
 
@@ -9356,10 +9431,6 @@ i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
 \end_layout
 
 \end_deeper
-\begin_layout Itemize
-Data type long double.
-\end_layout
-
 \begin_layout Itemize
 Compound literals.
  
@@ -9445,7 +9516,7 @@ In addition to what is mentioned in the section above, the following features
 \end_layout
 
 \begin_layout Itemize
-Improved Unicode support.
+string literals prfixed by u or U.
 \end_layout
 
 \begin_layout Subsection
@@ -14112,9 +14183,9 @@ status collapsed
 
 \end_inset
 
--funsigned-char
+-fsigned-char
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -14130,28 +14201,19 @@ status collapsed
 
 \end_inset
 
--funsigned-char
+-fsigned-char
 \end_layout
 
 \end_inset
 
 
 \series default
- The default signedness for every type is 
-\family typewriter
-signed
-\family default
-.
- In some embedded environments the default signedness of 
-\family typewriter
-char
-\family default
- is 
+ By default char is 
 \family typewriter
 unsigned
 \family default
 .
- To set the signess for characters to unsigned, use the option -
+ To set the signess for characters to signed, use the option -
 \series bold
 
 \begin_inset ERT
@@ -14168,9 +14230,9 @@ status collapsed
 
 
 \series default
--funsigned-char.
+-fsigned-char.
  If this option is set and no signedness keyword (unsigned/signed) is given,
- a char will be signed.
+ a char will be unsigned.
  All other types are unaffected.
 \end_layout
 
@@ -23447,6 +23509,23 @@ and you can use the same hardware dependent routine without changes, as
  for example in a library.
  This is somehow similar to sbit, but only one absolute address has to be
  specified in the whole project.
+\end_layout
+
+\begin_layout Subsection
+Preserved register specification
+\end_layout
+
+\begin_layout Standard
+SDCC allows to specify preserved registers in function declarations, to
+ enable further optimizations on calls to functions implemented in assembler.
+ Example for the Z80 architecture specifying that a function will preserve
+ register pairs bc and iy:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+void f(void) __preserves_regs(b, c, iyl, iyh);
 \end_layout
 
 \begin_layout Subsection
@@ -43613,71 +43692,129 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
-10F: 320, 322
+10F320, 10F322, 10LF320, 10LF322
 \end_layout
 
 \begin_layout Standard
-10LF: 320, 322
+12F609, 12F615, 12F617, 12F629, 12F635, 12F675, 12F683
 \end_layout
 
 \begin_layout Standard
-12F: 609, 615, 617, 629, 635, 675, 683
+12F752
 \end_layout
 
 \begin_layout Standard
-12F: 752
+12HV752
 \end_layout
 
 \begin_layout Standard
-16C: 432, 433
+16C62, 16C63A, 16C65B
 \end_layout
 
 \begin_layout Standard
-16C: 554, 557, 558
+16C71, 16C72, 16C73B, 16C74B
 \end_layout
 
 \begin_layout Standard
-16C: 62, 620, 620a, 621, 621a, 622, 622a, 63a, 65b
+16C432, 16C433
 \end_layout
 
 \begin_layout Standard
-16C: 71, 710, 711, 715, 717, 72, 73b, 745, 74b, 765, 770, 771, 773, 774,
- 781, 782
+16C554, 16C557, 16C558
 \end_layout
 
 \begin_layout Standard
-16C: 925, 926
+16C620, 16C620A, 16C621, 16C621A, 16C622, 16C622A
 \end_layout
 
 \begin_layout Standard
-16CR: 620a, 73, 74, 76, 77
+16C710, 16C711, 16C715, 16C717, 16C745, 16C765, 16C770, 16C771, 16C773,
+ 16C774, 16C781, 16C782
 \end_layout
 
 \begin_layout Standard
-16F: 610, 616, 627, 627a, 628, 628a, 630, 631, 636, 639, 648, 648a, 676,
- 677,684, 685, 687, 688, 689, 690
+16C925, 16C926 
 \end_layout
 
 \begin_layout Standard
-16F: 707, 716, 72, 720, 721, 722, 722a, 723, 723a, 724, 726, 727, 73, 737,
- 74, 747, 753, 76, 767, 77, 777, 785
+16CR73, 16CR74, 16CR76, 16CR77
 \end_layout
 
 \begin_layout Standard
-16LF: 707, 720, 721, 722, 722a, 723, 723a, 724, 726, 727
+16CR620A
 \end_layout
 
 \begin_layout Standard
-16F: 818, 819, 84, 84a, 87, 870, 871, 872, 873, 873a, 874, 874a, 876, 876a,
- 877, 877a, 88, 882, 883, 884, 886, 887
+16F72 ,16F73, 16F74, 16F76, 16F77
 \end_layout
 
 \begin_layout Standard
-16F: 913, 914, 916, 917, 946
+16F84, 16F84A, 16F87, 16F88
 \end_layout
 
 \begin_layout Standard
-16HV: 610, 616, 753, 785
+16F610, 16F616, 16F627, 16F627A, 16F628, 16F628A, 16F630, 16F631, 16F636,
+ 16F639, 16F648A
+\end_layout
+
+\begin_layout Standard
+16F676, 16F677, 16F684, 16F685, 16F687, 16F688, 16F689, 16F690
+\end_layout
+
+\begin_layout Standard
+16F707, 16F716, 16F720, 16F721, 16F722, 16F722A, 16F723, 16F723A, 16F724,
+ 16F726, 16F727
+\end_layout
+
+\begin_layout Standard
+16F737, 16F747, 16F753, 16F767, 16F777, 16F785
+\end_layout
+
+\begin_layout Standard
+16F818, 16F819, 16F870, 16F871, 16F872, 16F873, 16F873A, 16F874, 16F874A,
+ 16F876, 16F876A
+\end_layout
+
+\begin_layout Standard
+16F877, 16F877A, 16F882, 16F883, 16F884, 16F886, 16F887
+\end_layout
+
+\begin_layout Standard
+16F913, 16F914, 16F916, 16F917, 16F946
+\end_layout
+
+\begin_layout Standard
+16LF74, 16LF76, 16LF77
+\end_layout
+
+\begin_layout Standard
+16LF84, 16LF84A, 16LF87, 16LF88
+\end_layout
+
+\begin_layout Standard
+16LF627, 16LF627A, 16LF628, 16LF628A, 16LF648A
+\end_layout
+
+\begin_layout Standard
+16LF707, 16LF720, 16LF721, 16LF722, 16LF722A, 16LF723, 16LF723A, 16LF724,
+ 16LF726, 16LF727 
+\end_layout
+
+\begin_layout Standard
+16LF747, 16LF767, 16LF777
+\end_layout
+
+\begin_layout Standard
+16LF818, 16LF819, 16LF870, 16LF871, 16LF872, 16LF873, 16LF873A, 16LF874,
+ 16LF874A
+\end_layout
+
+\begin_layout Standard
+16LF876, 16LF876A, 16LF877, 16LF877A
+\end_layout
+
+\begin_layout Standard
+16HV610, 16HV616, 16HV753, 16HV785
 \end_layout
 
 \begin_layout Standard
@@ -43701,78 +43838,119 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-12F: 1501, 1571, 1572
+12F1501, 12F1571, 12F1572, 12F1612, 12F1822, 12F1840
 \end_layout
 
 \begin_layout Standard
-12LF: 1501, 1552, 1571, 1572
+12LF1501, 12LF1552, 12LF1571, 12LF1572, 12LF1612, 12LF1822, 12LF1840, 12LF1840T3
+9A, 12LF1840T48A
 \end_layout
 
 \begin_layout Standard
-12F: 1612
+16F1454, 16F1455, 16F1458, 16F1459
 \end_layout
 
 \begin_layout Standard
-12LF: 1612
+16F1503, 16F1507, 16F1508, 16F1509, 16F1512, 16F1513, 16F1516, 16F1517,
+ 16F1518, 16F1519
 \end_layout
 
 \begin_layout Standard
-12F: 1822, 1840
+16F1526, 16F1527, 16F1574, 16F1575, 16F1578, 16F1579
 \end_layout
 
 \begin_layout Standard
-12LF: 1822, 1840
+16F1613, 16F1614, 16F1615, 16F1618, 16F1619
 \end_layout
 
 \begin_layout Standard
-16F: 1454, 1455, 1458, 1459
+16F1703, 16F1704, 16F1705, 16F1707, 16F1708, 16F1709, 16F1713, 16F1716,
+ 16F1717, 16F1718, 16F1719
 \end_layout
 
 \begin_layout Standard
-16LF: 1454, 1455, 1458, 1459
+16F1764, 16F1765, 16F1768, 16F1769, 16F1773, 16F1776, 16F1777, 16F1778,
+ 16F1779
 \end_layout
 
 \begin_layout Standard
-16F: 1503, 1507, 1508, 1509, 1512, 1513, 1516, 1517, 1518, 1519, 1526, 1527
+16F1782, 16F1783, 16F1784, 16F1786, 16F1787, 16F1788, 16F1789
 \end_layout
 
 \begin_layout Standard
-16LF: 1503, 1507, 1508, 1509, 1512, 1513, 1516, 1517, 1518, 1519, 1526,
- 1527, 1554, 1559
+16F1823, 16F1824, 16F1825, 16F1826, 16F1827, 16F1828, 16F1829, 16F1829LIN,
+ 16F1847
 \end_layout
 
 \begin_layout Standard
-16F: 1613
+16F1933, 16F1934, 16F1936, 16F1937, 16F1938, 16F1939, 16F1946, 16F1947
 \end_layout
 
 \begin_layout Standard
-16LF: 1613
+16F18313, 16F18323, 16F18324, 16F18325, 16F18344, 16F18345,
 \end_layout
 
 \begin_layout Standard
-16F: 1703, 1704, 1705, 1707, 1708, 1709, 1713, 1716, 1717, 1718, 1719, 1782,
- 1783, 1784, 1786, 1787, 1788, 1789
+16F18855, 16F18875
 \end_layout
 
 \begin_layout Standard
-16LF: 1703, 1704, 1705, 1707, 1708, 1709, 1713, 1716, 1717, 1718, 1719,
- 1782, 1783, 1784, 1786, 1787, 1788, 1789
+16LF1454, 16LF1455, 16LF1458, 16LF1459
 \end_layout
 
 \begin_layout Standard
-16F: 1823, 1824, 1825, 1826, 1827, 1828, 1829, 1847
+16LF1503, 16LF1507, 16LF1508, 16LF1509, 16LF1512, 16LF1513, 16LF1516, 16LF1517,
+ 16LF1518, 16LF1519,
 \end_layout
 
 \begin_layout Standard
-16LF: 1823, 1824, 1825, 1826, 1827, 1828, 1829, 1847
+16LF1526, 16LF1527 
 \end_layout
 
 \begin_layout Standard
-16F: 1933, 1934, 1936, 1937, 1938, 1939, 1946, 1947
+16LF1554, 16LF1559, 16LF1566, 16LF1567, 16LF1574, 16LF1575, 16LF1578, 16LF1579
 \end_layout
 
 \begin_layout Standard
-16LF: 1902, 1903, 1904, 1906, 1907
+16LF1613, 16LF1614, 16LF1615, 16LF1618, 16LF1619
+\end_layout
+
+\begin_layout Standard
+16LF1703, 16LF1704, 16LF1705, 16LF1707, 16LF1708, 16LF1709, 16LF1713, 16LF1716,
+ 16LF1717, 16LF1718, 16LF1719 
+\end_layout
+
+\begin_layout Standard
+16LF1764, 16LF1765, 16LF1768, 16LF1769, 16LF1773, 16LF1776, 16LF1777, 16LF1778,
+ 16LF1779
+\end_layout
+
+\begin_layout Standard
+16LF1782, 16LF1783, 16LF1784, 16LF1786, 16LF1787, 16LF1788, 16LF1789,
+\end_layout
+
+\begin_layout Standard
+16LF1823, 16LF1824, 16LF1824T39A
+\end_layout
+
+\begin_layout Standard
+16LF1825, 16LF1826, 16LF1827, 16LF1828, 16LF1829, 16LF1847
+\end_layout
+
+\begin_layout Standard
+16LF1902, 16LF1903, 16LF1904, 16LF1906, 16LF1907
+\end_layout
+
+\begin_layout Standard
+16LF1933, 16LF1934, 16LF1936, 16LF1937, 16LF1938, 16LF1939, 16LF1946, 16LF1947
+\end_layout
+
+\begin_layout Standard
+16LF18313, 16LF18323, 16LF18324, 16LF18325, 16LF18344, 16LF18345
+\end_layout
+
+\begin_layout Standard
+16LF18855, 16LF18875
 \end_layout
 
 \begin_layout Standard
@@ -45065,163 +45243,360 @@ PIC
 \end_layout
 
 \begin_layout Standard
-18f13k22 18f13k50 18f14k22 18f14k50 18f23k20 18f23k22
+18F13K22 18F13K50
 \end_layout
 
 \begin_layout Standard
-18f24j10 18f24j11 18f24j50 18f24k20 18f24k22 18f24k50
+18F14K22 18F14K50
 \end_layout
 
 \begin_layout Standard
-18f25j10 18f25j11 18f25j50 18f25k20 18f25k22 18f25k50
+18F23K20 18F23K22
 \end_layout
 
 \begin_layout Standard
-18f25k80 18f26j11 18f26j13 18f26j50 18f26j53 18f26k20
+18F24J10 18F24J11 18F24J50 18F24K20 18F24K22 18F24K50
 \end_layout
 
 \begin_layout Standard
-18f26k22 18f26k80 18f27j13 18f27j53 18f43k20 18f43k22
+18F25J10 18F25J11 18F25J50 18F25K20 18F25K22 18F25K50 18F25K80
 \end_layout
 
 \begin_layout Standard
-18f44j10 18f44j11 18f44j50 18f44k20 18f44k22 18f45j10
+18F26J11 18F26J13 18F26J50 18F26J53 18F26K20 18F26K22 18F26K80
 \end_layout
 
 \begin_layout Standard
-18f45j11 18f45j50 18f45k20 18f45k22 18f45k50 18f45k80
+18F27J13 18F27J53
 \end_layout
 
 \begin_layout Standard
-18f46j11 18f46j13 18f46j50 18f46j53 18f46k20 18f46k22
+18F43K20 18F43K22
 \end_layout
 
 \begin_layout Standard
-18f46k80 18f47j13 18f47j53 18f63j11 18f63j90 18f64j11
+18F44J10 18F44J11 18F44J50 18F44K20 18F44K22
 \end_layout
 
 \begin_layout Standard
-18f64j90 18f65j10 18f65j11 18f65j15 18f65j50 18f65j90
+18F45J10 18F45J11 18F45J50 18F45K20 18F45K22 18F45K50 18F45K80
 \end_layout
 
 \begin_layout Standard
-18f65j94 18f65k22 18f65k80 18f65k90 18f66j10 18f66j11
+18F46J11 18F46J13 18F46J50 18F46J53 18F46K20 18F46K22 18F46K80
 \end_layout
 
 \begin_layout Standard
-18f66j15 18f66j16 18f66j50 18f66j55 18f66j60 18f66j65
+18F47J13 18F47J53
 \end_layout
 
 \begin_layout Standard
-18f66j90 18f66j93 18f66j94 18f66j99 18f66k22 18f66k80
+18F63J11 18F63J90
 \end_layout
 
 \begin_layout Standard
-18f66k90 18f67j10 18f67j11 18f67j50 18f67j60 18f67j90
+18F64J11 18F64J90
 \end_layout
 
 \begin_layout Standard
-18f67j93 18f67j94 18f67k22 18f67k90 18f83j11 18f83j90
+18F65J10 18F65J11 18F65J15 18F65J50 18F65J90 18F65J94 18F65K22 18F65K80
+ 18F65K90
 \end_layout
 
 \begin_layout Standard
-18f84j11 18f84j90 18f85j10 18f85j11 18f85j15 18f85j50
+18F66J10 18F66J11 18F66J15 18F66J16 18F66J50 18F66J55 18F66J60 18F66J65
 \end_layout
 
 \begin_layout Standard
-18f85j90 18f85j94 18f85k22 18f85k90 18f86j10 18f86j11
+18F66J90 18F66J93 18F66J94 18F66J99 18F66K22 18F66K80 18F66K90
 \end_layout
 
 \begin_layout Standard
-18f86j15 18f86j16 18f86j50 18f86j55 18f86j60 18f86j65
+18F67J10 18F67J11 18F67J50 18F67J60 18F67J90 18F67J93 18F67J94 18F67K22
+ 18F67K90
 \end_layout
 
 \begin_layout Standard
-18f86j72 18f86j90 18f86j93 18f86j94 18f86j99 18f86k22
+18F83J11 18F83J90
 \end_layout
 
 \begin_layout Standard
-18f86k90 18f87j10 18f87j11 18f87j50 18f87j60 18f87j72
+18F84J11 18F84J90
 \end_layout
 
 \begin_layout Standard
-18f87j90 18f87j93 18f87j94 18f87k22 18f87k90 18f95j94
+18F85J10 18F85J11 18F85J15 18F85J50 18F85J90 18F85J94 18F85K22 18F85K90
 \end_layout
 
 \begin_layout Standard
-18f96j60 18f96j65 18f96j94 18f96j99 18f97j60 18f97j94
+18F86J10 18F86J11 18F86J15 18F86J16 18F86J50 18F86J55 18F86J60 18F86J65
 \end_layout
 
 \begin_layout Standard
-18f242   18f248   18f252   18f258   18f442   18f448
+18F86J72 18F86J90 18F86J93 18F86J94 18F86J99 18F86K22 18F86K90
 \end_layout
 
 \begin_layout Standard
-18f452   18f458   18f1220  18f1230  18f1320  18f1330
+18F87J10 18F87J11 18F87J50 18F87J60 18F87J72 18F87J90 18F87J93 18F87J94
+ 18F87K22 18F87K90
 \end_layout
 
 \begin_layout Standard
-18f2220  18f2221  18f2320  18f2321  18f2331  18f2410
+18F95J94 18F96J60 18F96J65 18F96J94 18F96J99
 \end_layout
 
 \begin_layout Standard
-18f2420  18f2423  18f2431  18f2439  18f2450  18f2455
+18F97J60 18F97J94
 \end_layout
 
 \begin_layout Standard
-18f2458  18f2480  18f2510  18f2515  18f2520  18f2523
+18F242 18F248 18F252 18F258
 \end_layout
 
 \begin_layout Standard
-18f2525  18f2539  18f2550  18f2553  18f2580  18f2585
+18F442 18F448 18F452 18F458
 \end_layout
 
 \begin_layout Standard
-18f2610  18f2620  18f2680  18f2682  18f2685  18f4220
+18F1220 18F1230
 \end_layout
 
 \begin_layout Standard
-18f4221  18f4320  18f4321  18f4331  18f4410  18f4420
+18F1320 18F1330
 \end_layout
 
 \begin_layout Standard
-18f4423  18f4431  18f4439  18f4450  18f4455  18f4458
+18F2220 18F2221
 \end_layout
 
 \begin_layout Standard
-18f4480  18f4510  18f4515  18f4520  18f4523  18f4525
+18F2320 18F2321 18F2331
 \end_layout
 
 \begin_layout Standard
-18f4539  18f4550  18f4553  18f4580  18f4585  18f4610
+18F2410 18F2420 18F2423 18F2431 18F2439 18F2450 18F2455 18F2458 18F2480
 \end_layout
 
 \begin_layout Standard
-18f4620  18f4680  18f4682  18f4685  18f6310  18f6390
+18F2510 18F2515 18F2520 18F2523 18F2525 18F2539 18F2550 18F2553 18F2580
+ 18F2585
 \end_layout
 
 \begin_layout Standard
-18f6393  18f6410  18f6490  18f6493  18f6520  18f6525
+18F2610 18F2620 18F2680 18F2682 18F2685
 \end_layout
 
 \begin_layout Standard
-18f6527  18f6585  18f6620  18f6621  18f6622  18f6627
+18F4220 18F4221
 \end_layout
 
 \begin_layout Standard
-18f6628  18f6680  18f6720  18f6722  18f6723  18f8310
+18F4320 18F4321 18F4331
 \end_layout
 
 \begin_layout Standard
-18f8390  18f8393  18f8410  18f8490  18f8493  18f8520
+18F4410 18F4420 18F4423 18F4431 18F4439 18F4450 18F4455 18F4458 18F4480
 \end_layout
 
 \begin_layout Standard
-18f8525  18f8527  18f8585  18f8620  18f8621  18f8622
+18F4510 18F4515 18F4520 18F4523 18F4525 18F4539 18F4550 18F4553 18F4580
+ 18F4585
 \end_layout
 
 \begin_layout Standard
-18f8627  18f8628  18f8680  18f8720  18f8722  18f8723
+18F4610 18F4620 18F4680 18F4682 18F4685
+\end_layout
+
+\begin_layout Standard
+18F6310 18F6390 18F6393
+\end_layout
+
+\begin_layout Standard
+18F6410 18F6490 18F6493
+\end_layout
+
+\begin_layout Standard
+18F6520 18F6525 18F6527 18F6585
+\end_layout
+
+\begin_layout Standard
+18F6620 18F6621 18F6622 18F6627 18F6628 18F6680
+\end_layout
+
+\begin_layout Standard
+18F6720 18F6722 18F6723
+\end_layout
+
+\begin_layout Standard
+18F8310 18F8390 18F8393
+\end_layout
+
+\begin_layout Standard
+18F8410 18F8490 18F8493
+\end_layout
+
+\begin_layout Standard
+18F8520 18F8525 18F8527 18F8585
+\end_layout
+
+\begin_layout Standard
+18F8620 18F8621 18F8622 18F8627 18F8628 18F8680
+\end_layout
+
+\begin_layout Standard
+18F8720 18F8722 18F8723
+\end_layout
+
+\begin_layout Standard
+18LF13K22 18LF13K50
+\end_layout
+
+\begin_layout Standard
+18LF14K22 18LF14K50
+\end_layout
+
+\begin_layout Standard
+18LF23K22 18LF24J10 18LF24J11 18LF24J50 18LF24K22 18LF24K50
+\end_layout
+
+\begin_layout Standard
+18LF25J10 18LF25J11 18LF25J50 18LF25K22 18LF25K50 18LF25K80
+\end_layout
+
+\begin_layout Standard
+18LF26J11 18LF26J13 18LF26J50 18LF26J53 18LF26K22 18LF26K80
+\end_layout
+
+\begin_layout Standard
+18LF27J13 18LF27J53
+\end_layout
+
+\begin_layout Standard
+18LF43K22
+\end_layout
+
+\begin_layout Standard
+18LF44J10 18LF44J11 18LF44J50 18LF44K22
+\end_layout
+
+\begin_layout Standard
+18LF45J10 18LF45J11 18LF45J50 18LF45K22 18LF45K50 18LF45K80
+\end_layout
+
+\begin_layout Standard
+18LF46J11 18LF46J13 18LF46J50 18LF46J53 18LF46K22 18LF46K80
+\end_layout
+
+\begin_layout Standard
+18LF47J13 18LF47J53
+\end_layout
+
+\begin_layout Standard
+18LF65K80
+\end_layout
+
+\begin_layout Standard
+18LF66K80
+\end_layout
+
+\begin_layout Standard
+18LF242 18LF248 18LF252 18LF258
+\end_layout
+
+\begin_layout Standard
+18LF442 18LF448 18LF452 18LF458
+\end_layout
+
+\begin_layout Standard
+18LF1220 18LF1230
+\end_layout
+
+\begin_layout Standard
+18LF1320 18LF1330
+\end_layout
+
+\begin_layout Standard
+18LF2220 18LF2221
+\end_layout
+
+\begin_layout Standard
+18LF2320 18LF2321 18LF2331
+\end_layout
+
+\begin_layout Standard
+18LF2410 18LF2420 18LF2423 18LF2431 18LF2439 18LF2450 18LF2455 18LF2458
+ 18LF2480
+\end_layout
+
+\begin_layout Standard
+18LF2510 18LF2515 18LF2520 18LF2523 18LF2525 18LF2539 18LF2550 18LF2553
+ 18LF2580 18LF2585
+\end_layout
+
+\begin_layout Standard
+18LF2610 18LF2620 18LF2680 18LF2682 18LF2685
+\end_layout
+
+\begin_layout Standard
+18LF4220 18LF4221
+\end_layout
+
+\begin_layout Standard
+18LF4320 18LF4321 18LF4331
+\end_layout
+
+\begin_layout Standard
+18LF4410 18LF4420 18LF4423 18LF4431 18LF4439 18LF4450 18LF4455 18LF4458
+ 18LF4480
+\end_layout
+
+\begin_layout Standard
+18LF4510 18LF4515 18LF4520 18LF4523 18LF4525 18LF4539 18LF4550 18LF4553
+ 18LF4580 18LF4585
+\end_layout
+
+\begin_layout Standard
+18LF4610 18LF4620 18LF4680 18LF4682 18LF4685
+\end_layout
+
+\begin_layout Standard
+18LF6310 18LF6390 18LF6393
+\end_layout
+
+\begin_layout Standard
+18LF6410 18LF6490 18LF6493
+\end_layout
+
+\begin_layout Standard
+18LF6520 18LF6525 18LF6527 18LF6585
+\end_layout
+
+\begin_layout Standard
+18LF6620 18LF6621 18LF6622 18LF6627 18LF6628 18LF6680
+\end_layout
+
+\begin_layout Standard
+18LF6720 18LF6722 18LF6723
+\end_layout
+
+\begin_layout Standard
+18LF8310 18LF8390 18LF8393
+\end_layout
+
+\begin_layout Standard
+18LF8410 18LF8490 18LF8493
+\end_layout
+
+\begin_layout Standard
+18LF8520 18LF8525 18LF8527 18LF8585
+\end_layout
+
+\begin_layout Standard
+18LF8620 18LF8621 18LF8622 18LF8627 18LF8628 18LF8680
+\end_layout
+
+\begin_layout Standard
+18LF8720 18LF8722 18LF8723 
 \end_layout
 
 \begin_layout Standard

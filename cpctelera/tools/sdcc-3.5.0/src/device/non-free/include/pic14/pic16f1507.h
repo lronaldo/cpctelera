@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1507 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:45 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:40 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -118,15 +118,19 @@
 #define PWM1DCL_ADDR            0x0611
 #define PWM1DCH_ADDR            0x0612
 #define PWM1CON_ADDR            0x0613
+#define PWM1CON0_ADDR           0x0613
 #define PWM2DCL_ADDR            0x0614
 #define PWM2DCH_ADDR            0x0615
 #define PWM2CON_ADDR            0x0616
+#define PWM2CON0_ADDR           0x0616
 #define PWM3DCL_ADDR            0x0617
 #define PWM3DCH_ADDR            0x0618
 #define PWM3CON_ADDR            0x0619
+#define PWM3CON0_ADDR           0x0619
 #define PWM4DCL_ADDR            0x061A
 #define PWM4DCH_ADDR            0x061B
 #define PWM4CON_ADDR            0x061C
+#define PWM4CON0_ADDR           0x061C
 #define CWG1DBR_ADDR            0x0691
 #define CWG1DBF_ADDR            0x0692
 #define CWG1CON0_ADDR           0x0693
@@ -1399,7 +1403,7 @@ typedef struct
   unsigned FREE                 : 1;
   unsigned LWLO                 : 1;
   unsigned CFGS                 : 1;
-  unsigned EEPGD                : 1;
+  unsigned                      : 1;
   } __PMCON1bits_t;
 
 extern __at(0x0195) volatile __PMCON1bits_t PMCON1bits;
@@ -1411,7 +1415,6 @@ extern __at(0x0195) volatile __PMCON1bits_t PMCON1bits;
 #define _FREE                   0x10
 #define _LWLO                   0x20
 #define _CFGS                   0x40
-#define _EEPGD                  0x80
 
 //==============================================================================
 
@@ -2029,6 +2032,33 @@ extern __at(0x0613) volatile __PWM1CONbits_t PWM1CONbits;
 
 
 //==============================================================================
+//        PWM1CON0 Bits
+
+extern __at(0x0613) __sfr PWM1CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM1POL              : 1;
+  unsigned PWM1OUT              : 1;
+  unsigned PWM1OE               : 1;
+  unsigned PWM1EN               : 1;
+  } __PWM1CON0bits_t;
+
+extern __at(0x0613) volatile __PWM1CON0bits_t PWM1CON0bits;
+
+#define _PWM1CON0_PWM1POL       0x10
+#define _PWM1CON0_PWM1OUT       0x20
+#define _PWM1CON0_PWM1OE        0x40
+#define _PWM1CON0_PWM1EN        0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        PWM2DCL Bits
 
 extern __at(0x0614) __sfr PWM2DCL;
@@ -2116,6 +2146,33 @@ extern __at(0x0616) volatile __PWM2CONbits_t PWM2CONbits;
 #define _PWM2OUT                0x20
 #define _PWM2OE                 0x40
 #define _PWM2EN                 0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        PWM2CON0 Bits
+
+extern __at(0x0616) __sfr PWM2CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM2POL              : 1;
+  unsigned PWM2OUT              : 1;
+  unsigned PWM2OE               : 1;
+  unsigned PWM2EN               : 1;
+  } __PWM2CON0bits_t;
+
+extern __at(0x0616) volatile __PWM2CON0bits_t PWM2CON0bits;
+
+#define _PWM2CON0_PWM2POL       0x10
+#define _PWM2CON0_PWM2OUT       0x20
+#define _PWM2CON0_PWM2OE        0x40
+#define _PWM2CON0_PWM2EN        0x80
 
 //==============================================================================
 
@@ -2213,6 +2270,33 @@ extern __at(0x0619) volatile __PWM3CONbits_t PWM3CONbits;
 
 
 //==============================================================================
+//        PWM3CON0 Bits
+
+extern __at(0x0619) __sfr PWM3CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM3POL              : 1;
+  unsigned PWM3OUT              : 1;
+  unsigned PWM3OE               : 1;
+  unsigned PWM3EN               : 1;
+  } __PWM3CON0bits_t;
+
+extern __at(0x0619) volatile __PWM3CON0bits_t PWM3CON0bits;
+
+#define _PWM3CON0_PWM3POL       0x10
+#define _PWM3CON0_PWM3OUT       0x20
+#define _PWM3CON0_PWM3OE        0x40
+#define _PWM3CON0_PWM3EN        0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        PWM4DCL Bits
 
 extern __at(0x061A) __sfr PWM4DCL;
@@ -2300,6 +2384,33 @@ extern __at(0x061C) volatile __PWM4CONbits_t PWM4CONbits;
 #define _PWM4OUT                0x20
 #define _PWM4OE                 0x40
 #define _PWM4EN                 0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        PWM4CON0 Bits
+
+extern __at(0x061C) __sfr PWM4CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM4POL              : 1;
+  unsigned PWM4OUT              : 1;
+  unsigned PWM4OE               : 1;
+  unsigned PWM4EN               : 1;
+  } __PWM4CON0bits_t;
+
+extern __at(0x061C) volatile __PWM4CON0bits_t PWM4CON0bits;
+
+#define _PWM4CON0_PWM4POL       0x10
+#define _PWM4CON0_PWM4OUT       0x20
+#define _PWM4CON0_PWM4OE        0x40
+#define _PWM4CON0_PWM4EN        0x80
 
 //==============================================================================
 
@@ -2660,13 +2771,13 @@ typedef union
 
   struct
     {
-    unsigned D1S                : 3;
+    unsigned LC1D1S             : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC1D1S             : 3;
+    unsigned D1S                : 3;
     unsigned                    : 5;
     };
 
@@ -2736,13 +2847,13 @@ typedef union
 
   struct
     {
-    unsigned D3S                : 3;
+    unsigned LC1D3S             : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC1D3S             : 3;
+    unsigned D3S                : 3;
     unsigned                    : 5;
     };
 
@@ -3142,27 +3253,27 @@ typedef union
 
   struct
     {
-    unsigned LC2D1S             : 3;
-    unsigned                    : 5;
-    };
-
-  struct
-    {
     unsigned D1S                : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned                    : 4;
-    unsigned LC2D2S             : 3;
-    unsigned                    : 1;
+    unsigned LC2D1S             : 3;
+    unsigned                    : 5;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned D2S                : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned LC2D2S             : 3;
     unsigned                    : 1;
     };
   } __CLC2SEL0bits_t;
@@ -3231,14 +3342,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned LC2D4S             : 3;
+    unsigned D4S                : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned D4S                : 3;
+    unsigned LC2D4S             : 3;
     unsigned                    : 1;
     };
   } __CLC2SEL1bits_t;
@@ -3935,7 +4046,6 @@ extern __at(0x0FEF) __sfr TOSH;
 #define FREE                    PMCON1bits.FREE                 // bit 4
 #define LWLO                    PMCON1bits.LWLO                 // bit 5
 #define CFGS                    PMCON1bits.CFGS                 // bit 6
-#define EEPGD                   PMCON1bits.EEPGD                // bit 7
 
 #define RA0                     PORTAbits.RA0                   // bit 0
 #define RA1                     PORTAbits.RA1                   // bit 1

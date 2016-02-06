@@ -562,5 +562,6 @@ new(unsigned int n)
                 fprintf(stderr, "Out of space!\n");
                 asexit(ER_FATAL);
         }
+        memset (p, 0, n);
         return (p);
 }

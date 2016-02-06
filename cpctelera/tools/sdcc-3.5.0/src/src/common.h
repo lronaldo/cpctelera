@@ -32,7 +32,7 @@
 #endif
 #endif
 
-/* C++ incompatible heared files */
+/* C++ incompatible header files */
 #ifdef __cplusplus
 /* TODO: the extern "C" should be moved to each header file */
 extern "C" {

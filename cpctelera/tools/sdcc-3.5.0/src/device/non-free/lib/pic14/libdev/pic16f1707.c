@@ -2,9 +2,9 @@
  * This definitions of the PIC16F1707 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:43 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -281,6 +281,9 @@ __at(0x0299) __sfr CCPR2H;
 __at(0x029A) __sfr CCP2CON;
 __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
 
+__at(0x029A) __sfr ECCP2CON;
+__at(0x029A) volatile __ECCP2CONbits_t ECCP2CONbits;
+
 __at(0x030C) __sfr SLRCONA;
 __at(0x030C) volatile __SLRCONAbits_t SLRCONAbits;
 
@@ -363,6 +366,14 @@ __at(0x0E94) __sfr RA4PPS;
 
 __at(0x0E95) __sfr RA5PPS;
 
+__at(0x0E9C) __sfr RB4PPS;
+
+__at(0x0E9D) __sfr RB5PPS;
+
+__at(0x0E9E) __sfr RB6PPS;
+
+__at(0x0E9F) __sfr RB7PPS;
+
 __at(0x0EA0) __sfr RC0PPS;
 
 __at(0x0EA1) __sfr RC1PPS;
@@ -374,6 +385,10 @@ __at(0x0EA3) __sfr RC3PPS;
 __at(0x0EA4) __sfr RC4PPS;
 
 __at(0x0EA5) __sfr RC5PPS;
+
+__at(0x0EA6) __sfr RC6PPS;
+
+__at(0x0EA7) __sfr RC7PPS;
 
 __at(0x0F9E) __sfr ICDBK0H;
 __at(0x0F9E) volatile __ICDBK0Hbits_t ICDBK0Hbits;

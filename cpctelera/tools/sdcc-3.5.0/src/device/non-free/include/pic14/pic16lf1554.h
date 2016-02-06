@@ -2,9 +2,9 @@
  * This declarations of the PIC16LF1554 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:47 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:52 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -124,6 +124,7 @@
 #define PWM2DCL_ADDR            0x0614
 #define PWM2DCH_ADDR            0x0615
 #define PWM2CON_ADDR            0x0616
+#define PWM2CON0_ADDR           0x0616
 #define AAD1CON0_ADDR           0x0711
 #define AADCON0_ADDR            0x0711
 #define AD1CON0_ADDR            0x0711
@@ -154,12 +155,16 @@
 #define AD1CAPCON_ADDR          0x0719
 #define AAD1RES0_ADDR           0x071A
 #define AAD1RES0L_ADDR          0x071A
+#define AD1RES0_ADDR            0x071A
 #define AD1RES0L_ADDR           0x071A
+#define ADRES0_ADDR             0x071A
 #define AAD1RES0H_ADDR          0x071B
 #define AD1RES0H_ADDR           0x071B
 #define AAD1RES1_ADDR           0x071C
 #define AAD1RES1L_ADDR          0x071C
+#define AD1RES1_ADDR            0x071C
 #define AD1RES1L_ADDR           0x071C
+#define ADRES1_ADDR             0x071C
 #define AAD1RES1H_ADDR          0x071D
 #define AD1RES1H_ADDR           0x071D
 #define AAD1CH_ADDR             0x071E
@@ -183,11 +188,13 @@
 #define AD2CAPCON_ADDR          0x0799
 #define AAD2RES0_ADDR           0x079A
 #define AAD2RES0L_ADDR          0x079A
+#define AD2RES0_ADDR            0x079A
 #define AD2RES0L_ADDR           0x079A
 #define AAD2RES0H_ADDR          0x079B
 #define AD2RES0H_ADDR           0x079B
 #define AAD2RES1_ADDR           0x079C
 #define AAD2RES1L_ADDR          0x079C
+#define AD2RES1_ADDR            0x079C
 #define AD2RES1L_ADDR           0x079C
 #define AAD2RES1H_ADDR          0x079D
 #define AD2RES1H_ADDR           0x079D
@@ -2186,6 +2193,33 @@ extern __at(0x0616) volatile __PWM2CONbits_t PWM2CONbits;
 
 
 //==============================================================================
+//        PWM2CON0 Bits
+
+extern __at(0x0616) __sfr PWM2CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM2POL              : 1;
+  unsigned PWM2OUT              : 1;
+  unsigned PWM2OE               : 1;
+  unsigned PWM2EN               : 1;
+  } __PWM2CON0bits_t;
+
+extern __at(0x0616) volatile __PWM2CON0bits_t PWM2CON0bits;
+
+#define _PWM2CON0_PWM2POL       0x10
+#define _PWM2CON0_PWM2OUT       0x20
+#define _PWM2CON0_PWM2OE        0x40
+#define _PWM2CON0_PWM2EN        0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        AAD1CON0 Bits
 
 extern __at(0x0711) __sfr AAD1CON0;
@@ -3452,12 +3486,16 @@ extern __at(0x0719) volatile __AD1CAPCONbits_t AD1CAPCONbits;
 
 extern __at(0x071A) __sfr AAD1RES0;
 extern __at(0x071A) __sfr AAD1RES0L;
+extern __at(0x071A) __sfr AD1RES0;
 extern __at(0x071A) __sfr AD1RES0L;
+extern __at(0x071A) __sfr ADRES0;
 extern __at(0x071B) __sfr AAD1RES0H;
 extern __at(0x071B) __sfr AD1RES0H;
 extern __at(0x071C) __sfr AAD1RES1;
 extern __at(0x071C) __sfr AAD1RES1L;
+extern __at(0x071C) __sfr AD1RES1;
 extern __at(0x071C) __sfr AD1RES1L;
+extern __at(0x071C) __sfr ADRES1;
 extern __at(0x071D) __sfr AAD1RES1H;
 extern __at(0x071D) __sfr AD1RES1H;
 
@@ -4242,11 +4280,13 @@ extern __at(0x0799) volatile __AD2CAPCONbits_t AD2CAPCONbits;
 
 extern __at(0x079A) __sfr AAD2RES0;
 extern __at(0x079A) __sfr AAD2RES0L;
+extern __at(0x079A) __sfr AD2RES0;
 extern __at(0x079A) __sfr AD2RES0L;
 extern __at(0x079B) __sfr AAD2RES0H;
 extern __at(0x079B) __sfr AD2RES0H;
 extern __at(0x079C) __sfr AAD2RES1;
 extern __at(0x079C) __sfr AAD2RES1L;
+extern __at(0x079C) __sfr AD2RES1;
 extern __at(0x079C) __sfr AD2RES1L;
 extern __at(0x079D) __sfr AAD2RES1H;
 extern __at(0x079D) __sfr AD2RES1H;

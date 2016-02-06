@@ -2,7 +2,7 @@
 
 =back
 
-  Copyright (C) 2012-2014 Molnar Karoly <molnarkaroly@users.sf.net>
+  Copyright (C) 2012-2015 Molnar Karoly <molnarkaroly@users.sf.net>
 
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -24,7 +24,7 @@
     This program optimizes or unoptimizes the pic16devices.txt file.
     For more explanation: optimize_pic16devices.pl -h
 
-  $Id: optimize_pic16devices.pl 9068 2014-09-04 12:57:30Z molnarkaroly $
+  $Id: optimize_pic16devices.pl 9450 2016-01-09 16:47:43Z molnarkaroly $
 =cut
 
 use strict;
@@ -183,11 +183,11 @@ sub fnv1a32_int32($$)
 
 #---------------------------------------------------------------------------------------------------
 
-sub smartCompare($$)
+sub versionCompare($$)
   {
   my ($Str1, $Str2) = @_;
 
-  if (${$Str1} =~ /^\d/o && ${$Str2} =~ /^\d/o)
+  if ((${$Str1} =~ /^\d/o) && (${$Str2} =~ /^\d/o))
     {
         # $Str1 number and $Str2 number
     return (int(${$Str1}) <=> int(${$Str2}));
@@ -198,7 +198,7 @@ sub smartCompare($$)
 
 #---------------------------------------------------------------------------------------------------
 
-sub smartSort($$)
+sub versionSort($$)
   {
   my @a_s = ($_[0] =~ /(\d+|\D+)/go);
   my @b_s = ($_[1] =~ /(\d+|\D+)/go);
@@ -225,7 +225,7 @@ sub smartSort($$)
 
   for ($i = 0; $i < $end; ++$i)
     {
-    $k = smartCompare(\$a_s[$i], \$b_s[$i]);
+    $k = versionCompare(\$a_s[$i], \$b_s[$i]);
 
     return $k if ($k != 0);
     }
@@ -318,14 +318,14 @@ sub read_pic16devices_txt($)
         # Unlock the "using" keyword.
 
         Log("using      : $1", 7);
-        %{$device->{RAM}} = %{$parent->{RAM}};
-        $device->{CONFIG}->{FIRST} = $parent->{CONFIG}->{FIRST};
-        $device->{CONFIG}->{LAST}  = $parent->{CONFIG}->{LAST};
+        %{$device->{RAM}}             = %{$parent->{RAM}};
+        $device->{CONFIG}->{FIRST}    = $parent->{CONFIG}->{FIRST};
+        $device->{CONFIG}->{LAST}     = $parent->{CONFIG}->{LAST};
         %{$device->{CONFIG}->{WORDS}} = %{$parent->{CONFIG}->{WORDS}};
-        $device->{ID}->{FIRST} = $parent->{ID}->{FIRST};
-        $device->{ID}->{LAST}  = $parent->{ID}->{LAST};
-        %{$device->{ID}->{WORDS}} = %{$parent->{ID}->{WORDS}};
-        $device->{XINST} = $parent->{XINST};
+        $device->{ID}->{FIRST}        = $parent->{ID}->{FIRST};
+        $device->{ID}->{LAST}         = $parent->{ID}->{LAST};
+        %{$device->{ID}->{WORDS}}     = %{$parent->{ID}->{WORDS}};
+        $device->{XINST}              = $parent->{XINST};
         $is_using = TRUE;
         }
 
@@ -352,11 +352,11 @@ sub read_pic16devices_txt($)
         ($first, $last) = (str2int($1), str2int($2));
         Log("configrange: $first, $last", 7);
 
-        if ($device->{CONFIG}->{FIRST} >= 0 || $device->{CONFIG}->{LAST} >= 0)
+        if (($device->{CONFIG}->{FIRST} >= 0) || ($device->{CONFIG}->{LAST} >= 0))
           {
           Log("The configrange already exists in the \"$device->{NAME}\".", 0);
 
-          if ($device->{CONFIG}->{FIRST} != $first || $device->{CONFIG}->{LAST} != $last)
+          if (($device->{CONFIG}->{FIRST} != $first) || ($device->{CONFIG}->{LAST} != $last))
             {
             Log("  In addition the previous values different from the new values.", 0);
             Log(sprintf("  previous: 0x%06X - 0x%06X, new: 0x%06X - 0x%06X",
@@ -704,7 +704,7 @@ sub print_device($)
         # Optimized writing is required.
 
     $min_diff = ULONG_MAX;
-    for ($i = 0; $i < @device_names; ++$i)
+    for ($i = 0; $i < scalar(@device_names); ++$i)
       {
       $ac = $devices_by_name{$device_names[$i]};
 
@@ -764,7 +764,7 @@ sub print_device($)
       print_diff_config_words($ref1->{ORD_WORDS});
       }
 
-    printf "XINST       $dev->{XINST}\n" if ($ancestor->{XINST} < 0 && $dev->{XINST} > 0);
+    printf "XINST       $dev->{XINST}\n" if (($ancestor->{XINST} < 0) && ($dev->{XINST} > 0));
 
     $ref1 = $dev->{ID};
 
@@ -786,7 +786,7 @@ sub print_device($)
 
     $ref1 = $dev->{ID};
 
-    if ($ref1->{FIRST} > 0 && $ref1->{LAST} > 0)
+    if (($ref1->{FIRST} > 0) && ($ref1->{LAST} > 0))
       {
       printf "idlocrange  0x%06X 0x%06X\n", $ref1->{FIRST}, $ref1->{LAST};
       print_id_words($ref1->{ORD_WORDS});
@@ -867,7 +867,7 @@ for (my $i = 0; $i < @ARGV; )
     } # given ($opt)
   } # for (my $i = 0; $i < @ARGV; )
 
-if ($file eq '' || $operation == OP_NULL)
+if (($file eq '') || ($operation == OP_NULL))
   {
   usage();
   exit(0);
@@ -877,7 +877,7 @@ if ($file eq '' || $operation == OP_NULL)
 
 read_pic16devices_txt($file);
 
-@device_names = sort {smartSort($a, $b)} keys(%devices_by_name);
+@device_names = sort {versionSort($a, $b)} keys(%devices_by_name);
 
 foreach (@device_names)
   {

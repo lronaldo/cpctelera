@@ -88,6 +88,7 @@ static size_t include_cursor;
 static void handle_OPT_d (const char *);
 static void set_std_c89 (int, int);
 static void set_std_c99 (int);
+static void set_std_c11 (void);
 static void check_deps_environment_vars (void);
 static void handle_deferred_opts (void);
 static void sanitize_cpp_opts (void);
@@ -497,6 +498,10 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       set_std_c99 (true /* ISO */);
       break;
 
+    case OPT_std_c11:
+      set_std_c11 ();
+      break;
+
     case OPT_no_trigraphs:
       /* trigraphs enabled by default on sdcpp, -no-trgraphs disables them */
       cpp_opts->trigraphs = 0;
@@ -899,6 +904,13 @@ static void
 set_std_c99 (int iso)
 {
   cpp_set_lang (parse_in, iso ? CLK_STDC99: CLK_GNUC99);
+}
+
+/* Set the C 11 standard (without GNU extensions).  */
+static void
+set_std_c11 (void)
+{
+  cpp_set_lang (parse_in, CLK_STDC1X);
 }
 
 /* Args to -d specify what to dump.  Silently ignore

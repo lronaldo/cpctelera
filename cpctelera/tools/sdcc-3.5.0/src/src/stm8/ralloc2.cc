@@ -459,8 +459,6 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 // Code for another ic is generated when generating this one. Mark the other as generated.
 static void extra_ic_generated(iCode *ic)
 {
-  int i;
-
   if(ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP ||
     ic->op == BITWISEAND && (IS_OP_LITERAL (IC_LEFT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic))))
     {
@@ -472,7 +470,7 @@ static void extra_ic_generated(iCode *ic)
           int nonzero = 0;
           operand *const litop = IS_OP_LITERAL (IC_LEFT (ic)) ? IC_LEFT (ic) : IC_RIGHT (ic);
 
-          for(int i = 0; i < getSize(operandType(IC_LEFT (ic))) && i < getSize(operandType(IC_RIGHT (ic))) && i < getSize(operandType(IC_RESULT(ic))); i++)
+          for(unsigned int i = 0; i < getSize(operandType(IC_LEFT (ic))) && i < getSize(operandType(IC_RIGHT (ic))) && i < getSize(operandType(IC_RESULT(ic))); i++)
             if(byteOfVal (OP_VALUE (litop), i))
               nonzero++;
 

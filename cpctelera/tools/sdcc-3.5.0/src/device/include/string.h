@@ -64,8 +64,16 @@ typedef int errno_t;
 
 /* Copying functions: */
 extern void *memcpy (void * /*restrict */ dest, const void * /*restrict*/ src, size_t n);
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
+extern void *memmove (void *dest, const void *src, size_t n) __preserves_regs(iyl, iyh);
+#else
 extern void *memmove (void *dest, const void *src, size_t n);
+#endif
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
+extern char *strcpy (char * /*restrict*/ dest, const char * /*restrict*/ src) __preserves_regs(iyl, iyh);
+#else
 extern char *strcpy (char * /*restrict*/ dest, const char * /*restrict*/ src);
+#endif
 extern char *strncpy(char * /*restrict*/ dest, const char * /*restrict*/ src, size_t n);
 
 /* Concatenation functions: */
@@ -106,7 +114,11 @@ extern void *memset (void *s, int c, size_t n);
 #endif
 
 /* extern char *strerror(int errnum); */
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_tlcs90)
+extern size_t strlen (const char *s) __preserves_regs(d, e, iyl, iyh);
+#else
 extern size_t strlen (const char *s);
+#endif
 
 #ifdef __SDCC_ds390
 extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;

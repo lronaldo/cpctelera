@@ -2747,8 +2747,7 @@ extra_host_args=
 build_libs="build-libiberty"
 
 # these tools are built for the build environment
-#build_tools="build-texinfo build-flex build-bison build-m4 build-fixincludes"
-build_tools="build-flex build-bison build-m4 build-fixincludes"
+build_tools="build-texinfo build-flex build-bison build-m4 build-fixincludes"
 
 # these libraries are used by various programs built for the host environment
 #
@@ -4588,15 +4587,13 @@ if test "$ac_test_CFLAGS" = set; then
   CFLAGS=$ac_save_CFLAGS
 elif test $ac_cv_prog_cc_g = yes; then
   if test "$GCC" = yes; then
-    #CFLAGS="-g -O2"
-    CFLAGS="-O3 -fsigned-char"
+    CFLAGS="-g -O2"
   else
-    CFLAGS=""
+    CFLAGS="-g"
   fi
 else
   if test "$GCC" = yes; then
-    #CFLAGS="-O2"
-    CFLAGS="-O3 -fsigned-char"
+    CFLAGS="-O2"
   else
     CFLAGS=
   fi
@@ -4938,16 +4935,13 @@ if test "$ac_test_CXXFLAGS" = set; then
   CXXFLAGS=$ac_save_CXXFLAGS
 elif test $ac_cv_prog_cxx_g = yes; then
   if test "$GXX" = yes; then
-    #CXXFLAGS="-g -O2"
-    CXXFLAGS="-O3 -fsigned-char"
+    CXXFLAGS="-g -O2"
   else
-    #CXXFLAGS="-g"
-    CXXFLAGS=""
+    CXXFLAGS="-g"
   fi
 else
   if test "$GXX" = yes; then
-    #CXXFLAGS="-O2"
-    CXXFLAGS="-O3 -fsigned-char"
+    CXXFLAGS="-O2"
   else
     CXXFLAGS=
   fi

@@ -1,3 +1,887 @@
+2016-02-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCCnaddr.hpp,
+	  src/SDCCralloc.hpp:
+	  Workaround boost bug #11880 to make SDCC compile with boost 1.60.
+
+2016-02-05 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c
+	  Fix a bug in comparason operaion.
+	* support/regression/tests/memory.c
+	  Enable more tests.
+
+2016-02-04 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Allow array members of structs can be accessed in pointer form.
+	* support/regression/tests/bug-2468.c
+	  Add a test case.
+
+2016-02-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp:
+	  Fix compare operator, patch #267 by Peter Dons Tychsen.
+	* device/lib/pic16/libsdcc/char/divschar.c,
+	  device/lib/pic16/libsdcc/char/modschar.c:
+	  Fix signedness of pci16 char support routines.
+
+2016-02-01 Ben Shi <powerstudio1st AT 163 DOT com>
+ 
+	* src/SDCCast.c
+	  Try to find a common type for the left and right in '?:' .
+	* support/regression/tests/bug-2461.c
+	  Add a new test case.
+
+2016-02-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCglobl.h,
+	  src/SDCCmain.c,
+	  src/SDCCsymt.c,
+	  src/SDCCval.c,
+	  doc/sdccman.lyx:
+	  Make char unsigned by default.
+
+2016-02-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdlib.h:
+	  Fix declaration of aligned_alloc() for C11.
+
+2016-02-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	  Fix a bug: type mismatch between function definition and declaration.
+	* support/regression/tests/bug-2419.c
+	  Add a new test case.
+
+2016-01-31 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/device.c,
+	  src/pic14/gen.c,
+	  src/pic14/glue.c,
+	  src/pic14/pcode.c,
+	  src/pic14/pcodepeep.c,
+	  src/pic14/ralloc.c,
+	  src/pic16/device.c,
+	  src/pic16/device.h,
+	  src/pic16/gen.c,
+	  src/pic16/genarith.c,
+	  src/pic16/genutils.c,
+	  src/pic16/glue.c,
+	  src/pic16/glue.h,
+	  src/pic16/graph.c,
+	  src/pic16/main.c,
+	  src/pic16/pcode.c,
+	  src/pic16/pcode.h,
+	  src/pic16/pcodepeep.c,
+	  src/pic16/ralloc.c,
+	  src/pic16/ralloc.h:
+	  Use "Safe_alloc(...)" instead of "Safe_calloc(1, ...)".
+	  Use SNPRINTF(X, sizeof(X), ...) instead of sprintf(X, ...).
+	  Some code simplification, e.g.:
+	    sprintf (s, "%s", aop->aopu.aop_dir);
+	    rs = Safe_calloc (1, strlen (s) + 1);
+	    strcpy (rs, s);
+	    return rs;
+	      .
+	      .
+	      .
+	    return Safe_strdup(aop->aopu.aop_dir);
+
+2016-01-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/Makefile.in:
+	  Change handling of test filenames for regression tests, patch #266 by Peter Dons Tychsen.
+	* src/SDCCast.c,
+	  support/regression/tests/bug-2458.c:
+	  Changed result type propagation for logic operations, variant of proposed fix by Peter Dons Tychsen for bug #2458.
+
+2016-01-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c:
+	  Fix handling of __z88dk_fastcall in specifier merging.
+
+2016-01-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCval.c (strVal): free utf_8 and suppress warning
+
+2016-01-25 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/pcode.c,
+	  src/pic14/ralloc.c:
+	  More use the logical constants.
+
+2016-01-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  Improve DWARF support for stm8 ELF, picked from patch #255 by Peter Dons Tychsen.
+	* src/SDCCsymt.c:
+	  Fix handling of preserved regs in specifier merging.
+
+2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic16/pcode.c,
+	  src/pic16/pcodepeep.c:
+	  More use the logical constants.
+
+2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/gen.c,
+	  src/pic14/glue.c,
+	  src/pic14/pcode.c,
+	  src/pic14/pcoderegs.c,
+	  src/pic14/ralloc.c:
+	  More use the logical constants.
+
+2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/gen.c,
+	  src/pic14/pcode.c,
+	  src/pic14/pcode.h:
+	  Add support the ASRF, LSLF and LSRF instructions
+	  (enhanced intructions of pic14): feature-requests #484
+
+	* src/pic14/gen.c,
+	  src/pic14/gen.h:
+	  On more place I exchanged the "char *" to "const char *".
+
+2016-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCast.c
+	* src/SDCCast.h
+	* src/SDCCutil.c
+	* src/SDCCutil.h
+	  Format inline asm coding style.
+
+2016-01-23 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure
+	* configure.ac
+	* debugger/mcs51/configure
+	* debugger/mcs51/configure.ac
+	* support/cpp/configure
+	* support/cpp/configure.ac
+	* support/packihx/configure
+	* support/packihx/configure.ac
+	  Try to use C99 first.
+	* src/SDCC.lex
+	  Remove a duplicate function definition.
+	* src/SDCC.y
+	  Change to C99 style.
+
+2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  src/SDCCglue.h,
+	  src/SDCCglue.c:
+	  Do not display meaningless __reentrent to users.
+
+2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peep.c:
+	  Make estimate for preserved regs on function pointers less conservative.
+	* src/SDCCsymt.c:
+	  Consider preserved regs for type of function pointer.
+
+2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  More accurate handling of conditional jumps, handle ex (sp), ix and ex (sp), iy.
+
+2016-01-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.y:
+	  Seems we have to worry about more than MSVC wrt. C99, patch #265 by Peter Dons Tychsen.
+
+2016-01-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.h,
+	  src/*/main.c,
+	  src/z80/gen.c:
+	  Implement declaration of preserved registers, RFE #483.
+	* src/z80/peep.c
+	  Handle preserved register information in peephole optimization.
+	* device/include/stdlib.h,
+	  device/include/string.h:
+	  Preserved register information on standard functions.
+	* doc/sdccman.lyx:
+	  Document syntax for specifying preserved registers.
+
+2016-01-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  More exact handling of ex, support for decimal shifts.
+
+2016-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdebug.c:
+	  Debug info for block-copy-initialized global variables, patch #262 by Peter Dons Tychsen.
+	* src/SDCCdwarf2.c:
+	  Fix handling of declared, but unused global vairables in debug output, patch #263 by Peter Dons Tychsen.
+	* src/z80/peep.c:
+	  More accurate handling of functions returning long long for peephole optimizer.
+	* src/SDCCmain.c:
+	  Fix stream for help output, patch #264 by Peter Dons Tychsen.
+
+2016-01-18 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Apply a modified version of patch #261 by Peter Dons Tychsen.
+	* support/regression/bug-2455.c
+	  Improve test case.
+
+2016-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.c:
+	  Fix pointer dereference issue, patch #261 by Peter Dons Tychsen.
+
+2016-01-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/non-free/include/pic14/*.h,
+	  device/non-free/include/pic16/*.h,
+	  device/non-free/lib/pic14/libdev/*.c,
+	  device/non-free/lib/pic16/libdev/*.c:
+	  Updated the device files.
+
+2016-01-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/pcode.c,
+	  src/pic14/pcode.h,
+	  src/pic16/ralloc.c,
+	  src/pic16/ralloc.h,
+	  src/pic16/pcodepeep.c,
+	  src/pic16/ralloc.c,
+	  src/pic16/ralloc.h:
+	  On more place I exchanged the "char *" to "const char *".
+
+	* src/regression/Makefile:
+	  Added the option to CFLAGS: --no-warn-non-free
+
+2016-01-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/gen.c,
+	  src/pic14/pcode.c:
+	  Each function has its own code section.
+
+	* src/pic16/pcode.c:
+	  Fix a gcc warning.
+
+2016-01-15 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Fix bug #2455.
+	* support/regression/bug-2455.c
+	  Add a new test case.
+
+2016-01-14 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/lib/pic14/configure,
+	  device/lib/pic14/configure.ac,
+	  device/lib/pic16/configure.ac:
+	  Do away with the automake warning:
+	  "option 'subdir-objects' is disabled"
+
+	* device/lib/pic16/Makefile.in,
+	  device/lib/pic16/aclocal.m4,
+	  device/lib/pic16/configure,
+	  device/lib/pic16/depcomp,
+	  device/lib/pic16/install-sh,
+	  device/lib/pic16/missing,
+	  device/lib/pic16/debug/Makefile.in,
+	  device/lib/pic16/libc/Makefile.in,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/libio/adc.ignore,
+	  device/lib/pic16/libio/i2c.ignore,
+	  device/lib/pic16/libio/usart.ignore,
+	  device/lib/pic16/libm/Makefile.in,
+	  device/lib/pic16/libsdcc/Makefile.in,
+	  device/lib/pic16/startup/Makefile.in,
+	  device/non-free/include/pic16/pic18fam.h:
+	  Improve of update to gputils-1.4.2-1.
+
+2016-01-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  More accurate handling of Z80/Z180 I/O in peepholes.
+
+2016-01-11 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/ds390/ralloc.c
+	* src/mcs51/ralloc.c
+	  Improve positionRegs().
+	* src/mcs51/gen.c
+	  Roll back to previous version.
+	* support/regression/tests/bug-2263.c
+	* support/regression/tests/bug-2403.c
+	  Add new test cases.
+
+2016-01-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  More accurate handling of Z80/Z180 I/O in peepholes.
+
+2016-01-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/mcs51/gen.c
+	  Fix a bug in genOr() when all operands are in registers.
+	* support/regression/tests/bug-2448.c
+	  Add a new test case.
+
+2016-01-09 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/cinc2h.pl,
+	  support/optimize_pic16devices.pl,
+	  support/z80-disasm.pl:
+	  Some minor repairs.
+
+	* device/include/pic14/pic14devices.txt,
+	  device/include/pic14/pic16regs.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/configure,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/libio/adc.ignore,
+	  device/lib/pic16/libio/i2c.ignore,
+	  device/lib/pic16/libio/usart.ignore,
+	  device/non-free/include/pic14/*.h,
+	  device/non-free/include/pic16/*.h,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/*.c,
+	  device/non-free/lib/pic16/Makefile.in,
+	  device/non-free/lib/pic16/aclocal.m4,
+	  device/non-free/lib/pic16/configure,
+	  device/non-free/lib/pic16/processors.ac,
+	  device/non-free/lib/pic16/libdev/Makefile.am,
+	  device/non-free/lib/pic16/libdev/Makefile.in,
+	  device/non-free/lib/pic16/libdev/*.c,
+	  doc/sdccman.lyx:
+	  Updated to gputils-1.4.2-1.
+
+2016-01-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.c:
+	  Optimize comparisons of cheap variables to expensive constants more.
+	* src/SDCCast.c:
+	  Use cheaper types for implicitly introduced constants.
+
+2016-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c:
+	  Do not try to output debug info in case of fatal errors - patch #260 by Peter Dons Tychsen
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2452.c:
+	  Fix gbz80 right shift bug #2452.
+
+2016-01-05 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Fix bug: members of pointer arrays are always treated as r-values.
+	* support/regression/tests/gcc-torture-execute-930526-1.c
+	  Improve test case.
+	* support/sdbinutils/binutils/arlex.c
+	  Removed.
+
+2016-01-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Fix handling of nop in z80MightRead, patch #259 by alvin.
+	* src/SDCCicode.c:
+	  Optimize comparisons of cheap variables to expensive constants.
+
+2016-01-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/linksrc/lkarea.c:
+	  Fix handling of NOLOAD for STM8 in linker, patch by Peter Dons Tychsen.
+	* src/SDCCralloc.hpp:
+	  Fix compare operator for register assignments.
+
+2016-01-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/sdbinutils/binutils/arparse.c
+	* support/sdbinutils/binutils/arparse.h
+	  Delete intermediate files.
+
+2016-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* all.vcxproj,
+	* config.vcxproj,
+	* sdas/as6808/as_hc08.vcxproj,
+	* sdas/as8051/asx8051.vcxproj,
+	* sdas/as8xcxxx/sdas390.vcxproj,
+	* sdas/asgb/asgb.vcxproj,
+	* sdas/linksrc/aslink.vcxproj,
+	* src/avr/avr.vcxproj,
+	* src/ds390/ds390.vcxproj,
+	* src/hc08/hc08.vcxproj,
+	* src/mcs51/mcs51.vcxproj,
+	* src/pic14/pic14.vcxproj,
+	* src/pic16/pic16.vcxproj,
+	* src/sdcc.vcxproj,
+	* src/xa51/xa51.vcxproj,
+	* src/z80/z80.vcxproj,
+	* src/z80/z80a.vcxproj,
+	* support/cpp/sdcpp.vcxproj,
+	* support/librarian/librarian.vcxproj,
+	* support/makebin/makebin.vcxproj,
+	* support/packihx/packihx.vcxproj: applied patch 252 by Peter Dons Tychsen
+	  to remove UpgradeFromVC60.props
+
+2015-12-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdwarf2.c:
+	  Fix memory bug in DWARF output, patch by Peter Dons Tychsen.
+	* sdas/asxxsrc/asdbg.c:
+	  Fix 0 pointer access when specifying -y or -j without -o.
+
+2015-12-30 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCsymt.c
+	  Make comparePtrType() less strict.
+	* support/regression/tests/bug-2271.c
+	  Improve test case.
+
+2015-12-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* doc/sdccman.lyx
+	  Suggest msys2 along with msys while building wih MSVC.
+	* sdas/asxxsrc/assym.c
+	  Apply patch #253.
+
+2015-12-26 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/gen.c
+	  Add absent call to dwWriteFunction() while --debug is specified.
+  
+2015-12-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	  Fix a bug in the front end. (pointer array parameters)
+	* support/regression/tests/bug-2271.c
+	  Add a test case.
+
+2015-12-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  Option for ELF output in STM8 backend.
+
+2015-12-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/linksrc/lkelf.c,
+	  sdas/linksrc/lkmain.c:
+	  STM8 ELF linker support from patch #251.
+
+2015-12-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c:
+	  Always use preprocessor in standard mode.
+	* device/include/stdlib.h:
+	  Fix declaration order for inlined aligned_alloc().
+
+2015-12-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* Makefile.in
+	  Fix the conflict in parallel build caused by component dependency.
+
+2015-12-16 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sim/ucsim/cmd.src/cmdset.cc
+	  Apply a modified version of patch #250. 
+
+2015-12-14 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c:
+	  Avoid redundant call to processParms().
+	* support/regression/tests/bug-2436.c
+	  Add a new test case.
+
+2015-12-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/wchar.h:
+	  A basic wchar.h with for types that are useful even with no wide character functions around.
+
+2015-12-05 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Fix a bug of type definition of a function by typedef.
+
+2015-12-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Fix defects in previous commit.
+
+2015-12-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Remove warning #220 (W_ANONYMOUS_MEMBER).
+
+2015-11-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c:
+	  Fix operandsNotRelated() bug #2435.
+	* device/include/stddef.h,
+	  device/include/stdlib.h,
+	  src/SDCC.lex,
+	  src/SDCCmain.c,
+	  src/SDCCval.c,
+	  src/SDCCval.h,
+	  support/regression/tests/charconst.c,
+	  support/regression/tests/string.c:
+	  Make wchar_t UTF-32.
+	* support/cpp/Makefile.in:
+	  Fix call to make.
+
+2015-11-26 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/gcc-torture-execute-20050111-1.c
+	* support/regression/tests/gcc-torture-execute-950511-1.c
+	  Disable test cases.
+
+2015-11-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	* src/SDCCval.c
+	* src/SDCCval.h
+	  Improve long long multiplication.
+	* support/regression/tests/gcc-torture-execute-20050111-1.c
+	* support/regression/tests/gcc-torture-execute-950511-1.c
+	* support/regression/tests/longlong.c
+	  Improve test cases.
+
+2015-11-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/Makefile.in,
+	  doc/sdccman.lyx:
+	  Fix bookmarks and hyperlinks in manual, bug #2405.
+	* src/SDCCglue.c:
+	  Drop build time in asm output to ease reproducible builds.
+	* device/lib/*/Makefile.in,
+	  device/lib/Makefile.in:
+	  Drop build time in sdar calls to make non-pic lib builds reproducible.
+
+2015-11-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/cpp/libcpp/include/symtab.h:
+	  Fix build failure on MacOS x86-64.
+	* support/regression/tests/inline.c:
+	  Fix failure in test-host in NetBSD.
+	* support/regression/tests/literalop.c:
+	  Disable some tests on MacOS x86-64.
+
+2015-11-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89c51id2.h: moved
+
+2015-11-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update standard compliance documentation.
+
+2015-11-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89c51ed2.h: applied patch 247
+	* device/include/at89c51id2.h: new, added, thanks Victor Munoz
+	* src/SDCC.lex: it seems really hard not to declare vars amidst the code
+	* src/SDCCast.c (expandInlineFuncs): fix bug 2295: also expand for clauses
+	* support/regression/tests/ctype.c: warn about undefined __STDC_VERSION__
+	* support/regression/tests/inline.c (bug_2295): new test case
+
+2015-11-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCCval.c:
+	  UTF-32 and UTF-16 encodig in strVal().
+
+2015-11-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c: added IS_AOP_IMMEDIATE,
+	  (gencjneshort): applied modified part of patch 129, thanks Hubert Sack
+
+2015-11-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/string.c
+	  Separate C11 behaviour from implementation-defined behaviour.
+
+2015-11-07 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCglue.c:
+	  Eliminate unused static symbols. (__str_%d generated in stringToSymbol()).
+	* support/regression/tests/bug-2089.c:
+	  Improve test case.
+	* support/regression/ports/mcs51-xstack-auto/spec.mk:
+	  Use default sdcc11.
+	* support/regression/tests/string.c:
+	  Disabled for test-host.
+
+2015-11-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/util/dbuf_string.h,
+	  support/util/dbuf_string.c,
+	  src/SDCCval.c,
+	  src/SDCC.lex:
+	  Handling of UTF-16 and UTF-16 string literals in the frontend up to strVal().
+
+2015-11-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/util/dbuf.h,
+	  support/util/dbuf.c,
+	  support/util/dbuf_string.h,
+	  support/util/dbuf_string.c:
+	  Allow prepending to dynamic buffers.
+	* src/SDCC.lex,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c:
+	  Support C11 u8 prefix for UTF-8-encoded unicode string literals.
+	* src/SDCCutil.c,
+	  support/regression/tests/string.c:
+	  Fix handling of universal escape sequences in UTF-8-encoded string literals.
+	* support/regression/tests/iso-8859-1.c:
+	  Test support for source encodings other than unicode.
+
+2015-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y: only emit W_FLEXARRAY_INSTRUCT for c89
+	* src/SDCCpeeph.c (labelJTInRange): removed env SDCC_SJMP_JUMPTABLE check,
+	  closes patch #29,
+	  (readRules): clean up
+
+2015-11-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c:
+	  Print calling convention for functions.
+	* src/z80/peep.c:
+	  More accurate handling of register arguments in peepholes.
+
+2015-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/ralloc.c (packRegsForOneuse): fixed bug 2373
+	* support/regression/tests/bug-2373.c: new, added
+
+2015-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdcc.sln,
+	* src/yacc.vcxproj: deleted yacc project
+	* src/sdcc.vcxproj,
+	* src/sdcc.vcxproj.filters: moved SDCC.y here for better dependencies
+	* SDCC.props: new, added Visual C property sheet for generic settings like
+	  boost path (default: c:\local\boost_1_59_0\)
+	* src/hc08/hc08.vcxproj,
+	* src/sdcc.vcxproj,
+	* src/stm8/stm8.vcxproj,
+	* src/z80/z80.vcxproj: use SDCC.props
+	* sdas/linksrc/lkaomf51.c: output capitals depending on the zflag
+	* src/common.h
+	* src/stm8/ralloc2.cc (extra_ic_generated),
+	* src/z80/ralloc2.cc (default_operand_cost, assign_cost, Ainst_ok,
+	  rough_cost_estimate),
+	* src/SDCCglue.c (printIvalChar),
+	* src/SDCCopt.c (convertToFcall): fixed warnings
+	* src/SDCCutil.c (isblank): added for MSVC 2010
+	* support/cpp/ansidecl.h: deleted
+	* support/cpp/sdcpp.vcxproj,
+	* support/cpp/sdcpp.vcxproj.filters: use files in support/sdbinutils/
+	* support/sdbinutils/libiberty/getpwd.c: fixed for MSVC
+
+2015-10-30 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lkmem.c:
+	  Fix defects in previous commit.
+
+2015-10-30 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lkarea.c:
+	* sdas/linksrc/lkmem.c:
+	  Improve the error message in .mem when no enough space for the stack.
+	  Suggest the largest spare space (address and size) in the internal RAM.
+
+2015-10-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lkmem.c:
+	  Fix incorrect check of "--xram-size".
+
+2015-10-27 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCglue.c:
+	  Bug fix: char s[10] = "ab", bytes beyond "ab" sometimes aren't set to 0.
+
+2015-10-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge cpp-merge-upstream branch to get improved standard support.
+
+2015-10-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* .version:
+	  Bump version due to improved standard support.
+
+2015-10-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc.c,
+	  src/port.h:
+	  Spelling fixes.
+
+2015-10-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/Makefile.in:
+	  Fix build-dependency of sdcpp on libiberty.
+	* support/cpp/sdcpp.opt,
+	  support/cpp/sdcpp-opts.c,
+	  support/cpp/libcpp/init.c:
+	  Support C11 in preprocessor.
+	* src/SDCCmain.c:
+	  Fix standard support, add support for c95 and sdcc11 dialects.
+
+2015-10-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* SDCC.y:
+	  Add checks for NULL pointers.
+
+2015-10-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c:
+	* src/SDCCglue.c:
+	* src/SDCCglue.h:
+	  Eliminate redundant string literals to be generated.
+	* support/regression/tests/bug-2089.c:
+	  Add a new test case.
+
+2015-10-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/libcpp/*:
+	  Reformat to reduce diff to upstream cpp.
+
+2015-10-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/libcpp/*:
+	  Reformat to reduce diff to upstream cpp.
+
+2015-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCC.lex:
+	  Support C95 wide string literals.
+
+2015-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/libcpp/include/*:
+	  Reformat to reduce diff to upstream version.
+
+2015-10-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/util/dbuf_string.c:
+	  Add check for null pointer.
+
+2015-10-09 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/z80/gen.c:
+	  Wrap strtoul() to support $-prefix hex numbers.
+
+2015-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* New memory management by merging malloc branch into trunk.
+
+2015-10-09 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lkaomf51.c:
+	  Add bound check while accessing a buffer in the heap.
+
+2015-10-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/libcpp/files.c:
+	  Drop cpp support for Borland C.
+
+2015-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/charconst.c,
+	  support/regression/tests/escape.c:
+	  Disable some tests for host, so we don't need a C11 host.
+
+2015-10-07 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCval.c:
+	  Add bound check in reorderIlist().
+	* support/regression/bug-2423.c:
+	  Add a new test case.
+
+2015-10-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCutil.h,
+	  src/SDCCutil.c,
+	  src/SDCCval.c,
+	  support/regression/tests/charconst.c,
+	  support/regression/tests/escape.c:
+	  Implement escape sequences for wide character constants, fix universal escape sequences.
+
+2015-10-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/uchar.h,
+	  src/SDCCval.h,
+	  src/SDCCval.c,
+	  src/SDCC.lex,
+	  src/SDCCutil.c,
+	  src/SDCCmain.c,
+	  src/SDCCglobl.h,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/regression/tests/charconst.c:
+	  Wide character constants.
+
+2015-10-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/malloc.c:
+	  Improve comments on heap data structures.
+
+2015-10-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdlib.h,
+	  device/lib/aligned_alloc.c:
+	  Implement aligned_alloc().
+
+2015-10-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/realloc.c:
+	  Fix a bug in realloc() freeing.
+
+2015-10-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/free.c,
+	  device/lib/realloc.c,
+	  device/lib/malloc.c,
+	  device/lib/realloc.c,
+	  support/regression/tests/malloc.c:
+	  Simplify memory management, document search of free list.
+	* support/regression/fwk/lib/testfwk.c:
+	  Support printing unsigned in test logs
+
+2015-10-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCval.c:
+	  Loose the condition of warning 116.
+
+2015-09-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/main.c:
+	  Support "pragma codeseg" and "pragma constseg" in the stm8 port.
+
+2015-09-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/main.c:
+	  Support "--codeseg" and "--constseg" on the stm8 port.
+
 2015-09-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_calloc.c,
@@ -14,6 +898,28 @@
 
 	* support/regression/tests/gcc-torture-execute-pr28982a.c:
 	  Enabled for the r2k and r3ka ports.
+
+2015-09-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/calloc.c,
+	  device/lib/malloc.c,
+	  device/lib/realloc.c,
+	  device/lib/free.c:
+	  Use typedefs for memory block header type, use more pointers to __xdata.
+	* device/include/stdlib.h,
+	  device/include/malloc.h:
+	  Move memory management to stdlib.h, fix stdlib.h inclusion.
+
+2015-09-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/asm/*/features.h,
+	  device/include/malloc.h,
+	  device/lib/calloc.c,
+	  device/lib/malloc.c,
+	  device/lib/realloc.c,
+	  device/lib/free.c,
+	  support/regression/tests/malloc.c:
+	  First version of new, more efficient memory management.
 
 2015-09-20 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -10709,7 +11615,7 @@
 2011-10-18 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: changed MS Visual C++ 6.0 to MS Visual C++ 2010,
-	  reverted to LyX version 1.6.7 format, as prpbosed by Robert Larice
+	  reverted to LyX version 1.6.7 format, as proposed by Robert Larice
 	* support/cpp/sdcpp-opts.c: fixed bug #3388478:
 	  Preprocessor Error when Invoking sdcc with -E/-M/-MM and -o
 
@@ -34760,4 +35666,4 @@
 	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
 	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
 
-$Revision: 9329 $
+$Revision: 9498 $

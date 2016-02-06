@@ -1119,7 +1119,7 @@ convertToFcall (eBBlock ** ebbs, int count)
             {
               sym_link *type = operandType (IC_LEFT (ic));
 
-              if (IS_INTEGRAL (type) && getSize (type) > port->support.shift && port->support.shift >= 0)
+              if (IS_INTEGRAL (type) && getSize (type) > (unsigned)port->support.shift && port->support.shift >= 0)
                 {
                   convilong (ic, ebbs[i]);
                 }

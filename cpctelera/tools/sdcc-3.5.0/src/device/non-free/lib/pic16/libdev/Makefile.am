@@ -224,20 +224,6 @@ libdev18f2410_a_SOURCES = pic18f2410.c
 libdev18f2410_a_SOURCES += gptr/dispatch.S
 libdev18f2410_a_CFLAGS = -p18f2410 $(AM_CFLAGS)
 
-if ENABLE_18F242
-lib_LIBRARIES += libdev18f242.a
-endif ENABLE_18F242
-libdev18f242_a_SOURCES = pic18f242.c
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f242_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f242_a_CFLAGS = -p18f242 $(AM_CFLAGS)
-
 if ENABLE_18F2420
 lib_LIBRARIES += libdev18f2420.a
 endif ENABLE_18F2420
@@ -265,6 +251,20 @@ libdev18f2423_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
 libdev18f2423_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f2423_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2423_a_CFLAGS = -p18f2423 $(AM_CFLAGS)
+
+if ENABLE_18F242
+lib_LIBRARIES += libdev18f242.a
+endif ENABLE_18F242
+libdev18f242_a_SOURCES = pic18f242.c
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f242_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f242_a_CFLAGS = -p18f242 $(AM_CFLAGS)
 
 if ENABLE_18F2431
 lib_LIBRARIES += libdev18f2431.a
@@ -330,20 +330,6 @@ libdev18f2458_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f2458_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2458_a_CFLAGS = -p18f2458 $(AM_CFLAGS)
 
-if ENABLE_18F248
-lib_LIBRARIES += libdev18f248.a
-endif ENABLE_18F248
-libdev18f248_a_SOURCES = pic18f248.c
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f248_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f248_a_CFLAGS = -p18f248 $(AM_CFLAGS)
-
 if ENABLE_18F2480
 lib_LIBRARIES += libdev18f2480.a
 endif ENABLE_18F2480
@@ -357,6 +343,20 @@ libdev18f2480_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
 libdev18f2480_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f2480_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2480_a_CFLAGS = -p18f2480 $(AM_CFLAGS)
+
+if ENABLE_18F248
+lib_LIBRARIES += libdev18f248.a
+endif ENABLE_18F248
+libdev18f248_a_SOURCES = pic18f248.c
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f248_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f248_a_CFLAGS = -p18f248 $(AM_CFLAGS)
 
 if ENABLE_18F24J10
 lib_LIBRARIES += libdev18f24j10.a
@@ -435,20 +435,6 @@ libdev18f2515_a_SOURCES = pic18f2515.c
 libdev18f2515_a_SOURCES += gptr/dispatch.S
 libdev18f2515_a_CFLAGS = -p18f2515 $(AM_CFLAGS)
 
-if ENABLE_18F252
-lib_LIBRARIES += libdev18f252.a
-endif ENABLE_18F252
-libdev18f252_a_SOURCES = pic18f252.c
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f252_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f252_a_CFLAGS = -p18f252 $(AM_CFLAGS)
-
 if ENABLE_18F2520
 lib_LIBRARIES += libdev18f2520.a
 endif ENABLE_18F2520
@@ -490,6 +476,20 @@ libdev18f2525_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
 libdev18f2525_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f2525_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2525_a_CFLAGS = -p18f2525 $(AM_CFLAGS)
+
+if ENABLE_18F252
+lib_LIBRARIES += libdev18f252.a
+endif ENABLE_18F252
+libdev18f252_a_SOURCES = pic18f252.c
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f252_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f252_a_CFLAGS = -p18f252 $(AM_CFLAGS)
 
 if ENABLE_18F2539
 lib_LIBRARIES += libdev18f2539.a
@@ -533,20 +533,6 @@ libdev18f2553_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f2553_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f2553_a_CFLAGS = -p18f2553 $(AM_CFLAGS)
 
-if ENABLE_18F258
-lib_LIBRARIES += libdev18f258.a
-endif ENABLE_18F258
-libdev18f258_a_SOURCES = pic18f258.c
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f258_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f258_a_CFLAGS = -p18f258 $(AM_CFLAGS)
-
 if ENABLE_18F2580
 lib_LIBRARIES += libdev18f2580.a
 endif ENABLE_18F2580
@@ -574,6 +560,20 @@ libdev18f2585_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
 libdev18f2585_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f2585_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f2585_a_CFLAGS = -p18f2585 $(AM_CFLAGS)
+
+if ENABLE_18F258
+lib_LIBRARIES += libdev18f258.a
+endif ENABLE_18F258
+libdev18f258_a_SOURCES = pic18f258.c
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f258_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f258_a_CFLAGS = -p18f258 $(AM_CFLAGS)
 
 if ENABLE_18F25J10
 lib_LIBRARIES += libdev18f25j10.a
@@ -904,20 +904,6 @@ libdev18f4410_a_SOURCES = pic18f4410.c
 libdev18f4410_a_SOURCES += gptr/dispatch.S
 libdev18f4410_a_CFLAGS = -p18f4410 $(AM_CFLAGS)
 
-if ENABLE_18F442
-lib_LIBRARIES += libdev18f442.a
-endif ENABLE_18F442
-libdev18f442_a_SOURCES = pic18f442.c
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f442_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f442_a_CFLAGS = -p18f442 $(AM_CFLAGS)
-
 if ENABLE_18F4420
 lib_LIBRARIES += libdev18f4420.a
 endif ENABLE_18F4420
@@ -945,6 +931,20 @@ libdev18f4423_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
 libdev18f4423_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f4423_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4423_a_CFLAGS = -p18f4423 $(AM_CFLAGS)
+
+if ENABLE_18F442
+lib_LIBRARIES += libdev18f442.a
+endif ENABLE_18F442
+libdev18f442_a_SOURCES = pic18f442.c
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f442_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f442_a_CFLAGS = -p18f442 $(AM_CFLAGS)
 
 if ENABLE_18F4431
 lib_LIBRARIES += libdev18f4431.a
@@ -1010,20 +1010,6 @@ libdev18f4458_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f4458_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4458_a_CFLAGS = -p18f4458 $(AM_CFLAGS)
 
-if ENABLE_18F448
-lib_LIBRARIES += libdev18f448.a
-endif ENABLE_18F448
-libdev18f448_a_SOURCES = pic18f448.c
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f448_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f448_a_CFLAGS = -p18f448 $(AM_CFLAGS)
-
 if ENABLE_18F4480
 lib_LIBRARIES += libdev18f4480.a
 endif ENABLE_18F4480
@@ -1037,6 +1023,20 @@ libdev18f4480_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
 libdev18f4480_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f4480_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4480_a_CFLAGS = -p18f4480 $(AM_CFLAGS)
+
+if ENABLE_18F448
+lib_LIBRARIES += libdev18f448.a
+endif ENABLE_18F448
+libdev18f448_a_SOURCES = pic18f448.c
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f448_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f448_a_CFLAGS = -p18f448 $(AM_CFLAGS)
 
 if ENABLE_18F44J10
 lib_LIBRARIES += libdev18f44j10.a
@@ -1101,20 +1101,6 @@ libdev18f4515_a_SOURCES = pic18f4515.c
 libdev18f4515_a_SOURCES += gptr/dispatch.S
 libdev18f4515_a_CFLAGS = -p18f4515 $(AM_CFLAGS)
 
-if ENABLE_18F452
-lib_LIBRARIES += libdev18f452.a
-endif ENABLE_18F452
-libdev18f452_a_SOURCES = pic18f452.c
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f452_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f452_a_CFLAGS = -p18f452 $(AM_CFLAGS)
-
 if ENABLE_18F4520
 lib_LIBRARIES += libdev18f4520.a
 endif ENABLE_18F4520
@@ -1156,6 +1142,20 @@ libdev18f4525_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
 libdev18f4525_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f4525_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4525_a_CFLAGS = -p18f4525 $(AM_CFLAGS)
+
+if ENABLE_18F452
+lib_LIBRARIES += libdev18f452.a
+endif ENABLE_18F452
+libdev18f452_a_SOURCES = pic18f452.c
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f452_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f452_a_CFLAGS = -p18f452 $(AM_CFLAGS)
 
 if ENABLE_18F4539
 lib_LIBRARIES += libdev18f4539.a
@@ -1199,20 +1199,6 @@ libdev18f4553_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
 libdev18f4553_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
 libdev18f4553_a_CFLAGS = -p18f4553 $(AM_CFLAGS)
 
-if ENABLE_18F458
-lib_LIBRARIES += libdev18f458.a
-endif ENABLE_18F458
-libdev18f458_a_SOURCES = pic18f458.c
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
-libdev18f458_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
-libdev18f458_a_CFLAGS = -p18f458 $(AM_CFLAGS)
-
 if ENABLE_18F4580
 lib_LIBRARIES += libdev18f4580.a
 endif ENABLE_18F4580
@@ -1240,6 +1226,20 @@ libdev18f4585_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
 libdev18f4585_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f4585_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f4585_a_CFLAGS = -p18f4585 $(AM_CFLAGS)
+
+if ENABLE_18F458
+lib_LIBRARIES += libdev18f458.a
+endif ENABLE_18F458
+libdev18f458_a_SOURCES = pic18f458.c
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18f458_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18f458_a_CFLAGS = -p18f458 $(AM_CFLAGS)
 
 if ENABLE_18F45J10
 lib_LIBRARIES += libdev18f45j10.a
@@ -2589,6 +2589,1832 @@ libdev18f97j94_a_SOURCES = pic18f97j94.c
 libdev18f97j94_a_SOURCES += gptr/dispatch.S
 libdev18f97j94_a_SOURCES += fake_sspbuf.c
 libdev18f97j94_a_CFLAGS = -p18f97j94 $(AM_CFLAGS)
+
+if ENABLE_18LF1220
+lib_LIBRARIES += libdev18lf1220.a
+endif ENABLE_18LF1220
+libdev18lf1220_a_SOURCES = pic18lf1220.c
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf1220_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf1220_a_SOURCES += fake_sspbuf.c
+libdev18lf1220_a_CFLAGS = -p18lf1220 $(AM_CFLAGS)
+
+if ENABLE_18LF1230
+lib_LIBRARIES += libdev18lf1230.a
+endif ENABLE_18LF1230
+libdev18lf1230_a_SOURCES = pic18lf1230.c
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf1230_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf1230_a_SOURCES += fake_sspbuf.c
+libdev18lf1230_a_CFLAGS = -p18lf1230 $(AM_CFLAGS)
+
+if ENABLE_18LF1320
+lib_LIBRARIES += libdev18lf1320.a
+endif ENABLE_18LF1320
+libdev18lf1320_a_SOURCES = pic18lf1320.c
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf1320_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf1320_a_SOURCES += fake_sspbuf.c
+libdev18lf1320_a_CFLAGS = -p18lf1320 $(AM_CFLAGS)
+
+if ENABLE_18LF1330
+lib_LIBRARIES += libdev18lf1330.a
+endif ENABLE_18LF1330
+libdev18lf1330_a_SOURCES = pic18lf1330.c
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf1330_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf1330_a_SOURCES += fake_sspbuf.c
+libdev18lf1330_a_CFLAGS = -p18lf1330 $(AM_CFLAGS)
+
+if ENABLE_18LF13K22
+lib_LIBRARIES += libdev18lf13k22.a
+endif ENABLE_18LF13K22
+libdev18lf13k22_a_SOURCES = pic18lf13k22.c
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf13k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf13k22_a_CFLAGS = -p18lf13k22 $(AM_CFLAGS)
+
+if ENABLE_18LF13K50
+lib_LIBRARIES += libdev18lf13k50.a
+endif ENABLE_18LF13K50
+libdev18lf13k50_a_SOURCES = pic18lf13k50.c
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf13k50_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf13k50_a_CFLAGS = -p18lf13k50 $(AM_CFLAGS)
+
+if ENABLE_18LF14K22
+lib_LIBRARIES += libdev18lf14k22.a
+endif ENABLE_18LF14K22
+libdev18lf14k22_a_SOURCES = pic18lf14k22.c
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf14k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf14k22_a_CFLAGS = -p18lf14k22 $(AM_CFLAGS)
+
+if ENABLE_18LF14K50
+lib_LIBRARIES += libdev18lf14k50.a
+endif ENABLE_18LF14K50
+libdev18lf14k50_a_SOURCES = pic18lf14k50.c
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf14k50_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf14k50_a_CFLAGS = -p18lf14k50 $(AM_CFLAGS)
+
+if ENABLE_18LF2220
+lib_LIBRARIES += libdev18lf2220.a
+endif ENABLE_18LF2220
+libdev18lf2220_a_SOURCES = pic18lf2220.c
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2220_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2220_a_CFLAGS = -p18lf2220 $(AM_CFLAGS)
+
+if ENABLE_18LF2221
+lib_LIBRARIES += libdev18lf2221.a
+endif ENABLE_18LF2221
+libdev18lf2221_a_SOURCES = pic18lf2221.c
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2221_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2221_a_CFLAGS = -p18lf2221 $(AM_CFLAGS)
+
+if ENABLE_18LF2320
+lib_LIBRARIES += libdev18lf2320.a
+endif ENABLE_18LF2320
+libdev18lf2320_a_SOURCES = pic18lf2320.c
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2320_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2320_a_CFLAGS = -p18lf2320 $(AM_CFLAGS)
+
+if ENABLE_18LF2321
+lib_LIBRARIES += libdev18lf2321.a
+endif ENABLE_18LF2321
+libdev18lf2321_a_SOURCES = pic18lf2321.c
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2321_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2321_a_CFLAGS = -p18lf2321 $(AM_CFLAGS)
+
+if ENABLE_18LF2331
+lib_LIBRARIES += libdev18lf2331.a
+endif ENABLE_18LF2331
+libdev18lf2331_a_SOURCES = pic18lf2331.c
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2331_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2331_a_CFLAGS = -p18lf2331 $(AM_CFLAGS)
+
+if ENABLE_18LF23K22
+lib_LIBRARIES += libdev18lf23k22.a
+endif ENABLE_18LF23K22
+libdev18lf23k22_a_SOURCES = pic18lf23k22.c
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf23k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf23k22_a_CFLAGS = -p18lf23k22 $(AM_CFLAGS)
+
+if ENABLE_18LF2410
+lib_LIBRARIES += libdev18lf2410.a
+endif ENABLE_18LF2410
+libdev18lf2410_a_SOURCES = pic18lf2410.c
+libdev18lf2410_a_SOURCES += gptr/dispatch.S
+libdev18lf2410_a_CFLAGS = -p18lf2410 $(AM_CFLAGS)
+
+if ENABLE_18LF2420
+lib_LIBRARIES += libdev18lf2420.a
+endif ENABLE_18LF2420
+libdev18lf2420_a_SOURCES = pic18lf2420.c
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2420_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2420_a_CFLAGS = -p18lf2420 $(AM_CFLAGS)
+
+if ENABLE_18LF2423
+lib_LIBRARIES += libdev18lf2423.a
+endif ENABLE_18LF2423
+libdev18lf2423_a_SOURCES = pic18lf2423.c
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2423_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2423_a_CFLAGS = -p18lf2423 $(AM_CFLAGS)
+
+if ENABLE_18LF242
+lib_LIBRARIES += libdev18lf242.a
+endif ENABLE_18LF242
+libdev18lf242_a_SOURCES = pic18lf242.c
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf242_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf242_a_CFLAGS = -p18lf242 $(AM_CFLAGS)
+
+if ENABLE_18LF2431
+lib_LIBRARIES += libdev18lf2431.a
+endif ENABLE_18LF2431
+libdev18lf2431_a_SOURCES = pic18lf2431.c
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2431_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2431_a_CFLAGS = -p18lf2431 $(AM_CFLAGS)
+
+if ENABLE_18LF2439
+lib_LIBRARIES += libdev18lf2439.a
+endif ENABLE_18LF2439
+libdev18lf2439_a_SOURCES = pic18lf2439.c
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2439_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2439_a_CFLAGS = -p18lf2439 $(AM_CFLAGS)
+
+if ENABLE_18LF2450
+lib_LIBRARIES += libdev18lf2450.a
+endif ENABLE_18LF2450
+libdev18lf2450_a_SOURCES = pic18lf2450.c
+libdev18lf2450_a_SOURCES += gptr/dispatch.S
+libdev18lf2450_a_SOURCES += fake_sspbuf.c
+libdev18lf2450_a_CFLAGS = -p18lf2450 $(AM_CFLAGS)
+
+if ENABLE_18LF2455
+lib_LIBRARIES += libdev18lf2455.a
+endif ENABLE_18LF2455
+libdev18lf2455_a_SOURCES = pic18lf2455.c
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2455_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2455_a_CFLAGS = -p18lf2455 $(AM_CFLAGS)
+
+if ENABLE_18LF2458
+lib_LIBRARIES += libdev18lf2458.a
+endif ENABLE_18LF2458
+libdev18lf2458_a_SOURCES = pic18lf2458.c
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2458_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2458_a_CFLAGS = -p18lf2458 $(AM_CFLAGS)
+
+if ENABLE_18LF2480
+lib_LIBRARIES += libdev18lf2480.a
+endif ENABLE_18LF2480
+libdev18lf2480_a_SOURCES = pic18lf2480.c
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2480_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2480_a_CFLAGS = -p18lf2480 $(AM_CFLAGS)
+
+if ENABLE_18LF248
+lib_LIBRARIES += libdev18lf248.a
+endif ENABLE_18LF248
+libdev18lf248_a_SOURCES = pic18lf248.c
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf248_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf248_a_CFLAGS = -p18lf248 $(AM_CFLAGS)
+
+if ENABLE_18LF24J10
+lib_LIBRARIES += libdev18lf24j10.a
+endif ENABLE_18LF24J10
+libdev18lf24j10_a_SOURCES = pic18lf24j10.c
+libdev18lf24j10_a_SOURCES += gptr/dispatch.S
+libdev18lf24j10_a_CFLAGS = -p18lf24j10 $(AM_CFLAGS)
+
+if ENABLE_18LF24J11
+lib_LIBRARIES += libdev18lf24j11.a
+endif ENABLE_18LF24J11
+libdev18lf24j11_a_SOURCES = pic18lf24j11.c
+libdev18lf24j11_a_SOURCES += gptr/dispatch.S
+libdev18lf24j11_a_CFLAGS = -p18lf24j11 $(AM_CFLAGS)
+
+if ENABLE_18LF24J50
+lib_LIBRARIES += libdev18lf24j50.a
+endif ENABLE_18LF24J50
+libdev18lf24j50_a_SOURCES = pic18lf24j50.c
+libdev18lf24j50_a_SOURCES += gptr/dispatch.S
+libdev18lf24j50_a_CFLAGS = -p18lf24j50 $(AM_CFLAGS)
+
+if ENABLE_18LF24K22
+lib_LIBRARIES += libdev18lf24k22.a
+endif ENABLE_18LF24K22
+libdev18lf24k22_a_SOURCES = pic18lf24k22.c
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf24k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf24k22_a_CFLAGS = -p18lf24k22 $(AM_CFLAGS)
+
+if ENABLE_18LF24K50
+lib_LIBRARIES += libdev18lf24k50.a
+endif ENABLE_18LF24K50
+libdev18lf24k50_a_SOURCES = pic18lf24k50.c
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf24k50_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf24k50_a_CFLAGS = -p18lf24k50 $(AM_CFLAGS)
+
+if ENABLE_18LF2510
+lib_LIBRARIES += libdev18lf2510.a
+endif ENABLE_18LF2510
+libdev18lf2510_a_SOURCES = pic18lf2510.c
+libdev18lf2510_a_SOURCES += gptr/dispatch.S
+libdev18lf2510_a_CFLAGS = -p18lf2510 $(AM_CFLAGS)
+
+if ENABLE_18LF2515
+lib_LIBRARIES += libdev18lf2515.a
+endif ENABLE_18LF2515
+libdev18lf2515_a_SOURCES = pic18lf2515.c
+libdev18lf2515_a_SOURCES += gptr/dispatch.S
+libdev18lf2515_a_CFLAGS = -p18lf2515 $(AM_CFLAGS)
+
+if ENABLE_18LF2520
+lib_LIBRARIES += libdev18lf2520.a
+endif ENABLE_18LF2520
+libdev18lf2520_a_SOURCES = pic18lf2520.c
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2520_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2520_a_CFLAGS = -p18lf2520 $(AM_CFLAGS)
+
+if ENABLE_18LF2523
+lib_LIBRARIES += libdev18lf2523.a
+endif ENABLE_18LF2523
+libdev18lf2523_a_SOURCES = pic18lf2523.c
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2523_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2523_a_CFLAGS = -p18lf2523 $(AM_CFLAGS)
+
+if ENABLE_18LF2525
+lib_LIBRARIES += libdev18lf2525.a
+endif ENABLE_18LF2525
+libdev18lf2525_a_SOURCES = pic18lf2525.c
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf2525_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf2525_a_CFLAGS = -p18lf2525 $(AM_CFLAGS)
+
+if ENABLE_18LF252
+lib_LIBRARIES += libdev18lf252.a
+endif ENABLE_18LF252
+libdev18lf252_a_SOURCES = pic18lf252.c
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf252_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf252_a_CFLAGS = -p18lf252 $(AM_CFLAGS)
+
+if ENABLE_18LF2539
+lib_LIBRARIES += libdev18lf2539.a
+endif ENABLE_18LF2539
+libdev18lf2539_a_SOURCES = pic18lf2539.c
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2539_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2539_a_CFLAGS = -p18lf2539 $(AM_CFLAGS)
+
+if ENABLE_18LF2550
+lib_LIBRARIES += libdev18lf2550.a
+endif ENABLE_18LF2550
+libdev18lf2550_a_SOURCES = pic18lf2550.c
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2550_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2550_a_CFLAGS = -p18lf2550 $(AM_CFLAGS)
+
+if ENABLE_18LF2553
+lib_LIBRARIES += libdev18lf2553.a
+endif ENABLE_18LF2553
+libdev18lf2553_a_SOURCES = pic18lf2553.c
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2553_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2553_a_CFLAGS = -p18lf2553 $(AM_CFLAGS)
+
+if ENABLE_18LF2580
+lib_LIBRARIES += libdev18lf2580.a
+endif ENABLE_18LF2580
+libdev18lf2580_a_SOURCES = pic18lf2580.c
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf2580_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf2580_a_CFLAGS = -p18lf2580 $(AM_CFLAGS)
+
+if ENABLE_18LF2585
+lib_LIBRARIES += libdev18lf2585.a
+endif ENABLE_18LF2585
+libdev18lf2585_a_SOURCES = pic18lf2585.c
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf2585_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf2585_a_CFLAGS = -p18lf2585 $(AM_CFLAGS)
+
+if ENABLE_18LF258
+lib_LIBRARIES += libdev18lf258.a
+endif ENABLE_18LF258
+libdev18lf258_a_SOURCES = pic18lf258.c
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf258_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf258_a_CFLAGS = -p18lf258 $(AM_CFLAGS)
+
+if ENABLE_18LF25J10
+lib_LIBRARIES += libdev18lf25j10.a
+endif ENABLE_18LF25J10
+libdev18lf25j10_a_SOURCES = pic18lf25j10.c
+libdev18lf25j10_a_SOURCES += gptr/dispatch.S
+libdev18lf25j10_a_CFLAGS = -p18lf25j10 $(AM_CFLAGS)
+
+if ENABLE_18LF25J11
+lib_LIBRARIES += libdev18lf25j11.a
+endif ENABLE_18LF25J11
+libdev18lf25j11_a_SOURCES = pic18lf25j11.c
+libdev18lf25j11_a_SOURCES += gptr/dispatch.S
+libdev18lf25j11_a_CFLAGS = -p18lf25j11 $(AM_CFLAGS)
+
+if ENABLE_18LF25J50
+lib_LIBRARIES += libdev18lf25j50.a
+endif ENABLE_18LF25J50
+libdev18lf25j50_a_SOURCES = pic18lf25j50.c
+libdev18lf25j50_a_SOURCES += gptr/dispatch.S
+libdev18lf25j50_a_CFLAGS = -p18lf25j50 $(AM_CFLAGS)
+
+if ENABLE_18LF25K22
+lib_LIBRARIES += libdev18lf25k22.a
+endif ENABLE_18LF25K22
+libdev18lf25k22_a_SOURCES = pic18lf25k22.c
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf25k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf25k22_a_CFLAGS = -p18lf25k22 $(AM_CFLAGS)
+
+if ENABLE_18LF25K50
+lib_LIBRARIES += libdev18lf25k50.a
+endif ENABLE_18LF25K50
+libdev18lf25k50_a_SOURCES = pic18lf25k50.c
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf25k50_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf25k50_a_CFLAGS = -p18lf25k50 $(AM_CFLAGS)
+
+if ENABLE_18LF25K80
+lib_LIBRARIES += libdev18lf25k80.a
+endif ENABLE_18LF25K80
+libdev18lf25k80_a_SOURCES = pic18lf25k80.c
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf25k80_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf25k80_a_CFLAGS = -p18lf25k80 $(AM_CFLAGS)
+
+if ENABLE_18LF2610
+lib_LIBRARIES += libdev18lf2610.a
+endif ENABLE_18LF2610
+libdev18lf2610_a_SOURCES = pic18lf2610.c
+libdev18lf2610_a_SOURCES += gptr/dispatch.S
+libdev18lf2610_a_CFLAGS = -p18lf2610 $(AM_CFLAGS)
+
+if ENABLE_18LF2620
+lib_LIBRARIES += libdev18lf2620.a
+endif ENABLE_18LF2620
+libdev18lf2620_a_SOURCES = pic18lf2620.c
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf2620_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf2620_a_CFLAGS = -p18lf2620 $(AM_CFLAGS)
+
+if ENABLE_18LF2680
+lib_LIBRARIES += libdev18lf2680.a
+endif ENABLE_18LF2680
+libdev18lf2680_a_SOURCES = pic18lf2680.c
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf2680_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf2680_a_CFLAGS = -p18lf2680 $(AM_CFLAGS)
+
+if ENABLE_18LF2682
+lib_LIBRARIES += libdev18lf2682.a
+endif ENABLE_18LF2682
+libdev18lf2682_a_SOURCES = pic18lf2682.c
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf2682_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf2682_a_CFLAGS = -p18lf2682 $(AM_CFLAGS)
+
+if ENABLE_18LF2685
+lib_LIBRARIES += libdev18lf2685.a
+endif ENABLE_18LF2685
+libdev18lf2685_a_SOURCES = pic18lf2685.c
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf2685_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf2685_a_CFLAGS = -p18lf2685 $(AM_CFLAGS)
+
+if ENABLE_18LF26J11
+lib_LIBRARIES += libdev18lf26j11.a
+endif ENABLE_18LF26J11
+libdev18lf26j11_a_SOURCES = pic18lf26j11.c
+libdev18lf26j11_a_SOURCES += gptr/dispatch.S
+libdev18lf26j11_a_CFLAGS = -p18lf26j11 $(AM_CFLAGS)
+
+if ENABLE_18LF26J13
+lib_LIBRARIES += libdev18lf26j13.a
+endif ENABLE_18LF26J13
+libdev18lf26j13_a_SOURCES = pic18lf26j13.c
+libdev18lf26j13_a_SOURCES += gptr/dispatch.S
+libdev18lf26j13_a_CFLAGS = -p18lf26j13 $(AM_CFLAGS)
+
+if ENABLE_18LF26J50
+lib_LIBRARIES += libdev18lf26j50.a
+endif ENABLE_18LF26J50
+libdev18lf26j50_a_SOURCES = pic18lf26j50.c
+libdev18lf26j50_a_SOURCES += gptr/dispatch.S
+libdev18lf26j50_a_CFLAGS = -p18lf26j50 $(AM_CFLAGS)
+
+if ENABLE_18LF26J53
+lib_LIBRARIES += libdev18lf26j53.a
+endif ENABLE_18LF26J53
+libdev18lf26j53_a_SOURCES = pic18lf26j53.c
+libdev18lf26j53_a_SOURCES += gptr/dispatch.S
+libdev18lf26j53_a_CFLAGS = -p18lf26j53 $(AM_CFLAGS)
+
+if ENABLE_18LF26K22
+lib_LIBRARIES += libdev18lf26k22.a
+endif ENABLE_18LF26K22
+libdev18lf26k22_a_SOURCES = pic18lf26k22.c
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf26k22_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf26k22_a_CFLAGS = -p18lf26k22 $(AM_CFLAGS)
+
+if ENABLE_18LF26K80
+lib_LIBRARIES += libdev18lf26k80.a
+endif ENABLE_18LF26K80
+libdev18lf26k80_a_SOURCES = pic18lf26k80.c
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf26k80_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf26k80_a_CFLAGS = -p18lf26k80 $(AM_CFLAGS)
+
+if ENABLE_18LF27J13
+lib_LIBRARIES += libdev18lf27j13.a
+endif ENABLE_18LF27J13
+libdev18lf27j13_a_SOURCES = pic18lf27j13.c
+libdev18lf27j13_a_SOURCES += gptr/dispatch.S
+libdev18lf27j13_a_CFLAGS = -p18lf27j13 $(AM_CFLAGS)
+
+if ENABLE_18LF27J53
+lib_LIBRARIES += libdev18lf27j53.a
+endif ENABLE_18LF27J53
+libdev18lf27j53_a_SOURCES = pic18lf27j53.c
+libdev18lf27j53_a_SOURCES += gptr/dispatch.S
+libdev18lf27j53_a_CFLAGS = -p18lf27j53 $(AM_CFLAGS)
+
+if ENABLE_18LF4220
+lib_LIBRARIES += libdev18lf4220.a
+endif ENABLE_18LF4220
+libdev18lf4220_a_SOURCES = pic18lf4220.c
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4220_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4220_a_CFLAGS = -p18lf4220 $(AM_CFLAGS)
+
+if ENABLE_18LF4221
+lib_LIBRARIES += libdev18lf4221.a
+endif ENABLE_18LF4221
+libdev18lf4221_a_SOURCES = pic18lf4221.c
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4221_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4221_a_CFLAGS = -p18lf4221 $(AM_CFLAGS)
+
+if ENABLE_18LF4320
+lib_LIBRARIES += libdev18lf4320.a
+endif ENABLE_18LF4320
+libdev18lf4320_a_SOURCES = pic18lf4320.c
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4320_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4320_a_CFLAGS = -p18lf4320 $(AM_CFLAGS)
+
+if ENABLE_18LF4321
+lib_LIBRARIES += libdev18lf4321.a
+endif ENABLE_18LF4321
+libdev18lf4321_a_SOURCES = pic18lf4321.c
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4321_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4321_a_CFLAGS = -p18lf4321 $(AM_CFLAGS)
+
+if ENABLE_18LF4331
+lib_LIBRARIES += libdev18lf4331.a
+endif ENABLE_18LF4331
+libdev18lf4331_a_SOURCES = pic18lf4331.c
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4331_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4331_a_CFLAGS = -p18lf4331 $(AM_CFLAGS)
+
+if ENABLE_18LF43K22
+lib_LIBRARIES += libdev18lf43k22.a
+endif ENABLE_18LF43K22
+libdev18lf43k22_a_SOURCES = pic18lf43k22.c
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf43k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf43k22_a_CFLAGS = -p18lf43k22 $(AM_CFLAGS)
+
+if ENABLE_18LF4410
+lib_LIBRARIES += libdev18lf4410.a
+endif ENABLE_18LF4410
+libdev18lf4410_a_SOURCES = pic18lf4410.c
+libdev18lf4410_a_SOURCES += gptr/dispatch.S
+libdev18lf4410_a_CFLAGS = -p18lf4410 $(AM_CFLAGS)
+
+if ENABLE_18LF4420
+lib_LIBRARIES += libdev18lf4420.a
+endif ENABLE_18LF4420
+libdev18lf4420_a_SOURCES = pic18lf4420.c
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4420_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4420_a_CFLAGS = -p18lf4420 $(AM_CFLAGS)
+
+if ENABLE_18LF4423
+lib_LIBRARIES += libdev18lf4423.a
+endif ENABLE_18LF4423
+libdev18lf4423_a_SOURCES = pic18lf4423.c
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4423_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4423_a_CFLAGS = -p18lf4423 $(AM_CFLAGS)
+
+if ENABLE_18LF442
+lib_LIBRARIES += libdev18lf442.a
+endif ENABLE_18LF442
+libdev18lf442_a_SOURCES = pic18lf442.c
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf442_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf442_a_CFLAGS = -p18lf442 $(AM_CFLAGS)
+
+if ENABLE_18LF4431
+lib_LIBRARIES += libdev18lf4431.a
+endif ENABLE_18LF4431
+libdev18lf4431_a_SOURCES = pic18lf4431.c
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4431_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4431_a_CFLAGS = -p18lf4431 $(AM_CFLAGS)
+
+if ENABLE_18LF4439
+lib_LIBRARIES += libdev18lf4439.a
+endif ENABLE_18LF4439
+libdev18lf4439_a_SOURCES = pic18lf4439.c
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4439_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4439_a_CFLAGS = -p18lf4439 $(AM_CFLAGS)
+
+if ENABLE_18LF4450
+lib_LIBRARIES += libdev18lf4450.a
+endif ENABLE_18LF4450
+libdev18lf4450_a_SOURCES = pic18lf4450.c
+libdev18lf4450_a_SOURCES += gptr/dispatch.S
+libdev18lf4450_a_SOURCES += fake_sspbuf.c
+libdev18lf4450_a_CFLAGS = -p18lf4450 $(AM_CFLAGS)
+
+if ENABLE_18LF4455
+lib_LIBRARIES += libdev18lf4455.a
+endif ENABLE_18LF4455
+libdev18lf4455_a_SOURCES = pic18lf4455.c
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4455_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4455_a_CFLAGS = -p18lf4455 $(AM_CFLAGS)
+
+if ENABLE_18LF4458
+lib_LIBRARIES += libdev18lf4458.a
+endif ENABLE_18LF4458
+libdev18lf4458_a_SOURCES = pic18lf4458.c
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4458_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4458_a_CFLAGS = -p18lf4458 $(AM_CFLAGS)
+
+if ENABLE_18LF4480
+lib_LIBRARIES += libdev18lf4480.a
+endif ENABLE_18LF4480
+libdev18lf4480_a_SOURCES = pic18lf4480.c
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4480_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4480_a_CFLAGS = -p18lf4480 $(AM_CFLAGS)
+
+if ENABLE_18LF448
+lib_LIBRARIES += libdev18lf448.a
+endif ENABLE_18LF448
+libdev18lf448_a_SOURCES = pic18lf448.c
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf448_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf448_a_CFLAGS = -p18lf448 $(AM_CFLAGS)
+
+if ENABLE_18LF44J10
+lib_LIBRARIES += libdev18lf44j10.a
+endif ENABLE_18LF44J10
+libdev18lf44j10_a_SOURCES = pic18lf44j10.c
+libdev18lf44j10_a_SOURCES += gptr/dispatch.S
+libdev18lf44j10_a_CFLAGS = -p18lf44j10 $(AM_CFLAGS)
+
+if ENABLE_18LF44J11
+lib_LIBRARIES += libdev18lf44j11.a
+endif ENABLE_18LF44J11
+libdev18lf44j11_a_SOURCES = pic18lf44j11.c
+libdev18lf44j11_a_SOURCES += gptr/dispatch.S
+libdev18lf44j11_a_CFLAGS = -p18lf44j11 $(AM_CFLAGS)
+
+if ENABLE_18LF44J50
+lib_LIBRARIES += libdev18lf44j50.a
+endif ENABLE_18LF44J50
+libdev18lf44j50_a_SOURCES = pic18lf44j50.c
+libdev18lf44j50_a_SOURCES += gptr/dispatch.S
+libdev18lf44j50_a_CFLAGS = -p18lf44j50 $(AM_CFLAGS)
+
+if ENABLE_18LF44K22
+lib_LIBRARIES += libdev18lf44k22.a
+endif ENABLE_18LF44K22
+libdev18lf44k22_a_SOURCES = pic18lf44k22.c
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf44k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf44k22_a_CFLAGS = -p18lf44k22 $(AM_CFLAGS)
+
+if ENABLE_18LF4510
+lib_LIBRARIES += libdev18lf4510.a
+endif ENABLE_18LF4510
+libdev18lf4510_a_SOURCES = pic18lf4510.c
+libdev18lf4510_a_SOURCES += gptr/dispatch.S
+libdev18lf4510_a_CFLAGS = -p18lf4510 $(AM_CFLAGS)
+
+if ENABLE_18LF4515
+lib_LIBRARIES += libdev18lf4515.a
+endif ENABLE_18LF4515
+libdev18lf4515_a_SOURCES = pic18lf4515.c
+libdev18lf4515_a_SOURCES += gptr/dispatch.S
+libdev18lf4515_a_CFLAGS = -p18lf4515 $(AM_CFLAGS)
+
+if ENABLE_18LF4520
+lib_LIBRARIES += libdev18lf4520.a
+endif ENABLE_18LF4520
+libdev18lf4520_a_SOURCES = pic18lf4520.c
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4520_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4520_a_CFLAGS = -p18lf4520 $(AM_CFLAGS)
+
+if ENABLE_18LF4523
+lib_LIBRARIES += libdev18lf4523.a
+endif ENABLE_18LF4523
+libdev18lf4523_a_SOURCES = pic18lf4523.c
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4523_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4523_a_CFLAGS = -p18lf4523 $(AM_CFLAGS)
+
+if ENABLE_18LF4525
+lib_LIBRARIES += libdev18lf4525.a
+endif ENABLE_18LF4525
+libdev18lf4525_a_SOURCES = pic18lf4525.c
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf4525_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf4525_a_CFLAGS = -p18lf4525 $(AM_CFLAGS)
+
+if ENABLE_18LF452
+lib_LIBRARIES += libdev18lf452.a
+endif ENABLE_18LF452
+libdev18lf452_a_SOURCES = pic18lf452.c
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf452_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf452_a_CFLAGS = -p18lf452 $(AM_CFLAGS)
+
+if ENABLE_18LF4539
+lib_LIBRARIES += libdev18lf4539.a
+endif ENABLE_18LF4539
+libdev18lf4539_a_SOURCES = pic18lf4539.c
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4539_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4539_a_CFLAGS = -p18lf4539 $(AM_CFLAGS)
+
+if ENABLE_18LF4550
+lib_LIBRARIES += libdev18lf4550.a
+endif ENABLE_18LF4550
+libdev18lf4550_a_SOURCES = pic18lf4550.c
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4550_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4550_a_CFLAGS = -p18lf4550 $(AM_CFLAGS)
+
+if ENABLE_18LF4553
+lib_LIBRARIES += libdev18lf4553.a
+endif ENABLE_18LF4553
+libdev18lf4553_a_SOURCES = pic18lf4553.c
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4553_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4553_a_CFLAGS = -p18lf4553 $(AM_CFLAGS)
+
+if ENABLE_18LF4580
+lib_LIBRARIES += libdev18lf4580.a
+endif ENABLE_18LF4580
+libdev18lf4580_a_SOURCES = pic18lf4580.c
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf4580_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf4580_a_CFLAGS = -p18lf4580 $(AM_CFLAGS)
+
+if ENABLE_18LF4585
+lib_LIBRARIES += libdev18lf4585.a
+endif ENABLE_18LF4585
+libdev18lf4585_a_SOURCES = pic18lf4585.c
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf4585_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf4585_a_CFLAGS = -p18lf4585 $(AM_CFLAGS)
+
+if ENABLE_18LF458
+lib_LIBRARIES += libdev18lf458.a
+endif ENABLE_18LF458
+libdev18lf458_a_SOURCES = pic18lf458.c
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf458_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf458_a_CFLAGS = -p18lf458 $(AM_CFLAGS)
+
+if ENABLE_18LF45J10
+lib_LIBRARIES += libdev18lf45j10.a
+endif ENABLE_18LF45J10
+libdev18lf45j10_a_SOURCES = pic18lf45j10.c
+libdev18lf45j10_a_SOURCES += gptr/dispatch.S
+libdev18lf45j10_a_CFLAGS = -p18lf45j10 $(AM_CFLAGS)
+
+if ENABLE_18LF45J11
+lib_LIBRARIES += libdev18lf45j11.a
+endif ENABLE_18LF45J11
+libdev18lf45j11_a_SOURCES = pic18lf45j11.c
+libdev18lf45j11_a_SOURCES += gptr/dispatch.S
+libdev18lf45j11_a_CFLAGS = -p18lf45j11 $(AM_CFLAGS)
+
+if ENABLE_18LF45J50
+lib_LIBRARIES += libdev18lf45j50.a
+endif ENABLE_18LF45J50
+libdev18lf45j50_a_SOURCES = pic18lf45j50.c
+libdev18lf45j50_a_SOURCES += gptr/dispatch.S
+libdev18lf45j50_a_CFLAGS = -p18lf45j50 $(AM_CFLAGS)
+
+if ENABLE_18LF45K22
+lib_LIBRARIES += libdev18lf45k22.a
+endif ENABLE_18LF45K22
+libdev18lf45k22_a_SOURCES = pic18lf45k22.c
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf45k22_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf45k22_a_CFLAGS = -p18lf45k22 $(AM_CFLAGS)
+
+if ENABLE_18LF45K50
+lib_LIBRARIES += libdev18lf45k50.a
+endif ENABLE_18LF45K50
+libdev18lf45k50_a_SOURCES = pic18lf45k50.c
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrget1_dispatch.S
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrget2_dispatch.S
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrget3_dispatch.S
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrget4_dispatch.S
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrput1_dispatch.S
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrput2_dispatch.S
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrput3_dispatch.S
+libdev18lf45k50_a_SOURCES += gptr/eeprom8_gptrput4_dispatch.S
+libdev18lf45k50_a_CFLAGS = -p18lf45k50 $(AM_CFLAGS)
+
+if ENABLE_18LF45K80
+lib_LIBRARIES += libdev18lf45k80.a
+endif ENABLE_18LF45K80
+libdev18lf45k80_a_SOURCES = pic18lf45k80.c
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf45k80_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf45k80_a_CFLAGS = -p18lf45k80 $(AM_CFLAGS)
+
+if ENABLE_18LF4610
+lib_LIBRARIES += libdev18lf4610.a
+endif ENABLE_18LF4610
+libdev18lf4610_a_SOURCES = pic18lf4610.c
+libdev18lf4610_a_SOURCES += gptr/dispatch.S
+libdev18lf4610_a_CFLAGS = -p18lf4610 $(AM_CFLAGS)
+
+if ENABLE_18LF4620
+lib_LIBRARIES += libdev18lf4620.a
+endif ENABLE_18LF4620
+libdev18lf4620_a_SOURCES = pic18lf4620.c
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf4620_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf4620_a_CFLAGS = -p18lf4620 $(AM_CFLAGS)
+
+if ENABLE_18LF4680
+lib_LIBRARIES += libdev18lf4680.a
+endif ENABLE_18LF4680
+libdev18lf4680_a_SOURCES = pic18lf4680.c
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf4680_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf4680_a_CFLAGS = -p18lf4680 $(AM_CFLAGS)
+
+if ENABLE_18LF4682
+lib_LIBRARIES += libdev18lf4682.a
+endif ENABLE_18LF4682
+libdev18lf4682_a_SOURCES = pic18lf4682.c
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf4682_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf4682_a_CFLAGS = -p18lf4682 $(AM_CFLAGS)
+
+if ENABLE_18LF4685
+lib_LIBRARIES += libdev18lf4685.a
+endif ENABLE_18LF4685
+libdev18lf4685_a_SOURCES = pic18lf4685.c
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf4685_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf4685_a_CFLAGS = -p18lf4685 $(AM_CFLAGS)
+
+if ENABLE_18LF46J11
+lib_LIBRARIES += libdev18lf46j11.a
+endif ENABLE_18LF46J11
+libdev18lf46j11_a_SOURCES = pic18lf46j11.c
+libdev18lf46j11_a_SOURCES += gptr/dispatch.S
+libdev18lf46j11_a_CFLAGS = -p18lf46j11 $(AM_CFLAGS)
+
+if ENABLE_18LF46J13
+lib_LIBRARIES += libdev18lf46j13.a
+endif ENABLE_18LF46J13
+libdev18lf46j13_a_SOURCES = pic18lf46j13.c
+libdev18lf46j13_a_SOURCES += gptr/dispatch.S
+libdev18lf46j13_a_CFLAGS = -p18lf46j13 $(AM_CFLAGS)
+
+if ENABLE_18LF46J50
+lib_LIBRARIES += libdev18lf46j50.a
+endif ENABLE_18LF46J50
+libdev18lf46j50_a_SOURCES = pic18lf46j50.c
+libdev18lf46j50_a_SOURCES += gptr/dispatch.S
+libdev18lf46j50_a_CFLAGS = -p18lf46j50 $(AM_CFLAGS)
+
+if ENABLE_18LF46J53
+lib_LIBRARIES += libdev18lf46j53.a
+endif ENABLE_18LF46J53
+libdev18lf46j53_a_SOURCES = pic18lf46j53.c
+libdev18lf46j53_a_SOURCES += gptr/dispatch.S
+libdev18lf46j53_a_CFLAGS = -p18lf46j53 $(AM_CFLAGS)
+
+if ENABLE_18LF46K22
+lib_LIBRARIES += libdev18lf46k22.a
+endif ENABLE_18LF46K22
+libdev18lf46k22_a_SOURCES = pic18lf46k22.c
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf46k22_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf46k22_a_CFLAGS = -p18lf46k22 $(AM_CFLAGS)
+
+if ENABLE_18LF46K80
+lib_LIBRARIES += libdev18lf46k80.a
+endif ENABLE_18LF46K80
+libdev18lf46k80_a_SOURCES = pic18lf46k80.c
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf46k80_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf46k80_a_CFLAGS = -p18lf46k80 $(AM_CFLAGS)
+
+if ENABLE_18LF47J13
+lib_LIBRARIES += libdev18lf47j13.a
+endif ENABLE_18LF47J13
+libdev18lf47j13_a_SOURCES = pic18lf47j13.c
+libdev18lf47j13_a_SOURCES += gptr/dispatch.S
+libdev18lf47j13_a_CFLAGS = -p18lf47j13 $(AM_CFLAGS)
+
+if ENABLE_18LF47J53
+lib_LIBRARIES += libdev18lf47j53.a
+endif ENABLE_18LF47J53
+libdev18lf47j53_a_SOURCES = pic18lf47j53.c
+libdev18lf47j53_a_SOURCES += gptr/dispatch.S
+libdev18lf47j53_a_CFLAGS = -p18lf47j53 $(AM_CFLAGS)
+
+if ENABLE_18LF6310
+lib_LIBRARIES += libdev18lf6310.a
+endif ENABLE_18LF6310
+libdev18lf6310_a_SOURCES = pic18lf6310.c
+libdev18lf6310_a_SOURCES += gptr/dispatch.S
+libdev18lf6310_a_CFLAGS = -p18lf6310 $(AM_CFLAGS)
+
+if ENABLE_18LF6390
+lib_LIBRARIES += libdev18lf6390.a
+endif ENABLE_18LF6390
+libdev18lf6390_a_SOURCES = pic18lf6390.c
+libdev18lf6390_a_SOURCES += gptr/dispatch.S
+libdev18lf6390_a_CFLAGS = -p18lf6390 $(AM_CFLAGS)
+
+if ENABLE_18LF6393
+lib_LIBRARIES += libdev18lf6393.a
+endif ENABLE_18LF6393
+libdev18lf6393_a_SOURCES = pic18lf6393.c
+libdev18lf6393_a_SOURCES += gptr/dispatch.S
+libdev18lf6393_a_CFLAGS = -p18lf6393 $(AM_CFLAGS)
+
+if ENABLE_18LF6410
+lib_LIBRARIES += libdev18lf6410.a
+endif ENABLE_18LF6410
+libdev18lf6410_a_SOURCES = pic18lf6410.c
+libdev18lf6410_a_SOURCES += gptr/dispatch.S
+libdev18lf6410_a_CFLAGS = -p18lf6410 $(AM_CFLAGS)
+
+if ENABLE_18LF6490
+lib_LIBRARIES += libdev18lf6490.a
+endif ENABLE_18LF6490
+libdev18lf6490_a_SOURCES = pic18lf6490.c
+libdev18lf6490_a_SOURCES += gptr/dispatch.S
+libdev18lf6490_a_CFLAGS = -p18lf6490 $(AM_CFLAGS)
+
+if ENABLE_18LF6493
+lib_LIBRARIES += libdev18lf6493.a
+endif ENABLE_18LF6493
+libdev18lf6493_a_SOURCES = pic18lf6493.c
+libdev18lf6493_a_SOURCES += gptr/dispatch.S
+libdev18lf6493_a_CFLAGS = -p18lf6493 $(AM_CFLAGS)
+
+if ENABLE_18LF6520
+lib_LIBRARIES += libdev18lf6520.a
+endif ENABLE_18LF6520
+libdev18lf6520_a_SOURCES = pic18lf6520.c
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6520_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6520_a_CFLAGS = -p18lf6520 $(AM_CFLAGS)
+
+if ENABLE_18LF6525
+lib_LIBRARIES += libdev18lf6525.a
+endif ENABLE_18LF6525
+libdev18lf6525_a_SOURCES = pic18lf6525.c
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6525_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6525_a_CFLAGS = -p18lf6525 $(AM_CFLAGS)
+
+if ENABLE_18LF6527
+lib_LIBRARIES += libdev18lf6527.a
+endif ENABLE_18LF6527
+libdev18lf6527_a_SOURCES = pic18lf6527.c
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6527_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6527_a_CFLAGS = -p18lf6527 $(AM_CFLAGS)
+
+if ENABLE_18LF6585
+lib_LIBRARIES += libdev18lf6585.a
+endif ENABLE_18LF6585
+libdev18lf6585_a_SOURCES = pic18lf6585.c
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6585_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6585_a_CFLAGS = -p18lf6585 $(AM_CFLAGS)
+
+if ENABLE_18LF65K80
+lib_LIBRARIES += libdev18lf65k80.a
+endif ENABLE_18LF65K80
+libdev18lf65k80_a_SOURCES = pic18lf65k80.c
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf65k80_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf65k80_a_CFLAGS = -p18lf65k80 $(AM_CFLAGS)
+
+if ENABLE_18LF6620
+lib_LIBRARIES += libdev18lf6620.a
+endif ENABLE_18LF6620
+libdev18lf6620_a_SOURCES = pic18lf6620.c
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6620_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6620_a_CFLAGS = -p18lf6620 $(AM_CFLAGS)
+
+if ENABLE_18LF6621
+lib_LIBRARIES += libdev18lf6621.a
+endif ENABLE_18LF6621
+libdev18lf6621_a_SOURCES = pic18lf6621.c
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6621_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6621_a_CFLAGS = -p18lf6621 $(AM_CFLAGS)
+
+if ENABLE_18LF6622
+lib_LIBRARIES += libdev18lf6622.a
+endif ENABLE_18LF6622
+libdev18lf6622_a_SOURCES = pic18lf6622.c
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6622_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6622_a_CFLAGS = -p18lf6622 $(AM_CFLAGS)
+
+if ENABLE_18LF6627
+lib_LIBRARIES += libdev18lf6627.a
+endif ENABLE_18LF6627
+libdev18lf6627_a_SOURCES = pic18lf6627.c
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6627_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6627_a_CFLAGS = -p18lf6627 $(AM_CFLAGS)
+
+if ENABLE_18LF6628
+lib_LIBRARIES += libdev18lf6628.a
+endif ENABLE_18LF6628
+libdev18lf6628_a_SOURCES = pic18lf6628.c
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6628_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6628_a_CFLAGS = -p18lf6628 $(AM_CFLAGS)
+
+if ENABLE_18LF6680
+lib_LIBRARIES += libdev18lf6680.a
+endif ENABLE_18LF6680
+libdev18lf6680_a_SOURCES = pic18lf6680.c
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6680_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6680_a_CFLAGS = -p18lf6680 $(AM_CFLAGS)
+
+if ENABLE_18LF66K80
+lib_LIBRARIES += libdev18lf66k80.a
+endif ENABLE_18LF66K80
+libdev18lf66k80_a_SOURCES = pic18lf66k80.c
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf66k80_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf66k80_a_CFLAGS = -p18lf66k80 $(AM_CFLAGS)
+
+if ENABLE_18LF6720
+lib_LIBRARIES += libdev18lf6720.a
+endif ENABLE_18LF6720
+libdev18lf6720_a_SOURCES = pic18lf6720.c
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6720_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6720_a_CFLAGS = -p18lf6720 $(AM_CFLAGS)
+
+if ENABLE_18LF6722
+lib_LIBRARIES += libdev18lf6722.a
+endif ENABLE_18LF6722
+libdev18lf6722_a_SOURCES = pic18lf6722.c
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6722_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6722_a_CFLAGS = -p18lf6722 $(AM_CFLAGS)
+
+if ENABLE_18LF6723
+lib_LIBRARIES += libdev18lf6723.a
+endif ENABLE_18LF6723
+libdev18lf6723_a_SOURCES = pic18lf6723.c
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf6723_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf6723_a_CFLAGS = -p18lf6723 $(AM_CFLAGS)
+
+if ENABLE_18LF8310
+lib_LIBRARIES += libdev18lf8310.a
+endif ENABLE_18LF8310
+libdev18lf8310_a_SOURCES = pic18lf8310.c
+libdev18lf8310_a_SOURCES += gptr/dispatch.S
+libdev18lf8310_a_CFLAGS = -p18lf8310 $(AM_CFLAGS)
+
+if ENABLE_18LF8390
+lib_LIBRARIES += libdev18lf8390.a
+endif ENABLE_18LF8390
+libdev18lf8390_a_SOURCES = pic18lf8390.c
+libdev18lf8390_a_SOURCES += gptr/dispatch.S
+libdev18lf8390_a_CFLAGS = -p18lf8390 $(AM_CFLAGS)
+
+if ENABLE_18LF8393
+lib_LIBRARIES += libdev18lf8393.a
+endif ENABLE_18LF8393
+libdev18lf8393_a_SOURCES = pic18lf8393.c
+libdev18lf8393_a_SOURCES += gptr/dispatch.S
+libdev18lf8393_a_CFLAGS = -p18lf8393 $(AM_CFLAGS)
+
+if ENABLE_18LF8410
+lib_LIBRARIES += libdev18lf8410.a
+endif ENABLE_18LF8410
+libdev18lf8410_a_SOURCES = pic18lf8410.c
+libdev18lf8410_a_SOURCES += gptr/dispatch.S
+libdev18lf8410_a_CFLAGS = -p18lf8410 $(AM_CFLAGS)
+
+if ENABLE_18LF8490
+lib_LIBRARIES += libdev18lf8490.a
+endif ENABLE_18LF8490
+libdev18lf8490_a_SOURCES = pic18lf8490.c
+libdev18lf8490_a_SOURCES += gptr/dispatch.S
+libdev18lf8490_a_CFLAGS = -p18lf8490 $(AM_CFLAGS)
+
+if ENABLE_18LF8493
+lib_LIBRARIES += libdev18lf8493.a
+endif ENABLE_18LF8493
+libdev18lf8493_a_SOURCES = pic18lf8493.c
+libdev18lf8493_a_SOURCES += gptr/dispatch.S
+libdev18lf8493_a_CFLAGS = -p18lf8493 $(AM_CFLAGS)
+
+if ENABLE_18LF8520
+lib_LIBRARIES += libdev18lf8520.a
+endif ENABLE_18LF8520
+libdev18lf8520_a_SOURCES = pic18lf8520.c
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8520_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8520_a_CFLAGS = -p18lf8520 $(AM_CFLAGS)
+
+if ENABLE_18LF8525
+lib_LIBRARIES += libdev18lf8525.a
+endif ENABLE_18LF8525
+libdev18lf8525_a_SOURCES = pic18lf8525.c
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8525_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8525_a_CFLAGS = -p18lf8525 $(AM_CFLAGS)
+
+if ENABLE_18LF8527
+lib_LIBRARIES += libdev18lf8527.a
+endif ENABLE_18LF8527
+libdev18lf8527_a_SOURCES = pic18lf8527.c
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8527_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8527_a_CFLAGS = -p18lf8527 $(AM_CFLAGS)
+
+if ENABLE_18LF8585
+lib_LIBRARIES += libdev18lf8585.a
+endif ENABLE_18LF8585
+libdev18lf8585_a_SOURCES = pic18lf8585.c
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8585_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8585_a_CFLAGS = -p18lf8585 $(AM_CFLAGS)
+
+if ENABLE_18LF8620
+lib_LIBRARIES += libdev18lf8620.a
+endif ENABLE_18LF8620
+libdev18lf8620_a_SOURCES = pic18lf8620.c
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8620_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8620_a_CFLAGS = -p18lf8620 $(AM_CFLAGS)
+
+if ENABLE_18LF8621
+lib_LIBRARIES += libdev18lf8621.a
+endif ENABLE_18LF8621
+libdev18lf8621_a_SOURCES = pic18lf8621.c
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8621_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8621_a_CFLAGS = -p18lf8621 $(AM_CFLAGS)
+
+if ENABLE_18LF8622
+lib_LIBRARIES += libdev18lf8622.a
+endif ENABLE_18LF8622
+libdev18lf8622_a_SOURCES = pic18lf8622.c
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8622_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8622_a_CFLAGS = -p18lf8622 $(AM_CFLAGS)
+
+if ENABLE_18LF8627
+lib_LIBRARIES += libdev18lf8627.a
+endif ENABLE_18LF8627
+libdev18lf8627_a_SOURCES = pic18lf8627.c
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8627_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8627_a_CFLAGS = -p18lf8627 $(AM_CFLAGS)
+
+if ENABLE_18LF8628
+lib_LIBRARIES += libdev18lf8628.a
+endif ENABLE_18LF8628
+libdev18lf8628_a_SOURCES = pic18lf8628.c
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8628_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8628_a_CFLAGS = -p18lf8628 $(AM_CFLAGS)
+
+if ENABLE_18LF8680
+lib_LIBRARIES += libdev18lf8680.a
+endif ENABLE_18LF8680
+libdev18lf8680_a_SOURCES = pic18lf8680.c
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8680_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8680_a_CFLAGS = -p18lf8680 $(AM_CFLAGS)
+
+if ENABLE_18LF8720
+lib_LIBRARIES += libdev18lf8720.a
+endif ENABLE_18LF8720
+libdev18lf8720_a_SOURCES = pic18lf8720.c
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8720_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8720_a_CFLAGS = -p18lf8720 $(AM_CFLAGS)
+
+if ENABLE_18LF8722
+lib_LIBRARIES += libdev18lf8722.a
+endif ENABLE_18LF8722
+libdev18lf8722_a_SOURCES = pic18lf8722.c
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8722_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8722_a_CFLAGS = -p18lf8722 $(AM_CFLAGS)
+
+if ENABLE_18LF8723
+lib_LIBRARIES += libdev18lf8723.a
+endif ENABLE_18LF8723
+libdev18lf8723_a_SOURCES = pic18lf8723.c
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrget2_dispatch.S
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrget3_dispatch.S
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrget4_dispatch.S
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrput1_dispatch.S
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrput2_dispatch.S
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
+libdev18lf8723_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
+libdev18lf8723_a_CFLAGS = -p18lf8723 $(AM_CFLAGS)
 
 include $(top_srcdir)/Makefile.common
 

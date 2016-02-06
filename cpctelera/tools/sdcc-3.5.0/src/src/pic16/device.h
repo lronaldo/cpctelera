@@ -134,6 +134,7 @@ typedef struct pic16_config_options_s {
 extern pic16_config_options_t *pic16_config_options;
 
 /****************************************/
+const char *pic16_processor_base_name(void);
 void pic16_assignConfigWordValue(int address, unsigned int value);
 void pic16_assignIdByteValue(int address, char value);
 int pic16_isREGinBank(reg_info *reg, int bank);
@@ -144,4 +145,3 @@ int checkAddSym(set **set, symbol *reg);
 int checkSym(set *set, symbol *reg);
 
 #endif  /* __DEVICE_H__ */
-

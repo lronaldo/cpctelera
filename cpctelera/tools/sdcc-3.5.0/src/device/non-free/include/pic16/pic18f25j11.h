@@ -2,9 +2,9 @@
  * This declarations of the PIC18F25J11 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:43 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:02 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -756,6 +756,37 @@ extern __at(0x0F74) volatile __SSP2ADDbits_t SSP2ADDbits;
 #define _SSP2ADD_MSK5           0x20
 #define _SSP2ADD_MSK6           0x40
 #define _SSP2ADD_MSK7           0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        SSP2MSK Bits
+
+extern __at(0x0F74) __sfr SSP2MSK;
+
+typedef struct
+  {
+  unsigned MSK0                 : 1;
+  unsigned MSK1                 : 1;
+  unsigned MSK2                 : 1;
+  unsigned MSK3                 : 1;
+  unsigned MSK4                 : 1;
+  unsigned MSK5                 : 1;
+  unsigned MSK6                 : 1;
+  unsigned MSK7                 : 1;
+  } __SSP2MSKbits_t;
+
+extern __at(0x0F74) volatile __SSP2MSKbits_t SSP2MSKbits;
+
+#define _SSP2MSK_MSK0           0x01
+#define _SSP2MSK_MSK1           0x02
+#define _SSP2MSK_MSK2           0x04
+#define _SSP2MSK_MSK3           0x08
+#define _SSP2MSK_MSK4           0x10
+#define _SSP2MSK_MSK5           0x20
+#define _SSP2MSK_MSK6           0x40
+#define _SSP2MSK_MSK7           0x80
 
 //==============================================================================
 
@@ -4148,6 +4179,37 @@ extern __at(0x0FC8) volatile __SSP1ADDbits_t SSP1ADDbits;
 
 
 //==============================================================================
+//        SSP1MSK Bits
+
+extern __at(0x0FC8) __sfr SSP1MSK;
+
+typedef struct
+  {
+  unsigned MSK0                 : 1;
+  unsigned MSK1                 : 1;
+  unsigned MSK2                 : 1;
+  unsigned MSK3                 : 1;
+  unsigned MSK4                 : 1;
+  unsigned MSK5                 : 1;
+  unsigned MSK6                 : 1;
+  unsigned MSK7                 : 1;
+  } __SSP1MSKbits_t;
+
+extern __at(0x0FC8) volatile __SSP1MSKbits_t SSP1MSKbits;
+
+#define _SSP1MSK_MSK0           0x01
+#define _SSP1MSK_MSK1           0x02
+#define _SSP1MSK_MSK2           0x04
+#define _SSP1MSK_MSK3           0x08
+#define _SSP1MSK_MSK4           0x10
+#define _SSP1MSK_MSK5           0x20
+#define _SSP1MSK_MSK6           0x40
+#define _SSP1MSK_MSK7           0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        SSPADD Bits
 
 extern __at(0x0FC8) __sfr SSPADD;
@@ -4893,4 +4955,22 @@ extern __at(0x0FFD) __sfr TOS;
 extern __at(0x0FFD) __sfr TOSL;
 extern __at(0x0FFE) __sfr TOSH;
 extern __at(0x0FFF) __sfr TOSU;
+
+//==============================================================================
+//
+//        Configuration Addresses
+//
+//==============================================================================
+
+#define __CONFIG1L              0x007FF8
+#define __CONFIG1H              0x007FF9
+#define __CONFIG2L              0x007FFA
+#define __CONFIG2H              0x007FFB
+#define __CONFIG3L              0x007FFC
+#define __CONFIG3H              0x007FFD
+#define __CONFIG4L              0x007FFE
+#define __CONFIG4H              0x007FFF
+
+//==============================================================================
+
 #endif // #ifndef __PIC18F25J11_H__

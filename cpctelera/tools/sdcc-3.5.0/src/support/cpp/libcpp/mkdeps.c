@@ -31,8 +31,8 @@ along with this program; see the file COPYING3.  If not see
 struct deps
 {
   const char **targetv;
-  unsigned int ntargets;        /* number of slots actually occupied */
-  unsigned int targets_size;    /* amt of allocated space - in words */
+  unsigned int ntargets;	/* number of slots actually occupied */
+  unsigned int targets_size;	/* amt of allocated space - in words */
 
   const char **depv;
   unsigned int ndeps;
@@ -263,7 +263,7 @@ deps_add_default_target (cpp_reader *pfile, const char *tgt)
 
       suffix = strrchr (o, '.');
       if (!suffix)
-	suffix = o + strlen (o);
+        suffix = o + strlen (o);
       strcpy (suffix, obj_ext);
 
       deps_add_target (d, o, 1);
@@ -397,9 +397,9 @@ deps_save (struct deps *deps, FILE *f)
     {
       size_t num_to_write = strlen (deps->depv[i]);
       if (fwrite (&num_to_write, sizeof (size_t), 1, f) != 1)
-	  return -1;
+          return -1;
       if (fwrite (deps->depv[i], num_to_write, 1, f) != 1)
-	  return -1;
+          return -1;
     }
 
   return 0;
@@ -439,7 +439,7 @@ deps_restore (struct deps *deps, FILE *fd, const char *self)
 
       /* Generate makefile dependencies from .pch if -nopch-deps.  */
       if (self != NULL && strcmp (buf, self) != 0)
-	deps_add_dep (deps, buf);
+        deps_add_dep (deps, buf);
     }
 
   free (buf);

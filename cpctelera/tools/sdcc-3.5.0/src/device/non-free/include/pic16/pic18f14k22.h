@@ -2,9 +2,9 @@
  * This declarations of the PIC18F14K22 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:42 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:01 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -539,7 +539,7 @@ typedef union
     {
     unsigned CVREF              : 1;
     unsigned C12IN0M            : 1;
-    unsigned C1OUT              : 1;
+    unsigned T0CKI              : 1;
     unsigned NOT_MCLR           : 1;
     unsigned OSC2               : 1;
     unsigned OSC1               : 1;
@@ -551,7 +551,7 @@ typedef union
     {
     unsigned VREFM              : 1;
     unsigned VREFP              : 1;
-    unsigned T0CKI              : 1;
+    unsigned INT2               : 1;
     unsigned VPP                : 1;
     unsigned CLKOUT             : 1;
     unsigned CLKIN              : 1;
@@ -563,7 +563,7 @@ typedef union
     {
     unsigned INT0               : 1;
     unsigned INT1               : 1;
-    unsigned INT2               : 1;
+    unsigned SRQ                : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -575,7 +575,7 @@ typedef union
     {
     unsigned PGD                : 1;
     unsigned PGC                : 1;
-    unsigned SRQ                : 1;
+    unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -625,7 +625,6 @@ extern __at(0x0F80) volatile __PORTAbits_t PORTAbits;
 #define _PORTA_PGC              0x02
 #define _PORTA_RA2              0x04
 #define _PORTA_AN2              0x04
-#define _PORTA_C1OUT            0x04
 #define _PORTA_T0CKI            0x04
 #define _PORTA_INT2             0x04
 #define _PORTA_SRQ              0x04
@@ -745,7 +744,7 @@ typedef union
     unsigned AN5                : 1;
     unsigned AN6                : 1;
     unsigned AN7                : 1;
-    unsigned C12OUT             : 1;
+    unsigned SRNQ               : 1;
     unsigned P1A                : 1;
     unsigned AN8                : 1;
     unsigned AN9                : 1;
@@ -757,7 +756,7 @@ typedef union
     unsigned C12IN1M            : 1;
     unsigned C12IN2M            : 1;
     unsigned C12IN3M            : 1;
-    unsigned P1B                : 1;
+    unsigned C12OUT             : 1;
     unsigned CCP1               : 1;
     unsigned SS                 : 1;
     unsigned SDO                : 1;
@@ -769,7 +768,7 @@ typedef union
     unsigned                    : 1;
     unsigned P1D                : 1;
     unsigned P1C                : 1;
-    unsigned C2OUT              : 1;
+    unsigned P1B                : 1;
     unsigned                    : 1;
     unsigned NOT_SS             : 1;
     unsigned                    : 1;
@@ -807,9 +806,9 @@ extern __at(0x0F82) volatile __PORTCbits_t PORTCbits;
 #define _PORTC_P1C              0x08
 #define _PORTC_PGM              0x08
 #define _PORTC_RC4              0x10
+#define _PORTC_SRNQ             0x10
 #define _PORTC_C12OUT           0x10
 #define _PORTC_P1B              0x10
-#define _PORTC_C2OUT            0x10
 #define _PORTC_RC5              0x20
 #define _PORTC_P1A              0x20
 #define _PORTC_CCP1             0x20
@@ -3018,6 +3017,18 @@ typedef union
     unsigned GIEL               : 1;
     unsigned GIEH               : 1;
     };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned PIE                : 1;
+    unsigned                    : 1;
+    };
   } __INTCONbits_t;
 
 extern __at(0x0FF2) volatile __INTCONbits_t INTCONbits;
@@ -3037,6 +3048,7 @@ extern __at(0x0FF2) volatile __INTCONbits_t INTCONbits;
 #define _PEIE_GIEL              0x40
 #define _PEIE                   0x40
 #define _GIEL                   0x40
+#define _PIE                    0x40
 #define _GIE_GIEH               0x80
 #define _GIE                    0x80
 #define _GIEH                   0x80

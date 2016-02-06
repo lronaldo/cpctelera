@@ -10,8 +10,7 @@
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Source Files\libiberty">
-      <UniqueIdentifier>{b6c63ea3-5a66-4c2b-a21e-486f3635d588}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+      <UniqueIdentifier>{c359aa07-8032-4d56-bcd1-10116c18ccaa}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\win32">
       <UniqueIdentifier>{91bececb-ff6f-4e1a-ac50-e893b4f567a9}</UniqueIdentifier>
@@ -31,10 +30,6 @@
     </Filter>
     <Filter Include="Header Files\win32_h">
       <UniqueIdentifier>{9e3e99c3-3f00-41e5-9964-8e386b8ba272}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl</Extensions>
-    </Filter>
-    <Filter Include="Header Files\libiberty_h">
-      <UniqueIdentifier>{39dbfa87-81c8-4124-8311-42545e459a1c}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Custom Build">
@@ -114,52 +109,52 @@
     <ClCompile Include="libcpp\traditional.c">
       <Filter>Source Files\libcpp</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\concat.c">
+    <ClCompile Include="..\sdbinutils\libiberty\concat.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\fopen_unlocked.c">
+    <ClCompile Include="..\sdbinutils\libiberty\fopen_unlocked.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\getpwd.c">
+    <ClCompile Include="..\sdbinutils\libiberty\getpwd.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\hashtab.c">
+    <ClCompile Include="..\sdbinutils\libiberty\hashtab.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\hex.c">
+    <ClCompile Include="..\sdbinutils\libiberty\hex.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\lbasename.c">
+    <ClCompile Include="..\sdbinutils\libiberty\lbasename.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\md5.c">
+    <ClCompile Include="..\sdbinutils\libiberty\md5.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\obstack.c">
+    <ClCompile Include="..\sdbinutils\libiberty\obstack.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\safe-ctype.c">
+    <ClCompile Include="..\sdbinutils\libiberty\safe-ctype.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\splay-tree.c">
+    <ClCompile Include="..\sdbinutils\libiberty\alloca.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\vasprintf.c">
+    <ClCompile Include="..\sdbinutils\libiberty\vasprintf.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\xexit.c">
+    <ClCompile Include="..\sdbinutils\libiberty\xexit.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\xmalloc.c">
+    <ClCompile Include="..\sdbinutils\libiberty\xmalloc.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\xmemdup.c">
+    <ClCompile Include="..\sdbinutils\libiberty\xmemdup.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\xstrdup.c">
+    <ClCompile Include="..\sdbinutils\libiberty\xstrdup.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
-    <ClCompile Include="libiberty\xstrerror.c">
+    <ClCompile Include="..\sdbinutils\libiberty\xstrerror.c">
       <Filter>Source Files\libiberty</Filter>
     </ClCompile>
     <ClCompile Include="win32\dirent.c">
@@ -185,7 +180,7 @@
     <ClInclude Include="intl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libiberty.h">
+    <ClInclude Include="..\sdbinutils\include\libiberty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="md5.h">
@@ -203,13 +198,13 @@
     <ClInclude Include="prefix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libiberty\safe-ctype.h">
+    <ClInclude Include="..\sdbinutils\include\safe-ctype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sdcpp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libiberty\splay-tree.h">
+    <ClInclude Include="..\sdbinutils\include\splay-tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="symcat.h">
@@ -248,14 +243,14 @@
     <ClInclude Include="win32\dirent.h">
       <Filter>Header Files\win32_h</Filter>
     </ClInclude>
-    <ClInclude Include="libiberty\filenames.h">
-      <Filter>Header Files\libiberty_h</Filter>
+    <ClInclude Include="..\sdbinutils\include\filenames.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libiberty\hashtab.h">
-      <Filter>Header Files\libiberty_h</Filter>
+    <ClInclude Include="..\sdbinutils\include\hashtab.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libiberty\obstack.h">
-      <Filter>Header Files\libiberty_h</Filter>
+    <ClInclude Include="..\sdbinutils\include\obstack.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="auto-host.h">
       <Filter>Header Files\libcpp_h\include</Filter>
@@ -268,5 +263,19 @@
     <CustomBuild Include="sdcpp.opt">
       <Filter>Custom Build</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="optc-gen.awk">
+      <Filter>Custom Build</Filter>
+    </None>
+    <None Include="opt-functions.awk">
+      <Filter>Custom Build</Filter>
+    </None>
+    <None Include="opt-gather.awk">
+      <Filter>Custom Build</Filter>
+    </None>
+    <None Include="opth-gen.awk">
+      <Filter>Custom Build</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -47,6 +47,7 @@ int dbuf_init(struct dbuf_s *dbuf, size_t size);
 int dbuf_is_initialized (struct dbuf_s *dbuf);
 int dbuf_set_length(struct dbuf_s *dbuf, size_t size);
 int dbuf_append(struct dbuf_s *dbuf, const void *buf, size_t len);
+int dbuf_prepend(struct dbuf_s *dbuf, const void *buf, size_t len);
 const void *dbuf_get_buf(struct dbuf_s *dbuf);
 size_t dbuf_get_length(struct dbuf_s *dbuf);
 const char *dbuf_c_str(struct dbuf_s *dbuf);

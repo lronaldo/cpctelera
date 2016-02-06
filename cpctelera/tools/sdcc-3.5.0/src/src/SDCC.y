@@ -104,7 +104,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
 %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
@@ -191,27 +191,27 @@ function_definition
              /* assume it to be 'int'       */
              addDecl($1,0,newIntLink());
              $1 = createFunctionDecl($1);
-             if (FUNC_ISCRITICAL ($1->type))
+             if ($1 && FUNC_ISCRITICAL ($1->type))
                inCriticalFunction = 1;
          }
       function_body  {
                                    $$ = createFunction($1,$3);
-                                   if (FUNC_ISCRITICAL ($1->type))
+                                   if ($1 && FUNC_ISCRITICAL ($1->type))
                                      inCriticalFunction = 0;
-
                                }
    | declaration_specifiers function_declarator
          {
-              pointerTypes($2->type,copyLinkChain($1));
-              addDecl($2,0,$1);
+              sym_link *p = copyLinkChain($1);
+              pointerTypes($2->type,p);
+              addDecl($2,0,p);
               $2 = createFunctionDecl($2);
-              if (FUNC_ISCRITICAL ($2->type))
+              if ($2 && FUNC_ISCRITICAL ($2->type))
                 inCriticalFunction = 1;
          }
      function_body
                                 {
                                     $$ = createFunction($2,$4);
-                                    if (FUNC_ISCRITICAL ($2->type))
+                                    if ($2 && FUNC_ISCRITICAL ($2->type))
                                       inCriticalFunction = 0;
                                 }
    ;
@@ -280,6 +280,22 @@ function_attributes
    |  Z88DK_CALLEE   {  $$ = newLink (SPECIFIER);
                         FUNC_ISZ88DK_CALLEE($$) = 1;
                      }
+   |  PRESERVES_REGS '(' identifier_list ')'
+                     {
+                        $$ = newLink (SPECIFIER);
+
+                        for(const struct symbol *regsym = $3; regsym; regsym = regsym->next)
+                          {
+                            int regnum;
+
+                            if (!port->getRegByName || ((regnum = port->getRegByName(regsym->name)) < 0))
+                              {
+                                werror (W_UNKNOWN_REG);
+                                break;
+                              }
+                            $$->funcAttrs.preserved_regs[regnum] = TRUE;
+                          }
+                     }
    ;
 
 function_body
@@ -336,6 +352,7 @@ string_literal_val
                        /* refer to support/cpp/libcpp/macro.c for details */
                        while ((((int) ($1[cnt] & 0xff)) & 0xff) == 0xff)
                          cnt++;
+
                        if (cnt <= max)
                          {
                            $$ = newAst_VALUE (strVal ($1));
@@ -600,7 +617,7 @@ declaration
              for (l1 = lnk; l1 != NULL; l1 = l1->next)
                if (IS_STRUCT (l1) && SPEC_STRUCT (l1)->b_flexArrayMember)
                  break;
-             if (l0 == NULL && l1 != NULL && SPEC_EXTR($1) != 1)
+             if (!options.std_c99 && l0 == NULL && l1 != NULL && SPEC_EXTR($1) != 1)
                werror (W_FLEXARRAY_INSTRUCT, sym->name);
              /* do the pointer stuff */
              pointerTypes(sym->type,lnk);
@@ -886,6 +903,9 @@ type_specifier
             symbol *sym;
             sym_link *p;
             sym = findSym(TypedefTab,NULL,$1);
+            if (sym != NULL)
+              if (IS_FUNC (sym->type))
+                werrorfl(sym->fileDef, sym->lineDef, E_TYPE_IS_FUNCTION, sym->name);
             $$ = p = copyLinkChain(sym ? sym->type : NULL);
             SPEC_TYPEDEF(getSpec(p)) = 0;
             ignoreTypedefType = 1;
@@ -1138,11 +1158,6 @@ struct_declaration
                   addDecl (sym, 0, btype);
               /* make sure the type is complete and sane */
               checkTypeSanity(sym->etype, sym->name);
-
-              /* disabled, see bug 2378
-              if (strlen (sym->name) == 0 && !options.std_c11)
-                werrorfl(sym->fileDef, sym->lineDef, W_ANONYMOUS_MEMBER);
-              */
             }
           ignoreTypedefType = 0;
           $$ = $2;
@@ -1614,7 +1629,7 @@ type_name
 abstract_declarator
    : pointer { $$ = reverseLink($1); }
    | abstract_declarator2
-   | pointer abstract_declarator2   { $1 = reverseLink($1); $1->next = $2; $$ = $1;
+   | pointer abstract_declarator2   { $1 = reverseLink($1); $2->next = $1; $$ = $2;
           if (IS_PTR($1) && IS_FUNC($2))
             DCL_TYPE($1) = CPOINTER;
         }
@@ -1670,7 +1685,7 @@ abstract_declarator2
         }
      parameter_type_list ')'
         {
-          sym_link *p = newLink(DECLARATOR);
+          sym_link *p = newLink(DECLARATOR), *q;
           DCL_TYPE(p) = FUNCTION;
 
           FUNC_HASVARARGS(p) = IS_VARG($4);
@@ -1686,7 +1701,8 @@ abstract_declarator2
               DCL_TYPE($1) = CPOINTER;
               $$ = $1;
             }
-          $1->next = p;
+          for (q = $1; q && q->next; q = q->next);
+          q->next = p;
         }
    ;
 
@@ -2068,7 +2084,7 @@ asm_statement
 
         seqPointNo++;
         ex = newNode(INLINEASM, NULL, NULL);
-        ex->values.inlineasm = copyStr ($3, NULL);
+        ex->values.inlineasm = strdup(copyStr ($3, NULL));
         seqPointNo++;
         $$ = ex;
      }

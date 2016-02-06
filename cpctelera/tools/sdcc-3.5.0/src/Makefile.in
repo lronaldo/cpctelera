@@ -138,7 +138,7 @@ all: checkconf sdcc
 
 tini: checkconf sdcc-tini
 
-sdcc-libs:
+sdcc-libs: sdcc-sdbinutils
 	for lib in $(SDCC_LIBS); do $(MAKE) -C $$lib; done
 
 sdcc-cc: sdcc-libs

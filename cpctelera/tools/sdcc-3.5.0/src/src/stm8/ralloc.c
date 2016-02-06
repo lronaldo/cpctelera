@@ -527,7 +527,7 @@ verifyRegsAssigned (operand * op, iCode * ic)
 {
   symbol *sym;
   int i;
-  bool completly_in_regs;
+  bool completely_in_regs;
 
   if (!op)
     return;
@@ -545,10 +545,10 @@ verifyRegsAssigned (operand * op, iCode * ic)
   if (sym->isspilt)
     return;
 
-  for(i = 0, completly_in_regs = TRUE; i < sym->nRegs; i++)
+  for(i = 0, completely_in_regs = TRUE; i < sym->nRegs; i++)
     if (!sym->regs[i])
-      completly_in_regs = FALSE;
-  if (completly_in_regs)
+      completely_in_regs = FALSE;
+  if (completely_in_regs)
     return;
 
   spillThis (sym, FALSE);
@@ -634,7 +634,7 @@ stm8_assignRegisters (ebbIndex * ebbi)
   /* Invoke optimal register allocator */
   ic = stm8_ralloc2_cc (ebbi);
 
-  /* Get spilllocs for all variables that have not been placed completly in regs */
+  /* Get spilllocs for all variables that have not been placed completely in regs */
   RegFix (ebbs, count);
 
   /* redo the offsets for stacked automatic variables */
@@ -657,7 +657,7 @@ stm8_assignRegisters (ebbIndex * ebbi)
           /* Invoke optimal register allocator */
           ic = stm8_ralloc2_cc (ebbi);
 
-          /* Get spilllocs for all variables that have not been placed completly in regs */
+          /* Get spilllocs for all variables that have not been placed completely in regs */
           RegFix (ebbs, count);
 
           redoStackOffsets ();

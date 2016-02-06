@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -306,6 +306,9 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="SDCC.lex">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SDCC.y">
       <Filter>Custom Build</Filter>
     </CustomBuild>
   </ItemGroup>

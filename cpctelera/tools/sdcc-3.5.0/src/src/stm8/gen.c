@@ -7123,6 +7123,12 @@ genSTM8Code (iCode *lic)
   int cln = 0;
   regalloc_dry_run = FALSE;
 
+  /* if debug information required */
+  if (options.debug && currFunc)
+    {
+      debugFile->writeFunction (currFunc, lic);
+    }
+
   for (ic = lic; ic; ic = ic->next)
     {
       initGenLineElement ();

@@ -37,13 +37,13 @@ typedef int iconv_t;  /* dummy */
 extern "C" {
 #endif
 
-struct directive;               /* Deliberately incomplete.  */
+struct directive;		/* Deliberately incomplete.  */
 struct pending_option;
 struct op;
 struct _cpp_strbuf;
 
 typedef bool (*convert_f) (iconv_t, const unsigned char *, size_t,
-                           struct _cpp_strbuf *);
+			   struct _cpp_strbuf *);
 struct cset_converter
 {
   convert_f func;
@@ -91,8 +91,8 @@ struct dummy
 #define CPP_ALIGN2(size, align) (((size) + ((align) - 1)) & ~((align) - 1))
 #define CPP_ALIGN(size) CPP_ALIGN2 (size, DEFAULT_ALIGNMENT)
 
-#define _cpp_mark_macro_used(NODE) do {                                 \
-  if ((NODE)->type == NT_MACRO && !((NODE)->flags & NODE_BUILTIN))      \
+#define _cpp_mark_macro_used(NODE) do {					\
+  if ((NODE)->type == NT_MACRO && !((NODE)->flags & NODE_BUILTIN))	\
     (NODE)->value.macro->used = 1; } while (0)
 
 /* A generic memory buffer, and operations on it.  */
@@ -226,10 +226,10 @@ struct lexer_state
 /* Special nodes - identifiers with predefined significance.  */
 struct spec_nodes
 {
-  cpp_hashnode *n_defined;              /* defined operator */
-  cpp_hashnode *n_true;                 /* C++ keyword true */
-  cpp_hashnode *n_false;                /* C++ keyword false */
-  cpp_hashnode *n__VA_ARGS__;           /* C99 vararg macros */
+  cpp_hashnode *n_defined;		/* defined operator */
+  cpp_hashnode *n_true;			/* C++ keyword true */
+  cpp_hashnode *n_false;		/* C++ keyword false */
+  cpp_hashnode *n__VA_ARGS__;		/* C99 vararg macros */
   /* SDCC _asm specific */
   cpp_hashnode *n__asm;                 /* __asm ... __endasm ; */
   cpp_hashnode *n__endasm;              /* __asm ... __endasm ; */
@@ -350,9 +350,9 @@ struct cpp_reader
   source_location directive_line;
 
   /* Memory buffers.  */
-  _cpp_buff *a_buff;            /* Aligned permanent storage.  */
-  _cpp_buff *u_buff;            /* Unaligned permanent storage.  */
-  _cpp_buff *free_buffs;        /* Free buffer chain.  */
+  _cpp_buff *a_buff;		/* Aligned permanent storage.  */
+  _cpp_buff *u_buff;		/* Unaligned permanent storage.  */
+  _cpp_buff *free_buffs;	/* Free buffer chain.  */
 
   /* Context stack.  */
   struct cpp_context base_context;
@@ -373,9 +373,9 @@ struct cpp_reader
   bool set_invocation_location;
 
   /* Search paths for include files.  */
-  struct cpp_dir *quote_include;        /* "" */
-  struct cpp_dir *bracket_include;      /* <> */
-  struct cpp_dir no_search_path;        /* No path.  */
+  struct cpp_dir *quote_include;	/* "" */
+  struct cpp_dir *bracket_include;	/* <> */
+  struct cpp_dir no_search_path;	/* No path.  */
 
   /* Chain of all hashed _cpp_file instances.  */
   struct _cpp_file *all_files;
@@ -511,16 +511,16 @@ struct cpp_reader
    In the unlikely event that characters other than \r and \n enter
    the set is_vspace, the macro handle_newline() in lex.c must be
    updated.  */
-#define _dollar_ok(x)   ((x) == '$' && CPP_OPTION (pfile, dollars_in_ident))
+#define _dollar_ok(x)	((x) == '$' && CPP_OPTION (pfile, dollars_in_ident))
 
-#define is_idchar(x)    (ISIDNUM(x) || _dollar_ok(x))
-#define is_numchar(x)   ISIDNUM(x)
-#define is_idstart(x)   (ISIDST(x) || _dollar_ok(x))
-#define is_numstart(x)  ISDIGIT(x)
-#define is_hspace(x)    ISBLANK(x)
-#define is_vspace(x)    IS_VSPACE(x)
-#define is_nvspace(x)   IS_NVSPACE(x)
-#define is_space(x)     IS_SPACE_OR_NUL(x)
+#define is_idchar(x)	(ISIDNUM(x) || _dollar_ok(x))
+#define is_numchar(x)	ISIDNUM(x)
+#define is_idstart(x)	(ISIDST(x) || _dollar_ok(x))
+#define is_numstart(x)	ISDIGIT(x)
+#define is_hspace(x)	ISBLANK(x)
+#define is_vspace(x)	IS_VSPACE(x)
+#define is_nvspace(x)	IS_NVSPACE(x)
+#define is_space(x)	IS_SPACE_OR_NUL(x)
 
 /* This table is constant if it can be initialized at compile time,
    which is the case if cpp was compiled with GCC >=2.7, or another
@@ -554,15 +554,15 @@ extern void _cpp_free_definition (cpp_hashnode *);
 extern bool _cpp_create_definition (cpp_reader *, cpp_hashnode *);
 extern void _cpp_pop_context (cpp_reader *);
 extern void _cpp_push_text_context (cpp_reader *, cpp_hashnode *,
-                                    const unsigned char *, size_t);
+				    const unsigned char *, size_t);
 extern bool _cpp_save_parameter (cpp_reader *, cpp_macro *, cpp_hashnode *);
 extern bool _cpp_arguments_ok (cpp_reader *, cpp_macro *, const cpp_hashnode *,
-                               unsigned int);
+			       unsigned int);
 extern const unsigned char *_cpp_builtin_macro_text (cpp_reader *,
-                                                     cpp_hashnode *);
+						     cpp_hashnode *);
 extern int _cpp_warn_if_unused_macro (cpp_reader *, cpp_hashnode *, void *);
 extern void _cpp_push_token_context (cpp_reader *, cpp_hashnode *,
-                                     const cpp_token *, unsigned int);
+				     const cpp_token *, unsigned int);
 extern void _cpp_backup_tokens_direct (cpp_reader *, unsigned int);
 
 /* In identifiers.c */
@@ -572,13 +572,13 @@ extern void _cpp_destroy_hashtable (cpp_reader *);
 /* In files.c */
 typedef struct _cpp_file _cpp_file;
 extern _cpp_file *_cpp_find_file (cpp_reader *, const char *, cpp_dir *,
-                                  bool, int);
+				  bool, int);
 extern bool _cpp_find_failed (_cpp_file *);
 extern void _cpp_mark_file_once_only (cpp_reader *, struct _cpp_file *);
 extern void _cpp_fake_include (cpp_reader *, const char *);
 extern bool _cpp_stack_file (cpp_reader *, _cpp_file*, bool);
 extern bool _cpp_stack_include (cpp_reader *, const char *, int,
-                                enum include_type);
+				enum include_type);
 extern int _cpp_compare_file_date (cpp_reader *, const char *, int);
 extern void _cpp_report_missing_guards (cpp_reader *);
 extern void _cpp_init_files (cpp_reader *);
@@ -618,7 +618,7 @@ extern int _cpp_do__Pragma (cpp_reader *);
 extern void _cpp_init_directives (cpp_reader *);
 extern void _cpp_init_internal_pragmas (cpp_reader *);
 extern void _cpp_do_file_change (cpp_reader *, enum lc_reason, const char *,
-                                 linenum_type, unsigned int);
+				 linenum_type, unsigned int);
 extern void _cpp_pop_buffer (cpp_reader *);
 
 /* In directives.c */
@@ -630,19 +630,19 @@ struct _cpp_dir_only_callbacks
 };
 
 extern void _cpp_preprocess_dir_only (cpp_reader *,
-                                      const struct _cpp_dir_only_callbacks *);
+				      const struct _cpp_dir_only_callbacks *);
 
 /* In traditional.c.  */
 extern bool _cpp_scan_out_logical_line (cpp_reader *, cpp_macro *);
 extern bool _cpp_read_logical_line_trad (cpp_reader *);
 extern void _cpp_overlay_buffer (cpp_reader *pfile, const unsigned char *,
-                                 size_t);
+				 size_t);
 extern void _cpp_remove_overlay (cpp_reader *);
 extern bool _cpp_create_trad_definition (cpp_reader *, cpp_macro *);
 extern bool _cpp_expansions_different_trad (const cpp_macro *,
-                                            const cpp_macro *);
+					    const cpp_macro *);
 extern unsigned char *_cpp_copy_replacement_text (const cpp_macro *,
-                                                  unsigned char *);
+						  unsigned char *);
 extern size_t _cpp_replacement_text_len (const cpp_macro *);
 
 /* In charset.c.  */
@@ -669,16 +669,16 @@ struct normalize_state
   ((st)->previous = 0, (st)->prev_class = 0)
 
 extern cppchar_t _cpp_valid_ucn (cpp_reader *, const unsigned char **,
-                                 const unsigned char *, int,
-                                 struct normalize_state *state);
+				 const unsigned char *, int,
+				 struct normalize_state *state);
 extern void _cpp_destroy_iconv (cpp_reader *);
 extern unsigned char *_cpp_convert_input (cpp_reader *, const char *,
-                                          unsigned char *, size_t, size_t,
-                                          const unsigned char **, off_t *);
+					  unsigned char *, size_t, size_t,
+					  const unsigned char **, off_t *);
 extern const char *_cpp_default_encoding (void);
 extern cpp_hashnode * _cpp_interpret_identifier (cpp_reader *pfile,
-                                                 const unsigned char *id,
-                                                 size_t len);
+						 const unsigned char *id,
+						 size_t len);
 
 /* Utility routines and macros.  */
 #define DSC(str) (const unsigned char *)str, sizeof str - 1
@@ -687,7 +687,7 @@ extern cpp_hashnode * _cpp_interpret_identifier (cpp_reader *pfile,
    checking.  */
 static inline int ustrcmp (const unsigned char *, const unsigned char *);
 static inline int ustrncmp (const unsigned char *, const unsigned char *,
-                            size_t);
+			    size_t);
 static inline size_t ustrlen (const unsigned char *);
 static inline unsigned char *uxstrdup (const unsigned char *);
 static inline unsigned char *ustrchr (const unsigned char *, int);

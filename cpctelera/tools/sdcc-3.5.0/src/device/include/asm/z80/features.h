@@ -44,7 +44,5 @@
 /* Register allocator is as good as hand coded asm.  Cool. */
 #define _SDCC_PORT_PROVIDES_STRCPY	0
 
-#define _SDCC_MALLOC_TYPE_MLH		1
-
 #endif
 

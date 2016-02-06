@@ -32,7 +32,7 @@
 
 unsigned char _moduchar (unsigned char a, unsigned char b);
 
-char _modschar (char a, char b) _IL_REENTRANT
+signed char _modschar (signed char a, signed char b) _IL_REENTRANT
 {
   register char r;
   char ta, tb;
@@ -45,3 +45,4 @@ char _modschar (char a, char b) _IL_REENTRANT
     if (a < 0) return -r;
     else return r;
 }
+

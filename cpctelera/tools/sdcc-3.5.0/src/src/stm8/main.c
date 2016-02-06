@@ -30,6 +30,98 @@
 #include "dbuf_string.h"
 #include "peep.h"
 
+#define OPTION_CODE_SEG        "--codeseg"
+#define OPTION_CONST_SEG       "--constseg"
+#define OPTION_ELF             "--out-fmt-elf"
+
+extern DEBUGFILE dwarf2DebugFile;
+extern int dwarf2FinalizeFile(FILE *);
+
+static OPTION stm8_options[] = {
+  {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
+  {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+  {0, OPTION_ELF,             NULL, "Output executable in ELF format"},
+  {0, NULL}
+};
+
+enum
+{
+  P_CODESEG = 1,
+  P_CONSTSEG,
+};
+
+static int
+stm8_do_pragma (int id, const char *name, const char *cp)
+{
+  struct pragma_token_s token;
+  int processed = 1, error = 0;
+
+  init_pragma_token (&token);
+
+  switch (id)
+    {
+      case P_CODESEG:
+      case P_CONSTSEG:
+        {
+          char *segname;
+
+          cp = get_pragma_token (cp, &token);
+          if (token.type == TOKEN_EOL)
+            {
+              error = 1;
+              break;
+            }
+          else
+            segname = Safe_strdup (get_pragma_string (&token));
+
+          cp = get_pragma_token (cp, &token);
+          if (token.type != TOKEN_EOL)
+            {
+              Safe_free (segname);
+              error = 1;
+              break;
+            }
+          else
+            {
+              if (id == P_CODESEG)
+                {
+                  if (options.code_seg)
+                    Safe_free (options.code_seg);
+                  options.code_seg = segname;
+                } 
+              else
+                {
+                  if (options.const_seg)
+                    Safe_free (options.const_seg);
+                  options.const_seg = segname;
+                }
+            }
+        }
+        break;
+      default:
+        processed = 0;
+        break;
+    }
+
+  if (error)
+    werror (W_BAD_PRAGMA_ARGUMENTS, name);
+
+  free_pragma_token (&token);
+  return processed;
+}
+
+static struct pragma_s stm8_pragma_tbl[] = {
+  {"codeseg", P_CODESEG, 0, stm8_do_pragma},
+  {"constseg", P_CONSTSEG, 0, stm8_do_pragma},
+  {NULL, 0, 0, NULL},
+};
+
+static int
+stm8_process_pragma (const char *s)
+{
+  return process_pragma_tbl (stm8_pragma_tbl, s);
+}
+
 static char stm8_defaultRules[] = {
 #include "peeph.rul"
   ""
@@ -44,6 +136,15 @@ static char *stm8_keywords[] = {
   "naked",
   NULL
 };
+
+static void
+stm8_genAssemblerEnd (FILE *of)
+{
+  if (options.out_fmt == 'E' && options.debug)
+    {
+      dwarf2FinalizeFile (of);
+    }
+}
 
 static void
 stm8_init (void)
@@ -67,6 +168,12 @@ stm8_reg_parm (sym_link * l, bool reentrant)
 static bool
 stm8_parseOptions (int *pargc, char **argv, int *i)
 {
+  if (!strcmp (argv[*i], "--out-fmt-elf"))
+  {
+    options.out_fmt = 'E';
+    debugFile = &dwarf2DebugFile;
+    return TRUE;
+  }
   return FALSE;
 }
 
@@ -137,10 +244,10 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
   dbuf_tprintf (oBuf, "\tint s_GSINIT ;reset\n");
   
   if(interrupts[INTNO_TRAP])
-	dbuf_printf (oBuf, "\tint %s ;trap\n", interrupts[INTNO_TRAP]->rname);
+    dbuf_printf (oBuf, "\tint %s ;trap\n", interrupts[INTNO_TRAP]->rname);
   else
-	dbuf_tprintf (oBuf, "\tint 0x0000 ;trap\n");
-	
+    dbuf_tprintf (oBuf, "\tint 0x0000 ;trap\n");
+    
   for(i = 0; i < STM8_INTERRUPTS_COUNT; i++)
   {
       if (i < intCount && interrupts[i])
@@ -149,6 +256,16 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
         dbuf_tprintf (oBuf, "\tint 0x0000 ;int%d\n", i); // int<n>
   }
   return TRUE;
+}
+
+/*----------------------------------------------------------------------*/
+/* stm8_dwarfRegNum - return the DWARF register number for a register.  */
+/*----------------------------------------------------------------------*/
+static int
+stm8_dwarfRegNum (const struct reg_info *reg)
+{
+  /* todo: return valid values */
+  return -1;
 }
 
 static bool
@@ -269,7 +386,18 @@ PORT stm8_port =
   { -1, 0, 7, 2, 0, 2 },        /* stack information */
   /* Use more fine-grained control for multiplication / division. */
   { 0, -1 },
-  { stm8_emitDebuggerSymbol },
+  { stm8_emitDebuggerSymbol,
+	{
+      stm8_dwarfRegNum,
+      NULL,
+      NULL,
+      4,                        /* addressSize */
+      0,                        /* regNumRet */
+      0,                        /* regNumSP */
+      0,                        /* regNumBP */
+      0,                        /* offsetSP */
+    },
+  },
   {
     32767,                      /* maxCount */
      2,                         /* sizeofElement */
@@ -281,22 +409,23 @@ PORT stm8_port =
   "_",
   stm8_init,
   stm8_parseOptions,
-  NULL,
+  stm8_options,
   NULL,
   stm8_finaliseOptions,
   stm8_setDefaultOptions,
   stm8_assignRegisters,
   stm8_getRegName,
+  0,
   NULL,
   stm8_keywords,
   NULL,
-  NULL,                         /* no genAssemblerEnd */
+  stm8_genAssemblerEnd,
   stm8_genIVT,
   0,                            /* no genXINIT code */
-  stm8_genInitStartup,                         /* genInitStartup */
+  stm8_genInitStartup,          /* genInitStartup */
   stm8_reset_regparm,
   stm8_reg_parm,
-  NULL,                         /* process_pragma */
+  stm8_process_pragma,          /* process_pragma */
   NULL,                         /* getMangledFunctionName */
   _hasNativeMulFor,             /* hasNativeMulFor */
   hasExtBitOp,                  /* hasExtBitOp */

@@ -83,12 +83,6 @@ static char *_pic16_keywords[] =
 pic16_sectioninfo_t pic16_sectioninfo;
 int has_xinst_config = 0;
 
-extern char *pic16_processor_base_name(void);
-
-void pic16_pCodeInitRegisters(void);
-
-void pic16_assignRegisters (ebbIndex *);
-
 static int regParmFlg = 0;  /* determine if we can register a parameter */
 
 pic16_options_t pic16_options;
@@ -249,11 +243,11 @@ do_pragma (int id, const char *name, const char *cp)
         addSet (&pic16_fix_udata, reg);
 
         sym = newSymbol ("stack", 0);
-        sprintf (sym->rname, "_%s", sym->name);
+        SNPRINTF(sym->rname, sizeof(sym->rname), "_%s", sym->name);
         addSet (&publics, sym);
 
         sym = newSymbol ("stack_end", 0);
-        sprintf (sym->rname, "_%s", sym->name);
+        SNPRINTF(sym->rname, sizeof(sym->rname), "_%s", sym->name);
         addSet (&publics, sym);
 
         initsfpnt = 1;    // force glue() to initialize stack/frame pointers */
@@ -269,8 +263,8 @@ do_pragma (int id, const char *name, const char *cp)
         if (TOKEN_STR != token.type)
           goto code_err;
 
-        absS = Safe_calloc (1, sizeof (absSym));
-        sprintf (absS->name, "_%s", get_pragma_string (&token));
+        absS = Safe_alloc(sizeof(absSym));
+        SNPRINTF(absS->name, sizeof(absS->name), "_%s", get_pragma_string(&token));
 
         cp = get_pragma_token (cp, &token);
         if (TOKEN_INT != token.type)
@@ -332,9 +326,11 @@ do_pragma (int id, const char *name, const char *cp)
 
         while (symname)
           {
-            ssym = Safe_calloc (1, sizeof (sectSym));
-            ssym->name = Safe_calloc (1, strlen (symname) + 2);
-            sprintf (ssym->name, "%s%s", port->fun_prefix, symname);
+            size_t len = strlen(symname) + 2;
+
+            ssym = Safe_alloc(sizeof(sectSym));
+            ssym->name = Safe_alloc(len);
+            SNPRINTF(ssym->name, len, "%s%s", port->fun_prefix, symname);
             ssym->reg = NULL;
 
             addSet (&sectSyms, ssym);
@@ -358,7 +354,7 @@ do_pragma (int id, const char *name, const char *cp)
 
             if(!found)
               {
-                snam = Safe_calloc (1, sizeof (sectName));
+                snam = Safe_alloc(sizeof(sectName));
                 snam->name = Safe_strdup (sectname);
                 snam->regsSet = NULL;
 
@@ -1009,7 +1005,7 @@ _pic16_mangleFunctionName (const char *sz)
 static void
 _pic16_genAssemblerPreamble (FILE * of)
 {
-  char *name = pic16_processor_base_name();
+  const char *name = pic16_processor_base_name();
 
   if (!name)
     {
@@ -1397,6 +1393,7 @@ PORT pic16_port =
   _pic16_setDefaultOptions,
   pic16_assignRegisters,
   _pic16_getRegName,
+  0,
   NULL,
   _pic16_keywords,
   _pic16_genAssemblerPreamble,

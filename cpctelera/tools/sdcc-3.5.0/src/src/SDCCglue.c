@@ -36,6 +36,8 @@ symbol *interrupts[INTNO_MAX + 1];
 void printIval (symbol *, sym_link *, initList *, struct dbuf_s *, bool check);
 set *publics = NULL;            /* public variables */
 set *externs = NULL;            /* Variables that are declared as extern */
+set *strSym = NULL;             /* string initializers */
+set *ccpStr = NULL;             /* char * const pointers with a string literal initializer */
 
 unsigned maxInterrupts = 0;
 int allocInfo = 1;
@@ -225,8 +227,10 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                 DCL_PTR_CONST (t) = 1;
               SPEC_STAT (newSym->etype) = 1;
 
-              /* This results in unencessary calls to stringToSymbol() through decorateType(), which make strings take twice as much  space as they should */
+              strSym = NULL;
+              ++noAlloc;
               resolveIvalSym (newSym->ival, newSym->type);
+              --noAlloc;
 
               // add it to the "XINIT (CODE)" segment
               addSet ((SPEC_OCLS (sym->etype) == xidata) ? &xinit->syms : &initializer->syms, newSym);
@@ -234,6 +238,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
               if (!SPEC_ABSA (sym->etype))
                 {
                   struct dbuf_s tmpBuf;
+                  symbol *ps = NULL;
+                  set *tmpSym = NULL;
 
                   dbuf_init (&tmpBuf, 4096);
                   // before allocation we must parse the sym->ival tree
@@ -244,8 +250,20 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                   printIval (sym, sym->type, sym->ival, &tmpBuf, TRUE);
                   --noInit;
                   --noAlloc;
+
+                  // delete redundant __str_%d symbols (initiailzer for char arrays)
+                  for (ps = setFirstItem (statsg->syms); ps; ps = setNextItem (statsg->syms))
+                    if (!strstr (tmpBuf.buf, ps->name) && isinSet (strSym, ps))
+                      addSet (&tmpSym, ps);
+                  for (ps = setFirstItem (tmpSym); ps; ps = setNextItem (tmpSym))
+                    deleteSetItem (&statsg->syms, ps);
+
+                  deleteSet (&tmpSym);
                   dbuf_destroy (&tmpBuf);
                 }
+
+              if (strSym)
+                deleteSet (&strSym);
             }
           else
             {
@@ -1007,7 +1025,9 @@ int
 printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf, const char *s, bool check)
 {
   value *val;
-  unsigned int size = DCL_ELEM (type);
+  size_t size = DCL_ELEM(type);
+  char *p;
+  size_t asz;
 
   if (!s)
     {
@@ -1029,7 +1049,15 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
           if (check && DCL_ELEM (val->type) > size)
             werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
 
-          printChar (oBuf, SPEC_CVAL (val->etype).v_char, size);
+          if (size > (asz = DCL_ELEM (val->type)) && !!(p = malloc (size)))
+            {
+              memcpy (p, SPEC_CVAL (val->etype).v_char, asz);
+              memset (p + asz, 0x00, size - asz);
+              printChar (oBuf, p, size);
+              free (p);
+            }
+          else
+            printChar (oBuf, SPEC_CVAL (val->etype).v_char, size);
 
           return 1;
         }
@@ -1210,6 +1238,13 @@ int
 printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s *oBuf)
 {
   int size = 0;
+  char *p;
+
+  if (val && !!(p = (char *) malloc (strlen (val->name) + 1)))
+    {
+      strcpy (p, val->name);
+      addSet (&ccpStr, p);
+    }
 
   /* PENDING: this is _very_ mcs51 specific, including a magic
      number...
@@ -1543,8 +1578,13 @@ void
 emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
 {
   symbol *sym;
+  set *tmpSet = NULL;
 
   /* fprintf(out, "\t.area\t%s\n", map->sname); */
+
+  /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
+  for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
+    addSet (&tmpSet, sym);
 
   /* for all variables in this segment do */
   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
@@ -1552,6 +1592,19 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
       /* if it is "extern" then do nothing */
       if (IS_EXTERN (sym->etype) && !sym->ival)
         continue;
+
+      /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
+      if (!isinSet (tmpSet, sym))
+        {
+          const char *p;
+          if (!ccpStr)
+            continue;
+          for (p = setFirstItem (ccpStr); p; p = setNextItem (ccpStr))
+            if (strcmp (p, sym->name) == 0)
+              break;
+          if (!p)
+            continue;
+        }
 
       /* if it is not static add it to the public table */
       if (!IS_STATIC (sym->etype))
@@ -1622,6 +1675,17 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
                 }
             }
         }
+    }
+
+  if (tmpSet)
+    deleteSet (&tmpSet);
+  if (ccpStr)
+    {
+      char *p;
+      for (p = setFirstItem (ccpStr); p; p = setNextItem (ccpStr))
+        if (p)
+          free (p);
+      deleteSet (&ccpStr);
     }
 }
 
@@ -1748,11 +1812,8 @@ char *iComments2 = {
 void
 initialComments (FILE * afile)
 {
-  time_t t;
-  time (&t);
   fprintf (afile, "%s", iComments1);
   fprintf (afile, "; Version " SDCC_VERSION_STR " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());
-  fprintf (afile, "; This file was generated %s", asctime (localtime (&t)));
   fprintf (afile, "%s", iComments2);
 }
 
@@ -2257,3 +2318,39 @@ glue (void)
     }
   fclose (asmFile);
 }
+
+/* will return 1 if the string is a part
+   of a target specific keyword */
+int
+isTargetKeyword (const char *s)
+{
+  int i;
+
+  if (port->keywords == NULL)
+    return 0;
+
+  if (s[0] == '_' && s[1] == '_')
+    {
+      /* Keywords in the port's array have either 0 or 1 underscore, */
+      /* so skip over the appropriate number of chars when comparing */
+      for (i = 0 ; port->keywords[i] ; i++ )
+        {
+          if (port->keywords[i][0] == '_' &&
+              strcmp(port->keywords[i],s+1) == 0)
+            return 1;
+          else if (strcmp(port->keywords[i],s+2) == 0)
+            return 1;
+        }
+    }
+  else
+    {
+      for (i = 0 ; port->keywords[i] ; i++ )
+        {
+          if (strcmp(port->keywords[i],s) == 0)
+            return 1;
+        }
+    }
+
+  return 0;
+}
+

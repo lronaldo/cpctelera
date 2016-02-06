@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1613 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:47 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:42 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -60,6 +60,8 @@
 #define T1CON_ADDR              0x0018
 #define T1GCON_ADDR             0x0019
 #define T2TMR_ADDR              0x001A
+#define TMR2_ADDR               0x001A
+#define PR2_ADDR                0x001B
 #define T2PR_ADDR               0x001B
 #define T2CON_ADDR              0x001C
 #define T2HLT_ADDR              0x001D
@@ -110,16 +112,14 @@
 #define WPUC_ADDR               0x020E
 #define ODCONA_ADDR             0x028C
 #define ODCONC_ADDR             0x028E
-#define CCP1RL_ADDR             0x0291
 #define CCPR1_ADDR              0x0291
 #define CCPR1L_ADDR             0x0291
-#define CCP1RH_ADDR             0x0292
 #define CCPR1H_ADDR             0x0292
 #define CCP1CON_ADDR            0x0293
 #define CCP1CAP_ADDR            0x0294
-#define CCP2RL_ADDR             0x0298
 #define CCPR2_ADDR              0x0298
-#define CCP2RH_ADDR             0x0299
+#define CCPR2L_ADDR             0x0298
+#define CCPR2H_ADDR             0x0299
 #define CCP2CON_ADDR            0x029A
 #define CCP2CAP_ADDR            0x029B
 #define CCPTMRS_ADDR            0x029E
@@ -134,12 +134,16 @@
 #define IOCCN_ADDR              0x0398
 #define IOCCF_ADDR              0x0399
 #define T4TMR_ADDR              0x0413
+#define TMR4_ADDR               0x0413
+#define PR4_ADDR                0x0414
 #define T4PR_ADDR               0x0414
 #define T4CON_ADDR              0x0415
 #define T4HLT_ADDR              0x0416
 #define T4CLKCON_ADDR           0x0417
 #define T4RST_ADDR              0x0418
 #define T6TMR_ADDR              0x041A
+#define TMR6_ADDR               0x041A
+#define PR6_ADDR                0x041B
 #define T6PR_ADDR               0x041B
 #define T6CON_ADDR              0x041C
 #define T6HLT_ADDR              0x041D
@@ -648,6 +652,8 @@ extern __at(0x0019) volatile __T1GCONbits_t T1GCONbits;
 //==============================================================================
 
 extern __at(0x001A) __sfr T2TMR;
+extern __at(0x001A) __sfr TMR2;
+extern __at(0x001B) __sfr PR2;
 extern __at(0x001B) __sfr T2PR;
 
 //==============================================================================
@@ -708,14 +714,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned CKPS               : 3;
+    unsigned T2CKPS             : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned T2CKPS             : 3;
+    unsigned CKPS               : 3;
     unsigned                    : 1;
     };
   } __T2CONbits_t;
@@ -2159,223 +2165,9 @@ extern __at(0x028E) volatile __ODCONCbits_t ODCONCbits;
 
 //==============================================================================
 
-
-//==============================================================================
-//        CCP1RL Bits
-
-extern __at(0x0291) __sfr CCP1RL;
-
-typedef union
-  {
-  struct
-    {
-    unsigned CCPR10             : 1;
-    unsigned CCPR11             : 1;
-    unsigned CCPR12             : 1;
-    unsigned CCPR13             : 1;
-    unsigned CCPR14             : 1;
-    unsigned CCPR15             : 1;
-    unsigned CCPR16             : 1;
-    unsigned CCPR17             : 1;
-    };
-
-  struct
-    {
-    unsigned CCP1R0             : 1;
-    unsigned CCP1R1             : 1;
-    unsigned CCP1R2             : 1;
-    unsigned CCP1R3             : 1;
-    unsigned CCP1R4             : 1;
-    unsigned CCP1R5             : 1;
-    unsigned CCP1R6             : 1;
-    unsigned CCP1R7             : 1;
-    };
-  } __CCP1RLbits_t;
-
-extern __at(0x0291) volatile __CCP1RLbits_t CCP1RLbits;
-
-#define _CCPR10                 0x01
-#define _CCP1R0                 0x01
-#define _CCPR11                 0x02
-#define _CCP1R1                 0x02
-#define _CCPR12                 0x04
-#define _CCP1R2                 0x04
-#define _CCPR13                 0x08
-#define _CCP1R3                 0x08
-#define _CCPR14                 0x10
-#define _CCP1R4                 0x10
-#define _CCPR15                 0x20
-#define _CCP1R5                 0x20
-#define _CCPR16                 0x40
-#define _CCP1R6                 0x40
-#define _CCPR17                 0x80
-#define _CCP1R7                 0x80
-
-//==============================================================================
-
 extern __at(0x0291) __sfr CCPR1;
-
-//==============================================================================
-//        CCPR1L Bits
-
 extern __at(0x0291) __sfr CCPR1L;
-
-typedef union
-  {
-  struct
-    {
-    unsigned CCPR10             : 1;
-    unsigned CCPR11             : 1;
-    unsigned CCPR12             : 1;
-    unsigned CCPR13             : 1;
-    unsigned CCPR14             : 1;
-    unsigned CCPR15             : 1;
-    unsigned CCPR16             : 1;
-    unsigned CCPR17             : 1;
-    };
-
-  struct
-    {
-    unsigned CCP1R0             : 1;
-    unsigned CCP1R1             : 1;
-    unsigned CCP1R2             : 1;
-    unsigned CCP1R3             : 1;
-    unsigned CCP1R4             : 1;
-    unsigned CCP1R5             : 1;
-    unsigned CCP1R6             : 1;
-    unsigned CCP1R7             : 1;
-    };
-  } __CCPR1Lbits_t;
-
-extern __at(0x0291) volatile __CCPR1Lbits_t CCPR1Lbits;
-
-#define _CCPR1L_CCPR10          0x01
-#define _CCPR1L_CCP1R0          0x01
-#define _CCPR1L_CCPR11          0x02
-#define _CCPR1L_CCP1R1          0x02
-#define _CCPR1L_CCPR12          0x04
-#define _CCPR1L_CCP1R2          0x04
-#define _CCPR1L_CCPR13          0x08
-#define _CCPR1L_CCP1R3          0x08
-#define _CCPR1L_CCPR14          0x10
-#define _CCPR1L_CCP1R4          0x10
-#define _CCPR1L_CCPR15          0x20
-#define _CCPR1L_CCP1R5          0x20
-#define _CCPR1L_CCPR16          0x40
-#define _CCPR1L_CCP1R6          0x40
-#define _CCPR1L_CCPR17          0x80
-#define _CCPR1L_CCP1R7          0x80
-
-//==============================================================================
-
-
-//==============================================================================
-//        CCP1RH Bits
-
-extern __at(0x0292) __sfr CCP1RH;
-
-typedef union
-  {
-  struct
-    {
-    unsigned CCPR18             : 1;
-    unsigned CCPR19             : 1;
-    unsigned CCPR110            : 1;
-    unsigned CCPR111            : 1;
-    unsigned CCPR112            : 1;
-    unsigned CCPR113            : 1;
-    unsigned CCPR114            : 1;
-    unsigned CCPR115            : 1;
-    };
-
-  struct
-    {
-    unsigned CCP1R8             : 1;
-    unsigned CCP1R9             : 1;
-    unsigned CCP1R10            : 1;
-    unsigned CCP1R11            : 1;
-    unsigned CCP1R12            : 1;
-    unsigned CCP1R13            : 1;
-    unsigned CCP1R14            : 1;
-    unsigned CCP1R15            : 1;
-    };
-  } __CCP1RHbits_t;
-
-extern __at(0x0292) volatile __CCP1RHbits_t CCP1RHbits;
-
-#define _CCPR18                 0x01
-#define _CCP1R8                 0x01
-#define _CCPR19                 0x02
-#define _CCP1R9                 0x02
-#define _CCPR110                0x04
-#define _CCP1R10                0x04
-#define _CCPR111                0x08
-#define _CCP1R11                0x08
-#define _CCPR112                0x10
-#define _CCP1R12                0x10
-#define _CCPR113                0x20
-#define _CCP1R13                0x20
-#define _CCPR114                0x40
-#define _CCP1R14                0x40
-#define _CCPR115                0x80
-#define _CCP1R15                0x80
-
-//==============================================================================
-
-
-//==============================================================================
-//        CCPR1H Bits
-
 extern __at(0x0292) __sfr CCPR1H;
-
-typedef union
-  {
-  struct
-    {
-    unsigned CCPR18             : 1;
-    unsigned CCPR19             : 1;
-    unsigned CCPR110            : 1;
-    unsigned CCPR111            : 1;
-    unsigned CCPR112            : 1;
-    unsigned CCPR113            : 1;
-    unsigned CCPR114            : 1;
-    unsigned CCPR115            : 1;
-    };
-
-  struct
-    {
-    unsigned CCP1R8             : 1;
-    unsigned CCP1R9             : 1;
-    unsigned CCP1R10            : 1;
-    unsigned CCP1R11            : 1;
-    unsigned CCP1R12            : 1;
-    unsigned CCP1R13            : 1;
-    unsigned CCP1R14            : 1;
-    unsigned CCP1R15            : 1;
-    };
-  } __CCPR1Hbits_t;
-
-extern __at(0x0292) volatile __CCPR1Hbits_t CCPR1Hbits;
-
-#define _CCPR1H_CCPR18          0x01
-#define _CCPR1H_CCP1R8          0x01
-#define _CCPR1H_CCPR19          0x02
-#define _CCPR1H_CCP1R9          0x02
-#define _CCPR1H_CCPR110         0x04
-#define _CCPR1H_CCP1R10         0x04
-#define _CCPR1H_CCPR111         0x08
-#define _CCPR1H_CCP1R11         0x08
-#define _CCPR1H_CCPR112         0x10
-#define _CCPR1H_CCP1R12         0x10
-#define _CCPR1H_CCPR113         0x20
-#define _CCPR1H_CCP1R13         0x20
-#define _CCPR1H_CCPR114         0x40
-#define _CCPR1H_CCP1R14         0x40
-#define _CCPR1H_CCPR115         0x80
-#define _CCPR1H_CCP1R15         0x80
-
-//==============================================================================
-
 
 //==============================================================================
 //        CCP1CON Bits
@@ -2410,13 +2202,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned CCP1MODE           : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CCP1MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
   } __CCP1CONbits_t;
@@ -2476,13 +2268,13 @@ typedef union
 
   struct
     {
-    unsigned CCP1CTS            : 2;
+    unsigned CTS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned CTS                : 2;
+    unsigned CCP1CTS            : 2;
     unsigned                    : 6;
     };
   } __CCP1CAPbits_t;
@@ -2496,115 +2288,9 @@ extern __at(0x0294) volatile __CCP1CAPbits_t CCP1CAPbits;
 
 //==============================================================================
 
-
-//==============================================================================
-//        CCP2RL Bits
-
-extern __at(0x0298) __sfr CCP2RL;
-
-typedef union
-  {
-  struct
-    {
-    unsigned CCPR20             : 1;
-    unsigned CCPR21             : 1;
-    unsigned CCPR22             : 1;
-    unsigned CCPR23             : 1;
-    unsigned CCPR24             : 1;
-    unsigned CCPR25             : 1;
-    unsigned CCPR26             : 1;
-    unsigned CCPR27             : 1;
-    };
-
-  struct
-    {
-    unsigned CCP2R0             : 1;
-    unsigned CCP2R1             : 1;
-    unsigned CCP2R2             : 1;
-    unsigned CCP2R3             : 1;
-    unsigned CCP2R4             : 1;
-    unsigned CCP2R5             : 1;
-    unsigned CCP2R6             : 1;
-    unsigned CCP2R7             : 1;
-    };
-  } __CCP2RLbits_t;
-
-extern __at(0x0298) volatile __CCP2RLbits_t CCP2RLbits;
-
-#define _CCPR20                 0x01
-#define _CCP2R0                 0x01
-#define _CCPR21                 0x02
-#define _CCP2R1                 0x02
-#define _CCPR22                 0x04
-#define _CCP2R2                 0x04
-#define _CCPR23                 0x08
-#define _CCP2R3                 0x08
-#define _CCPR24                 0x10
-#define _CCP2R4                 0x10
-#define _CCPR25                 0x20
-#define _CCP2R5                 0x20
-#define _CCPR26                 0x40
-#define _CCP2R6                 0x40
-#define _CCPR27                 0x80
-#define _CCP2R7                 0x80
-
-//==============================================================================
-
 extern __at(0x0298) __sfr CCPR2;
-
-//==============================================================================
-//        CCP2RH Bits
-
-extern __at(0x0299) __sfr CCP2RH;
-
-typedef union
-  {
-  struct
-    {
-    unsigned CCPR28             : 1;
-    unsigned CCPR29             : 1;
-    unsigned CCPR210            : 1;
-    unsigned CCPR211            : 1;
-    unsigned CCPR212            : 1;
-    unsigned CCPR213            : 1;
-    unsigned CCPR214            : 1;
-    unsigned CCPR215            : 1;
-    };
-
-  struct
-    {
-    unsigned CCP2R8             : 1;
-    unsigned CCP2R9             : 1;
-    unsigned CCP2R10            : 1;
-    unsigned CCP2R11            : 1;
-    unsigned CCP2R12            : 1;
-    unsigned CCP2R13            : 1;
-    unsigned CCP2R14            : 1;
-    unsigned CCP2R15            : 1;
-    };
-  } __CCP2RHbits_t;
-
-extern __at(0x0299) volatile __CCP2RHbits_t CCP2RHbits;
-
-#define _CCPR28                 0x01
-#define _CCP2R8                 0x01
-#define _CCPR29                 0x02
-#define _CCP2R9                 0x02
-#define _CCPR210                0x04
-#define _CCP2R10                0x04
-#define _CCPR211                0x08
-#define _CCP2R11                0x08
-#define _CCPR212                0x10
-#define _CCP2R12                0x10
-#define _CCPR213                0x20
-#define _CCP2R13                0x20
-#define _CCPR214                0x40
-#define _CCP2R14                0x40
-#define _CCPR215                0x80
-#define _CCP2R15                0x80
-
-//==============================================================================
-
+extern __at(0x0298) __sfr CCPR2L;
+extern __at(0x0299) __sfr CCPR2H;
 
 //==============================================================================
 //        CCP2CON Bits
@@ -2639,13 +2325,13 @@ typedef union
 
   struct
     {
-    unsigned CCP2MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned CCP2MODE           : 4;
     unsigned                    : 4;
     };
   } __CCP2CONbits_t;
@@ -2705,13 +2391,13 @@ typedef union
 
   struct
     {
-    unsigned CTS                : 2;
+    unsigned CCP2CTS            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned CCP2CTS            : 2;
+    unsigned CTS                : 2;
     unsigned                    : 6;
     };
   } __CCP2CAPbits_t;
@@ -3139,6 +2825,8 @@ extern __at(0x0399) volatile __IOCCFbits_t IOCCFbits;
 //==============================================================================
 
 extern __at(0x0413) __sfr T4TMR;
+extern __at(0x0413) __sfr TMR4;
+extern __at(0x0414) __sfr PR4;
 extern __at(0x0414) __sfr T4PR;
 
 //==============================================================================
@@ -3186,13 +2874,13 @@ typedef union
 
   struct
     {
-    unsigned T4OUTPS            : 4;
+    unsigned OUTPS              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned OUTPS              : 4;
+    unsigned T4OUTPS            : 4;
     unsigned                    : 4;
     };
 
@@ -3366,13 +3054,13 @@ typedef union
 
   struct
     {
-    unsigned RSEL               : 4;
+    unsigned T4RSEL             : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned T4RSEL             : 4;
+    unsigned RSEL               : 4;
     unsigned                    : 4;
     };
   } __T4RSTbits_t;
@@ -3391,6 +3079,8 @@ extern __at(0x0418) volatile __T4RSTbits_t T4RSTbits;
 //==============================================================================
 
 extern __at(0x041A) __sfr T6TMR;
+extern __at(0x041A) __sfr TMR6;
+extern __at(0x041B) __sfr PR6;
 extern __at(0x041B) __sfr T6PR;
 
 //==============================================================================
@@ -3438,27 +3128,27 @@ typedef union
 
   struct
     {
-    unsigned OUTPS              : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
     unsigned T6OUTPS            : 4;
     unsigned                    : 4;
     };
 
   struct
     {
+    unsigned OUTPS              : 4;
     unsigned                    : 4;
-    unsigned CKPS               : 3;
-    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned T6CKPS             : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned CKPS               : 3;
     unsigned                    : 1;
     };
   } __T6CONbits_t;
@@ -3519,13 +3209,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned T6MODE             : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned T6MODE             : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
   } __T6HLTbits_t;
@@ -3618,13 +3308,13 @@ typedef union
 
   struct
     {
-    unsigned RSEL               : 4;
+    unsigned T6RSEL             : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned T6RSEL             : 4;
+    unsigned RSEL               : 4;
     unsigned                    : 4;
     };
   } __T6RSTbits_t;
@@ -3801,14 +3491,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned CWG1LSAC           : 2;
+    unsigned LSAC               : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned LSAC               : 2;
+    unsigned CWG1LSAC           : 2;
     unsigned                    : 4;
     };
 
@@ -4310,13 +4000,13 @@ typedef union
 
   struct
     {
-    unsigned WINDOW             : 3;
+    unsigned WDTWINDOW          : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned WDTWINDOW          : 3;
+    unsigned WINDOW             : 3;
     unsigned                    : 5;
     };
 
@@ -4763,13 +4453,13 @@ typedef union
 
   struct
     {
-    unsigned SCANMODE           : 2;
+    unsigned MODE               : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned MODE               : 2;
+    unsigned SCANMODE           : 2;
     unsigned                    : 6;
     };
   } __SCANCON0bits_t;
@@ -5369,13 +5059,13 @@ typedef union
 
   struct
     {
-    unsigned PLEN               : 4;
+    unsigned CRCPLEN            : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CRCPLEN            : 4;
+    unsigned PLEN               : 4;
     unsigned                    : 4;
     };
 
@@ -5862,13 +5552,13 @@ typedef union
 
   struct
     {
-    unsigned SMT1MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned SMT1MODE           : 4;
     unsigned                    : 4;
     };
   } __SMT1CON1bits_t;
@@ -5973,13 +5663,13 @@ typedef union
 
   struct
     {
-    unsigned SMT1CSEL           : 3;
+    unsigned CSEL               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned CSEL               : 3;
+    unsigned SMT1CSEL           : 3;
     unsigned                    : 5;
     };
   } __SMT1CLKbits_t;
@@ -6029,13 +5719,13 @@ typedef union
 
   struct
     {
-    unsigned SSEL               : 3;
+    unsigned SMT1SSEL           : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned SMT1SSEL           : 3;
+    unsigned SSEL               : 3;
     unsigned                    : 5;
     };
   } __SMT1SIGbits_t;
@@ -6558,13 +6248,13 @@ typedef union
 
   struct
     {
-    unsigned SMT2MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned SMT2MODE           : 4;
     unsigned                    : 4;
     };
   } __SMT2CON1bits_t;
@@ -6725,13 +6415,13 @@ typedef union
 
   struct
     {
-    unsigned SMT2SSEL           : 3;
+    unsigned SSEL               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned SSEL               : 3;
+    unsigned SMT2SSEL           : 3;
     unsigned                    : 5;
     };
   } __SMT2SIGbits_t;
@@ -6781,13 +6471,13 @@ typedef union
 
   struct
     {
-    unsigned WSEL               : 4;
+    unsigned SMT2WSEL           : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned SMT2WSEL           : 4;
+    unsigned WSEL               : 4;
     unsigned                    : 4;
     };
   } __SMT2WINbits_t;
@@ -6877,8 +6567,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define _WRT_HALF               0x3FFD  // 000h to FFFh write protected, 1000h to 1FFFh may be modified by EECON control.
 #define _WRT_BOOT               0x3FFE  // 000h to 1FFh write protected, 200h to 1FFFh may be modified by EECON control.
 #define _WRT_OFF                0x3FFF  // Write protection off.
-#define _nZCD_ON                0x3F7F  // ZCD always enabled.
-#define _nZCD_OFF               0x3FFF  // ZCD disable.  ZCD can be enabled by setting the ZCDSEN bit of ZCDCON.
+#define _ZCD_ON                 0x3F7F  // ZCD always enabled.
+#define _ZCD_OFF                0x3FFF  // ZCD disable.  ZCD can be enabled by setting the ZCDSEN bit of ZCDCON.
 #define _PLLEN_OFF              0x3EFF  // 4x PLL is enabled when software sets the SPLLEN bit.
 #define _PLLEN_ON               0x3FFF  // 4x PLL is always enabled.
 #define _STVREN_OFF             0x3DFF  // Stack Overflow or Underflow will not cause a Reset.
@@ -7009,74 +6699,6 @@ extern __at(0x0FEF) __sfr TOSH;
 #define CCP1OE                  CCP1CONbits.CCP1OE              // bit 6, shadows bit in CCP1CONbits
 #define EN                      CCP1CONbits.EN                  // bit 7, shadows bit in CCP1CONbits
 #define CCP1EN                  CCP1CONbits.CCP1EN              // bit 7, shadows bit in CCP1CONbits
-
-#define CCPR18                  CCP1RHbits.CCPR18               // bit 0, shadows bit in CCP1RHbits
-#define CCP1R8                  CCP1RHbits.CCP1R8               // bit 0, shadows bit in CCP1RHbits
-#define CCPR19                  CCP1RHbits.CCPR19               // bit 1, shadows bit in CCP1RHbits
-#define CCP1R9                  CCP1RHbits.CCP1R9               // bit 1, shadows bit in CCP1RHbits
-#define CCPR110                 CCP1RHbits.CCPR110              // bit 2, shadows bit in CCP1RHbits
-#define CCP1R10                 CCP1RHbits.CCP1R10              // bit 2, shadows bit in CCP1RHbits
-#define CCPR111                 CCP1RHbits.CCPR111              // bit 3, shadows bit in CCP1RHbits
-#define CCP1R11                 CCP1RHbits.CCP1R11              // bit 3, shadows bit in CCP1RHbits
-#define CCPR112                 CCP1RHbits.CCPR112              // bit 4, shadows bit in CCP1RHbits
-#define CCP1R12                 CCP1RHbits.CCP1R12              // bit 4, shadows bit in CCP1RHbits
-#define CCPR113                 CCP1RHbits.CCPR113              // bit 5, shadows bit in CCP1RHbits
-#define CCP1R13                 CCP1RHbits.CCP1R13              // bit 5, shadows bit in CCP1RHbits
-#define CCPR114                 CCP1RHbits.CCPR114              // bit 6, shadows bit in CCP1RHbits
-#define CCP1R14                 CCP1RHbits.CCP1R14              // bit 6, shadows bit in CCP1RHbits
-#define CCPR115                 CCP1RHbits.CCPR115              // bit 7, shadows bit in CCP1RHbits
-#define CCP1R15                 CCP1RHbits.CCP1R15              // bit 7, shadows bit in CCP1RHbits
-
-#define CCPR10                  CCP1RLbits.CCPR10               // bit 0, shadows bit in CCP1RLbits
-#define CCP1R0                  CCP1RLbits.CCP1R0               // bit 0, shadows bit in CCP1RLbits
-#define CCPR11                  CCP1RLbits.CCPR11               // bit 1, shadows bit in CCP1RLbits
-#define CCP1R1                  CCP1RLbits.CCP1R1               // bit 1, shadows bit in CCP1RLbits
-#define CCPR12                  CCP1RLbits.CCPR12               // bit 2, shadows bit in CCP1RLbits
-#define CCP1R2                  CCP1RLbits.CCP1R2               // bit 2, shadows bit in CCP1RLbits
-#define CCPR13                  CCP1RLbits.CCPR13               // bit 3, shadows bit in CCP1RLbits
-#define CCP1R3                  CCP1RLbits.CCP1R3               // bit 3, shadows bit in CCP1RLbits
-#define CCPR14                  CCP1RLbits.CCPR14               // bit 4, shadows bit in CCP1RLbits
-#define CCP1R4                  CCP1RLbits.CCP1R4               // bit 4, shadows bit in CCP1RLbits
-#define CCPR15                  CCP1RLbits.CCPR15               // bit 5, shadows bit in CCP1RLbits
-#define CCP1R5                  CCP1RLbits.CCP1R5               // bit 5, shadows bit in CCP1RLbits
-#define CCPR16                  CCP1RLbits.CCPR16               // bit 6, shadows bit in CCP1RLbits
-#define CCP1R6                  CCP1RLbits.CCP1R6               // bit 6, shadows bit in CCP1RLbits
-#define CCPR17                  CCP1RLbits.CCPR17               // bit 7, shadows bit in CCP1RLbits
-#define CCP1R7                  CCP1RLbits.CCP1R7               // bit 7, shadows bit in CCP1RLbits
-
-#define CCPR28                  CCP2RHbits.CCPR28               // bit 0, shadows bit in CCP2RHbits
-#define CCP2R8                  CCP2RHbits.CCP2R8               // bit 0, shadows bit in CCP2RHbits
-#define CCPR29                  CCP2RHbits.CCPR29               // bit 1, shadows bit in CCP2RHbits
-#define CCP2R9                  CCP2RHbits.CCP2R9               // bit 1, shadows bit in CCP2RHbits
-#define CCPR210                 CCP2RHbits.CCPR210              // bit 2, shadows bit in CCP2RHbits
-#define CCP2R10                 CCP2RHbits.CCP2R10              // bit 2, shadows bit in CCP2RHbits
-#define CCPR211                 CCP2RHbits.CCPR211              // bit 3, shadows bit in CCP2RHbits
-#define CCP2R11                 CCP2RHbits.CCP2R11              // bit 3, shadows bit in CCP2RHbits
-#define CCPR212                 CCP2RHbits.CCPR212              // bit 4, shadows bit in CCP2RHbits
-#define CCP2R12                 CCP2RHbits.CCP2R12              // bit 4, shadows bit in CCP2RHbits
-#define CCPR213                 CCP2RHbits.CCPR213              // bit 5, shadows bit in CCP2RHbits
-#define CCP2R13                 CCP2RHbits.CCP2R13              // bit 5, shadows bit in CCP2RHbits
-#define CCPR214                 CCP2RHbits.CCPR214              // bit 6, shadows bit in CCP2RHbits
-#define CCP2R14                 CCP2RHbits.CCP2R14              // bit 6, shadows bit in CCP2RHbits
-#define CCPR215                 CCP2RHbits.CCPR215              // bit 7, shadows bit in CCP2RHbits
-#define CCP2R15                 CCP2RHbits.CCP2R15              // bit 7, shadows bit in CCP2RHbits
-
-#define CCPR20                  CCP2RLbits.CCPR20               // bit 0, shadows bit in CCP2RLbits
-#define CCP2R0                  CCP2RLbits.CCP2R0               // bit 0, shadows bit in CCP2RLbits
-#define CCPR21                  CCP2RLbits.CCPR21               // bit 1, shadows bit in CCP2RLbits
-#define CCP2R1                  CCP2RLbits.CCP2R1               // bit 1, shadows bit in CCP2RLbits
-#define CCPR22                  CCP2RLbits.CCPR22               // bit 2, shadows bit in CCP2RLbits
-#define CCP2R2                  CCP2RLbits.CCP2R2               // bit 2, shadows bit in CCP2RLbits
-#define CCPR23                  CCP2RLbits.CCPR23               // bit 3, shadows bit in CCP2RLbits
-#define CCP2R3                  CCP2RLbits.CCP2R3               // bit 3, shadows bit in CCP2RLbits
-#define CCPR24                  CCP2RLbits.CCPR24               // bit 4, shadows bit in CCP2RLbits
-#define CCP2R4                  CCP2RLbits.CCP2R4               // bit 4, shadows bit in CCP2RLbits
-#define CCPR25                  CCP2RLbits.CCPR25               // bit 5, shadows bit in CCP2RLbits
-#define CCP2R5                  CCP2RLbits.CCP2R5               // bit 5, shadows bit in CCP2RLbits
-#define CCPR26                  CCP2RLbits.CCPR26               // bit 6, shadows bit in CCP2RLbits
-#define CCP2R6                  CCP2RLbits.CCP2R6               // bit 6, shadows bit in CCP2RLbits
-#define CCPR27                  CCP2RLbits.CCPR27               // bit 7, shadows bit in CCP2RLbits
-#define CCP2R7                  CCP2RLbits.CCP2R7               // bit 7, shadows bit in CCP2RLbits
 
 #define CCP1TSEL0               CCPTMRSbits.CCP1TSEL0           // bit 0
 #define CCP1TSEL1               CCPTMRSbits.CCP1TSEL1           // bit 1

@@ -61,7 +61,7 @@ void pic16_genMult8X8_n (operand *, operand *, operand *);
 extern void pic16_printpBlock (FILE * of, pBlock * pb);
 static asmop *newAsmop (short type);
 static pCodeOp *pic16_popRegFromString (char *str, int size, int offset, operand * op);
-extern pCode *pic16_newpCodeAsmDir (char *asdir, char *argfmt, ...);
+extern pCode *pic16_newpCodeAsmDir (const char *asdir, const char *argfmt, ...);
 static void mov2fp (pCodeOp * dst, asmop * src, int offset);
 static pCodeOp *pic16_popRegFromIdx (int rIdx);
 static void genCritical (iCode * ic);
@@ -306,9 +306,10 @@ pic16_emitcode (char *inst, char *fmt, ...)
   if (inst && *inst)
     {
       if (fmt && *fmt)
-        sprintf (lb, "%s\t", inst);
+        SNPRINTF(lb, sizeof(lb), "%s\t", inst);
       else
-        sprintf (lb, "%s", inst);
+        SNPRINTF(lb, sizeof(lb), "%s", inst);
+
       vsprintf (lb + (strlen (lb)), fmt, ap);
     }
   else
@@ -355,7 +356,7 @@ newAsmop (short type)
 {
   asmop *aop;
 
-  aop = Safe_calloc (1, sizeof (asmop));
+  aop = Safe_alloc(sizeof(asmop));
   aop->type = type;
   return aop;
 }
@@ -1311,9 +1312,6 @@ dealloc:
 char *
 pic16_aopGet (asmop * aop, int offset, bool bit16, bool dname)
 {
-  char *s = buffer;
-  char *rs;
-
   //DEBUGpic16_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
 
   /* offset is greater than size then zero */
@@ -1324,16 +1322,14 @@ pic16_aopGet (asmop * aop, int offset, bool bit16, bool dname)
   switch (aop->type)
     {
     case AOP_DIR:
-      if (offset)
+      if (offset > 0)
         {
-          sprintf (s, "(%s + %d)", aop->aopu.aop_dir, offset);
-          DEBUGpic16_emitcode (";", "oops AOP_DIR did this %s\n", s);
+          SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", aop->aopu.aop_dir, offset);
+          DEBUGpic16_emitcode (";", "oops AOP_DIR did this %s\n", buffer);
+          return Safe_strdup(buffer);
         }
       else
-        sprintf (s, "%s", aop->aopu.aop_dir);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+        return Safe_strdup(aop->aopu.aop_dir);
 
     case AOP_REG:
       return aop->aopu.aop_reg[offset]->name;
@@ -1346,14 +1342,11 @@ pic16_aopGet (asmop * aop, int offset, bool bit16, bool dname)
 //        fprintf(stderr, "%s:%d Warning -pic port ignoring get(AOP_ACC)\n",__FILE__, __LINE__);
 //        assert( 0 );
 //      return aop->aopu.aop_str[offset];       //->"AOP_accumulator_bug";
-      rs = Safe_strdup ("WREG");
-      return (rs);
+      return Safe_strdup("WREG");
 
     case AOP_LIT:
-      sprintf (s, "0x%02x", pic16aopLiteral (aop->aopu.aop_lit, offset));
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+      SNPRINTF(buffer, sizeof(buffer), "0x%02x", pic16aopLiteral (aop->aopu.aop_lit, offset));
+      return Safe_strdup(buffer);
 
     case AOP_STR:
       aop->coff = offset;
@@ -1367,7 +1360,6 @@ pic16_aopGet (asmop * aop, int offset, bool bit16, bool dname)
           return Safe_strdup ("_WREG");
         }
       DEBUGpic16_emitcode (";", "%d - %s", __LINE__, aop->aopu.aop_str[offset]);
-
       return aop->aopu.aop_str[offset];
 
     case AOP_PCODE:
@@ -1377,42 +1369,37 @@ pic16_aopGet (asmop * aop, int offset, bool bit16, bool dname)
       if (pcop->name)
         {
           DEBUGpic16_emitcode (";", "%s offset %d", pcop->name, PCOI (pcop)->offset);
-          //sprintf(s,"(%s+0x%02x)", pcop->name,PCOI(aop->aopu.pcop)->offset);
-          if (offset)
+          //SNPRINTF(buffer, sizeof(buffer), "(%s+0x%02x)", pcop->name, PCOI(aop->aopu.pcop)->offset);
+          if (offset > 0)
             {
-              sprintf (s, "(%s + %d)", pic16_get_op (pcop, NULL, 0), offset);
+              SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", pic16_get_op (pcop, NULL, 0), offset);
             }
           else
             {
-              sprintf (s, "%s", pic16_get_op (pcop, NULL, 0));
+              SNPRINTF(buffer, sizeof(buffer), "%s", pic16_get_op (pcop, NULL, 0));
             }
         }
       else
-        sprintf (s, "0x%02x", PCOI (aop->aopu.pcop)->offset);
+        SNPRINTF(buffer, sizeof(buffer), "0x%02x", PCOI (aop->aopu.pcop)->offset);
 
     }
-    rs = Safe_calloc (1, strlen (s) + 1);
-    strcpy (rs, s);
-    return rs;
+    return Safe_strdup(buffer);
 
 #if 0
     case AOP_PAGED:
       DEBUGpic16_emitcode (";", "oops AOP_PAGED did this %s\n", s);
       if (offset)
         {
-          sprintf (s, "(%s + %d)", aop->aopu.aop_dir, offset);
+          SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", aop->aopu.aop_dir, offset);
         }
       else
-        sprintf (s, "%s", aop->aopu.aop_dir);
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_dir);
       DEBUGpic16_emitcode (";", "oops AOP_PAGED did this %s\n", s);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+      return Safe_strdup(buffer);
 #endif
 
     case AOP_STA:
-      rs = Safe_strdup (PCOR (aop->aopu.stk.pop[offset])->r->name);
-      return (rs);
+      return Safe_strdup(PCOR(aop->aopu.stk.pop[offset])->r->name);
 
     case AOP_STK:
 //        pCodeOp *pcop = aop->aop
@@ -1607,9 +1594,9 @@ pic16_popCopyReg (pCodeOpReg * pc)
 {
   pCodeOpReg *pcor;
 
-  pcor = Safe_calloc (1, sizeof (pCodeOpReg));
-  memcpy (pcor, pc, sizeof (pCodeOpReg));
-  pcor->r->wasUsed = 1;
+  pcor = Safe_malloc(sizeof(pCodeOpReg));
+  memcpy(pcor, pc, sizeof(pCodeOpReg));
+  pcor->r->wasUsed = TRUE;
 
   //pcor->pcop.type = pc->pcop.type;
   if (pc->pcop.name)
@@ -1693,7 +1680,7 @@ static pCodeOp *
 pic16_popRegFromString (char *str, int size, int offset, operand * op)
 {
 
-  pCodeOp *pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+  pCodeOp *pcop = Safe_alloc(sizeof(pCodeOpReg));
   pcop->type = PO_DIR;
 
   DEBUGpic16_emitcode (";", "%d %s %s %d/%d", __LINE__, __FUNCTION__, str, size, offset);       // patch 14
@@ -1702,8 +1689,7 @@ pic16_popRegFromString (char *str, int size, int offset, operand * op)
   if (!str)
     str = "BAD_STRING";
 
-  pcop->name = Safe_calloc (1, strlen (str) + 1);
-  strcpy (pcop->name, str);
+  pcop->name = Safe_strdup(str);
 
   //pcop->name = Safe_strdup( ( (str) ? str : "BAD STRING"));
 
@@ -1735,7 +1721,7 @@ pic16_popRegFromIdx (int rIdx)
 //      DEBUGpic16_emitcode ("; ***","%s,%d\trIdx=0x%x", __FUNCTION__,__LINE__,rIdx);
 //      fprintf(stderr, "%s:%d rIdx = 0x%0x\n", __FUNCTION__, __LINE__, rIdx);
 
-  pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+  pcop = Safe_alloc(sizeof(pCodeOpReg));
   PCOR (pcop)->rIdx = rIdx;
   PCOR (pcop)->r = pic16_regWithIdx (rIdx);
   if (!PCOR (pcop)->r)
@@ -1760,8 +1746,6 @@ pic16_popGet2 (asmop * aop_src, asmop * aop_dst, int offset)
   return PCOP (pcop2);
 }
 
-
-
 /*--------------------------------------------------------------------------------.-*/
 /* pic16_popGet2p - a variant of pic16_popGet to handle two memory operand commands */
 /*                  VR 030601 , adapted by Hans Dorn                                */
@@ -1785,7 +1769,6 @@ pic16_popCombine2 (pCodeOpReg * src, pCodeOpReg * dst, int noalloc)
 
   return PCOP (pcop2);
 }
-
 
 /*-----------------------------------------------------------------*/
 /* pic16_popGet - asm operator to pcode operator conversion              */
@@ -1822,7 +1805,7 @@ pic16_popGet (asmop * aop, int offset)  //, bool bit16, bool dname)
 
       DEBUGpic16_emitcode (";", "%d\tAOP_ACC", __LINE__);
 
-      pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+      pcop = Safe_alloc(sizeof(pCodeOpReg));
       PCOR (pcop)->rIdx = rIdx;
       PCOR (pcop)->r = pic16_typeRegWithIdx (rIdx, REG_SFR, 1);       // pic16_regWithIdx(rIdx);
       PCOR (pcop)->r->wasUsed = 1;
@@ -1860,7 +1843,7 @@ pic16_popGet (asmop * aop, int offset)  //, bool bit16, bool dname)
 
       DEBUGpic16_emitcode (";", "%d\tAOP_REG", __LINE__);
 
-      pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+      pcop = Safe_alloc(sizeof(pCodeOpReg));
 //      pcop->type = PO_GPR_REGISTER;
       PCOR (pcop)->rIdx = rIdx;
       PCOR (pcop)->r = pic16_allocWithIdx (rIdx);     //pic16_regWithIdx(rIdx);
@@ -1895,7 +1878,7 @@ pic16_popGet (asmop * aop, int offset)  //, bool bit16, bool dname)
       return pic16_newpCodeOpRegFromStr (aop->aopu.aop_str[offset]);
 
       /*
-         pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+         pcop = Safe_alloc(sizeof(pCodeOpReg));
          PCOR(pcop)->r = pic16_allocRegByName(aop->aopu.aop_str[offset]);
          PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
          pcop->type = PCOR(pcop)->r->pc_type;
@@ -1964,7 +1947,6 @@ pic16_popGetImmed(asmop *aop, int offset, int overload)
 void
 pic16_aopPut (asmop * aop, char *s, int offset)
 {
-  char *d = buffer;
   symbol *lbl;
 
   return;
@@ -1982,21 +1964,21 @@ pic16_aopPut (asmop * aop, char *s, int offset)
   switch (aop->type)
     {
     case AOP_DIR:
-      if (offset)
+      if (offset > 0)
         {
-          sprintf (d, "(%s + %d)", aop->aopu.aop_dir, offset);
+          SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", aop->aopu.aop_dir, offset);
           fprintf (stderr, "oops pic16_aopPut:AOP_DIR did this %s\n", s);
-
         }
       else
-        sprintf (d, "%s", aop->aopu.aop_dir);
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_dir);
 
-      if (strcmp (d, s))
+      if (strcmp(buffer, s))
         {
           DEBUGpic16_emitcode (";", "%d", __LINE__);
           if (strcmp (s, "W"))
             pic16_emitcode ("movf", "%s,w", s);
-          pic16_emitcode ("movwf", "%s", d);
+
+          pic16_emitcode ("movwf", "%s", buffer);
 
           if (strcmp (s, "W"))
             {
@@ -2047,7 +2029,7 @@ pic16_aopPut (asmop * aop, char *s, int offset)
             }
           else if (strcmp (s, "W") == 0)
             {
-              pCodeOp *pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+              pCodeOp *pcop = Safe_alloc(sizeof(pCodeOpReg));
               pcop->type = PO_GPR_REGISTER;
 
               PCOR (pcop)->rIdx = -1;
@@ -2075,7 +2057,6 @@ pic16_aopPut (asmop * aop, char *s, int offset)
         pic16_emitcode ("push", "acc");
       else
         pic16_emitcode ("push", "%s", s);
-
       break;
 
     case AOP_CRY:
@@ -2275,11 +2256,10 @@ pic16_testStackOverflow (void)
     symbol *sym;
 
     sym = newSymbol (GSTACK_TEST_NAME, 0);
-    sprintf (sym->rname, "%s", /*port->fun_prefix, */ GSTACK_TEST_NAME);
+    SNPRINTF(sym->rname, sizeof(sym->rname), "%s", /*port->fun_prefix, */ GSTACK_TEST_NAME);
 //      strcpy(sym->rname, GSTACK_TEST_NAME);
     checkAddSym (&externs, sym);
   }
-
 }
 
 /* push pcop into stack */
@@ -2296,9 +2276,9 @@ pic16_pushpCodeOp (pCodeOp * pcop)
     {
       pic16_emitpcode (POC_MOVFF, pic16_popGet2p (pcop, pic16_popCopyReg (pic16_stack_postdec)));
     }
+
   if (pic16_options.gstack)
     pic16_testStackOverflow ();
-
 }
 
 /* pop pcop from stack */
@@ -3287,9 +3267,9 @@ genFunction (iCode * ic)
       //debugf ("interrupt number: %hhi\n", FUNC_INTNO (sym->type));
 
       if (FUNC_INTNO (sym->type) == INTNO_UNSPEC)
-        sprintf (asymname, "ivec_%s", sym->name);
+        SNPRINTF(asymname, sizeof(asymname), "ivec_%s", sym->name);
       else
-        sprintf (asymname, "ivec_0x%x_%s", FUNC_INTNO (sym->type), sym->name);
+        SNPRINTF(asymname, sizeof(asymname), "ivec_0x%x_%s", FUNC_INTNO (sym->type), sym->name);
 
       /* when an interrupt is declared as naked, do not emit the special
        * wrapper segment at vector address. The user should take care for
@@ -3312,14 +3292,15 @@ genFunction (iCode * ic)
         }
       else
         {
-          sprintf (asymname, "%s", sym->rname);
+          SNPRINTF(asymname, sizeof(asymname), "%s", sym->rname);
         }
 
       {
         absSym *abSym;
 
-        abSym = Safe_calloc (1, sizeof (absSym));
-        strcpy (abSym->name, asymname);
+        abSym = Safe_alloc(sizeof(absSym));
+        strncpy(abSym->name, asymname, sizeof(abSym->name) - 1);
+        abSym->name[sizeof(abSym->name) - 1] = '\0';
 
         switch (FUNC_INTNO (sym->type))
           {

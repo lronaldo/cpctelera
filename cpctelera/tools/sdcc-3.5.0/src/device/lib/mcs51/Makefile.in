@@ -34,10 +34,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcS $@ $(OBJ)
+	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rc $@ $(OBJ)
+	$(top_builddir)/bin/sdar -rcD $@ $(OBJ)
     else
 	rm -f $@
 	for i in $(basename $(OBJ)); do echo $$i >>$@; done

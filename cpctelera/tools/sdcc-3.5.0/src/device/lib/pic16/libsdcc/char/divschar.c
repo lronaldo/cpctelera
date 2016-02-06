@@ -33,7 +33,7 @@
 
 unsigned char _divuchar (unsigned char a, unsigned char b);
 
-int _divschar (char a, char b) _IL_REENTRANT
+int _divschar (signed char a, signed char b) _IL_REENTRANT
 {
   register unsigned char r;
   char ta, tb;
@@ -46,3 +46,4 @@ int _divschar (char a, char b) _IL_REENTRANT
     if ((a < 0) ^ (b < 0)) return -r;
     else return r;
 }
+

@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1707 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:43 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -129,6 +129,7 @@
 #define CCPR2L_ADDR             0x0298
 #define CCPR2H_ADDR             0x0299
 #define CCP2CON_ADDR            0x029A
+#define ECCP2CON_ADDR           0x029A
 #define SLRCONA_ADDR            0x030C
 #define SLRCONB_ADDR            0x030D
 #define SLRCONC_ADDR            0x030E
@@ -161,12 +162,18 @@
 #define RA2PPS_ADDR             0x0E92
 #define RA4PPS_ADDR             0x0E94
 #define RA5PPS_ADDR             0x0E95
+#define RB4PPS_ADDR             0x0E9C
+#define RB5PPS_ADDR             0x0E9D
+#define RB6PPS_ADDR             0x0E9E
+#define RB7PPS_ADDR             0x0E9F
 #define RC0PPS_ADDR             0x0EA0
 #define RC1PPS_ADDR             0x0EA1
 #define RC2PPS_ADDR             0x0EA2
 #define RC3PPS_ADDR             0x0EA3
 #define RC4PPS_ADDR             0x0EA4
 #define RC5PPS_ADDR             0x0EA5
+#define RC6PPS_ADDR             0x0EA6
+#define RC7PPS_ADDR             0x0EA7
 #define ICDBK0H_ADDR            0x0F9E
 #define STATUS_SHAD_ADDR        0x0FE4
 #define WREG_SHAD_ADDR          0x0FE5
@@ -2566,6 +2573,65 @@ extern __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
 
 
 //==============================================================================
+//        ECCP2CON Bits
+
+extern __at(0x029A) __sfr ECCP2CON;
+
+typedef union
+  {
+  struct
+    {
+    unsigned CCP2M0             : 1;
+    unsigned CCP2M1             : 1;
+    unsigned CCP2M2             : 1;
+    unsigned CCP2M3             : 1;
+    unsigned DC2B0              : 1;
+    unsigned DC2B1              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned CCP2Y              : 1;
+    unsigned CCP2X              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned CCP2M              : 4;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned DC2B               : 2;
+    unsigned                    : 2;
+    };
+  } __ECCP2CONbits_t;
+
+extern __at(0x029A) volatile __ECCP2CONbits_t ECCP2CONbits;
+
+#define _ECCP2CON_CCP2M0        0x01
+#define _ECCP2CON_CCP2M1        0x02
+#define _ECCP2CON_CCP2M2        0x04
+#define _ECCP2CON_CCP2M3        0x08
+#define _ECCP2CON_DC2B0         0x10
+#define _ECCP2CON_CCP2Y         0x10
+#define _ECCP2CON_DC2B1         0x20
+#define _ECCP2CON_CCP2X         0x20
+
+//==============================================================================
+
+
+//==============================================================================
 //        SLRCONA Bits
 
 extern __at(0x030C) __sfr SLRCONA;
@@ -3146,12 +3212,18 @@ extern __at(0x0E91) __sfr RA1PPS;
 extern __at(0x0E92) __sfr RA2PPS;
 extern __at(0x0E94) __sfr RA4PPS;
 extern __at(0x0E95) __sfr RA5PPS;
+extern __at(0x0E9C) __sfr RB4PPS;
+extern __at(0x0E9D) __sfr RB5PPS;
+extern __at(0x0E9E) __sfr RB6PPS;
+extern __at(0x0E9F) __sfr RB7PPS;
 extern __at(0x0EA0) __sfr RC0PPS;
 extern __at(0x0EA1) __sfr RC1PPS;
 extern __at(0x0EA2) __sfr RC2PPS;
 extern __at(0x0EA3) __sfr RC3PPS;
 extern __at(0x0EA4) __sfr RC4PPS;
 extern __at(0x0EA5) __sfr RC5PPS;
+extern __at(0x0EA6) __sfr RC6PPS;
+extern __at(0x0EA7) __sfr RC7PPS;
 
 //==============================================================================
 //        ICDBK0H Bits

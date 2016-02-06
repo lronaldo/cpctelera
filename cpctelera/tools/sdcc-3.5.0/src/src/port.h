@@ -321,6 +321,8 @@ typedef struct
       Used so that 'reg_info' can be an incomplete type. */
   const char *(*getRegName) (const struct reg_info *reg);
 
+  int (*getRegByName) (const char *name);
+
   /** Try to keep track of register contents. */
   bool (*rtrackUpdate)(const char* line);
 
@@ -399,7 +401,7 @@ typedef struct
   int num_regs;                 /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
 
 #define PORT_MAGIC 0xAC32
-  /** Used at runtime to detect if this structure has been completly filled in. */
+  /** Used at runtime to detect if this structure has been completely filled in. */
   int magic;
 }
 PORT;

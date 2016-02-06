@@ -139,8 +139,8 @@ void emitpcode_real(PIC_OPCODE poc, pCodeOp *pcop);
 #define emitpcode(poc,pcop)     do { if (options.debug || debug_verbose) { emitpComment (" >>> %s:%d:%s", __FILE__, __LINE__, __FUNCTION__); } emitpcode_real(poc,pcop); } while(0)
 void emitpComment (const char *fmt, ...);
 void emitpLabel(int key);
-void pic14_emitcode (char *inst,char *fmt, ...);
-void DEBUGpic14_emitcode (char *inst,char *fmt, ...);
+void pic14_emitcode (const char *inst, const char *fmt, ...);
+void DEBUGpic14_emitcode (const char *inst, const char *fmt, ...);
 void pic14_emitDebuggerSymbol (const char *);
 bool pic14_sameRegs (asmop *aop1, asmop *aop2 );
 char *aopGet (asmop *aop, int offset, bool bit16, bool dname);
@@ -150,12 +150,12 @@ void genpic14Code (iCode *lic);
 
 pCodeOp *popGet (asmop *aop, int offset);//, bool bit16, bool dname);
 pCodeOp *popGetAddr (asmop *aop, int offset, int index);
-pCodeOp *popGetExternal (char *str, int isReg);
+pCodeOp *popGetExternal (const char *str, int isReg);
 pCodeOp *popGetLabel(unsigned int key);
 pCodeOp *popGetLit(unsigned int lit);
 
 
-void aopPut (asmop *aop, char *s, int offset);
+void aopPut (asmop *aop, const char *s, int offset);
 void pic14_outAcc(operand *result);
 void aopOp (operand *op, iCode *ic, bool result);
 void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);

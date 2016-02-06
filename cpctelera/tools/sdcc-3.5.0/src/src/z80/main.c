@@ -536,7 +536,7 @@ _parseOptions (int *pargc, char **argv, int *i)
               return TRUE;
             }
         }
-	  else if (!strncmp (argv[*i], OPTION_EMIT_EXTERNS, sizeof (OPTION_EMIT_EXTERNS) - 1))
+      else if (!strncmp (argv[*i], OPTION_EMIT_EXTERNS, sizeof (OPTION_EMIT_EXTERNS) - 1))
         {
           port->assembler.externGlobal = 1;
           return TRUE;
@@ -712,6 +712,30 @@ _getRegName (const struct reg_info *reg)
     }
   /*  assert (0); */
   return "err";
+}
+
+static int
+_getRegByName (const char *name)
+{
+  if (!strcmp (name, "c"))
+    return 0;
+  if (!strcmp (name, "b"))
+    return 1;
+  if (!strcmp (name, "e"))
+    return 2;
+  if (!strcmp (name, "d"))
+    return 3;
+  if (!strcmp (name, "l"))
+    return 4;
+  if (!strcmp (name, "h"))
+    return 5;
+  if (!strcmp (name, "iyl"))
+    return 6;
+  if (!strcmp (name, "iyh"))
+    return 7;
+  if (!strcmp (name, "a"))
+    return port->num_regs - 1;
+  return -1;
 }
 
 static bool
@@ -916,6 +940,7 @@ PORT z80_port =
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  _getRegByName,
   NULL,
   _keywords,
   0,                            /* no assembler preamble */
@@ -1044,6 +1069,7 @@ PORT z180_port =
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  _getRegByName,
   NULL,
   _keywords,
   0,                            /* no assembler preamble */
@@ -1171,6 +1197,7 @@ PORT r2k_port =
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  _getRegByName,
   NULL,
   _keywords,
   0,                            /* no assembler preamble */
@@ -1299,6 +1326,7 @@ PORT r3ka_port =
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  _getRegByName,
   NULL,
   _keywords,
   0,                            /* no assembler preamble */
@@ -1429,6 +1457,7 @@ PORT gbz80_port =
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  _getRegByName,
   NULL,
   _keywordsgb,
   0,                            /* no assembler preamble */
@@ -1557,6 +1586,7 @@ PORT tlcs90_port =
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  _getRegByName,
   NULL,
   _keywords,
   0,                            /* no assembler preamble */

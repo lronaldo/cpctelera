@@ -61,10 +61,10 @@ ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(STM8OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
-	$(top_builddir)/bin/sdar -rcS $@ $(OBJ) $(STM8OBJECTS)
+	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ) $(STM8OBJECTS)
   else
     ifeq ($(LIB_TYPE), RANLIB)
-	$(top_builddir)/bin/sdar -rc $@ $(OBJ) $(STM8OBJECTS)
+	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(STM8OBJECTS)
     else
 	rm -f $@
 	for i in $(basename $(OBJ) $(STM8OBJECTS)); do echo $$i >>$@; done

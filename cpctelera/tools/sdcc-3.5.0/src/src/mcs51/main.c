@@ -886,6 +886,7 @@ PORT mcs51_port =
   _mcs51_setDefaultOptions,
   mcs51_assignRegisters,
   _mcs51_getRegName,
+  0,
   _mcs51_rtrackUpdate,
   _mcs51_keywords,
   _mcs51_genAssemblerPreamble,

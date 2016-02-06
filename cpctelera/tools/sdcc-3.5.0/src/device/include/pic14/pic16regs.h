@@ -2,7 +2,7 @@
  *
  * This file is generated automatically by the device-manager.pl program.
  *
- * Copyright (C) 2012-2014, Molnar Karoly <molnarkaroly@users.sf.net>
+ * Copyright (C) 2012-2016, Molnar Karoly <molnarkaroly@users.sf.net>
  *
  */
 
@@ -14,6 +14,12 @@
 
 #elif defined(__SDCC_PIC10F322)
   #include <pic10f322.h>
+
+#elif defined(__SDCC_PIC10LF320)
+  #include <pic10lf320.h>
+
+#elif defined(__SDCC_PIC10LF322)
+  #include <pic10lf322.h>
 
 #elif defined(__SDCC_PIC12F609)
   #include <pic12f609.h>
@@ -38,6 +44,54 @@
 
 #elif defined(__SDCC_PIC12F752)
   #include <pic12f752.h>
+
+#elif defined(__SDCC_PIC12F1501)
+  #include <pic12f1501.h>
+
+#elif defined(__SDCC_PIC12F1571)
+  #include <pic12f1571.h>
+
+#elif defined(__SDCC_PIC12F1572)
+  #include <pic12f1572.h>
+
+#elif defined(__SDCC_PIC12F1612)
+  #include <pic12f1612.h>
+
+#elif defined(__SDCC_PIC12F1822)
+  #include <pic12f1822.h>
+
+#elif defined(__SDCC_PIC12F1840)
+  #include <pic12f1840.h>
+
+#elif defined(__SDCC_PIC12HV752)
+  #include <pic12hv752.h>
+
+#elif defined(__SDCC_PIC12LF1501)
+  #include <pic12lf1501.h>
+
+#elif defined(__SDCC_PIC12LF1552)
+  #include <pic12lf1552.h>
+
+#elif defined(__SDCC_PIC12LF1571)
+  #include <pic12lf1571.h>
+
+#elif defined(__SDCC_PIC12LF1572)
+  #include <pic12lf1572.h>
+
+#elif defined(__SDCC_PIC12LF1612)
+  #include <pic12lf1612.h>
+
+#elif defined(__SDCC_PIC12LF1822)
+  #include <pic12lf1822.h>
+
+#elif defined(__SDCC_PIC12LF1840)
+  #include <pic12lf1840.h>
+
+#elif defined(__SDCC_PIC12LF1840T39A)
+  #include <pic12lf1840t39a.h>
+
+#elif defined(__SDCC_PIC12LF1840T48A)
+  #include <pic12lf1840t48a.h>
 
 #elif defined(__SDCC_PIC16C62)
   #include <pic16c62.h>
@@ -339,33 +393,6 @@
 #elif defined(__SDCC_PIC16F946)
   #include <pic16f946.h>
 
-#elif defined(__SDCC_PIC16HV616)
-  #include <pic16hv616.h>
-
-#elif defined(__SDCC_PIC16HV753)
-  #include <pic16hv753.h>
-
-#elif defined(__SDCC_PIC12F1501)
-  #include <pic12f1501.h>
-
-#elif defined(__SDCC_PIC12F1571)
-  #include <pic12f1571.h>
-
-#elif defined(__SDCC_PIC12F1572)
-  #include <pic12f1572.h>
-
-#elif defined(__SDCC_PIC12F1612)
-  #include <pic12f1612.h>
-
-#elif defined(__SDCC_PIC12F1822)
-  #include <pic12f1822.h>
-
-#elif defined(__SDCC_PIC12F1840)
-  #include <pic12f1840.h>
-
-#elif defined(__SDCC_PIC12LF1552)
-  #include <pic12lf1552.h>
-
 #elif defined(__SDCC_PIC16F1454)
   #include <pic16f1454.h>
 
@@ -414,8 +441,32 @@
 #elif defined(__SDCC_PIC16F1527)
   #include <pic16f1527.h>
 
+#elif defined(__SDCC_PIC16F1574)
+  #include <pic16f1574.h>
+
+#elif defined(__SDCC_PIC16F1575)
+  #include <pic16f1575.h>
+
+#elif defined(__SDCC_PIC16F1578)
+  #include <pic16f1578.h>
+
+#elif defined(__SDCC_PIC16F1579)
+  #include <pic16f1579.h>
+
 #elif defined(__SDCC_PIC16F1613)
   #include <pic16f1613.h>
+
+#elif defined(__SDCC_PIC16F1614)
+  #include <pic16f1614.h>
+
+#elif defined(__SDCC_PIC16F1615)
+  #include <pic16f1615.h>
+
+#elif defined(__SDCC_PIC16F1618)
+  #include <pic16f1618.h>
+
+#elif defined(__SDCC_PIC16F1619)
+  #include <pic16f1619.h>
 
 #elif defined(__SDCC_PIC16F1703)
   #include <pic16f1703.h>
@@ -449,6 +500,33 @@
 
 #elif defined(__SDCC_PIC16F1719)
   #include <pic16f1719.h>
+
+#elif defined(__SDCC_PIC16F1764)
+  #include <pic16f1764.h>
+
+#elif defined(__SDCC_PIC16F1765)
+  #include <pic16f1765.h>
+
+#elif defined(__SDCC_PIC16F1768)
+  #include <pic16f1768.h>
+
+#elif defined(__SDCC_PIC16F1769)
+  #include <pic16f1769.h>
+
+#elif defined(__SDCC_PIC16F1773)
+  #include <pic16f1773.h>
+
+#elif defined(__SDCC_PIC16F1776)
+  #include <pic16f1776.h>
+
+#elif defined(__SDCC_PIC16F1777)
+  #include <pic16f1777.h>
+
+#elif defined(__SDCC_PIC16F1778)
+  #include <pic16f1778.h>
+
+#elif defined(__SDCC_PIC16F1779)
+  #include <pic16f1779.h>
 
 #elif defined(__SDCC_PIC16F1782)
   #include <pic16f1782.h>
@@ -492,6 +570,9 @@
 #elif defined(__SDCC_PIC16F1829)
   #include <pic16f1829.h>
 
+#elif defined(__SDCC_PIC16F1829LIN)
+  #include <pic16f1829lin.h>
+
 #elif defined(__SDCC_PIC16F1847)
   #include <pic16f1847.h>
 
@@ -519,17 +600,344 @@
 #elif defined(__SDCC_PIC16F1947)
   #include <pic16f1947.h>
 
+#elif defined(__SDCC_PIC16F18313)
+  #include <pic16f18313.h>
+
+#elif defined(__SDCC_PIC16F18323)
+  #include <pic16f18323.h>
+
+#elif defined(__SDCC_PIC16F18324)
+  #include <pic16f18324.h>
+
+#elif defined(__SDCC_PIC16F18325)
+  #include <pic16f18325.h>
+
+#elif defined(__SDCC_PIC16F18344)
+  #include <pic16f18344.h>
+
+#elif defined(__SDCC_PIC16F18345)
+  #include <pic16f18345.h>
+
+#elif defined(__SDCC_PIC16F18855)
+  #include <pic16f18855.h>
+
+#elif defined(__SDCC_PIC16F18875)
+  #include <pic16f18875.h>
+
+#elif defined(__SDCC_PIC16HV616)
+  #include <pic16hv616.h>
+
+#elif defined(__SDCC_PIC16HV753)
+  #include <pic16hv753.h>
+
+#elif defined(__SDCC_PIC16LF74)
+  #include <pic16lf74.h>
+
+#elif defined(__SDCC_PIC16LF76)
+  #include <pic16lf76.h>
+
+#elif defined(__SDCC_PIC16LF77)
+  #include <pic16lf77.h>
+
+#elif defined(__SDCC_PIC16LF84)
+  #include <pic16lf84.h>
+
+#elif defined(__SDCC_PIC16LF84A)
+  #include <pic16lf84a.h>
+
+#elif defined(__SDCC_PIC16LF87)
+  #include <pic16lf87.h>
+
+#elif defined(__SDCC_PIC16LF88)
+  #include <pic16lf88.h>
+
+#elif defined(__SDCC_PIC16LF627)
+  #include <pic16lf627.h>
+
+#elif defined(__SDCC_PIC16LF627A)
+  #include <pic16lf627a.h>
+
+#elif defined(__SDCC_PIC16LF628)
+  #include <pic16lf628.h>
+
+#elif defined(__SDCC_PIC16LF628A)
+  #include <pic16lf628a.h>
+
+#elif defined(__SDCC_PIC16LF648A)
+  #include <pic16lf648a.h>
+
+#elif defined(__SDCC_PIC16LF707)
+  #include <pic16lf707.h>
+
+#elif defined(__SDCC_PIC16LF720)
+  #include <pic16lf720.h>
+
+#elif defined(__SDCC_PIC16LF721)
+  #include <pic16lf721.h>
+
+#elif defined(__SDCC_PIC16LF722)
+  #include <pic16lf722.h>
+
+#elif defined(__SDCC_PIC16LF722A)
+  #include <pic16lf722a.h>
+
+#elif defined(__SDCC_PIC16LF723)
+  #include <pic16lf723.h>
+
+#elif defined(__SDCC_PIC16LF723A)
+  #include <pic16lf723a.h>
+
+#elif defined(__SDCC_PIC16LF724)
+  #include <pic16lf724.h>
+
+#elif defined(__SDCC_PIC16LF726)
+  #include <pic16lf726.h>
+
+#elif defined(__SDCC_PIC16LF727)
+  #include <pic16lf727.h>
+
+#elif defined(__SDCC_PIC16LF747)
+  #include <pic16lf747.h>
+
+#elif defined(__SDCC_PIC16LF767)
+  #include <pic16lf767.h>
+
+#elif defined(__SDCC_PIC16LF777)
+  #include <pic16lf777.h>
+
+#elif defined(__SDCC_PIC16LF818)
+  #include <pic16lf818.h>
+
+#elif defined(__SDCC_PIC16LF819)
+  #include <pic16lf819.h>
+
+#elif defined(__SDCC_PIC16LF870)
+  #include <pic16lf870.h>
+
+#elif defined(__SDCC_PIC16LF871)
+  #include <pic16lf871.h>
+
+#elif defined(__SDCC_PIC16LF872)
+  #include <pic16lf872.h>
+
+#elif defined(__SDCC_PIC16LF873)
+  #include <pic16lf873.h>
+
+#elif defined(__SDCC_PIC16LF873A)
+  #include <pic16lf873a.h>
+
+#elif defined(__SDCC_PIC16LF874)
+  #include <pic16lf874.h>
+
+#elif defined(__SDCC_PIC16LF874A)
+  #include <pic16lf874a.h>
+
+#elif defined(__SDCC_PIC16LF876)
+  #include <pic16lf876.h>
+
+#elif defined(__SDCC_PIC16LF876A)
+  #include <pic16lf876a.h>
+
+#elif defined(__SDCC_PIC16LF877)
+  #include <pic16lf877.h>
+
+#elif defined(__SDCC_PIC16LF877A)
+  #include <pic16lf877a.h>
+
+#elif defined(__SDCC_PIC16LF1454)
+  #include <pic16lf1454.h>
+
+#elif defined(__SDCC_PIC16LF1455)
+  #include <pic16lf1455.h>
+
+#elif defined(__SDCC_PIC16LF1458)
+  #include <pic16lf1458.h>
+
+#elif defined(__SDCC_PIC16LF1459)
+  #include <pic16lf1459.h>
+
+#elif defined(__SDCC_PIC16LF1503)
+  #include <pic16lf1503.h>
+
+#elif defined(__SDCC_PIC16LF1507)
+  #include <pic16lf1507.h>
+
+#elif defined(__SDCC_PIC16LF1508)
+  #include <pic16lf1508.h>
+
+#elif defined(__SDCC_PIC16LF1509)
+  #include <pic16lf1509.h>
+
+#elif defined(__SDCC_PIC16LF1512)
+  #include <pic16lf1512.h>
+
+#elif defined(__SDCC_PIC16LF1513)
+  #include <pic16lf1513.h>
+
+#elif defined(__SDCC_PIC16LF1516)
+  #include <pic16lf1516.h>
+
+#elif defined(__SDCC_PIC16LF1517)
+  #include <pic16lf1517.h>
+
+#elif defined(__SDCC_PIC16LF1518)
+  #include <pic16lf1518.h>
+
+#elif defined(__SDCC_PIC16LF1519)
+  #include <pic16lf1519.h>
+
+#elif defined(__SDCC_PIC16LF1526)
+  #include <pic16lf1526.h>
+
+#elif defined(__SDCC_PIC16LF1527)
+  #include <pic16lf1527.h>
+
 #elif defined(__SDCC_PIC16LF1554)
   #include <pic16lf1554.h>
 
 #elif defined(__SDCC_PIC16LF1559)
   #include <pic16lf1559.h>
 
+#elif defined(__SDCC_PIC16LF1566)
+  #include <pic16lf1566.h>
+
+#elif defined(__SDCC_PIC16LF1567)
+  #include <pic16lf1567.h>
+
+#elif defined(__SDCC_PIC16LF1574)
+  #include <pic16lf1574.h>
+
+#elif defined(__SDCC_PIC16LF1575)
+  #include <pic16lf1575.h>
+
+#elif defined(__SDCC_PIC16LF1578)
+  #include <pic16lf1578.h>
+
+#elif defined(__SDCC_PIC16LF1579)
+  #include <pic16lf1579.h>
+
+#elif defined(__SDCC_PIC16LF1613)
+  #include <pic16lf1613.h>
+
+#elif defined(__SDCC_PIC16LF1614)
+  #include <pic16lf1614.h>
+
+#elif defined(__SDCC_PIC16LF1615)
+  #include <pic16lf1615.h>
+
+#elif defined(__SDCC_PIC16LF1618)
+  #include <pic16lf1618.h>
+
+#elif defined(__SDCC_PIC16LF1619)
+  #include <pic16lf1619.h>
+
+#elif defined(__SDCC_PIC16LF1703)
+  #include <pic16lf1703.h>
+
 #elif defined(__SDCC_PIC16LF1704)
   #include <pic16lf1704.h>
 
+#elif defined(__SDCC_PIC16LF1705)
+  #include <pic16lf1705.h>
+
+#elif defined(__SDCC_PIC16LF1707)
+  #include <pic16lf1707.h>
+
 #elif defined(__SDCC_PIC16LF1708)
   #include <pic16lf1708.h>
+
+#elif defined(__SDCC_PIC16LF1709)
+  #include <pic16lf1709.h>
+
+#elif defined(__SDCC_PIC16LF1713)
+  #include <pic16lf1713.h>
+
+#elif defined(__SDCC_PIC16LF1716)
+  #include <pic16lf1716.h>
+
+#elif defined(__SDCC_PIC16LF1717)
+  #include <pic16lf1717.h>
+
+#elif defined(__SDCC_PIC16LF1718)
+  #include <pic16lf1718.h>
+
+#elif defined(__SDCC_PIC16LF1719)
+  #include <pic16lf1719.h>
+
+#elif defined(__SDCC_PIC16LF1764)
+  #include <pic16lf1764.h>
+
+#elif defined(__SDCC_PIC16LF1765)
+  #include <pic16lf1765.h>
+
+#elif defined(__SDCC_PIC16LF1768)
+  #include <pic16lf1768.h>
+
+#elif defined(__SDCC_PIC16LF1769)
+  #include <pic16lf1769.h>
+
+#elif defined(__SDCC_PIC16LF1773)
+  #include <pic16lf1773.h>
+
+#elif defined(__SDCC_PIC16LF1776)
+  #include <pic16lf1776.h>
+
+#elif defined(__SDCC_PIC16LF1777)
+  #include <pic16lf1777.h>
+
+#elif defined(__SDCC_PIC16LF1778)
+  #include <pic16lf1778.h>
+
+#elif defined(__SDCC_PIC16LF1779)
+  #include <pic16lf1779.h>
+
+#elif defined(__SDCC_PIC16LF1782)
+  #include <pic16lf1782.h>
+
+#elif defined(__SDCC_PIC16LF1783)
+  #include <pic16lf1783.h>
+
+#elif defined(__SDCC_PIC16LF1784)
+  #include <pic16lf1784.h>
+
+#elif defined(__SDCC_PIC16LF1786)
+  #include <pic16lf1786.h>
+
+#elif defined(__SDCC_PIC16LF1787)
+  #include <pic16lf1787.h>
+
+#elif defined(__SDCC_PIC16LF1788)
+  #include <pic16lf1788.h>
+
+#elif defined(__SDCC_PIC16LF1789)
+  #include <pic16lf1789.h>
+
+#elif defined(__SDCC_PIC16LF1823)
+  #include <pic16lf1823.h>
+
+#elif defined(__SDCC_PIC16LF1824)
+  #include <pic16lf1824.h>
+
+#elif defined(__SDCC_PIC16LF1824T39A)
+  #include <pic16lf1824t39a.h>
+
+#elif defined(__SDCC_PIC16LF1825)
+  #include <pic16lf1825.h>
+
+#elif defined(__SDCC_PIC16LF1826)
+  #include <pic16lf1826.h>
+
+#elif defined(__SDCC_PIC16LF1827)
+  #include <pic16lf1827.h>
+
+#elif defined(__SDCC_PIC16LF1828)
+  #include <pic16lf1828.h>
+
+#elif defined(__SDCC_PIC16LF1829)
+  #include <pic16lf1829.h>
+
+#elif defined(__SDCC_PIC16LF1847)
+  #include <pic16lf1847.h>
 
 #elif defined(__SDCC_PIC16LF1902)
   #include <pic16lf1902.h>
@@ -545,6 +953,54 @@
 
 #elif defined(__SDCC_PIC16LF1907)
   #include <pic16lf1907.h>
+
+#elif defined(__SDCC_PIC16LF1933)
+  #include <pic16lf1933.h>
+
+#elif defined(__SDCC_PIC16LF1934)
+  #include <pic16lf1934.h>
+
+#elif defined(__SDCC_PIC16LF1936)
+  #include <pic16lf1936.h>
+
+#elif defined(__SDCC_PIC16LF1937)
+  #include <pic16lf1937.h>
+
+#elif defined(__SDCC_PIC16LF1938)
+  #include <pic16lf1938.h>
+
+#elif defined(__SDCC_PIC16LF1939)
+  #include <pic16lf1939.h>
+
+#elif defined(__SDCC_PIC16LF1946)
+  #include <pic16lf1946.h>
+
+#elif defined(__SDCC_PIC16LF1947)
+  #include <pic16lf1947.h>
+
+#elif defined(__SDCC_PIC16LF18313)
+  #include <pic16lf18313.h>
+
+#elif defined(__SDCC_PIC16LF18323)
+  #include <pic16lf18323.h>
+
+#elif defined(__SDCC_PIC16LF18324)
+  #include <pic16lf18324.h>
+
+#elif defined(__SDCC_PIC16LF18325)
+  #include <pic16lf18325.h>
+
+#elif defined(__SDCC_PIC16LF18344)
+  #include <pic16lf18344.h>
+
+#elif defined(__SDCC_PIC16LF18345)
+  #include <pic16lf18345.h>
+
+#elif defined(__SDCC_PIC16LF18855)
+  #include <pic16lf18855.h>
+
+#elif defined(__SDCC_PIC16LF18875)
+  #include <pic16lf18875.h>
 
 #else
   #error The sdcc is not supported by this processor!

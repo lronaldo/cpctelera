@@ -2,7 +2,7 @@
 
 =back
 
-  Copyright (C) 2013-2014, Molnar Karoly <molnarkaroly@users.sf.net>
+  Copyright (C) 2013-2016, Molnar Karoly <molnarkaroly@users.sf.net>
 
     This software is provided 'as-is', without any express or implied
     warranty.  In no event will the authors be held liable for any damages
@@ -29,11 +29,12 @@
 
     Proposal for use: ./z80-disasm.pl program.hex > program.dasm
 
-  $Id: z80-disasm.pl 9007 2014-04-21 17:26:49Z molnarkaroly $
+  $Id: z80-disasm.pl 9450 2016-01-09 16:47:43Z molnarkaroly $
 =cut
 
 use strict;
 use warnings;
+no if $] >= 5.018, warnings => "experimental::smartmatch";        # perl 5.16
 use 5.12.0;                     # when (regex)
 
 use constant FALSE	=> 0;
@@ -322,7 +323,7 @@ sub _defined($)
 
 sub define($)
   {
-  my ($Name) = ($_[0] =~ /^(\S+)/o);
+  my ($Name) = ($_[0] =~ /^(\S+)/op);
   my $Body = ${^POSTMATCH};
 
   $Body =~ s/^\s+//o;
@@ -1647,7 +1648,14 @@ sub CB_prefix_decoder()
 
 	$i_reg = $core_registers8[$dcd_instr_z];
 	$reg = $i_reg->{EXPL};
-	$str = sprintf $i_shift->{EXPL}, $reg, $reg;
+	if ($dcd_instr_y == 0)
+	  {
+	  $str = sprintf $i_shift->{EXPL}, $reg, $reg;
+	  }
+	else
+	  {
+	  $str = sprintf $i_shift->{EXPL}, $reg;
+	  }
 	print_3($i_shift->{INSTR}, $i_reg->{NAME}, $str);
 	}
       }
@@ -4025,7 +4033,7 @@ sub add_instr_block($)
 
   $instr_size  = determine_instr_size();
 
-  if (! $instr_size)
+  if ($instr_size == 0)
     {
     $instr_size = 1;
     add_block($Address, BLOCK_CONST, $instr_size, BL_TYPE_NONE, '');
@@ -4800,12 +4808,12 @@ for (my $i = 0; $i < @ARGV; )
 
       if ($rom_size < 1024)
 	{
-	printf STDERR "$PROGRAM: Code size of the MCS51 family greater than 1024 bytes!\n";
+	printf STDERR "$PROGRAM: Code size of the Z80 family greater than 1024 bytes!\n";
 	exit(1);
 	}
       elsif ($rom_size > Z80_ROM_SIZE)
 	{
-	printf STDERR "$PROGRAM: Code size of the MCS51 family not greater %u bytes!\n", Z80_ROM_SIZE;
+	printf STDERR "$PROGRAM: Code size of the Z80 family not greater %u bytes!\n", Z80_ROM_SIZE;
 	exit(1);
 	}
       }

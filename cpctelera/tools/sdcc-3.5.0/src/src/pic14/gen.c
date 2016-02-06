@@ -46,9 +46,10 @@
 extern struct dbuf_s *codeOutBuf;
 extern set *externs;
 
+static PIC_device *pic = NULL;
 
-static pCodeOp *popGetImmd (char *name, unsigned int offset, int index, int is_func);
-static pCodeOp *popRegFromString (char *str, int size, int offset);
+static pCodeOp *popGetImmd (const char *name, unsigned int offset, int index, int is_func);
+static pCodeOp *popRegFromString (const char *str, int size, int offset);
 static int aop_isLitLike (asmop * aop);
 static void genCritical (iCode * ic);
 static void genEndCritical (iCode * ic);
@@ -97,7 +98,7 @@ typedef struct resolvedIfx
 static pBlock *pb;
 
 /*-----------------------------------------------------------------*/
-/*  my_powof2(n) - If `n' is an integaer power of 2, then the      */
+/*  my_powof2(n) - If `n' is an integer power of 2, then the       */
 /*                 exponent of 2 is returned, otherwise -1 is      */
 /*                 returned.                                       */
 /* note that this is similar to the function `powof2' in SDCCsymt  */
@@ -158,7 +159,7 @@ DEBUGpic14_AopTypeSign (int line_no, operand * left, operand * right, operand * 
 }
 
 void
-DEBUGpic14_emitcode (char *inst, char *fmt, ...)
+DEBUGpic14_emitcode (const char *inst, const char *fmt, ...)
 {
   va_list ap;
 
@@ -209,12 +210,12 @@ emitpcode_real (PIC_OPCODE poc, pCodeOp * pcop)
     addpCode2pBlock (pb, newpCode (poc, pcop));
   else
     {
-      static int has_warned = 0;
+      static int has_warned = FALSE;
 
       DEBUGpic14_emitcode (";", "%s  ignoring NULL pcop", __FUNCTION__);
       if (!has_warned)
         {
-          has_warned = 1;
+          has_warned = TRUE;
           fprintf (stderr, "WARNING: encountered NULL pcop--this is probably a compiler bug...\n");
         }
     }
@@ -230,7 +231,7 @@ emitpcodeNULLop (PIC_OPCODE poc)
 /* pic14_emitcode - writes the code into a file : for now it is simple    */
 /*-----------------------------------------------------------------*/
 void
-pic14_emitcode (char *inst, char *fmt, ...)
+pic14_emitcode (const char *inst, const char *fmt, ...)
 {
   va_list ap;
 
@@ -249,9 +250,9 @@ pic14_emitcode (char *inst, char *fmt, ...)
 void
 pic14_emitDebuggerSymbol (const char *debugSym)
 {
-  genLine.lineElement.isDebug = 1;
+  genLine.lineElement.isDebug = TRUE;
   pic14_emitcode ("", ";%s ==.", debugSym);
-  genLine.lineElement.isDebug = 0;
+  genLine.lineElement.isDebug = FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -262,7 +263,7 @@ newAsmop (short type)
 {
   asmop *aop;
 
-  aop = Safe_calloc (1, sizeof (asmop));
+  aop = Safe_alloc(sizeof(asmop));
   aop->type = type;
   return aop;
 }
@@ -279,8 +280,8 @@ resolveIfx (resolvedIfx * resIfx, iCode * ifx)
 
   //  DEBUGpic14_emitcode("; ***","%s %d",__FUNCTION__,__LINE__);
 
-  resIfx->condition = 1;        /* assume that the ifx is true */
-  resIfx->generated = 0;        /* indicate that the ifx has not been used */
+  resIfx->condition = TRUE;     /* assume that the ifx is true */
+  resIfx->generated = FALSE;    /* indicate that the ifx has not been used */
 
   if (!ifx)
     {
@@ -295,7 +296,7 @@ resolveIfx (resolvedIfx * resIfx, iCode * ifx)
       else
         {
           resIfx->lbl = IC_FALSE (ifx);
-          resIfx->condition = 0;
+          resIfx->condition = FALSE;
         }
     }
 
@@ -335,7 +336,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_PCODE);
       aop->aopu.pcop = popGetImmd (sym->rname, 0, 0, 1);
       PCOI (aop->aopu.pcop)->_const = IN_CODESPACE (space);
-      PCOI (aop->aopu.pcop)->_function = 1;
+      PCOI (aop->aopu.pcop)->_function = TRUE;
       PCOI (aop->aopu.pcop)->index = 0;
       aop->size = FPTRSIZE;
       DEBUGpic14_emitcode (";", "%d size = %d, name =%s", __LINE__, aop->size, sym->rname);
@@ -347,7 +348,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_PCODE);
       aop->aopu.pcop = popGetImmd (sym->rname, 0, 0, 1);
       PCOI (aop->aopu.pcop)->_const = IN_CODESPACE (space);
-      PCOI (aop->aopu.pcop)->_function = 0;
+      PCOI (aop->aopu.pcop)->_function = FALSE;
       PCOI (aop->aopu.pcop)->index = 0;
       aop->size = getSize (sym->etype) * DCL_ELEM (sym->type);
 
@@ -371,7 +372,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 
   /* if it is in code space */
   if (IN_CODESPACE (space))
-    aop->code = 1;
+    aop->code = TRUE;
 
   return aop;
 }
@@ -714,7 +715,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
   if (!aop)
     return;
 
-  aop->freed = 1;
+  aop->freed = TRUE;
 
   /* all other cases just dealloc */
   if (op)
@@ -766,9 +767,6 @@ pic14aopLiteral (value * val, int offset)
 char *
 aopGet (asmop * aop, int offset, bool bit16, bool dname)
 {
-  char *s = buffer;
-  char *rs;
-
   //DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   /* offset is greater than
      size then zero */
@@ -778,31 +776,26 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
 
   /* depending on type */
   switch (aop->type)
-    {
-
+  {
     case AOP_IMMD:
       if (bit16)
-        sprintf (s, "%s", aop->aopu.aop_immd);
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_immd);
       else if (offset)
-        sprintf (s, "(%s >> %d)", aop->aopu.aop_immd, offset * 8);
+        SNPRINTF(buffer, sizeof(buffer), "(%s >> %d)", aop->aopu.aop_immd, offset * 8);
       else
-        sprintf (s, "%s", aop->aopu.aop_immd);
-      DEBUGpic14_emitcode (";", "%d immd %s", __LINE__, s);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_immd);
+      DEBUGpic14_emitcode (";", "%d immd %s", __LINE__, buffer);
+      return Safe_strdup(buffer);
 
     case AOP_DIR:
       if (offset)
         {
-          sprintf (s, "(%s + %d)", aop->aopu.aop_dir, offset);
-          DEBUGpic14_emitcode (";", "oops AOP_DIR did this %s\n", s);
+          SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", aop->aopu.aop_dir, offset);
+          DEBUGpic14_emitcode (";", "oops AOP_DIR did this %s\n", buffer);
         }
       else
-        sprintf (s, "%s", aop->aopu.aop_dir);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_dir);
+      return Safe_strdup(buffer);
 
     case AOP_REG:
       //if (dname)
@@ -815,16 +808,14 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
       return aop->aopu.aop_dir;
 
     case AOP_LIT:
-      sprintf (s, "0x%02x", pic14aopLiteral (aop->aopu.aop_lit, offset));
-      rs = Safe_strdup (s);
-      return rs;
+      SNPRINTF(buffer, sizeof(buffer), "0x%02x", pic14aopLiteral (aop->aopu.aop_lit, offset));
+      return Safe_strdup(buffer);
 
     case AOP_STR:
       aop->coff = offset;
       if (strcmp (aop->aopu.aop_str[offset], "a") == 0 && dname)
         return "acc";
       DEBUGpic14_emitcode (";", "%d - %s", __LINE__, aop->aopu.aop_str[offset]);
-
       return aop->aopu.aop_str[offset];
 
     case AOP_PCODE:
@@ -837,26 +828,24 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
             {
               offset += PCOI (pcop)->index;
             }
+
           if (offset)
             {
               DEBUGpic14_emitcode (";", "%s offset %d", pcop->name, offset);
-              sprintf (s, "(%s+%d)", pcop->name, offset);
+              SNPRINTF(buffer, sizeof(buffer), "(%s+%d)", pcop->name, offset);
             }
           else
             {
               DEBUGpic14_emitcode (";", "%s", pcop->name);
-              sprintf (s, "%s", pcop->name);
+              SNPRINTF(buffer, sizeof(buffer), "%s", pcop->name);
             }
         }
       else
-        sprintf (s, "0x%02x", PCOI (aop->aopu.pcop)->offset);
-
+        SNPRINTF(buffer, sizeof(buffer), "0x%02x", PCOI (aop->aopu.pcop)->offset);
     }
-    rs = Safe_calloc (1, strlen (s) + 1);
-    strcpy (rs, s);
-    return rs;
 
-    }
+    return Safe_strdup(buffer);
+  }
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopget got unsupported aop->type");
   exit (0);
@@ -874,8 +863,8 @@ popGetTempReg (void)
   pcop = newpCodeOp (NULL, PO_GPR_TEMP);
   if (pcop && pcop->type == PO_GPR_TEMP && PCOR (pcop)->r)
     {
-      PCOR (pcop)->r->wasUsed = 1;
-      PCOR (pcop)->r->isFree = 0;
+      PCOR (pcop)->r->wasUsed = TRUE;
+      PCOR (pcop)->r->isFree = FALSE;
     }
 
   return pcop;
@@ -889,7 +878,7 @@ popReleaseTempReg (pCodeOp * pcop)
 {
 
   if (pcop && pcop->type == PO_GPR_TEMP && PCOR (pcop)->r)
-    PCOR (pcop)->r->isFree = 1;
+    PCOR (pcop)->r->isFree = TRUE;
 
 }
 
@@ -934,7 +923,7 @@ popGetLit (unsigned int lit)
 /* popGetImmd - asm operator to pcode immediate conversion         */
 /*-----------------------------------------------------------------*/
 static pCodeOp *
-popGetImmd (char *name, unsigned int offset, int index, int is_func)
+popGetImmd (const char *name, unsigned int offset, int index, int is_func)
 {
 
   return newpCodeOpImmd (name, offset, index, 0, is_func);
@@ -944,7 +933,7 @@ popGetImmd (char *name, unsigned int offset, int index, int is_func)
 /* popGetWithString - asm operator to pcode operator conversion            */
 /*-----------------------------------------------------------------*/
 static pCodeOp *
-popGetWithString (char *str, int isExtern)
+popGetWithString (const char *str, int isExtern)
 {
   pCodeOp *pcop;
 
@@ -962,7 +951,7 @@ popGetWithString (char *str, int isExtern)
 }
 
 pCodeOp *
-popGetExternal (char *str, int isReg)
+popGetExternal (const char *str, int isReg)
 {
   pCodeOp *pcop;
 
@@ -1000,10 +989,10 @@ popGetExternal (char *str, int isReg)
 /* popRegFromString -                                              */
 /*-----------------------------------------------------------------*/
 static pCodeOp *
-popRegFromString (char *str, int size, int offset)
+popRegFromString (const char *str, int size, int offset)
 {
 
-  pCodeOp *pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+  pCodeOp *pcop = Safe_alloc(sizeof(pCodeOpReg));
   pcop->type = PO_DIR;
 
   DEBUGpic14_emitcode (";", "%d", __LINE__);
@@ -1011,8 +1000,7 @@ popRegFromString (char *str, int size, int offset)
   if (!str)
     str = "BAD_STRING";
 
-  pcop->name = Safe_calloc (1, strlen (str) + 1);
-  strcpy (pcop->name, str);
+  pcop->name = Safe_strdup(str);
 
   //pcop->name = Safe_strdup( ( (str) ? str : "BAD STRING"));
 
@@ -1041,12 +1029,12 @@ popRegFromIdx (int rIdx)
 
   DEBUGpic14_emitcode ("; ***", "%s,%d  , rIdx=0x%x", __FUNCTION__, __LINE__, rIdx);
 
-  pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+  pcop = Safe_alloc(sizeof(pCodeOpReg));
 
   PCOR (pcop)->rIdx = rIdx;
   PCOR (pcop)->r = typeRegWithIdx (rIdx, REG_STK, 1);
-  PCOR (pcop)->r->isFree = 0;
-  PCOR (pcop)->r->wasUsed = 1;
+  PCOR (pcop)->r->isFree = FALSE;
+  PCOR (pcop)->r->wasUsed = TRUE;
 
   pcop->type = PCOR (pcop)->r->pc_type;
 
@@ -1097,11 +1085,11 @@ popGet (asmop * aop, int offset)        //, bool bit16, bool dname)
       assert (offset < aop->size);
       rIdx = aop->aopu.aop_reg[offset]->rIdx;
 
-      pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+      pcop = Safe_alloc(sizeof(pCodeOpReg));
       PCOR (pcop)->rIdx = rIdx;
       PCOR (pcop)->r = pic14_regWithIdx (rIdx);
-      PCOR (pcop)->r->wasUsed = 1;
-      PCOR (pcop)->r->isFree = 0;
+      PCOR (pcop)->r->wasUsed = TRUE;
+      PCOR (pcop)->r->isFree = FALSE;
 
       PCOR (pcop)->instance = offset;
       pcop->type = PCOR (pcop)->r->pc_type;
@@ -1190,9 +1178,8 @@ popGetAddr (asmop * aop, int offset, int index)
 /* aopPut - puts a string for a aop                                */
 /*-----------------------------------------------------------------*/
 void
-aopPut (asmop * aop, char *s, int offset)
+aopPut (asmop * aop, const char *s, int offset)
 {
-  char *d = buffer;
   symbol *lbl;
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
@@ -1210,19 +1197,19 @@ aopPut (asmop * aop, char *s, int offset)
     case AOP_DIR:
       if (offset)
         {
-          sprintf (d, "(%s + %d)", aop->aopu.aop_dir, offset);
+          SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", aop->aopu.aop_dir, offset);
           fprintf (stderr, "oops aopPut:AOP_DIR did this %s\n", s);
-
         }
       else
-        sprintf (d, "%s", aop->aopu.aop_dir);
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_dir);
 
-      if (strcmp (d, s))
+      if (strcmp (buffer, s))
         {
           DEBUGpic14_emitcode (";", "%d", __LINE__);
           if (strcmp (s, "W"))
             pic14_emitcode ("movf", "%s,w", s);
-          pic14_emitcode ("movwf", "%s", d);
+
+          pic14_emitcode ("movwf", "%s", buffer);
 
           if (strcmp (s, "W"))
             {
@@ -1238,7 +1225,6 @@ aopPut (asmop * aop, char *s, int offset)
                 }
             }
           emitpcode (POC_MOVWF, popGet (aop, offset));
-
         }
       break;
 
@@ -1257,7 +1243,7 @@ aopPut (asmop * aop, char *s, int offset)
             }
           else if (strcmp (s, "W") == 0)
             {
-              pCodeOp *pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+              pCodeOp *pcop = Safe_alloc(sizeof(pCodeOpReg));
               pcop->type = PO_GPR_REGISTER;
 
               PCOR (pcop)->rIdx = -1;
@@ -1285,7 +1271,6 @@ aopPut (asmop * aop, char *s, int offset)
         pic14_emitcode ("push", "acc");
       else
         pic14_emitcode ("push", "%s", s);
-
       break;
 
     case AOP_CRY:
@@ -1311,6 +1296,7 @@ aopPut (asmop * aop, char *s, int offset)
                 {
                   MOVA (s);
                 }
+
               pic14_emitcode ("clr", "c");
               pic14_emitcode ("jz", "%05d_DS_", labelKey2num (lbl->key));
               pic14_emitcode ("cpl", "c");
@@ -1328,9 +1314,8 @@ aopPut (asmop * aop, char *s, int offset)
 
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopPut got unsupported aop->type");
-      exit (0);
+      exit(0);
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2256,10 +2241,13 @@ genPcall (iCode * ic)
      if(AOP_TYPE(IC_LEFT(ic)) == AOP_DIR) {
      char *rname;
      char *buffer;
+     size_t len;
+
      rname = IC_LEFT(ic)->aop->aopu.aop_dir;
      DEBUGpic14_emitcode ("; ***","%s  %d AOP_DIR %s",__FUNCTION__,__LINE__,rname);
-     buffer = Safe_calloc(1,strlen(rname)+16);
-     sprintf(buffer, "%s_goto_helper", rname);
+     len = strlen(rname) + 16;
+     buffer = Safe_alloc(len);
+     SNPRINTF(buffer, len, "%s_goto_helper", rname);
      addpCode2pBlock(pb,newpCode(POC_CALL,newpCodeOp(buffer,PO_STR)));
      free(buffer);
      }
@@ -2355,7 +2343,7 @@ genFunction (iCode * ic)
   pic14_stringInSet (sym->rname, &pic14_localFunctions, 1);
 
   pic14_emitcode ("", "%s:", sym->rname);
-  addpCode2pBlock (pb, newpCodeFunction (NULL, sym->rname, !IS_STATIC (sym->etype)));
+  addpCode2pBlock (pb, newpCodeFunction (moduleName, sym->rname, !IS_STATIC (sym->etype)));
 
   /* mark symbol as NOT extern (even if it was declared so previously) */
   assert (IS_SPEC (sym->etype));
@@ -2394,7 +2382,7 @@ genFunction (iCode * ic)
       /* generate ISR prolog if and not naked */
       if (!IFFUNC_ISNAKED (sym->type))
         {
-          if (pic14_getPIC ()->isEnhancedCore)
+          if (pic->isEnhancedCore)
             {
               /*
                * Enhanced CPUs have automatic context saving for W,
@@ -2617,7 +2605,7 @@ genEndFunction (iCode * ic)
         }
 
       /* generate ISR epilog if not enhanced core and not naked */
-      if (!pic14_getPIC ()->isEnhancedCore && !IFFUNC_ISNAKED (sym->type))
+      if (!pic->isEnhancedCore && !IFFUNC_ISNAKED (sym->type))
         {
           emitpcode (POC_MOVFW, popGetExternal ("___sdcc_saved_fsr", 1));
           emitpcode (POC_MOVWF, popCopyReg (&pc_fsr));
@@ -2667,7 +2655,7 @@ genEndFunction (iCode * ic)
       emitpcodeNULLop (POC_RETURN);
 
       /* Mark the end of a function */
-      addpCode2pBlock (pb, newpCodeFunction (NULL, NULL, 0));
+      addpCode2pBlock (pb, newpCodeFunction (moduleName, NULL, 0));
     }
 
 }
@@ -2998,7 +2986,16 @@ genDivOneByte (operand * left, operand * right, operand * result)
       emitpcode (POC_INCF, popGet (AOP (result), 0));
       emitpcode (POC_SUBWF, temp);
       emitSKPNC;
-      emitpcode (POC_GOTO, popGetLabel (lbl->key));
+
+      if (pic->isEnhancedCore)
+        {
+          emitpcode (POC_BRA, popGetLabel (lbl->key));
+        }
+      else
+        {
+          emitpcode (POC_GOTO, popGetLabel (lbl->key));
+        }
+
       emitpcode (POC_DECF, popGet (AOP (result), 0));
       popReleaseTempReg (temp);
 #endif
@@ -3123,7 +3120,16 @@ genModOneByte (operand * left, operand * right, operand * result)
       emitpLabel (lbl->key);
       emitpcode (POC_SUBWF, popGet (AOP (result), 0));
       emitSKPNC;
-      emitpcode (POC_GOTO, popGetLabel (lbl->key));
+
+      if (pic->isEnhancedCore)
+        {
+          emitpcode (POC_BRA, popGetLabel (lbl->key));
+        }
+      else
+        {
+          emitpcode (POC_GOTO, popGetLabel (lbl->key));
+        }
+
       emitpcode (POC_ADDWF, popGet (AOP (result), 0));
 #endif
     }
@@ -3225,7 +3231,7 @@ genIfxJump (iCode * ic, char *jval)
 
 
   /* mark the icode as generated */
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3245,7 +3251,7 @@ genSkipc (resolvedIfx * rifx)
 
   emitpcode (POC_GOTO, popGetLabel (rifx->lbl->key));
   emitpComment ("%s:%u: created from rifx:%p", __FUNCTION__, __LINE__, rifx);
-  rifx->generated = 1;
+  rifx->generated = TRUE;
 }
 
 #define isAOP_REGlike(x)  (AOP_TYPE(x) == AOP_REG || AOP_TYPE(x) == AOP_DIR || AOP_TYPE(x) == AOP_PCODE)
@@ -3475,7 +3481,16 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
     {
       //DEBUGpc ("comparing bytes at offset %d", offs);
       emitSKPZ;
-      emitpcode (POC_GOTO, popGetLabel (templbl->key));
+
+      if (pic->isEnhancedCore)
+        {
+          emitpcode (POC_BRA, popGetLabel (templbl->key));
+        }
+      else
+        {
+          emitpcode (POC_GOTO, popGetLabel (templbl->key));
+        }
+
       pic14_mov2w_regOrLit (AOP (right), lit, offs);
       emitpcode (POC_SUBFW, popGet (AOP (left), offs));
     }                           // while (offs)
@@ -3495,7 +3510,7 @@ result_in_carry:
     {
       invert_result = 1;
       // value will be used in the following genSkipc ()
-      rIfx.condition ^= 1;
+      rIfx.condition ^= TRUE;
     }                           // if
 
 correct_result_in_carry:
@@ -3530,7 +3545,7 @@ correct_result_in_carry:
     {
       //DEBUGpc ("generate control flow");
       genSkipc (&rIfx);
-      ifx->generated = 1;
+      ifx->generated = TRUE;
     }                           // if
 }
 
@@ -3725,7 +3740,7 @@ genCmpEq (iCode * ic, iCode * ifx)
     emitpLabel (false_label->key);
 
   if (ifx)
-    ifx->generated = 1;
+    ifx->generated = TRUE;
 
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -3860,7 +3875,7 @@ continueIfTrue (iCode * ic)
       emitpcode (POC_GOTO, popGetLabel (labelKey2num (IC_TRUE (ic)->key)));
       pic14_emitcode ("ljmp", "%05d_DS_", labelKey2num (IC_FALSE (ic)->key));
     }
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3876,7 +3891,7 @@ jumpIfTrue (iCode * ic)
       emitpcode (POC_GOTO, labelKey2num (popGetLabel (IC_TRUE (ic)->key)));
       pic14_emitcode ("ljmp", "%05d_DS_", labelKey2num (IC_FALSE (ic)->key));
     }
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3901,7 +3916,7 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
       pic14_emitcode ("ljmp", "%05d_DS_", labelKey2num (IC_FALSE (ic)->key));
       pic14_emitcode ("", "%05d_DS_:", labelKey2num (tlbl->key));
     }
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -4039,7 +4054,7 @@ genAnd (iCode * ic, iCode * ifx)
                              newpCodeOpBit (aopGet (AOP (left), offset, FALSE, FALSE), posbit, 0));
                   emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
 
-                  ifx->generated = 1;
+                  ifx->generated = TRUE;
                 }
               goto release;
             }
@@ -4076,7 +4091,7 @@ genAnd (iCode * ic, iCode * ifx)
               emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
             }
           emitpLabel(tlbl->key);
-          ifx->generated = 1;
+          ifx->generated = TRUE;
           // bit = left & literal
           if (size)
             {
@@ -4817,7 +4832,6 @@ genRRC (iCode * ic)
 
   while (size--)
     {
-
       if (same)
         {
           emitpcode (POC_RRF, popGet (AOP (left), offset));
@@ -4867,7 +4881,6 @@ genRLC (iCode * ic)
 
   while (size--)
     {
-
       if (same)
         {
           emitpcode (POC_RLF, popGet (AOP (left), offset));
@@ -5180,20 +5193,53 @@ shiftLeft_Left2ResultLit (operand * left, operand * result, int shCount)
         }
       else
         {
-          emitCLRC;
-          for (i = 0; i < size; i++)
+          if (pic->isEnhancedCore)
             {
-              if (same && !offr)
+              for (i = 0; i < size; i++)
                 {
-                  emitpcode (POC_RLF, popGet (AOP (left), i));
+                  if (same && !offr)
+                    {
+                      if (i == 0)
+                        {
+                          emitpcode (POC_LSLF, popGet (AOP (left), i));
+                        }
+                      else
+                        {
+                          emitpcode (POC_RLF, popGet (AOP (left), i));
+                        }
+                    }
+                  else
+                    {
+                      if (i == 0)
+                        {
+                          emitpcode (POC_LSLFW, popGet (AOP (left), i));
+                        }
+                      else
+                        {
+                          emitpcode (POC_RLFW, popGet (AOP (left), i));
+                        }
+
+                      emitpcode (POC_MOVWF, popGet (AOP (result), i + offr));
+                    }
                 }
-              else
+            }
+          else
+            {
+              emitCLRC;
+              for (i = 0; i < size; i++)
                 {
-                  emitpcode (POC_RLFW, popGet (AOP (left), i));
-                  emitpcode (POC_MOVWF, popGet (AOP (result), i + offr));
-                }               // if
-            }                   // for
-        }                       // if (offr)
+                  if (same && !offr)
+                    {
+                      emitpcode (POC_RLF, popGet (AOP (left), i));
+                    }
+                  else
+                    {
+                      emitpcode (POC_RLFW, popGet (AOP (left), i));
+                      emitpcode (POC_MOVWF, popGet (AOP (result), i + offr));
+                    }           // if
+                }               // for
+            }                   // if (pic->isEnhancedCore)
+        }                       // if (same && offr)
       break;
 
     case 4:                    /* takes 3+5(N-1) = 5N-2 cycles (for offr==0) */
@@ -5280,25 +5326,73 @@ shiftRight_Left2ResultLit (operand * left, operand * result, int shCount, int si
             }
           else
             {
-              emitCLRC;
-              if (sign)
+              if (pic->isEnhancedCore)
                 {
-                  emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE, FALSE), 7, 0));
-                  emitSETC;
+                  for (i = size - 1; i >= 0; i--)
+                    {
+                      if (same && !offr)
+                        {
+                          if (i == (size - 1))
+                            {
+                              if (sign)
+                                {
+                                  emitpcode (POC_ASRF, popGet (AOP (left), i));
+                                }
+                              else
+                                {
+                                  emitpcode (POC_LSRF, popGet (AOP (left), i));
+                                }
+                            }
+                          else
+                            {
+                              emitpcode (POC_RRF, popGet (AOP (left), i));
+                            }
+                        }
+                      else
+                        {
+                          if (i == (size - 1))
+                            {
+                              if (sign)
+                                {
+                                  emitpcode (POC_ASRFW, popGet (AOP (left), i));
+                                }
+                              else
+                                {
+                                  emitpcode (POC_LSRFW, popGet (AOP (left), i));
+                                }
+                            }
+                          else
+                            {
+                              emitpcode (POC_RRFW, popGet (AOP (left), i + offr));
+                            }
+
+                          emitpcode (POC_MOVWF, popGet (AOP (result), i));
+                        }       // if (same && !offr)
+                    }           // for i
                 }
-              for (i = size - 1; i >= 0; i--)
+              else
                 {
-                  if (same && !offr)
+                  emitCLRC;
+                  if (sign)
                     {
-                      emitpcode (POC_RRF, popGet (AOP (left), i));
+                      emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (left), AOP_SIZE (left) - 1, FALSE, FALSE), 7, 0));
+                      emitSETC;
                     }
-                  else
+
+                  for (i = size - 1; i >= 0; i--)
                     {
-                      emitpcode (POC_RRFW, popGet (AOP (left), i + offr));
-                      emitpcode (POC_MOVWF, popGet (AOP (result), i));
-                    }
-                }               // for i
-            }                   // if (offr)
+                      if (same && !offr)
+                        {
+                          emitpcode (POC_RRF, popGet (AOP (left), i));
+                        }
+                      else
+                        {
+                          emitpcode (POC_RRFW, popGet (AOP (left), i + offr));
+                          emitpcode (POC_MOVWF, popGet (AOP (result), i));
+                        }
+                    }           // for i
+                }               // if (pic->isEnhancedCore)  
+            }                   // if (same && offr)
           break;
 
         case 4:                /* takes 3(6)+5(N-1) = 5N-2(+1) cycles (for offr==0) */
@@ -5589,7 +5683,7 @@ SetIrp (operand * result)
 static void
 setup_fsr (operand * ptr)
 {
-  if (pic14_getPIC ()->isEnhancedCore)
+  if (pic->isEnhancedCore)
     {
       mov2w_op (ptr, 0);
       emitpcode (POC_MOVWF, popCopyReg (&pc_fsr0l));
@@ -5615,7 +5709,7 @@ inc_fsr (int delta)
       return;
     } // if
 
-  if (pic14_getPIC ()->isEnhancedCore)
+  if (pic->isEnhancedCore)
     {
       if (pic14_options.no_ext_instr)
         {
@@ -5782,7 +5876,7 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
             }
           emitpcode ((rIfx.condition) ? POC_BTFSC : POC_BTFSS, pcop);
           emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
-          ifx->generated = 1;
+          ifx->generated = TRUE;
         }
       else
         {
@@ -6723,7 +6817,6 @@ genPointerSet (iCode * ic)
      the pointer values */
   switch (p_type)
     {
-
     case POINTER:
     case FPOINTER:
       //case IPOINTER:
@@ -6815,7 +6908,7 @@ genIfx (iCode * ic, iCode * popIc)
         }
     }
 
-  ic->generated = 1;
+  ic->generated = TRUE;
 
   /* the result is now in the accumulator */
   freeAsmop (cond, NULL, ic, TRUE);
@@ -7060,7 +7153,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genJumpTab - genrates code for jump table                       */
+/* genJumpTab - generates code for jump table                      */
 /*-----------------------------------------------------------------*/
 static void
 genJumpTab (iCode * ic)
@@ -7345,7 +7438,7 @@ genDjnz (iCode * ic, iCode * ifx)
   emitpcode (POC_GOTO, popGetLabel (IC_TRUE (ifx)->key));
 
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
-  ifx->generated = 1;
+  ifx->generated = TRUE;
   return 1;
 }
 
@@ -7424,6 +7517,8 @@ genpic14Code (iCode * lic)
   const char *cline;
 
   FENTRY;
+
+  pic = pic14_getPIC();
 
   pb = newpCodeChain (GcurMemmap, 0, newpCodeCharP ("; Starting pCode block"));
   addpBlock (pb);
@@ -7700,16 +7795,16 @@ aop_isLitLike (asmop * aop)
 {
   assert (aop);
   if (aop->type == AOP_LIT)
-    return 1;
+    return TRUE;
   if (aop->type == AOP_IMMD)
-    return 1;
+    return TRUE;
   if ((aop->type == AOP_PCODE) && ((aop->aopu.pcop->type == PO_LITERAL)))
     {
       /* this should be treated like a literal/immediate (use MOVLW/ADDLW/SUBLW
        * instead of MOVFW/ADDFW/SUBFW, use popGetAddr instead of popGet) */
-      return 1;
+      return TRUE;
     }
-  return 0;
+  return FALSE;
 }
 
 int
@@ -7717,13 +7812,13 @@ op_isLitLike (operand * op)
 {
   assert (op);
   if (aop_isLitLike (AOP (op)))
-    return 1;
+    return TRUE;
   if (IS_SYMOP (op) && IS_FUNC (OP_SYM_TYPE (op)))
-    return 1;
+    return TRUE;
   if (IS_SYMOP (op) && IS_PTR (OP_SYM_TYPE (op)) && (AOP_TYPE (op) == AOP_PCODE) && (AOP (op)->aopu.pcop->type == PO_IMMEDIATE))
     {
-      return 1;
+      return TRUE;
     }
 
-  return 0;
+  return FALSE;
 }

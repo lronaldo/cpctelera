@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1454 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:44 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:40 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -122,6 +122,7 @@
 #define PWM2DCL_ADDR            0x0614
 #define PWM2DCH_ADDR            0x0615
 #define PWM2CON_ADDR            0x0616
+#define PWM2CON0_ADDR           0x0616
 #define UCON_ADDR               0x0E8E
 #define USTAT_ADDR              0x0E8F
 #define UIR_ADDR                0x0E90
@@ -2018,6 +2019,33 @@ extern __at(0x0616) volatile __PWM2CONbits_t PWM2CONbits;
 #define _PWM2OUT                0x20
 #define _PWM2OE                 0x40
 #define _PWM2EN                 0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        PWM2CON0 Bits
+
+extern __at(0x0616) __sfr PWM2CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM2POL              : 1;
+  unsigned PWM2OUT              : 1;
+  unsigned PWM2OE               : 1;
+  unsigned PWM2EN               : 1;
+  } __PWM2CON0bits_t;
+
+extern __at(0x0616) volatile __PWM2CON0bits_t PWM2CON0bits;
+
+#define _PWM2CON0_PWM2POL       0x10
+#define _PWM2CON0_PWM2OUT       0x20
+#define _PWM2CON0_PWM2OE        0x40
+#define _PWM2CON0_PWM2EN        0x80
 
 //==============================================================================
 

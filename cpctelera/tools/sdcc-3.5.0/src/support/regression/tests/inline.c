@@ -189,13 +189,32 @@ bug_3564755 (void)
 {
   a_3564755 = 1;
   b_3564755 = 250;
-  
+
   while (!condition_func()) /* inlined function returning bit caused segfault */
     {
       b_3564755 += 1;
     }
-  ASSERT(a_3564755 == b_3564755);  
-}    
+  ASSERT(a_3564755 == b_3564755);
+}
+
+/*--------------*/
+
+/*--------------
+    bug 2295
+*/
+
+void
+bug_2295 (void)
+{
+  char x = 0, y = 0, z = 0;
+  for (x = inlined_function(); inlined_function() - z; y += inlined_function())
+    {
+      z += inlined_function();
+    }
+  ASSERT (x == 1);
+  ASSERT (y == 1);
+  ASSERT (z == 1);
+}
 
 /*--------------*/
 
@@ -211,4 +230,7 @@ testInline (void)
   bug_1767885 ();
   bug_1864577 ();
   bug_3564755 ();
+#ifndef SKIP_EXTERNAL
+  bug_2295 ();
+#endif
 }

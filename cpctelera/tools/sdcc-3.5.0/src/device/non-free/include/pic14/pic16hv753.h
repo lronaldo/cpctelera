@@ -2,9 +2,9 @@
  * This declarations of the PIC16HV753 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:40 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:49 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -953,8 +953,8 @@ typedef union
     unsigned FVRBUFEN           : 1;
     unsigned                    : 1;
     unsigned                    : 1;
-    unsigned FVRBUFSS0          : 1;
-    unsigned FVRBUFSS1          : 1;
+    unsigned FVRBUSS0           : 1;
+    unsigned FVRBUSS1           : 1;
     unsigned FVROE              : 1;
     unsigned FVRRDY             : 1;
     unsigned FVREN              : 1;
@@ -963,7 +963,7 @@ typedef union
   struct
     {
     unsigned                    : 3;
-    unsigned FVRBUFSS           : 2;
+    unsigned FVRBUSS            : 2;
     unsigned                    : 3;
     };
   } __FVR1CON0bits_t;
@@ -971,8 +971,8 @@ typedef union
 extern __at(0x0090) volatile __FVR1CON0bits_t FVR1CON0bits;
 
 #define _FVRBUFEN               0x01
-#define _FVRBUFSS0              0x08
-#define _FVRBUFSS1              0x10
+#define _FVRBUSS0               0x08
+#define _FVRBUSS1               0x10
 #define _FVROE                  0x20
 #define _FVRRDY                 0x40
 #define _FVREN                  0x80
@@ -2930,8 +2930,8 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 #define DACEN                   DAC1CON0bits.DACEN              // bit 7
 
 #define FVRBUFEN                FVR1CON0bits.FVRBUFEN           // bit 0
-#define FVRBUFSS0               FVR1CON0bits.FVRBUFSS0          // bit 3
-#define FVRBUFSS1               FVR1CON0bits.FVRBUFSS1          // bit 4
+#define FVRBUSS0                FVR1CON0bits.FVRBUSS0           // bit 3
+#define FVRBUSS1                FVR1CON0bits.FVRBUSS1           // bit 4
 #define FVROE                   FVR1CON0bits.FVROE              // bit 5
 #define FVRRDY                  FVR1CON0bits.FVRRDY             // bit 6
 #define FVREN                   FVR1CON0bits.FVREN              // bit 7

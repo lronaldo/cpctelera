@@ -226,6 +226,12 @@ gcc_AC_CHECK_DECLS(getenv abort strsignal errno \
 # Restore CFLAGS from before the gcc_AC_NEED_DECLARATIONS tests.
 CFLAGS="$saved_CFLAGS"
 
+# Try to append a c99 flag
+AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" != "no"; then
+  CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
+fi
+
 # mkdir takes a single argument on some systems.
 gcc_AC_FUNC_MKDIR_TAKES_ONE_ARG
 

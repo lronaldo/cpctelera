@@ -245,13 +245,13 @@ copyAst (ast * src)
     addSet (&pset, src);
 
   dest = Safe_alloc (sizeof (ast));
-
   dest->type = src->type;
   dest->filename = src->filename;
   dest->lineno = src->lineno;
   dest->level = src->level;
   dest->funcName = src->funcName;
   dest->reversed = src->reversed;
+  dest->parmProcessed = src->parmProcessed;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
@@ -880,13 +880,21 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
       (*actParm)->decorated = 1;
       if ((*actParm)->reversed)
         {
-          return (processParms (func, defParm, &(*actParm)->right, parmNumber, FALSE) ||
-                  processParms (func, defParm ? defParm->next : NULL, &(*actParm)->left, parmNumber, rightmost));
+          int ret;
+          ret = (processParms (func, defParm, &(*actParm)->right, parmNumber, FALSE) ||
+                 processParms (func, defParm ? defParm->next : NULL, &(*actParm)->left, parmNumber, rightmost));
+          if (!ret)
+            (*actParm)->parmProcessed = 1;    
+          return ret;
         }
       else
         {
-          return (processParms (func, defParm, &(*actParm)->left, parmNumber, FALSE) ||
-                  processParms (func, defParm ? defParm->next : NULL, &(*actParm)->right, parmNumber, rightmost));
+          int ret;
+          ret = (processParms (func, defParm, &(*actParm)->left, parmNumber, FALSE) ||
+                 processParms (func, defParm ? defParm->next : NULL, &(*actParm)->right, parmNumber, rightmost));
+          if (!ret)
+            (*actParm)->parmProcessed = 1;
+          return ret;
         }
     }
   else if (defParm)             /* not vararg */
@@ -928,6 +936,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
            (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, cast.literalFromCast))))
         {
           /* Parameter was explicitly typecast; don't touch it. */
+         (*actParm)->parmProcessed = 1;
           return 0;
         }
 
@@ -972,14 +981,17 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
 
           *actParm = decorateType (*actParm, resultType);
         }
+      (*actParm)->parmProcessed = 1;
       return 0;
     }                           /* vararg */
 
   /* if defined parameters ended but actual has not & */
   /* reentrant */
   if (!defParm && *actParm && (options.stackAuto || IFFUNC_ISREENT (functype)))
-    return 0;
-
+    {
+      (*actParm)->parmProcessed = 1;
+      return 0;
+    }
   resolveSymbols (*actParm);
 
   /* the parameter type must be at least castable */
@@ -1033,6 +1045,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
     }
 
   (*parmNumber)++;
+  (*actParm)->parmProcessed = 1;
   return 0;
 }
 
@@ -1672,6 +1685,11 @@ stringToSymbol (value * val)
       addSymChain (&sym);
       allocVariables (sym);
     }
+  else
+    {
+      addSet (&strSym, sym);
+      addSet (&statsg->syms, sym);      
+    }
   sym->ival = NULL;
   return symbolVal (sym);
 }
@@ -1935,7 +1953,7 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr, symbol ** sym, 
               IS_AST_SYM_VALUE (condExpr->left->left) && isSymbolEqual (*sym, AST_SYMBOL (condExpr->left->left)))
             {
 
-              *end = newNode ('+', condExpr->left->right, newAst_VALUE (constCharVal (1)));
+              *end = newNode ('+', condExpr->left->right, newAst_VALUE (constVal ("1")));
               break;
             }
           return FALSE;
@@ -2326,7 +2344,7 @@ replLoopSym (ast * body, symbol * sym)
           body->type = EX_OP;
           body->opval.op = '-';
           body->left = newAst_VALUE (symbolVal (sym));
-          body->right = newAst_VALUE (constCharVal (1));
+          body->right = newAst_VALUE (constVal ("1"));
         }
       return;
     }
@@ -2371,7 +2389,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
                                          newNode (NULLOP,
                                                   newNode (SUB_ASSIGN,
                                                            newAst_VALUE (symbolVal (sym)),
-                                                           newAst_VALUE (constCharVal (1))), rloop))));
+                                                           newAst_VALUE (constVal ("1"))), rloop))));
 
   rloop->lineno = init->lineno;
   return decorateType (rloop, RESULT_TYPE_NONE);
@@ -2693,6 +2711,8 @@ resultTypePropagate (ast * tree, RESULT_TYPE resultType)
     case AND_OP:
     case OR_OP:
     case '!':
+      /* Logical operators should always propagate to boolean */
+      return RESULT_TYPE_BOOL;
     case '=':
     case '?':
     case ':':
@@ -4022,7 +4042,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           tree->type = EX_VALUE;
           tree->left = tree->right = NULL;
-          tree->opval.val = constCharVal (0);
+          tree->opval.val = constVal ("0");
           TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
           return tree;
         }
@@ -4132,7 +4152,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           /* optimize bit-result, even if we optimize a buggy source */
           tree->type = EX_VALUE;
-          tree->opval.val = constCharVal (1);
+          tree->opval.val = constBoolVal (1);
         }
       else
         tree->left = addCast (tree->left, resultTypeProp, TRUE);
@@ -4163,7 +4183,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           /* remove double '!!X' by 'X ? 1 : 0' */
           tree->opval.op = '?';
           tree->left = tree->left->left;
-          tree->right = newNode (':', newAst_VALUE (constCharVal (1)), newAst_VALUE (constCharVal (0)));
+          tree->right = newNode (':', newAst_VALUE (constBoolVal (1)), newAst_VALUE (constBoolVal (0)));
           tree->right->filename = tree->filename;
           tree->right->lineno = tree->lineno;
           tree->decorated = 0;
@@ -4280,7 +4300,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               /* Change shift op to comma op and replace the right operand with 0. */
               /* This preserves the left operand in case there were side-effects. */
               tree->opval.op = ',';
-              tree->right->opval.val = constCharVal (0);
+              tree->right->opval.val = constVal ("0");
               TETYPE (tree) = TTYPE (tree) = tree->right->opval.val->type;
               return tree;
             }
@@ -4598,13 +4618,30 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
             if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
               {
-                werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
-                fprintf (stderr, "comparing type ");
-                printTypeChain (LTYPE (tree), stderr);
-                fprintf (stderr, " to type ");
-                printTypeChain (RTYPE (tree), stderr);
-                fprintf (stderr, "\n");
-                goto errorTreeReturn;
+                if (compareType (RTYPE (tree), LTYPE (tree)) != 0)
+                  {
+                    struct ast *s = tree->left;
+                    tree->left = tree->right;
+                    tree->right = s;
+                    if (tree->opval.op == '>')
+                      tree->opval.op = '<';
+                    else if (tree->opval.op == '>')
+                      tree->opval.op = '<';
+                    else if (tree->opval.op == LE_OP)
+                      tree->opval.op = GE_OP;
+                    else if (tree->opval.op == GE_OP)
+                      tree->opval.op = LE_OP;
+                  }
+                else
+                  {
+                    werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
+                    fprintf (stderr, "comparing type ");
+                    printTypeChain (LTYPE (tree), stderr);
+                    fprintf (stderr, " to type ");
+                    printTypeChain (RTYPE (tree), stderr);
+                    fprintf (stderr, "\n");
+                    goto errorTreeReturn;
+                  }
               }
         }
 
@@ -4622,7 +4659,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           case CCR_ALWAYS_TRUE:
           case CCR_ALWAYS_FALSE:
             werrorfl (tree->filename, tree->lineno, W_COMP_RANGE, ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
-            return decorateType (newAst_VALUE (constCharVal ((unsigned char) (ccr_result == CCR_ALWAYS_TRUE))), resultType);
+            return decorateType (newAst_VALUE (constBoolVal ((unsigned char) (ccr_result == CCR_ALWAYS_TRUE))), resultType);
           case CCR_OK:
           default:
             break;
@@ -4642,7 +4679,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           /* (unsigned value) ? 1 : 0 */
           tree->opval.op = '?';
-          tree->right = newNode (':', newAst_VALUE (constCharVal (1)), tree->right);    /* val 0 */
+          tree->right = newNode (':', newAst_VALUE (constBoolVal (1)), tree->right);    /* val 0 */
           tree->right->filename = tree->filename;
           tree->right->lineno = tree->lineno;
           tree->right->left->filename = tree->filename;
@@ -4774,7 +4811,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
       /*             sizeof         */
       /*----------------------------*/
-    case SIZEOF:               /* evaluate wihout code generation */
+    case SIZEOF:               /* evaluate without code generation */
       {
         /* change the type to a integer */
         struct dbuf_s dbuf;
@@ -5000,13 +5037,19 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       return tree;
 
     case ':':
+      if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) && (compareType (RTYPE (tree), LTYPE (tree)) == 0))
+        if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)))
+          DCL_TYPE (LTYPE(tree)) = GPOINTER;
+        if (IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))
+          DCL_TYPE (RTYPE(tree)) = GPOINTER;
+
       if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) &&
         (compareType (RTYPE (tree), LTYPE (tree)) == 0) &&
         !(IS_ARRAY(LTYPE (tree)) && IS_INTEGRAL(RTYPE (tree))) &&
         !(IS_ARRAY(RTYPE (tree)) && IS_INTEGRAL(LTYPE (tree))))
         {
           werrorfl (tree->filename, tree->lineno, E_TYPE_MISMATCH, "conditional operator", " ");
-          goto errorTreeReturn;
+          printFromToType (RTYPE (tree), LTYPE (tree));
         }
 
       TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op);
@@ -5240,7 +5283,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           else
             functype = LTYPE (tree);
 
-          if (processParms (tree->left, FUNC_ARGS (functype), &tree->right, &parmNumber, TRUE))
+          if ((tree->right && !tree->right->parmProcessed) && processParms (tree->left, FUNC_ARGS (functype), &tree->right, &parmNumber, TRUE))
             {
               goto errorTreeReturn;
             }
@@ -5380,6 +5423,10 @@ decorateType (ast * tree, RESULT_TYPE resultType)
     case PARAM:
       werrorfl (tree->filename, tree->lineno, E_INTERNAL_ERROR, __FILE__, __LINE__, "node PARAM shouldn't be processed here");
       /* but in processParams() */
+      return tree;
+    case INLINEASM:
+      formatInlineAsm (tree->values.inlineasm);
+      TTYPE (tree) = TETYPE (tree) = NULL;
       return tree;
     default:
       TTYPE (tree) = TETYPE (tree) = NULL;
@@ -6351,12 +6398,12 @@ optimizeCompare (ast * root)
         case '>':
         case '<':
         case NE_OP:
-          optExpr = newAst_VALUE (constCharVal (0));
+          optExpr = newAst_VALUE (constBoolVal (0));
           break;
         case GE_OP:
         case LE_OP:
         case EQ_OP:
-          optExpr = newAst_VALUE (constCharVal (1));
+          optExpr = newAst_VALUE (constBoolVal (1));
           break;
         }
 
@@ -6520,8 +6567,8 @@ copyAstLoc (ast * dest, ast * src)
 static void fixupInline (ast * tree, int level);
 
 /*-----------------------------------------------------------------*/
-/* expandInlineFuncsInDeclarators - replace calls to inline        */
-/*                      functions with the function itself         */
+/* fixupInlineInDeclarators - recursively perform various fixups   */
+/*                            on an inline function tree           */
 /*-----------------------------------------------------------------*/
 static void
 fixupInlineInDeclarators (struct initList *ival, int level)
@@ -6786,8 +6833,8 @@ inlineFindParm (ast * parms, int index)
 static void expandInlineFuncs (ast * tree, ast * block);
 
 /*-----------------------------------------------------------------*/
-/* expandInlineFuncsInDeclarators - replace calls to inline        */
-/*                      functions with the function itself         */
+/* expandInlineFuncsInDeclarators - recursively replace calls to   */
+/*                                  inline functions               */
 /*-----------------------------------------------------------------*/
 static void
 expandInlineFuncsInDeclarators (struct initList *ival, ast * block)
@@ -6983,6 +7030,16 @@ expandInlineFuncs (ast * tree, ast * block)
             }
         }
 
+      if (tree->opval.op == FOR)
+        {
+          if (AST_FOR (tree, initExpr))
+            expandInlineFuncs (AST_FOR (tree, initExpr), block);
+          if (AST_FOR (tree, condExpr))
+            expandInlineFuncs (AST_FOR (tree, condExpr), block);
+          if (AST_FOR (tree, loopExpr))
+            expandInlineFuncs (AST_FOR (tree, loopExpr), block);
+        }
+
       if (tree->left)
         expandInlineFuncs (tree->left, block);
       if (tree->right)
@@ -7173,7 +7230,8 @@ createFunction (symbol * name, ast * body)
 skipall:
   /* dealloc the block variables */
   processBlockVars (body, &stack, DEALLOCATE);
-  outputDebugStackSymbols ();
+  if (!fatalError)
+    outputDebugStackSymbols ();
   /* deallocate paramaters */
   deallocParms (FUNC_ARGS (name->type));
 

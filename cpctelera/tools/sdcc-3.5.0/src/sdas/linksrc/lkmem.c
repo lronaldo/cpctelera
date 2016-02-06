@@ -474,8 +474,9 @@ int summary2(struct area * areap)
 
     char buff[128];
     int toreturn = 0;
-    unsigned int j;
+    unsigned int i, j;
     unsigned long int Stack_Start=0, Stack_Size;
+    int spare_begin = -1, spare_size = 0;
 
     struct area * xp;
     struct area * xstack_xp = NULL;
@@ -595,7 +596,7 @@ int summary2(struct area * areap)
 
     for(j=Stack_Start, Stack_Size=0; j<((iram_size)?iram_size:256); j++)
     {
-        if((idatamap[j]=='S')||(idatamap[j]==' ')) Stack_Size++;
+        if(idatamap[j]=='S') Stack_Size++;
         else break;
     }
 
@@ -613,12 +614,28 @@ int summary2(struct area * areap)
     }
 
     /*Report the position of the begining of the stack*/
-    if(Stack_Start!=256)
+    if(Stack_Start!=256 && Stack_Size > 0)
         fprintf(of, "\n%s starts at: 0x%02lx (sp set to 0x%02lx) with %ld bytes available.",
             rflag ? "16 bit mode initial stack" : "Stack", Stack_Start, Stack_Start-1, Stack_Size);
     else
-        fprintf(of, "\nI don't have a clue where the stack ended up! Sorry...");
+        fprintf(of, "\nNo clue at where the stack begins and ends!");
 
+    /* Report the spare space left in the IRAM */
+    for (j = 0; j < (iram_size ? iram_size : 256); )
+    {
+        for (i = j; i < (iram_size ? iram_size : 256) && idatamap[i] == ' '; i++);
+        if (i - j > spare_size)
+        {
+            spare_size = i - j;
+            spare_begin = j;
+        }
+        j = i + 1;
+    }
+    if (spare_size > 0)
+        fprintf(of, "\nThe largest spare internal RAM space starts at 0x%x with %d byte%s available.", spare_begin, spare_size, spare_size > 1 ? "s" : "");
+    else
+        fprintf(of, "\nNo spare internal RAM space left.");
+ 
     /*Report about xstack*/
     if (xstack_xp)
     {
@@ -679,7 +696,7 @@ int summary2(struct area * areap)
 
     /*Report any excess:*/
     if( ((XRam.End) > XRam.Max) ||
-        (((int)XRam.Size>xram_size)&&(xram_size>=0)) )
+        ((((int)XRam.Size+(int)Paged.Size)>xram_size)&&(xram_size>=0)) )
     {
         sprintf(buff, "Insufficient EXTERNAL RAM memory.\n");
         REPORT_ERROR(buff, 1);

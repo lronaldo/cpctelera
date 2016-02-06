@@ -1,7 +1,6 @@
 /* Get common system includes and various definitions and declarations based
    on autoconf macros.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2009, 2010
-   Free Software Foundation, Inc.
+   Copyright (C) 1998-2014 Free Software Foundation, Inc.
 
 This file is part of GCC.
 
@@ -44,6 +43,14 @@ along with GCC; see the file COPYING3.  If not see
 #endif
 
 /* Use the unlocked open routines from libiberty.  */
+
+/* Some of these are #define on some systems, e.g. on AIX to redirect
+   the names to 64bit capable functions for LARGE_FILES support. These
+   redefs are pointless here so we can override them.  */
+    
+#undef fopen 
+#undef freopen 
+
 #define fopen(PATH,MODE) fopen_unlocked(PATH,MODE)
 #define fdopen(FILDES,MODE) fdopen_unlocked(FILDES,MODE)
 #define freopen(PATH,MODE,STREAM) freopen_unlocked(PATH,MODE,STREAM)
@@ -83,6 +90,10 @@ along with GCC; see the file COPYING3.  If not see
 #  undef fputc
 #  define fputc(C, Stream) fputc_unlocked (C, Stream)
 # endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 # ifdef HAVE_CLEARERR_UNLOCKED
 #  undef clearerr
@@ -163,6 +174,10 @@ extern size_t fwrite_unlocked (const void *, size_t, size_t, FILE *);
 extern int fprintf_unlocked (FILE *, const char *, ...);
 #  endif
 # endif
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
@@ -286,8 +301,16 @@ extern int errno;
    here.  These checks will be in the undefined state while configure
    is running so be careful to test "defined (HAVE_DECL_*)".  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined (HAVE_DECL_ABORT) && !HAVE_DECL_ABORT
 extern void abort (void);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #if HAVE_SYS_STAT_H
@@ -345,37 +368,20 @@ extern void abort (void);
 
 /* Get libiberty declarations.  */
 #include "libiberty.h"
-#if defined(__APPLE__) && defined(__MACH__)
-#include <libiberty/safe-ctype.h>
-#else
-#include <safe-ctype.h>
-#endif
+#include "safe-ctype.h"
 
 /* 1 if we have C99 designated initializers.
 
    ??? C99 designated initializers are not supported by most C++
    compilers, including G++.  -- gdr, 2005-05-18  */
 #if !defined(HAVE_DESIGNATED_INITIALIZERS)
-#if defined(__APPLE__) && (__MACH__)
-#define HAVE_DESIGNATED_INITIALIZERS 0
-#else
 #define HAVE_DESIGNATED_INITIALIZERS \
-  ((!defined(__cplusplus) && (GCC_VERSION >= 2007)) \
-   || (__STDC_VERSION__ >= 199901L))
-#endif
-#endif
-
-/* Be conservative and only use enum bitfields with GCC.
-   FIXME: provide a complete autoconf test for buggy enum bitfields.  */
-
-#if (GCC_VERSION > 2000)
-#define ENUM_BITFIELD(TYPE) __extension__ enum TYPE
-#else
-#define ENUM_BITFIELD(TYPE) unsigned int
+  (!defined(__cplusplus) \
+   && ((GCC_VERSION >= 2007) || (__STDC_VERSION__ >= 199901L)))
 #endif
 
 #ifndef offsetof
-#define offsetof(TYPE, MEMBER)  ((size_t) &((TYPE *) 0)->MEMBER)
+#define offsetof(TYPE, MEMBER)	((size_t) &((TYPE *) 0)->MEMBER)
 #endif
 
 /* __builtin_expect(A, B) evaluates to A, but notifies the compiler that
@@ -387,7 +393,7 @@ extern void abort (void);
 
 /* Provide a fake boolean type.  We make no attempt to use the
    C99 _Bool, as it may not be available in the bootstrap compiler,
-   and even if it is, it is liable to be buggy.
+   and even if it is, it is liable to be buggy.  
    This must be after all inclusion of system headers, as some of
    them will mess us up.  */
 #undef bool

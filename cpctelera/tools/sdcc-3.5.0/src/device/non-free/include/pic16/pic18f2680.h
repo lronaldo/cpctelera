@@ -2,9 +2,9 @@
  * This declarations of the PIC18F2680 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:42:01 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:18 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -2347,14 +2347,14 @@ typedef union
 
   struct
     {
-    unsigned FILHIT             : 5;
-    unsigned                    : 3;
+    unsigned TXPRI              : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
-    unsigned TXPRI              : 2;
-    unsigned                    : 6;
+    unsigned FILHIT             : 5;
+    unsigned                    : 3;
     };
   } __B0CONbits_t;
 
@@ -3284,14 +3284,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __B1DLCbits_t;
@@ -3743,14 +3743,14 @@ typedef union
 
   struct
     {
-    unsigned FILHIT             : 5;
-    unsigned                    : 3;
+    unsigned TXPRI              : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
-    unsigned TXPRI              : 2;
-    unsigned                    : 6;
+    unsigned FILHIT             : 5;
+    unsigned                    : 3;
     };
   } __B2CONbits_t;
 
@@ -5378,14 +5378,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __B4DLCbits_t;
@@ -5853,14 +5853,14 @@ typedef union
 
   struct
     {
-    unsigned FILHIT             : 5;
-    unsigned                    : 3;
+    unsigned TXPRI              : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
-    unsigned TXPRI              : 2;
-    unsigned                    : 6;
+    unsigned FILHIT             : 5;
+    unsigned                    : 3;
     };
   } __B5CONbits_t;
 
@@ -6093,14 +6093,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __B5DLCbits_t;
@@ -9665,14 +9665,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __RXB1DLCbits_t;
@@ -10649,14 +10649,14 @@ typedef union
 
   struct
     {
-    unsigned EICODE             : 5;
-    unsigned                    : 3;
+    unsigned ICODE              : 4;
+    unsigned                    : 4;
     };
 
   struct
     {
-    unsigned ICODE              : 4;
-    unsigned                    : 4;
+    unsigned EICODE             : 5;
+    unsigned                    : 3;
     };
 
   struct
@@ -13354,13 +13354,13 @@ typedef union
 
   struct
     {
-    unsigned LVV                : 4;
+    unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned HLVDL              : 4;
+    unsigned LVV                : 4;
     unsigned                    : 4;
     };
 
@@ -13446,13 +13446,13 @@ typedef union
 
   struct
     {
-    unsigned HLVDL              : 4;
+    unsigned LVDL               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned LVDL               : 4;
+    unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
   } __LVDCONbits_t;

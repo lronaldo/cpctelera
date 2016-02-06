@@ -230,8 +230,8 @@ enum {
   W_DEPRECATED_OPTION           = 201, /* deprecated compiler option '%s' */
   E_BAD_DESIGNATOR              = 202, /* Bad designated initializer */
   W_DUPLICATE_INIT              = 203, /* duplicate initializer */
-  E_INVALID_UNIVERSAL           = 204, /* incomplete universal character name %s. */
-  W_UNIVERSAL_C99               = 205, /* universal character names are only valid in C99 */
+  E_INVALID_UNIVERSAL           = 204, /* invalid universal character name %s. */
+  W_UNIVERSAL_C95               = 205, /* universal character names are only valid in C95 or later */
   E_SHORTLONG                   = 206, /* Invalid combination of short / long */
   E_INTEGERSUFFIX               = 207, /* Invalid integer suffix */
   E_AUTO_ADDRSPACE              = 208, /* named address space for auto var */
@@ -246,7 +246,7 @@ enum {
   W_INTERNAL_ERROR              = 217, /* warning for non-fatal internal errors - things that should not have happened, but can be handled */
   W_UNRECOGNIZED_ASM            = 218, /* unrecognized asm instruction in peephole optimizer */
   W_FLEXARRAY_INSTRUCT          = 219, /* using flexible arrays in a struct */
-  W_ANONYMOUS_MEMBER            = 220, /* anonymous member in struct/union */
+  E_TYPE_IS_FUNCTION            = 220, /* typedef void foo_t(void); foo_t foo; */
   W_INLINE_NAKED                = 221, /* inline function is naked */
   E_Z88DK_FASTCALL_PARAMETERS   = 222, /* invalid number of parameters in __z88dk_fastcall */
   E_Z88DK_FASTCALL_PARAMETER    = 223, /* invalid parameter type in __z88dk_fastcall */
@@ -257,6 +257,11 @@ enum {
   E_MULTIPLE_MATCHES_IN_GENERIC = 228, /* multiple matching expressions in generic association */
   E_NO_MATCH_IN_GENERIC         = 229, /* no matching expression in generic association */
   W_LABEL_WITHOUT_STATEMENT     = 230, /* label without statement, not allowed in standard C */
+  E_WCHAR_CONST_C95             = 231, /* character constant of type wchar_t requires ISO C 95 or later */
+  E_WCHAR_CONST_C11             = 232, /* character constant of type char16_t or char32_t equires ISO C 11 or later */
+  E_WCHAR_STRING_C95            = 233, /* wide character string literal requires ISO C 95 or later */
+  E_WCHAR_STRING_C11            = 234, /* wide character string literal requires ISO C 11 or later */
+  W_UNKNOWN_REG                 = 235, /* unknown register specified */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

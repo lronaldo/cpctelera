@@ -303,7 +303,7 @@ void pic16_DumpAop(char *prefix, asmop *aop)
 	if (aop->type == AOP_LIT)
 	{
 		DEBUGpic16_emitcode (";", " %s type:AOP_LIT",prefix);
-		sprintf(s,"%s (aopu.aop_lit)",prefix);
+		SNPRINTF(s, sizeof(s), "%s (aopu.aop_lit)",prefix);
 		pic16_DumpValue(s,aop->aopu.aop_lit);
 	}
 	if (aop->type == AOP_REG)
@@ -330,7 +330,7 @@ void pic16_DumpAop(char *prefix, asmop *aop)
 	if (aop->type == AOP_PCODE)
 	{
 		DEBUGpic16_emitcode (";", " %s type:AOP_PCODE",prefix);
-		sprintf(s,"%s (aopu.pcop)",prefix);
+		SNPRINTF(s, sizeof(s), "%s (aopu.pcop)",prefix);
 		pic16_DumpPcodeOp(s,aop->aopu.pcop);
 	}
 
@@ -397,7 +397,7 @@ void pic16_DumpSymbol(char *prefix, symbol *sym)
 
 	if(sym->aop)
 	{
-		sprintf(s,"%s (aop)",prefix);
+		SNPRINTF(s, sizeof(s), "%s (aop)",prefix);
 		pic16_DumpAop(s,sym->aop);
 	} else {
 		DEBUGpic16_emitcode (";", " %s aop:NULL",prefix);
@@ -425,7 +425,7 @@ void pic16_DumpOp(char *prefix, operand *op)
 	DEBUGpic16_emitcode (";", " %s isLiteral:%d",prefix,op->isLiteral);
 	DEBUGpic16_emitcode (";", " %s key:%d",prefix,op->key);
 	if(IS_SYMOP(op)) {
-		sprintf(s,"%s (symOperand)",prefix);
+		SNPRINTF(s, sizeof(s), "%s (symOperand)",prefix);
 		pic16_DumpSymbol(s, OP_SYMBOL (op));
 	}
 }

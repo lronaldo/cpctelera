@@ -606,13 +606,11 @@ read_file_guts (cpp_reader *pfile, _cpp_file *file)
 	 SSIZE_MAX to be much smaller than the actual range of the
 	 type.  Use INTTYPE_MAXIMUM unconditionally to ensure this
 	 does not bite us.  */
-#ifndef __BORLANDC__
       if (file->st.st_size > INTTYPE_MAXIMUM (ssize_t))
 	{
 	  cpp_error (pfile, CPP_DL_ERROR, "%s is too large", file->path);
 	  return false;
 	}
-#endif
 
       size = file->st.st_size;
     }
@@ -643,18 +641,9 @@ read_file_guts (cpp_reader *pfile, _cpp_file *file)
       return false;
     }
 
-#ifndef __BORLANDC__
-  /* For some reason, even though we opened with O_BINARY,
-   * Borland C++ seems to insist on doing CR/LF -> LF
-   * translations for us, which results in the file appearing
-   * shorter than stat told us it should be.
-   *
-   * This sucks, but don't bother throwing a warning.
-   */
   if (regular && total != size && STAT_SIZE_RELIABLE (file->st))
     cpp_error (pfile, CPP_DL_WARNING,
 	       "%s is shorter than expected", file->path);
-#endif
 
   file->buffer = _cpp_convert_input (pfile,
 				     CPP_OPTION (pfile, input_charset),

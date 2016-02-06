@@ -207,7 +207,8 @@ BaseFileName (struct asmf * currFile, int spacesToUnderscores)
                 /*
                  * Dump a FILE command with full path and extension
                  */
-                fprintf(ofp, ";!FILE %s\n", p1);
+                if (ofp)
+                  fprintf(ofp, ";!FILE %s\n", p1);
 
                 /*
                  * The name starts after the last
@@ -233,3 +234,4 @@ BaseFileName (struct asmf * currFile, int spacesToUnderscores)
         return(baseName);
 }
 #endif
+

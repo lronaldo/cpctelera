@@ -37,4 +37,5 @@
 #endif
 
 __xdata char __sdcc_heap[HEAP_SIZE];
-__xdata void * const __sdcc_last_memheader = (__sdcc_heap + HEAP_SIZE - sizeof(__xdata void *));
+const unsigned int __sdcc_heap_size = HEAP_SIZE;
+

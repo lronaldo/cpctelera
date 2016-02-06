@@ -368,7 +368,7 @@ static void adjustArithmeticResult(iCode *ic)
         !pic16_sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))) &&
         !pic16_sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)))) {
         char buffer[5];
-        sprintf(buffer,"#%d",pointerCode(getSpec(operandType(IC_LEFT(ic)))));
+        SNPRINTF(buffer, sizeof(buffer), "#%d", pointerCode(getSpec(operandType(IC_LEFT(ic)))));
         pic16_aopPut(AOP(IC_RESULT(ic)),buffer,2);
     }
 }
@@ -403,7 +403,8 @@ static void adjustArithmeticResult(iCode *ic)
          !pic16_sameRegs(AOP(IC_RESULT(ic)),AOP(IC_LEFT(ic))) &&
          !pic16_sameRegs(AOP(IC_RESULT(ic)),AOP(IC_RIGHT(ic)))) {
          char buffer[5];
-         sprintf(buffer,"#%d",pointerCode(getSpec(operandType(IC_LEFT(ic)))));
+
+         SNPRINTF(buffer, sizeof(buffer), "#%d", pointerCode(getSpec(operandType(IC_LEFT(ic)))));
          pic16_aopPut(AOP(IC_RESULT(ic)),buffer,GPTRSIZE - 1);
      }
 }

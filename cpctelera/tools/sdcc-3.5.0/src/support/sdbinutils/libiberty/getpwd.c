@@ -107,6 +107,11 @@ getpwd (void)
 
 #else	/* VMS || _WIN32 && !__CYGWIN__ */
 
+#ifdef _WIN32
+#include <direct.h>
+#define getcwd	_getcwd
+#endif
+
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 255
 #endif

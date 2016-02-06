@@ -168,12 +168,13 @@ char *get_pragma_token (const char *s, struct pragma_token_s *token);
 const char *get_pragma_string (struct pragma_token_s *token);
 void free_pragma_token (struct pragma_token_s *token);
 
-unsigned char hexEscape (const char **src);
-unsigned char universalEscape (const char **src, unsigned int n);
-unsigned char octalEscape (const char **src);
+unsigned long int hexEscape (const char **src);
+unsigned long int universalEscape (const char **src, unsigned int n);
+unsigned long int octalEscape (const char **src);
 const char *copyStr (const char *src, size_t *size);
 
 void getPrefixSuffix(const char *);
 char *setPrefixSuffix(const char *);
 
+char *formatInlineAsm (char *);
 #endif

@@ -16,6 +16,8 @@ void mallocfree(void)
 	char *a, *b, *c;
 	char d[25];
 
+	LOG (("mallocfree()\n"));
+
 	a = malloc(16);
 	ASSERT(a);
 	memset(a, 2, 16);
@@ -24,7 +26,9 @@ void mallocfree(void)
 	memset(b, 1, 16);
 	c = calloc(16, 1);
 	ASSERT(c);
-
+#ifndef PORT_HOST
+	LOG (("1 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 	memset(d, 2, 16);
 	ASSERT(!memcmp(d, a, 16));
 	memset(d, 1, 16);
@@ -35,7 +39,9 @@ void mallocfree(void)
 	free(b);
 	b = malloc(20);
 	memset(b, 3, 20);
-
+#ifndef PORT_HOST
+	LOG (("2 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 	memset(d, 2, 16);
 	ASSERT(!memcmp(d, a, 16));
 	memset(d, 3, 20);
@@ -46,7 +52,9 @@ void mallocfree(void)
 	free(b);
 	b = malloc(10);
 	memset(b, 4, 10);
-
+#ifndef PORT_HOST
+	LOG (("3 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 	memset(d, 2, 16);
 	ASSERT(!memcmp(d, a, 16));
 	memset(d, 4, 20);
@@ -60,13 +68,25 @@ void mallocfree(void)
 	b = realloc(b, 4);
 	memset(d, 5, 8);
 	ASSERT(!memcmp(d, b, 4));
+#ifndef PORT_HOST
+	LOG (("4 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 
 	free(a);
 	b = realloc(b, 8);
 	ASSERT(!memcmp(d, b, 4));
 
+#ifndef PORT_HOST
+	LOG (("5 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 	free(b);
+#ifndef PORT_HOST
+	LOG (("6 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 	free(c);
+#ifndef PORT_HOST
+	LOG (("7 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 
 	a = malloc(10);
 	memset(a, 6, 10);
@@ -74,14 +94,24 @@ void mallocfree(void)
 	memset(b, 7, 10);
 	c = malloc(10);
 	memset(c, 8, 10);
+#ifndef PORT_HOST
+	LOG (("8 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
+
 	free(b);
 	a = realloc(a, 25);
 	memset(a + 10, 6, 15);
+#ifndef PORT_HOST
+	LOG (("9 a %u b %u c %u\n", (unsigned)a, (unsigned)b, (unsigned)c));
+#endif
 
 	memset(d, 6, 25);
 	ASSERT(!memcmp(d, a, 25));
 	memset(d, 8, 10);
 	ASSERT(!memcmp(d, c, 10));
+
+	free(a);
+	free(c);
 }
 
 void
@@ -91,7 +121,7 @@ testMalloc (void)
   char *p;
   unsigned char i;
 
-#if !defined(PORT_HOST) && !defined(__SDCC_gbz80) && !defined(__SDCC_z80)
+
 #if defined(__SDCC_pic16)
   _initHeap (heap, sizeof heap);
 #endif
@@ -102,6 +132,7 @@ testMalloc (void)
   LOG (("p1 == NULL when out of memory\n"));
 #endif
 
+#if !defined(PORT_HOST) && !defined(__SDCC_gbz80) && !defined(__SDCC_z80)
   p1 = malloc (2000);
   ASSERT (p1 == NULL);
   LOG (("p1 == NULL when out of memory\n"));
@@ -166,6 +197,8 @@ testMalloc (void)
   LOG (("p3, after freeing p2: %u\n", (unsigned) p3));
 #endif
 
+  free (p1);
+  free (p3);
   mallocfree();
 }
 

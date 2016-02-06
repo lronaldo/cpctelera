@@ -241,6 +241,7 @@ static struct
 
 bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
 bool z80_symmParm_in_calls_from_current_function;
+bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop * aop, int offset, bool bit16);
 
@@ -1811,6 +1812,48 @@ requiresHL (const asmop * aop)
     }
 }
 
+/*----------------------------------------------------------*/
+/* strtoul_z80: a wrapper to strtoul, which can also handle */
+/* hex numbers with a $ prefix.                             */
+/*----------------------------------------------------------*/
+static unsigned long int 
+strtoul_z80asm (const char *nptr, char **endptr, int base)
+{
+  char *p = NULL;
+  int i, flag = 0, len;
+  unsigned long ret;
+
+  if (nptr != NULL && (p = malloc ((len = strlen (nptr)) + 1 + 1)) != NULL)
+    {
+      memset (p, 0, len + 2);
+      for (i = 0; i < len; i++)
+        {
+          if (!flag)
+            if (isspace (nptr[i]))
+              p[i] = nptr[i];
+            else if (nptr[i] == '$')
+              {
+                p[i] = '0';
+                p[i + 1] = 'x';
+                flag = 1;
+              }
+            else
+              break;
+          else
+            p[i + 1] = nptr[i];
+        }
+    }
+
+  if (flag)
+    ret = strtoul (p, endptr, base);
+  else
+    ret = strtoul (nptr, endptr, base);
+
+  if (p)
+    free (p);
+  return ret;
+}
+
 static void
 fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
 {
@@ -1857,7 +1900,7 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
         {
           unsigned new_low, new_high, old_low, old_high;
           unsigned long v_new = ulFromVal (left->aopu.aop_lit);
-          unsigned long v_old = strtoul (_G.pairs[pairId].base, NULL, 0);
+          unsigned long v_old = strtoul_z80asm (_G.pairs[pairId].base, NULL, 0);
           new_low = (v_new >> 0) & 0xff;
           new_high = (v_new >> 8) & 0xff;
           old_low = (v_old >> 0) & 0xff;
@@ -3761,6 +3804,9 @@ _saveRegsForCall (const iCode * ic, bool dontsaveIY)
      o ...
    */
 
+  sym_link *dtype = operandType (IC_LEFT (ic));
+  sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+
   if (_G.saves.saved == FALSE)
     {
       bool push_bc, push_de, push_hl, push_iy;
@@ -3785,8 +3831,8 @@ _saveRegsForCall (const iCode * ic, bool dontsaveIY)
         }
       else
         {
-          push_bc = bitVectBitValue (ic->rSurv, B_IDX) || bitVectBitValue (ic->rSurv, C_IDX);
-          push_de = bitVectBitValue (ic->rSurv, D_IDX) || bitVectBitValue (ic->rSurv, E_IDX);
+          push_bc = bitVectBitValue (ic->rSurv, B_IDX) && !ftype->funcAttrs.preserved_regs[B_IDX] || bitVectBitValue (ic->rSurv, C_IDX) && !ftype->funcAttrs.preserved_regs[C_IDX];
+          push_de = bitVectBitValue (ic->rSurv, D_IDX) && !ftype->funcAttrs.preserved_regs[D_IDX] || bitVectBitValue (ic->rSurv, E_IDX) && !ftype->funcAttrs.preserved_regs[E_IDX];
           push_hl = bitVectBitValue (ic->rSurv, H_IDX) || bitVectBitValue (ic->rSurv, L_IDX);
           push_iy = !dontsaveIY && (bitVectBitValue (ic->rSurv, IYH_IDX) || bitVectBitValue (ic->rSurv, IYL_IDX));
         }
@@ -4151,8 +4197,12 @@ emitCall (const iCode *ic, bool ispcall)
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+  int i;
 
   z88dk_callee = IFFUNC_ISZ88DK_CALLEE (ftype);
+
+  for (i = 0; i < IYH_IDX + 1; i++)
+    z80_regs_preserved_in_calls_from_current_function[i] |= ftype->funcAttrs.preserved_regs[i];
 
   _saveRegsForCall (ic, FALSE);
 
@@ -8679,7 +8729,7 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed)
   if (!is_signed &&
     (AOP (result)->type == AOP_ACC ||
     AOP (result)->type != AOP_REG ||
-    (shCount >= 4 && !IS_GB || AOP (left)->type == AOP_ACC) /*&& !bitVectBitValue (ic->rSurv, A_IDX)*/))
+    (shCount >= 4 || AOP (left)->type == AOP_ACC) /*&& !bitVectBitValue (ic->rSurv, A_IDX)*/))
     {
       cheapMove (ASMOP_A, 0, AOP (left), 0);
       AccRsh (shCount);
@@ -8688,17 +8738,7 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed)
   else if (AOP (result)->type == AOP_REG) // Can shift in destination for register result.
     {
       cheapMove (AOP (result), 0, AOP (left), 0);
-      if (!is_signed && IS_GB && shCount >= 3)
-        {
-          if (shCount == 3)
-            {
-              emit3 (A_RLC, AOP (result), 0);
-              shCount++;
-            }
-          emit3 (A_SWAP, AOP (result), 0);
-          regalloc_dry_run_cost += 2;
-          shCount -= 4;
-        }
+
       while (shCount--)
         emit3 (is_signed ? A_SRA : A_SRL, AOP (result), 0);
     }
@@ -12077,6 +12117,7 @@ genZ80Code (iCode * lic)
 
   memset(z80_regs_used_as_parms_in_calls_from_current_function, 0, sizeof(bool) * (IYH_IDX + 1));
   z80_symmParm_in_calls_from_current_function = TRUE;
+  memset(z80_regs_preserved_in_calls_from_current_function, 0, sizeof(bool) * (IYH_IDX + 1));
 
   /* if debug information required */
   if (options.debug && currFunc)

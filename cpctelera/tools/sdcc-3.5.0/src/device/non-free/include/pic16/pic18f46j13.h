@@ -2,9 +2,9 @@
  * This declarations of the PIC18F46J13 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:47 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:05 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -67,13 +67,13 @@ typedef union
 
   struct
     {
-    unsigned SRC                : 2;
+    unsigned TRIGSEL            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned TRIGSEL            : 2;
+    unsigned SRC                : 2;
     unsigned                    : 6;
     };
   } __ADCTRIGbits_t;
@@ -7192,4 +7192,22 @@ extern __at(0x0FFD) __sfr TOS;
 extern __at(0x0FFD) __sfr TOSL;
 extern __at(0x0FFE) __sfr TOSH;
 extern __at(0x0FFF) __sfr TOSU;
+
+//==============================================================================
+//
+//        Configuration Addresses
+//
+//==============================================================================
+
+#define __CONFIG1L              0x00FFF8
+#define __CONFIG1H              0x00FFF9
+#define __CONFIG2L              0x00FFFA
+#define __CONFIG2H              0x00FFFB
+#define __CONFIG3L              0x00FFFC
+#define __CONFIG3H              0x00FFFD
+#define __CONFIG4L              0x00FFFE
+#define __CONFIG4H              0x00FFFF
+
+//==============================================================================
+
 #endif // #ifndef __PIC18F46J13_H__

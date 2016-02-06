@@ -2,9 +2,9 @@
  * This definitions of the PIC16LF1559 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:47 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:52 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -285,6 +285,9 @@ __at(0x0615) volatile __PWM2DCHbits_t PWM2DCHbits;
 __at(0x0616) __sfr PWM2CON;
 __at(0x0616) volatile __PWM2CONbits_t PWM2CONbits;
 
+__at(0x0616) __sfr PWM2CON0;
+__at(0x0616) volatile __PWM2CON0bits_t PWM2CON0bits;
+
 __at(0x0711) __sfr AAD1CON0;
 __at(0x0711) volatile __AAD1CON0bits_t AAD1CON0bits;
 
@@ -373,7 +376,11 @@ __at(0x071A) __sfr AAD1RES0;
 
 __at(0x071A) __sfr AAD1RES0L;
 
+__at(0x071A) __sfr AD1RES0;
+
 __at(0x071A) __sfr AD1RES0L;
+
+__at(0x071A) __sfr ADRES0;
 
 __at(0x071B) __sfr AAD1RES0H;
 
@@ -383,7 +390,11 @@ __at(0x071C) __sfr AAD1RES1;
 
 __at(0x071C) __sfr AAD1RES1L;
 
+__at(0x071C) __sfr AD1RES1;
+
 __at(0x071C) __sfr AD1RES1L;
+
+__at(0x071C) __sfr ADRES1;
 
 __at(0x071D) __sfr AAD1RES1H;
 
@@ -450,11 +461,15 @@ __at(0x079A) __sfr AAD2RES0;
 
 __at(0x079A) __sfr AAD2RES0L;
 
+__at(0x079A) __sfr AD2RES0;
+
 __at(0x079B) __sfr AAD2RES0H;
 
 __at(0x079C) __sfr AAD2RES1;
 
 __at(0x079C) __sfr AAD2RES1L;
+
+__at(0x079C) __sfr AD2RES1;
 
 __at(0x079D) __sfr AAD2RES1H;
 

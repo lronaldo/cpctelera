@@ -129,7 +129,7 @@ __sfr __at (0xB1) IEN1;		//Interrupt Enable 1
 __sfr __at (0xB8) IPL0;	    //Interrupt Priority 0 LOW
 	__sbit __at (0xBE) PPCL;//PCA Interrupt Priority low bit.
 	__sbit __at (0xBD) PT2L;//Timer 2 Interrupt Priority Low Bit.
-	__sbit __at (0xBC) PLS; //Serial Port Interrupt Priority Low Bit.
+	__sbit __at (0xBC) PSL; //Serial Port Interrupt Priority Low Bit.
 	__sbit __at (0xBB) PT1L;//Timer 1 Interrupt Priority Low Bit.
 	__sbit __at (0xBA) PX1L;//External Interrupt 1 Priority Low Bit.
 	__sbit __at (0xB9) PT0L;//Timer 0 Interrupt Priority Low Bit.
@@ -138,7 +138,7 @@ __sfr __at (0xB8) IPL0;	    //Interrupt Priority 0 LOW
 __sfr __at (0xB7) IPH0;		//Interrupt Priority 0 HIGH
 	#define PPCH 0x40		//PCA Interrupt Priority High Bit.
 	#define PT2H 0x20		//Timer 2 Interrupt Priority High Bit.
-	#define PHS  0x10		//Serial Port Interrupt Priority High Bit.
+	#define PSH  0x10		//Serial Port Interrupt Priority High Bit.
 	#define PT1H 0x08		//Timer 1 Interrupt Priority High Bit.
 	#define PX1H 0x04		//External Interrupt 1 Priority High Bit.
 	#define PT0H 0x02		//Timer 0 Interrupt Priority High Bit.
@@ -242,5 +242,16 @@ __sfr __at (0x9E) KBF;      //Keyboard Flag Register
 __sfr __at (0xD2) EECON;    //EEPROM Data Control
 	#define EEE    0x02		//EEPROM Enable. '1'=use EEPROM, '0'=use XRAM
 	#define EEBUSY 0x01		//EEPROM Busy. '1'=EEPROM is busy programming
+
+// PCON bit definitions
+	#define SMOD1 0x80
+	#define SMOD0 0x40
+	#define POF   0x10
+
+/* Interrupt numbers: address = (number * 8) + 3 */
+#define TF2_VECTOR      5       /* 0x2b timer 2 */
+#define PCA_VECTOR      6       /* 0x33 Programmable Counter Array */
+#define KBD_VECTOR      7       /* 0x3b Keyboard Interface */
+#define SPI_VECTOR      9       /* 0x4b Serial Port Interface */
 
 #endif /*REG_AT89C51ED2_H*/

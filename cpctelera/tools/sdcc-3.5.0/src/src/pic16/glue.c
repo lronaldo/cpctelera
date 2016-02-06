@@ -532,9 +532,9 @@ _pic16_printPointerType (const char *name, char ptype, void *p)
 {
   char buf[256];
 
-  sprintf (buf, "LOW(%s)", name);
+  SNPRINTF(buf, sizeof(buf), "LOW(%s)", name);
   pic16_emitDS (buf, ptype, p);
-  sprintf (buf, "HIGH(%s)", name);
+  SNPRINTF(buf, sizeof(buf), "HIGH(%s)", name);
   pic16_emitDS (buf, ptype, p);
 }
 
@@ -565,7 +565,7 @@ pic16_printGPointerType (const char *iname, const unsigned int itype,
     case FUNCTION: /* fall through */
     case GPOINTER:
       /* GPTRs pointing to __data space should be reported as POINTERs */
-      sprintf (buf, "UPPER(%s)", iname);
+      SNPRINTF(buf, sizeof(buf), "UPPER(%s)", iname);
       pic16_emitDS (buf, ptype, p);
       break;
 
@@ -573,7 +573,7 @@ pic16_printGPointerType (const char *iname, const unsigned int itype,
     case FPOINTER: /* fall through */
     case IPOINTER: /* fall through */
     case PPOINTER: /* __data space */
-      sprintf (buf, "0x%02x", GPTR_TAG_DATA);
+      SNPRINTF(buf, sizeof(buf), "0x%02x", GPTR_TAG_DATA);
       pic16_emitDS (buf, ptype, p);
       break;
 
@@ -1361,8 +1361,9 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sn
               ++noAlloc;
               resolveIvalSym (sym->ival, sym->type);
               asym = newSymbol (sym->rname, 0);
-              abSym = Safe_calloc (1, sizeof (absSym));
-              strcpy (abSym->name, sym->rname);
+              abSym = Safe_alloc(sizeof (absSym));
+              strncpy(abSym->name, sym->rname, sizeof(abSym->name) - 1);
+              abSym->name[sizeof(abSym->name) - 1] = '\0';
               abSym->address = SPEC_ADDR (sym->etype);
               addSet (&absSymSet, abSym);
 
@@ -1370,7 +1371,7 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sn
               pic16_addpBlock (pb);
 
               pcf = pic16_newpCodeFunction (moduleName, asym->name);
-              PCF (pcf)->absblock = 1;
+              PCF (pcf)->absblock = TRUE;
 
               pic16_addpCode2pBlock (pb, pcf);
               pic16_addpCode2pBlock (pb, pic16_newpCodeLabel (sym->rname, -1));
@@ -1821,10 +1822,9 @@ pic16glue ()
 
 #if 1
     if(pic16_options.dumpcalltree) {
-      FILE *cFile;
+        FILE *cFile;
 
-        sprintf(buffer, "%s", dstFileName);
-        strcat(buffer, ".calltree");
+        SNPRINTF(buffer, sizeof(buffer), "%s.calltree", dstFileName);
         cFile = fopen(buffer, "w");
         pic16_printCallTree( cFile );
         fclose(cFile);
@@ -1834,17 +1834,15 @@ pic16glue ()
     pic16_InlinepCode();
     pic16_AnalyzepCode('*');
 
-
     if(pic16_debug_verbose)
       pic16_pcode_test();
 
     /* now put it all together into the assembler file */
     /* create the assembler file name */
     if((noAssemble || options.c1mode)  && fullDstFileName) {
-      sprintf (buffer, "%s", fullDstFileName);
+      SNPRINTF(buffer, sizeof(buffer), "%s", fullDstFileName);
     } else {
-      sprintf (buffer, "%s", dstFileName);
-      strcat (buffer, ".asm");
+      SNPRINTF(buffer, sizeof(buffer), "%s.asm", dstFileName);
     }
 
     if(!(asmFile = fopen (buffer, "w"))) {

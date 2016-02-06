@@ -2,9 +2,9 @@
  * This definitions of the PIC12F1572 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:45 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:34 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -359,11 +359,17 @@ __at(0x0DAA) volatile __PWM2TMRHbits_t PWM2TMRHbits;
 __at(0x0DAB) __sfr PWM2CON;
 __at(0x0DAB) volatile __PWM2CONbits_t PWM2CONbits;
 
+__at(0x0DAC) __sfr PWM2INTCON;
+__at(0x0DAC) volatile __PWM2INTCONbits_t PWM2INTCONbits;
+
 __at(0x0DAC) __sfr PWM2INTE;
 __at(0x0DAC) volatile __PWM2INTEbits_t PWM2INTEbits;
 
 __at(0x0DAD) __sfr PWM2INTF;
 __at(0x0DAD) volatile __PWM2INTFbits_t PWM2INTFbits;
+
+__at(0x0DAD) __sfr PWM2INTFLG;
+__at(0x0DAD) volatile __PWM2INTFLGbits_t PWM2INTFLGbits;
 
 __at(0x0DAE) __sfr PWM2CLKCON;
 __at(0x0DAE) volatile __PWM2CLKCONbits_t PWM2CLKCONbits;
@@ -417,11 +423,17 @@ __at(0x0DBA) volatile __PWM3TMRHbits_t PWM3TMRHbits;
 __at(0x0DBB) __sfr PWM3CON;
 __at(0x0DBB) volatile __PWM3CONbits_t PWM3CONbits;
 
+__at(0x0DBC) __sfr PWM3INTCON;
+__at(0x0DBC) volatile __PWM3INTCONbits_t PWM3INTCONbits;
+
 __at(0x0DBC) __sfr PWM3INTE;
 __at(0x0DBC) volatile __PWM3INTEbits_t PWM3INTEbits;
 
 __at(0x0DBD) __sfr PWM3INTF;
 __at(0x0DBD) volatile __PWM3INTFbits_t PWM3INTFbits;
+
+__at(0x0DBD) __sfr PWM3INTFLG;
+__at(0x0DBD) volatile __PWM3INTFLGbits_t PWM3INTFLGbits;
 
 __at(0x0DBE) __sfr PWM3CLKCON;
 __at(0x0DBE) volatile __PWM3CLKCONbits_t PWM3CLKCONbits;

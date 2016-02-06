@@ -10,13 +10,13 @@
 # Adopted for the SDCC/pic14 library by
 #	Raphael Neider <rneider AT web.de>
 #
-# $Id: configure.ac 9283 2015-07-12 01:14:32Z benshi $
+# $Id: configure.ac 9455 2016-01-14 16:22:45Z molnarkaroly $
 #
 
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.60)
 AC_INIT([pic14lib], [0.1], [tecodev AT users sourceforge net])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([libsdcc/idata.c])
 AC_CONFIG_HEADER([config.h])
 

@@ -277,6 +277,7 @@ typedef struct sym_link
     unsigned javaNative;            /* is a JavaNative Function (TININative ONLY) */
     unsigned overlay;               /* force parameters & locals into overlay segment */
     unsigned hasStackParms;         /* function has parameters on stack     */
+    bool preserved_regs[9];         /* Registers preserved by the function - may be an underestimate */
   } funcAttrs;
 
   struct sym_link *next;            /* next element on the chain  */

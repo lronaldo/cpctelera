@@ -29,7 +29,7 @@ extern set *userIncDirsSet;
 extern set *libDirsSet;
 extern set *libPathsSet;
 
-#define MAX_PICLIST 200
+#define MAX_PICLIST 400
 static PIC_device *Pics[MAX_PICLIST];
 static PIC_device *pic = NULL;
 static int num_of_supported_PICS = 0;
@@ -120,8 +120,8 @@ create_pic (char *pic_name, int maxram, int bankmsk, int confsiz,
   PIC_device *new_pic;
   char *simple_pic_name = sanitise_processor_name (pic_name);
 
-  new_pic = Safe_calloc (1, sizeof (PIC_device));
-  new_pic->name = Safe_strdup (simple_pic_name);
+  new_pic = Safe_alloc(sizeof(PIC_device));
+  new_pic->name = Safe_strdup(simple_pic_name);
 
   new_pic->defMaxRAMaddrs = maxram;
   new_pic->bankMask = bankmsk;
@@ -159,7 +159,7 @@ register_map (int num_words, char **word)
 
   for (pcount = 2; pcount < num_words; pcount++)
     {
-      r = Safe_calloc (1, sizeof (memRange));
+      r = Safe_alloc(sizeof(memRange));
 
       r->start_address = parse_config_value (word[pcount]);
       r->end_address = parse_config_value (word[pcount]);
@@ -185,7 +185,7 @@ ram_map (int num_words, char **word)
       return;
     } // if
 
-  r = Safe_calloc (1, sizeof (memRange));
+  r = Safe_alloc(sizeof(memRange));
   //fprintf (stderr, "%s: %s %s %s\n", __FUNCTION__, word[1], word[2], word[3]);
 
   r->start_address = parse_config_value (word[1]);
@@ -577,7 +577,7 @@ init_pic (char *pic_type)
   if (pic == NULL)
     {
       /* check for shortened "16xxx" form */
-      sprintf(long_name, "16%s", pic_type);
+      SNPRINTF(long_name, sizeof(long_name), "16%s", pic_type);
       pic = find_device(long_name);
       if (pic == NULL)
         {

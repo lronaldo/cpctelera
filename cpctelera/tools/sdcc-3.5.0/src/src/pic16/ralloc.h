@@ -107,22 +107,23 @@ extern set *pic16_equ_data;
 extern set *pic16_int_regs;
 extern set *pic16_acs_udata;
 
-reg_info *pic16_regWithIdx (int);
+void pic16_assignRegisters(ebbIndex *ebbi);
+reg_info *pic16_regWithIdx(int);
 reg_info *pic16_typeRegWithIdx(int, int, int);
-reg_info *pic16_dirregWithName (char *name );
-reg_info *pic16_allocregWithName(char *name);
-reg_info *pic16_regWithName(char *name);
-void  pic16_freeAllRegs ();
-void  pic16_deallocateAllRegs ();
+reg_info *pic16_dirregWithName(const char *name);
+reg_info *pic16_allocregWithName(const char *name);
+reg_info *pic16_regWithName(const char *name);
+void pic16_freeAllRegs(void);
+void pic16_deallocateAllRegs(void);
 reg_info *pic16_findFreeReg(short type);
 reg_info *pic16_findFreeRegNext(short type, reg_info *creg);
-reg_info *pic16_allocWithIdx (int idx);
+reg_info *pic16_allocWithIdx(int idx);
 
-reg_info *pic16_allocDirReg (operand *op );
-reg_info *pic16_allocRegByName (char *name, int size, operand *op);
+reg_info *pic16_allocDirReg (operand *op);
+reg_info *pic16_allocRegByName (const char *name, int size, operand *op);
 extern char *pic16_decodeOp(unsigned int op);
 
-reg_info* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int alias, operand *refop);
+reg_info* newReg(int type, short pc_type, int rIdx, const char *name, unsigned size, int alias, operand *refop);
 
 /* Define register address that are constant across PIC16 family */
 #define IDX_TMR0    0xfd6

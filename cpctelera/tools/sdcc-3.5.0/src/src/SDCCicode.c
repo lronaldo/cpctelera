@@ -1216,8 +1216,17 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
       /* it will be an unsigned long                      */
       if (IS_INT (type) || !IS_SPEC (type))
         {
+          /* long long is handled here, because it can overflow with double */
+          if (IS_LONGLONG (type) || !IS_SPEC (type))
+            /* signed and unsigned mul are the same, as long as the precision
+               of the result isn't bigger than the precision of the operands. */
+            retval = operandFromValue (valCastLiteral (type,
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (left)) *
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (right)),
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (left)) *
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (right))));
           /* long is handled here, because it can overflow with double */
-          if (IS_LONG (type) || !IS_SPEC (type))
+          else if (IS_LONG (type) || !IS_SPEC (type))
             /* signed and unsigned mul are the same, as long as the precision
                of the result isn't bigger than the precision of the operands. */
             retval = operandFromValue (valCastLiteral (type,
@@ -1897,7 +1906,7 @@ usualBinaryConversions (operand ** op1, operand ** op2, RESULT_TYPE resultType, 
 }
 
 /*-----------------------------------------------------------------*/
-/* geniCodeValueAtAddress - generate intermeditate code for value  */
+/* geniCodeValueAtAddress - generate intermediate code for value   */
 /*                          at address                             */
 /*-----------------------------------------------------------------*/
 operand *
@@ -1908,8 +1917,8 @@ geniCodeRValue (operand * op, bool force)
   sym_link *etype = getSpec (type);
 
   /* if this is an array & already */
-  /* an address then return this   */
-  if (IS_AGGREGATE (type) || (IS_PTR (type) && !force && !op->isaddr))
+  /* a resolved address then return this   */
+  if ((IS_ARRAY (type) && !IS_FUNCPTR (type->next)) || IS_STRUCT (type) || (IS_PTR (type) && !force && !op->isaddr))
     return operandFromOperand (op);
 
   /* if this is not an address then must be */
@@ -1934,7 +1943,7 @@ geniCodeRValue (operand * op, bool force)
     }
 
   ic = newiCode (GET_VALUE_AT_ADDRESS, op, operandFromLit (0));
-  if (IS_PTR (type) && op->isaddr && force)
+  if ((IS_PTR (type) && op->isaddr && force) || IS_ARRAY (type))
     type = type->next;
 
   type = copyLinkChain (type);
@@ -2457,9 +2466,8 @@ geniCodeArray (operand * left, operand * right, int lvl)
 
   ic = newiCode ('+', left, right);
 
-  IC_RESULT (ic) = newiTempOperand ((IS_PTR (ltype) &&
-                                     !IS_AGGREGATE (ltype->next) &&
-                                     !IS_PTR (ltype->next)) ? ltype : ltype->next, 0);
+  IC_RESULT (ic) = newiTempOperand (((IS_PTR (ltype) && !IS_AGGREGATE (ltype->next) && !IS_PTR (ltype->next)) ||
+                                    (IS_ARRAY (ltype) && IS_FUNCPTR (ltype->next))) ? ltype : ltype->next, 0);
 
   if (!IS_AGGREGATE (ltype->next))
     {
@@ -2485,7 +2493,7 @@ geniCodeStruct (operand * left, operand * right, bool islval)
 
   wassert (IS_SYMOP (right));
 
-  wassert (IS_STRUCT (type) || (IS_PTR (type) && IS_STRUCT (type->next)));
+  wassert (IS_STRUCT (type) || ((IS_PTR (type) || IS_ARRAY (type)) && IS_STRUCT (type->next)));
 
   /* add the offset */
   ic = newiCode ('+', left, operandFromLit (element->offset));
@@ -2943,6 +2951,12 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
         }
     }
 
+  /* Avoid expensive comparisons when the type of the constant is bigger than the type of the non-const operand */
+  if (IS_INTEGRAL (ltype) && IS_LITERAL (rtype) && getSize (ltype) < getSize (rtype) && !TARGET_HC08_LIKE)
+    right->svt.valOperand = valCastLiteral (ltype, operandLitValue (right), operandLitValue (right));
+  if (IS_INTEGRAL (rtype) && IS_LITERAL (ltype) && getSize (rtype) < getSize (ltype) && !TARGET_HC08_LIKE)
+    left->svt.valOperand = valCastLiteral (rtype, operandLitValue (left), operandLitValue (left));
+
   /* if one operand is a pointer and the other is a literal generic void pointer,
      change the type of the literal generic void pointer to match the other pointer */
   if (IS_GENPTR (ltype) && IS_VOID (ltype->next) && IS_ITEMP (left) && IS_PTR (rtype) && !IS_GENPTR (rtype))
@@ -3378,6 +3392,19 @@ geniCodeCall (operand * left, ast * parms, int lvl)
   sym_link *ftype;
   int stack = 0;
   int iArg = 0;
+
+  if (IS_ARRAY (operandType (left)))
+    {
+      iCode *tic;
+      sym_link *ttype;
+
+      tic = newiCode (GET_VALUE_AT_ADDRESS, left, operandFromLit (0));
+      ttype = copyLinkChain (operandType (left)->next);
+      IC_RESULT (tic) = newiTempOperand (ttype, 1);
+      IC_RESULT (tic)->isaddr = IS_FUNCPTR (ttype) ? 1 : 0;
+      ADDTOCHAIN (tic);
+      left = IC_RESULT (tic);
+    }
 
   ftype = operandType (left);
   if (!IS_FUNC (ftype) && !IS_FUNCPTR (ftype))
@@ -4135,7 +4162,9 @@ ast2iCode (ast * tree, int lvl)
       if (IS_ASSIGN_OP (tree->opval.op) || IS_DEREF_OP (tree) || IS_ADDRESS_OF_OP (tree))
         {
           addLvaluereq (lvl);
-          if ((!IS_ADDRESS_OF_OP (tree) && IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left)) ||
+          if ((!IS_ADDRESS_OF_OP (tree) && IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left) &&
+               tree->left->left->ftype && IS_ARRAY (tree->left->left->ftype) &&
+               tree->left->left->ftype->next && IS_ARRAY (tree->left->left->ftype->next)) || 
               (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
             clearLvaluereq ();
 
@@ -4435,10 +4464,10 @@ ast2iCode (ast * tree, int lvl)
       if (tree->right && tree->right->type == EX_VALUE)
         {
           geniCodeDummyRead (ast2iCode (tree->right, lvl + 1));
-	  return NULL;
-	}
+          return NULL;
+        }
       else
-	return ast2iCode (tree->right, lvl + 1);
+        return ast2iCode (tree->right, lvl + 1);
 
     case GOTO:
       geniCodeGoto (OP_SYMBOL (ast2iCode (tree->left, lvl + 1)));

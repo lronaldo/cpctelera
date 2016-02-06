@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1788 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:52 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:46 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -199,10 +199,13 @@
 #define OPA2CON_ADDR            0x0513
 #define CLKRCON_ADDR            0x051A
 #define DAC2CON0_ADDR           0x0591
+#define DAC2CON1_ADDR           0x0592
 #define DAC2REF_ADDR            0x0592
 #define DAC3CON0_ADDR           0x0593
+#define DAC3CON1_ADDR           0x0594
 #define DAC3REF_ADDR            0x0594
 #define DAC4CON0_ADDR           0x0595
+#define DAC4CON1_ADDR           0x0596
 #define DAC4REF_ADDR            0x0596
 #define PSMC1CON_ADDR           0x0E91
 #define PSMC1MDL_ADDR           0x0E92
@@ -4396,13 +4399,13 @@ typedef union
 
   struct
     {
-    unsigned PCH                : 3;
+    unsigned OPA1PCH            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned OPA1PCH            : 3;
+    unsigned PCH                : 3;
     unsigned                    : 5;
     };
   } __OPA1CONbits_t;
@@ -4555,6 +4558,7 @@ extern __at(0x0591) volatile __DAC2CON0bits_t DAC2CON0bits;
 
 //==============================================================================
 
+extern __at(0x0592) __sfr DAC2CON1;
 extern __at(0x0592) __sfr DAC2REF;
 
 //==============================================================================
@@ -4582,6 +4586,7 @@ extern __at(0x0593) volatile __DAC3CON0bits_t DAC3CON0bits;
 
 //==============================================================================
 
+extern __at(0x0594) __sfr DAC3CON1;
 extern __at(0x0594) __sfr DAC3REF;
 
 //==============================================================================
@@ -4609,6 +4614,7 @@ extern __at(0x0595) volatile __DAC4CON0bits_t DAC4CON0bits;
 
 //==============================================================================
 
+extern __at(0x0596) __sfr DAC4CON1;
 extern __at(0x0596) __sfr DAC4REF;
 
 //==============================================================================

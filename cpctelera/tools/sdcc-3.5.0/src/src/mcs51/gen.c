@@ -76,6 +76,10 @@ static short rbank = -1;
                        (x->aopu.aop_reg[0] == REG_WITH_INDEX(R0_IDX) || \
                         x->aopu.aop_reg[0] == REG_WITH_INDEX(R1_IDX) )))
 
+#define IS_AOP_IMMEDIATE(x) (AOP(x) && (AOP_TYPE(x) == AOP_LIT || \
+                                        AOP_TYPE(x) == AOP_IMMD || \
+                                        AOP_TYPE(x) == AOP_STR))
+
 #define SP_BP(sp, bp) (options.omitFramePtr ? sp : bp)
 #define SYM_BP(sym)   (SPEC_OCLS (sym->etype)->paged ? SP_BP("_spx", "_bpx") : SP_BP("sp", "_bp"))
 
@@ -1199,7 +1203,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
           emitpop ("ar0");
           _G.r0Pushed--;
         }
-	  break;
+      break;
     }
 
 dealloc:
@@ -6303,10 +6307,11 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 
   D (emitcode (";", "gencjneshort"));
 
-  /* if the left side is a literal or
+  /* if the left side is a immediate/literal or
      if the right is in a pointer register and left is not */
-  if ((AOP_TYPE (left) == AOP_LIT) ||
-      (AOP_TYPE (left) == AOP_IMMD) || (AOP_TYPE (left) == AOP_DIR) || (IS_AOP_PREG (right) && !IS_AOP_PREG (left)))
+  if (IS_AOP_IMMEDIATE (left) ||
+      (AOP_TYPE (left) == AOP_DIR && !IS_AOP_IMMEDIATE (right)) ||
+      (IS_AOP_PREG (right) && !IS_AOP_PREG (left)))
     {
       operand *t = right;
       right = left;
@@ -6329,8 +6334,8 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
     }
 
   /* if the right side is a literal then anything goes */
-  else if (AOP_TYPE (right) == AOP_LIT &&
-           AOP_TYPE (left) != AOP_DIR && AOP_TYPE (left) != AOP_IMMD && AOP_TYPE (left) != AOP_STR)
+  else if (IS_AOP_IMMEDIATE (right) &&
+           AOP_TYPE (left) != AOP_DIR && !IS_AOP_IMMEDIATE (left))
     {
       while (size--)
         {
@@ -6349,10 +6354,111 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
      if the left is a pointer register & right is not */
   else if (AOP_TYPE (right) == AOP_REG ||
            AOP_TYPE (right) == AOP_DIR ||
-           AOP_TYPE (right) == AOP_LIT ||
-           AOP_TYPE (right) == AOP_IMMD ||
-           (AOP_TYPE (left) == AOP_DIR && AOP_TYPE (right) == AOP_LIT) || (IS_AOP_PREG (left) && !IS_AOP_PREG (right)))
+           IS_AOP_IMMEDIATE (right) ||
+           (IS_AOP_PREG (left) && !IS_AOP_PREG (right)))
     {
+      if (AOP_TYPE (right) == AOP_LIT)
+        {
+          int   val[4]  = {0, 0, 0, 0};
+          bool  chk[4]  = {TRUE, FALSE, FALSE, FALSE};
+          int   rsize   = AOP_SIZE (right);
+          int   pidx    = -1;
+          int   lidx, cidx;
+          unsigned long lit = ulFromVal (AOP (right)->aopu.aop_lit);
+
+          switch (rsize)
+            {
+            case 4:
+              val[3]  = (lit >> 24) & 0xff;
+              chk[3]  = TRUE;
+              //fallthrough
+            case 3:
+              val[2]  = (lit >> 16) & 0xff;
+              chk[2]  = TRUE;
+              //fallthrough
+            case 2:
+              val[1]  = (lit >> 8) & 0xff;
+              chk[1]  = TRUE;
+              //fallthrough
+            default:
+              val[0]  = (lit >> 0) & 0xff;
+              chk[0]  = TRUE;
+            }
+          if (optimize.codeSize && (rsize > 1))
+            {
+              if ((!chk[0] || val[0] == 0x00) &&
+                  (!chk[1] || val[1] == 0x00) &&
+                  (!chk[2] || val[2] == 0x00) &&
+                  (!chk[3] || val[3] == 0x00))
+                {
+                  MOVA(aopGet(left, 0, FALSE, FALSE));
+                  for (cidx = 1; cidx < size; cidx++)
+                    if (chk[cidx])
+                      emitcode ("orl", "a,%s", aopGet(left, cidx, FALSE, FALSE));
+                  emitcode ("jnz", "%05d$", lbl->key + 100);
+                  return;
+                }
+              if ((!chk[0] || val[0] == 0xFF) &&
+                  (!chk[1] || val[1] == 0xFF) &&
+                  (!chk[2] || val[2] == 0xFF) &&
+                  (!chk[3] || val[3] == 0xFF))
+                {
+                  MOVA(aopGet(left, 0, FALSE, FALSE));
+                  for (cidx = 1; cidx < size; cidx++)
+                    if (chk[cidx])
+                      emitcode ("anl", "a,%s", aopGet(left, cidx, FALSE, FALSE));
+                  emitcode ("cjne", "a,#0xFF,%05d$", lbl->key + 100);
+                  return;
+                }
+            }
+
+          for (lidx = 0; lidx < size; lidx++)
+            {
+              if (chk[lidx] && !aopGetUsesAcc(left, lidx))
+                {
+                  if (pidx >= 0)
+                    {
+                      if (val[pidx] == val[lidx])
+                        {
+                          chk[lidx] = FALSE;
+                        }
+                      if ((~val[pidx] & 0xff) == val[lidx])
+                        {
+                          emitcode ("cpl", "a");
+                          chk[lidx] = FALSE;
+                        }
+                      else if (((val[pidx] + 1) & 0xff) == val[lidx])
+                        {
+                          emitcode ("inc", "a");
+                          chk[lidx] = FALSE;
+                        }
+                      else if (((val[pidx] - 1) & 0xff) == val[lidx])
+                        {
+                          emitcode ("dec", "a");
+                          chk[lidx] = FALSE;
+                        }
+                    }
+                  pidx = lidx;
+                  if (chk[lidx])
+                    {
+                      MOVA(aopGet(right, lidx, FALSE, FALSE));
+                      chk[lidx] = FALSE;
+                    }
+                  emitcode ("cjne", "a,%s,%05d$", aopGet(left, lidx, FALSE, TRUE), lbl->key + 100);
+
+                  for (cidx = lidx + 1; cidx < size; cidx++)
+                    {
+                      if (chk[cidx] && val[lidx] == val[cidx] && !IS_AOP_PREG (left))
+                        {
+                          chk[cidx] = FALSE;
+                          emitcode ("cjne", "a,%s,%05d$", aopGet(left, cidx, FALSE, TRUE), lbl->key + 100);
+                        }
+                    }
+                }
+            }
+          return;
+        }
+
       while (size--)
         {
           const char *r;

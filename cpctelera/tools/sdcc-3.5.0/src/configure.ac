@@ -419,6 +419,13 @@ AC_SUBST(MAKEDEP)
 AC_SUBST(WALL_FLAG)
 AC_SUBST(C99_FLAG)
 
+# Try to append a c99 flag
+# -------------------------------------------------------------------------
+AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" != "no"; then
+  CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
+fi
+
 # SDCC_C_UNNAMED_STRUCT_TAG ()
 # chech whether C compiler supports tag in unnamed struct
 # -------------------------------------------------------------------------

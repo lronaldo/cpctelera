@@ -84,22 +84,22 @@ extern set *dynInternalRegs;
 
 
 void initStack(int base_address, int size, int shared);
-reg_info *pic14_regWithIdx (int);
-reg_info *dirregWithName (char *name );
-void pic14_assignRegisters (ebbIndex *ebbi);
+reg_info *pic14_regWithIdx(int);
+reg_info *dirregWithName(const char *name);
+void pic14_assignRegisters(ebbIndex *ebbi);
 reg_info *pic14_findFreeReg(short type);
 reg_info *pic14_allocWithIdx (int idx);
-reg_info *typeRegWithIdx (int idx, int type, int fixed);
-reg_info *regFindWithName (const char *name);
+reg_info *typeRegWithIdx(int idx, int type, int fixed);
+reg_info *regFindWithName(const char *name);
 
 void pic14_debugLogClose(void);
 void writeUsedRegs(FILE *of);
 
-reg_info *allocDirReg (operand *op );
-reg_info *allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias);
-reg_info *allocProcessorRegister(int rIdx, char * name, short po_type, int alias);
-reg_info *allocRegByName (char *name, int size );
-reg_info *allocNewDirReg (sym_link *symlnk,const char *name);
+reg_info *allocDirReg(operand *op );
+reg_info *allocInternalRegister(int rIdx, const char *name, PIC_OPTYPE po_type, int alias);
+reg_info *allocProcessorRegister(int rIdx, const char *name, short po_type, int alias);
+reg_info *allocRegByName(const char *name, int size );
+reg_info *allocNewDirReg(sym_link *symlnk, const char *name);
 
 /* Define register address that are constant across PIC family */
 #define IDX_INDF    0

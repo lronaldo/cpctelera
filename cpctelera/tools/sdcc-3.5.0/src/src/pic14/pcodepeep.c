@@ -1149,7 +1149,7 @@ static void   peepRuleCondition(char *cond, pCodePeep *pcp)
 static void initpCodeWildBlock(pCodeWildBlock *pcwb)
 {
 
-  //  pcwb = Safe_calloc(1,sizeof(pCodeWildBlock));
+  //  pcwb = Safe_alloc(sizeof(pCodeWildBlock));
 
   if(!pcwb)
     return;
@@ -1184,7 +1184,7 @@ static void postinit_pCodeWildBlock(pCodeWildBlock *pcwb)
 static void initpCodePeep(pCodePeep *pcp)
 {
 
-  //  pcwb = Safe_calloc(1,sizeof(pCodeWildBlock));
+  //  pcwb = Safe_alloc(sizeof(pCodeWildBlock));
 
   if(!pcp)
     return;
@@ -1229,10 +1229,10 @@ void peepRules2pCode(peepRule *rules)
 
     //DFPRINTF((stderr,"\nRule:\n\n"));
 
-    pcps = Safe_calloc(1,sizeof(pCodePeepSnippets));
+    pcps = Safe_alloc(sizeof(pCodePeepSnippets));
     peepSnippets = DLL_append((DLList*)peepSnippets,(DLList*)pcps);
 
-    currentRule = pcps->peep  = Safe_calloc(1,sizeof(pCodePeep));
+    currentRule = pcps->peep = Safe_alloc(sizeof(pCodePeep));
     initpCodePeep(currentRule);
 
     /* Convert the target block */

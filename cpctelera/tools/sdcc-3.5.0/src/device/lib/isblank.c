@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   isalnum.c
+   isblank.c
 
    Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
 

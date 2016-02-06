@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -30,11 +30,11 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\SDCC.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\SDCC.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -56,7 +56,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;..;..\support\util;C:\Program Files\boost\boost_1_50;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..;..\support\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;WIN32;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -100,7 +100,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>.;..;..\support\util;C:\Program Files\boost\boost_1_50;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..;..\support\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;WIN32;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -437,15 +437,20 @@
   <ItemGroup>
     <CustomBuild Include="SDCC.lex">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">flex -8 -f -oSDCClex.c SDCC.lex</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SDCClex.c</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -8 -f -oSDCClex.c SDCC.lex</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SDCClex.c;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SDCClex.c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SDCClex.c</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Lexer: SDCClex.c</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Lexer: SDCClex.c</Message>
+    </CustomBuild>
+    <CustomBuild Include="SDCC.y">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bison -d -v -o SDCCy.c SDCC.y</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -d -v -o SDCCy.c SDCC.y</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SDCCy.c;SDCCy.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SDCCy.c;SDCCy.h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Parser: SDCCy.c</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Parser: SDCCy.c</Message>
     </CustomBuild>
     <None Include="..\support\scripts\sdcc.ico" />
   </ItemGroup>

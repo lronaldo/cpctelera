@@ -1053,7 +1053,7 @@ parse()
                                         break;
 
                                 case 'E':
-                                        if (TARGET_IS_6808) {
+                                        if (TARGET_IS_6808 || TARGET_IS_STM8) {
                                                 oflag = 4;
                                                 break;
                                         }

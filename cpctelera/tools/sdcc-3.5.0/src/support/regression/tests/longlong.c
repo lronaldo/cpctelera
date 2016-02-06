@@ -35,6 +35,11 @@ long long d(int i)
 }
 
 long long (*gp)(void) = &g;
+
+static unsigned long long mulLL(unsigned long long a, unsigned long long b)
+{
+  return a * b;
+}
 #endif
 
 void
@@ -115,15 +120,38 @@ testLongLong (void)
   ASSERT (y + x == 0x9988776655443322ull + 0x1122334455667788ll);
   ASSERT (y - x == 0x9988776655443322ull - 0x1122334455667788ll);
 
-#if 0 // why fail? need investigation.
+#ifndef __SDCC_gbz80 // long long multiplication broken on gbz80, bug #2329
   y = 0x55667788ull;
-  ASSERT (y * y == 0x55667788ull * 0x55667788ull);
+  ASSERT (y * y == 0x55667788ull * 0x55667788ull); // this test is optimized by constant propagation
+  ASSERT (mulLL (y, y) == 0x55667788ull * 0x55667788ull); // this test is not
   y = 0x55667788ull;
   x = 0x55667788ll;
-  ASSERT (y * x == 0x55667788ull * 0x55667788ll);
+  ASSERT (y * x == 0x55667788ull * 0x55667788ll); // this test is optimized by constant propagation
+  ASSERT (mulLL (y, x) == 0x55667788ull * 0x55667788ll); // this test is not
+
+  y = 0xa5667788ull;
+  ASSERT (y * y == 0xa5667788ull * 0xa5667788ull); // this test is optimized by constant propagation
+  ASSERT (mulLL (y, y) == 0xa5667788ull * 0xa5667788ull); // this test is not
+  y = 0xa5667788ull;
+  x = 0xa5667788ll;
+  ASSERT (y * x == 0xa5667788ull * 0xa5667788ll); // this test is optimized by constant propagation
+  ASSERT (mulLL (y, x) == 0xa5667788ull * 0xa5667788ull); // this test is not
+
+  y = 0xa5667788ccddull;
+  x = 0x0788ll;
+  ASSERT (y * x == 0xa5667788ccddull * 0x0788ll); // this test is optimized by constant propagation
+  ASSERT (mulLL (y, x) == 0xa5667788ccddull * 0x0788ll); // this test is not
+#endif
+
+#if 0
+  y = 0x5566778899aaull;
+  ASSERT ((y << 8) == 0x5566778899aa00ull);
+
+  y = 0x5566778899aaull;
+  x = 0x33ll;
+  ASSERT (y / x == 0x5566778899aaull / 0x33ll);
 #endif
 
   c(); // Unused long long return value require special handling in register allocation.
 #endif
 }
-

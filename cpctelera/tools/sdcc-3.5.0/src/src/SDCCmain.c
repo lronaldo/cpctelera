@@ -133,14 +133,16 @@ char buffer[PATH_MAX * 2];
 #define OPTION_OPT_CODE_SPEED       "--opt-code-speed"
 #define OPTION_OPT_CODE_SIZE        "--opt-code-size"
 #define OPTION_STD_C89              "--std-c89"
+#define OPTION_STD_C95              "--std-c95"
 #define OPTION_STD_C99              "--std-c99"
 #define OPTION_STD_C11              "--std-c11"
 #define OPTION_STD_SDCC89           "--std-sdcc89"
 #define OPTION_STD_SDCC99           "--std-sdcc99"
+#define OPTION_STD_SDCC11           "--std-sdcc11"
 #define OPTION_CODE_SEG             "--codeseg"
 #define OPTION_CONST_SEG            "--constseg"
 #define OPTION_DOLLARS_IN_IDENT     "--fdollars-in-identifiers"
-#define OPTION_UNSIGNED_CHAR        "--funsigned-char"
+#define OPTION_SIGNED_CHAR          "--fsigned-char"
 #define OPTION_USE_NON_FREE         "--use-non-free"
 #define OPTION_PEEP_RETURN          "--peep-return"
 #define OPTION_NO_PEEP_RETURN       "--no-peep-return"
@@ -180,13 +182,15 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_WERROR, NULL, "Treat the warnings as errors"},
   {0,   OPTION_DEBUG, NULL, "Enable debugging symbol output"},
   {0,   "--cyclomatic", &options.cyclomatic, "Display complexity of compiled functions"},
-  {0,   OPTION_STD_C89, NULL, "Use C89 standard (slightly incomplete)"},
-  {0,   OPTION_STD_SDCC89, NULL, "Use C89 standard with SDCC extensions (default)"},
-  {0,   OPTION_STD_C99, NULL, "Use C99 standard (incomplete)"},
-  {0,   OPTION_STD_SDCC99, NULL, "Use C99 standard with SDCC extensions"},
-  {0,   OPTION_STD_C11, NULL, "Use C11 standard (very incomplete)"},
+  {0,   OPTION_STD_C89, NULL, "Use ISO C90 (aka ANSI C89) standard (slightly incomplete)"},
+  {0,   OPTION_STD_SDCC89, NULL, "Use ISO C90 (aka ANSI C89) standard with SDCC extensions (default)"},
+  {0,   OPTION_STD_C95, NULL, "Use ISO C95 (aka ISO C94) standard (slightly incomplete)"},
+  {0,   OPTION_STD_C99, NULL, "Use ISO C99 standard (incomplete)"},
+  {0,   OPTION_STD_SDCC99, NULL, "Use ISO C99 standard with SDCC extensions"},
+  {0,   OPTION_STD_C11, NULL, "Use ISO C11 standard (incomplete)"},
+  {0,   OPTION_STD_SDCC11, NULL, "Use ISO C11 standard with SDCC extensions"},
   {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
-  {0,   OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
+  {0,   OPTION_SIGNED_CHAR, &options.signed_char, "Make \"char\" signed by default"},
   {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
 
   {0,   NULL, NULL, "Code generation options"},
@@ -521,10 +525,10 @@ printOptions (const OPTION * optionsTable, FILE * stream)
 /* printUsage - prints command line syntax         */
 /*-----------------------------------------------------------------*/
 static void
-printUsage (void)
+printUsage (bool err)
 {
   int i;
-  FILE *stream = stderr;
+  FILE *stream = err ? stderr : stdout;
 
   printVersionInfo (stream);
   fprintf (stream,
@@ -596,8 +600,9 @@ setDefaultOptions (void)
   options.verbose = 0;
   options.shortis8bits = 0;
   options.std_sdcc = 1;         /* enable SDCC language extensions */
-  options.std_c99 = 1;          /* default to C99, to enable inlining of standard functions */
-  options.std_c11 = 0;          /* default to C99 until more C11 support */
+  options.std_c95 = 1;
+  options.std_c99 = 1;
+  options.std_c11 = 1;          /* default to C11 (we want inline by default, so we need at least C99, and support for C11 is more complete than C99) */
   options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL;        /* default to CSEG for generated code */
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
   options.stack10bit = 0;
@@ -984,7 +989,7 @@ parseCmdLine (int argc, char **argv)
             }
           if (strcmp (argv[i], OPTION_HELP) == 0)
             {
-              printUsage ();
+              printUsage (FALSE);
               exit (EXIT_SUCCESS);
             }
 
@@ -1128,20 +1133,34 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_STD_C89) == 0)
             {
+              options.std_c95 = 0;
               options.std_c99 = 0;
+              options.std_c11 = 0;
+              options.std_sdcc = 0;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_STD_C95) == 0)
+            {
+              options.std_c95 = 1;
+              options.std_c99 = 0;
+              options.std_c11 = 0;
               options.std_sdcc = 0;
               continue;
             }
 
           if (strcmp (argv[i], OPTION_STD_C99) == 0)
             {
+              options.std_c95 = 1;
               options.std_c99 = 1;
+              options.std_c11 = 0;
               options.std_sdcc = 0;
               continue;
             }
 
           if (strcmp (argv[i], OPTION_STD_C11) == 0)
             {
+              options.std_c95 = 1;
               options.std_c99 = 1;
               options.std_c11 = 1;
               options.std_sdcc = 0;
@@ -1150,14 +1169,27 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_STD_SDCC89) == 0)
             {
+              options.std_c95 = 0;
               options.std_c99 = 0;
+              options.std_c11 = 0;
               options.std_sdcc = 1;
               continue;
             }
 
           if (strcmp (argv[i], OPTION_STD_SDCC99) == 0)
             {
+              options.std_c95 = 1;
               options.std_c99 = 1;
+              options.std_c11 = 0;
+              options.std_sdcc = 1;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_STD_SDCC11) == 0)
+            {
+              options.std_c95 = 1;
+              options.std_c99 = 1;
+              options.std_c11 = 1;
               options.std_sdcc = 1;
               continue;
             }
@@ -1218,7 +1250,7 @@ parseCmdLine (int argc, char **argv)
             case 'h':
               verifyShortOption (argv[i]);
 
-              printUsage ();
+              printUsage (FALSE);
               exit (EXIT_SUCCESS);
               break;
 
@@ -1947,7 +1979,9 @@ preProcess (char **envp)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_NOOVERLAY"));
 
       /* set the macro for unsigned char  */
-      if (options.unsigned_char)
+      if (options.signed_char)
+        addSet (&preArgvSet, Safe_strdup ("-D__SDCC_CHAR_SIGNED"));
+      else
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_CHAR_UNSIGNED"));
 
       /* set the macro for non-free  */
@@ -2052,10 +2086,15 @@ preProcess (char **envp)
       addSet (&preArgvSet, Safe_strdup ("-D__SDCC_{port}"));
 
       /* Optinal C features not (yet) supported by sdcc */
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_COMPLEX__"));
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_THREADS__"));
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_ATOMICS__"));
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_VLA__"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_COMPLEX__=1"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_THREADS__=1"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_ATOMICS__=1"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_VLA__=1"));
+
+      /* Character encoding */
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_ISO_10646__=201409L")); // wchar_t is UTF-32
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_16__=1")); // char16_t is UTF-16
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_32__=1")); // char32_t is UTF-32
 
       /* standard include path */
       if (!options.nostdinc)
@@ -2337,8 +2376,11 @@ initValues (void)
    * Make sure the preprocessor is called with the "-std" option
    * corresponding to the --std used to start sdcc
    */
-  if (!options.std_sdcc)
-    setMainValue ("cppstd", options.std_c11 ? "-std=c11 " : (options.std_c99 ? "-std=c99 " : "-std=c89 "));
+  setMainValue ("cppstd",
+    options.std_c11 ? "-std=c11 " :
+    (options.std_c99 ? "-std=c99 " :
+    (options.std_c95 ? "-std=iso9899:199409 " :
+    "-std=c89 ")));
 }
 
 static void
@@ -2477,7 +2519,7 @@ main (int argc, char **argv, char **envp)
     {
       if (options.printSearchDirs)
         exit (EXIT_SUCCESS);
-      printUsage ();
+      printUsage (TRUE);
       exit (EXIT_FAILURE);
     }
 
@@ -2553,3 +2595,4 @@ main (int argc, char **argv, char **envp)
 
   return 0;
 }
+

@@ -424,6 +424,7 @@ PORT pic_port =
   _pic14_setDefaultOptions,
   pic14_assignRegisters,
   _pic14_getRegName,
+  0,
   NULL,
   _pic14_keywords,
   _pic14_genAssemblerPreamble,

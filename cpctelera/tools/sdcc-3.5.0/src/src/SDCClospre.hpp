@@ -19,6 +19,12 @@
 //
 // Lifetime-optimal speculative partial redundancy elimination.
 
+// Workaround for boost bug #11880
+#include <boost/version.hpp>
+#if BOOST_VERSION == 106000
+   #include <boost/type_traits/ice.hpp>
+#endif
+
 #include <boost/graph/graphviz.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
@@ -62,6 +68,8 @@ struct assignment_lospre
 
     for (i = local.begin(), ai = a.local.begin();; ++i, ++ai)
       {
+        if (i == i_end && ai == ai_end)
+          return(false);
         if (i == i_end)
           return(true);
         if (ai == ai_end)

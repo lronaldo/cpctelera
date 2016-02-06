@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   peep.c - source file for peephole optimizer helper functions
 
-  Written By -  Philipp Klaus Krause
+  Written By - Philipp Klaus Krause
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -31,8 +31,11 @@
 
 #define NOTUSEDERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");} while(0)
 
-/*#define D(_s) { printf _s; fflush(stdout); }*/
+#if 0
+#define D(_s) { printf _s; fflush(stdout); }
+#else
 #define D(_s)
+#endif
 
 #define ISINST(l, i) (!STRNCASECMP((l), (i), sizeof(i) - 1))
 
@@ -54,6 +57,7 @@ static struct
 
 extern bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
 extern bool z80_symmParm_in_calls_from_current_function;
+extern bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 /*-----------------------------------------------------------------*/
 /* univisitLines - clear "visited" flag in all lines               */
@@ -96,7 +100,7 @@ isReturned(const char *what)
       if(sym->type->select.d.dcl_type != FUNCTION)
         NOTUSEDERROR();
       spec = &(sym->etype->select.s);
-      if(spec->noun == V_VOID)
+      if(spec->noun == V_VOID || spec->noun == V_INT && spec->b_longlong) // long long is not returned via registers for the Z80-related ports
         size = 0;
       else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
         size = 1;
@@ -163,12 +167,12 @@ findLabel (const lineNode *pl)
 
   /* 1. extract label in opcode */
 
-  /* In each mcs51 jumping opcode the label is at the end of the opcode */
+  /* In each z80 jumping opcode the label is at the end of the opcode */
   p = strlen (pl->line) - 1 + pl->line;
 
   /* scan backward until ',' or '\t' */
   for (; p > pl->line; p--)
-    if (*p == ',' || *p == '\t')
+    if (*p == ',' || isspace(*p))
       break;
 
   /* sanity check */
@@ -188,7 +192,7 @@ findLabel (const lineNode *pl)
   /* 3. search lineNode with label definition and return it */
   for (cpl = _G.head; cpl; cpl = cpl->next)
     {
-      if (   cpl->isLabel
+      if (cpl->isLabel
           && strncmp (p, cpl->line, strlen(p)) == 0)
         {
           return cpl;
@@ -200,7 +204,9 @@ findLabel (const lineNode *pl)
 /* Check if reading arg implies reading what. */
 static bool argCont(const char *arg, const char *what)
 {
-  return (arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
+  while(isspace (*arg) || *arg == ',')
+    arg++;
+  return(arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
 }
 
 static bool
@@ -220,32 +226,59 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strstr(what, "iy") != 0)
     return TRUE;
 
-  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0) // TODO: Making this more accurate (i.e. finding out about the actual situation at _this_ call) could allow more optimization.
+  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
     {
-      if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
-        return TRUE;
-      if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
-        return TRUE;
-      if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
-        return TRUE;
-      if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
-        return TRUE;
-      if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
-        return TRUE;
-      if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
-        return TRUE;
-      if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
-        return TRUE;
-      return FALSE;
+      const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+      if (f)
+      {
+        const value *args = FUNC_ARGS (f->type);
+
+        if (IFFUNC_ISZ88DK_FASTCALL (f->type) && args) // Has one register argument of size up to 32 bit.
+          {
+            const unsigned int size = getSize (args->type);
+            wassert (!args->next); // Only one argment allowed in __z88dk_fastcall functions.
+            if (strchr(what, 'l') && size >= 1)
+              return TRUE;
+            if (strchr(what, 'h') && size >= 2)
+              return TRUE;
+            if (strchr(what, 'e') && size >= 3)
+              return TRUE;
+            if (strchr(what, 'd') && size >= 4)
+              return TRUE;
+          }
+        return FALSE;
+      }
+      else // Fallback needed for calls through function pointers and for calls to literal addresses.
+      {
+        if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
+          return TRUE;
+        if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
+          return TRUE;
+        if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
+          return TRUE;
+        if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
+          return TRUE;
+        if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
+          return TRUE;
+        if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
+          return TRUE;
+        if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
+          return TRUE;
+        return FALSE;
+      }
     }
 
   if(ISINST(pl->line, "ret"))
     return(isReturned(what));
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
-    return(!strchr(what, 'h') || !strchr(what, 'l'));
+    return(!strcmp(what, "h") || !strcmp(what, "l"));
+  if(!strcmp(pl->line, "ex\t(sp), ix") || !strcmp(pl->line, "ex\t(sp),ix"))
+    return(strstr(what, "ix"));
+  if(!strcmp(pl->line, "ex\t(sp), iy") || !strcmp(pl->line, "ex\t(sp),iy"))
+    return(strstr(what, "iy"));
   if(!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
-    return(!strchr(what, 'h') || !strchr(what, 'l') || !strchr(what, 'd') || !strchr(what, 'e'));
+    return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
   if(ISINST(pl->line, "ld\t"))
     {
       if(strstr(strchr(pl->line, ','), what) && strchr(pl->line, ',')[1] != '#' && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[2] == '#') && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[3] != ')' && strchr(pl->line, ',')[4] != ')'))
@@ -298,7 +331,7 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
     return(FALSE);
 
-  // Rotate and shift group (todo: rld rrd, maybe sll)
+  // Rotate and shift group
   if(ISINST(pl->line, "rlca") ||
      ISINST(pl->line, "rla")  ||
      ISINST(pl->line, "rrca") ||
@@ -318,6 +351,10 @@ z80MightRead(const lineNode *pl, const char *what)
     {
       return(argCont(pl->line + 4, what));
     }
+  if(!IS_GB && !IS_RAB &&
+    (ISINST(pl->line, "rld") ||
+     ISINST(pl->line, "rrd")))
+    return(strstr("ahl", what));
 
   // Bit set, reset and test group
   if(ISINST(pl->line, "bit\t") ||
@@ -327,7 +364,8 @@ z80MightRead(const lineNode *pl, const char *what)
       return(argCont(pl->line + 4, what));
     }
 
- if(ISINST(pl->line, "ccf"))
+ if(ISINST(pl->line, "ccf") ||
+    ISINST(pl->line, "nop"))
     return FALSE;
 
   if(strncmp(pl->line, "jp\t", 3) == 0 ||
@@ -340,11 +378,15 @@ z80MightRead(const lineNode *pl, const char *what)
   if(!IS_GB && ISINST(pl->line, "ldir"))
     return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e") || !strcmp(what, "h") || !strcmp(what, "l"));
 
-  /* TODO: There are out and in variants that do not read bc. */
-  if(!IS_GB && ISINST(pl->line, "out\t"))
-    return(strstr(strchr(pl->line + 4, ','), what) != 0 || !strcmp(what, "b") || !strcmp(what, "c"));
-  if(!IS_GB && ISINST(pl->line, "in\t"))
-    return(strstr(pl->line + 3, what) != 0 || !strcmp(what, "b") || !strcmp(what, "c"));
+  if(!IS_GB && !IS_RAB && ISINST(pl->line, "out\t"))
+    return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+  if(!IS_GB && !IS_RAB && ISINST(pl->line, "in\t"))
+    return(!strstr(strchr(pl->line + 4, ','), "(c)") && !strcmp(what, "a") || strstr(strchr(pl->line + 4, ','), "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+
+  if(!IS_GB && !IS_RAB &&
+    (ISINST(pl->line, "ini\t") || ISINST(pl->line, "ind\t") || ISINST(pl->line, "inir\t") || ISINST(pl->line, "indr\t") ||
+    ISINST(pl->line, "outi\t") || ISINST(pl->line, "outd\t") || ISINST(pl->line, "otir\t") || ISINST(pl->line, "otdr\t")))
+    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "h") || !strcmp(what, "l"));
 
   if(IS_Z180 && ISINST(pl->line, "mlt\t"))
     return(argCont(pl->line + 4, what));
@@ -400,12 +442,39 @@ z80SurelyWrites(const lineNode *pl, const char *what)
     return TRUE;
   if(ISINST(pl->line, "ld\t") && strncmp(pl->line + 3, "bc", 2) == 0 && (what[0] == 'b' || what[0] == 'c'))
     return TRUE;
-  if(ISINST(pl->line, "ld\t") && strncmp(pl->line + 3, what, strlen(what)) == 0 && pl->line[3 + strlen(what)] == ',')
+  if((ISINST(pl->line, "ld\t") || ISINST(pl->line, "in\t"))
+    && strncmp(pl->line + 3, what, strlen(what)) == 0 && pl->line[3 + strlen(what)] == ',')
     return TRUE;
   if(ISINST(pl->line, "pop\t") && strstr(pl->line + 4, what))
     return TRUE;
-  if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0  && strcmp(what, "ix"))
-    return TRUE;
+  if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0)
+    {
+      const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+      const bool *preserved_regs;
+
+      if(!strcmp(what, "ix"))
+        return FALSE;
+
+      if(f)
+          preserved_regs = f->type->funcAttrs.preserved_regs;
+      else // Err on the safe side.
+        preserved_regs = z80_regs_preserved_in_calls_from_current_function;
+
+      if(!strcmp(what, "c"))
+        return !preserved_regs[C_IDX];
+      if(!strcmp(what, "b"))
+        return !preserved_regs[B_IDX];
+      if(!strcmp(what, "e"))
+        return !preserved_regs[E_IDX];
+      if(!strcmp(what, "d"))
+        return !preserved_regs[D_IDX];
+      if(!strcmp(what, "l"))
+        return !preserved_regs[L_IDX];
+      if(!strcmp(what, "h"))
+        return !preserved_regs[H_IDX];
+      if(!strcmp(what, "iy"))
+        return !preserved_regs[IYL_IDX] && !preserved_regs[IYH_IDX];
+    }
   if(strcmp(pl->line, "ret") == 0)
     return TRUE;
   if(ISINST(pl->line, "ld\tiy") && strncmp(what, "iy", 2) == 0)

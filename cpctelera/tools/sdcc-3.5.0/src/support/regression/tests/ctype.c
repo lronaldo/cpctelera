@@ -10,6 +10,10 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#ifndef __STDC_VERSION__
+  #warning __STDC_VERSION__ not defined
+#endif
+
 void testCtype (void)
 {
   char c = 'a';

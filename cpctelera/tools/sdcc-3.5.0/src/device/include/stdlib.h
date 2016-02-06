@@ -26,16 +26,28 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDC51_STDLIB_H
-#define __SDC51_STDLIB_H 1
+#ifndef __SDCC_STDLIB_H
+#define __SDCC_STDLIB_H 1
 
-#ifndef NULL
-# define NULL (void *)0
+#ifndef __SIZE_T_DEFINED
+#define __SIZE_T_DEFINED
+  typedef unsigned int size_t;
 #endif
 
-#include <malloc.h>
+#ifndef __WCHAR_T_DEFINED
+#define __WCHAR_T_DEFINED
+  typedef unsigned long int wchar_t;
+#endif
 
+#ifndef NULL
+#define NULL (void *)0
+#endif
+
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
+int abs(int j) __preserves_regs(b, c, iyl, iyh);
+#else
 int abs(int j);
+#endif
 long int labs(long int j);
 
 extern float atof (const char *nptr);
@@ -56,6 +68,25 @@ extern void _ltoa(long, char*, unsigned char);
 int rand(void);
 void srand(unsigned int seed);
 
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
+void __xdata *calloc (size_t nmemb, size_t size);
+void __xdata *malloc (size_t size);
+void __xdata *realloc (void *ptr, size_t size);
+#else
+void *calloc (size_t nmemb, size_t size);
+void *malloc (size_t size);
+void *realloc (void *ptr, size_t size);
+#endif
+
+#if __STDC_VERSION__ >= 201112L
+inline void *aligned_alloc(size_t alignment, size_t size)
+{
+  return malloc(size);
+}
+#endif
+
+extern void free (void * ptr);
+
 /* Bounds-checking interfaces from annex K of the C11 standard. */
 #if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__
 
@@ -74,3 +105,4 @@ typedef void (*constraint_handler_t)(const char *restrict msg, void *restrict pt
 #endif
 
 #endif
+

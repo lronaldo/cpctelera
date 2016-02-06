@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1703 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:42 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -123,6 +123,7 @@
 #define CCPR2L_ADDR             0x0298
 #define CCPR2H_ADDR             0x0299
 #define CCP2CON_ADDR            0x029A
+#define ECCP2CON_ADDR           0x029A
 #define SLRCONA_ADDR            0x030C
 #define SLRCONC_ADDR            0x030E
 #define INLVLA_ADDR             0x038C
@@ -2434,6 +2435,65 @@ extern __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
 #define _CCP2Y                  0x10
 #define _DC2B1                  0x20
 #define _CCP2X                  0x20
+
+//==============================================================================
+
+
+//==============================================================================
+//        ECCP2CON Bits
+
+extern __at(0x029A) __sfr ECCP2CON;
+
+typedef union
+  {
+  struct
+    {
+    unsigned CCP2M0             : 1;
+    unsigned CCP2M1             : 1;
+    unsigned CCP2M2             : 1;
+    unsigned CCP2M3             : 1;
+    unsigned DC2B0              : 1;
+    unsigned DC2B1              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned CCP2Y              : 1;
+    unsigned CCP2X              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned CCP2M              : 4;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned DC2B               : 2;
+    unsigned                    : 2;
+    };
+  } __ECCP2CONbits_t;
+
+extern __at(0x029A) volatile __ECCP2CONbits_t ECCP2CONbits;
+
+#define _ECCP2CON_CCP2M0        0x01
+#define _ECCP2CON_CCP2M1        0x02
+#define _ECCP2CON_CCP2M2        0x04
+#define _ECCP2CON_CCP2M3        0x08
+#define _ECCP2CON_DC2B0         0x10
+#define _ECCP2CON_CCP2Y         0x10
+#define _ECCP2CON_DC2B1         0x20
+#define _ECCP2CON_CCP2X         0x20
 
 //==============================================================================
 

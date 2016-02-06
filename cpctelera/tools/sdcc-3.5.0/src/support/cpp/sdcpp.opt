@@ -296,13 +296,17 @@ std=c99
 SDCPP
 Conform to the ISO 1999 C standard
 
+std=c11
+SDCPP
+Conform to the ISO 2011 C standard
+
 std=iso9899:1990
 C ObjC
 Conform to the ISO 1990 C standard
 
 std=iso9899:199409
 SDCPP
-Conform to the ISO 1990 C standard as amended in 1994
+Conform to the ISO 1990 C standard as amended in 1994 (and ratified in 1995)
 
 std=iso9899:1999
 C ObjC

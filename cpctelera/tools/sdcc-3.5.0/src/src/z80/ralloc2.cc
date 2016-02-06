@@ -75,9 +75,11 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
 
               // Penalty for not placing 2- and 4-byte variables in register pairs
               // Todo: Extend this once the register allcoator can use registers other than bc, de:
-              if((size == 2 || size == 4) && (byteregs[1] != byteregs[0] + 1 || byteregs[0] != REG_C && byteregs[0] != REG_E && byteregs[0] != REG_L))
+              if ((size == 2 || size == 4) &&
+                  (byteregs[1] != byteregs[0] + 1 || (byteregs[0] != REG_C && byteregs[0] != REG_E && byteregs[0] != REG_L)))
                 c += 2.0f;
-              if(size == 4 && (byteregs[3] != byteregs[2] + 1 || byteregs[2] != REG_C && byteregs[2] != REG_E && byteregs[0] != REG_L))
+              if (size == 4 &&
+				  (byteregs[3] != byteregs[2] + 1 || (byteregs[2] != REG_C && byteregs[2] != REG_E && byteregs[0] != REG_L)))
                 c += 2.0f;
 
               // Code generator cannot handle variables only partially in A.
@@ -90,7 +92,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
                 c -= 0.4f;
               else if(OPTRALLOC_HL && byteregs[0] == REG_L)
                 c -= 0.1f;
-              else if(OPTRALLOC_IY && byteregs[0] == REG_IYL || byteregs[0] == REG_IYH)
+              else if((OPTRALLOC_IY && byteregs[0] == REG_IYL) || byteregs[0] == REG_IYH)
                 c += 0.1f;
             }
           // Spilt.
@@ -213,7 +215,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
 
       if(byteregs[0] == REG_A)
         c -= 0.4f;
-      else if(OPTRALLOC_IY && byteregs[0] == REG_IYL || byteregs[0] == REG_IYH)
+      else if((OPTRALLOC_IY && byteregs[0] == REG_IYL) || byteregs[0] == REG_IYH)
         c += 0.1f;
     }
 
@@ -244,7 +246,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
 
       if(byteregs[0] == REG_A)
         c -= 0.4f;
-      else if(OPTRALLOC_IY && byteregs[0] == REG_IYL || byteregs[0] == REG_IYH)
+      else if((OPTRALLOC_IY && byteregs[0] == REG_IYL) || byteregs[0] == REG_IYH)
         c += 0.1f;
     }
 
@@ -528,7 +530,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   //std::cout << "Ainst_ok: A = (" << ia.registers[REG_A][0] << ", " << ia.registers[REG_A][1] << "), inst " << i << ", " << ic->key << "\n";
 
   // Code generator cannot handle variables that are only partially in A.
-  if(I[ia.registers[REG_A][1]].size > 1 || ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1)
+  if(I[ia.registers[REG_A][1]].size > 1 || (ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1))
     return(false);
 
   // Check if the result of this instruction is placed in A.
@@ -1371,9 +1373,10 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   c += weird_byte_order(a, I);
 
   if(OPTRALLOC_HL &&
-    (ia.registers[REG_L][1] >= 0 && ia.registers[REG_H][1] >= 0) &&
-    !((ia.registers[REG_L][0] >= 0) ^ (ia.registers[REG_H][0] >= 0)) &&
-    !HLinst_ok(a, i, G, I))
+     ia.registers[REG_L][1] >= 0 &&
+     ia.registers[REG_H][1] >= 0 &&
+     ((ia.registers[REG_L][0] >= 0) == (ia.registers[REG_H][0] >= 0)) &&
+     !HLinst_ok(a, i, G, I))
     c += 8.0f;
 
   if(ia.registers[REG_A][1] < 0)
@@ -1428,7 +1431,6 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
           if (a.global[*v] == REG_B && a.global[*v - 1] >= 0 && a.global[*v - 1] != REG_C)
             c += 16.0f;
         }
-
     }
 
   c -= a.local.size() * 0.2f;

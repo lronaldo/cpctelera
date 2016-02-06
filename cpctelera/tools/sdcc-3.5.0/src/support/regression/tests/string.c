@@ -2,6 +2,9 @@
 */
 #include <testfwk.h>
 #include <string.h>
+#if defined (__SDCC)
+#include <uchar.h>
+#endif
 
 /** tests for strcmp
 */
@@ -145,16 +148,45 @@ do_teststrtok (void)
 #endif
 }
 
-/** tests for multibyte character sets
- * related to bug #3506236
-*/
+// Test C11 utf-8 behaviour.
 static void
-do_multibyte (void)
+do_multibyte_utf_8 (void)
 {
-  const char *str = "��";
+#if defined(__STDC_VERSION) && __STDC_VERSION >= 201112L
+  const char *str1 = u8"Ä ä";
+  const char *str2 = u8"\u00c4 ä";
+  const char *str3 = u8"Ä " "ä";
+  const char *str4 = u8"Ä " u8"ä";
+  const char *str5 = "Ä " u8"ä";
 
-  ASSERT (str[0] == '\xd4');
-  ASSERT (str[1] == '\xc2');
+  ASSERT (str1[0] == '\xc3');
+  ASSERT (str2[1] == '\x84');
+  ASSERT (!strcmp (str1, str2));
+  ASSERT (!strcmp (str1, str3));
+  ASSERT (!strcmp (str1, str4));
+  ASSERT (!strcmp (str1, str5));
+#endif
+}
+
+// Test SDCC implementation-defined utf-8 behaviour
+// string literals are utf-8 (as nearly all implementations out there)
+static void
+do_multibyte_utf_8_sdcc (void)
+{
+#if defined (__SDCC)
+  const char *str1 = "Ä ä";
+  const char *str2 = "\u00c4 ä";
+  const char *str3 = u8"Ä " "ä";
+  const char *str4 = "Ä " "ä";
+  const char *str5 = u8"Ä " u8"ä";
+
+  ASSERT (str1[0] == '\xc3');
+  ASSERT (str2[1] == '\x84');
+  ASSERT (!strcmp (str1, str2));
+  ASSERT (!strcmp (str1, str3));
+  ASSERT (!strcmp (str1, str4));
+  ASSERT (!strcmp (str1, str5));
+#endif
 }
 
 static void
@@ -168,5 +200,7 @@ teststr (void)
   do_teststrstr ();
   do_teststrspn ();
   do_teststrtok ();
-  do_multibyte ();
+  do_multibyte_utf_8 ();
+  do_multibyte_utf_8_sdcc ();
 }
+

@@ -656,12 +656,12 @@ checkTypeSanity (sym_link * etype, const char *name)
 /* finalizeSpec                                                     */
 /*    currently just a V_CHAR is forced to be unsigned              */
 /*      when it's neither signed nor unsigned                       */
-/*      and the --funsigned-char command line switch is active      */
+/*      unless the --fsigned-char command line switch is active     */
 /*------------------------------------------------------------------*/
 sym_link *
 finalizeSpec (sym_link * lnk)
 {
-  if (options.unsigned_char)
+  if (!options.signed_char)
     {
       sym_link *p = lnk;
       while (p && !IS_SPEC (p))
@@ -678,6 +678,8 @@ finalizeSpec (sym_link * lnk)
 sym_link *
 mergeSpec (sym_link * dest, sym_link * src, const char *name)
 {
+  unsigned int i;
+
   if (!IS_SPEC (dest) || !IS_SPEC (src))
     {
 #if 0
@@ -822,7 +824,10 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
   FUNC_ISNORETURN (dest) |= FUNC_ISNORETURN (src);
   FUNC_ISSMALLC (dest) |= FUNC_ISSMALLC (src);
+  FUNC_ISZ88DK_FASTCALL (dest) |= FUNC_ISZ88DK_FASTCALL (src);
   FUNC_ISZ88DK_CALLEE (dest) |= FUNC_ISZ88DK_CALLEE (src);
+  for (i = 0; i < 9; i++)
+    if (dest->funcAttrs.preserved_regs[i] |= src->funcAttrs.preserved_regs[i]);
 
   if (SPEC_ADDRSPACE (src) && SPEC_ADDRSPACE (dest))
     werror (E_TWO_OR_MORE_STORAGE_CLASSES, name);
@@ -2394,6 +2399,7 @@ compareFuncType (sym_link * dest, sym_link * src)
   value *exargs, *acargs;
   value *checkValue;
   int argCnt = 0;
+  int i;
 
   /* if not type then some kind of error */
   if (!dest || !src)
@@ -2426,6 +2432,10 @@ compareFuncType (sym_link * dest, sym_link * src)
   if (IFFUNC_ISZ88DK_FASTCALL (dest) != IFFUNC_ISZ88DK_FASTCALL (src) ||
     IFFUNC_ISZ88DK_CALLEE (dest) != IFFUNC_ISZ88DK_CALLEE (src))
     return 0;
+
+  for (i = 0; i < 9; i++)
+    if (dest->funcAttrs.preserved_regs[i] > src->funcAttrs.preserved_regs[i])
+      return 0;
 
   /* compare register bank */
   if (FUNC_REGBANK (dest) != FUNC_REGBANK (src))
@@ -2495,7 +2505,7 @@ comparePtrType (sym_link *dest, sym_link *src, bool bMustCast)
   else if (res == -2)
     return bMustCast ? -1 : -2;
   else
-    return 0;
+    return res;
 }
 
 /*--------------------------------------------------------------------*/
@@ -3423,7 +3433,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                     dbuf_append_str (dbuf, ", ");
                 }
               dbuf_append_str (dbuf, ")");
-              if (IFFUNC_ISREENT (type))
+              if (IFFUNC_ISREENT (type) && isTargetKeyword("__reentrant"))
                 dbuf_append_str (dbuf, " __reentrant");
               if (FUNC_REGBANK (type))
                 {
@@ -3433,6 +3443,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                 }
               if (IFFUNC_ISBANKEDCALL (type))
                 dbuf_append_str (dbuf, " __banked");
+              if (IFFUNC_ISZ88DK_CALLEE (type))
+                dbuf_append_str (dbuf, " __z88dk_callee");
+              if (IFFUNC_ISZ88DK_FASTCALL (type))
+                dbuf_append_str (dbuf, " __z88dk_fastcall");
               break;
             case GPOINTER:
               dbuf_append_str (dbuf, "generic*");
@@ -4113,7 +4127,7 @@ initCSupport (void)
 
   floatType = newFloatLink ();
   fixed16x16Type = newFixed16x16Link ();
-  charType = (options.unsigned_char) ? UCHARTYPE : SCHARTYPE;
+  charType = (options.signed_char) ? SCHARTYPE : UCHARTYPE;
 
   fsadd = funcOfType ("__fsadd", floatType, floatType, 2, options.float_rent);
   fssub = funcOfType ("__fssub", floatType, floatType, 2, options.float_rent);

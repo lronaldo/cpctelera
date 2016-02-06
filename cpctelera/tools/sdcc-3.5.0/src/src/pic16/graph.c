@@ -19,7 +19,7 @@
    Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -------------------------------------------------------------------------*/
 
-/* $Id: graph.c 4781 2007-04-29 20:33:44Z borutr $ */
+/* $Id: graph.c 9490 2016-01-31 11:44:32Z molnarkaroly $ */
 
 #include "graph.h"
 
@@ -33,7 +33,7 @@ int default_compare (void *data1, void *data2)
 /* === GraphEdge ==================================================== */
 
 GraphEdge *newGEdge (GraphNode *src, GraphNode *dest, unsigned int weight) {
-  GraphEdge *edge = (GraphEdge *)Safe_calloc (1, sizeof (GraphEdge));
+  GraphEdge *edge = (GraphEdge *)Safe_alloc(sizeof(GraphEdge));
   edge->src = src;
   edge->node = dest;
   edge->weight = weight;
@@ -54,7 +54,7 @@ GraphEdge *deleteGEdge (GraphEdge *edge) {
 /* === GraphNode ==================================================== */
 
 GraphNode *newGNode (void *data, hash_t hash) {
-  GraphNode *node = (GraphNode*)Safe_calloc (1, sizeof (GraphNode));
+  GraphNode *node = (GraphNode*)Safe_alloc(sizeof(GraphNode));
   node->data = data;
   node->hash = hash;
   return node;
@@ -123,7 +123,7 @@ GraphEdge *getGEdge (GraphNode *from, GraphNode *to) {
 /* === Graph ======================================================== */
 
 Graph *newGraph (Graph_compareData *compare) {
-  Graph *graph = (Graph*) Safe_calloc (1, sizeof (Graph));
+  Graph *graph = (Graph*)Safe_alloc(sizeof(Graph));
   graph->compare = compare;
   if (!compare) graph->compare = default_compare;
   

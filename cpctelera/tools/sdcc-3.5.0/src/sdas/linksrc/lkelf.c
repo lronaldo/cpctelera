@@ -73,7 +73,8 @@ enum
   EM_68HC08 = 71,
   EM_68HC11 = 70,
   EM_68HC12 = 53,
-  EM_68HC16 = 69
+  EM_68HC16 = 69,
+  EM_STM8 = 186
 };
 
 enum
@@ -626,7 +627,7 @@ elfGenerate (void)
     ehdr.e_ident[EI_DATA] = ELFDATA2MSB;
   ehdr.e_ident[EI_VERSION] = 1;
   ehdr.e_type = ET_EXEC;
-  ehdr.e_machine = EM_68HC08; /* FIXME: get rid of hardcoded value - EEP */
+  ehdr.e_machine = TARGET_IS_STM8 ? EM_STM8 : EM_68HC08; /* FIXME: get rid of hardcoded value - EEP */
   ehdr.e_phentsize = sizeof (*phdrp);
   ehdr.e_shentsize = sizeof (*shdrp);
   ehdr.e_ehsize = sizeof (ehdr);
@@ -728,10 +729,22 @@ elf (int i)
   /* Buffer the data until we have it all */
   if (i)
     {
-      if (hilo == 0)
-        address = rtval[0] + (rtval[1] << 8); /* little endian order */
+      /* 3 bytes address */
+      if(a_bytes == 3)
+        {
+          if (hilo == 0)
+            address = rtval[0] + (rtval[1] << 8) + (rtval[2] << 16); /* little endian order */
+          else
+            address = rtval[2] + (rtval[1] << 8) + (rtval[0] << 16); /* big endian order */
+        }
+        /* 2 bytes address */
       else
-        address = rtval[1] + (rtval[0] << 8); /* big endian order */
+        {
+          if (hilo == 0)
+            address = rtval[0] + (rtval[1] << 8); /* little endian order */
+          else
+            address = rtval[1] + (rtval[0] << 8); /* big endian order */
+        }
 
       /* If this area doesn't have an image buffer, create one */
       if (!ap->a_image)
@@ -746,7 +759,7 @@ elf (int i)
         }
 
       /* Copy the data into the image buffer */
-      for (i = 2; i < rtcnt ; i++)
+      for (i = a_bytes; i < rtcnt ; i++)
         {
           if (rtflg[i])
             {

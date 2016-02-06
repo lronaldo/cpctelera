@@ -2769,21 +2769,21 @@ dwWriteEndFunction (symbol *sym, iCode *ic, int offset)
   else
     sprintf (debugSym, "XG$%s$0$0", sym->name);
   emitDebuggerSymbol (debugSym);
-      
+
   dwAddTagAttr (dwFuncTag, dwNewAttrAddrLabel (DW_AT_high_pc,
                                                Safe_strdup(debugSym),
                                                offset));
-  
+
   if (dwFrameLocList)
     {
       dwAddTagAttr (dwFuncTag, dwNewAttrLocRef (DW_AT_frame_base,
                                                 dwFrameLocList));
-      
+
       dwFrameLocList->next = dwRootLocList;
       dwRootLocList = dwFrameLocList;
       dwFrameLocList = NULL;
     }
-    
+
   return 1;
 }
 
@@ -2866,8 +2866,12 @@ dwWriteSymbol (symbol *sym)
   if (IS_FUNC (sym->type))
     return 1;
 
-  /* If it is an iTemp, then it is not a C source symbol; ignore it */
+  /* If it is an iTemp, then it is a local variable; ignore it */
   if (sym->isitmp)
+    return 1;
+
+  /* If it is an unused extern ignore it, or it might produce link failure */
+  if (IS_EXTERN (sym->etype) && !sym->used)
     return 1;
 
   /* Ignore parameters; they must be handled specially so that they will */
@@ -2897,7 +2901,7 @@ int
 dwWriteModule (const char *name)
 {
   dwtag * tp;
-  char verid[125];
+  char *verid = (char*)Safe_alloc(125);
   
   dwModuleName = Safe_strdup (name);
   

@@ -115,7 +115,7 @@ static FILE *debugF = NULL;
 /*-----------------------------------------------------------------*/
 //static void debugLog(char *inst,char *fmt, ...)
 static void
-debugLog (char *fmt,...)
+debugLog (const char *fmt,...)
 {
   static int append = 0;        // First time through, open the file without append.
 
@@ -202,8 +202,8 @@ char *
 pic16_decodeOp (unsigned int op)
 {
         if (op < 128 && op > ' ') {
-                buffer[0] = (op & 0xff);
-                buffer[1] = 0;
+                buffer[0] = op & 0xff;
+                buffer[1] = '\0';
           return buffer;
         }
 
@@ -311,13 +311,13 @@ pic16_decodeOp (unsigned int op)
                 case SEND:              return "SEND";
                 case DUMMY_READ_VOLATILE:       return "DUMMY_READ_VOLATILE";
         }
-        sprintf (buffer, "unknown op %d %c", op, op & 0xff);
+        SNPRINTF(buffer, sizeof(buffer), "unknown op %d %c", op, op & 0xff);
 
   return buffer;
 }
 
 #if 0
-static char *decodeRegType(short type)
+static const char *decodeRegType(short type)
 {
         switch(type) {
                 case REG_GPR: return "REG_GPR";
@@ -332,7 +332,7 @@ static char *decodeRegType(short type)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static char *
+static const char *
 debugLogRegType (short type)
 {
         if(!pic16_ralloc_debug)return NULL;
@@ -341,7 +341,7 @@ debugLogRegType (short type)
                 case REG_PTR: return "REG_PTR";
                 case REG_CND: return "REG_CND";
         }
-        sprintf (buffer, "unknown reg type %d", type);
+        SNPRINTF(buffer, sizeof(buffer), "unknown reg type %d", type);
 
   return buffer;
 }
@@ -356,24 +356,21 @@ static int regname2key(char const *name)
     return 0;
 
   while(*name) {
-
     key += (*name++) + 1;
-
   }
 
-  return ( (key + (key >> 4) + (key>>8)) & 0x3f);
-
+  return ((key + (key >> 4) + (key>>8)) & 0x3f);
 }
 
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-reg_info* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int alias, operand *refop)
+reg_info* newReg(int type, short pc_type, int rIdx, const char *name, unsigned size, int alias, operand *refop)
 {
 
   reg_info *dReg;
 
-        dReg = Safe_calloc(1,sizeof(reg_info));
+        dReg = Safe_alloc(sizeof(reg_info));
         dReg->type = type;
         dReg->pc_type = pc_type;
         dReg->rIdx = rIdx;
@@ -381,9 +378,9 @@ reg_info* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, i
                 dReg->name = Safe_strdup(name);
         else {
           if(pic16_options.xinst && pc_type == PO_GPR_TEMP) {
-            sprintf(buffer,"0x%02x", dReg->rIdx);
+            SNPRINTF(buffer, sizeof(buffer), "0x%02x", dReg->rIdx);
           } else {
-            sprintf(buffer,"r0x%02x", dReg->rIdx);
+            SNPRINTF(buffer, sizeof(buffer), "r0x%02x", dReg->rIdx);
           }
 
           if(type == REG_STK) {
@@ -494,7 +491,7 @@ regFindFreeNext(set *dRegs, reg_info *creg)
 /*-----------------------------------------------------------------*
  *-----------------------------------------------------------------*/
 reg_info *
-pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
+pic16_allocProcessorRegister(int rIdx, const char * name, short po_type, int alias)
 {
   reg_info *reg = newReg(REG_SFR, po_type, rIdx, name, 1, alias, NULL);
 
@@ -512,15 +509,15 @@ pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
  *-----------------------------------------------------------------*/
 
 reg_info *
-pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias)
+pic16_allocInternalRegister(int rIdx, const char *name, short po_type, int alias)
 {
-  reg_info * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias, NULL);
+  reg_info * reg = newReg(REG_GPR, po_type, rIdx, name, 1, alias, NULL);
 
 //  fprintf(stderr,"%s:%d: %s   %s addr =0x%x\n",__FILE__, __LINE__, __FUNCTION__, name, rIdx);
 
     if(reg) {
       reg->wasUsed = 0;
-      return addSet(&pic16_dynInternalRegs,reg);
+      return addSet(&pic16_dynInternalRegs, reg);
     }
 
   return NULL;
@@ -595,7 +592,7 @@ allocReg (short type)
 /* pic16_dirregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_dirregWithName (char *name)
+pic16_dirregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -629,7 +626,7 @@ pic16_dirregWithName (char *name)
 /* pic16_allocregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_allocregWithName (char *name)
+pic16_allocregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -664,7 +661,7 @@ pic16_allocregWithName (char *name)
 /* pic16_procregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_procregWithName (char *name)
+pic16_procregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -698,7 +695,7 @@ pic16_procregWithName (char *name)
 /* pic16_accessregWithName - search for register by name           */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_accessregWithName (char *name)
+pic16_accessregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -728,7 +725,7 @@ pic16_accessregWithName (char *name)
 
 }
 
-reg_info *pic16_regWithName(char *name)
+reg_info *pic16_regWithName(const char *name)
 {
   reg_info *reg;
 
@@ -951,7 +948,7 @@ pic16_allocDirReg (operand *op )
 /* pic16_allocRegByName - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_allocRegByName (char *name, int size, operand *op)
+pic16_allocRegByName(const char *name, int size, operand *op)
 {
 
   reg_info *reg;
@@ -1272,7 +1269,7 @@ static void packBits(set *bregs)
       breg->address >>= 3;
 
       if(!bitfield) {
-        sprintf (buffer, "fbitfield%02x", breg->address);
+        SNPRINTF(buffer, sizeof(buffer), "fbitfield%02x", breg->address);
         //fprintf(stderr,"new bit field\n");
         bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0, NULL);
         bitfield->isBitField = 1;
@@ -1291,7 +1288,7 @@ static void packBits(set *bregs)
       if(!relocbitfield || bit_no >7) {
         byte_no++;
         bit_no=0;
-        sprintf (buffer, "bitfield%d", byte_no);
+        SNPRINTF(buffer, sizeof(buffer), "bitfield%d", byte_no);
         //fprintf(stderr,"new relocatable bit field\n");
         relocbitfield = newReg(REG_GPR, PO_GPR_BIT,rDirectIdx++,buffer,1,0, NULL);
         relocbitfield->isBitField = 1;
@@ -1626,8 +1623,8 @@ createStackSpil (symbol * sym)
 {
   symbol *sloc = NULL;
   int useXstack, model, noOverlay;
+  char slocBuffer[120];
 
-  char slocBuffer[30];
   debugLog ("%s\n", __FUNCTION__);
 
   /* first go try and find a free one that is already
@@ -1642,18 +1639,8 @@ createStackSpil (symbol * sym)
       return sym;
     }
 
-  /* could not then have to create one , this is the hard part
-     we need to allocate this on the stack : this is really a
-     hack!! but cannot think of anything better at this time */
-
-  if (sprintf (slocBuffer, "sloc%d", _G.slocNum++) >= sizeof (slocBuffer))
-    {
-      fprintf (stderr, "kkkInternal error: slocBuffer overflowed: %s:%d\n",
-               __FILE__, __LINE__);
-      exit (1);
-    }
-
-  sloc = newiTemp (slocBuffer);
+  SNPRINTF(slocBuffer, sizeof(slocBuffer), "sloc%d", _G.slocNum++);
+  sloc = newiTemp(slocBuffer);
 
   /* set the type to the spilling symbol */
   sloc->type = copyLinkChain (sym->type);
@@ -2748,8 +2735,7 @@ regTypeNum ()
 
   debugLog ("%s\n", __FUNCTION__);
   /* for each live range do */
-  for (sym = hTabFirstItem (liveRanges, &k); sym;
-       sym = hTabNextItem (liveRanges, &k)) {
+  for (sym = hTabFirstItem (liveRanges, &k); sym; sym = hTabNextItem (liveRanges, &k)) {
 
     debugLog ("  %d - %s\n", __LINE__, sym->rname);
     //fprintf(stderr,"  %d - %s\n", __LINE__, sym->rname);
@@ -2757,7 +2743,6 @@ regTypeNum ()
     /* if used zero times then no registers needed */
     if ((sym->liveTo - sym->liveFrom) == 0)
       continue;
-
 
     /* if the live range is a temporary */
     if (sym->isitmp) {

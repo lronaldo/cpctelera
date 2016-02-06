@@ -49,6 +49,20 @@ dbuf_append_str (struct dbuf_s *dbuf, const char *str)
     return 0;
 }
 
+/*
+ * Prepend string to the beginning of the buffer.
+ * The buffer is null terminated.
+ */
+
+int
+dbuf_prepend_str (struct dbuf_s *dbuf, const char *str)
+{
+  size_t len;
+  assert (str != NULL);
+
+  len = strlen (str);
+  return (dbuf_prepend (dbuf, str, len));
+}
 
 /*
  * Append single character to the end of the buffer.
@@ -68,6 +82,20 @@ dbuf_append_char (struct dbuf_s *dbuf, char chr)
     }
   else
     return 0;
+}
+
+/*
+ * Prepend single character to the end of the buffer.
+ * The buffer is null terminated.
+ */
+
+int
+dbuf_prepend_char (struct dbuf_s *dbuf, char chr)
+{
+  char buf[2];
+  buf[0] = chr;
+  buf[1] = '\0';
+  return (dbuf_prepend_str (dbuf, buf));
 }
 
 /*
@@ -141,7 +169,10 @@ calc_result_length (const char *format, va_list args)
               total_width += 307;
               break;
             case 's':
-              total_width += strlen (va_arg (ap, char *));
+              {
+                const char *p = va_arg (ap, char *);
+                total_width += strlen (p ? p : "(null)");
+              }
               break;
             case 'p':
             case 'n':

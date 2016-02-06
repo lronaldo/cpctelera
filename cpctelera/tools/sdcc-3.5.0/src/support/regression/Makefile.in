@@ -206,7 +206,7 @@ M_CASES = $(ALL_M_TESTS:$(TESTS_DIR)/%.m4=$(CASES_DIR)/%.c)
 PORT_CASES_DIR = $(CASES_DIR)/$(PORT)
 PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 # Each test generates a result log file
-PORT_RESULTS = $(sort $(ALL_C_TESTS:$(TESTS_DIR)/%.c=$(PORT_RESULTS_DIR)/%.out) $(ALL_M_TESTS:$(TESTS_DIR)/%.m4=$(PORT_RESULTS_DIR)/%.out))
+PORT_RESULTS = $(sort $(patsubst %.c,$(PORT_RESULTS_DIR)/%.out,$(notdir $(ALL_C_TESTS))) $(patsubst %.m4,$(PORT_RESULTS_DIR)/%.out,$(notdir $(ALL_M_TESTS))))
 
 SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
 

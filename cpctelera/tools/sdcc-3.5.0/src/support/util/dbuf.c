@@ -163,6 +163,25 @@ int dbuf_append(struct dbuf_s *dbuf, const void *buf, size_t len)
   return 0;
 }
 
+/*
+ * Prepend the buf to the beginning of the buffer.
+ */
+
+int dbuf_prepend(struct dbuf_s *dbuf, const void *buf, size_t len)
+{
+  assert(dbuf);
+  assert(dbuf->alloc);
+  assert(dbuf->buf);
+
+  if (_dbuf_expand(dbuf, len) != 0) {
+    memmove(&(((char *)dbuf->buf)[len]), dbuf->buf, dbuf->len);
+    memcpy(dbuf->buf, buf, len);
+    dbuf->len += len;
+    return 1;
+  }
+
+  return 0;
+}
 
 /*
  * Add '\0' character at the end of the buffer without

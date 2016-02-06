@@ -27,7 +27,7 @@ returnFirstArg(int marker, ...)
 
     va_end(ap);
 
-    LOG(("Returning %u\n", i));
+    LOG(("Returning %d\n", i));
     return i;
 }
 
@@ -43,7 +43,7 @@ returnSecondArg(int marker, ...)
 
     va_end(ap);
 
-    LOG(("Returning %u\n", i));
+    LOG(("Returning %d\n", i));
     return i;
 }
 
@@ -61,7 +61,7 @@ returnSecondArgCopy(int marker, ...)
     va_end(ap1);
     va_end(ap2);
 
-    LOG(("Returning %u\n", i));
+    LOG(("Returning %d\n", i));
     return i;
 }
 
@@ -78,7 +78,7 @@ returnThirdArg(int marker, ...)
 
     va_end(ap);
 
-    LOG(("Returning %u\n", i));
+    LOG(("Returning %d\n", i));
     return i;
 }
 #endif

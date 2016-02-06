@@ -2,9 +2,9 @@
  * This declarations of the PIC18F85K22 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:53 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:11 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -5546,7 +5546,7 @@ typedef struct
   unsigned TMR4IE               : 1;
   unsigned TMR5IE               : 1;
   unsigned TMR6IE               : 1;
-  unsigned TMR7IE               : 1;
+  unsigned                      : 1;
   unsigned TMR8IE               : 1;
   unsigned                      : 1;
   unsigned                      : 1;
@@ -5558,7 +5558,6 @@ extern __at(0x0FB9) volatile __PIE5bits_t PIE5bits;
 #define _TMR4IE                 0x01
 #define _TMR5IE                 0x02
 #define _TMR6IE                 0x04
-#define _TMR7IE                 0x08
 #define _TMR8IE                 0x10
 
 //==============================================================================
@@ -5574,7 +5573,7 @@ typedef struct
   unsigned TMR4IF               : 1;
   unsigned TMR5IF               : 1;
   unsigned TMR6IF               : 1;
-  unsigned TMR7IF               : 1;
+  unsigned                      : 1;
   unsigned TMR8IF               : 1;
   unsigned                      : 1;
   unsigned                      : 1;
@@ -5586,7 +5585,6 @@ extern __at(0x0FBA) volatile __PIR5bits_t PIR5bits;
 #define _TMR4IF                 0x01
 #define _TMR5IF                 0x02
 #define _TMR6IF                 0x04
-#define _TMR7IF                 0x08
 #define _TMR8IF                 0x10
 
 //==============================================================================

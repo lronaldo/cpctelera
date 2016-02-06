@@ -31,7 +31,6 @@
 #include "newalloc.h"
 #include "dbuf_string.h"
 
-
 int cNestLevel;
 
 
@@ -555,8 +554,8 @@ initList *reorderIlist (sym_link * type, initList * ilist)
         {
           if (nlistArray[idx] != NULL)
             werrorfl (iloop->filename, iloop->lineno, W_DUPLICATE_INIT, idx);
-
-          nlistArray[idx] = iloop;
+          if (idx < size)
+            nlistArray[idx] = iloop;
         }
     }
 
@@ -707,6 +706,15 @@ double2ul (double val)
  * on other known platforms (long) 2147483648.0 equals to -2147483648
  */
   return ((val) < 0) ? (((val) < -2147483647.0) ? 0x80000000UL : (unsigned long) -((long) -(val))) : (unsigned long) (val);
+}
+
+/*-----------------------------------------------------------------*/
+/* double2ull - double to unsigned long long conversion                  */
+/*-----------------------------------------------------------------*/
+unsigned long long
+double2ull (double val)
+{
+  return ((val) < 0) ? (((val) < -9223372036854775807.0) ? 0x8000000000000000ULL : (unsigned long long) -((long long) -(val))) : (unsigned long long) (val);
 }
 
 /*--------------------------------------------------------------------*/
@@ -1320,10 +1328,10 @@ constVal (const char *s)
 }
 
 /*-----------------------------------------------------------------*/
-/* constCharVal - converts a CHAR constant to value                */
+/* constCharacterVal - converts a character constant to value      */
 /*-----------------------------------------------------------------*/
 value *
-constCharVal (unsigned char v)
+constCharacterVal (unsigned long v, char type)
 {
   value *val = newValue ();     /* alloc space for value   */
 
@@ -1331,12 +1339,50 @@ constCharVal (unsigned char v)
   SPEC_SCLS (val->type) = S_LITERAL;
   SPEC_CONST (val->type) = 1;
 
-  SPEC_NOUN (val->type) = V_INT;
-  SPEC_USIGN (val->type) = 0;
-
-  SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
+  switch (type)
+    {
+    case 0: // character constant
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 0;
+      SPEC_CVAL (val->type).v_int = options.signed_char ? (signed char) v : (unsigned char) v;
+      break;
+    case 'L': // wide character constant
+      if (!options.std_c95)
+        werror (E_WCHAR_CONST_C95);
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 1;
+      SPEC_LONG (val->etype) = 1;
+      SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) v;
+      break;
+    case 'u': // wide character constant
+      if (!options.std_c11)
+        werror (E_WCHAR_CONST_C11);
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 1;
+      SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) v;
+      break;
+    case 'U': // wide character constant
+      if (!options.std_c11)
+        werror (E_WCHAR_CONST_C11);
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 1;
+      SPEC_LONG (val->etype) = 1;
+      SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) v;
+      break;
+    default:
+      wassert (0);
+    }
 
   return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* constCharVal - converts a character constant to value           */
+/*-----------------------------------------------------------------*/
+value *
+constCharVal (unsigned char v)
+{
+  return constCharacterVal (v, 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1358,6 +1404,87 @@ constBoolVal (bool v)
   return val;
 }
 
+// TODO: Move this function to SDCCutil?
+static const TYPE_UDWORD *utf_32_from_utf_8 (size_t *utf_32_len, const char *utf_8, size_t utf_8_len)
+{
+  size_t allocated = 0;
+  TYPE_UDWORD *utf_32 = 0;
+  unsigned char first_byte;
+  TYPE_UDWORD codepoint;
+  size_t seqlen;
+
+  for (*utf_32_len = 0; utf_8_len; (*utf_32_len)++)
+    {
+      if (allocated == *utf_32_len)
+        {
+          utf_32 = realloc (utf_32, sizeof(TYPE_UDWORD) * (*utf_32_len + 16));
+          wassert (utf_32);
+          allocated = *utf_32_len + 16;
+        }
+
+      first_byte = *utf_8;
+      seqlen = 1;
+      if (first_byte & 0x80)
+        {
+          while (first_byte & (0x80 >> seqlen))
+            seqlen++;
+          first_byte &= (0xff >> (seqlen + 1));
+        }
+      wassert (seqlen <= 6); // seqlen 5 and 6 are deprecated in current unicode standard, but for now, allow them.
+
+      codepoint = first_byte;
+      utf_8++;
+      utf_8_len--;
+      seqlen--;
+
+      for(; seqlen; seqlen--)
+        {
+          codepoint <<= 6;
+          codepoint |= (*utf_8 & 0xf);
+          utf_8++;
+          utf_8_len--;
+        }
+
+      utf_32[*utf_32_len] = codepoint;
+    }
+  return (utf_32);
+}
+
+// TODO: Move this function to SDCCutil?
+static const TYPE_UWORD *utf_16_from_utf_32 (size_t *utf_16_len, const TYPE_UDWORD *utf_32, size_t utf_32_len)
+{
+  size_t allocated = 0;
+  TYPE_UWORD *utf_16 = 0;
+  TYPE_UDWORD codepoint;
+
+  for (*utf_16_len = 0; utf_32_len; utf_32_len--, utf_32++)
+    {
+      if (allocated <= *utf_16_len + 2)
+        {
+          utf_16 = realloc (utf_16, sizeof(TYPE_UWORD) * (*utf_16_len + 16));
+          wassert (utf_16);
+          allocated = *utf_16_len + 16;
+        }
+
+      codepoint = *utf_32;
+
+      if (codepoint < 0xd7ff || codepoint >= 0xe000 && codepoint <= 0xffff) // Code in basic multilingual plane.
+        {
+          utf_16[(*utf_16_len)++] = codepoint;
+          continue;
+        }
+
+      // Code point in supplementary plane.
+      wassert (codepoint >= 0x100000 && codepoint <= 0x10ffff);
+      codepoint -= 0x100000;
+
+      utf_16[(*utf_16_len)++] = ((codepoint >> 10) & 0x3ff) + 0xd800;
+      utf_16[(*utf_16_len)++] = (codepoint & 0x3ff) + 0xdc00;
+    }
+
+  return (utf_16);
+}
+
 /*------------------------------------------------------------------*/
 /* strVal - converts a string constant to a value                   */
 /*------------------------------------------------------------------*/
@@ -1365,6 +1492,8 @@ value *
 strVal (const char *s)
 {
   value *val;
+  const char *utf_8;
+  size_t utf_8_size;
 
   val = newValue ();            /* get a new one */
 
@@ -1372,15 +1501,43 @@ strVal (const char *s)
   val->type = newLink (DECLARATOR);
   DCL_TYPE (val->type) = ARRAY;
   val->type->next = val->etype = newLink (SPECIFIER);
-  SPEC_NOUN (val->etype) = V_CHAR;
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  SPEC_CVAL (val->etype).v_char = copyStr (s, &DCL_ELEM (val->type));
+  // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
+  utf_8 = copyStr (s[0] == '"' ? s : s + 1, &utf_8_size);
+
+  if (s[0] == '"') // UTF-8 string literal (any prefix u8 or L in the source would already have been stripped by earlier stages)
+    {
+      SPEC_NOUN (val->etype) = V_CHAR;
+      SPEC_CVAL (val->etype).v_char = utf_8;
+      DCL_ELEM (val->type) = utf_8_size;
+    }
+  else
+    {
+      size_t utf_32_size;
+      // Convert to UTF-32 next, since converting UTF-32 to UTF-16 is easier than UTF-8 to UTF-16.
+      const TYPE_UDWORD *utf_32 = utf_32_from_utf_8 (&utf_32_size, utf_8, utf_8_size);
+
+	  dbuf_free (utf_8);
+
+      if (s[0] == 'U' || s[0] == 'L') // UTF-32 string literal
+        wassertl (0, "UTF-32 string literals are not yet supported");
+      else if (s[0] == 'u') // UTF-16 string literal
+        {
+          size_t utf_16_size;
+          const TYPE_UWORD *utf_16 = utf_16_from_utf_32 (&utf_16_size, utf_32, utf_32_size);
+
+          (void)utf_16; // suppress warning of unused variable as long as this is unsupported
+
+          wassertl (0, "C11 UTF-16 string literals are not yet supported");
+        }
+      else
+        wassert (0);
+    }
 
   return val;
 }
-
 
 /*------------------------------------------------------------------*/
 /* reverseValWithType - reverses value chain with type & etype      */
@@ -1474,34 +1631,42 @@ copyValue (value * src)
 value *
 charVal (const char *s)
 {
-  /* get rid of quotation */
+  char type;
+
+  if (*s == 'L' || *s == 'u' || *s == 'U')
+    type = *s++;
+  else
+    type = 0;
+
+  s++; // Get rid of quotation.
+
   /* if \ then special processing */
-  if (*++s == '\\')
+  if (*s == '\\')
     {
       switch (*++s)             /* go beyond the backslash  */
         {
         case 'n':
-          return constCharVal ('\n');
+          return constCharacterVal ('\n', type);
         case 't':
-          return constCharVal ('\t');
+          return constCharacterVal ('\t', type);
         case 'v':
-          return constCharVal ('\v');
+          return constCharacterVal ('\v', type);
         case 'b':
-          return constCharVal ('\b');
+          return constCharacterVal ('\b', type);
         case 'r':
-          return constCharVal ('\r');
+          return constCharacterVal ('\r', type);
         case 'f':
-          return constCharVal ('\f');
+          return constCharacterVal ('\f', type);
         case 'a':
-          return constCharVal ('\a');
+          return constCharacterVal ('\a', type);
         case '\\':
-          return constCharVal ('\\');
+          return constCharacterVal ('\\', type);
         case '\?':
-          return constCharVal ('\?');
+          return constCharacterVal ('\?', type);
         case '\'':
-          return constCharVal ('\'');
+          return constCharacterVal ('\'', type);
         case '\"':
-          return constCharVal ('\"');
+          return constCharacterVal ('\"', type);
 
         case '0':
         case '1':
@@ -1511,23 +1676,23 @@ charVal (const char *s)
         case '5':
         case '6':
         case '7':
-          return constCharVal (octalEscape (&s));
+          return constCharacterVal (octalEscape (&s), type);
 
         case 'x':
-          return constCharVal (hexEscape (&s));
+          return constCharacterVal (hexEscape (&s), type);
 
         case 'u':
-          return constCharVal (universalEscape (&s, 4));
+          return constCharacterVal (universalEscape (&s, 4), type);
 
         case 'U':
-          return constCharVal (universalEscape (&s, 8));
+          return constCharacterVal (universalEscape (&s, 8), type);
 
         default:
-          return constCharVal (*s);
+          return constCharacterVal (*s, type);
         }
     }
   else                          /* not a backslash */
-    return constCharVal (*s);
+    return constCharacterVal (*s, type);
 }
 
 /*------------------------------------------------------------------*/
@@ -2294,7 +2459,8 @@ valShift (value * lval, value * rval, int lr)
       /* left shift */
       (lr ||
        /* right shift and unsigned */
-       (!lr && SPEC_USIGN (rval->type))))
+       (!lr && SPEC_USIGN (rval->type))) &&
+       ((TYPE_TARGET_ULONG) ulFromVal (lval) != (TYPE_TARGET_ULONG) 0))
     {
       werror (W_SHIFT_CHANGED, (lr ? "left" : "right"));
     }

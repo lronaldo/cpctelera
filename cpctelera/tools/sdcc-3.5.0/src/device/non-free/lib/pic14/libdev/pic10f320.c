@@ -2,9 +2,9 @@
  * This definitions of the PIC10F320 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:37 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:33 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -100,6 +100,9 @@ __at(0x0018) volatile __PWM2DCHbits_t PWM2DCHbits;
 
 __at(0x0019) __sfr PWM2CON;
 __at(0x0019) volatile __PWM2CONbits_t PWM2CONbits;
+
+__at(0x0019) __sfr PWM2CON0;
+__at(0x0019) volatile __PWM2CON0bits_t PWM2CON0bits;
 
 __at(0x001A) __sfr IOCAP;
 __at(0x001A) volatile __IOCAPbits_t IOCAPbits;

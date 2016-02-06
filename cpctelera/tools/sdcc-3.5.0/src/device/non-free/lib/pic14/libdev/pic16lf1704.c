@@ -2,9 +2,9 @@
  * This definitions of the PIC16LF1704 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:54 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -342,6 +342,9 @@ __at(0x0299) __sfr CCPR2H;
 __at(0x029A) __sfr CCP2CON;
 __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
 
+__at(0x029A) __sfr ECCP2CON;
+__at(0x029A) volatile __ECCP2CONbits_t ECCP2CONbits;
+
 __at(0x029E) __sfr CCPTMRS;
 __at(0x029E) volatile __CCPTMRSbits_t CCPTMRSbits;
 
@@ -404,6 +407,9 @@ __at(0x0618) volatile __PWM3DCHbits_t PWM3DCHbits;
 __at(0x0619) __sfr PWM3CON;
 __at(0x0619) volatile __PWM3CONbits_t PWM3CONbits;
 
+__at(0x0619) __sfr PWM3CON0;
+__at(0x0619) volatile __PWM3CON0bits_t PWM3CON0bits;
+
 __at(0x061A) __sfr PWM4DCL;
 __at(0x061A) volatile __PWM4DCLbits_t PWM4DCLbits;
 
@@ -412,6 +418,9 @@ __at(0x061B) volatile __PWM4DCHbits_t PWM4DCHbits;
 
 __at(0x061C) __sfr PWM4CON;
 __at(0x061C) volatile __PWM4CONbits_t PWM4CONbits;
+
+__at(0x061C) __sfr PWM4CON0;
+__at(0x061C) volatile __PWM4CON0bits_t PWM4CON0bits;
 
 __at(0x0691) __sfr COG1PHR;
 __at(0x0691) volatile __COG1PHRbits_t COG1PHRbits;

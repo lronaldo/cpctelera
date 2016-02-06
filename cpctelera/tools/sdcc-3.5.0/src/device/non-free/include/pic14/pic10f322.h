@@ -2,9 +2,9 @@
  * This declarations of the PIC10F322 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:37 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:33 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -60,6 +60,7 @@
 #define PWM2DCL_ADDR            0x0017
 #define PWM2DCH_ADDR            0x0018
 #define PWM2CON_ADDR            0x0019
+#define PWM2CON0_ADDR           0x0019
 #define IOCAP_ADDR              0x001A
 #define IOCAN_ADDR              0x001B
 #define IOCAF_ADDR              0x001C
@@ -806,6 +807,33 @@ extern __at(0x0019) volatile __PWM2CONbits_t PWM2CONbits;
 
 
 //==============================================================================
+//        PWM2CON0 Bits
+
+extern __at(0x0019) __sfr PWM2CON0;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned PWM2POL              : 1;
+  unsigned PWM2OUT              : 1;
+  unsigned PWM2OE               : 1;
+  unsigned PWM2EN               : 1;
+  } __PWM2CON0bits_t;
+
+extern __at(0x0019) volatile __PWM2CON0bits_t PWM2CON0bits;
+
+#define _PWM2CON0_PWM2POL       0x10
+#define _PWM2CON0_PWM2OUT       0x20
+#define _PWM2CON0_PWM2OE        0x40
+#define _PWM2CON0_PWM2EN        0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        IOCAP Bits
 
 extern __at(0x001A) __sfr IOCAP;
@@ -1459,14 +1487,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned LC1D2S             : 3;
+    unsigned D2S                : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned D2S                : 3;
+    unsigned LC1D2S             : 3;
     unsigned                    : 1;
     };
   } __CLC1SEL0bits_t;
@@ -1535,14 +1563,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned D4S                : 3;
+    unsigned LC1D4S             : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned LC1D4S             : 3;
+    unsigned D4S                : 3;
     unsigned                    : 1;
     };
   } __CLC1SEL1bits_t;
