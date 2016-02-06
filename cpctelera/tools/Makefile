@@ -42,7 +42,7 @@ $(1): $(1)/Makefile
 endef
 
 define MAKETOOL
-	@$(MAKE) -j -C $(1) $(2)
+	@$(MAKE) -C $(1) $(2)
 
 endef
 
