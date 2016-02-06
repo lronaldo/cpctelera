@@ -39,7 +39,7 @@
 
 // Workaround for boost bug #11880
 #include <boost/version.hpp>
-#if BOOST_VERSION == 106000
+#if BOOST_VERSION >= 106000
    #include <boost/type_traits/ice.hpp>
 #endif
 
