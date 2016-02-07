@@ -296,6 +296,8 @@ coloredMachineEcho ${COLOR_LIGHT_GREEN} 0.002 "> CPCtelera's tools and library a
 
 # Build examples in subshell process, then go monitoring until it finishes
 coloredMachineEcho $'\n'"${COLOR_CYAN}" 0.005 ">>> Building cpctelera examples:       "
+export PATH=$PATH:$CPCT_SCRIPTS_DIR
+export CPCT_PATH=$CPCT_MAIN_DIR
 makeWithProgressSupervision "$CPCT_EXAMPLES_DIR" "$CPCT_EXAMPLES_BUILD_LOG" "" \
                               "$CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES"  35  0.1  \
                                "There was an error building CPCtelera examples."
