@@ -69,6 +69,7 @@ DSK     := $(PROJNAME).dsk
 
 # TARGETs for compilation (if you only want one of them, remove the other)
 TARGET  := $(CDT) $(DSK)
+OBJS2CLEAN := src/sprite.c
 
 ####
 ## SECTION 2: TOOL PATH CONFIGURATION
