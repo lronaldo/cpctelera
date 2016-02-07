@@ -99,8 +99,12 @@ DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 ##  $(DSK):    Generates the DSK file with main binary
 ##  $(DSKINC): Includes all files from DSKFILESDIR into DSK as binaries 
 ##
-TARGET  := $(CDT) $(DSK) $(DSKINC)
+TARGET := $(CDT) $(DSK) $(DSKINC)
 
+##
+## OBJS2CLEAN: Additional objects to be removed when running "make clean"
+##
+OBJS2CLEAN :=
 
 ####
 ## SECTION 2: TOOL PATH CONFIGURATION
@@ -150,4 +154,4 @@ CFILES         := $(filter-out $(BIN_OBJFILES), $(CFILES))
 C_OBJFILES     := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(BIN_OBJFILES) $(CFILES)))
 ASM_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
 DSKINCOBJFILES := $(foreach FILE, $(DSKINCSRCFILES), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(FILE)).$(DSKINC_EXT))
-OBJFILES		   := $(C_OBJFILES) $(ASM_OBJFILES)
+OBJFILES       := $(C_OBJFILES) $(ASM_OBJFILES)
