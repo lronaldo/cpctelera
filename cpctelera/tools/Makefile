@@ -35,14 +35,17 @@ TOOLSYSTEM=ToolMaker
 RM=rm -f
 MKDIR=mkdir
 
+# Set optimization only for non-arm devices to prevent Raspberry Pi's to hang due to SD i/o block
+MODIF:=$(shell if uname -a | grep -o arm > /dev/null 2>&1; then echo ""; else echo "-f"; fi)
+
 define MAKERULE
 $(1): $(1)/Makefile
 	$(call PRINT,$(TOOLSYSTEM),"Building $(1)...")
-	@$(MAKE) -j -C $(1)
+	@$(MAKE) $(MODIF) -C $(1)
 endef
 
 define MAKETOOL
-	@$(MAKE) -j -C $(1) $(2)
+	@$(MAKE) -C $(1) $(2)
 
 endef
 
