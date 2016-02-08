@@ -1,3 +1,4 @@
+SHELL:=/bin/bash
 INCDIR=include
 SRCDIR=src
 OBJDIR=obj
