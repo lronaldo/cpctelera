@@ -29,8 +29,8 @@
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel data)
 ;;  (2B DE) memory - Destination video memory pointer
-;;  (1B B ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
-;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B B ) height - Sprite Height in bytes (>0)
+;;  (1B C ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSprite_asm
