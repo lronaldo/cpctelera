@@ -72,7 +72,9 @@
 ;; (end code)
 ;;    NC=Number of colours to convert
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+  
+.globl cpct_firmware2hw_colour ;; colour conversion table defined in cpct_getHWColour.s
+
 f2h_colour_loop:
    ld   hl, #cpct_firmware2hw_colour ;; [3] HL points to the start of the firmware2hw_colour array
    ld    a, (de)            ;; [2] A = Next colour to convert

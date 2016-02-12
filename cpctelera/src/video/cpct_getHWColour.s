@@ -65,6 +65,8 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+.globl cpct_firmware2hw_colour ;; colour conversion table defined in cpct_getHWColour.s
+
 _cpct_getHWColour::
 cpct_getHWColour_asm::       ;; Assembly entry point
    ld   de, #cpct_firmware2hw_colour ;; [3] DE points to the start of the colour table
