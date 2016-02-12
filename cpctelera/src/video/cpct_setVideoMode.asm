@@ -23,8 +23,6 @@
 ;
 .module cpct_video
    
-.include /videomode.s/
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Function: cpct_setVideoMode
 ;;
@@ -37,7 +35,7 @@
 ;;    > call cpct_setVideoMode_asm
 ;;
 ;; Input Parameters (1 Byte):
-;;    (1B A) videoMode - [0-3] Video mode to set
+;;    (1B C) videoMode - [0-3] Video mode to set
 ;;
 ;; Parameter Restrictions: 
 ;;  - *videomode* must be < 3, otherwise unexpected results may happen. Namely,
@@ -67,17 +65,17 @@
 ;;    AF, BC, HL
 ;;
 ;; Required memory:
-;;    18 bytes
+;;    C-bindings - 14 bytes
+;;  ASM-bindings - 13 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case       | Cycles | microSecs (us)
-;; -------------------------------
-;; Any        |   71   |  17.75
-;; -------------------------------
-;; Asm saving |  -28   |  -7.00
-;; -------------------------------
-;; Asm 
+;; Case       | microSecs | CPU Cycles |
+;; -------------------------------------
+;; Any        |    80     |     20     |
+;; -------------------------------------
+;; Asm saving |    -4     |     -1     |
+;; -------------------------------------
 ;; (end code)
 ;;
 ;; Credits:
@@ -85,21 +83,13 @@
 ;; cpcrslib by Raul Simarro.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_setVideoMode::
-   ;; Get Parameter from stack
-   ld   hl, #2               ;; [10] HL = SP + 2 (Place where parameters are in the stack)
-   add  hl, sp               ;; [11]
-   ld    c, (hl)             ;; [ 7] A = First Paramter (Video Mode to be selected)
+   ld   hl, #_cpct_mode_rom_status ;; [3] HL points to present MODE, INT.GEN and ROM selection byte.
+   ld    a, (hl)                   ;; [2] A = Present values for MODE, INT.GEN and ROM selection. (See mode_rom_status)
+   and #0xFC                       ;; [2] A = (xxxxxx00) set bits 1,0 to 0, to prepare them for inserting the mode parameter
+   or    c                         ;; [1] A = Mixes previously selected ING.GEN and ROM values with user selected MODE (last 2 bits)
+   ld    b, #GA_port_byte          ;; [2] B = Gate Array Port (0x7F)
+   out (c), a                      ;; [4] GA Command: Set Video Mode
 
-cpct_setVideoMode_asm::      ;; Entry point for assembly calls using registers for parameter passing
+   ld (hl), a                      ;; [2] Save new Mode and ROM status for later use if required
 
-   ld   hl, #_cpct_mode_rom_status ;; [10] HL points to present MODE, INT.GEN and ROM selection byte.
-   ld    a, (hl)             ;; [ 7] A = Present values for MODE, INT.GEN and ROM selection. (See mode_rom_status)
-   and #0xFC                 ;; [ 7] A = (xxxxxx00) set bits 1,0 to 0, to prepare them for inserting the mode parameter
-   or    c                   ;; [ 4] A = Mixes previously selected ING.GEN and ROM values with user selected MODE (last 2 bits)
-   ld    b, #GA_port_byte    ;; [ 7] B = Gate Array Port (0x7F)
-   out (c), a                ;; [12] GA Command: Set Video Mode
-
-   ld (hl), a                ;; [ 7] Save new Mode and ROM status for later use if required
-
-   ret                       ;; [10] Return
+   ret                             ;; [3] Return

@@ -27,7 +27,7 @@
 #include <memutils/memutils.h>
 
 // Setting Video Mode
-extern void cpct_setVideoMode (u8 videoMode);
+extern void cpct_setVideoMode (u8 videoMode) __z88dk_fastcall;
 
 // Waiting for VSYNC
 extern void cpct_waitVSYNC    ();
