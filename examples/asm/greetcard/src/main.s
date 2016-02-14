@@ -201,8 +201,8 @@ redrawString:
    ;; Increment colour for next call
    ld     a, (fg_colour)         ;; A = Foreground colour
    inc    a                      ;; A++
-   cp   #16                      ;; Check against 16
-   jr     c, dont_reset_a        ;; If Carry (A < 16), do nothing
+   cp     #palete_size           ;; Check against number of palette colours used
+   jr     c, dont_reset_a        ;; If Carry (A < palette_size), do nothing
    ld     a, #1                  ;; Else, set A=1 again
 
 dont_reset_a:
