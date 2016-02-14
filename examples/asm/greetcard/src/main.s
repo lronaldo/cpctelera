@@ -83,7 +83,6 @@ tscroll_bday:
 ;; DESTROYS:
 ;;    AF, BC, DE, HL
 ;;
-aquiempiezato::
 init:
    ;; Disable Firmware
    call  cpct_disableFirmware_asm   ;; Disable firmware
