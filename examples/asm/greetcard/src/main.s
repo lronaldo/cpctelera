@@ -1,0 +1,370 @@
+;;-----------------------------LICENSE NOTICE------------------------------------
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;
+;;  This program is free software: you can redistribute it and/or modify
+;;  it under the terms of the GNU General Public License as published by
+;;  the Free Software Foundation, either version 3 of the License, or
+;;  (at your option) any later version.
+;;
+;;  This program is distributed in the hope that it will be useful,
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;  GNU General Public License for more details.
+;;
+;;  You should have received a copy of the GNU General Public License
+;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;-------------------------------------------------------------------------------
+
+;;===============================================================================
+;; DEFINED CONSTANTS
+;;===============================================================================
+
+pvideomem     = 0xC000 ;; First byte of video memory
+initxy_sprite = 0xC805 ;; (x, y) = (5, 200) = (0x05, 0xC8) Initial Sprite coordinates
+init_colour   = 0x0001 ;; Background = 0x00, Foreground = 0x01
+
+;;===============================================================================
+;; DATA SECTION
+;;===============================================================================
+
+.area _DATA
+
+;; Ascii strings
+str_happy: .asciz "Happy"
+str_bday:  .asciz "Birthday"
+str_dav:   .asciz "@Davitsu"
+
+;; Palette (16 bytes)
+g_palette: 
+.db 0x1F, 0x14, 0x18, 0x05  ; (14,  0,  4,  7) || Pastel Blue, Black, Magenta, Purple
+.db 0x16, 0x1C, 0x06, 0x1E  ; ( 9,  3, 10, 12) || Green, Red, Cyan, Yellow
+.db 0x00, 0x0E, 0x07, 0x0F  ; (13, 15, 16, 17) || White, Orange, Pink, Pastel Magenta
+.db 0x19, 0x0A, 0x03, 0x0B  ; (22, 24, 25, 26) || Pastel Green, Bright Yellow, Pastel Yellow, Bright White
+
+;; Sprite (defined in its own C file)
+.globl _dav_davitsu_round
+
+;; Scrolling data structures for both scrolling strings (Happy / BDay)
+tscroll_happy: 
+   .dw   str_happy   ;; String pointer (2 bytes)
+   .db   1, 15*8     ;; x, y starting coordinates 
+   .db  -1           ;; x velocity
+   .db   80-5*4-1    ;; maxX coordinate
+
+tscroll_bday: 
+   .dw   str_bday    ;; String pointer (2 bytes)
+   .db   47, 18*8    ;; x, y starting coordinates 
+   .db    1          ;; x velocity 
+   .db   80-8*4-1    ;; maxX coordinate
+
+;;===============================================================================
+;; CODE SECTION
+;;===============================================================================
+
+.area _CODE
+
+;; Symbols with the names of the CPCtelera functions we want to use
+;; must be declared globl to be recognized by the compiler. Later on,
+;; linker will do its job and make the calls go to function code.
+.globl cpct_disableFirmware_asm
+.globl cpct_setVideoMode_asm
+.globl cpct_setPalette_asm
+.globl cpct_setPALColour_asm
+.globl cpct_getScreenPtr_asm
+.globl cpct_drawSprite_asm
+.globl cpct_waitVSYNC_asm
+.globl cpct_drawStringM0_asm
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNC: init
+;;    Sets CPC to its initial status
+;; DESTROYS:
+;;    AF, BC, DE, HL
+;;
+aquiempiezato::
+init:
+   ;; Disable Firmware
+   call  cpct_disableFirmware_asm   ;; Disable firmware
+
+   ;; Set Mode 0
+   ld    c, #0                      ;; C = 0 (New video mode)
+   call  cpct_setVideoMode_asm      ;; Set Mode 0
+   
+   ;; Set Palette
+   ld    hl, #g_palette             ;; HL = pointer to the start of the palette array
+   ld    de, #16                    ;; DE = Size of the palette array (num of colours)
+   call  cpct_setPalette_asm        ;; Set the new palette
+
+   ;; Change border colour
+   ld    hl, #0x1F10                ;; H=16 (Border ID), L=0x1F (Hardware colour to set)
+   call  cpct_setPALColour_asm      ;; Set the border (colour 16)
+
+   ret                              ;; return
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNC: drawSpriteClipped
+;;    Draw sprite with down clippling
+;; INPUT:
+;;    B: y pixel coordinate where to draw the sprite
+;;    C: x pixel coordinate where to draw the sprite
+;; DESTROYS:
+;;    AF, BC, DE, HL
+;;
+drawSpriteClipped:
+   ;; Calculate the memory location where the sprite will be drawn
+   push  bc                      ;; save x,y coordinates passed as parameters
+   ld    de, #pvideomem          ;; DE points to the start of video memory
+   call  cpct_getScreenPtr_asm   ;; Return pointer to byte located at (x,y) (C, B) in HL
+   ex    de, hl                  ;; DE = pointer to video memory location to draw the sprite
+   pop   af                      ;; A = y coordinate
+
+   ;; Check if clipping is needed
+   ld    bc, #0x2814             ;; C=20 (0x14), B=40 (0x28) WidthxHeight of the sprite in bytes
+   cp    #160                    ;; Compare A with 160. 160 is the amount of pixels where clipping starts
+   jr     c, no_clip             ;; If Carry, (A < 160), no need to do clipping
+
+   ;; Perform clippling (A = vertical size of the sprite to be drawn)
+   sub   #201                    ;; A' =  A - 201
+   neg                           ;; A' = -A' = 201 - A
+   ld     b, a                   ;; B = Reduced sprite height (clipped) to be drawn
+
+no_clip:
+   ;; Draw the sprite 
+   ;; - DE already points to video mem, and BC contains WidthxHeight)
+   ld    hl, #_dav_davitsu_round ;; HL points to the sprite
+   call  cpct_drawSprite_asm     ;; Draw the sprite on the screen
+
+   ret                           ;; Return
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNC: moveSprite
+;;    Moves the sprite from down the screen to its final location in a
+;; simple, linear animation.
+;; DESTROYS:
+;;    AF, BC, DE, HL
+;;
+moveSprite:
+   ;; Draw Sprite After VSYNC
+   call  cpct_waitVSYNC_asm   ;; Wait for VSYNC
+
+   y_coord = .+2              ;; Location in memory of the value for the Y coordinate
+   ld    bc, #initxy_sprite         ;; BC takes XY coordinates (value loaded is modified dynamically)
+   call  drawSpriteClipped    ;; Draw the sprite
+
+   ;; Move Sprite Up
+   ld    hl, #y_coord         ;; HL points to y_coord in memory
+   ld     a, (hl)             ;; A = y (Vertical coordinate)
+   cp    #60                  ;; Check against 60
+   ret   z                    ;; If y==60, end of the animation (no more coordinate update)
+
+   dec   (hl)                 ;; Move sprite 1 pixel UP (B--)
+
+   jr    moveSprite           ;; Loop again
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNC: redrawString
+;;    Draws a string with a new colour value each time, on a given location
+;; INPUT:
+;;    HL: Pointer to the string
+;;    B: y pixel coordinate where to draw the string
+;;    C: x pixel coordinate where to draw the string
+;; DESTROYS:
+;;    AF, BC, DE, HL
+;;
+redrawString:
+   ;; Calculate screen location where to draw the string
+   push  hl                      ;; Save pointer to the string
+   ld    de, #pvideomem          ;; DE points to the start of video memory
+   call  cpct_getScreenPtr_asm   ;; Return pointer to byte located at (x,y) (C, B) in HL
+   ex    de, hl                  ;; DE = pointer to video memory location to draw the sprite
+
+   ;; Draw the string
+   pop   hl                      ;; Recover pointer to the string
+   fg_colour = .+1               ;; fg_colour = location in memory of the Foreground colour value
+   ld    bc, #init_colour        ;; Colour
+   call  cpct_drawStringM0_asm   ;; Draw the string
+
+   ;; Increment colour for next call
+   ld     a, (fg_colour)         ;; A = Foreground colour
+   inc    a                      ;; A++
+   cp   #16                      ;; Check against 16
+   jr     c, dont_reset_a        ;; If Carry (A < 16), do nothing
+   ld     a, #1                  ;; Else, set A=1 again
+
+dont_reset_a:
+   ld    (fg_colour), a          ;; Save Foreground colour for next use
+
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNC: doOneScrollStep
+;;    Scrolls a complete charater line 1 byte to the left or to the right 
+;; (2 mode 0 pixels)
+;; INPUT: 
+;;    HL: Pointer to the start of the first screen line to be scrolled (it
+;; must be a pixel-0 screen line of a character)
+;;     A: -1 to scroll the line to the left, other value to scroll to the right
+;; DESTROYS:
+;;    AF, BC, DE, HL
+;;
+inc_e  = 0x1C   ;; Opcode for incrementing e
+inc_l  = 0x2C   ;; Opcode for incrementing l
+_ldir_ = 0xB0ED ;; Opcode for LDIR
+_lddr_ = 0xB8ED ;; Opcode for LDDR
+
+doOneScrollStep:
+   ;;
+   ;; Set up the copy
+   ;;
+   
+   ;; Check type of copy (1=scroll left, scroll right otherwise)
+   inc    a            ;; A++ (To check if A is -1 or not)
+   jr     z, scr_left  ;; If A=1, scroll left
+
+scr_right:             ;; A is not 1, scroll right
+   ld     a, #inc_e    ;; Increment e on scrolling right
+   ld    bc, #78       ;; | Add 78 bytes to point to ...
+   add   hl, bc        ;; | ... the byte before the last byte of the line 
+   ld    bc, #_lddr_   ;; Copy instruction to use: right copy
+   jr    start_copy    ;; Start the copy
+
+scr_left:
+   ld     a, #inc_l    ;; | Increment l on scrolling left
+   ld    bc, #_ldir_   ;; Copy instruction to use: left copy
+
+start_copy:
+   ;; Modify loop instruction that differs between movements and start
+   ld   (scr_pcopy), bc;; | Modify internal loop code with instructions...
+   ld   (scr_pincr), a ;; | ... required for this type of copy
+   
+   ;;
+   ;; Do the copy
+   ;;
+   ld     a, #8        ;; 8 pixel lines to be scrolled
+loop_scroll:
+   push  hl            ;; Save current hl value
+
+   ld     d, h         ;; | DE points to the first byte...
+   ld     e, l         ;; | and HL to the next one
+   scr_pincr = .       ;; << Memory address of the increment instruction
+   inc    l            ;; | (this instruction is modified dynamically)
+
+   ld    bc, #79       ;; 79 bytes to copy
+   scr_pcopy = .       ;; << Memory address of the copy instruction
+   ldir                ;; do the copy
+
+   pop   hl            ;; Restore HL value, for calculations
+
+   dec    a            ;; A-- (1 line less to be copied)
+   ret    z            ;; If A==0, scroll has ended
+
+   ld     b, a         ;; B = A (B acts as a backup of A)
+   ld     a, h         ;; | HL += 0x800
+   add   #8            ;; |
+   ld     h, a         ;; |
+   ld     a, b         ;; A = B (Restore A value from its backup)
+
+   jr    loop_scroll   ;; Next line
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNC: moveString
+;;    Moves a string 1 byte to the left or to the right, bouncing on the
+;; boundaries and then redrawing the string with a new colour
+;; INPUT:
+;;    IX: Pointer to a 6-bytes structure containing these fields,
+;;       2 bytes > Pointer to string to be drawn
+;;       1 byte  > x coordinate where the string is
+;;       1 byte  > y coordinate where the string is
+;;       1 byte  > current movement velocity (-1 or +1)
+;;       1 byte  > max x coordinate (where it should bounce on the right side)
+;; DESTROYS:
+;;    AF, AF', BC, DE, HL
+;;
+moveString:
+   ;; Update x location
+   ld     d, 4(ix)               ;; D = x velocity (VelX)
+   ld     a, 2(ix)               ;; A = x coordinate
+   add    d                      ;; A' = A + D = x + VelX
+
+   ;; Set B=y coordinate, as this will be used by both branches
+   ld     b, 3(ix)               ;; B = y coordinate of the string
+
+   ;; Check whether string is touching a boundary or not
+   jr     z, boundary_hit        ;; If x' == 0, left boundary (1) has been exceeded
+   cp  5(ix)                     ;; Check against maxX value
+   jr     c, do_string_movement  ;; If x < maxX, right boundary has not been hit
+
+boundary_hit:
+   ;; Save previous x pixel coordinate in c
+   sub    d                      ;; A = A' - D = x + VelX - VelX = x
+   ld     c, a                   ;; C = x
+
+   ;; Invert velocity
+   xor    a                      ;; A = 0
+   sub    d                      ;; A = -D = -VelX
+   ld 4(ix), a                   ;; Update VelX value
+   
+   ;; Redraw string with a new colour value
+   ld     l, 0(ix)               ;; HL = Pointer to the string
+   ld     h, 1(ix)               ;; (C = x already)
+   call  redrawString            ;; Redraws the string
+
+   ret                           ;; Nothing more to do, return.
+
+do_string_movement:
+   ;; Update string's x location
+   ld 2(ix), a                   ;; Update x location value
+
+   ;; Save VelX into a'
+   ld     a, d                   ;; A = D = VelX
+   ex    af, af'                 ;; A' = VelX
+
+   ;; Calculate memory location for y line
+   ld     c, #0                  ;; C = 0 (x coordinate = 0 to get the start of the y line)
+   ld    de, #pvideomem          ;; DE points to the start of video memory
+   call  cpct_getScreenPtr_asm   ;; Return pointer to byte located at (x,y) (C, B) in HL
+   ;; HL now points to the start of the first pixel line where the
+   ;; string is located (to be able to scroll it)
+
+   ;; Scroll the string
+   ex    af, af'                 ;; A = VelX (recover value from A')
+   call  doOneScrollStep         ;; Do scroll to the side determined by VelX
+
+   ret                           ;; Return
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; MAIN function. This is the entry point of the application.
+;;    _main:: global symbol is required for correctly compiling and linking
+;;
+_main:: 
+   call  init                 ;; Initialize the CPC
+   call  moveSprite           ;; Do the complete sprite animation and return when finished
+
+   ;; Draw davitsu string
+   ld    hl, #str_dav         ;; HL points to @Davitsu string
+   ld    bc, #0x4020          ;; B = y = 64 (0x40), C = x = 32 (0x20)
+   call  redrawString         ;; Draw the string with the initial colour
+
+loop:
+   ;; Scroll Happy String
+   ld    ix, #tscroll_happy   ;; IX points to the structure with scroll information about "Happy"
+   call  cpct_waitVSYNC_asm   ;; Wait for VSYNC before proceeding
+   call  moveString           ;; Move "Happy" String
+
+   ;; Scroll BDay String
+   ld    ix, #tscroll_bday    ;; IX points to the structure with scroll information about "Birthday"
+   call  cpct_waitVSYNC_asm   ;; Wait for VSYNC before proceeding
+   call  moveString           ;; Move "Birthday" String
+
+   jr    loop                 ;; Repeat forever
