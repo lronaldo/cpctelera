@@ -13,33 +13,33 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 <div id=Content><div class="CFunction"><div class=CTopic id=MainTopic><h1 class=CTitle><a name="cpct_setPalette"></a>cpct_setPalette</h1><div class=CBody><p>Changes the hardware palette colour values (selecting new ones).</p><h4 class=CHeading>C Definition</h4><p>void <a href="#cpct_setPalette" class=LFunction id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">cpct_setPalette</a> (<a href="../types-h.html#u8" class=LType id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">u8</a>* <b>colour_array</b>, <a href="../types-h.html#u16" class=LType id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">u16</a> <b>size</b>)</p><h4 class=CHeading>Input Parameters (4 Bytes)</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>(2B HL) colour_array</td><td class=CDLDescription>Pointer to a byte array containing new hardware colour values [0 - 31]</td></tr><tr><td class=CDLEntry>(2B DE) size</td><td class=CDLDescription>[1 - 16] Number of colours to change</td></tr></table><h4 class=CHeading>Assembly call (Input parameters on registers)</h4><blockquote><pre>call cpct_setPalette_asm</pre></blockquote><h4 class=CHeading>Parameter Restrictions</h4><ul><li><b>colour_array</b> must be an array of unsigned 8-bit values (u8), each one in the [0-31] range.</li><li><b>size</b> must be between 1 and 16.&nbsp; A size of 0 will be treated as 256, and any value greater than 16 will cause undefined behaviour, probably leading to program crashes.</li></ul><h4 class=CHeading>Requirements</h4><p>This function requires the CPC <b>firmware</b> to be <b>DISABLED</b>.&nbsp; Otherwise, it may not work, as firmware tends to restore palette colour values to its own selection.</p><h4 class=CHeading>Details</h4><p>This function modifies hardware palette registers to set new colours to use.&nbsp; These colours values are easily identified with PENs on the CPC, and are the ones shown in the 2nd column of Table 1.&nbsp; The function starts modiying PEN 0, and goes changing PEN 1, 2, 3... up to the number of provided colours (<b>size</b>) from the <b>colour_array</b>.&nbsp; It is important to notice that this function requires hardware colour values, which are different from firmware colour values (usually known as INKs on the CPC).&nbsp; Table 1 shows all of them, and you may use it for reference.</p><p>Palette registers are contained inside the PAL chip of the CPC (which is located inside the Gate Array).&nbsp; To access PAL chip, the same port (&amp;7F) as Gate Array is used.&nbsp; The function is not thought to be optimal, but secure.&nbsp; If a more optimal one is required, it can be derived from this code.&nbsp; The array of color values passed to this routine must include hardware color values (0-31) and not firmware ones.</p><blockquote><pre class="prettyprint">Firmware | Hardware  | Hard+Command | Colour Name    |  R%   G%   B% Colour
 ---------------------------------------------------------------------------
-     0   | 20 (0x14) |  0x54        | Black          |   0    0    0
-     1   |  4 (0x04) |  0x44 (0x50) | Blue           |   0    0   50
-     2   | 21 (0x15) |  0x55        | Bright Blue    |   0    0  100
-     3   | 28 (0x1C) |  0x5C        | Red            |  50    0    0
-     4   | 24 (0x18) |  0x58        | Magenta        |  50    0   50
-     5   | 29 (0x1D) |  0x5D        | Mauve          |  50    0  100
-     6   | 12 (0x0C) |  0x4C        | Bright Red     | 100    0    0
-     7   |  5 (0x05) |  0x45 (0x48) | Purple         | 100    0   50
-     8   | 13 (0x0D) |  0x4D        | Bright Magenta | 100    0  100
-     9   | 22 (0x16) |  0x56        | Green          |   0   50    0
-    10   |  6 (0x06) |  0x46        | Cyan           |   0   50   50
-    11   | 23 (0x17) |  0x57        | Sky Blue       |   0   50  100
-    12   | 30 (0x1E) |  0x5E        | Yellow         |  50   50    0
-    13   |  0 (0x00) |  0x40 (0x41) | White          |  50   50   50
-    14   | 31 (0x1F) |  0x5F        | Pastel Blue    |  50   50  100
-    15   | 14 (0x0E) |  0x4E        | Orange         | 100   50    0
-    16   |  7 (0x07) |  0x47        | Pink           | 100   50   50
-    17   | 15 (0x0F) |  0x4F        | Pastel Magenta | 100   50  100
-    18   | 18 (0x12) |  0x52        | Bright Green   |   0  100    0
-    19   |  2 (0x02) |  0x42 (0x51) | Sea Green      |   0  100   50
-    20   | 19 (0x13) |  0x53        | Bright Cyan    |   0  100  100
-    21   | 26 (0x1A) |  0x5A        | Lime           |  50  100    0
-    22   | 25 (0x19) |  0x59        | Pastel Green   |  50  100   50
-    23   | 27 (0x1B) |  0x5B        | Pastel Cyan    |  50  100  100
-    24   | 10 (0x0A) |  0x4A        | Bright Yellow  | 100  100    0
-    25   |  3 (0x03) |  0x43 (0x49) | Pastel Yellow  | 100  100   50
-    26   | 11 (0x0B) |  0x4B        | Bright White   | 100  100  100
+     0   | 20 (0x14) |  0x54        | Black          |   0    0    0 <font style="background-color: rgb(0,0,0)">     </font>
+     1   |  4 (0x04) |  0x44 (0x50) | Blue           |   0    0   50 <font style="background-color: rgb(0,0,128)">     </font>
+     2   | 21 (0x15) |  0x55        | Bright Blue    |   0    0  100 <font style="background-color: rgb(0,0,255)">     </font>
+     3   | 28 (0x1C) |  0x5C        | Red            |  50    0    0 <font style="background-color: rgb(128,0,0)">     </font>
+     4   | 24 (0x18) |  0x58        | Magenta        |  50    0   50 <font style="background-color: rgb(128,0,128)">     </font>
+     5   | 29 (0x1D) |  0x5D        | Mauve          |  50    0  100 <font style="background-color: rgb(128,0,255)">     </font>
+     6   | 12 (0x0C) |  0x4C        | Bright Red     | 100    0    0 <font style="background-color: rgb(255,0,0)">     </font>
+     7   |  5 (0x05) |  0x45 (0x48) | Purple         | 100    0   50 <font style="background-color: rgb(255,0,128)">     </font>
+     8   | 13 (0x0D) |  0x4D        | Bright Magenta | 100    0  100 <font style="background-color: rgb(255,0,255)">     </font>
+     9   | 22 (0x16) |  0x56        | Green          |   0   50    0 <font style="background-color: rgb(0,128,0)">     </font>
+    10   |  6 (0x06) |  0x46        | Cyan           |   0   50   50 <font style="background-color: rgb(0,128,128)">     </font>
+    11   | 23 (0x17) |  0x57        | Sky Blue       |   0   50  100 <font style="background-color: rgb(0,128,255)">     </font>
+    12   | 30 (0x1E) |  0x5E        | Yellow         |  50   50    0 <font style="background-color: rgb(128,128,0)">     </font>
+    13   |  0 (0x00) |  0x40 (0x41) | White          |  50   50   50 <font style="background-color: rgb(128,128,128)">     </font>
+    14   | 31 (0x1F) |  0x5F        | Pastel Blue    |  50   50  100 <font style="background-color: rgb(128,128,255)">     </font>
+    15   | 14 (0x0E) |  0x4E        | Orange         | 100   50    0 <font style="background-color: rgb(255,128,0)">     </font>
+    16   |  7 (0x07) |  0x47        | Pink           | 100   50   50 <font style="background-color: rgb(255,128,128)">     </font>
+    17   | 15 (0x0F) |  0x4F        | Pastel Magenta | 100   50  100 <font style="background-color: rgb(255,128,255)">     </font>
+    18   | 18 (0x12) |  0x52        | Bright Green   |   0  100    0 <font style="background-color: rgb(0,128,0)">     </font>
+    19   |  2 (0x02) |  0x42 (0x51) | Sea Green      |   0  100   50 <font style="background-color: rgb(0,255,128)">     </font>
+    20   | 19 (0x13) |  0x53        | Bright Cyan    |   0  100  100 <font style="background-color: rgb(0,255,255)">     </font>
+    21   | 26 (0x1A) |  0x5A        | Lime           |  50  100    0 <font style="background-color: rgb(128,255,0)">     </font>
+    22   | 25 (0x19) |  0x59        | Pastel Green   |  50  100   50 <font style="background-color: rgb(128,255,128)">     </font>
+    23   | 27 (0x1B) |  0x5B        | Pastel Cyan    |  50  100  100 <font style="background-color: rgb(128,255,255)">     </font>
+    24   | 10 (0x0A) |  0x4A        | Bright Yellow  | 100  100    0 <font style="background-color: rgb(255,255,0)">     </font>
+    25   |  3 (0x03) |  0x43 (0x49) | Pastel Yellow  | 100  100   50 <font style="background-color: rgb(255,255,128)">     </font>
+    26   | 11 (0x0B) |  0x4B        | Bright White   | 100  100  100 <font style="background-color: rgb(255,255,255)">     </font>
 ---------------------------------------------------------------------------
    Table 1. Colour values on the CPC (Firmware, Hardware and RGB)</pre></blockquote><p>Table 1 shows Firmware colour values (column 1), Hardware correspondant colour values (column 2) and classic Hardware values (column 3) which include the colour value (5 Least significant bits) along with the command for the Gate Array (3 Most significant bits).&nbsp; As this function already provides hardware commands, the values it requires are the ones from column 2 (Hardware).&nbsp; Table 1 also provides colour names and precentages of RGB values for better understanding.</p><h4 class=CHeading>Known limitations</h4><p>This function cannot set blinking colors, as blinking colours are managed by the firmware (not by hardware).</p><h4 class=CHeading>Destroyed Register values</h4><p>AF, BC, DE, HL</p><h4 class=CHeading>Required memory</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>C-bindings</td><td class=CDLDescription>23 bytes</td></tr><tr><td class=CDLEntry>ASM-bindings</td><td class=CDLDescription>19 bytes</td></tr></table><h4 class=CHeading>Time Measures</h4><blockquote><pre class="prettyprint">   Case    | microSecs (us) | CPU Cycles
 ---------------------------------------------
