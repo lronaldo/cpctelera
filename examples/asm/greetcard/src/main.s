@@ -20,9 +20,17 @@
 ;; DEFINED CONSTANTS
 ;;===============================================================================
 
-pvideomem     = 0xC000 ;; First byte of video memory
-initxy_sprite = 0xC805 ;; (x, y) = (5, 200) = (0x05, 0xC8) Initial Sprite coordinates
-init_colour   = 0x0001 ;; Background = 0x00, Foreground = 0x01
+pvideomem     = 0xC000         ;; First byte of video memory
+screen_H      = 200            ;; Height of the screen in pixels
+screen_W      = 80             ;; Width of the screen in bytes
+init_colour   = 0x0001         ;; Background = 0x00, Foreground = 0x01
+palete_size   = 16             ;; Number of total palette colours
+border_colour = 0x1F10         ;; 0x10 (Border ID), 0x1F (Colour to set, Pen 0 from palette). Ready to be loaded into HL
+initxy_sprite = 0xC805         ;; (x, y) = (5, 200) = (0x05, 0xC8) Initial Sprite coordinates
+sprite_HxW    = 0x2814         ;; Height (40, 0x28) and Width (20, 0x14) of the sprite in bytes. To be loaded in BC   
+sprite_end_y  = 60             ;; y coordinate where sprite will stop its entering animation
+clip_Height   = screen_H - 40  ;; Minimum height at which to do clipping (200 - sprite_Height)
+xy_str_dav    = 0x4020         ;; y = 64 (0x40), x = 32 (0x20) (ready to be loaded into BC, B=y, C=x)  
 
 ;;===============================================================================
 ;; DATA SECTION
@@ -30,7 +38,7 @@ init_colour   = 0x0001 ;; Background = 0x00, Foreground = 0x01
 
 .area _DATA
 
-;; Ascii strings
+;; Ascii zero-terminated strings
 str_happy: .asciz "Happy"
 str_bday:  .asciz "Birthday"
 str_dav:   .asciz "@Davitsu"
@@ -47,16 +55,16 @@ g_palette:
 
 ;; Scrolling data structures for both scrolling strings (Happy / BDay)
 tscroll_happy: 
-   .dw   str_happy   ;; String pointer (2 bytes)
-   .db   1, 15*8     ;; x, y starting coordinates 
-   .db  -1           ;; x velocity
-   .db   80-5*4-1    ;; maxX coordinate
+   .dw   str_happy       ;; String pointer (2 bytes)
+   .db   1, 15*8         ;; x, y starting coordinates (y=15th character line)
+   .db  -1               ;; x velocity
+   .db   screen_W-5*4-1  ;; maxX coordinate: line-size (80) - 5 chars * 4 bytes/char - 1 (to set boundary 1 byte before)
 
 tscroll_bday: 
-   .dw   str_bday    ;; String pointer (2 bytes)
-   .db   47, 18*8    ;; x, y starting coordinates 
-   .db    1          ;; x velocity 
-   .db   80-8*4-1    ;; maxX coordinate
+   .dw   str_bday        ;; String pointer (2 bytes)
+   .db   47, 18*8        ;; x, y starting coordinates (y=18th character line)
+   .db    1              ;; x velocity 
+   .db   screen_W-8*4-1  ;; maxX coordinate: line-size (80) - 8 chars * 4 bytes/char - 1 (to set boundary 1 byte before)
 
 ;;===============================================================================
 ;; CODE SECTION
@@ -93,11 +101,11 @@ init:
    
    ;; Set Palette
    ld    hl, #g_palette             ;; HL = pointer to the start of the palette array
-   ld    de, #16                    ;; DE = Size of the palette array (num of colours)
+   ld    de, #palete_size           ;; DE = Size of the palette array (num of colours)
    call  cpct_setPalette_asm        ;; Set the new palette
 
    ;; Change border colour
-   ld    hl, #0x1F10                ;; H=16 (Border ID), L=0x1F (Hardware colour to set)
+   ld    hl, #border_colour         ;; L=Border colour value, H=Palette Colour to be set (Border=16)
    call  cpct_setPALColour_asm      ;; Set the border (colour 16)
 
    ret                              ;; return
@@ -122,13 +130,13 @@ drawSpriteClipped:
    pop   af                      ;; A = y coordinate
 
    ;; Check if clipping is needed
-   ld    bc, #0x2814             ;; C=20 (0x14), B=40 (0x28) WidthxHeight of the sprite in bytes
-   cp    #160                    ;; Compare A with 160. 160 is the amount of pixels where clipping starts
+   ld    bc, #sprite_HxW         ;; WidthxHeight of the sprite in bytes
+   cp    #clip_Height            ;; Compare A with clipping height: y coordinate where clipping starts
    jr     c, no_clip             ;; If Carry, (A < 160), no need to do clipping
 
    ;; Perform clippling (A = vertical size of the sprite to be drawn)
-   sub   #201                    ;; A' =  A - 201
-   neg                           ;; A' = -A' = 201 - A
+   sub   #screen_H+1             ;; A2 =  A - (screen_Height + 1)
+   neg                           ;; A3 = -A2 = screen_Height - A + 1
    ld     b, a                   ;; B = Reduced sprite height (clipped) to be drawn
 
 no_clip:
@@ -152,16 +160,16 @@ moveSprite:
    call  cpct_waitVSYNC_asm   ;; Wait for VSYNC
 
    y_coord = .+2              ;; Location in memory of the value for the Y coordinate
-   ld    bc, #initxy_sprite         ;; BC takes XY coordinates (value loaded is modified dynamically)
+   ld    bc, #initxy_sprite   ;; BC takes XY coordinates (value loaded is modified dynamically)
    call  drawSpriteClipped    ;; Draw the sprite
 
    ;; Move Sprite Up
    ld    hl, #y_coord         ;; HL points to y_coord in memory
    ld     a, (hl)             ;; A = y (Vertical coordinate)
-   cp    #60                  ;; Check against 60
-   ret   z                    ;; If y==60, end of the animation (no more coordinate update)
+   cp    #sprite_end_y        ;; Check against y coordinate where sprite has to end its animation (end_y)
+   ret   z                    ;; If y==end_y, end of the animation (no more coordinate update)
 
-   dec   (hl)                 ;; Move sprite 1 pixel UP (B--)
+   dec   (hl)                 ;; Move sprite 1 pixel UP (y--)
 
    jr    moveSprite           ;; Loop again
 
@@ -187,7 +195,7 @@ redrawString:
    ;; Draw the string
    pop   hl                      ;; Recover pointer to the string
    fg_colour = .+1               ;; fg_colour = location in memory of the Foreground colour value
-   ld    bc, #init_colour        ;; Colour
+   ld    bc, #init_colour        ;; BC = fg/bg colours (value modified dynamically)
    call  cpct_drawStringM0_asm   ;; Draw the string
 
    ;; Increment colour for next call
@@ -200,7 +208,7 @@ redrawString:
 dont_reset_a:
    ld    (fg_colour), a          ;; Save Foreground colour for next use
 
-   ret
+   ret                           ;; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -224,54 +232,55 @@ doOneScrollStep:
    ;; Set up the copy
    ;;
    
-   ;; Check type of copy (1=scroll left, scroll right otherwise)
-   inc    a            ;; A++ (To check if A is -1 or not)
-   jr     z, scr_left  ;; If A=1, scroll left
+   ;; Check type of copy (-1=scroll left, scroll right otherwise)
+   inc    a                ;; A++ (To check if A is -1 or not)
+   jr     z, scr_left      ;; If A=-1, scroll left
 
-scr_right:             ;; A is not 1, scroll right
-   ld     a, #inc_e    ;; Increment e on scrolling right
-   ld    bc, #78       ;; | Add 78 bytes to point to ...
-   add   hl, bc        ;; | ... the byte before the last byte of the line 
-   ld    bc, #_lddr_   ;; Copy instruction to use: right copy
-   jr    start_copy    ;; Start the copy
+scr_right:                 ;; A is not -1, scroll right
+   ld     a, #inc_e        ;; Increment e on scrolling right (so DE = HL + 1)
+   ld    bc, #screen_W-2   ;; | Add 78 bytes to point to ...
+   add   hl, bc            ;; | ... the byte before the last byte of the line 
+   ld    bc, #_lddr_       ;; Copy instruction to use: decrementing copy (HL=>DE, DE--, HL--, BC--)
+   jr    start_copy        ;; Start the copy
 
 scr_left:
-   ld     a, #inc_l    ;; | Increment l on scrolling left
-   ld    bc, #_ldir_   ;; Copy instruction to use: left copy
+   ld     a, #inc_l        ;; | Increment l on scrolling left (so HL = DE + 1)
+   ld    bc, #_ldir_       ;; Copy instruction to use: incrementing copy (HL=>DE, DE++, HL++, BC--)
 
 start_copy:
    ;; Modify loop instruction that differs between movements and start
-   ld   (scr_pcopy), bc;; | Modify internal loop code with instructions...
-   ld   (scr_pincr), a ;; | ... required for this type of copy
+   ld   (scr_pcopy), bc    ;; | Modify internal loop code with instructions...
+   ld   (scr_pincr), a     ;; | ... required for this type of copy
    
    ;;
    ;; Do the copy
    ;;
-   ld     a, #8        ;; 8 pixel lines to be scrolled
+   ld     a, #8            ;; 8 pixel lines to be scrolled
 loop_scroll:
-   push  hl            ;; Save current hl value
+   push  hl                ;; Save current hl value
 
-   ld     d, h         ;; | DE points to the first byte...
-   ld     e, l         ;; | and HL to the next one
-   scr_pincr = .       ;; << Memory address of the increment instruction
-   inc    l            ;; | (this instruction is modified dynamically)
+   ld     d, h             ;; | DE points to the first byte...
+   ld     e, l             ;; | and HL to the next one
+   scr_pincr = .           ;; << Memory address of the increment instruction
+   inc    l                ;; | (this instruction is modified dynamically: inc l / inc e)
 
-   ld    bc, #79       ;; 79 bytes to copy
-   scr_pcopy = .       ;; << Memory address of the copy instruction
-   ldir                ;; do the copy
+   ld    bc, #screen_W-1   ;; 79 bytes to copy (all bytes in 1 line minus the first one)
+   scr_pcopy = .           ;; << Memory address of the copy instruction
+   ldir                    ;; do the copy  (This instruction is modified dynamically: ldir / lddr)
 
-   pop   hl            ;; Restore HL value, for calculations
+   pop   hl                ;; Restore HL value, for calculations
 
-   dec    a            ;; A-- (1 line less to be copied)
-   ret    z            ;; If A==0, scroll has ended
+   dec    a                ;; A-- (1 line less to be copied)
+   ret    z                ;; If A==0, scroll has ended
 
-   ld     b, a         ;; B = A (B acts as a backup of A)
-   ld     a, h         ;; | HL += 0x800
-   add   #8            ;; |
-   ld     h, a         ;; |
-   ld     a, b         ;; A = B (Restore A value from its backup)
+   ;; Point to the next line to be scrolled inside this same character (HL += 0x800)
+   ld     b, a             ;; B = A (B acts as a backup of A)
+   ld     a, h             ;; | HL += 0x800
+   add   #8                ;; |
+   ld     h, a             ;; |
+   ld     a, b             ;; A = B (Restore A value from its backup)
 
-   jr    loop_scroll   ;; Next line
+   jr    loop_scroll       ;; Next line
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -285,36 +294,40 @@ loop_scroll:
 ;;       1 byte  > y coordinate where the string is
 ;;       1 byte  > current movement velocity (-1 or +1)
 ;;       1 byte  > max x coordinate (where it should bounce on the right side)
+;; MODIFIES:
+;;       byte 2: x coordinate 
+;;       byte 4: movement velocity 
 ;; DESTROYS:
 ;;    AF, AF', BC, DE, HL
 ;;
 moveString:
    ;; Update x location
-   ld     d, 4(ix)               ;; D = x velocity (VelX)
-   ld     a, 2(ix)               ;; A = x coordinate
-   add    d                      ;; A' = A + D = x + VelX
+   ld     d, 4(ix)               ;; D  = x velocity (VelX)
+   ld     a, 2(ix)               ;; A  = x coordinate
+   add    d                      ;; A2 = A + D = x + VelX
 
-   ;; Set B=y coordinate, as this will be used by both branches
+   ;; Set B=y coordinate, as this value will be used by both next branches
    ld     b, 3(ix)               ;; B = y coordinate of the string
 
    ;; Check whether string is touching a boundary or not
-   jr     z, boundary_hit        ;; If x' == 0, left boundary (1) has been exceeded
+   jr     z, boundary_hit        ;; If x == 0, left boundary (1) has been exceeded
    cp  5(ix)                     ;; Check against maxX value
    jr     c, do_string_movement  ;; If x < maxX, right boundary has not been hit
 
 boundary_hit:
-   ;; Save previous x pixel coordinate in c
-   sub    d                      ;; A = A' - D = x + VelX - VelX = x
+   ;; Save in C the x coordinate previous to the actual one (boundary exceeded)
+   sub    d                      ;; A = A2 - D = x + VelX - VelX = x
    ld     c, a                   ;; C = x
 
-   ;; Invert velocity
+   ;; Invert velocity (to start scrolling to the other side)
    xor    a                      ;; A = 0
    sub    d                      ;; A = -D = -VelX
    ld 4(ix), a                   ;; Update VelX value
    
    ;; Redraw string with a new colour value
-   ld     l, 0(ix)               ;; HL = Pointer to the string
-   ld     h, 1(ix)               ;; (C = x already)
+   ;; (BC already contains y and x coordinates)
+   ld     l, 0(ix)               ;; | HL = Pointer to the string
+   ld     h, 1(ix)               ;; |
    call  redrawString            ;; Redraws the string
 
    ret                           ;; Nothing more to do, return.
@@ -328,6 +341,7 @@ do_string_movement:
    ex    af, af'                 ;; A' = VelX
 
    ;; Calculate memory location for y line
+   ;; (B already contains y coordinate)
    ld     c, #0                  ;; C = 0 (x coordinate = 0 to get the start of the y line)
    ld    de, #pvideomem          ;; DE points to the start of video memory
    call  cpct_getScreenPtr_asm   ;; Return pointer to byte located at (x,y) (C, B) in HL
@@ -335,6 +349,7 @@ do_string_movement:
    ;; string is located (to be able to scroll it)
 
    ;; Scroll the string
+   ;; (HL already points to the start of the first pixel line to be scrolled)
    ex    af, af'                 ;; A = VelX (recover value from A')
    call  doOneScrollStep         ;; Do scroll to the side determined by VelX
 
@@ -352,7 +367,7 @@ _main::
 
    ;; Draw davitsu string
    ld    hl, #str_dav         ;; HL points to @Davitsu string
-   ld    bc, #0x4020          ;; B = y = 64 (0x40), C = x = 32 (0x20)
+   ld    bc, #xy_str_dav      ;; BC = y, x coordinates where to draw @Davitsu string
    call  redrawString         ;; Draw the string with the initial colour
 
 loop:
