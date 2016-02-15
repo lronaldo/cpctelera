@@ -27,6 +27,7 @@
 #define CPCT_MEMUTILS_H
 
 #include <types.h>
+#include "relocation.h"
 
 // Standard memory management functions
 extern void cpct_memset    (void *array, u8  value, u16 size) __z88dk_callee;
