@@ -137,7 +137,7 @@ Group: Video  {
    File: cpct_setPalette  (video/cpct_setPalette.asm)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
-   File: cpct_setVideoMode  (video/cpct_setVideoMode.s)
+   File: cpct_setVideoMode  (video/cpct_setVideoMode.asm)
    File: cpct_waitVSYNC  (video/cpct_waitVSYNC.s)
    File: Video Macros&amp;Constants  (video/videomode.h)
    }  # Group: Video
@@ -149,6 +149,7 @@ Group: Memutils  {
    File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
    File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
    File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
+   File: Memory Relocation Utilities  (memutils/relocation.h)
    }  # Group: Memutils
 
 Group: Command Line Tools  {
