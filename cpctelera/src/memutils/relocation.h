@@ -29,12 +29,6 @@
 
 #include <types.h>
 
-// Code Macro needs to be undefined to make all relative segments
-// be part of __CODE
-#ifdef _CODE
-   #undef _CODE 
-#endif
-
 // Useful macros to concatenate names of identifiers
 #define CONCAT3(A, B, C)     A ## B ## C
 #define NAMECONCAT3(A, B, C) CONCAT3(A, B, C)
@@ -64,7 +58,35 @@
 // code segments. On this event, part of the code will be shadowed (it will
 // never be loaded in memory) as it is impossible to load 2 values on the
 // same memory cell.
-//    * This function should be used *outside* the scope of any function.
+//    * This macro should be used *outside* the scope of any function.
+//    * This macro *should not be used to* set the code entry point (i.e. the
+// place where compiler starts generating the code). For this purpose you 
+// should used *Z80CODELOC* variable instead (located in cfg/build_config.mk).
+//    * Beware when using this macro on files not containing code (only data, 
+// like arrays, strings, etc.). In this case, if you use only once and previous
+// to all data definitions, it would probably fail. This is due to the compiler
+// adding an ".area _CODE" directive to files that do not contain functions.
+// To overcome this problem you should add another macro at the end or 
+// in the middle of the file. You can use <CPCT_ABSOLUTE_LOCATION_AREA> again
+// or <CPCT_RELOCATABLE_AREA>, to prevent the compiler from rearranging your data.
+// This is an example on how to do it:
+// (start code)
+//    // This is the start of a file called music.c
+//    CPCT_ABSOLUTE_LOCATION_AREA(0x040);
+//
+//    // Music data gets located at 0x040
+//    const u8 music_data[100] = { 0x41, 0x54, 0x31, .... };
+//
+//    // Failing to add a relocation macro here will produce 
+//    // the compiler to add a ".area _CODE" directive before 
+//    // music data. This happens in data-only files.
+//    CPCT_RELOCATABLE_AREA();
+//
+//    // This is the end of the file music.c
+// (end code)
+// 
+// Required memory:
+//    1 byte
 //
 // Details:
 //    This macro is used to change the location where subsequent code or
@@ -98,10 +120,25 @@
 // for relocation inside these dummy functions. These functions are
 // not to be called by any means, nor it is required; they are required
 // as the compiler prevents directives from being entered outside function
-// scope. These functions are named as /dummy_absolute_MEM/ and they
-// cannot be duplicated, as they are proper functions for the compiler. 
+// scope. These functions are named as /dummy_absolute_MEM/ and 
+// /dummy_data_absorber_MEM/ and they cannot be duplicated, as they are 
+// proper functions for the compiler. 
+//
+//    /dummy_data_absorber_MEM/ function is generated first, and its 
+// purpose is to make all previous data definitions (arrays, strings, etc)
+// to be "absorbed". With this function being defined, previous data 
+// gets placed by the compiler at the end of this "absorber" function, 
+// just before the new absolutely located area definition, as wanted.
+// This function only contains a RET statement, and takes up 1 byte of
+// space in the final binary. As this function is dummy and gets never
+// called, this additional byte can be safely removed or overlapped if
+// required. This may by done by placing next absolutely located area
+// exactly where this byte lies, or by editing produced assembly code
+// and removing the RET statement before compiling. Do these operations
+// only if you know exactly what you are doing.
 //
 #define CPCT_ABSOLUTE_LOCATION_AREA(MEM) \
+void dummy_data_absorber##MEM (void) {} \
 void dummy_absolute_##MEM (void) __naked { \
   __asm \
     .area _ ## MEM ## _ (ABS) \
@@ -111,14 +148,14 @@ void dummy_absolute_##MEM (void) __naked { \
 void dummy_absolute_##MEM (void) __naked
 
 //
-// Macro: CPCT_RELATIVE_LOCATION_AREA
+// Macro: CPCT_RELOCATABLE_AREA
 //
 //    Macro that produces following code to be automatically distributed
 // by the linker amongst available memory space area, starting in the
 // loading location defined by Z80CODELOC (see cfg/build_config.mk file)
 //
 // C Definition:
-//    #define <CPCT_RELATIVE_LOCATION_AREA> (*ID*)
+//    #define <CPCT_RELOCATABLE_AREA> (*ID*)
 //
 // Input Parameters (identifier):
 //    (identifier) ID - An *optional* identifier to distinguish container
@@ -135,6 +172,9 @@ void dummy_absolute_##MEM (void) __naked
 //    * Read section *Details* if you have compilation problems using this
 // macro. There are possible issues when using the macro across different
 // source files.
+//
+// Required memory:
+//    1 byte
 //
 // Details:
 //    This macro restores normal code location behaviour. This normal behaviour
@@ -171,7 +211,7 @@ void dummy_absolute_##MEM (void) __naked
 //       // .. 1000 bytes of data
 //    };
 //    
-//    CPCT_RELATIVE_LOCATION_AREA();
+//    CPCT_RELOCATABLE_AREA();
 //
 //    // 
 //    // Next data and functions will be added to the _CODE area, 
@@ -194,7 +234,7 @@ void dummy_absolute_##MEM (void) __naked
 //       // function code...
 //    }
 //
-//    CPCT_RELATIVE_LOCATION_AREA();
+//    CPCT_RELOCATABLE_AREA();
 //
 //    // Main function will be placed in relative _CODE area managed
 //    // by the linker. 
@@ -212,8 +252,22 @@ void dummy_absolute_##MEM (void) __naked
 // for relocation inside these dummy functions. These functions are
 // not to be called by any means, nor it is required; they are required
 // as the compiler prevents directives from being entered outside function
-// scope. These functions are named as /dummy_relatice___LINE__ID/ and they
-// cannot be duplicated, as they are proper functions for the compiler. 
+// scope. These functions are named as /dummy_relative___LINE__ID/ and 
+// /dummy_data_absorber___LINE__ID/ and they cannot be duplicated, 
+// as they are proper functions for the compiler. 
+//
+//    /dummy_data_absorber___LINE__ID/ function is generated first, and its 
+// purpose is to make all previous data definitions (arrays, strings, etc)
+// to be "absorbed". With this function being defined, previous data 
+// gets placed by the compiler at the end of this "absorber" function, 
+// just before the new absolutely located area definition, as wanted.
+// This function only contains a RET statement, and takes up 1 byte of
+// space in the final binary. As this function is dummy and gets never
+// called, this additional byte can be safely removed or overlapped if
+// required. This may by done by placing next absolutely located area
+// exactly where this byte lies, or by editing produced assembly code
+// and removing the RET statement before compiling. Do these operations
+// only if you know exactly what you are doing.
 //
 //    When using this macro on different source code files, a compilation
 // error may arise. On the event of having 2 uses of this macro, on
@@ -222,13 +276,14 @@ void dummy_absolute_##MEM (void) __naked
 // In this case, a compilation error will happen. There are 2 possible
 // solutions,
 //    -  Add source code lines to place macros at different source code lines
-//    -  Add 2 different IDs on the call to <CPCT_RELATIVE_LOCATION_AREA> (ID).
+//    -  Add 2 different IDs on the call to <CPCT_RELOCATABLE_AREA> (ID).
 // This will prevent names from clashing.
 //
-#define CPCT_RELATIVE_LOCATION_AREA(FNAME) \
+#define CPCT_RELOCATABLE_AREA(FNAME) \
+void NAMECONCAT3(dummy_data_absorber_, __LINE__, FNAME) (void) {} \
 void NAMECONCAT3(dummy_relocatable_, __LINE__, FNAME) (void) __naked { \
   __asm \
-    .area _CODE \
+    .area _CSEG (REL, CON) \
   __endasm; \
 } \
 void NAMECONCAT3(dummy_relocatable_, __LINE__, FNAME) (void) __naked
