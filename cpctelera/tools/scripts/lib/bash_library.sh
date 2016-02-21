@@ -873,3 +873,60 @@ function makeWithProgressSupervision {
    fi
    drawOK
 }
+
+## Extracts the value of a variable from a given config file. The config file should
+## have variables in the format VAR=value, being each variable in a single line.
+## If variable is not found in the config file, it issues a non-recoverable error.
+##    $1: Name of the variable
+##    $2: Config file
+##
+## Returns value of the variable via echo
+##
+function extractVarValueFromConfigFile {
+   local VARNAME="$1"
+   local CFILE="$2"
+   local VALUE
+
+   ## Get the value of the variable and check it is not empty
+   VALUE=$(cat $CFILE | grep -m 1 "^ *${VARNAME}.*=" | grep -o "=.*$")
+   if (( ${#VALUE} == 0 )); then
+      Error "Variable '$VARNAME' not found in config file '$CFILE'. This may be due to config \
+file not existing or not being readable, or to some kind of data corruption inside this config \
+file. Please, check the file ('$CFILE') and verify that variable '$VARNAME' is correctly defined." 11  
+   fi
+
+   ## Return the value of the variable by printing it
+   echo "${VALUE:1}"
+}
+
+## Updates the value of a variable in a config file, by changing the line of the
+## file that defines the value of the variable. Variables in the config file should
+## be in the format VAR=value, one single variable per line. If it does not find 
+## the file or the variable, it issues a non-recoverable error.
+##    $1: Name of the variable
+##    $2: New value 
+##    $3: Config file
+##
+function updateVarValueInConfigFile() {
+   local VARNAME="$1"
+   local NEWVALUE="$2"
+   local CFILE="$3"
+   local LINE
+   local TMP
+
+   ## Get the line where variable is located
+   LINE=$(cat $CFILE | grep -m 1 -n "^ *${VARNAME}.*=" | grep -o "^[0-9]*")
+   if ! isInt $LINE; then
+      Error "Variable '$VARNAME' not found in config file '$CFILE'. This may be due to config \
+file not existing or not being readable, or to some kind of data corruption inside this config \
+file. Please, check the file ('$CFILE') and verify that variable '$VARNAME' is correctly defined." 11  
+   fi
+
+   ## Update the line with its new contents
+   TMP=$(createTempFile)
+   (
+      head -$((LINE-1)) "$CFILE"
+      echo "${VARNAME}=${NEWVALUE}"
+      tail -n +$((LINE+1)) "$CFILE"
+   ) > $TMP && mv "$TMP" "$CFILE"
+}

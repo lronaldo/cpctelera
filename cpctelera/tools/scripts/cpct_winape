@@ -58,9 +58,6 @@
 ## Global configuration
 ##
 
-# WinAPE Full Path
-WAPE=/path/to/WinAPE
-
 # Script configuration
 CPCT_TOOLS_FOLDER=$(dirname $0)/..
 WWW_WINAPE=http://winape.net/download/WinAPE20B2.zip
@@ -69,6 +66,8 @@ WINAPE_INI=WinAPE.ini
 WINAPE_ZIP=${CPCT_TOOLS_FOLDER}/winape.zip
 WINAPE_DIR=${CPCT_TOOLS_FOLDER}/winape
 WINE=wine
+WAPE=/path/to/WinAPE ## Should be read from config file
+CONFIG_FILE=$(dirname $0)/.cpct_winape.config
 
 # Command line parameter variables
 FILE=""
@@ -155,13 +154,9 @@ function getMySystemPath {
 ##  $1: New path to WinAPE.exe
 ##
 function setWinapePath {
-   local TAG="^WAPE="
    local WPATH="$1"
 
-   echo "${COLOR_LIGHT_YELLOW}Setting New Path for WinAPE to \
-'${COLOR_WHITE}${1}${COLOR_LIGHT_YELLOW}'...${COLOR_NORMAL}"
-   replaceTag "${TAG}.*$" "${TAG:1}${WPATH}" "$0" "#"
-   chmod +x "$0"
+   updateVarValueInConfigFile "WAPE" "$WPATH" $CONFIG_FILE
    WAPE="${1}"
 }
 
@@ -286,6 +281,35 @@ have WinAPE installed (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?${COLOR_NORMAL}" AN
    fi
 }
 
+## Generate a blank config file
+##
+function generateNewConfigFile() {
+##-------------- HERE DOCUMENT FOR CONFIG FILE ------------#
+cat > $CONFIG_FILE <<CPCT_WINAPE_CONFIG_FILE
+# cpct_winape config file
+#################################
+
+# WinAPE's Full path
+WAPE=/path/to/WinAPE
+CPCT_WINAPE_CONFIG_FILE
+##-------------- HERE DOCUMENT FOR CONFIG FILE ------------#
+}
+
+## Read config file or create it if it does not not exist
+##
+function readConfigFile {
+   ## Generate configfile whenever it does not exist
+   if ! isFileReadable $CONFIG_FILE; then
+      generateNewConfigFile
+   fi
+
+   ## Get value of WAPE variable
+   WAPE=$(extractVarValueFromConfigFile "WAPE" $CONFIG_FILE)
+}
+
+# First of all, read the config file
+readConfigFile
+
 # Proccess command line parameters
 while (( $# > 0 )); do
    case "$1" in
@@ -334,7 +358,7 @@ if checkSystem cygwin; then
 fi
 
 # Add automatic symbol loading when symbols are found on obj/ folder
-if [[ "$SYMS" == "" && "$AUTOLOADSYMS" == "true" ]]; then
+if "$AUTOLOADSYMS" && [[ "$SYMS" == "" ]]; then
    SFILES=(*.noi obj/*.noi)
    for f in ${SFILES[@]}; do
       SFILE=$(printf "%s" $f)
