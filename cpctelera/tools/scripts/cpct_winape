@@ -1,7 +1,7 @@
 #!/bin/bash
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2015-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
@@ -33,20 +33,25 @@
 ##    This script automatically launches WinAPE either directly or using wine, 
 ## depending on the system where it is executed (OSX and Linux will use wine, 
 ## Windows/Cygwin will execute directly). The script also lets the user give a
-## DSK file as parameter to be automatically loaded into WinAPE's FD1. It also
-## automatically RUNs the main program inside the DSK file.
+## DSK file as parameter to be automatically loaded into WinAPE's FD1. The main
+## file from the DSK will be automatically runned (with a RUN command) and the
+## corresponding NoICE symbols file for debugging will automatically be loaded.
+## NoICE symbols are grabbed either from the same folder where DSK lies, or from 
+## obj/ subfolder, if they exist.
 ##    
 ##    If WinAPE is not installed on the system or not propperly configured to
 ## be used with this script, the script prompts the user and helps to configure
 ## and/or to install WinAPE. Users can either give the script the path of their own
 ## WinAPE installations or ask the script to automatically download and install
 ## it inside CPCtelera's tool folder. For this last operation, wget and unzip 
-## commands are required (the should be installed in the system).
+## commands are required (they should be installed in the system).
 ##
 ## Command line options:
-##    -n | --no-execute              - Lauches WinAPE but does not automatically RUN any
-## DSK program.
-##    -h | --help                    - Shows help information on the terminal.
+##    -n | --no-execute               - Lauches WinAPE but does not automatically RUN any DSK program.
+##    -s | --symbols <symbols_file>   - Loads a symbols file for debugging (NoICE format .noi).
+##    -d | --disable-symbols-autoload - Prevents this script from trying to autoload a symbols 
+## file for debugging, when no symbols file is provided
+##    -h | --help                     - Shows help information on the terminal.
 ##
 
 ##
@@ -54,7 +59,7 @@
 ##
 
 # WinAPE Full Path
-WAPE=/path/to/WinApe
+WAPE=/path/to/WinAPE
 
 # Script configuration
 CPCT_TOOLS_FOLDER=$(dirname $0)/..
@@ -68,6 +73,8 @@ WINE=wine
 # Command line parameter variables
 FILE=""
 MODIFIER="/A"
+SYMS=""
+AUTOLOADSYMS=true
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh
@@ -81,26 +88,30 @@ function usage() {
    echo "${COLOR_CYAN}  Lets the user execute winape from command line and automatically \
 run a file from a DSK at will."
 
-   echo "${COLOR_CYAN}  Creates a fresh new project that uses CPCtelera engine. The script creates \
-a new folder named <project_folder_name> in the current folder. Then, the new project is created \
-inside <project_folder_name>. So, <project_folder_name> must not previously exist inside the \
-current folder."
    echo
    echo "${COLOR_CYAN}  This script automatically launches WinAPE either directly or using wine, \
 depending on the system where it is executed (OSX and Linux will use wine, Windows/Cygwin will \
-execute directly). The script also lets the user give a DSK file as parameter to be automatically \
-loaded into WinAPE's FD1. It also automatically RUNs the main program inside the DSK file."
+execute directly). The script also lets the user give a DSK file as parameter to be \
+automatically loaded into WinAPE's FD1. The main file from the DSK will be automatically \
+runned (with a RUN command) and the corresponding NoICE symbols file for debugging will \
+automatically be loaded. NoICE symbols are grabbed either from the same folder where DSK \
+lies, or from  obj/ subfolder, if they exist."
    echo
-   echo "${COLOR_CYAN}  If WinAPE is not installed on the system or not propperly configured to \
-be used with this script, the script prompts the user and helps to configure and/or to install \
-WinAPE. Users can either give the script the path of their own WinAPE installations or ask the \
-script to automatically download and install it inside CPCtelera's tool folder. For this last \
-operation, wget and unzip commands are required (the should be installed in the system)."
+   echo "${COLOR_CYAN}  If WinAPE is not installed on the system or not propperly configured \
+to be used with this script, the script prompts the user and helps to configure and/or to \
+install WinAPE. Users can either give the script the path of their own WinAPE installations \
+or ask the script to automatically download and install it inside CPCtelera's tool folder. \
+For this last operation, wget and unzip commands are required (they should be installed in \
+the system)."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches WinAPE but does not automatically RUN any DSK program."
-   echo 
+   echo "${COLOR_LIGHT_BLUE}  -s | --symbols <symbols_file>"
+   echo "${COLOR_CYAN}       Loads a symbols file for debugging (NoICE format .noi)."
+   echo "${COLOR_LIGHT_BLUE}  -d | --disable-symbols-autoload"
+   echo "${COLOR_CYAN}       Prevents this script from trying to autoload a symbols file \
+for debugging, when no symbols file is provided"
    echo "${COLOR_LIGHT_BLUE}  -h | --help"
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
@@ -276,10 +287,22 @@ have WinAPE installed (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?${COLOR_NORMAL}" AN
 }
 
 # Proccess command line parameters
-while [ "$#" -gt "0" ]; do
+while (( $# > 0 )); do
    case "$1" in
       "-n" | "--no-execute")
-        MODIFIER=""
+         MODIFIER=""
+      ;;
+      "-s" | "--symbols")
+         if (( $# < 2 )); then 
+            paramError "-s / --symbols must be followed by a symbol file." 9
+         elif ! isFileReadable $2; then
+            paramError "symbol file '$2' does not exist or is not readable." 10
+         fi
+         SYMS="/SYM:${2}"
+         shift
+      ;;
+      "-d" | "--disable-symbols-autoload")
+         AUTOLOADSYMS=false
       ;;
       "-h" | "--help")
         usage
@@ -310,7 +333,20 @@ if checkSystem cygwin; then
    chmod +x "$WAPE"
 fi
 
+# Add automatic symbol loading when symbols are found on obj/ folder
+if [[ "$SYMS" == "" && "$AUTOLOADSYMS" == "true" ]]; then
+   SFILES=(*.noi obj/*.noi)
+   for f in ${SFILES[@]}; do
+      SFILE=$(printf "%s" $f)
+      if isFileReadable $SFILE; then
+         SYMS="/SYM:$SFILE"
+         echo "Autoloading symbols file $SFILE"
+         break
+      fi
+   done
+fi
+
 # Launch Winape with appropriate path for DSK file
 ensureExecutionPrerequisitesAreInstalled
 FILEPATH=$(getMySystemPath "$FILE")
-${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" &> /dev/null &
+${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" "$SYMS" &> /dev/null &
