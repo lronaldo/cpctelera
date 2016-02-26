@@ -57,13 +57,20 @@
 ;; 
 ;; Examples:
 ;; (start code)
-;;    // 6-bit Array containing values 63, 0, 63, 0, 63, 0
-;;    const u8 my_array[6] = { 0b11111100, 0b00001111, 0b11000000, 0b11111100, 0b00001111, 0b11000000 };
+;;    // Declare and initialize a 6-bit Array with some useful macros
+;;    const CPCT_6BITARRAY(my_array, 8) = { 
+;;       CPCT_ENCODE6BITS(10, 12, 31, 45),
+;;       CPCT_ENCODE6BITS( 7, 60, 18,  2)
+;;    };
 ;; 
-;;    // Get the 1st and 4th value
+;;    // Recover some of the values of the array (take into account that
+;;    // array indexes start at 0)
 ;;    u8 value1 = cpct_get6Bits(my_array, 0);
-;;    u8 value4 = cpct_get6Bits(my_array, 3);
-;;    printf("Values obtained: %d %d", value1, value4);   // This will print 63, 0
+;;    u8 value3 = cpct_get6Bits(my_array, 2);
+;;    u8 value6 = cpct_get6Bits(my_array, 5);
+;;
+;;    // This should print 10, 31 and 60
+;;    printf("Values obtained: %d %d %d\n", value1, value3, value6);   
 ;; (end code)
 ;;
 ;; Destroyed Register values: 
