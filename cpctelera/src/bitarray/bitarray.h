@@ -36,10 +36,18 @@
 extern   u8 cpct_getBit  (void *array, u16 pos) __z88dk_callee;
 extern   u8 cpct_get2Bits(void *array, u16 pos) __z88dk_callee;
 extern   u8 cpct_get4Bits(void *array, u16 pos) __z88dk_callee;
+extern   u8 cpct_get6Bits(void *array, u16 pos) __z88dk_callee;
 
 // Set bit functions
 extern void cpct_setBit  (void *array, u16 value, u16 pos) __z88dk_callee;
 extern void cpct_set2Bits(void *array, u16 value, u16 pos) __z88dk_callee;
 extern void cpct_set4Bits(void *array, u16 value, u16 pos) __z88dk_callee;
+
+// Macros for comfortably defining bitarrays
+#define CPCT_6BITARRAY(Name, Elems) u8 Name[ (((Elems)/4 + !!((Elems) % 4)) * 3) ]
+#define CPCT_4BITARRAY(Name, Elems) u8 Name[ ((Elems)/2 + 1) ]
+#define CPCT_2BITARRAY(Name, Elems) u8 Name[ ((Elems)/4 + 1) ]
+#define CPCT_1BITARRAY(Name, Elems) u8 Name[ ((Elems)/8 + 1) ]
+#define CPCT_ENCODE6BITS(A, B, C, D) ((A)<<2) | ((B)>>4), ((B)<<4) | ((C)>>2), ((C)<<6) | ((D)&0x3F)
 
 #endif

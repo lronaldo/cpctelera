@@ -1,8 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
-;;  Copyright (C) 2015 Alberto García García
-;;  Copyright (C) 2015 Pablo Martínez González
+;;  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU General Public License as published by
@@ -72,8 +70,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings   - 25 bytes 
-;;    ASM-bindings - 22 bytes
+;;    C-bindings   - 70 bytes 
+;;    ASM-bindings - 67 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -96,29 +94,44 @@
    ;;    [00000011][11112222][22333333]
    ;;
    xor   a             ;; [1] A = 0 
-   srl   h             ;; [2] | HL = HL / 4, A = HL % 4
-   rr    l             ;; [2] |   -- HL holds the 3-byte offset to advance into the array pointed by DE
-   rlca                ;; [1] |   -- A  holds the remainder of division by 4, which is the group
-   srl   h             ;; [2] |      number inside the 3-bytes that contain the number
-   rr    l             ;; [2] |
-   rlca                ;; [1] \
+   srl   h             ;; [2] | HL = HL / 4, A = remainder (HL % 4) with bits 1 and 0 inverted in order
+   rr    l             ;; [2] |   -- HL holds the number of 3-byte groups to advance from the start
+   rla                 ;; [1] |      of the array to get into the 3-byte group containing our desired value
+   srl   h             ;; [2] |   -- A holds the remainder of division by 4, that tells us which one of
+   rr    l             ;; [2] |      the 4 numbers inside the 3-byte group is our desired value.
+   rla                 ;; [1] \      Warning: this is a 2-bits number, but with both bits inverted in order!
 
    ;; HL contains the number of 3-byte groups we have to advance to 
    ;; get to the one that contains our desired value. So,
    ;; Multiply HL*3 to know the offset (in bytes) we have to add to DE
    ;; to be at the start of the 3-byte group that contains the desired value
-   ld    b, h          ;; [1] BC = HL
-   ld    c, l          ;; [1]
+   ld    b, h          ;; [1] |BC = HL              (Copy of HL to be used later to multiply by 3)
+   ld    c, l          ;; [1] \
    add  hl, hl         ;; [3] HL = 2*HL
-   add  hl, bc         ;; [3] HL = 3*HL
-   add  hl, de         ;; [3] HL = 3*HL + DE (Points to the start of the 3-byte group)
+   add  hl, bc         ;; [3] HL = 2*HL + HL = 3*HL (Bytes we have to advance to get to the target 3-byte group)
+   add  hl, de         ;; [3] HL = 3*HL + DE        (HL now points to the start of the 3-byte group)
 
    ;; Now, get the value according to A, which holds the 6-bits group
-   rrca           ;; [1]   Rotate A right to get bit 0 into Carry
-   jr     c, gs13 ;; [2/3] If Carry, bit was 1, so A contained 1 or 3
+   rrca           ;; [1]   Rotate A right to get bit 0 into Carry (Most significant bit of remainder)
+   jr     c, gs23 ;; [2/3] If Carry, bit was 1, so A contained 2 or 3 (01 or 11, remember bits are in inverse order)
    rrca           ;; [1]   No Carry, So A contains 2 or 4. Rotate again to get next bit and check
-   jr     c, g2   ;; [2/3] If Carry, second bit was 1, so A contained a 2
-                  ;; Else, A Contained a 0
+   jr    nc, g0   ;; [2/3] If Not Carry, second bit was 0, so A contained a 0 (00)
+                  ;; Else, A Contained a 1 (10, remember bits are in inverse order)
+
+;; Desired 6-bits value is group 1: (byte 0, bit 1, located 6 bits from the start) 
+;;    Desired bits = x => [......xx][xxxx....][........]
+g1:
+   ld     b, (hl) ;; [2] B=byte 0, where first 2 bits are located B:[......oo]
+   inc   hl       ;; [2] Point HL to the byte 1
+   ld     a, (hl) ;; [2] A=byte 1, where next 4 bits are located A:[xxxx....]
+   srl    b       ;; [2] Shift B right and move last bit into the Carry
+   rra            ;; [1] rotate A right and insert the Carry as leftmost bit B:[.......o] A:[oxxxx...]
+   srl    b       ;; [2] Repeat both previous operations...
+   rra            ;; [1] ... leaving B:[........] A:[ooxxxx..]
+   srl    a       ;; [2] | Shift A to more times to the right, to 
+   srl    a       ;; [2] | get the final value A:[..ooxxxx]
+   ld     l, a    ;; [1] Move return value to L for returning it
+   ret            ;; [3] Return
 
 ;; Desired 6-bits value is group 0: (byte 0, 6 first bits)  
 ;;    Desired bits = x => [xxxxxx..][........][........]
@@ -127,6 +140,11 @@ g0:
    srl    l       ;; [2] | Desired 6 bits are the first 6 bits of L...
    srl    l       ;; [2] | ... shift them left to make L=desired value
    ret            ;; [3] Return
+
+gs23:
+   rrca           ;; [1]   Rotate A to get the second bit into Carry
+   jr     c, g3   ;; [2/3] If Carry, bit was 1, so A contained 3 (11)
+                  ;; Else, A Contained 2 (01, remember bits are in inverse order)
 
 ;; Desired 6-bits value is group 2: (byte 2, bit 3, located 12 bits from the start)
 ;;    Desired bits = x => [........][....xxxx][xx......]
@@ -142,26 +160,6 @@ g2:
    rlca           ;; [1] / The 2 oo bits should be the last, so we have to rotate them 2 times
    rlca           ;; [1] \ to leave it as [..xxxxoo]
    ld     l, a    ;; [1] Move value to L for returning it
-   ret            ;; [3] Return
-
-gs13:
-   rrca           ;; [1]   Rotate A to get the second bit into Carry
-   jr     c, g3   ;; [2/3] If Carry, bit was 1, so A contained 3
-                  ;; Else, A Contained 1
-
-;; Desired 6-bits value is group 1: (byte 0, bit 1, located 6 bits from the start) 
-;;    Desired bits = x => [......xx][xxxx....][........]
-g1:
-   ld     b, (hl) ;; [2] B=byte 0, where first 2 bits are located B:[......oo]
-   inc   hl       ;; [2] Point HL to the byte 1
-   ld     a, (hl) ;; [2] A=byte 1, where next 4 bits are located A:[xxxx....]
-   srl    b       ;; [2] Shift B right and move last bit into the Carry
-   rra            ;; [1] rotate A right and insert the Carry as leftmost bit B:[.......o] A:[oxxxx...]
-   srl    b       ;; [2] Repeat both previous operations...
-   rra            ;; [1] ... leaving B:[........] A:[ooxxxx..]
-   srl    a       ;; [2] | Shift A to more times to the right, to 
-   srl    a       ;; [2] | get the final value A:[..ooxxxx]
-   ld     l, a    ;; [1] Move return value to L for returning it
    ret            ;; [3] Return
 
 ;; Desired 6-bits value is group 3: (byte 3, bit 5, located 18 bits from the start)
