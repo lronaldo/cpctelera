@@ -38,4 +38,7 @@ extern void cpct_memcpy    (void *to, const void *from, u16 size) __z88dk_callee
 // Stack manipulation
 extern void cpct_setStackLocation(void *memory) __z88dk_fastcall;
 
+// Macro to check conditions at compile time and issue errors
+#define BUILD_BUG_ON(condition) ((void)sizeof(char[2 - 2*!!(condition)]))
+
 #endif
