@@ -18,8 +18,8 @@
 .module cpct_bitarray
 
 ;;
-;; Assembly entry point for <cpct_get6Bits>
+;; Assembly entry point for <cpct_set6Bits>
 ;;
-cpct_get6Bits_asm::
+cpct_set6Bits_asm::
 
-.include /cpct_get6Bits.asm/
+.include /cpct_set6Bits.asm/

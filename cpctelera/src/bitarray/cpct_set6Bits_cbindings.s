@@ -18,8 +18,17 @@
 .module cpct_bitarray
 
 ;;
-;; Assembly entry point for <cpct_get6Bits>
+;; C-bindings for calling function <cpct_set6Bits>
 ;;
-cpct_get6Bits_asm::
+;;  15 microSecs, 4 bytes
+;;
+_cpct_set6Bits::
+   ;; Recover parameters from the stack
+   pop hl           ;; [3] HL = Return Address
+   pop de           ;; [3] DE = Pointer to the array in memory
+   pop bc           ;; [3] BC = New value to be stored
+   ex (sp), hl      ;; [6] HL = Index of the 6-bits value we want to get
+                    ;; ... also putting again Return Address where SP is located now
+                    ;; ... as this function is using __z88dk_callee convention
 
-.include /cpct_get6Bits.asm/
+.include /cpct_set6Bits.asm/

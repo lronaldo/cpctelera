@@ -28,8 +28,8 @@
 ;;
 ;; Input Parameters (6 Bytes, B register ignored, only C register is used for value):
 ;;    (2B DE) array - Pointer to the first byte of the array
-;;    (2B HL) index - Index of the group of 6 bits in the array to be modified
 ;;    (2B BC) value - New value [0-63] for the group of 6 bits at the given position. If 
+;;    (2B HL) index - Index of the group of 6 bits in the array to be modified
 ;; you call from assembly, you can safely ignore B register and set only C register.
 ;;
 ;; Assembly call (Input parameters on registers):
