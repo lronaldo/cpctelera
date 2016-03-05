@@ -50,5 +50,7 @@ extern void cpct_set6Bits(void *array, u16 value, u16 pos) __z88dk_callee;
 #define CPCT_2BITARRAY(Name, Elems) u8 Name[ ((Elems)/4 + 1) ]
 #define CPCT_1BITARRAY(Name, Elems) u8 Name[ ((Elems)/8 + 1) ]
 #define CPCT_ENCODE6BITS(A, B, C, D) ((A)<<2) | ((B)>>4), ((B)<<4) | ((C)>>2), ((C)<<6) | ((D)&0x3F)
+#define CPCT_ENCODE4BITS(A, B)       ((A)<<4) | ((B)>>4)
+#define CPCT_ENCODE2BITS(A, B, C, D) ((A)<<6) | (((B)<<4)&0x30) | (((C)<<2)&0x0C) | ((D)&0x03)
 
 #endif
