@@ -98,12 +98,13 @@
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; We first divide INDEX / 4 because each 4 values are stored in groups of
-   ;; 3-bytes. Therefore, this let us count how many groups of 3-bytes do we
-   ;; have to advance to get to the 3-bytes where our desired value is stored.
+   ;; 3-bytes. Therefore, this lets us count how many groups of 3-bytes do we
+   ;; have to advance to get to the 3-bytes where the target value to be changed is.
    ;; The remainder of the division tells us which one of the 4 values contained
-   ;; in that target 3-byte group, contains the desired value.
+   ;; in that target 3-byte group, contains the target value.
    ;; Each group of 3-bytes stores the 4 values as follows:
    ;;    [00000011][11112222][22333333]
+   ;; New number to insert contained in BC is assumed to be [00000000][00xxxxxx]
    ;;
    xor   a        ;; [1] A = 0 
    srl   h        ;; [2] | HL = HL / 4, A = remainder (HL % 4) with bits 1 and 0 inverted in order
@@ -132,27 +133,45 @@
    jr    nc, g0   ;; [2/3] If Not Carry, second bit was 0, so A contained a 0 (00)
                   ;; Else, A Contained a 1 (10, remember bits are in inverse order)
 
-;; Desired 6-bits value is group 1: (byte 0, bit 1, located 6 bits from the start) 
-;;    Desired bits = x => [......xx][xxxx....][........]
-g1:
-   ld     b, (hl) ;; [2] B=byte 0, where first 2 bits are located B:[......oo]
-   inc   hl       ;; [2] Point HL to the byte 1
+;; Target 6-bits value is group 1: (byte 0, bit 1, located 6 bits from the start) 
+;;    Target bits = x => [......xx][xxxx....][........]
+g1: ;; [29]
+   ;; Set up new 6-bits to be inserted in its right place
+   ld     a, c    ;; [1] A=6 bits to be inserted [..xxxxxx]
+   rlca           ;; [1] / Rotate bits left to put them in their final location: 
+   rlca           ;; [1] |   A: [..xxxxxx] >>>  B:A [......xx][xxxx....]
+   rlca           ;; [1] | We do it rotating 4 times A to the left and
+   rl     b       ;; [2] | passing 2 bits to B using carry
+   rlca           ;; [1] |
+   rl     b       ;; [2] \
+   
+   ;; Insert first 2 bits at the end of the first byte
+   ld     c, a    ;; [1] C=A (Save value temporary as we need A)
+   ld     a, (hl) ;; [2] A=byte 0 from the target group of 3-bytes, to insert first 2 bits [......xx]
+   and #0xFC      ;; [2] Set last 2 bits to 0, leaving the rest untouched, A[______00]
+   or     b       ;; [1] Add the first 2 bits from new number of 6-bits in its target location
+   ld  (hl), a    ;; [2] Save it to memory
+
+   ;; Insert last 4 bits at the beginning of the second byte
+   inc   hl       ;; [2] Point to the 2nd byte from the target 3-bytes group, to insert last 4 bits [xxxx....]
    ld     a, (hl) ;; [2] A=byte 1, where next 4 bits are located A:[xxxx....]
-   srl    b       ;; [2] Shift B right and move last bit into the Carry
-   rra            ;; [1] rotate A right and insert the Carry as leftmost bit B:[.......o] A:[oxxxx...]
-   srl    b       ;; [2] Repeat both previous operations...
-   rra            ;; [1] ... leaving B:[........] A:[ooxxxx..]
-   srl    a       ;; [2] | Shift A to more times to the right, to 
-   srl    a       ;; [2] | get the final value A:[..ooxxxx]
-   ld     l, a    ;; [1] Move return value to L for returning it
+   and #0x0F      ;; [2] Set first 4 bits to 0, leaving the rest untouched, A:[0000____]
+   or     c       ;; [1] Add the last 4 bits from the new number of 6-bits in its target location
+   ld  (hl), a    ;; [2] Save it to memory
    ret            ;; [3] Return
 
-;; Desired 6-bits value is group 0: (byte 0, 6 first bits)  
-;;    Desired bits = x => [xxxxxx..][........][........]
-g0:
-   ld     l, (hl) ;; [2] L = byte containing desired 6 bits
-   srl    l       ;; [2] | Desired 6 bits are the first 6 bits of L...
-   srl    l       ;; [2] | ... shift them left to make L=desired value
+;; Target 6-bits value is group 0: (byte 0, 6 first bits)  
+;;    Target bits = x => [xxxxxx..][........][........]
+g0: ;; [14]
+   ;; Set up new 6-bits to be inserted in its right place
+   rlc    c       ;; [2] | Rotate bits left to put them in their target location: 
+   rlc    c       ;; [2] |    C: [..xxxxxx] >>> [xxxxxx..]
+
+   ;; Insert the 6 bits into the first byte of the target 3-byte group
+   ld     a, (hl) ;; [2] A=byte 0 from the target group of 3-bytes, to insert the 6-bits in [xxxxxx..]
+   and #0x03      ;; [2] Set first 6 bits to 0, leaving latest 2 bits untouched A:[000000__]
+   or     c       ;; [1] Add the 6 bits from the new number to their place A[xxxxxx__]
+   ld  (hl), a    ;; [2] Save it to memory
    ret            ;; [3] Return
 
 gs23:
@@ -160,28 +179,40 @@ gs23:
    jr     c, g3   ;; [2/3] If Carry, bit was 1, so A contained 3 (11)
                   ;; Else, A Contained 2 (01, remember bits are in inverse order)
 
-;; Desired 6-bits value is group 2: (byte 2, bit 3, located 12 bits from the start)
-;;    Desired bits = x => [........][....xxxx][xx......]
-g2:
-   inc   hl       ;; [2] Point HL to byte 1, which contains first 4 bits of desired value
-   ld     a, (hl) ;; [2] A=byte 1
-   and    #0x0F   ;; [2] Remove first 4 bits of the byte: they're not from the desired value
-   ld     b, a    ;; [1] Save these 4 bits into B
-   inc   hl       ;; [2] Point HL to byte 2, which has last 2 bits
-   ld     a, (hl) ;; [2] A=byte 2
-   and    #0xC0   ;; [2] Remove last 6 bits, as we only want the first 2
-   or     b       ;; [1] Add up the 4 bits and the other 2. They will be like this [oo..xxxx]
-   rlca           ;; [1] / The 2 oo bits should be the last, so we have to rotate them 2 times
-   rlca           ;; [1] \ to leave it as [..xxxxoo]
-   ld     l, a    ;; [1] Move value to L for returning it
+;; Target 6-bits value is group 2: (byte 2, bit 3, located 12 bits from the start)
+;;    Target bits = x => [........][....xxxx][xx......]
+g2: ;;[29]
+   ;; Set up new 6-bits to be inserted in its right place
+   xor    a       ;; [1]
+   rrc    c       ;; [2]     C:B [....xxxx][xx......]
+   rra            ;; [1]
+   rrc    c       ;; [2]
+   rra            ;; [1]
+   ld     b, a    ;; [1] 
+
+   inc   hl       ;; [2]
+   ld     a, (hl) ;; [2]
+   and #0xF0      ;; [2]  [____0000]
+   or     c       ;; [1]
+   ld  (hl), a    ;; [2]
+
+   inc   hl       ;; [2]
+   ld     a, (hl) ;; [2]
+   and #0x3F      ;; [2]  [00______]
+   or     b       ;; [1]
+   ld  (hl), a    ;; [2]
+
    ret            ;; [3] Return
 
-;; Desired 6-bits value is group 3: (byte 3, bit 5, located 18 bits from the start)
-;;    Desired bits = x => [........][........][..xxxxxx]
-g3:
-   inc   hl       ;; [2] | HL += 2, to make HL point to byte 2
-   inc   hl       ;; [2] \
-   ld     a, (hl) ;; [2] A = byte 2, which contains the desired value
-   and    #0x3F   ;; [2] Remove 2 leftmost bits that are not part of the desired value
-   ld     l, a    ;; [1] Move return value to L for returning it
+;; Target 6-bits value is group 3: (byte 3, bit 5, located 18 bits from the start)
+;;    Target bits = x => [........][........][..xxxxxx]
+g3: ;; [14]
+   inc   hl       ;; [2]
+   inc   hl       ;; [2]
+
+   ld     a, (hl) ;; [2]
+   and #0xC0      ;; [2]  [__000000]
+   or     c       ;; [1]
+   ld  (hl), a    ;; [2]
+
    ret            ;; [3] ret
