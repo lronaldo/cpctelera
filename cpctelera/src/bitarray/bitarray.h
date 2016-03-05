@@ -42,6 +42,7 @@ extern   u8 cpct_get6Bits(void *array, u16 pos) __z88dk_callee;
 extern void cpct_setBit  (void *array, u16 value, u16 pos) __z88dk_callee;
 extern void cpct_set2Bits(void *array, u16 value, u16 pos) __z88dk_callee;
 extern void cpct_set4Bits(void *array, u16 value, u16 pos) __z88dk_callee;
+extern void cpct_set6Bits(void *array, u16 value, u16 pos) __z88dk_callee;
 
 // Macros for comfortably defining bitarrays
 #define CPCT_6BITARRAY(Name, Elems) u8 Name[ (((Elems)/4 + !!((Elems) % 4)) * 3) ]

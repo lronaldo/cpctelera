@@ -140,9 +140,9 @@ g1: ;; [29]
    ld     a, c    ;; [1] A=6 bits to be inserted [..xxxxxx]
    rlca           ;; [1] / Rotate bits left to put them in their final location: 
    rlca           ;; [1] |   A: [..xxxxxx] >>>  B:A [......xx][xxxx....]
-   rlca           ;; [1] | We do it rotating 4 times A to the left and
+   rla            ;; [1] | We do it rotating 4 times A to the left and
    rl     b       ;; [2] | passing 2 bits to B using carry
-   rlca           ;; [1] |
+   rla            ;; [1] |
    rl     b       ;; [2] \
    
    ;; Insert first 2 bits at the end of the first byte
@@ -184,9 +184,9 @@ gs23:
 g2: ;;[29]
    ;; Set up new 6-bits to be inserted in its right place
    xor    a       ;; [1]
-   rrc    c       ;; [2]     C:B [....xxxx][xx......]
+   rr     c       ;; [2]     C:B [....xxxx][xx......]
    rra            ;; [1]
-   rrc    c       ;; [2]
+   rr     c       ;; [2]
    rra            ;; [1]
    ld     b, a    ;; [1] 
 
