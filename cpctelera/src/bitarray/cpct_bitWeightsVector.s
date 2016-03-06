@@ -25,7 +25,7 @@
 ;; an AND operation. Hence, the name bitWeights. It is used by <cpct_getBit> and 
 ;; <cpct_setBit> functions. mainly.
 ;;
-cpct_bitWeights:: .db #0x01, #0x02, #0x04, #0x08, #0x10, #0x20, #0x40, #0x80
+cpct_bitWeights:: .db #0x80, #0x40, #0x20, #0x10, #0x08, #0x04, #0x02, #0x01
 
 ;; This shuould be 8-byte aligned for better performance, but compiler is not able to do it
 ;; .bndry 8 ;; Make this vector start at a 8-byte aligned address to be able to use 8-bit arithmetic with pointers
