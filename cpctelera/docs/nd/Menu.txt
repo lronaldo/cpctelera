@@ -66,9 +66,11 @@ Group: Bitarray  {
    File: cpct_bitWeights  (bitarray/cpct_bitWeightsVector.s)
    File: cpct_get2Bits  (bitarray/cpct_get2Bits.asm)
    File: cpct_get4Bits  (bitarray/cpct_get4Bits.asm)
+   File: cpct_get6Bits  (bitarray/cpct_get6Bits.asm)
    File: cpct_getBit  (bitarray/cpct_getBit.asm)
    File: cpct_set2Bits  (bitarray/cpct_set2Bits.asm)
    File: cpct_set4Bits  (bitarray/cpct_set4Bits.asm)
+   File: cpct_set6Bits  (bitarray/cpct_set6Bits.asm)
    File: cpct_setBit  (bitarray/cpct_setBit.asm)
    }  # Group: Bitarray
 
