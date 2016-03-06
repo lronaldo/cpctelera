@@ -9,7 +9,6 @@
 *.status
 *.log
 *~
-*.asm
 *.bak
 *.bin
 *.bin.log
