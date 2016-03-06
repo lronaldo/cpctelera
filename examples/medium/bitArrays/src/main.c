@@ -72,9 +72,9 @@ void printArray(u8* pvideomem, void *array, u8 nItems, TFunc thefunction) {
 //
 void main (void) {
   u8 i, j;       // Counters for loops
-  u8 array1[10]; // Array of 10 bytes, 80 bits, to be used bit by bit
-  u8 array2[20]; // Array of 20 bytes, 160 bits, 80 groups of 2 bits.
-  u8 array4[40]; // Array of 40 bytes, 320 bits, 80 groups of 4 bits.
+  CPCT_1BITARRAY(array1, 80); // Array of 80 1-bit elements (10 bytes)
+  CPCT_2BITARRAY(array2, 80); // Array of 80 2-bit elements (20 bytes)
+  CPCT_4BITARRAY(array4, 80); // Array of 80 4-bit elements (40 bytes)
 
   // Disable firmware to prevent it from restoring video mode or
   // interfering with our drawChar functions
