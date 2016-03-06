@@ -21,16 +21,16 @@
 ;;
 ;; Function: cpct_set6Bits
 ;;
-;;    Sets the value of a selected group of 6 bits into a bitarray to [0-63].
+;;    Sets the value of a selected element of 6 bits into a bitarray to [0-63].
 ;;
 ;; C Definition:
 ;;    <u8> <cpct_set6Bits> (void* *array*, <u16> *value*, <u16> *index*);
 ;;
-;; Input Parameters (6 Bytes, B register ignored, only C register is used for value):
+;; Input Parameters (6 Bytes):
 ;;    (2B DE) array - Pointer to the first byte of the array
-;;    (2B BC) value - New value [0-63] for the group of 6 bits at the given position. If 
-;;    (2B HL) index - Index of the group of 6 bits in the array to be modified
+;;    (2B BC) value - New value [0-63] for the element of 6 bits at the given position. If 
 ;; you call from assembly, you can safely ignore B register and set only C register.
+;;    (2B HL) index - Index of the group of 6 bits in the array to be modified
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_set6Bits_asm
@@ -39,63 +39,67 @@
 ;;    * *array* must be the memory location of the first byte of the array.
 ;; However, this function will accept any given 16-value, without performing
 ;; any check. So, be warned that giving mistaken values to this function will
-;; not make it fail, but return an unpredictable value.
-;;    * *value* new value for the selected 6-bits group [0-63]. Only the 6 Least 
-;; Significant Bits (LSBs) are used. This means that any given *value* 
-;; will "work": only the 6-bits LSBs will finally be inserted in the *array*
-;; position (*index*).
-;;    * *index* position of the group of 6 bits to be set in the array, 
+;; produce unexpected behaviour (it may change random bits from memory).
+;;    * *value* new value for the selected 6-bits element [0-63]. Be sure not to
+;; use values greater than 63 or lower than 0. Wrong values can potentially
+;; change random bits from values near the selected one.
+;;    * *index* position of the 6-bits element to be set in the array, 
 ;; starting in 0. As this function does not perform any boundary check, if you gave
-;; an index outside the boundaries of the array, this function will overwritte a
+;; an index outside the boundaries of the array, this function will overwrite a
 ;; random location in memory, yielding unexpected results.
 ;;
 ;; Known limitations:
-;;    * Maximum of 65536 groups of 6-bits, 49152 bytes per *array*.      
+;;    * Maximum of 65536 elements of 6-bits, 49152 bytes per *array*.      
 ;;
 ;; Details:
-;;    Set the new *value* of the 6-bits group at the given position 
-;; (*index*) in the specified *array*. This function calculates the 
-;; location in memory considering each value to take 6-bits in memory.
-;; Then, only the 6 Least Significant Bits of the *value* will be
-;; inserted at the calculated location. 
-;;
+;;    Set the new *value* of the 6-bits element at the given position (*index*) in the 
+;; specified *array*. This function calculates the location in memory considering each 
+;; value to take 6-bits in memory. Then, the 6 Least Significant Bits of *value* are 
+;; inserted. However, take into account that values greater than 63 or lower than 0 
+;; (that is, requiring more than 6 bits) could potentially modify bits from nearby 
+;; elements on insertion.   
 ;; 
 ;; Examples:
 ;; (start code)
-;;    // Declare and initialize a 6-bit Array with some useful macros
+;;    u8 i;
+;;
+;;    // Declare and initialize a 6-bit Array using some useful macros
 ;;    const CPCT_6BITARRAY(my_array, 8) = { 
 ;;       CPCT_ENCODE6BITS(10, 12, 31, 45),
 ;;       CPCT_ENCODE6BITS( 7, 60, 18,  2)
 ;;    };
 ;; 
-;;    // Recover some of the values of the array (take into account that
-;;    // array indexes start at 0)
-;;    u8 value1 = cpct_get6Bits(my_array, 0);
-;;    u8 value3 = cpct_get6Bits(my_array, 2);
-;;    u8 value6 = cpct_get6Bits(my_array, 5);
+;;    // Multiply elements lower than 10 by 2
+;;    for(i=0; i < 8; i++) {
+;;       u8 value = cpct_get6Bits(my_array, i);
+;;       cpct_set6Bits(my_array, value*2, i);
+;;    }
 ;;
-;;    // This should print 10, 31 and 60
-;;    printf("Values obtained: %d %d %d\n", value1, value3, value6);   
+;;    // Show all the values. This should print: 10 12 31 45 14 60 18 4
+;;    //
+;;    for(i=0; i < 8; i++) {
+;;       printf("%d ", cpct_get6Bits(my_array, i));
+;;    }   
 ;; (end code)
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings   - xx bytes 
-;;    ASM-bindings - xx bytes
+;;    C-bindings   - 94 bytes 
+;;    ASM-bindings - 89 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;; Case      | microSecs (us) | CPU Cycles |
 ;; -----------------------------------------
-;; Best (0)  |      xx        |     148    |
+;; Best (0)  |      66        |     264    |
 ;; -----------------------------------------
-;; Worst(1|3)|      xx        |     196    |
+;; Worst(2)  |      81        |     324    |
 ;; -----------------------------------------
-;; ASM Saving|     -12        |     -48    |
+;; ASM Saving|     -15        |     -60    |
 ;; -----------------------------------------
-;; (end)
+;; (end) 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; We first divide INDEX / 4 because each 4 values are stored in groups of
    ;; 3-bytes. Therefore, this lets us count how many groups of 3-bytes do we
@@ -106,12 +110,13 @@
    ;;    [00000011][11112222][22333333]
    ;; New number to insert contained in BC is assumed to be [00000000][00xxxxxx]
    ;;
-   xor   a        ;; [1] A = 0 
-   srl   h        ;; [2] | HL = HL / 4, A = remainder (HL % 4) with bits 1 and 0 inverted in order
-   rr    l        ;; [2] |   -- HL holds the number of 3-byte groups to advance from the start
+   xor    a       ;; [1] A = 0 
+   ld     b, a    ;; [1] B = 0 (Ensure value from B do never produce side effects)
+   srl    h       ;; [2] | HL = HL / 4, A = remainder (HL % 4) with bits 1 and 0 inverted in order
+   rr     l       ;; [2] |   -- HL holds the number of 3-byte groups to advance from the start
    rla            ;; [1] |      of the array to get into the 3-byte group containing our desired value
-   srl   h        ;; [2] |   -- A holds the remainder of division by 4, that tells us which one of
-   rr    l        ;; [2] |      the 4 numbers inside the 3-byte group is our desired value.
+   srl    h       ;; [2] |   -- A holds the remainder of division by 4, that tells us which one of
+   rr     l       ;; [2] |      the 4 numbers inside the 3-byte group is our desired value.
    rla            ;; [1] \      Warning: this is a 2-bits number, but with both bits inverted in order!
 
    ;; HL contains the number of 3-byte groups we have to advance to 
@@ -183,36 +188,39 @@ gs23:
 ;;    Target bits = x => [........][....xxxx][xx......]
 g2: ;;[29]
    ;; Set up new 6-bits to be inserted in its right place
-   xor    a       ;; [1]
-   rr     c       ;; [2]     C:B [....xxxx][xx......]
-   rra            ;; [1]
-   rr     c       ;; [2]
-   rra            ;; [1]
-   ld     b, a    ;; [1] 
+   xor    a       ;; [1] A=0. Leave it ready to insert 2 of the 6 bits in it
+   rr     c       ;; [2] | Rotate bits to the right to put them in their target location
+   rra            ;; [1] |    C: [..xxxxxx] >>> C:A [....xxxx][xx......]
+   rr     c       ;; [2] |
+   rra            ;; [1] \
+   ld     b, a    ;; [1] B=A (Save A value for later use, so C:A >> C:B)
 
-   inc   hl       ;; [2]
-   ld     a, (hl) ;; [2]
-   and #0xF0      ;; [2]  [____0000]
-   or     c       ;; [1]
-   ld  (hl), a    ;; [2]
+   ;; Insert first 4 bits in the second byte of the target 3-byte group
+   inc   hl       ;; [2] Point HL to the 2nd byte on the 3-byte group
+   ld     a, (hl) ;; [2] A=byte 1 from the target group of 3-bytes, to insert 4-bits in [....xxxx]
+   and #0xF0      ;; [2] Set last 4 bits to 0, leaving first 4 bits untouched A:[____0000]
+   or     c       ;; [1] Add first 4 bits from the new number to their place A:[____xxxx]
+   ld  (hl), a    ;; [2] Save it to memory
 
-   inc   hl       ;; [2]
-   ld     a, (hl) ;; [2]
-   and #0x3F      ;; [2]  [00______]
-   or     b       ;; [1]
-   ld  (hl), a    ;; [2]
+   inc   hl       ;; [2] Point HL to the 3rd byte on the 3-byte group
+   ld     a, (hl) ;; [2] A=byte 2 from the target group of 3-bytes, to insert 2-bits in [xx......]
+   and #0x3F      ;; [2] Set the first 2 bits to 0, leaving last 6 bits untouched A:[00______] 
+   or     b       ;; [1] Add last 2 bits from the new number to their place A:[xx______]
+   ld  (hl), a    ;; [2] Save it to memory
 
    ret            ;; [3] Return
 
 ;; Target 6-bits value is group 3: (byte 3, bit 5, located 18 bits from the start)
 ;;    Target bits = x => [........][........][..xxxxxx]
 g3: ;; [14]
-   inc   hl       ;; [2]
-   inc   hl       ;; [2]
+   ;; Point HL to the 3rd byte of the 3-byte group
+   inc   hl       ;; [2] | HL += 2
+   inc   hl       ;; [2] \
 
-   ld     a, (hl) ;; [2]
-   and #0xC0      ;; [2]  [__000000]
-   or     c       ;; [1]
-   ld  (hl), a    ;; [2]
+   ;; Insert the 6 bits at the end of the 3-byte group
+   ld     a, (hl) ;; [2] A=byte 2 from the target group of 3-bytes, to insert 6-bits in [..xxxxxx]
+   and #0xC0      ;; [2] Set the last 6 bits to 0, leaving first 2 bits untouched A:[__000000]
+   or     c       ;; [1] Add last 6 bits from the new number to their place A:[__xxxxxx]
+   ld  (hl), a    ;; [2] Save it to memory
 
-   ret            ;; [3] ret
+   ret            ;; [3] Return
