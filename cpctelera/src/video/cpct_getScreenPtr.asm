@@ -28,8 +28,8 @@
 ;;
 ;; Input Parameters (4 Bytes):
 ;;    (2B DE) screen_start - Pointer to the start of the screen (or a backbuffer)
-;;    (1B B ) y            - [0-199] row starting from 0 (y coordinate)
 ;;    (1B C ) x            - [0-79]  Byte-aligned column starting from 0 (x coordinate, 
+;;    (1B B ) y            - [0-199] row starting from 0 (y coordinate)
 ;; *in bytes*)
 ;;
 ;; Assembly call (Input parameters on registers):

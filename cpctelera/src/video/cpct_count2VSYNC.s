@@ -41,7 +41,7 @@
 ;; loop. This count is returned when VSYNC is detected and the function ends.
 ;; For more reference about VSYNC and this waiting loop, see <cpct_waitVSYNC>.
 ;;
-;;    The main utility of counting loop iteration is to have an stimation of
+;;    The main utility of counting loop iteration is to have an estimate of
 ;; free cycles in a main loop. If you are planning to make a game or application
 ;; running at 50/25/12.5 FPS, all your CPU operations must fit into the allowed
 ;; time for that. A way to know if you still have time to include more operations
