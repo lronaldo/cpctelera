@@ -56,4 +56,15 @@ extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideom
 // Functions to modify behaviour of other functions
 extern void cpct_setDrawSpriteBlendFunction(u8 function) __z88dk_fastcall;
 
+// Blending Functions (opcodes)
+// TODO: Document
+#define CPCT_BLEND_XOR  0xAE
+#define CPCT_BLEND_AND  0xA6
+#define CPCT_BLEND_OR   0xB6
+#define CPCT_BLEND_ADD  0x86
+#define CPCT_BLEND_ADC  0x8E
+#define CPCT_BLEND_SBC  0x9E
+#define CPCT_BLEND_SUB  0x96
+#define CPCT_BLEND_NOP  0x00
+
 #endif
