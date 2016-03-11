@@ -19,6 +19,12 @@
 #ifndef CPCT_COLOURS_H
 #define CPCT_COLOURS_H
 
+// File: Colours
+//
+//    Constants and utilities to manage the 27 colours from
+// the CPC Palette comfortably.
+//
+
 // enum: CPCT_FW_Colour
 //
 //    Enumerates all 27 firmware colours
