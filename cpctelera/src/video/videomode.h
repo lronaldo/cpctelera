@@ -22,9 +22,9 @@
 //
 // File: Video Macros&Constants
 //
-
 #include <types.h>
 #include <memutils/memutils.h>
+#include "colours.h"
 
 // Setting Video Mode
 extern void cpct_setVideoMode (u8 videoMode) __z88dk_fastcall;
