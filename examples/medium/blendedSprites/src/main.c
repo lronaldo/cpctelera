@@ -17,13 +17,26 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
+#include "img/scifi_bg.h"
+
+#define SCR_VMEM  (u8*)0xC000
 
 // Firmware palette values
 #define G_PALETTE_SIZE 6
-u8 G_palette[G_PALETTE_SIZE] = { 
+const u8 g_palette[G_PALETTE_SIZE] = { 
     HW_BLACK      , HW_BLUE  , HW_RED
    ,HW_BRIGHT_RED , HW_WHITE , HW_PASTEL_BLUE
 };
+
+/////////////////////////////////////////////////////////////////////////
+// drawBackground
+//    Draws the background from pixel line 72 onwards
+//
+void drawBackground() {
+   u8* p = cpct_getScreenPtr(SCR_VMEM, 0, 72);
+   cpct_drawSprite(g_scifi_bg_0, p   , 40, 128);
+   cpct_drawSprite(g_scifi_bg_1, p+40, 40, 128);
+}
 
 /////////////////////////////////////////////////////////////////////////
 // Initialization routine
@@ -36,7 +49,7 @@ void initialize (){
    // 1. Set the palette colours using hardware colour values
    // 2. Set border colour to black
    // 3. Set video mode to 0 (160x200, 16 colours)
-   cpct_setPalette(G_palette, G_PALETTE_SIZE);
+   cpct_setPalette(g_palette, G_PALETTE_SIZE);
    cpct_setBorder (HW_BLACK);
    cpct_setVideoMode(0);
 }
@@ -45,7 +58,8 @@ void initialize (){
 // Main entry point of the application
 //
 void main(void) {
-   initialize(); // Initialize screen, palette and background
+   initialize();  // Initialize screen, palette and background
+   drawBackground();
 
    while(1);
 }
