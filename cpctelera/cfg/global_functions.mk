@@ -231,8 +231,9 @@ endef
 define IMG2C
 IMGCFILES  := $(basename $(1)).c $(IMGCFILES)
 OBJS2CLEAN := $(basename $(1)).c $(basename $(1)).h $(OBJS2CLEAN)
+.INTERMEDIATE: $(basename $(1)).c $(basename $(1)).h
 $(basename $(1)).c $(basename $(1)).h: $(1)
 	@$(call PRINT,$(PROJNAME),"Generating C-arrays for images in $(1)...")
-	cpct_img2tileset -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1)
+	@cpct_img2tileset -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1)
 	@$(call PRINT,$(PROJNAME),"C-arrays generated for $(1)")
 endef
