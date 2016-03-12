@@ -18,14 +18,17 @@
 
 #include <cpctelera.h>
 #include "img/scifi_bg.h"
+#include "img/items.h"
 
 #define SCR_VMEM  (u8*)0xC000
 
 // Firmware palette values
-#define G_PALETTE_SIZE 6
+#define G_PALETTE_SIZE 11
 const u8 g_palette[G_PALETTE_SIZE] = { 
-    HW_BLACK      , HW_BLUE  , HW_RED
-   ,HW_BRIGHT_RED , HW_WHITE , HW_PASTEL_BLUE
+    HW_BLACK         , HW_BLUE        , HW_RED
+   ,HW_BRIGHT_RED    , HW_GREEN       , HW_YELLOW
+   ,HW_WHITE         , HW_PASTEL_BLUE , HW_PASTEL_CYAN
+   ,HW_PASTEL_YELLOW , HW_BRIGHT_WHITE
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -36,6 +39,10 @@ void drawBackground() {
    u8* p = cpct_getScreenPtr(SCR_VMEM, 0, 72);
    cpct_drawSprite(g_scifi_bg_0, p   , 40, 128);
    cpct_drawSprite(g_scifi_bg_1, p+40, 40, 128);
+   cpct_drawSprite(g_items_0, SCR_VMEM +  0, 4, 8);
+   cpct_drawSprite(g_items_1, SCR_VMEM + 10, 4, 8);
+   cpct_drawSprite(g_items_2, SCR_VMEM + 20, 4, 8);
+   cpct_drawSprite(g_items_3, SCR_VMEM + 30, 4, 8);
 }
 
 /////////////////////////////////////////////////////////////////////////

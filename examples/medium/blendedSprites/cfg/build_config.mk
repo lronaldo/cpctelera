@@ -134,7 +134,9 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 include $(CPCT_PATH)/cfg/global_functions.mk
 
 # Convert images
-$(eval $(call IMG2SPRITES,src/img/scifi_bg.png,0,g,80,128,{0 1 3 6 13 14}))
+PALETTE={0 1 3 6 9 12 13 14 23 25 26}
+$(eval $(call IMG2SPRITES,src/img/scifi_bg.png,0,g,80,128,$(PALETTE)))
+$(eval $(call IMG2SPRITES,src/img/items.png,0,g,8,8,$(PALETTE)))
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
