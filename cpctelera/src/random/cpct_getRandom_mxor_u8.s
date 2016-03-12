@@ -50,8 +50,8 @@
 ;;      AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    75 bytes divided in, 
-;;    *  36 bytes (this function's code)
+;;    76 bytes divided in, 
+;;    *  37 bytes (this function's code)
 ;;    * +35 bytes (from <cpct_nextRandom_mxor_u32> function's code)
 ;;    *  +4 bytes (from <cpct_mxor32_seed>)
 ;;
@@ -59,10 +59,10 @@
 ;; (start code)
 ;;    Case     | microSecs (us) | CPU Cycles
 ;; -----------------------------------------
-;;  available  |      22        |     88
-;;  production |      87        |    348
+;;  available  |      23        |     92
+;;  production |      88        |    352
 ;; -----------------------------------------
-;;  average-4  |     38,25      |    153
+;;  average-4  |     39,25      |    157
 ;; -----------------------------------------
 ;; (end code)
 ;;
@@ -92,10 +92,11 @@ next_rand:
    ld   (n_randoms), a           ;; [4] | Update number of random bytes left in the buffer (+1)
 
    ld   hl, #_cpct_mxor32_seed-1 ;; [3] HL points to the byte previous to the start of the 32-bits seed 
-   add  l                        ;; [1] |
-   ld   l, a                     ;; [1] |
-   adc  h                        ;; [1] |
-   sub  l                        ;; [1] |> HL += A (as A is the number of random bytes left)
+   add  l                        ;; [1] / > HL += A
+   ld   l, a                     ;; [1] |  Make HL point to the next byte value from the
+   adc  h                        ;; [1] |  seed buffer that will be returned as random value
+   sub  l                        ;; [1] |  (A is the number of random bytes left)
+   ld   h, a                     ;; [1] \  
    ld   l, (hl)                  ;; [2] L = next 8-bits random value 
 
    ret          ;; [3] Returns next 8-bits random value
