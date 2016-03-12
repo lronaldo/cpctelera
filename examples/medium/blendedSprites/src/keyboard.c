@@ -25,8 +25,9 @@
 // the keyboard
 //
 void updateKeyboardStatus() {
-   u8 i;
-   
+   TKey *k;    // Pointer to an element of the g_keys array
+   u8    i;    // Counter
+
    // First read all present status of the keys in the keyboard
    cpct_scanKeyboard();
 
@@ -35,7 +36,7 @@ void updateKeyboardStatus() {
 
    // Get a pointer to the first element of the keys array
    // That will be incremented in every loop with k++
-   TKey *k = g_keys;
+   k = g_keys;
    for(i=0; i < G_NKEYS; i++, k++) {
       // Modifications depend in whether the key is pressed or not
       if (cpct_isKeyPressed(k->key)) {
