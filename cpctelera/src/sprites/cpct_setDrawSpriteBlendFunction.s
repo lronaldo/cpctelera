@@ -60,6 +60,8 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+.globl _cpct_dsb_blendFunction
+
 _cpct_setDrawSpriteBlendFunction::
 cpct_setDrawSpriteBlendFunction_asm::
    ld     a, l                         ;; [1] A = Opcode
