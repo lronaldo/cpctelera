@@ -68,6 +68,6 @@ typedef enum {
    , CPCT_BLEND_SUB = 0x96
    , CPCT_BLEND_LDI = 0x7E
    , CPCT_BLEND_NOP = 0x00
-} CPCT_BlendFunction;
+} CPCT_BlendMode;
 
 #endif
