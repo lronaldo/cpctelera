@@ -25,13 +25,14 @@
 //
 
 //
-// Title: Sprite Macros&Constants
+// Title: Sprite Types
 //
 
 #ifndef CPCT_SPRITES_H
 #define CPCT_SPRITES_H
 
 #include <types.h>
+#include "sprite_types.h"
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;
@@ -48,26 +49,12 @@ extern void cpct_drawTileAligned4x8_f(void *sprite, void* memory) __z88dk_callee
 // Sprite and box drawing functions
 extern void cpct_drawSprite          (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSpriteMasked    (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
-extern void cpct_drawSpriteBlended   (void* memory, u8 height, u8 width, void *sprite) __z88dk_callee;
+extern void cpct_drawSpriteBlended   (void *memory, u8 height, u8 width, void *sprite) __z88dk_callee;
 extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height);
 extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideomem, 
                                               u8 width, u8 height, const void* pmasktable) __z88dk_callee;
 
 // Functions to modify behaviour of other functions
-extern void cpct_setDrawSpriteBlendFunction(u8 function) __z88dk_fastcall;
-
-// Blending Functions (opcodes)
-// TODO: Document
-typedef enum {
-     CPCT_BLEND_XOR = 0xAE
-   , CPCT_BLEND_AND = 0xA6
-   , CPCT_BLEND_OR  = 0xB6
-   , CPCT_BLEND_ADD = 0x86
-   , CPCT_BLEND_ADC = 0x8E
-   , CPCT_BLEND_SBC = 0x9E
-   , CPCT_BLEND_SUB = 0x96
-   , CPCT_BLEND_LDI = 0x7E
-   , CPCT_BLEND_NOP = 0x00
-} CPCT_BlendMode;
+extern void cpct_setDrawSpriteBlendFunction(CPCT_BlendMode mode) __z88dk_fastcall;
 
 #endif
