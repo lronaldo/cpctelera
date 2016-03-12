@@ -20,8 +20,8 @@
 // Title: Sprite Types
 //
 
-#ifndef CPCT_SPRITES_TYPES_H
-#define CPCT_SPRITES_TYPES_H
+#ifndef CPCT_SPRITE_TYPES_H
+#define CPCT_SPRITE_TYPES_H
 
 // 
 // Enum: CPCT_BlendMode

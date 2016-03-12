@@ -21,7 +21,7 @@
 ;;
 ;; Function: cpct_drawSpriteBlended
 ;;
-;; TODO (xor by default)
+;;    Draws sprites blending them with current contents of screen video memory.
 ;;
 ;; C Definition:
 ;;    void <cpct_drawSpriteBlended> (void* *memory*, <u8> *height*, <u8> *width*, void* *sprite*) __z88dk_callee;
@@ -36,93 +36,102 @@
 ;;    > call cpct_drawSpriteBlended_asm
 ;;
 ;; Parameter Restrictions:
-;;
-;; TODO: REVIEW
-;;
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; along with mask data. Each mask byte will contain enabled bits as those that should
-;; be picked from the background (transparent) and disabled bits for those that will
-;; be printed from sprite colour data. Each mask data byte must precede its associated
-;; colour data byte.
 ;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
 ;; starting from top-left corner and going left-to-right, top-to-bottom down to the
-;; bottom-right corner. Total amount of bytes in pixel array should be 
-;; 2 x *width* x *height* (mask data doubles array size). You may check screen 
-;; pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 (<cpct_px2byteM1>) as 
-;; for mode 2 is linear (1 bit = 1 pixel).
-;;  * *memory* could be any place in memory, inside or outside current video memory. It
-;; will be equally treated as video memory (taking into account CPC's video memory 
-;; disposition). This lets you copy sprites to software or hardware backbuffers, and
-;; not only video memory.
-;;  * *width* must be the width of the sprite *in bytes*, *excluding mask data*, and 
-;; must be 1 or more. Using 0 as *width* parameter for this function could potentially 
-;; make the program hang or crash. Always remember that the *width* must be 
-;; expressed in bytes and *not* in pixels. The correspondence is:
-;;    mode 0      - 1 byte = 2 pixels
-;;    modes 1 / 3 - 1 byte = 4 pixels
-;;    mode 2      - 1 byte = 8 pixels
+;; bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*
+;; You may check screen pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 (<cpct_px2byteM1>)
+;; as for mode 2 is linear (1 bit = 1 pixel).
 ;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
+;;  * *width* must be the width of the sprite *in bytes* and must be 1 or more. 
+;; Using 0 as *width* parameter for this function could potentially make the program 
+;; hang or crash. Always remember that the *width* must be expressed in bytes 
+;; and *not* in pixels. The correspondence is:
+;;    mode 0      - 1 byte = 2 pixels
+;;    modes 1 / 3 - 1 byte = 4 pixels
+;;    mode 2      - 1 byte = 8 pixels
+;;  * *memory* could be any place in memory, inside or outside current video memory. It
+;; will be equally treated as video memory (taking into account CPC's video memory 
+;; layout). This lets you copy sprites to software or hardware backbuffers, and
+;; not only video memory.
 ;;
 ;; Known limitations:
-;;
-;; TODO: REVIEW
-;;
-;;    * This function does not do any kind of boundary check or clipping. If you 
+;;  * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
 ;; could cause your program to behave erratically, hang or crash. Always 
 ;; take the necessary steps to guarantee that you are drawing inside screen
 ;; or buffer boundaries.
-;;    * As this function receives a byte-pointer to memory, it can only 
+;;  * As this function receives a byte-pointer to memory, it can only 
 ;; draw byte-sized and byte-aligned sprites. This means that the box cannot
 ;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
 ;;
 ;; Details:
-;;
-;; TODO: REVIEW
-;;
-;;    This function copies a generic WxH bytes sprite from memory to a 
+;;    This function blends a generic WxH bytes sprite from memory to a 
 ;; video-memory location (either present video-memory or software / hardware  
-;; backbuffer). The original sprite must be stored as an array (i.e. with 
-;; all of its pixels stored as consecutive bytes in memory). It works in
-;; a similar way to <cpct_drawSprite>, but taking care about transparency
-;; information encoded in mask bytes. For detailed information about 
-;; how sprite copying works, and how video memory is formatted, take a 
-;; look at <cpct_drawSprite>.
+;; backbuffer). It performs similar to <cpct_drawSprite> but instead
+;; of copying bytes and overwrite video-memory, it blends them with
+;; present contents of video-memory destination.
 ;;
-;;    For this routine to work, the sprite must contain mask information: inside 
-;; the sprite array, for each byte containing screen colour information, there 
-;; *must* be a preceding byte with mask information. So, the format is
-;; as depicted in example 1:
+;;    The process is as follows. The function gets 1 byte from the destination
+;; video-memory and 1 byte from the sprite. It then performs a blending 
+;; operation between both bytes and stores the result in the same place where
+;; it got the byte from video memory. The process is repeated for every byte
+;; from the sprite.
+;;
+;;    The blending operation that this function performs is selectable. By 
+;; default, this operation will be a XOR between both bytes. To select a
+;; different operation mode, the function <cpct_setDrawSpriteBlendFunction>
+;; should be called. Available blending modes are defined in the <CPCT_BlendModes>
+;; enumeration and include: XOR, OR, AND, ADD, ADC, SUB, SBC, LDI and NOT.
+;;
+;; Use examples:
+;;    This function may be used directly to draw a sprite in video-memory:
 ;; (start code)
-;; Array storage format:  <-byte 1-> <-byte 2-> <-byte 3-> <-byte 4->
-;;                        <- mask -> <-colour-> <- mask -> <-colour->
-;; ------------------------------------------------------------------------------
-;;        u8* sprite =  {    0xFF,     0x00,       0x00,     0xC2,   .... };
-;; ------------------------------------------------------------------------------
-;; Video memory output:   <- 1st Screen byte -> <- 2nd Screen byte -> 
-;; ______________________________________________________________________________
-;;         Example 1: Definition of a masked sprite and byte format
-;; (end)
-;;     In example 1, each "Screen byte" will become 1 byte outputted to video memory
-;; resulting of the combination of 3 bytes: 1-byte mask, 1-byte sprite colour data 
-;; and 1-byte previous screen colour data. The combination of these 3 bytes results
-;; in sprite colour data being "blended" with previous screen colour data, adding
-;; sprite pixels with background pixels (the ones over transparent pixels).
+;;    // Main video memory starts at 0xC000 by default
+;;    #define VMEM (u8*)0xC000
+;;    
+;;    ...
+;; 
+;;    // This function will draw the sprite of the main Character
+;;    void drawCharacterSprite(u8 x, u8 y) {
+;;       // First, calculate video-memory location of the (x,y)
+;;       // coordinates where the character is located
+;;       u8 *pmem = cpct_getScreenPtr(VMEM, x, y);
 ;;
-;;    The way this function works is by getting sprite bytes two by two, 
-;; operating with them, and copying them to video memory (or backbuffer). Each 
-;; two bytes got (mask + sprite colour information) are mixed with an AND 
-;; opreation to remove (set to 0) sprite background pixels. After that, an OR
-;; operation between the resulting byte and the background (the present byte 
-;; at video memory location where we want to write) is performed. That 
-;; effectively mixes sprite colours with background colours, after removing 
-;; background pixels from the sprite.
+;;       // Then, draw the sprite, blending it with the background
+;;       cpct_drawSpriteBlended(pmem, 24, 8, sprite);
+;;    }
+;; (end code)
+;;    Previous function *drawCharacterSprite* could also be used to erase
+;; the sprite, leaving video-memory as it was before drawing the sprite, 
+;; if the selected blending mode is XOR. Calling the function again with
+;; same coordinates will do the trick, as M XOR S XOR S = M (Doing a double
+;; XOR operation to any (M)emory byte against any (S)prite byte will leave
+;; M untouched).
+;;
+;;    This function could even be used as a normal drawSprite function without
+;; *width* limits (as <cpct_drawSprite> cannot draw sprites wider than 63 bytes).
+;; This can be performed using the LDI mode:
+;; (start code)
+;;    // Draw the user interface of the application, that is composed
+;;    // of several sprites 
+;;    void drawUserInterface() {
+;;       // First, set LDI blending mode 
+;;       cpct_setDrawSpriteBlendFunction(CPCT_BLEND_LDI);
+;;
+;;       // Now print all sprites of the UI at their pre-calculated locations
+;;       cpct_drawSpriteBlended(               VMEM  , 80, 200, background);
+;;       cpct_drawSpriteBlended(SCOREBOARD_LOCATION  , 80,  20, score_board);
+;;       cpct_drawSpriteBlended(LEFT_COLUMN_LOCATION , 10, 100, left_column);
+;;       cpct_drawSpriteBlended(RIGHT_COLUMN_LOCATION, 10, 100, right_column);
+;;    }
+;; (end code)
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
