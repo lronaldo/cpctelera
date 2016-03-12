@@ -17,124 +17,53 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "img/scifi_bg.h"
-#include "img/items.h"
-
-// Macro constants
-#define SCR_VMEM   (u8*)0xC000
-#define SCR_WIDTH   80
-#define SCR_HEIGHT 200
-#define BG_HEIGHT  128
-#define BG_WIDTH    80
-#define BG_X         0
-#define BG_Y        72
-
-// Defined types
-typedef struct {
-   CPCT_BlendFunction blendmode;
-                   u8 name[4];
-} TBlend;
-
-typedef struct {
-   u8* sprite;
-   u8  name[7];
-} TItem;
-
-typedef enum {
-     KeySt_Free          // Not pressed
-   , KeySt_Pressed       // Recently pressed
-   , KeySt_StillPressed  // Pressed (maintained)
-   , KeySt_Released      // Recently released
-} TKeyStatus;
-
-typedef struct {
-   cpct_keyID  key;       // Check to check
-   TKeyStatus  status;    // Status of the key
-   void(*action)();       // Associated action
-} TKey;
-
-// Blending Modes
-#define G_NBLENDMODES   9
-const TBlend g_blendModes[G_NBLENDMODES] = {
-     { CPCT_BLEND_XOR, "XOR" } , { CPCT_BLEND_AND, "AND" }
-   , { CPCT_BLEND_OR,  "OR " } , { CPCT_BLEND_ADD, "ADD" }
-   , { CPCT_BLEND_SUB, "SUB" } , { CPCT_BLEND_LDI, "LDI" }
-   , { CPCT_BLEND_ADC, "ADC" } , { CPCT_BLEND_SBC, "SBC" }
-   , { CPCT_BLEND_NOP, "NOP" }
-};
-
-// Sprites (items)
-#define G_NITEMS   4
-const TItem g_items[G_NITEMS] = { 
-     { g_items_0, "Skull"  } , { g_items_1, "Paper" }
-   , { g_items_2, "Potion" } , { g_items_3, "Cat"   }
-};
-
-// Firmware palette values
-#define G_NCOLOURS  11
-const u8 g_palette[G_NCOLOURS] = { 
-    HW_BLACK         , HW_BLUE        , HW_RED
-   ,HW_BRIGHT_RED    , HW_GREEN       , HW_YELLOW
-   ,HW_WHITE         , HW_PASTEL_BLUE , HW_PASTEL_CYAN
-   ,HW_PASTEL_YELLOW , HW_BRIGHT_WHITE
-};
-
-// Function forward declarations
-void drawBackground();
-void drawCurrentSpriteAtRandom();
-void selectNextItem();
-void selectNextBlendMode();
-
-// Keyboard Status
-#define G_NKEYS   4
-const TKey g_keys[G_NKEYS] = {
-     { Key_Space , KeySt_Free , drawCurrentSpriteAtRandom } 
-   , { Key_Esc   , KeySt_Free , drawBackground            }
-   , { Key_1     , KeySt_Free , selectNextItem            } 
-   , { Key_2     , KeySt_Free , selectNextBlendMode       } 
-};
-
-// Global variables
-u8 g_selectedItem;
-u8 g_selectedBlendMode;
+#include "globaldata.h"
+#include "keyboard.h"
+#include "draw.h"
 
 /////////////////////////////////////////////////////////////////////////
-// drawBackground
-//    Draws the background from pixel line 72 onwards
+// selectNextItem
+//    Selects the next item and redraws the user interface
 //
-void drawBackground() {
-   u8* p = cpct_getScreenPtr(SCR_VMEM, BG_X, BG_Y);
-   cpct_drawSprite(g_scifi_bg_0, p             , BG_WIDTH/2, BG_HEIGHT);
-   cpct_drawSprite(g_scifi_bg_1, p + BG_WIDTH/2, BG_WIDTH/2, BG_HEIGHT);
+void selectNextItem() {
+   // Next item is item + 1, except when we run out of items.
+   // In that later case, we select again the first item (0)
+   if (++g_selectedItem >= G_NITEMS)
+      g_selectedItem = 0;
+
+   // Draw changes
+   drawUserInterfaceStatus();
 }
 
 /////////////////////////////////////////////////////////////////////////
-// drawSpriteMixed
-//    draws a (sprite) of size (w,h) at a given location (x,y) using
-// a given blending (mode)
+// selectNextBlendMode
+//    Selects the next blending mode and redraws the user interface
 //
-void drawSpriteMixed(CPCT_BlendFunction mode, u8* sprite, u8 x, u8 y, u8 w, u8 h) {
-   u8* p = cpct_getScreenPtr(SCR_VMEM, x, y);
-   cpct_setDrawSpriteBlendFunction(mode);
-   cpct_drawSpriteBlended(p, h, w, sprite);
+void selectNextBlendMode() {
+   // Next blending mode is blendmode + 1, except when we run out of modes.
+   // In that later case, we select again the first blending mode (0)
+   if (++g_selectedBlendMode >= G_NBLENDMODES) 
+      g_selectedBlendMode = 0;
+
+   // Draw changes
+   drawUserInterfaceStatus();
 }
 
 /////////////////////////////////////////////////////////////////////////
-// drawCurrentSpriteAtRandom
-//    draws the current selected sprite using the current selected blending
-// mode at a random (x,y) location inside the map
+// performUserActions
+//    Checks user input and performs selected actions
 //
-void drawCurrentSpriteAtRandom() {
-   u8 x, y;
+void performUserActions() {
+   u8 i;
 
-   // Random coordinates
-   x = cpct_rand() % (BG_WIDTH  - 4) + BG_X;
-   y = cpct_rand() % (BG_HEIGHT - 8) + BG_Y;
-
-   // Draw the sprite
-   drawSpriteMixed(  g_blendModes[g_selectedBlendMode].blendmode
-                   , g_items[g_selectedItem].sprite
-                   , x, y, 4, 8);
+   // Checks status of every key in the g_keys array
+   // Those keys with "Pressed" status trigger their associated action
+   // Important: Pressed means "pressed just now". When the user maintains
+   //            a key pressed, it moves to StillPressed status.
+   for(i = 0; i < G_NKEYS; i++) {
+      if (g_keys[i].status == KeySt_Pressed)
+         g_keys[i].action();
+   }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -148,101 +77,30 @@ void initialize (){
    // 1. Set the palette colours using hardware colour values
    // 2. Set border colour to black
    // 3. Set video mode to 0 (160x200, 16 colours)
-   cpct_setPalette(g_palette, G_NCOLOURS);
-   cpct_setBorder (HW_BLACK);
+   cpct_setPalette  (g_palette, G_NCOLOURS);
+   cpct_setBorder   (HW_BLACK);
    cpct_setVideoMode(0);
 
-   // Set initial selections
-   g_selectedItem      = 0xFF;
-   g_selectedBlendMode = 0xFF;
-   selectNextItem();
-   selectNextBlendMode();
-}
+   // Draw the Background and the user interface
+   drawUserInterfaceMessages();   
+   drawBackground();
 
-/////////////////////////////////////////////////////////////////////////
-// updateKeyboardStatus
-//    Checks user input and updates status of the relevant keys of 
-// the keyboard
-//
-void updateKeyboardStatus() {
-   u8 i;
-   
-   cpct_scanKeyboard();
-
-   for(i=0; i < G_NKEYS; i++) {
-      TKey *k    = &(g_keys[i]);
-
-      if (cpct_isKeyPressed(k->key)) {
-         switch(k->status) {
-            case KeySt_Pressed:  { k->status = KeySt_StillPressed; break; }
-            
-            case KeySt_Free:
-            case KeySt_Released: { k->status = KeySt_Pressed; }
-         }
-      } else {
-         switch(k->status) {
-            case KeySt_Pressed:
-            case KeySt_StillPressed: { k->status = KeySt_Released; break; }
-            
-            case KeySt_Released:     { k->status = KeySt_Free; }
-         }         
-      }
-   }
-}
-
-void selectNextItem() {
-   u8 *p = cpct_getScreenPtr(SCR_VMEM, 16, 60);
-   g_selectedItem = (++g_selectedItem) % G_NITEMS;
-   cpct_drawSprite(g_items[g_selectedItem].sprite, p, 4, 8);
-}
-
-void selectNextBlendMode() {
-   u8 *p = cpct_getScreenPtr(SCR_VMEM, 52, 60);
-   g_selectedBlendMode = (++g_selectedBlendMode) % G_NBLENDMODES;
-   cpct_drawStringM0(g_blendModes[g_selectedBlendMode].name, p, 8, 0);
-}
-
-/////////////////////////////////////////////////////////////////////////
-// performUserActions
-//    Checks user input and performs selected actions
-//
-void performUserActions() {
-   u8 i;
-
-   for(i = 0; i < G_NKEYS; i++) {
-      if (g_keys[i].status == KeySt_Released)
-         g_keys[i].action();
-   }
-}
-
-void drawUserInterfaceMessages() {
-   u8 *p;
-
-   p = cpct_getScreenPtr(SCR_VMEM, 0,  0);
-   cpct_drawStringM0("[Space]"   , p    , 3, 0);
-   cpct_drawStringM0("Draw Item" , p+32 , 9, 0);
-   p = cpct_getScreenPtr(SCR_VMEM, 0, 15);
-   cpct_drawStringM0("[1] [2]"   , p    , 3, 0);
-   cpct_drawStringM0("Select"    , p+32 , 9, 0);
-   p = cpct_getScreenPtr(SCR_VMEM, 0, 30);
-   cpct_drawStringM0("[Esc]"     , p    , 3, 0);
-   cpct_drawStringM0("Clear"     , p+32 , 9, 0);
-
-   p = cpct_getScreenPtr(SCR_VMEM, 0, 50);
-   cpct_drawStringM0("   Item     Blend   ", p, 1, 6);
+   // Set initial selections for item and blending mode
+   g_selectedItem      = 0;
+   g_selectedBlendMode = 0;
+   drawUserInterfaceStatus();
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Main entry point of the application
 //
 void main(void) {
-   initialize();  // Initialize screen, palette and background
-   drawBackground();
-   drawUserInterfaceMessages();
+   initialize();  // Initialize the Amstrad CPC, 
 
+   // Loop forever checking keyboard status and then
+   // performing selected user actions
    while(1) {
       updateKeyboardStatus();
       performUserActions();
-      while(cpct_count2VSYNC() & 0xFE);
    }
 }
