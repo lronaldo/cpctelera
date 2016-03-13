@@ -98,7 +98,7 @@
 ;;
 ;;    The blending operation that this function performs is selectable. By 
 ;; default, this operation will be a XOR between both bytes. To select a
-;; different operation mode, the function <cpct_setDrawSpriteBlendFunction>
+;; different operation mode, the function <cpct_setBlendMode>
 ;; should be called. 
 ;;
 ;; Use examples:
@@ -134,7 +134,7 @@
 ;;    // of several sprites 
 ;;    void drawUserInterface() {
 ;;       // First, select LDI as blending mode for cpct_drawSpriteBlended
-;;       cpct_setDrawSpriteBlendFunction(CPCT_BLEND_LDI);
+;;       cpct_setBlendMode(CPCT_BLEND_LDI);
 ;;
 ;;       // Now print all sprites of the UI at their pre-calculated locations
 ;;       // Note: assume *LOCATION macros are just absolute video-memory addresses
@@ -201,7 +201,7 @@ width_loop:
 
   ;; Blending Function. This is a 1-byte Z80 operation that should blend
   ;; the byte in A (background) with the byte from the sprite at (HL)
-  ;; This function is modified by <cpct_setDrawSpriteBlendFunction>.
+  ;; This function is modified by <cpct_setBlendMode>.
 _cpct_dsb_blendFunction::
    xor (hl)        ;; [2] Blend background with Sprite || This byte will be modified to change blend function
 

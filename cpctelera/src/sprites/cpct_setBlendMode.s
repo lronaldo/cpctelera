@@ -19,18 +19,18 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_setDrawSpriteBlendFunction
+;; Function: cpct_setBlendMode
 ;;
 ;; TODO (xor by default)
 ;;
 ;; C Definition:
-;;    void <cpct_setDrawSpriteBlendFunction> (u8 function) __z88dk_fastcall;
+;;    void <cpct_setBlendMode> (u8 function) __z88dk_fastcall;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (1B L) function - Opcode of the function to be applied to blend bytes
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_setDrawSpriteBlendFunction
+;;    > call cpct_setBlendMode
 ;;
 ;; Parameter Restrictions:
 ;;
@@ -62,8 +62,8 @@
 
 .globl _cpct_dsb_blendFunction
 
-_cpct_setDrawSpriteBlendFunction::
-cpct_setDrawSpriteBlendFunction_asm::
+_cpct_setBlendMode::
+cpct_setBlendMode_asm::
    ld     a, l                         ;; [1] A = Opcode
    ld    hl, #_cpct_dsb_blendFunction  ;; [3] HL points to memory place where blend opcode lies
    ld  (hl), a                         ;; [2] Set the new blend function
