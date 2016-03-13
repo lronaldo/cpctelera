@@ -104,16 +104,11 @@
 ;; Use examples:
 ;;    This function may be used directly to draw a sprite in video-memory:
 ;; (start code)
-;;    // Main video memory starts at 0xC000 by default
-;;    #define VMEM (u8*)0xC000
-;;    
-;;    ...
-;; 
 ;;    // This function will draw the sprite of the main Character
 ;;    void drawCharacterSprite(u8 x, u8 y) {
 ;;       // First, calculate video-memory location of the (x,y)
 ;;       // coordinates where the character is located
-;;       u8 *pmem = cpct_getScreenPtr(VMEM, x, y);
+;;       u8 *pmem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
 ;;
 ;;       // Then, draw the sprite, blending it with the background
 ;;       cpct_drawSpriteBlended(pmem, 24, 8, sprite);
@@ -171,10 +166,6 @@
 ;;
 ;;   Standard Blend operations take 2 nanoseconds except NOP and LDI, which take 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; GET: 15
-;; PRE+POST: 8+8+1 = 17
-;; LOOP: 
 
 ;; Convenient macros to clarify the use of 
 ;;   * LD IXL, B 

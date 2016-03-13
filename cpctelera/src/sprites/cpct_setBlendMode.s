@@ -46,15 +46,47 @@
 ;; requires it to be in RAM space.
 ;;
 ;; Details:
+;;    Sets a new blending mode for the function <cpct_drawSpriteBlended>. The new 
+;; blending mode will be the one <cpct_drawSpriteBlended> will use after calling
+;; this function, until another blending mode is established, by calling this function
+;; again.
 ;;
-;; TODO: REVIEW
+;;    Internally, what this function does is modifying 1 byte of <cpct_drawSpriteBlended>
+;; function code. This modified byte is the one that performs the operation between 
+;; every pair of screen video memory and sprite bytes. This operation is a single
+;; byte Z80 instruction, hence the modification on 1 byte.
+;;
+;; Examples of use:
+;;    <cpct_drawSpriteBlended> uses XOR mode as default. If we wanted to draw a moving
+;; ball in a game using AND mode, we should do it this way:
+;; (start code)
+;;    // We want our blended sprites to use AND mode, so we set it first
+;;    // (once set, it will continue being AND mode unless manually modified)
+;;    cpct_setBlendMode(CPCT_BLEND_AND);
+;;
+;;    // This is the main loop of the game
+;;    while(1) {
+;;       u8* pmem;   // Used to point to video memory when calling drawing functions
+;;
+;;       // Update all game entities and other stuff here...
+;;       // ...
+;;       // ...
+;;
+;;       // Draw the ball sprite, at its (x,y) location, blended with AND mode.
+;;       // Ball sprite is 8x8 pixels, 4x8 bytes in mode 0.
+;;       pmem = cpct_getScreenPtr(CPCT_VMEM_START, ball.x, ball.y);
+;;       cpct_drawSpriteBlended(pmem, 8, 4, ball_sprite);
+;;
+;;       // More drawing code and other things go here
+;;       // ...
+;;    }
+;; (end code)
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    A, HL
 ;;
 ;; Required memory:
-;;    C-bindings - xx bytes 
-;;  ASM-bindints - xx bytes
+;;    6 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
