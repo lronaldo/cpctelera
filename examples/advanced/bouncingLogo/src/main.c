@@ -60,12 +60,12 @@ void checkUserInput (f32 *ax, f32 *ay) {
 void main(void) {
    // Set up Logo entity
    TEntity logo = {
-      gc_LogoFremos, (void*)0xC000,  // Sprite and video memory location
+      gc_LogoFremos, CPCT_VMEM_START,  // Sprite and video memory location
       0, 0, 55, 20,                  // X, Y, Width and Height (bytes)
       { 0.5, 0.2, 0, 0, 1, 1 }       // Velocity values (vx, vy, acum_x,acum_y, max_x, max_y)
    };
    // Set up global message
-   g_message.videopos = (u8*)0xC000;
+   g_message.videopos = CPCT_VMEM_START;
    g_message.str[0]   = '\0';
    g_message.time     = 0;
 

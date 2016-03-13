@@ -95,10 +95,10 @@ i8 moveEntityY (TEntity* ent, i8 my, u8 sy) {
       // Move umy pixels up, taking care not to pass 0 limit
       if (umy <= ent->y) {
          ent->y        -= umy;
-         ent->videopos  = cpct_getScreenPtr((u8*)0xC000, ent->x, 2*ent->y);
+         ent->videopos  = cpct_getScreenPtr(CPCT_VMEM_START, ent->x, 2*ent->y);
       } else {
          // movement tryied to pass 0 limit, adjusting to 0 and reporting bounce
-         ent->videopos  = (u8*)0xC000 + ent->x;
+         ent->videopos  = CPCT_VMEM_START + ent->x;
          ent->y         = 0;
          bounced = 1;
       }
@@ -117,7 +117,7 @@ i8 moveEntityY (TEntity* ent, i8 my, u8 sy) {
          ent->y += umy;
       }
       // Recalculating video pos when y has been changed
-      ent->videopos = cpct_getScreenPtr((u8*)0xC000, ent->x, 2*ent->y);
+      ent->videopos = cpct_getScreenPtr(CPCT_VMEM_START, ent->x, 2*ent->y);
    }
 
    return bounced;
