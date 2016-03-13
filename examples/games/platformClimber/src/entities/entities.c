@@ -79,7 +79,6 @@ u16 G_score;         // Main score
 //
 const u8  g_SCR_WIDTH  =  80;         // Screen width in bytes (80 bytes = 160 pixels)
 const u8  g_SCR_HEIGHT = 200;         // Screen height in bytes
-u8* const g_SCR_VMEM   = (u8*)0xC000; // Pointer to the start of default video memory screen
 
 // Define entities in the world and main character
 //
@@ -308,7 +307,7 @@ u8 moveBlock(u8 b_idx) {
    // Calculate new screen position, on draw
    if (e->draw) {
       e->pscreen  = e->npscreen;
-      e->npscreen = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
+      e->npscreen = cpct_getScreenPtr(CPCT_VMEM_START, e->nx, e->ny);
    }
 
    // Return signalling that the block has NOT been destroyed
@@ -561,7 +560,7 @@ u8 updateCharacter(TCharacter *c) {
 
    // Check if character has moved to calculate new location and set for drawing
    if ( e->ny != e->y ) { 
-      e->npscreen  = cpct_getScreenPtr(g_SCR_VMEM, e->nx, e->ny);
+      e->npscreen  = cpct_getScreenPtr(CPCT_VMEM_START, e->nx, e->ny);
       e->draw = 1;
    } else if ( e->nx != e->x ) {
       e->npscreen = e->npscreen + e->nx - e->x;
@@ -665,7 +664,7 @@ u8 isOverFloor(TEntity *e) {
 //
 void setEntityLocation(TEntity *e, u8 x, u8 y, u8 vx, u8 vy, u8 eraseprev) {
    // Locate entity on screen
-   e->npscreen   = cpct_getScreenPtr(g_SCR_VMEM, x, y);
+   e->npscreen   = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
    e->nx = x;
    e->ny = y;
 
@@ -720,7 +719,7 @@ void drawBlockEntity (TEntity* e){
       sp = e->npscreen;
       if (e->ny <= G_minY) {
          drawh = block->h + e->ny - G_minY;
-         sp = cpct_getScreenPtr(g_SCR_VMEM, e->nx, G_minY);
+         sp = cpct_getScreenPtr(CPCT_VMEM_START, e->nx, G_minY);
       } else {
          if (e->ny + block->h > G_maxY) {
             drawh  = G_maxY - e->ny;

@@ -41,24 +41,24 @@ void initializeGameScreen(u16 hiscore) {
    c = cpct_px2byteM0(8,8);  // Colour pattern 8-8 (black-black)
    
    // Draw black background for scoreboard
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 54,   0);  
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 54,   0);  
    cpct_drawSolidBox(pscr, c, 26, 200);
 
    // Draw "HI" string 
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  16);   
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60,  16);   
    cpct_drawStringM0("HI", pscr, 3, 8);
 
    // Draw HI-Score
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  24);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60,  24);
    sprintf(str, "%5u", hiscore);
    cpct_drawStringM0(str, pscr, 15, 8);
 
    // Draw Credits
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60, 172);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60, 172);
    cpct_drawSprite(G_credits, pscr, 20, 27);
 
    // Draw tiled frame around playing area
-   drawFrame(g_SCR_VMEM, 0);
+   drawFrame(CPCT_VMEM_START, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,20 +141,20 @@ void showGameEnd(u16 score) {
    u8  str[6]; // String array to draw numbers on screen
 
    // Draw GAME OVER string
-   pscr = cpct_getScreenPtr(g_SCR_VMEM,  8, 24);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START,  8, 24);
    cpct_drawStringM0("GAME  OVER", pscr, 6, 0);
 
    // Draw SCORE string
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 16, 48);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 16, 48);
    cpct_drawStringM0(  "SCORE", pscr, 9, 0);
 
    // Draw the score got in this game
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 16, 56);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 16, 56);
    sprintf(str, "%5u", score);
    cpct_drawStringM0(str, pscr, 14, 0);
 
    // Draw PRESS SPACE string
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 6, 112);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 6, 112);
    cpct_drawStringM0("PRESS SPACE", pscr, 11, 0);
 
    // Wait for SPACE being pressed before continuing
