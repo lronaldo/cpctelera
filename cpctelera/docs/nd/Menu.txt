@@ -72,6 +72,7 @@ Group: Bitarray  {
    File: cpct_set4Bits  (bitarray/cpct_set4Bits.asm)
    File: cpct_set6Bits  (bitarray/cpct_set6Bits.asm)
    File: cpct_setBit  (bitarray/cpct_setBit.asm)
+   File: Useful macros  (bitarray/bitarray_macros.h)
    }  # Group: Bitarray
 
 Group: Firmware  {
@@ -99,6 +100,7 @@ Group: Sprites  {
 
    File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.asm)
    File: cpct_drawSprite  (sprites/cpct_drawSprite.asm)
+   File: cpct_drawSpriteBlended  (sprites/cpct_drawSpriteBlended.asm)
    File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.asm)
    File: cpct_drawSpriteMaskedAlignedTable  (sprites/cpct_drawSpriteMaskedAlignedTable.asm)
    File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.asm)
@@ -109,7 +111,8 @@ Group: Sprites  {
    File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.asm)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0.asm)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
-   File: Sprite Macros&amp;Constants  (sprites/sprites.h)
+   File: cpct_setBlendMode  (sprites/cpct_setBlendMode.s)
+   File: Sprite Types  (sprites/sprite_types.h)
    File: Transparency Tables  (sprites/transparency_tables.h)
    }  # Group: Sprites
 
@@ -130,6 +133,7 @@ Group: Strings  {
 
 Group: Video  {
 
+   File: Colours  (video/colours.h)
    File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
    File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
    File: cpct_fw2hw  (video/cpct_fw2hw.asm)
@@ -141,7 +145,7 @@ Group: Video  {
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
    File: cpct_setVideoMode  (video/cpct_setVideoMode.asm)
    File: cpct_waitVSYNC  (video/cpct_waitVSYNC.s)
-   File: Video Macros&amp;Constants  (video/videomode.h)
+   File: Useful Macros  (video/video_macros.h)
    }  # Group: Video
 
 Group: Memutils  {
