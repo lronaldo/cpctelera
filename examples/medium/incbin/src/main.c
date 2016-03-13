@@ -46,7 +46,7 @@ void main(void) {
    
    // Draw G_character sprite at top-left corner of the screen (first byte of video memory,
    // which is located at 0xC000 in memory by default). 
-   cpct_drawSprite(G_sprite, (u8*)0xC000, 8, 24);
+   cpct_drawSprite(G_sprite, CPCT_VMEM_START, 8, 24);
    
    // Loop forever
    while (1);

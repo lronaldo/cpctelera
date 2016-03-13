@@ -25,7 +25,6 @@
 //  * Size in bytes of a complete screen video pixel line
 //  * Offset from the start of a pixel line to the start of the next (inside same group of 8 pixel lines)
 //  * Screen character line to be used for scrolling (0-24)
-#define SCR_MEMORY_START  (u8*)0xC000
 #define PIXEL_LINE_SIZE   0x0050
 #define PIXEL_LINE_OFFSET 0x0800
 #define CHARLINE          12
@@ -60,7 +59,7 @@ void scrollLine(u8* pCharline, u16 lineSize) {
    // Scroll 8 pixel lines. This loop is executed 8 times: when pCharline is incremented
    // the 9th time, it will overflow (will be greater than 0xFFFF, cycling through 0x0000)
    // and will be lower than 0xC000.
-   for (; pCharline > SCR_MEMORY_START; pCharline += PIXEL_LINE_OFFSET)
+   for (; pCharline > CPCT_VMEM_START; pCharline += PIXEL_LINE_OFFSET)
       cpct_memcpy(pCharline, pCharline+1, lineSize);
 }
 
@@ -76,7 +75,7 @@ void main(void) {
    // (8 pixel lines) to be scrolled. First 25 pixel lines of screen
    // video memory are the 25 pixel 0 lines of each screen character line
    // (group of 8 pixel lines), hence this calculation.
-   u8* pCharline_start = SCR_MEMORY_START + (PIXEL_LINE_SIZE * CHARLINE);
+   u8* pCharline_start = CPCT_VMEM_START + (PIXEL_LINE_SIZE * CHARLINE);
 
    // Pointer to the first byte of the last screen character of the
    // character line (last 2 bytes of the 8 pixel lines)
@@ -87,7 +86,7 @@ void main(void) {
    u8 penColour=1;                 // Pen colour for the characters
 
    // Infinite scrolling loop
-   cpct_drawStringM1("Hold any key to pause scroll", SCR_MEMORY_START, 1, 3);
+   cpct_drawStringM1("Hold any key to pause scroll", CPCT_VMEM_START, 1, 3);
    while (1) {
       // When holding a key, wait for release (Loop scanning the keyboard
       // until no single key is pressed)

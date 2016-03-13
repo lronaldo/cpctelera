@@ -41,7 +41,7 @@ typedef struct {
 //   0xC000 - Main Screen Buffer
 //   0x8000 - BackBuffer (Requires moving program stack, that originally is at 0xBFFF)
 //
-u8* const g_scrbuffers[2] = { (u8*)0xC000, (u8*)0x8000 };
+u8* const g_scrbuffers[2] = { CPCT_VMEM_START, (u8*)0x8000 };
 
 /////////////////////////////////////////////////////////////////////////////////
 // Swaps between front-screen buffer and back-screen buffer. It manipulates 

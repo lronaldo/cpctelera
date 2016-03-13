@@ -101,7 +101,7 @@ void main (void) {
       cpct_setBit(array1, 1, i);
 
       // Print the complete array at the top of the screen
-      printArray((u8*)0xC000, array1, 80, f_getbit); 
+      printArray(CPCT_VMEM_START, array1, 80, f_getbit); 
       
       // Reset again the bit to 0 an iterate
       cpct_setBit(array1, 0, i);
@@ -148,7 +148,7 @@ void main (void) {
       cpct_setBit(array1, 1, i);
 
       // Print the complete array1 again
-      printArray((u8*)0xC000, array1, 80, f_getbit); 
+      printArray(CPCT_VMEM_START, array1, 80, f_getbit); 
     }
 
     //

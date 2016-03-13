@@ -45,7 +45,7 @@
 #include <cpctelera.h>
 
 // We will use main video memory (at 0xC000) and a double buffer (at 0x4000)
-#define VMEM_0       (u8*)0xC000
+#define VMEM_0       CPCT_VMEM_START
 #define VMEM_1       (u8*)0x4000
 #define VMEM_SIZE    0x4000
 

@@ -60,10 +60,10 @@ TKeyStatus checkKeyEvent(cpct_keyID key, TKeyStatus *keystatus) {
 //       *   2   - Play a sound effect on Channel C
 //
 void main(void) {
-   TKeyStatus k_space, k_0, k_1; // Status of the 3 Keys for this example (Space, 1, 2)
-   u8  playing   = 1;            // Flag to know if music is playing or not
-   u8  color     = 1;            // Color to draw charactes (normal / inverse)
-   u8* pvideomem = (u8*) 0xC000; // Pointer to video memory where next character will be drawn
+   TKeyStatus k_space, k_0, k_1;    // Status of the 3 Keys for this example (Space, 1, 2)
+   u8  playing   = 1;               // Flag to know if music is playing or not
+   u8  color     = 1;               // Color to draw charactes (normal / inverse)
+   u8* pvideomem = CPCT_VMEM_START; // Pointer to video memory where next character will be drawn
 
    // All 3 keys are considered to be released at the start of the program
    k_space = k_0 = k_1 = K_RELEASED;
@@ -106,8 +106,8 @@ void main(void) {
 
          // Point to the start of the next character in video memory
          if (++pvideomem >= (u8*)0xC7D0) {
-            pvideomem = (u8*)0xC000; // When we reach the end of the screen, we return..
-            color ^= 1;              // .. to the start, and change the colour
+            pvideomem = CPCT_VMEM_START; // When we reach the end of the screen, we return..
+            color ^= 1;                  // .. to the start, and change the colour
          }
 
          // Check if music has already ended (when looptimes is > 0)

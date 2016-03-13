@@ -57,7 +57,7 @@ void fillupScreen(TTile* tile) {
 
    // Cover all the screen (200 pixels) with tiles
    for (y=0; y < 200; y += tile->height) { 
-      pvideomem = cpct_getScreenPtr((u8*)0xC000, 0, y); // Calculate byte there this pixel line starts
+      pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, 0, y); // Calculate byte there this pixel line starts
 
       // Draw all the tiles for this line
       for (x=0; x < tilesperline; x++) {       

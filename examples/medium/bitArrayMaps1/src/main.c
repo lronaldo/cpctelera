@@ -55,7 +55,7 @@ void drawMessages() {
 
       // Get Location where next message should be drawn using 
       // message properties 0 and 1 (x and y coordinates)
-      pmem = cpct_getScreenPtr(VIDEO_MEM, msg_prop[i][0], msg_prop[i][1]);
+      pmem = cpct_getScreenPtr(CPCT_VMEM_START, msg_prop[i][0], msg_prop[i][1]);
 
       // Draw the i-th message with colours from its properties 2 and 3 (fg, bg)
       cpct_drawStringM1(strings[i], pmem, msg_prop[i][2], msg_prop[i][3]);
@@ -87,8 +87,8 @@ void initialize() {
    
    // Initialize Base Pointer of the map in video memory. This is 
    // the place where the map will start to be drawn (0,0). This
-   // location is (MAP_START_X, MAP_START_Y) with respect to VIDEO_MEM.
-   pmem = cpct_getScreenPtr(VIDEO_MEM, MAP_START_X, MAP_START_Y);
+   // location is (MAP_START_X, MAP_START_Y) with respect to CPCT_VMEM_START.
+   pmem = cpct_getScreenPtr(CPCT_VMEM_START, MAP_START_X, MAP_START_Y);
    map_setBaseMem(pmem);
 
    // Set cursor at the top-left corner of the screen

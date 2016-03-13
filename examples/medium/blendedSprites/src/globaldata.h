@@ -27,7 +27,6 @@
 /// MACROS & CONSTANTS
 ///   Values and operations used everywhere in this application.
 ///
-/// SCR_VMEM:   Pointer to the start of video memory
 /// SCR_WIDTH:
 /// SCR_HEIGHT: Size of the full screen video memory in bytes
 /// BG_WIDTH:
@@ -36,7 +35,6 @@
 ///             of the background image
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
-#define SCR_VMEM   (u8*)0xC000
 #define SCR_WIDTH   80
 #define SCR_HEIGHT 200
 #define BG_HEIGHT  128

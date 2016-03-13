@@ -20,9 +20,6 @@
 #include <cpctelera.h>
 #include "sprites/sprites.h"
 
-// Pointer to the start of default screen video memory
-#define SCR_VMEM  (u8*)0xC000
-
 // Background information
 // Starting screen coordinates of the top-left pixel (in bytes)
 // Width and Height of the background (in tiles)
@@ -49,19 +46,19 @@ void drawFrame() {
   pattern = cpct_px2byteM0 (15, 15);
   
   // Draw top box
-  pvmem = cpct_getScreenPtr(SCR_VMEM, (BACK_X),  (BACK_Y - 8) );
+  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X),  (BACK_Y - 8) );
   cpct_drawSolidBox(pvmem, pattern, 4*BACK_W,  8);
 
   // Draw bottom box
-  pvmem = cpct_getScreenPtr(SCR_VMEM, (BACK_X),  (BACK_Y + 8*BACK_H) );
+  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X),  (BACK_Y + 8*BACK_H) );
   cpct_drawSolidBox(pvmem, pattern, 4*BACK_W,  8);
 
   // Draw left box
-  pvmem = cpct_getScreenPtr(SCR_VMEM, (BACK_X - 4), (BACK_Y - 8) );
+  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X - 4), (BACK_Y - 8) );
   cpct_drawSolidBox(pvmem, pattern,  4, 8*(BACK_H + 2) );
 
   // Draw right box
-  pvmem = cpct_getScreenPtr(SCR_VMEM, (BACK_X + 4*BACK_W),  (BACK_Y - 8));
+  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X + 4*BACK_W),  (BACK_Y - 8));
   cpct_drawSolidBox(pvmem, pattern,  4, 8*(BACK_H + 2) );
 }
 
@@ -82,7 +79,7 @@ void drawBackground() {
       // Point to the video memory byte where tiles of this row should start.
       // X coordinate is always the same (first X coordinate, or BACK_X) and
       // y coordinate increments by 8 with each row.
-      pvideomem = cpct_getScreenPtr(SCR_VMEM, BACK_X, BACK_Y + 8*y);
+      pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, BACK_X, BACK_Y + 8*y);
 
       // Traverse columns of the tile array
       for(x=0; x < BACK_W; ++x) {
@@ -116,10 +113,10 @@ void repaintBackgroundOverSprite(u8 x, u8 y) {
    // and up to 2 tiles downside. However, as our sprite always moves in X, it will
    // always be aligned and will only extend 1 tile downside. So, drawing 4 tiles
    // is enough to be sure that we are erasing the sprite and restoring the background.
-   pvmem = cpct_getScreenPtr(SCR_VMEM, scrx, scry);
+   pvmem = cpct_getScreenPtr(CPCT_VMEM_START, scrx, scry);
    cpct_drawTileAligned4x8_f(G_background[tilex  ][tiley], pvmem    );
    cpct_drawTileAligned4x8_f(G_background[tilex+1][tiley], pvmem + 4);
-   pvmem = cpct_getScreenPtr(SCR_VMEM, scrx, scry + 8);
+   pvmem = cpct_getScreenPtr(CPCT_VMEM_START, scrx, scry + 8);
    cpct_drawTileAligned4x8_f(G_background[tilex  ][tiley+1], pvmem    );
    cpct_drawTileAligned4x8_f(G_background[tilex+1][tiley+1], pvmem + 4);
 }
@@ -157,7 +154,7 @@ void main(void) {
       // Draw the sprite with Mask. Calculate screen byte where to byte it
       // and call drawSpriteMasked to ensure that the sprite is drawn without
       // erasing the background. This is only valid for sprite defined with mask.
-      pvmem = cpct_getScreenPtr(SCR_VMEM, x, y);      
+      pvmem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);      
       cpct_drawSpriteMasked(G_sprite_EMR, pvmem, SPR_W, SPR_H);
 
       for(i=0; i < WAITLOOPS; i++); // Wait for a little while

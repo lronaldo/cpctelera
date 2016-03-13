@@ -28,7 +28,7 @@
 void drawBackground() {
    // Get a pointer to the (x,y) location in the screen where 
    // the background has to be drawn (its upper-left corner)
-   u8* p = cpct_getScreenPtr(SCR_VMEM, BG_X, BG_Y);
+   u8* p = cpct_getScreenPtr(CPCT_VMEM_START, BG_X, BG_Y);
 
    // The sprite of the background is split into 2 spites of half
    // its wide, to bypass the limit of 63-bytes that drawSprite can draw.
@@ -47,7 +47,7 @@ void drawSpriteMixed(  CPCT_BlendMode mode, u8* sprite
                      , u8 x, u8 y, u8 width, u8 height) {
    // Get a pointer to the (x,y) location in the screen where
    // the sprite will be drawn (its upper-left corner)
-   u8* p = cpct_getScreenPtr(SCR_VMEM, x, y);
+   u8* p = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
 
    // Set the blend mode to use before drawing the sprite using blending
    cpct_setBlendMode(mode);
@@ -84,7 +84,7 @@ void drawCurrentSpriteAtRandom() {
 void drawUserInterfaceStatus() {
    // Get a pointer to the (x,y) location in the screen where
    // the name and sprite of the item will be drawn
-   u8 *p = cpct_getScreenPtr(SCR_VMEM, 4, 60);
+   u8 *p = cpct_getScreenPtr(CPCT_VMEM_START, 4, 60);
    
    // Draw the name of the item and its corresponding sprite
    // The sprite has to be drawn 7 characters to the right (7*4 = 28 bytes)
@@ -92,7 +92,7 @@ void drawUserInterfaceStatus() {
    cpct_drawSprite  (g_items[g_selectedItem].sprite , p + 28 , 4, 8);
    
    // Do the same as before to draw the name of the current blending mode
-   p = cpct_getScreenPtr(SCR_VMEM, 52, 60);
+   p = cpct_getScreenPtr(CPCT_VMEM_START, 52, 60);
    cpct_drawStringM0(g_blendModes[g_selectedBlendMode].name, p, 8, 0);
 }
 
@@ -104,23 +104,23 @@ void drawUserInterfaceMessages() {
    u8 *p;   // Pointer to screen video memory
 
    // Draw first two strings at the top-left corner of the screen
-   // (exactly at SCR_VMEM) and 8 characters to the right (8*4 = 32 bytes)
-   cpct_drawStringM0("[Space]"   , SCR_VMEM    , 3, 0);
-   cpct_drawStringM0("Draw Item" , SCR_VMEM+32 , 9, 0);
+   // (exactly at CPCT_VMEM_START) and 8 characters to the right (8*4 = 32 bytes)
+   cpct_drawStringM0("[Space]"   , CPCT_VMEM_START    , 3, 0);
+   cpct_drawStringM0("Draw Item" , CPCT_VMEM_START+32 , 9, 0);
    
    // Get a pointer to the first pixel in the 15th line of the screen
    // And draw there next 2 strings, being the second 8 characters to the right also
-   p = cpct_getScreenPtr(SCR_VMEM, 0, 15);
+   p = cpct_getScreenPtr(CPCT_VMEM_START, 0, 15);
    cpct_drawStringM0("[1] [2]"   , p    , 3, 0);
    cpct_drawStringM0("Select"    , p+32 , 9, 0);
 
    // Repeat same operation as before, but to draw at the start of the 30th line
-   p = cpct_getScreenPtr(SCR_VMEM, 0, 30);
+   p = cpct_getScreenPtr(CPCT_VMEM_START, 0, 30);
    cpct_drawStringM0("[Esc]"     , p    , 3, 0);
    cpct_drawStringM0("Clear"     , p+32 , 9, 0);
 
    // And to same operation again, but to put messages for 
    // selected Item and Blend mode on the 50th line of the screen
-   p = cpct_getScreenPtr(SCR_VMEM, 0, 50);
+   p = cpct_getScreenPtr(CPCT_VMEM_START, 0, 50);
    cpct_drawStringM0("   Item     Blend   ", p, 1, 6);
 }

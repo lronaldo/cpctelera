@@ -18,9 +18,6 @@
 
 #include <cpctelera.h>
 
-// Pointer to the memory location where screen video memory starts by default
-#define SCR_VMEM  (u8*)0xC000
-
 // Funtion Pointer type, to point to memset functions that receive a pointer and 2 16-bit integers
 typedef void (*TMemsetFunc)(void*, u16, u16) __z88dk_callee;
 
@@ -58,9 +55,9 @@ void doSomeClears8(u8 colour, u8 vsyncs) {
    for(i=0; i < 2 ; i++) {
       u8 pattern = cpct_px2byteM0(colour, colour);
       waitNVSYNCs(vsyncs);
-      cpct_memset(SCR_VMEM, pattern, 0x4000);
+      cpct_memset(CPCT_VMEM_START, pattern, 0x4000);
       waitNVSYNCs(vsyncs);
-      cpct_memset(SCR_VMEM,       0, 0x4000);
+      cpct_memset(CPCT_VMEM_START,       0, 0x4000);
    }
 }
 
@@ -74,9 +71,9 @@ void doSomeClears(TMemsetFunc func, u8 colour, u8 vsyncs) {
    for(i=0; i < 2 ; i++) {
       u16 pattern = getColourPattern(colour, colour, colour, colour);
       waitNVSYNCs(vsyncs);
-      func(SCR_VMEM, pattern, 0x4000);
+      func(CPCT_VMEM_START, pattern, 0x4000);
       waitNVSYNCs(vsyncs);
-      func(SCR_VMEM,       0, 0x4000);
+      func(CPCT_VMEM_START,       0, 0x4000);
    }
 }
 

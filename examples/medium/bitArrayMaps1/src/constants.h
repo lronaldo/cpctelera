@@ -32,4 +32,3 @@
 #define  C_YELLOW       1
 #define  C_BLUE         2
 #define  C_RED          3
-#define  VIDEO_MEM    (u8*)0xC000

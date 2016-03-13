@@ -172,7 +172,7 @@ void map_draw() {
 
    // Draw a message down the screen to inform the user
    // that the map is drawing
-   pmem = cpct_getScreenPtr(VIDEO_MEM, 30, 160);
+   pmem = cpct_getScreenPtr(CPCT_VMEM_START, 30, 160);
    cpct_drawStringM1(string, pmem, C_BLACK, C_RED);
 
    // Draw the map tile by tile

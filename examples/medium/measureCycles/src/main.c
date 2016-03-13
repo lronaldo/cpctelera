@@ -29,10 +29,10 @@
 // EXAMPLE: Measuring free microseconds per frame after drawing a sprite
 //
 void main(void) {
-   u8  i;                        // Loop index
-   u8  x=0, y=0;                 // Sprite coordinates (in bytes)
-   u8* pvideomem = (u8*)0xC000;  // Sprite initial video memory byte location (where it will be drawn)
-   u16 ms = 0;                   // Available microseconds until next VSYNC, after all main loop calculations
+   u8  i;                           // Loop index
+   u8  x=0, y=0;                    // Sprite coordinates (in bytes)
+   u8* pvideomem = CPCT_VMEM_START; // Sprite initial video memory byte location (where it will be drawn)
+   u16 ms = 0;                      // Available microseconds until next VSYNC, after all main loop calculations
 
    // First, disable firmware to prevent it from intercepting our palette and video mode settings (and,
    // at the same time, winning some speed not having to process firmware code at every interrupt)

@@ -23,9 +23,6 @@
 #include "modules/palette.h" // Palette functions: fade-in, fade-out and RGB-HW colour conversions
 #include "modules/utils.h"   // Function wait_frames 
 
-// Default video memory location at CPC's start up
-#define SCR_VMEM  (u8*)0xC000
-
 //
 // MAIN: Palette Effects Example
 //
@@ -54,7 +51,7 @@ void main(void) {
       cpct_clearScreen(0x00);   // Clear the screen filling it up with 0's
       
       // Calculate video memory location for next sprite and draw it
-      pvmem = cpct_getScreenPtr(SCR_VMEM, img[i].x, img[i].y);
+      pvmem = cpct_getScreenPtr(CPCT_VMEM_START, img[i].x, img[i].y);
       cpct_drawSprite(img[i].sprite, pvmem, img[i].w, img[i].h);
 
       wait_frames(50);                    // Wait 1 second  ( 50 VSYNCs)
