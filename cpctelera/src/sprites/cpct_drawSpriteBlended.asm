@@ -126,9 +126,10 @@
 ;;       cpct_setDrawSpriteBlendFunction(CPCT_BLEND_LDI);
 ;;
 ;;       // Now print all sprites of the UI at their pre-calculated locations
-;;       cpct_drawSpriteBlended(               VMEM  , 80, 200, background);
-;;       cpct_drawSpriteBlended(SCOREBOARD_LOCATION  , 80,  20, score_board);
-;;       cpct_drawSpriteBlended(LEFT_COLUMN_LOCATION , 10, 100, left_column);
+;;       // Note: assume *LOCATION macros are just absolute video-memory addresses
+;;       cpct_drawSpriteBlended(                 VMEM, 80, 200, background);
+;;       cpct_drawSpriteBlended(  SCOREBOARD_LOCATION, 80,  20, score_board);
+;;       cpct_drawSpriteBlended( LEFT_COLUMN_LOCATION, 10, 100, left_column);
 ;;       cpct_drawSpriteBlended(RIGHT_COLUMN_LOCATION, 10, 100, right_column);
 ;;    }
 ;; (end code)
@@ -137,28 +138,34 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - xx bytes  (+4 bytes)
-;;  ASM-bindints - xx bytes
+;;    C-bindings - 43 bytes
+;;  ASM-bindings - 39 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;  Case      |    microSecs (us)        |    CPU Cycles
-;; ----------------------------------------------------------------
-;;  Best      |                          |                        
-;;  Worst     |                          |                
-;; ----------------------------------------------------------------
-;;  W=2,H=16  |                          |                
-;;  W=4,H=32  |                          |                  
-;; ----------------------------------------------------------------
-;; Asm saving |         -15              |         -60
-;; ----------------------------------------------------------------
+;;  Case           |      microSecs (us)       |         CPU Cycles          |
+;; ---------------------------------------------------------------------------
+;;  Best           | 32 + 21H + (12+B)WH + 10J | 128 + 84H + (48+4B)WH + 40J |
+;;  Worst          |         Best + 10         |         Best + 40           |
+;; ---------------------------------------------------------------------------
+;;  W=2,H=16,B=XOR |        826 /  836         |        3304 /  3344         |
+;;  W=4,H=32,B=XOR |       2526 / 2536         |       10104 / 10144         |
+;; ---------------------------------------------------------------------------
+;;  Asm saving     |          -15              |            -60              |
+;; ---------------------------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
+;;   W = *width* in bytes, H = *height* in bytes
+;;   B = Blend operation nanoseconds, WH = W * H, J = [(H-1)/8]
+;;   Standard Blend operations take 2 nanoseconds except NOP and LDI, which take 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; GET: 15
+;; PRE+POST: 8+8+1 = 17
+;; LOOP: 
+
 ;; Convenient macros to clarify the use of 
-;;   * LD IXL, C 
-;;   * LD C, IXL
+;;   * LD IXL, B 
+;;   * LD B, IXL
 ;;
 .macro ld__ixl_b
    .DW  #0x68DD    ;; ld ixl, b 
@@ -178,8 +185,13 @@ height_loop:
    ;; Copy and blend 1 complete sprite row
 width_loop:
    ld     a,(de)   ;; [2] Get next background byte into A
+
+  ;; Blending Function. This is a 1-byte Z80 operation that should blend
+  ;; the byte in A (background) with the byte from the sprite at (HL)
+  ;; This function is modified by <cpct_setDrawSpriteBlendFunction>.
 _cpct_dsb_blendFunction::
-   xor (hl)        ;; [2] Blend background with Sprite
+   xor (hl)        ;; [2] Blend background with Sprite || This byte will be modified to change blend function
+
    ld  (de), a     ;; [2] Save background blended with sprite
    inc   de        ;; [2] | Point to next byte 
    inc   hl        ;; [2] |  (sprite and memory)
