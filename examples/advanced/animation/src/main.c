@@ -40,7 +40,7 @@ void initializeCPC() {
 
    // Draw Sky and Fremos Logo
    c0 = cpct_px2byteM0(4, 4);   // c0 = 2 consecutive pixels of firmware colour 4 (blue)
-   cpct_drawSolidBox((void*)0xC000, c0, 40, 60); // Boxes cannot be wider than 64 bytes,
+   cpct_drawSolidBox(CPCT_VMEM_START, c0, 40, 60); // Boxes cannot be wider than 64 bytes,
    cpct_drawSolidBox((void*)0xC028, c0, 40, 60); // ... so we use 2 boxes of 40 bytes wide.
    cpct_drawSprite(gc_LogoFremos, (void*)0xC0FC, 55, 20);
 

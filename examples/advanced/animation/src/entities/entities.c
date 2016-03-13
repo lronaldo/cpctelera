@@ -175,11 +175,11 @@ i8 moveEntityY (TEntity* ent, i8 my) {
       // Move umy pixels up, taking care not to pass 0 limit
       if (umy <= ent->y) {
          ent->y        -= umy;
-         ent->videopos  = cpct_getScreenPtr((u8*)0xC000, ent->x, ent->y);
+         ent->videopos  = cpct_getScreenPtr(CPCT_VMEM_START, ent->x, ent->y);
          moved          = my;
       } else if ( ent->y ) {
          // movement tryied to pass 0 limit, adjusting to 0 
-         ent->videopos  = (u8*)0xC000 + ent->x;
+         ent->videopos  = CPCT_VMEM_START + ent->x;
          moved          = -ent->y;
          ent->y         = 0;
       }
@@ -204,7 +204,7 @@ i8 moveEntityY (TEntity* ent, i8 my) {
       }
       if (moved) {
          // Recalculating video pos when y has been changed
-         ent->videopos = cpct_getScreenPtr((u8*)0xC000, ent->x, ent->y);
+         ent->videopos = cpct_getScreenPtr(CPCT_VMEM_START, ent->x, ent->y);
       }
    }
 
@@ -270,7 +270,7 @@ void updateEntity(TEntity *ent) {
             moveEntityX(ent, -1);
          }
       } else if (anim->frame_id == 0xFF) {
-         cpct_drawSolidBox((u8*)0xC000, 0xFF, 4, 8);
+         cpct_drawSolidBox(CPCT_VMEM_START, 0xFF, 4, 8);
       } else {
          ent->status = es_stop;
       }
