@@ -22,6 +22,7 @@
 ;; Function: cpct_drawSpriteBlended
 ;;
 ;;    Draws sprites blending them with current contents of screen video memory.
+;; It uses XOR by default, but many other blending modes are available.
 ;;
 ;; C Definition:
 ;;    void <cpct_drawSpriteBlended> (void* *memory*, <u8> *height*, <u8> *width*, void* *sprite*) __z88dk_callee;
@@ -30,7 +31,7 @@
 ;;  (2B DE) memory - Destination video memory pointer
 ;;  (1B C ) height - Sprite Height in bytes (>0)
 ;;  (1B B ) width  - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
-;;  (2B HL) sprite - Source Sprite Pointer (array with pixel and mask data)
+;;  (2B HL) sprite - Source Sprite Pointer (array with pixel data)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteBlended_asm
@@ -59,6 +60,10 @@
 ;; not only video memory.
 ;;
 ;; Known limitations:
+;;  * This function could be used from ROM, but it will only perform a XOR
+;; blending operation. Blending operation will not be possible to change 
+;; on ROM, as it requires to change a byte of the code. That can only be
+;; performed when this function is on RAM.
 ;;  * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
@@ -71,12 +76,19 @@
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
 ;;
+;; Blending modes:
+;;    This function performs, *by default, a XOR* blending operation. However,
+;; This function can perform many blending operations. Consult all available
+;; blending modes at <CPCT_BlendMode> documentation.
+;;
+;;    Standard modes included: XOR (default), OR, AND, ADD, ADC, SUB, SBC, LDI and NOT.
+;;
 ;; Details:
 ;;    This function blends a generic WxH bytes sprite from memory to a 
 ;; video-memory location (either present video-memory or software / hardware  
 ;; backbuffer). It performs similar to <cpct_drawSprite> but instead
 ;; of copying bytes and overwrite video-memory, it blends them with
-;; present contents of video-memory destination.
+;; present contents of video-memory destination (background).
 ;;
 ;;    The process is as follows. The function gets 1 byte from the destination
 ;; video-memory and 1 byte from the sprite. It then performs a blending 
@@ -87,8 +99,7 @@
 ;;    The blending operation that this function performs is selectable. By 
 ;; default, this operation will be a XOR between both bytes. To select a
 ;; different operation mode, the function <cpct_setDrawSpriteBlendFunction>
-;; should be called. Available blending modes are defined in the <CPCT_BlendModes>
-;; enumeration and include: XOR, OR, AND, ADD, ADC, SUB, SBC, LDI and NOT.
+;; should be called. 
 ;;
 ;; Use examples:
 ;;    This function may be used directly to draw a sprite in video-memory:
@@ -122,7 +133,7 @@
 ;;    // Draw the user interface of the application, that is composed
 ;;    // of several sprites 
 ;;    void drawUserInterface() {
-;;       // First, set LDI blending mode 
+;;       // First, select LDI as blending mode for cpct_drawSpriteBlended
 ;;       cpct_setDrawSpriteBlendFunction(CPCT_BLEND_LDI);
 ;;
 ;;       // Now print all sprites of the UI at their pre-calculated locations
@@ -143,19 +154,21 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;;  Case           |      microSecs (us)       |         CPU Cycles          |
-;; ---------------------------------------------------------------------------
-;;  Best           | 32 + 21H + (12+B)WH + 10J | 128 + 84H + (48+4B)WH + 40J |
-;;  Worst          |         Best + 10         |         Best + 40           |
-;; ---------------------------------------------------------------------------
-;;  W=2,H=16,B=XOR |        826 /  836         |        3304 /  3344         |
-;;  W=4,H=32,B=XOR |       2526 / 2536         |       10104 / 10144         |
-;; ---------------------------------------------------------------------------
-;;  Asm saving     |          -15              |            -60              |
-;; ---------------------------------------------------------------------------
+;;  Case         |      microSecs (us)       |         CPU Cycles          |
+;; -------------------------------------------------------------------------
+;;  Best         | 32 + 21H + (12+B)WH + 10J | 128 + 84H + (48+4B)WH + 40J |
+;;  Worst        |         Best + 10         |         Best + 40           |
+;; -------------------------------------------------------------------------
+;;  W=2,H=16,B=2 |        826 /  836         |        3304 /  3344         |
+;;  W=4,H=32,B=2 |       2526 / 2536         |       10104 / 10144         |
+;; -------------------------------------------------------------------------
+;;  Asm saving   |          -15              |            -60              |
+;; -------------------------------------------------------------------------
 ;; (end code)
-;;   W = *width* in bytes, H = *height* in bytes
-;;   B = Blend operation nanoseconds, WH = W * H, J = [(H-1)/8]
+;;   *W* = *width* in bytes, *H* = *height* in bytes
+;;
+;;   *B* = Blend operation nanoseconds, *WH* = W * H, *J* = [(H-1)/8]
+;;
 ;;   Standard Blend operations take 2 nanoseconds except NOP and LDI, which take 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
