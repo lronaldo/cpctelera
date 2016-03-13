@@ -50,7 +50,7 @@ void drawSpriteMixed(  CPCT_BlendMode mode, u8* sprite
    u8* p = cpct_getScreenPtr(SCR_VMEM, x, y);
 
    // Set the blend mode to use before drawing the sprite using blending
-   cpct_setDrawSpriteBlendFunction(mode);
+   cpct_setBlendMode(mode);
 
    // Draw the sprite to screen with blending
    cpct_drawSpriteBlended(p, height, width, sprite);
