@@ -21,24 +21,29 @@
 ;;
 ;; Function: cpct_setBlendMode
 ;;
-;; TODO (xor by default)
+;;    Establishes the blending mode that <cpct_drawSpriteBlended> will use from
+;; now on.
 ;;
 ;; C Definition:
-;;    void <cpct_setBlendMode> (u8 function) __z88dk_fastcall;
+;;    void <cpct_setBlendMode> (<CPCT_BlendMode> mode) __z88dk_fastcall;
 ;;
-;; Input Parameters (6 bytes):
-;;  (1B L) function - Opcode of the function to be applied to blend bytes
+;; Input Parameters (1 bytes):
+;;  (1B L) mode - New blending mode to be used for <cpct_drawSpriteBlended>
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_setBlendMode
+;;    > call cpct_setBlendMode_asm
 ;;
 ;; Parameter Restrictions:
-;;
-;; TODO: REVIEW
+;;    * *mode* it could theoretically be any 8-bits value, but only some values
+;; will be really useful, whereas some others will have unexpected results, even
+;; making the program crash. In C it is restricted by the <CPCT_BlendMode> enumeration
+;; to prevent errors. The value of this parameter is a Z80 opcode that will be 
+;; inserted into the blending function as blend operation.
 ;;
 ;; Known limitations:
-;;
-;; TODO: REVIEW
+;;    * This function will produce no result if <cpct_drawSpriteBlended> is allocated 
+;; in ROM space. This function modifies <cpct_drawSpriteBlended> code, therefore it
+;; requires it to be in RAM space.
 ;;
 ;; Details:
 ;;
