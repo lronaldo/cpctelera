@@ -30,7 +30,7 @@ u8* incrementedVideoPos(u8* pvideomem, u8 inc) {
    // ... a character can be writen (25 character lines go from 0xC000 to 0xC7D0)
    // If we exceed the range, restore the pointer
    if (pvideomem > (u8*)0xC7D0)
-      pvideomem = (u8*)0xC000;
+      pvideomem = (u8*)CPCT_VMEM_START;
 
    // Return the new incremented position of video memory pointer
    return pvideomem;
@@ -89,8 +89,8 @@ void drawCharacters(u8** pvideomem, u8 maxtimes, u8 mode, u8* fg_colour, u8* bg_
 // Drawing Characters example: MAIN
 //
 void main(void) {
-   u8* pvideomem  = (u8*)0xC000;    // Pointer to video memory
-   u8  colours[6] = {0};            // 6 variables for 3 pairs of foreground / background colour
+   u8* pvideomem  = CPCT_VMEM_START; // Pointer to video memory
+   u8  colours[6] = {0};             // 6 variables for 3 pairs of foreground / background colour
 
    // Disable firmware to prevent it from restoring our video memory changes 
    // ... and interfering with drawChar functions

@@ -68,7 +68,7 @@ void main(void) {
       cpct_setVideoMode(0);
 
       // Let's start drawing strings at the start of video memory (0xC000)
-      pvideomem = (u8*)0xC000;
+      pvideomem = CPCT_VMEM_START;
 
       // Draw 25 strings, 1 for each character line on the screen
       for (times=0; times < 25; times++) {
@@ -96,7 +96,7 @@ void main(void) {
       cpct_setVideoMode(1);
       
       // Let's start drawing strings at the start of video memory (0xC000)
-      pvideomem = (u8*)0xC000;
+      pvideomem = CPCT_VMEM_START;
 
       // Draw 25 strings, 1 for each character line on the screen    
       for (times=0; times < 25; times++) {
@@ -131,7 +131,7 @@ void main(void) {
       cpct_setVideoMode(2);
 
       // Let's start drawing strings at the start of video memory (0xC000)    
-      pvideomem = (u8*)0xC000;
+      pvideomem = CPCT_VMEM_START;
 
       // Draw 25 strings, 1 for each character line on the screen    
       for (times=0; times < 25; times++) {

@@ -23,9 +23,6 @@
 // Number of loops to wait between each sprite drawing
 #define WAITLOOPS 150000
 
-// Pointer to the memory location where screen video memory starts by default
-#define SCR_VMEM  (u8*)0xC000
-
 // Sizes of the sprites (in bytes)
 //  Logo         = (160x191 pixels in Mode 1 => 40x191 bytes)
 //  Banner parts = ( 80x96  pixels in Mode 0 => 40x96  bytes)
@@ -54,11 +51,11 @@ void drawBanner() {
     // Remember: in Mode 0, 1 byte = 2 pixels
 
     // Draw left part at screen byte coordinates  ( 0, 52) (pixel coordinates ( 0, 52))
-    pvideo_s1 = cpct_getScreenPtr(SCR_VMEM,  0, 52);
+    pvideo_s1 = cpct_getScreenPtr(CPCT_VMEM_START,  0, 52);
     cpct_drawSprite(G_CPCt_left,  pvideo_s1, BANNER_W, BANNER_H);
 
     // Draw right part at screen byte coordinates (40, 52) (pixel coordinates (80, 52))
-    pvideo_s2 = cpct_getScreenPtr(SCR_VMEM, 40, 52);
+    pvideo_s2 = cpct_getScreenPtr(CPCT_VMEM_START, 40, 52);
     cpct_drawSprite(G_CPCt_right, pvideo_s2, BANNER_W, BANNER_H);
 }
 
@@ -80,7 +77,7 @@ void drawLogo() {
     // Remember: in Mode 1, 1 byte = 4 pixels    
 
     // Draw the sprite at screen byte coordinates (20, 4) (pixel coordinates (80, 4))
-    pvideo = cpct_getScreenPtr(SCR_VMEM, 20, 4);
+    pvideo = cpct_getScreenPtr(CPCT_VMEM_START, 20, 4);
     cpct_drawSprite(G_CPCt_logo, pvideo, LOGO_W, LOGO_H);
 }
 

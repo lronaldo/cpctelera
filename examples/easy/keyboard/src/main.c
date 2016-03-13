@@ -65,7 +65,7 @@ void main(void) {
       else if (cpct_isKeyPressed(Key_CursorDown)  && y < (SCR_H - SP_H) ) ++y;
       
       // Get video memory byte for coordinates x, y of the sprite (in bytes)
-      pvideomem = cpct_getScreenPtr((u8*)0xC000, x, y);
+      pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
 
       // Draw the sprite in the video memory location got from coordinates x, y
       cpct_drawSprite(G_spriteLogoCT, pvideomem, SP_W, SP_H);

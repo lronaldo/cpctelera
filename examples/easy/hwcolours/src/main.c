@@ -18,7 +18,6 @@
 
 #include <cpctelera.h>
 #include <stdio.h>
-//#include <string.h>
 
 //
 // MAIN PROGRAM:
