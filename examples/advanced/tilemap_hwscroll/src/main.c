@@ -21,7 +21,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////
 // USEFUL MACROS
-#define VIDEOMEM (u8*)0xC000
 #define MAXSCROLL 80
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -108,13 +107,13 @@ void initialize_CPC() {
    cpct_etm_setTileset2x4(g_tileset);   
 
    // Clean up the screen 
-   cpct_memset(VIDEOMEM, 0x00, 0x4000);
+   cpct_memset(CPCT_VMEM_START, 0x00, 0x4000);
 
    // Draw the full tilemap for the first time
    cpct_etm_drawTileBox2x4(0, 0,                       // (X, Y) upper-left corner of the tilemap
                            SCR_TILE_WIDTH, MAP_HEIGHT, // (Width, Height) of the Box to be drawn (all the screen)
                            MAP_WIDTH,                  // Width of the full tilemap (which is wider than the screen)
-                           VIDEOMEM,                   // Pointer to the start of video memory (upper-left corner of the
+                           CPCT_VMEM_START,                   // Pointer to the start of video memory (upper-left corner of the
                                                        // ...tilemap in the screen)
                            g_tilemap);                 // Pointer to the first tile of the tilemap to be drawn (upper-left
                                                        // ... corner of the tilemap viewport window)
@@ -124,7 +123,7 @@ void initialize_CPC() {
 // Main application's code
 //
 void main(void) {
-   TScreenTilemap scr = { VIDEOMEM, g_tilemap, 0 }; // Screen tilemap properties
+   TScreenTilemap scr = { CPCT_VMEM_START, g_tilemap, 0 }; // Screen tilemap properties
    i16 scroll_offset;                                // Requested scroll offset
 
    initialize_CPC(); // Initialize the machine and set up all necessary things

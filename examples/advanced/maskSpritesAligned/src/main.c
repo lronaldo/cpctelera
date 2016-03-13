@@ -21,7 +21,6 @@
 #include "sprites/sprites.h"
 
 // Some useful constants
-#define SCR_VMEM        (u8*)0xC000
 #define MAP_WIDTH_TILES          40
 #define MAP_HEIGHT_TILES         50
 #define ALIEN_WIDTH_BYTES         6
@@ -55,7 +54,7 @@ void initialization (){
 
    // Draw the background tilemap
    cpct_etm_drawTilemap2x4_f(MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 
-                             SCR_VMEM, g_background);  
+                             CPCT_VMEM_START, g_background);  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -107,11 +106,11 @@ void main(void) {
 
       // Redraw a tilebox over the alien to erase it (redrawing background over it)
       cpct_etm_drawTileBox2x4(a->tx, a->ty, ALIEN_WIDTH_TILES, ALIEN_HEIGHT_TILES, 
-                              MAP_WIDTH_TILES, SCR_VMEM, g_background);
+                              MAP_WIDTH_TILES, CPCT_VMEM_START, g_background);
       // Move the alien and calculate it's new location on screen
       a->tx += a->vx; 
       a->ty += a->vy;
-      pscra = cpct_getScreenPtr(SCR_VMEM, TILEWIDTH_BYTES*a->tx, TILEHEIGHT_BYTES*a->ty);
+      pscra = cpct_getScreenPtr(CPCT_VMEM_START, TILEWIDTH_BYTES*a->tx, TILEHEIGHT_BYTES*a->ty);
       // Draw the alien in its new location
       cpct_drawSpriteMaskedAlignedTable(g_alien, pscra, ALIEN_WIDTH_BYTES, 
                                         ALIEN_HEIGHT_BYTES, cpct_transparentMaskTable00M0);

@@ -24,7 +24,6 @@
 //
 
 // Constant values
-#define SCR_VMEM            (u8*)0xC000
 #define SCR_WIDTH_PIXELS      160
 #define SCR_HEIGHT_PIXELS     200
 #define PIXELS_PER_BYTE         2
@@ -126,11 +125,11 @@ void drawEntity(TEntity *e) {
    // Erase the sprite drawing a 0 colour (background) box
    // Horizontal location is in pixels, so we divide it by the number of pixels per byte
    // (2 in mode 0) to give the screen location in bytes, as cpct_getScreenPtr requires
-   pscr = cpct_getScreenPtr(SCR_VMEM, e->x / PIXELS_PER_BYTE, e->y);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, e->x / PIXELS_PER_BYTE, e->y);
    cpct_drawSolidBox(pscr, 0x00, e->w, e->h);
    
    // Draw the sprite at its present location on the screen
-   pscr = cpct_getScreenPtr(SCR_VMEM, e->nx / PIXELS_PER_BYTE, e->ny);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, e->nx / PIXELS_PER_BYTE, e->ny);
    cpct_drawSprite(e->sprite, pscr, e->w, e->h);
 
    // Update sprite coordinates

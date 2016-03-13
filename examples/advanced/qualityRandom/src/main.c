@@ -19,8 +19,6 @@
 #include <cpctelera.h>
 #include <stdio.h>
 
-#define VMEM (u8*)0xC000
-
 void initializeRandomGenerators() {
    cpct_setRandomSeedUniform_u8(0x55);
    cpct_setSeed_glfsr16(0x1120);
@@ -32,7 +30,7 @@ u8 mixedRandomGenerator() {
 }
 
 void putpixel(u16 x, u8 y, u8 val) {
-   u8* vram = cpct_getScreenPtr(VMEM, x >> 3, y + 8);
+   u8* vram = cpct_getScreenPtr(CPCT_VMEM_START, x >> 3, y + 8);
    u8  byte = *vram;
    u8  pen  = val << (7 - (x & 7));
    *vram = byte & (pen ^ 0xFF) | pen;
@@ -42,7 +40,7 @@ void drawPixelCount(u16 pixels) {
    if (! (pixels & 15) ) {
       char str[7];
       sprintf(str, "%6u", pixels);
-      cpct_drawStringM2(str, VMEM+26, 1);
+      cpct_drawStringM2(str, CPCT_VMEM_START+26, 1);
   }
 }
 
@@ -54,7 +52,7 @@ void main(void) {
    cpct_setVideoMode(2);
    initializeRandomGenerators();
 
-   cpct_drawStringM2("Random numbers generated:", VMEM, 1);
+   cpct_drawStringM2("Random numbers generated:", CPCT_VMEM_START, 1);
    while(1) {
       u8 y = mixedRandomGenerator();
       putpixel(last_y, y>>1, 1);

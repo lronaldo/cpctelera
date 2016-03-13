@@ -18,8 +18,6 @@
 
 #include <cpctelera.h>
 
-// Pointer to the start of video memory
-#define VIDEO_MEM (u8*)0xC000
 // Offset from the start of a character row to the next in video memory
 #define ROW_OFFSET 0x50
 
@@ -43,7 +41,7 @@ void myInterruptHandler() {
 // Print some messages on the screen about this example
 //
 void printMessages() {
-   u8* pvm = VIDEO_MEM;
+   u8* pvm = CPCT_VMEM_START;
    cpct_drawStringM1_f("Interrupt Handler Example", pvm, 0, 3);
 
    pvm += 3 * ROW_OFFSET;
