@@ -1,0 +1,63 @@
+#!/bin/sh
+
+VERSION="1.3.2"
+
+if test -n "$CC"; then
+    CC="$CC"
+    echo "Forcing compiler to be $CC"
+else
+    CC="gcc"
+fi
+
+ARCHFLAGS=""
+if test -n "$CFLAGS"; then
+    ARCHFLAGS="$ARCHFLAGS $CFLAGS"
+    echo "Adding $ARCHFLAGS to ARCHFLAGS"
+fi
+
+ARCHLIBS=""
+if test -n "$LDFLAGS"; then
+    ARCHLIBS="$ARCHLIBS $LDFLAGS"
+    echo "Adding $ARCHLIBS to ARCHLIBS"
+fi
+
+prefix=/usr/local
+
+for opt in "$@" ; do
+	case $opt in
+	--prefix=*)
+		prefix=`echo $opt | sed -n 's/--prefix=\(.*\)/\1/p'`
+		;;
+	--package-prefix=*)
+		packageprefix=`echo $opt | sed -n 's/--package-prefix=\(.*\)/\1/p'`
+		;;
+	*)
+		echo "configure parameter error"
+		echo ""
+		echo "valid options are:"
+		echo "--prefix dir           install pipemeter to prefix 'dir'"
+ 		echo "--package-prefix dest  pretend to install to the prefix,"
+		echo "                       but copy files to 'dest/prefix' on make install"
+		echo "Setting environment variables CFLAGS and LDFLAGS lets you add"
+		echo "compile time options for your architecture. CC variable choose the"
+		echo "compiler."
+		exit
+		;;
+	esac
+done
+
+if test ! -z "$packageprefix" ; then
+    prefix="$packageprefix/$prefix"
+fi
+
+sed -e "s|{PREFIX}|$prefix|g" -e "s|{VERSION}|$VERSION|g" \
+    < Makefile.in > Makefile
+
+echo "Would install xdms binary to directory $prefix/bin."
+echo ""
+echo "Configure succesful."
+
+
+sed -e "s|{CC}|$CC|" -e "s|{ARCHFLAGS}|$ARCHFLAGS|" \
+    -e "s|{ARCHLIBS}|$ARCHLIBS|" -e "s|{VERSION}|$VERSION|" \
+    < src/Makefile.in > src/Makefile

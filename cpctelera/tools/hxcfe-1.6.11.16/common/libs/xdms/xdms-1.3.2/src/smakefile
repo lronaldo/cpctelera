@@ -1,0 +1,52 @@
+
+
+#  xDMS  makefile for SAS/C
+
+
+OBJS= u_heavy.o xdms.o u_deep.o u_init.o u_quick.o u_medium.o u_rle.o \
+      tables.o pfile.o maketbl.o getbits.o crc_csum.o
+
+SC = sc
+
+CFLAGS = OPTIMIZE OPTIMIZERTIME NOICONS ANSI STRICT
+
+xdms: $(OBJS)
+	$(SC) link to xdms $(OBJS)
+
+getbits.o: getbits.c cdata.h getbits.h
+	$(SC) $(CFLAGS) getbits.c
+
+tables.o: tables.c cdata.h
+	$(SC) $(CFLAGS) tables.c
+
+maketbl.o: maketbl.c cdata.h maketbl.h
+	$(SC) $(CFLAGS) maketbl.c
+
+crc_csum.o: crc_csum.c cdata.h crc_csum.h
+	$(SC) $(CFLAGS) crc_csum.c
+
+u_rle.o: u_rle.c cdata.h u_rle.h
+	$(SC) $(CFLAGS) u_rle.c
+
+u_quick.o: u_quick.c cdata.h u_quick.h getbits.h
+	$(SC) $(CFLAGS) u_quick.c
+
+u_medium.o: u_medium.c cdata.h u_medium.h getbits.h tables.h cdata.h
+	$(SC) $(CFLAGS) u_medium.c
+
+u_deep.o: u_deep.c cdata.h u_deep.h getbits.h
+	$(SC) $(CFLAGS) u_deep.c
+
+u_heavy.o: u_heavy.c cdata.h u_heavy.h getbits.h maketbl.h
+	$(SC) $(CFLAGS) u_heavy.c
+
+u_init.o: u_init.c cdata.h u_init.h u_quick.h u_medium.h u_deep.h u_heavy.h
+	$(SC) $(CFLAGS) u_init.c
+
+xdms.o: xdms.c cdata.h pfile.h crc_csum.h
+	$(SC) $(CFLAGS) xdms.c
+
+pfile.o: pfile.c cdata.h u_rle.h u_quick.h u_medium.h u_deep.h \
+         u_heavy.h u_init.h crc_csum.h pfile.h
+	$(SC) $(CFLAGS) pfile.c
+

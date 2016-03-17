@@ -59,6 +59,7 @@ HEX2BIN_PATH := $(CPCT_PATH)tools/hex2bin-2.0/bin/
 IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.13/bin/
 2CDT_PATH    := $(CPCT_PATH)tools/2cdt/bin/
 SCRIPTS_PATH := $(CPCT_PATH)tools/scripts/
+HFE_PATH     := $(CPCT_PATH)tools/hxcfe-1.6.11.16/
 
 # PATHs FOR CPCTELERA SOURCES AND LIBRARY FILE
 CPCT_SRC := $(CPCT_PATH)src
@@ -74,6 +75,7 @@ HEX2BIN  := $(HEX2BIN_PATH)hex2bin
 IDSK     := $(IDSK_PATH)iDSK
 2CDT     := $(2CDT_PATH)2cdt
 BIN2C    := $(SCRIPTS_PATH)cpct_bin2c
+HFE	     := $(HFE_PATH)hxcfloppyemulator_convert.exe
 
 ## SHELL TOOLS ALIASES
 TOUCH := touch

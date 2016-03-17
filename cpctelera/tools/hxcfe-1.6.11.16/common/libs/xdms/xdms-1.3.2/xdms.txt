@@ -1,0 +1,295 @@
+xDMS - extracting DMS disk image files
+--------------------------------------
+
+Introduction:
+-------------
+
+    Some time ago I started using UAE and Fellow Amiga emulators in the PC,
+while  still  using  my Amiga.  Both emulators are very nice, and I started
+testing some of my old games and demos with it.  But a thing annoyed me.  I
+have  some  CDs with demos and other software, with hundreds of disk images
+compressed  with  DMS.   DMS  was  always the Amiga 'de facto' standard for
+storing  copies of non-dos disks, as used by most games and demos.  But the
+emulators  required  the  Amiga  software  to be in uncompressed disk image
+format  (now  known as .ADF) or disk images compressed with gzip (ADZ).  To
+use  my  DMS  archives  in  the emulators I had to uncompress them with DMS
+inside  the  emulation,  saving  it as an uncompressed disk image in the PC
+hard  disk.   It  was  very  boring, and also a waste of time and hard disk
+space,  since  I  could not leave the files into the CDs.  I thought a much
+better  solution  would  be  to  add  direct  support  for DMS files in the
+emulators itselves, in the same way as they support gzip compressed images.
+But  as  DMS  uses  a proprietary format, I thought DMS support in the near
+future would be unlikely.  So I decided to do something myself and began to
+study  the  inner workings of DMS.  After some days of hard work, I wrote a
+portable  DMS  unpacker,  xDMS.   xDMS  is  more  useful for users of Amiga
+emulators, but can also be useful for actual Amiga users too.
+
+
+
+xDMS Features:
+--------------
+
+  Supports   decompression   of   files  compressed  using  all  known  DMS
+compression  modes,  including  old  and  obsolete ones, and also encrypted
+files, for 100% compatibility.
+  Can  test  DMS  files integrity, view file informations and show attached
+Banners and FILEID.DIZ .
+  Can generate standard disk images and compressed disk images, using gzip,
+if you want to store your files in ADF or ADZ formats.
+  Can  extract  the  files  contained  inside  the  DMS  archives,  if  the
+compressed disk is an AmigaDOS disk, using readdisk made by Bernd Schmidt.
+  Can  process  multiple files in batch with a single command, and also use
+stdin and stdout for input and output of data.
+
+
+
+Installation:
+------------
+
+  This  archive  contains  xDMS  in  binary  executable format for AmigaOS,
+MS-DOS  and  Linux/Intel/ELF,  and also its source code.  If the system you
+use  is  one  of these, you can just copy the binary file to a directory in
+your  path.   If  you  use  another  system,  you will need to compile xDMS
+yourself.   xDMS  was written in ANSI C and should work with most ANSI C or
+C++  compilers and platforms with minor or no changes.  It was tested under
+Linux  with  GCC,  MS-DOS  with DJGPP and Amiga with SAS/C and worked well,
+without  warnings.   To  compile it with GCC or DJGPP you can just use make
+with  the supplied Makefile.  For other compilers you may have to modify it
+slightly.   A  smakefile  for  SAS/C  is also supplied.  After a successful
+compilation  you  can  install  the  generated executable somewhere in your
+path.  You also need to install gzip and readdisk if you want to be able to
+create  gzip  compressed  disk  images and extract files from DMS.  gzip is
+available  in  most public domain software libraries.  Readdisk is supplied
+with UAE.  You probably already have both.
+
+
+
+Usage:
+------
+
+  xDMS  is  a  shell  utility program.  When executed without arguments, it
+shows an usage screen.  The template of xDMS is the following:
+
+    xdms [options] <command> {<dms_file[.dms]> [+output]}
+
+Arguments inside [] are optional. Arguments inside <> are required.
+Arguments inside {} can be used one or several times.
+
+A command is indicated by a letter and can be one of the following:
+
+     t : Test DMS archives
+     u : Unpack DMS archives to disk images
+     z : Unpack to disk images and compress it with gzip
+     x : Extract files inside DMS archives using readdisk
+     v : View DMS archives information
+     f : View full information
+     d : Show attached FILEID.DIZ
+     b : Show attached Banner
+
+
+  If  the  supplied  input  DMS  file  name  doesn't  have  a  .DMS or .dms
+extension, a default .dms will be appended to it.
+  The  output argument is optional and specifies a file name or a directory
+for  each  unpacked  file.   If  the output filename is not supplied, it is
+generated  from  the  input  filename.  If the generated file is a standard
+disk  image  it  will have the .adf extension.  If it is a compressed image
+the  extension  will  be  .adz  .   If  you  supply an output file name, no
+extension  will  be  added.   By default, files are unpacked to the current
+directory,  unless  you specify another directory with the output file name
+or use the -d option.
+  Commands  z  and  x  respectively  need gzip and readdisk instaled in the
+current path, or it will fail.
+  When  extracting files with x option, xDMS will call readdisk and it will
+reconstruct  the  tree  of  files  and directories contained inside the DMS
+compressed  disk  image,  starting in a directory with the same name as the
+volume  name  of  the  disk in the DMS file.  This command can fail if xDMS
+can't  execute  readdisk,  or if the dms compressed disk is not an AmigaDOS
+disk.   The current version of readdisk supplied with UAE only supports old
+OFS  Kickstart  1.x  compatible  disks,  reporting any of the newer formats
+introduced  with  AmigaOS 2.0 or newer as non-dos disks, while they actualy
+are.
+  The  v  commands  show  some  information  contained in DMS files, as the
+version  of  DMS  that  created it, the type of the disk, date of creation,
+number  of  tracks,  etc.   The  f  command  also  shows  additional tracks
+informations.
+  The  b command shows the banner, if the file contains one.  A banner is a
+text  that  is  displayed  when  DMS  unpacks  a  file and usually contains
+informations about the group/BBS/person that made it.
+  The  f  command  shows the FILEID.DIZ, if found in the DMS.  It is a text
+that identifies what the DMS file contains.
+  You can also supply as input filename stdin and/or +stdout as output.  in
+this case xDMS will read the data from the standard input and/or send it to
+the standard output.
+  You  can  supply  multiple  input  and optional output files and use wild
+cards.   When  using  wildcards,  the +output argument will affect only the
+last  file name expanded from the wildcard.  To supply a global destination
+directory  you  must  use  the -d option.  All commands and options are not
+case sensitive.
+
+You can also supply one or more (or none) of the following options:
+
+    -f : Override errors (to salvage broken data tracks)
+    -q : Quiet
+    -v : Verbose
+    -d <destdir>  : Set destination directory
+    -p <password> : Decrypt encrypted archives using password
+
+
+  When  more than one option is supplied they must be separated.  You can't
+use something like -qd dir .
+  The  quiet  option  suppresses  all  messages  usually  emited  by  xDMS,
+including error messages.  It is mostly to be used when xDMS is called from
+inside  emulators  or  some type of front-end.  The program that calls xDMS
+can  verify  if  the  operation  was successful checking the return code of
+xDMS.   It  will  be zero if the operation was successful or non-zero if it
+failed for one or more files.
+  The verbose option makes xDMS display more messages than it usually does,
+including  a  progress  indicator  when unpacking files.  This indicator is
+only useful if you have a slow computer.
+  The  -d  option specifies a global destination directory.  This directory
+name  is  inserted  before  the name of any output file or output directory
+supplied with +output in the command line.
+  The  -p  option  uses  a  password  to  decrypt the dms files if they are
+encrypted.   DMS uses a very lame encryption algorithm that could be easyly
+cracked.  In fact, if the file is encrypted, and contains a banner, you can
+unpack it with any password.
+
+
+Some examples:
+
+    xdms u foo.dms
+
+This  will  unpack the file foo.dms in the current directory and save it as
+foo.adf, also in the current directory.
+
+
+    xdms -v -d /tmp/tst u foo +bar.dsk
+
+This  will  unpack the file foo.dms in the current directory and save it as
+/tmp/tst/bar.dsk  .   Aditional  messages  and a progress indicator will be
+displayed.
+
+    xdms f ram:Hardwired1.dms   (in the Amiga or inside Amiga emu)
+
+This  will  show  informations about the file Hardwired1.dms in Amiga's Ram
+Disk, including tracks information.
+
+    xdms -p treva u tst1 tst2 +tstdir/ttt tst3.DMS +stdout >tora
+
+This  will (try to) unpack the files tst1.dms, tst2.dms and tst3.DMS in the
+current directory.  If any of them is encrypted xDMS will try to decrypt it
+using  the  password  "treva".   tst1.dms  will  be  unpacked  as tst1.adf,
+tst2.dms  as  tstdir/ttt  and  tst3.DMS  will be unpacked to stdout that is
+redirected to file tora.
+
+    xdms -d /home/apele/uae/demos z /mnt/cdrom/*.dms       (under Linux)
+
+    xdms -d c:\emul\fellow\demos z f:\*.dms              (under MS-DOS)
+
+This  will unpack all files with the dms extension in the root directory of
+a  CDROM  disk,  pack it again using gzip and save it in another directory.
+The generated files will have the .adz extension.
+
+
+    xdms -q x tst
+
+This  will  (try  to)  extract the files contained inside the tst.dms file.
+The  files  and  directories  will  be extracted to a directory with a name
+equal  to  the  volume  name  of  the  disk  contained in the dms file.  No
+messages will be displayed.
+
+
+    xdms -d stdout u *.dms >bigfile
+
+This  will  unpack all the dms files in the current directory and save them
+all to a single file.
+
+
+    xdms -d /home u apele +apele/yourfile.adf trevor +trevor/yourfile.adf
+
+This will unpack the file apele.dms in the current directory and save it as
+/home/apele/yourfile.adf  .   Will  also  unpack  the  file  trevor.dms  as
+/home/trevor/yourfile.adf .
+
+
+    cat tst.dms | xdms u stdin +stdout | strings | more
+
+This  will display the ascii strings inside the unpacked dms file.  In this
+case, xDMS is used as a filter.
+
+
+
+
+Known problems:
+---------------
+  If  you  try  to extract the files (using the x command) of a DMS archive
+that  contains  a  disk  in one of the disk formats introduced with AmigaOS
+version  2  or  newer, it will fail.  Also, if you try to extract the files
+under  MS-DOS  it will almost always fail.  It's not a problem in xDMS.  It
+is  a  problem  in  the  current  version of readdisk.  It only suports OFS
+disks.   Another  problem  of readdisk is that it fails when executed under
+MS-DOS  and  the  DMS  archive  contains files with names invalid to MS-DOS
+rules.   If  your  Amiga disk compressed in the DMS archive contains a file
+named as Amazing_Amiga.txt.info, it will fail.  It works under Unix.  Under
+MS-DOS  readdisk  also  changes  the  current  working  directory after its
+execution,  if  you specify an output directory to it.  This can cause some
+problems  too.
+  xDMS  doesn't  perform  internal  expansion of wildcards, but expects the
+shell  (or the compiler) to do it.  It is the usual under unix.  But if you
+use  it in a system where the shell does not perform wildcard expansion and
+your  compiler  also  does  not generate code to perform it, then wildcards
+will not work.  This is the case, for example when using xDMS in the Amiga,
+under  the  standard  Amiga Shell, when compiled with SAS/C.  I think Amiga
+GCC  adds  wildcard expansion to the program it compiles.  The same applies
+to  xDMS compiled with compilers like TurboC under MS-DOS.  DJGPP for MSDOS
+generate code to expand wildcards.
+
+
+
+Acknowledgements:
+-----------------
+
+xDMS  uses  source code fragments or informations from the following public
+domain or freeware programs:
+
+Unix  LHA  by Masaru Oki :  xDMS Heavy mode decrunch functions are based in
+lha  static  lzh  functions.   DMS used parts of LHA and LZHUF in the first
+place.
+
+LZHUF  by Haruyasu Yoshizaki :  xDMS Deep mode decrunch functions are based
+in LZHUF.
+
+testdms  by  Bjorn Stenberg :  I got some initial information about the DMS
+headers with testdms, and also the CRC calculation function.
+
+
+xDMS  also  calls,  if  available,  gzip  made  by  Jean-loup Gailly / Free
+Software    Foundation,    and    readdisk    made    by    Bernd   Schmidt
+<crux@pool.informatik.rwth-aachen.de>
+
+
+
+Copyright:
+----------
+
+  xDMS is released as public domain software.  You can spread it, modify it
+and  use  it in any way you like.  You can do anything with it without even
+asking  me  first.   But I would like to know if you do something cool with
+it.
+
+
+
+How to contact the author:
+--------------------------
+
+  If you have some problem, or have found a bug in xDMS, you can contact me
+by e-mail.  But first make sure you have read all this documentation.
+
+	 The new maintainer:
+	     Heikki Orsila
+	     heikki.orsila@iki.fi
+
+	 The old maintainer:
+	     Andre' Rodrigues de la Rocha
+	     adlroc@usa.net
+

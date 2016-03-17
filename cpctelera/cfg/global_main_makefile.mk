@@ -80,6 +80,12 @@ $(DSKINC): $(DSK) $(DSKINCOBJFILES)
 	@$(call PRINT,$(PROJNAME),"All files added to $(DSK). Disc ready.")
 	@touch $(DSKINC)
 
+# GENERATE AN HFE FILE WITH DSK FILE FOR GOTEK USB FLOPPY DISK
+%.hfe: $(DSK)  
+	@$(call PRINT,$(PROJNAME),"Creating Hfe File $(DSK) ")
+	@$(call CONVERTHFE,$(DSK))	
+	@$(call PRINT,$(PROJNAME),"Successfully created $@")
+
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
 $(OBJSUBDIRS): 
 	@$(MKDIR) $@
