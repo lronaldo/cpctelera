@@ -227,13 +227,32 @@ endef
 # $(4): Width in pixels of each sprite/tile/etc that will be generated
 # $(5): Height in pixels of each sprite/tile/etc that will be generated
 # $(6): Firmware palette used to convert the image file into C values
+# $(7): If equals "mask", generate interlaced mask for sprites converted
+# $(8): Output subfolder for generated .C and .H files (inside project folder)
 #
 define IMG2SPRITES
-IMGCFILES  := $(basename $(1)).c $(IMGCFILES)
-OBJS2CLEAN := $(basename $(1)).c $(basename $(1)).h $(OBJS2CLEAN)
-.SECONDARY: $(basename $(1)).c $(basename $(1)).h
-$(basename $(1)).c $(basename $(1)).h: $(1)
-	@$(call PRINT,$(PROJNAME),"Generating C-arrays for images in $(1)...")
-	@cpct_img2tileset -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1)
-	@$(call PRINT,$(PROJNAME),"C-arrays generated for $(1)")
+$(eval I2S_C  := $(basename $(1)).c)
+$(eval I2S_H  := $(basename $(1)).h)
+$(eval I2S_NC := $(notdir $(I2S_C)))
+$(eval I2S_NH := $(notdir $(I2S_H)))
+$(eval I2S_C2 := $(shell if [ ! "$(8)" = "" ]; then echo "$(8)/$(I2S_NC)"; else echo "$(I2S_C)"; fi))
+$(eval I2S_H2 := $(shell if [ ! "$(8)" = "" ]; then echo "$(8)/$(I2S_NH)"; else echo "$(I2S_H)"; fi))
+$(eval I2S_CH := $(I2S_C2) $(I2S_H2))
+.SECONDARY: $(I2S_CH)
+$(I2S_CH): $(1)
+	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
+	@if [ "$(7)" = "mask" ]; then \
+	   cpct_img2tileset -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) -im $(1); \
+	else \
+	   cpct_img2tileset -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1); \
+	fi
+	@$(call PRINT,$(PROJNAME),"Moving generated files:")
+	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
+	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
+	@if [ ! "$(8)" = "" ]; then \
+	   mv "$(I2S_C)" "$(8)/$(I2S_NC)"; \
+	   mv "$(I2S_H)" "$(8)/$(I2S_NH)"; \
+	fi
+IMGCFILES  := $(I2S_C2) $(IMGCFILES)
+OBJS2CLEAN := $(I2S_CH) $(OBJS2CLEAN)
 endef
