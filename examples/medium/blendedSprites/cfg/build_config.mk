@@ -135,8 +135,8 @@ include $(CPCT_PATH)/cfg/global_functions.mk
 
 # Convert images
 PALETTE={0 1 3 6 9 12 13 14 23 25 26}
-$(eval $(call IMG2SPRITES,src/img/scifi_bg.png,0,g,80,128,$(PALETTE)))
-$(eval $(call IMG2SPRITES,src/img/items.png,0,g,8,8,$(PALETTE)))
+$(eval $(call IMG2SPRITES,src/img/scifi_bg.png,0,g,80,128,$(PALETTE),,src/))
+$(eval $(call IMG2SPRITES,src/img/items.png,0,g,8,8,$(PALETTE),,src/))
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))

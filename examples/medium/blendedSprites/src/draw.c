@@ -18,8 +18,8 @@
 
 #include <cpctelera.h>
 #include "globaldata.h"
-#include "img/scifi_bg.h"
-#include "img/items.h"
+#include "scifi_bg.h"
+#include "items.h"
 
 /////////////////////////////////////////////////////////////////////////
 // drawBackground
