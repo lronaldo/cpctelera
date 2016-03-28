@@ -227,7 +227,8 @@ endef
 # $(4): Width in pixels of each sprite/tile/etc that will be generated
 # $(5): Height in pixels of each sprite/tile/etc that will be generated
 # $(6): Firmware palette used to convert the image file into C values
-# $(7): If equals "mask", generate interlaced mask for sprites converted
+# $(7): (mask,tileset,) "mask":    generate interlaced mask for all sprites converted
+#                       "tileset": generate a tileset array including pointers to all sprites
 # $(8): Output subfolder for generated .C and .H files (inside project folder)
 #
 define IMG2SPRITES
@@ -243,6 +244,8 @@ $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
 	@if [ "$(7)" = "mask" ]; then \
 	   cpct_img2tileset -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) -im $(1); \
+	elif [ "$(7)" = "tileset" ]; then \
+	   cpct_img2tileset     -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1); \
 	else \
 	   cpct_img2tileset -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1); \
 	fi
