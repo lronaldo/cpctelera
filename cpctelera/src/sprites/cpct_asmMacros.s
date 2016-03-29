@@ -12,8 +12,6 @@
 ;; >> Modifies: AF, TReg
 ;; >> 16 microseconds
 ;; >> 16 bytes
-;; TODO: review if modified register (C) can be passed as parameter
-;; TODO: Make it possible to configure the initial copy from A to C
 ;; TODO: Parameterize selection masks to reuse macro for different inversions
 ;;
 .macro _reverse_bits_of_A  TReg
@@ -46,26 +44,26 @@
 ;;    Inverts order of pixels in A, according to mode 1 format 
 ;; ([01234567] => [32107654])
 ;;    
-;; >> Input: A = C = Pixels to be reverted (mode 1 format)
-;; >> Modifies: AF, C
+;; >> Input: A = TReg = Pixels to be reverted (mode 1 format)
+;; >> Modifies: AF, TReg
 ;; >> 16 microseconds
 ;; >> 16 bytes
 ;; TODO: review if modified register (C) can be passed as parameter
 ;; TODO: Make it possible to configure the initial copy from A to C
 ;;
-.macro _revertpixels_m1_a
+.macro _reverse_mode_1_pixels_of_A  TReg
    rlca            ;; [1] | Rotate left twice so that...
    rlca            ;; [1] | ... A=[23456701]
 
-   ;; Mix bits of C and A so that all bits are in correct relative order
+   ;; Mix bits of TReg and A so that all bits are in correct relative order
    ;; but displaced from their final desired location
-   xor  c          ;; [1]  C = [01234567] (original value)
-   and #0b01010101 ;; [2]  A = [23456701] (bits rotated twice left)
-   xor  c          ;; [1] A2 = [03254761] (C mixed with A to get bits in order)
+   xor TReg        ;; [1] TReg = [01234567] (original value)
+   and #0b01010101 ;; [2]    A = [23456701] (bits rotated twice left)
+   xor TReg        ;; [1]   A2 = [03254761] (TReg mixed with A to get bits in order)
    
    ;; Now get bits 32 & 76 in their right location and save them into C
-   rlca            ;; [1] A = [ 32 54 76 10 ] (32 & 76 are in their desired place)
-   ld   c, a       ;; [1] C = A (Save this bit location into C)
+   rlca            ;; [1]    A = [ 32 54 76 10 ] (32 & 76 are in their desired place)
+   ld TReg, a      ;; [1] TReg = A (Save this bit location into TReg)
    
    ;; Now get bits 10 and 54 in their right location in A
    rrca            ;; [1] | Rotate A right 4 times to...
@@ -74,7 +72,7 @@
    rrca            ;; [1] | ... A = [ 76 10 32 54 ] (10 and 54 are in their desired place)
    
    ;; Finally, mix bits from C and A to get all bits reversed into A
-   xor  c          ;; [1]  C = [32547610] (Mixed bits with 32 & 76 in their right place)
-   and #0b00110011 ;; [2]  A = [76103254] (Mixed bits with 10 & 54 in their right place)
-   xor  c          ;; [1] A2 = [32107654] final value: mode 1 pixels of A reversed
+   xor TReg        ;; [1] TReg = [32547610] (Mixed bits with 32 & 76 in their right place)
+   and #0b00110011 ;; [2]    A = [76103254] (Mixed bits with 10 & 54 in their right place)
+   xor TReg        ;; [1]   A2 = [32107654] final value: mode 1 pixels of A reversed
 .endm
