@@ -33,6 +33,8 @@
 ;; (end code)
 ;;
 
+.include /cpct_asmMacros.s/
+
 ;; Parameter retrieval
    pop  hl     ;; [3] HL = return address
    pop  de     ;; [3] DE = Sprite start address pointer
@@ -100,7 +102,7 @@ first:
    ld   a, c      ;; [1] A holds copy of C, required to revert pixels
    _revertpixels_m1_a ;; [16] Revert mode 1 pixels from A (C gets modified)
 
-   djnz next      ;; [3/4] B--, if B!=0, continue reversing next byte
+   djnz nextbyte  ;; [3/4] B--, if B!=0, continue reversing next byte
 
 ;; Finished reversing present byte row from the sprite
 ;; 

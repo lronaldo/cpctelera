@@ -16,7 +16,7 @@
 ;; TODO: Make it possible to configure the initial copy from A to C
 ;; TODO: Parameterize selection masks to reuse macro for different inversions
 ;;
-.defm _revert_a
+.macro _revert_a
    rlca            ;; [1] | Rotate left twice so that...
    rlca            ;; [1] | ... A=[23456701]
 
@@ -53,7 +53,7 @@
 ;; TODO: review if modified register (C) can be passed as parameter
 ;; TODO: Make it possible to configure the initial copy from A to C
 ;;
-.defm _revertpixels_m1_a
+.macro _revertpixels_m1_a
    rlca            ;; [1] | Rotate left twice so that...
    rlca            ;; [1] | ... A=[23456701]
 

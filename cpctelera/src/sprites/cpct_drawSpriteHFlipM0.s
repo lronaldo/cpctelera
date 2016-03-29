@@ -43,7 +43,7 @@ nextrow:
    
    ;; Check if HL has moved out of screen video memory boundaries
    and #0x38        ;; [2]   Check bits 13-11 of H
-   jr  nz, fisrtrow ;; [2/3] if any of the 3 bits is not 0, boundaries have not been crossed
+   jr  nz, firstrow ;; [2/3] if any of the 3 bits is not 0, boundaries have not been crossed
 
    ;; HL points outside screen video memory area (last +0x800 crossed boundaries)   
    ;; To wrap up to the start of video memory again, add up +0xC050

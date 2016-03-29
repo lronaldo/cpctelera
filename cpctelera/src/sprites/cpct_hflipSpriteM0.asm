@@ -226,7 +226,7 @@ first:
    xor  c          ;; [1] | A2 = [03254761]
    rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
 
-   djnz next       ;; [3/4] B--, if B!=0, continue reversing next byte
+   djnz nextbyte   ;; [3/4] B--, if B!=0, continue reversing next byte
 
 ;; Finished reversing present byte row from the sprite
 ;; 

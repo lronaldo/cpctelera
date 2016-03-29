@@ -33,13 +33,13 @@
 ;; (end code)
 ;;
 
+.include /cpct_asmMacros.s/
+
 ;; Parameter retrieval
    pop  hl     ;; [3] HL = return address
    pop  de     ;; [3] DE = Sprite start address pointer
    ex (sp), hl ;; [6] HL = height / width, while leaving return address in the
                ;; ... stack, as this function uses __z88dk_callee convention
-
-.include /cpct_macros.s/
 
 ;; This loop is repeated for every vertical row of the sprite
 ;;   Set HL to point to the end of present sprite row, as DE
@@ -98,7 +98,7 @@ first:
    ld   a, c      ;; [1] A=C=pixels to be reversed, as required by revert macro
    _revert_a      ;; [16] Revert the bits of A (C gets modified)
 
-   djnz next      ;; [3/4] B--, if B!=0, continue reversing next byte
+   djnz nextbyte  ;; [3/4] B--, if B!=0, continue reversing next byte
 
 ;; Finished reversing present byte row from the sprite
 ;; 
