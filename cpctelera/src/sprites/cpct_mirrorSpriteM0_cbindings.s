@@ -1,3 +1,10 @@
+;; >> GPL info
+;; function: cpct_mirrorSpriteM0
+;;   Mirrors a mode 0 encoded sprite left-to-right and viceversa
+;;
+;; C definition:
+;;   void <cpct_mirrorSpriteM0> (<u8>*sprite, <u8> width, <u8> height);
+;;
 ;; Input parameters:
 ;;    de - sprite
 ;;    hl - alto / ancho
@@ -6,20 +13,31 @@
 ;;
 ;; Measures:
 ;;   Space:
-;;   Time:    24H + (42WW + 18W)H + 3  us  (without parameters)
+;;   Time:    24H + (38WW + 16W)H + 14 us (-12 in asm)
 ;;
 ;; Use example:
 ;; (start code)
-;;    cpct_mirrorSpriteM0(sprite, 4, 8);
-;;    cpct_drawSprite(sprite, pmem, 4, 8);
+;;   // Draws the main character sprite always looking to the 
+;;   // appropriate side (right or left), reversing it whenever required
+;;   void drawCharacter(u8 lookingat) {
+;;
+;;      // Check if we have to reverse character sprite or not
+;;      if(lookingAt != wasLookingAt) {
+;;         cpct_mirrorSpriteM0(characterSprite, 4, 8);
+;;         wasLookingAt = lookingAt;
+;;      }
+;;
+;;      // Draw main character's sprite
+;;      cpct_drawSprite(characterSprite, pmem, 4, 8);
+;;   }
 ;; (end code)
+;;
 
 ;; Parameter retrieval
    pop  hl     ;; [3] HL = return address
    pop  de     ;; [3] DE = Sprite start address pointer
    ex (sp), hl ;; [6] HL = height / width, while leaving return address in the
                ;; ... stack, as this function uses __z88dk_callee convention
-
 
 ;; This loop is repeated for every vertical row of the sprite
 ;;   Set HL to point to the end of present sprite row, as DE
@@ -42,8 +60,8 @@ nextrow:
 ;; byte order    |   A   B   C   D       D   C   B   A
 ;; pixel values  | [12][34][56][78] --> [87][65][43][21]
 ;; --------------------------------------------------------------------------
-;; byte layout   |   0 2  1 3         0 2  1 3   << Bit order
-;; (Mode 0,2 px) | [ 0101 0101 ] --> [1010 1010] << Pixel bits (pixel 1, pixel 0)
+;; byte layout   | [ 0123 4567 ]     [ 1032 5476 ] << Bit order (reversed by pairs)
+;; (Mode 0,2 px) | [ 0101 0101 ] --> [ 1010 1010 ] << Pixel bits (pixel 1, pixel 0)
 ;;
 nextbyte:
    ld (de), a     ;; [2] Save last reversed byte into destination
@@ -61,46 +79,50 @@ first:
    ;; taking a byte from the start of the row and placing it at the end
    ;;
    ex  de, hl     ;; [1] DE <-> HL to use HL to refer to the byte going to be reversed now
-   ld   a, (hl)   ;; [2] A=byte to be reversed	
-   and 0b01010101 ;; [2] A=pixel 1 bits isolated
-   rlca           ;; [1] A=pixel 1 bits moved to pixel 0 location (by rotating them left)
-   ld   c, a      ;; [1] C=A (Save new pixel 1 bits in C)
-   ld   a, (hl)   ;; [2] A=byte to be reversed again
-   and 0b10101010 ;; [2] A=pixel 0 bits isolated
-   rrca           ;; [1] A=pixel 0 bits moved to pixel 1 location (by rotating them right)
-   or   c         ;; [1] A= {pixel 0} + {pixel 1} bits mixed in their new location (interchanged)
 
-   dec  b         ;; [1] B-- (One less byte to be reversed)
-   jr   z, end    ;; [2/3] If B=0, this was the last byte to be reversed, son got to end
+   ld   a, (hl)    ;; [2] A=byte to be reversed	
+   ld   c, a       ;; [1] C=A (Copy to be used later for mixing bits)
+   rlca            ;; [1] | Rotate A twice to the left to get bits ordered...
+   rlca            ;; [1] | ... in the way we need for mixing, A=[23456701]
+  
+   ;; Mix C with A to get pixels reversed by reordering bits
+   xor  c          ;; [1] |  C = [01234567]
+   and #0b10101010 ;; [2] |  A = [23456701]
+   xor  c          ;; [1] | A2 = [03254761]
+   rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
+
+   dec  b          ;; [1] B-- (One less byte to be reversed)
+   jr   z, end     ;; [2/3] If B=0, this was the last byte to be reversed, son got to end
 
    ;;
    ;; This part reverses (DE) byte and places it at (HL) location too,
    ;; but taking bytes from the end of the row and placing them at the start
    ;;
-   ex  de, hl     ;; [1] DE <-> HL to use HL to refer to the byte going to be reversed now
-   ld   c, (hl)   ;; [2] C=Next byte to be reversed
-   ld (hl), a     ;; [2] Save previously reversed byte into its destination 
-   ld   a, c      ;; [1] A=Next byte to be reversed
-   and 0b01010101 ;; [2] A=pixel 1 bits isolated
-   rlca           ;; [1] A=pixel 1 bits moved to pixel 0 location (by rotating them left)
-   ld   c, a      ;; [1] C=A (Save new pixel 1 bits in C)
-   ld   a, (hl)   ;; [2] A=byte to be reversed again
-   and 0b10101010 ;; [2] A=pixel 0 bits isolated
-   rrca           ;; [1] A=pixel 0 bits moved to pixel 1 location (by rotating them right)
-   or   c         ;; [1] A= {pixel 0} + {pixel 1} bits mixed in their new location (interchanged)
+   ex  de, hl      ;; [1] DE <-> HL to use HL to refer to the byte going to be reversed now
+   ld   c, (hl)    ;; [2] C=Next byte to be reversed
+   ld (hl), a      ;; [2] Save previously reversed byte into its destination 
 
-   djnz next      ;; [3/4] B--, if B!=0, continue reversing next byte
+   ld   a, c       ;; [1] A=Next byte to be reversed
+   rlca            ;; [1] | Rotate A twice to the left to get bits ordered...
+   rlca            ;; [1] | ... in the way we need for mixing, A=[23456701]
+  
+   ;; Mix C with A to get pixels reversed by reordering bits
+   xor  c          ;; [1] |  C = [01234567]
+   and #0b10101010 ;; [2] |  A = [23456701]
+   xor  c          ;; [1] | A2 = [03254761]
+   rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
+
+   djnz next       ;; [3/4] B--, if B!=0, continue reversing next byte
 
 ;; Finished reversing present byte row from the sprite
 ;; 
 end:
-   ld (de), a     ;; [2] Save last reversed byte into its final destination
+   ld (de), a       ;; [2] Save last reversed byte into its final destination
 
-   pop  de        ;; [3] DE points to the start of next sprite byte row (saved previously)
-   pop  hl        ;; [3] HL contains (H: height, L: width of the sprite)
+   pop  de          ;; [3] DE points to the start of next sprite byte row (saved previously)
+   pop  hl          ;; [3] HL contains (H: height, L: width of the sprite)
 
-   dec   h        ;; [1] H--, One less sprite row to finish
+   dec   h          ;; [1] H--, One less sprite row to finish
    jr   nz, nextrow ;; [2/3] If H!=0, process next sprite row, as there are more
 
-   ret            ;; [3] All sprite rows reversed. Return.
-
+   ret              ;; [3] All sprite rows reversed. Return.
