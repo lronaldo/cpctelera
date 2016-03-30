@@ -50,6 +50,10 @@ extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width,
 extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideomem, 
                                               u8 width, u8 height, const void* pmasktable) __z88dk_callee;
 
+// Sprite flipping functions
+extern void cpct_hflipSpriteM0 (void* sprite, u8 width, u8 height) __z88dk_callee;
+
+
 // Functions to modify behaviour of other functions
 extern void cpct_setBlendMode (CPCT_BlendMode mode) __z88dk_fastcall;
 
