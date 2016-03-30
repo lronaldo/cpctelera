@@ -20,6 +20,9 @@
 #include <cpctelera.h>
 #include "sprites/sprites.h"
 
+// Sets the transparent mask table for color 0, mode 0
+cpctm_createTransparentMaskTable00M0(g_masktable, 0x0100);
+
 // Some useful constants
 #define MAP_WIDTH_TILES          40
 #define MAP_HEIGHT_TILES         50
@@ -113,6 +116,6 @@ void main(void) {
       pscra = cpct_getScreenPtr(CPCT_VMEM_START, TILEWIDTH_BYTES*a->tx, TILEHEIGHT_BYTES*a->ty);
       // Draw the alien in its new location
       cpct_drawSpriteMaskedAlignedTable(g_alien, pscra, ALIEN_WIDTH_BYTES, 
-                                        ALIEN_HEIGHT_BYTES, cpct_transparentMaskTable00M0);
+                                        ALIEN_HEIGHT_BYTES, g_masktable);
    }
 }

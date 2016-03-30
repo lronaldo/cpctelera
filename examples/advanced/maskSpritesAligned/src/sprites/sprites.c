@@ -19,21 +19,6 @@
 
 #include "sprites.h"
 
-//
-// Include transparency table. This transparency includes 256 bytes used to 
-// draw sprites transparent (using Pen 0 as transparent colour).
-// This table will be included at memory location 0x0100 because:
-//   1. Program starts at 0x0294 and we need to allocate this table and the
-//      sprite of the alien (the one that will be drawn with cpct_drawSpriteMaskedAlignedTable)
-//      So table will occupy memory locations 0x0100-0x01FF.
-//   2. 0x0100 is a 256-byte aligned memory location, as it is required by
-//      function cpct_drawSpriteMaskedAlignedTable. All values of the table
-//      will occupy a 0x01?? location (first 2 hex. digits never change).
-//
-// Define is placed in sprites.h to make it public
-//   #define cpct_transparentMaskTable00M0_address 0x0100
-#include <sprites/transparency_tables.h>
-
 // Common palette for background and sprites, using hardware colour values
 const u8 g_palette[7] = {
 // HW Value  | FW Value  | Colour name
