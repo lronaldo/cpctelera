@@ -19,20 +19,20 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_mirrorSpriteM0
+;; Function: cpct_hflipSpriteM0
 ;;
-;;   Mirrors a *mode 0* encoded sprite left-to-right and vice-versa.
+;;   Horizontally flips a sprite, encoded in screen pixel format, *mode 0*.
 ;;
 ;; C definition:
-;;   void <cpct_mirrorSpriteM0> (<u8>*sprite, <u8> width, <u8> height);
+;;   void <cpct_hflipSpriteM0> (<void>*sprite, <u8> width, <u8> height) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (2B DE) sprite - Pointer to the sprite array (first byte of consecutive sprite data)
-;;  (1B  H) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
-;;  (1B  L) height - Height of the sprite in pixels / bytes (both are the same). Must be >= 1.
+;;  (1B  L) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
+;;  (1B  H) height - Height of the sprite in pixels / bytes (both are the same). Must be >= 1.
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_mirrorSpriteM0_asm
+;;    > call cpct_hflipSpriteM0_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
@@ -60,24 +60,24 @@
 ;; This could cause your program to behave erratically, hang or crash. Always 
 ;; take the necessary steps to guarantee that your values are correct.
 ;;  * As this function receives a byte-pointer to memory, it can only 
-;; mirror byte-sized and byte-aligned sprites. This means that the box cannot
+;; flip byte-sized and byte-aligned sprites. This means that the box cannot
 ;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
 ;; their sizes must be a multiple of a byte.
 ;;
 ;; Details:
-;;    This function performs an horizontal mirroring of the given sprite. To 
+;;    This function performs an horizontal flipping of the given sprite. To 
 ;; do so, the function inverts byte-order in all sprite rows, and also inverts
 ;; pixel order inside each byte of the sprite. The function expects to receive
 ;; an sprite in screen pixel format (mode 0), like in this example:
 ;;
 ;; (start code)
 ;;    // Example call. Sprite has 8x4 pixels (4x4 bytes)
-;;    cpct_mirrorSpriteM0(sprite, 4, 4);
+;;    cpct_hflipSpriteM0(sprite, 4, 4);
 ;;
 ;;    // Operation performed by the call and results
 ;;    //
 ;;    // --------------------------------------------------------------
-;;    //  |  Received as parameter     | Result after mirroring      |
+;;    //  |  Received as parameter     | Result after flipping       |
 ;;    // --------------------------------------------------------------
 ;;    //  | sprite => [05][21][73][40] |  sprite => [04][37][12][05] |
 ;;    //  |           [52][23][37][74] |            [47][73][32][25] |
@@ -89,22 +89,22 @@
 ;; (end code)
 ;;
 ;;    As can be seen on the example, the function modifies the bytes of the 
-;; *sprite* in-place. Therefore, the *sprite* becomes horizontally mirrored
+;; *sprite* in-place. Therefore, the *sprite* becomes horizontally flipped
 ;; after the call and will not return to normal status unless another 
-;; horizontally mirroring operation is performed.
+;; horizontally flipping operation is performed.
 ;;
 ;;    This function has a high performance if taking into account that it is not 
 ;; using a conversion table. However, it is very slow compared to functions that 
 ;; use memory-aligned conversion tables. The advantage is that this function takes
 ;; less memory space as it does not require the 256-bytes table to be held in 
 ;; memory. Therefore, the main use for this function is to save space in memory
-;; whenever fast mirroring is not required. If fast performance is required, it 
+;; whenever fast flipping is not required. If fast performance is required, it 
 ;; is better to consider the use of functions with memory-aligned conversion tables.
 ;;
 ;; Use example:
 ;;    Next example shows how to create a function for drawing a 2D-Character
 ;; sprite that can look either to the left or to the right. Sprite is only 
-;; mirrored when the character changes the side it is looking.
+;; flipped when the character changes the side it is looking.
 ;; (start code)
 ;;    // Draws the main character sprite always looking to the 
 ;;    // appropriate side (right or left), reversing it whenever required
@@ -113,9 +113,9 @@
 ;;
 ;;       // Check if we have to reverse character sprite or not
 ;;       if(lookingAt != wasLookingAt) {
-;;          // Horizontally mirror character sprite when it 
+;;          // Horizontally flip character's sprite when it 
 ;;          // changes the side it is looking at
-;;          cpct_mirrorSpriteM0(characterSprite, 4, 8);
+;;          cpct_hflipSpriteM0(characterSprite, 4, 8);
 ;;          wasLookingAt = lookingAt;
 ;;       }
 ;;
@@ -129,8 +129,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - ?? bytes
-;;  ASM-bindings - ?? bytes
+;;    C-bindings - 48 bytes
+;;  ASM-bindings - 45 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -138,8 +138,8 @@
 ;; -----------------------------------------------------------------------
 ;;  Best       |  24H + (38WW + 16W)H + 14 |  96H + (152WW + 64W)H + 56  |
 ;; -----------------------------------------------------------------------
-;;  W=2,H=16   |        
-;;  W=4,H=32   |       
+;;  W=2,H=16   |          1006             |           4024              |
+;;  W=5,H=32   |          3726             |          14904              |
 ;; -----------------------------------------------------------------------
 ;;  Asm saving |          -12              |            -48              |
 ;; -----------------------------------------------------------------------
@@ -173,8 +173,8 @@ nextrow:
 ;;
 nextbyte:
    ld (de), a     ;; [2] Save last reversed byte into destination
-   inc  hl        ;; [2] Start-of-the-row pointer advances to next byte to be reversed 
-   dec  de        ;; [2] End-of-the-row pointer moves 1 byte backwards to the next byte to be reversed
+   inc  de        ;; [2] Start-of-the-row pointer advances to next byte to be reversed 
+   dec  hl        ;; [2] End-of-the-row pointer moves 1 byte backwards to the next byte to be reversed
 
 ;; DE points to the start of the byte row and increasing, whereas 
 ;; HL points to the end of the byte row and decreasing. 
