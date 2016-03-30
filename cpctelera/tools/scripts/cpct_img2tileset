@@ -53,7 +53,7 @@
 ##    Provided image file may be a PNG, JPG, BMP, GIF or TIFF file. 
 ##
 ## Command line options:
-##    -pf | --palette-firmware <palete_array> - Sets the Amstrad CPC palette 
+##    -pf  | --palette-firmware <palete_array> - Sets the Amstrad CPC palette 
 ##               to be used for the conversion as an array of firmware colour values (up to 16, 
 ##               in mode 0). Values must be passed inside '{' '}' and separated by spaces. 
 ##               Following example sets mode 1 palette to Black, white, red and green colours, 
@@ -61,18 +61,19 @@
 ##
 ##                        > cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png
 ##
-##    -nt | --no-tileset                      - Do not generate a tileset array containing pointers to
+##    -nt  | --no-tileset                      - Do not generate a tileset array containing pointers to
 ##                                              generated sprites/tiles.
-##    -im | --interlaced-masks                - Generates transparent sprites with interlaced masks
+##    -oph | --output-palette-hardware         - Generate output palette array containing hardware values
+##    -im  | --interlaced-masks                - Generates transparent sprites with interlaced masks
 ##                                              using 0 as the index of the palette colour to
 ##                                              be considered transparent
-##    -bn | --tiles-basename  <name>          - Sets the basename that will be used as C identifier 
+##    -bn  | --tiles-basename  <name>          - Sets the basename that will be used as C identifier 
 ##                                              for tiles or sprites. Default: g_tile
-##    -m  | --mode <cpc_graphics_mode>        - Sets the CPC Graphics mode the output data will 
+##    -m   | --mode <cpc_graphics_mode>        - Sets the CPC Graphics mode the output data will 
 ##                                              be produced for (0, 1 or 2). Default: 0.
-##    -tw | --tile-width   <pixels>           - Sets the width of a tile in pixels. Default: 4.
-##    -th | --tile-height  <pixels>           - Sets the height of a tile in pixels. Default: 4.
-##    -h  | --help                            - Shows help information on the terminal.
+##    -tw  | --tile-width   <pixels>           - Sets the width of a tile in pixels. Default: 4.
+##    -th  | --tile-height  <pixels>           - Sets the height of a tile in pixels. Default: 4.
+##    -h   | --help                            - Shows help information on the terminal.
 ##
 ##
 
@@ -129,7 +130,7 @@ that is set when a CPC computer starts)."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo 
-   echo "${COLOR_LIGHT_BLUE}  -pf | --palette-firmware <palete_array> "
+   echo "${COLOR_LIGHT_BLUE}  -pf  | --palette-firmware <palete_array> "
    echo "${COLOR_CYAN}       Sets the Amstrad CPC palette to be used for the conversion as an array \
 of firmware colour values (up to 16, in mode 0). Values must be passed inside '$LPAR' '$RPAR' and \
 separated by spaces. Following example sets mode 1 palette to Black, white, red and green colours, \
@@ -137,20 +138,22 @@ to convert the file tiles.png: "
    echo
    echo "          ${COLOR_WHITE}cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png"
    echo
-   echo "${COLOR_LIGHT_BLUE}  -nt | --no-tileset"
+   echo "${COLOR_LIGHT_BLUE}  -nt  | --no-tileset"
    echo "${COLOR_CYAN}       Do not generate a tileset array containing pointers to generated sprites/tiles."
-   echo "${COLOR_LIGHT_BLUE}  -bn | --tiles-basename  <name>"
+   echo "${COLOR_LIGHT_BLUE}  -oph | --output-palette-hardware"
+   echo "${COLOR_CYAN}       Generate output palette array containing hardware values."
+   echo "${COLOR_LIGHT_BLUE}  -bn  | --tiles-basename  <name>"
    echo "${COLOR_CYAN}       Sets the basename that will be used as C identifier for tiles or sprites. Default: g_tile"
-   echo "${COLOR_LIGHT_BLUE}  -im | --interlaced-masks"
+   echo "${COLOR_LIGHT_BLUE}  -im  | --interlaced-masks"
    echo "${COLOR_CYAN}       Generates transparent sprites with interlaced masks using 0 \
 as the index of the palette colour to be considered transparent."
-   echo "${COLOR_LIGHT_BLUE}  -m  | --mode   <cpc_graphics_mode>"
+   echo "${COLOR_LIGHT_BLUE}  -m   | --mode   <cpc_graphics_mode>"
    echo "${COLOR_CYAN}       Sets the CPC Graphics mode the output data will be produced for (0, 1 or 2). Default: 0."
-   echo "${COLOR_LIGHT_BLUE}  -tw | --tile-width   <pixels>"
+   echo "${COLOR_LIGHT_BLUE}  -tw  | --tile-width   <pixels>"
    echo "${COLOR_CYAN}       Sets the width of a tile in pixels. Default: 4."
-   echo "${COLOR_LIGHT_BLUE}  -th | --tile-height  <pixels>"
+   echo "${COLOR_LIGHT_BLUE}  -th  | --tile-height  <pixels>"
    echo "${COLOR_CYAN}       Sets the height of a tile in pixels. Default: 4."
-   echo "${COLOR_LIGHT_BLUE}  -h  | --help"
+   echo "${COLOR_LIGHT_BLUE}  -h   | --help"
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
    exit 1
@@ -170,6 +173,10 @@ while (( $# >= 1 )); do
       ## Do not generate tilesets
       "-nt" | "--no-tileset")
          GENTILESET="-nt"
+      ;;
+      ## Generate output palette as hardware values
+      "-oph" | "--output-palette-hardware")
+         OUTPUTPALETTE="-ophw"
       ;;
       ## Generate interlaced masks with a transparent colour
       "-im" | "--interlaced-masks")
@@ -345,7 +352,7 @@ echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}PROCESS${COLOR_LIGHT_RED}]${COLOR_
 to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
 ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]})" -of c -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" \
--o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $GENTILESET "${FILE}"
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $GENTILESET $OUTPUTPALETTE "${FILE}"
 
 ## Success message
 echo
