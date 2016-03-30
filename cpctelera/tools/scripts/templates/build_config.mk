@@ -36,7 +36,7 @@
 ##   If you change folder structure, CPCT_PATH should reflect this change.
 ##   This variable should always have the absolute path value.
 ##
-CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
+CPCT_PATH := %%%CPCTELERA_PATH%%%
 
 ####
 ## SECTION 1: Project configuration 
@@ -136,6 +136,9 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ##  folder structure inside the main source directory.
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
+
+# Convert images
+include cfg/image_conversion.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))

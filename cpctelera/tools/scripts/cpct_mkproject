@@ -1,7 +1,7 @@
 #!/bin/bash
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2015-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates
 CPCTELERA_DIRECTORY=$(dirname $(dirname "$SCRIPT_FULL_PATH"))
 SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/main.c
 MAKE_TEMPLATE=${TEMPLATE_DIRECTORY}/Makefile
+IMGCON_TEMPLATE=${TEMPLATE_DIRECTORY}/image_conversion.mk
 CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/build_config.mk
 ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE})
 
@@ -182,6 +183,7 @@ SOURCE_DIR=${PROJECTDIR}/src
 CONFIG_DIR=${PROJECTDIR}/cfg
 NEW_MAIN=${SOURCE_DIR}/main.c
 NEW_BUILD=${CONFIG_DIR}/build_config.mk
+NEW_IMGCON=${CONFIG_DIR}/image_conversion.mk
 NEW_MAKE=${PROJECTDIR}/Makefile
 
 # Welcome message
@@ -198,6 +200,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Copying files from project templates
 cp ${SRC_TEMPLATE} ${NEW_MAIN}
 cp ${CFG_TEMPLATE} ${NEW_BUILD}
 cp ${MAKE_TEMPLATE} ${NEW_MAKE}
+cp ${IMGCON_TEMPLATE} ${NEW_IMGCON}
 drawOK
 
 # Configuring project values into CFG_TEMPLATE
