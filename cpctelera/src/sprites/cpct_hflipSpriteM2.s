@@ -33,7 +33,7 @@
 ;; (end code)
 ;;
 
-.include /cpct_asmMacros.s/
+.include "../macros/cpct_reverseBits.s"
 
 ;; Parameter retrieval
    pop  hl     ;; [3] HL = return address
@@ -83,7 +83,8 @@ first:
    ex  de, hl     ;; [1] DE <-> HL to use HL to refer to the byte going to be reversed now
    ld   a, (hl)   ;; [2]  A=next byte to be reversed
    ld   c, a      ;; [1]  A=C=pixels to be reversed, as required by revert macro
-   _reverse_bits_of_A c ;; [16] Reverse the bits of A (using C as temporary storage)
+
+   cpctm_reverse_mode_2_pixels_of_A c ;; [16] Reverse the bits of A (using C as temporary storage)
 
    dec  b         ;; [1] B-- (One less byte to be reversed)
    jr   z, end    ;; [2/3] If B=0, this was the last byte to be reversed, son got to end
@@ -96,7 +97,8 @@ first:
    ld   c, (hl)   ;; [2] C=Next byte to be reversed
    ld (hl), a     ;; [2] Save previously reverted byte
    ld   a, c      ;; [1] A=C=pixels to be reversed, as required by revert macro
-   _reverse_bits_of_A c ;; [16] Reverse the bits of A (using C as temporary storage)
+   
+   cpctm_reverse_mode_2_pixels_of_A c ;; [16] Reverse the bits of A (using C as temporary storage)
 
    djnz nextbyte  ;; [3/4] B--, if B!=0, continue reversing next byte
 

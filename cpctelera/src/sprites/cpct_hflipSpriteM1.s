@@ -33,7 +33,7 @@
 ;; (end code)
 ;;
 
-.include /cpct_asmMacros.s/
+.include "../macros/cpct_reverseBits.s"
 
 ;; Parameter retrieval
    pop  hl     ;; [3] HL = return address
@@ -86,7 +86,8 @@ first:
 
    ld   a, (hl)       ;; [2]  A = Next byte to be reversed
    ld   c, a          ;; [1]  C = Copy of A, required for reverting pixels
-   _reverse_mode_1_pixels_of_A c ;; [16] Reverse mode 1 pixels from A (using C as temporary storage)
+
+   cpctm_reverse_mode_1_pixels_of_A c ;; [16] Reverse mode 1 pixels from A (using C as temporary storage)
 
    dec  b             ;; [1] B-- (One less byte to be reversed)
    jr   z, end        ;; [2/3] If IXH=0, this was the last byte to be reversed, son got to end
@@ -100,7 +101,8 @@ first:
    ld (hl), a     ;; [2] Save previously reversed byte into its destination 
 
    ld   a, c      ;; [1] A holds copy of C, required to revert pixels
-   _reverse_mode_1_pixels_of_A c ;; [16] Reverse mode 1 pixels from A (using C as temporary storage)
+
+   cpctm_reverse_mode_1_pixels_of_A c ;; [16] Reverse mode 1 pixels from A (using C as temporary storage)
 
    djnz nextbyte  ;; [3/4] B--, if B!=0, continue reversing next byte
 

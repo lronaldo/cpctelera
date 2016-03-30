@@ -22,6 +22,8 @@
 ;; (end code)
 ;;
 
+.include "../macros/cpct_reverseBits.s"
+
 ;; Parameter retrieval
    pop  hl     ;; [3] HL = return address
    pop  bc     ;; [3] BC = height / width
@@ -71,14 +73,8 @@ nextbyte:
 first:
    ld   a, (de)    ;; [2] A=byte to be reversed	
    ld   b, a       ;; [1] B=A (Copy to be used later for mixing bits)
-   rlca            ;; [1] | Rotate A twice to the left to get bits ordered...
-   rlca            ;; [1] | ... in the way we need for mixing, A=[23456701]
-  
-   ;; Mix C with A to get pixels reversed by reordering bits
-   xor  b          ;; [1] |  B = [01234567]
-   and #0b10101010 ;; [2] |  A = [23456701]
-   xor  b          ;; [1] | A2 = [03254761]
-   rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
+
+   cpctm_reverse_mode_0_pixels_of_A b ;; [7] Reverses pixel order in A (Using B as temporary storage)
    
    ld (hl), a      ;; [2] Copy reversed byte to screen video memory
    

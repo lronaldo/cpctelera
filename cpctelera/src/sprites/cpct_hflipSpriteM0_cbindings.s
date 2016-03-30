@@ -17,6 +17,9 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
+;; Required macro definitions
+.include "../macros/cpct_reverseBits.s"
+
 ;;
 ;; C bindings for <cpct_hflipSpriteM0>
 ;;

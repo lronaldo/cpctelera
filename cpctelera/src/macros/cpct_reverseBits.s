@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,12 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-;; Useful macros for assembly programming
 ;;
-;; Check all TODOs in this file
-;; TODO: Check if it's possible to modify absolutely locating macros to prevent them from inserting an aditional byte
-;; TODO: Try to generate macros to add translation tables at fixed memory locations
+;; Useful macros for bit reversing and selecting in different ways
 ;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Macro: _reverse_and_select_bits_in_A
+;; Macro: cpctm_reverse_and_select_bits_of_A
 ;;
 ;;    Reorders the bits of A and mixes them letting the user select the 
 ;; new order for the bits by using a selection mask.
@@ -81,7 +78,7 @@
 ;; ------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.macro _reverse_and_select_bits_of_A  TReg, SelectionMask
+.macro cpctm_reverse_and_select_bits_of_A  TReg, SelectionMask
    rlca            ;; [1] | Rotate left twice so that...
    rlca            ;; [1] | ... A=[23456701]
 
@@ -108,9 +105,11 @@
 .endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Macro: _reverse_bits_of_A 
+;; Macro: cpctm_reverse_bits_of_A 
+;; Macro: cpctm_reverse_mode_2_pixels_of_A
 ;;
-;;    Reverses the 8-bits of A, from [01234567] to [76543210].
+;;    Reverses the 8-bits of A, from [01234567] to [76543210]. This also reverses
+;; all pixels contained in A when A is in screen pixel format, mode 2.
 ;;
 ;; Parameters:
 ;;    TReg - An 8-bits register that will be used for intermediate calculations.
@@ -122,6 +121,9 @@
 ;;
 ;; Return Value:
 ;;    A - Resulting value with bits reversed 
+;;
+;; Requires:
+;;   - Uses the macro <cpctm_reverse_and_select_bits_of_A>.
 ;;
 ;; Details:
 ;;    This macro reverses the bits in A. If bits of A = [01234567], the final
@@ -142,12 +144,15 @@
 ;; ------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.macro _reverse_bits_of_A  TReg
-   _reverse_and_select_bits_of_A  TReg, #0b11001100
+.macro cpctm_reverse_bits_of_A  TReg
+   cpctm_reverse_and_select_bits_of_A  TReg, #0b11001100
+.endm
+.macro cpctm_reverse_mode_2_pixels_of_A   TReg
+   cpctm_reverse_bits_of_A  TReg
 .endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Macro: _reverse_mode_1_pixels_of_A
+;; Macro: cpctm_reverse_mode_1_pixels_of_A
 ;;
 ;;    Reverses the order of pixel values contained in register A, assuming A is 
 ;; in screen pixel format, mode 1.
@@ -163,6 +168,9 @@
 ;; Return Value:
 ;;    A - Resulting byte with the 4 pixels values reversed in order
 ;;
+;; Requires:
+;;   - Uses the macro <cpctm_reverse_and_select_bits_of_A>.
+;;
 ;; Details:
 ;;    This macro considers that A contains a byte that codifies 4 pixels in 
 ;; screen pixel format, mode 1. It modifies A to reverse the order of its 4 
@@ -171,6 +179,9 @@
 ;; (start code)
 ;;    A = [012345678] == reverse-pixels ==> [10326587] = A2
 ;; (end code)
+;;    You may want to check <cpct_px2byteM1> to know how bits codify both pixels
+;; in one single byte for screen pixel format, mode 1.
+;;
 ;;    *TReg* is an 8-bit register that will be used for intermediate calculations,
 ;; destroying its original value (that should be same as A, at the start).
 ;;
@@ -188,6 +199,62 @@
 ;; ------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.macro _reverse_mode_1_pixels_of_A  TReg
-   _reverse_and_select_bits_of_A  TReg, #0b00110011
+.macro cpctm_reverse_mode_1_pixels_of_A  TReg
+   cpctm_reverse_and_select_bits_of_A  TReg, #0b00110011
+.endm
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Macro: cpctm_reverse_mode_0_pixels_of_A
+;;
+;;    Reverses the order of pixel values contained in register A, assuming A is 
+;; in screen pixel format, mode 0.
+;;
+;; Parameters:
+;;    TReg - An 8-bits register that will be used for intermediate calculations.
+;; This register may be one of these: B, C, D, E, H, L
+;; 
+;; Input Registers: 
+;;    A    - Byte with pixel values to be reversed
+;;    TReg - Should have a copy of A (same exact value)
+;;
+;; Return Value:
+;;    A - Resulting byte with the 2 pixels values reversed in order
+;;
+;; Details:
+;;    This macro considers that A contains a byte that codifies 2 pixels in 
+;; screen pixel format, mode 0. It modifies A to reverse the order of its 2 
+;; contained pixel values left-to-right (12 -> 21). With respect to the 
+;; order of the 8-bits of A, the concrete operation performed is:
+;; (start code)
+;;    A = [012345678] == reverse-pixels ==> [10325476] = A2
+;; (end code)
+;;    You may want to check <cpct_px2byteM0> to know how bits codify both pixels
+;; in one single byte for screen pixel format, mode 0.
+;;
+;;    *TReg* is an 8-bit register that will be used for intermediate calculations,
+;; destroying its original value (that should be same as A, at the start).
+;;
+;; Modified Registers: 
+;;    AF, TReg
+;;
+;; Required memory:
+;;    7 bytes
+;;
+;; Time Measures:
+;; (start code)
+;;  Case | microSecs(us) | CPU Cycles
+;; ------------------------------------
+;;  Any  |       7       |     28
+;; ------------------------------------
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.macro cpctm_reverse_mode_0_pixels_of_A  TReg
+   rlca            ;; [1] | Rotate A twice to the left to get bits ordered...
+   rlca            ;; [1] | ... in the way we need for mixing, A = [23456701]
+  
+   ;; Mix TReg with A to get pixels reversed by reordering bits
+   xor TReg        ;; [1] | TReg = [01234567]
+   and #0b10101010 ;; [2] |    A = [23456701]
+   xor TReg        ;; [1] |   A2 = [03254761]
+   rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
 .endm

@@ -147,12 +147,6 @@
 ;;   *W* = *width* % 2, *WW* = *width*/2, *H* = *height*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Parameter retrieval
-   pop  hl     ;; [3] HL = return address
-   pop  de     ;; [3] DE = Sprite start address pointer
-   ex (sp), hl ;; [6] HL = height / width, while leaving return address in the
-               ;; ... stack, as this function uses __z88dk_callee convention
-
 ;; This loop is repeated for every vertical row of the sprite
 ;;   Set HL to point to the end of present sprite row, as DE
 ;;   already points to the start of it.
@@ -196,14 +190,8 @@ first:
 
    ld   a, (hl)    ;; [2] A=byte to be reversed	
    ld   c, a       ;; [1] C=A (Copy to be used later for mixing bits)
-   rlca            ;; [1] | Rotate A twice to the left to get bits ordered...
-   rlca            ;; [1] | ... in the way we need for mixing, A=[23456701]
-  
-   ;; Mix C with A to get pixels reversed by reordering bits
-   xor  c          ;; [1] |  C = [01234567]
-   and #0b10101010 ;; [2] |  A = [23456701]
-   xor  c          ;; [1] | A2 = [03254761]
-   rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
+
+   cpctm_reverse_mode_0_pixels_of_A c ;; [7] Reverses pixel order in A (Using C as temporary storage)
 
    dec  b          ;; [1] B-- (One less byte to be reversed)
    jr   z, end     ;; [2/3] If B=0, this was the last byte to be reversed, son got to end
@@ -217,14 +205,8 @@ first:
    ld (hl), a      ;; [2] Save previously reversed byte into its destination 
 
    ld   a, c       ;; [1] A=Next byte to be reversed
-   rlca            ;; [1] | Rotate A twice to the left to get bits ordered...
-   rlca            ;; [1] | ... in the way we need for mixing, A=[23456701]
-  
-   ;; Mix C with A to get pixels reversed by reordering bits
-   xor  c          ;; [1] |  C = [01234567]
-   and #0b10101010 ;; [2] |  A = [23456701]
-   xor  c          ;; [1] | A2 = [03254761]
-   rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
+
+   cpctm_reverse_mode_0_pixels_of_A c ;; [7] Reverses pixel order in A (Using C as temporary storage)
 
    djnz nextbyte   ;; [3/4] B--, if B!=0, continue reversing next byte
 
