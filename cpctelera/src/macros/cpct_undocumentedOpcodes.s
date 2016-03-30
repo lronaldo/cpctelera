@@ -17,7 +17,10 @@
 ;;-------------------------------------------------------------------------------
 
 ;;
-;; Macros to clarify source code when using undocumented opcodes
+;; File: Undocumented Opcodes
+;;
+;;    Macros to clarify source code when using undocumented opcodes. Only
+;; valid to be used from assembly language (not from C).
 ;;
 
 ;; Macro: jr__0
