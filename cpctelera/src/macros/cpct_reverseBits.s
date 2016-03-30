@@ -17,7 +17,10 @@
 ;;-------------------------------------------------------------------------------
 
 ;;
-;; Useful macros for bit reversing and selecting in different ways
+;; File: Reverse Bits
+;;
+;;    Useful macros for bit reversing and selecting in different ways. Only
+;; valid to be used from assembly language (not from C).
 ;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -254,7 +257,7 @@
   
    ;; Mix TReg with A to get pixels reversed by reordering bits
    xor TReg        ;; [1] | TReg = [01234567]
-   and #0b10101010 ;; [2] |    A = [23456701]
+   and #0b01010101 ;; [2] |    A = [23456701]
    xor TReg        ;; [1] |   A2 = [03254761]
    rrca            ;; [1] Rotate right to get pixels reversed A = [10325476]
 .endm
