@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2014-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 #include <types.h>
 #include "sprite_types.h"
+#include "transparency_tables.h"
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;
