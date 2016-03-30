@@ -42,8 +42,11 @@ Arkos player original code:
 Random number generation:
    * George Marsaglia
 
-Graphics:
+Graphical assets:
    * <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
+   * <C-TOY at http://c-toy.blogspot.com.es/>
+   * <hassekf at http://opengameart.org/users/hassekf>
+   * <SpinachChicken at http://opengameart.org/users/spinachchicken>
 
 (see logos_composite_long.png)
 
