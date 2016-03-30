@@ -172,13 +172,6 @@
 ;; http://www.cpcmania.com/Docs/Programming/Painting_pixels_introduction_to_video_memory.htm>.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;
-;; Macro to introduce a JR 0 more clearly
-;;
-.macro jr__0
-   .DW #0x0018    ;; JR #00 (Normally used as a modifiable jump, as jr 0 is an infinite loop)
-.endm
-
    ;; Modify code using width to jump in drawSpriteWidth
    ld    a, #126           ;; [2] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite * 2 (2B)
    sub   c                 ;; [1]    to do as much LDIs as bytes the Sprite is wide

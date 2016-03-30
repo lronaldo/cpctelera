@@ -17,6 +17,9 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
+;; Macros for easy use of undocumented opcodes
+.include "../macros/cpct_undocumentedOpcodes.s"
+
 ;;
 ;; ASM bindings for <cpct_drawSpriteBlended>
 ;;

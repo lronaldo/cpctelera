@@ -139,18 +139,6 @@
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Convenient macros to clarify the use of 
-;;   * LD IXL, C 
-;;   * LD C, IXL
-;;
-.macro ld__ixl_c
-   .DW  #0x69DD   ;; ld ixl, c 
-.endm
-
-.macro ld__c_ixl
-   .DW  #0x4DDD   ;; ld c, ixl
-.endm
-
    push ix         ;; [5] Save IX regiter before using it as temporal var
    ld__ixl_c       ;; [3] Save Sprite Width into IXL for later use
 

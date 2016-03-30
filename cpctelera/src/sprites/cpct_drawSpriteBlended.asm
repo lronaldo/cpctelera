@@ -167,18 +167,6 @@
 ;;   Standard Blend operations take 2 nanoseconds except NOP and LDI, which take 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Convenient macros to clarify the use of 
-;;   * LD IXL, B 
-;;   * LD B, IXL
-;;
-.macro ld__ixl_b
-   .DW  #0x68DD    ;; ld ixl, b 
-.endm
-
-.macro ld__b_ixl
-   .DW  #0x45DD    ;; ld b, ixl
-.endm
-
    push ix         ;; [5] Save IX regiter before using it as temporal var
    ld__ixl_b       ;; [3] Save Sprite Width into IXL for later use
 

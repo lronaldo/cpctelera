@@ -135,24 +135,8 @@
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;
-;; Convenient macros
-;;
-.macro ld__a__ixl
-   .dw #0x7DDD    ;; Opcode for ld a, ixl
-.endm
-.macro dec__ixh
-   .dw #0x25DD    ;; Opcode for dec ixh
-.endm
-.macro dec__ixl
-   .dw #0x2DDD    ;; Opcode for dec ixl
-.endm
-.macro ld___ixl_00 
-   .db #0xDD, #0x2E, #0x00  ;; Opcode for ld ixl, #00, using 00 as placehoder
-.endm
-
    ;; Save Width in a placeholder for easy recovering it later
-   ld__a__ixl              ;; [2] A = IXL = width of the sprite
+   ld__a_ixl               ;; [2] A = IXL = width of the sprite
    ld (restore_ixl + 2), a ;; [4] Save IXL (widht of the sprite) in a placeholder for recovering it later
 
 dms_sprite_height_loop:
@@ -179,7 +163,7 @@ dms_sprite_width_loop:
    jr    z,dms_sprite_copy_ended;; [2/3] If 0, we have finished the last sprite line.
                                 ;;      - If not 0, we have to move pointers to the next pixel line
 restore_ixl:
-   ld___ixl_00     ;; [3] IXL = Restore IXL to the width of the sprite (00 is a placeholder)
+   ld__ixl #00     ;; [3] IXL = Restore IXL to the width of the sprite (00 is a placeholder)
 
    ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
    add   #0x08     ;; [2]    so we add it to DE (just by adding 0x08 to D)
