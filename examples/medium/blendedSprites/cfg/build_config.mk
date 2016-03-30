@@ -134,9 +134,7 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 include $(CPCT_PATH)/cfg/global_functions.mk
 
 # Convert images
-PALETTE={0 1 3 6 9 12 13 14 23 25 26}
-$(eval $(call IMG2SPRITES,src/img/scifi_bg.png,0,g,80,128,$(PALETTE),,src/))
-$(eval $(call IMG2SPRITES,src/img/items.png,0,g,8,8,$(PALETTE),,src/))
+include cfg/image_conversions.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
@@ -145,7 +143,7 @@ OBJSUBDIRS    := $(OBJDSKINCSDIR) $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR
 
 # Calculate all source files
 CFILES         := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
-CFILES  			:= $(IMGCFILES) $(filter-out $(IMGCFILES), $(CFILES))
+CFILES         := $(IMGCFILES) $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
