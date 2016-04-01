@@ -28,8 +28,8 @@
 _cpct_hflipSpriteM0::
    ;; Parameter retrieval from stack
    pop  hl     ;; [3] HL = return address
-   pop  de     ;; [3] DE = Sprite start address pointer
-   ex (sp), hl ;; [6] HL = height / width, while leaving return address in the
-               ;; ... stack, as this function uses __z88dk_callee convention
+   pop  bc     ;; [3] BC = height / width of the sprite
+   ex (sp), hl ;; [6] HL = Sprite start address pointer, while leaving return address 
+               ;; ... in the stack, as this function uses __z88dk_callee convention
 
 .include /cpct_hflipSpriteM0.asm/

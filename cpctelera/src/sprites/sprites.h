@@ -52,7 +52,7 @@ extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideom
                                               u8 width, u8 height, const void* pmasktable) __z88dk_callee;
 
 // Sprite flipping functions
-extern void cpct_hflipSpriteM0 (void* sprite, u8 width, u8 height) __z88dk_callee;
+extern void cpct_hflipSpriteM0 (u8 width, u8 height, void* sprite) __z88dk_callee;
 
 
 // Functions to modify behaviour of other functions
