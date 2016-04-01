@@ -73,9 +73,9 @@ void initialize() {
 // MAIN: Using keyboard to move a sprite example
 //
 void main(void) {
-   u8  x=20;                    // Sprite horizontal coordinate
-   u8  lookingAt = LOOK_RIGHT;  // Know where the sprite is looking at 
-   u8* pvideomem;               // Pointer to video memory
+   u8 x=20;                     // Sprite horizontal coordinate
+   u8 lookingAt = LOOK_RIGHT;   // Know where the sprite is looking at 
+   u8 nowLookingAt = lookingAt; // New looking direction after keypress
 
    // Initialize the Amstrad CPC
    initialize();
@@ -84,6 +84,8 @@ void main(void) {
    // Infinite moving loop
    //
    while(1) {
+      u8* pvideomem; // Pointer to video memory
+
       // Scan Keyboard (fastest routine)
       // The Keyboard has to be scanned to obtain pressed / not pressed status of
       // every key before checking each individual key's status.
@@ -93,18 +95,18 @@ void main(void) {
       // it will still be inside screen boundaries
       if (cpct_isKeyPressed(Key_CursorRight) && x < (SCR_W - SP_W) ) {
          ++x;
-         if (lookingAt == LOOK_LEFT) {
-            lookingAt = LOOK_RIGHT;
-            cpct_hflipSpriteM0(g_spirit, SP_W, SP_H);
-         }
+         nowLookingAt = LOOK_RIGHT;
       } else if (cpct_isKeyPressed(Key_CursorLeft)  && x > 0) {
          --x; 
-         if (lookingAt == LOOK_RIGHT) {
-            lookingAt = LOOK_LEFT;
-            cpct_hflipSpriteM0(g_spirit, SP_W, SP_H);
-         }
+         nowLookingAt = LOOK_LEFT;
       }
-      
+
+      // Check if we have changed looking direction      
+      if (lookingAt != nowLookingAt) {
+         lookingAt = nowLookingAt;
+         cpct_hflipSpriteM0(SP_W, SP_H, g_spirit);
+      }
+
       // Get video memory byte for coordinates x, y of the sprite (in bytes)
       pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, x, FLOOR_Y - SP_H);
 
