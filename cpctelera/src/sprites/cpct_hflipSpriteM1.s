@@ -86,7 +86,7 @@
 ;;    //  |           [9876][5432][abcd][efgh] |            [hgfe][dcba][2345][6789] |
 ;;    // -----------------------------------------------------------------------------
 ;;    //  Sprite takes 16 consecutive bytes in memory (4 rows with 4 bytes, 
-;;    //  and 4 pixels each byte)
+;;    //  and 4 pixels each byte, for a total of 16x4 pixels, 64 pixels)
 ;;    //
 ;; (end code)
 ;;
@@ -157,18 +157,19 @@
 ;; USEFUL CONSTANTS TO CLARIFY CODE
 ;;    ld_b_hl - Opcode for Z80 operation "LD B, (HL)"
 ;;    jr_one  - Opcode for Z80 operation "JR one". It must be 0x??18, as 0x18 is 
-;;              the opcode for JR and ?? is the offset from (varjump+3) (next byte to
-;;              this JR one operation, as ld_b_hl will be before) to (one).
+;;              the opcode for JR and ?? is the offset from (varjump+3) to (one)
+;;              (NOTE: (varjump+3) refers to the byte right after this "JR one" operation, 
+;;               taking into account that ld_b_hl goes before "JR one" and takes up 1 byte)
 ;;    jr_byteloop - Opcode for Z80 operation "JR nextbyte+1". It is generated same as
-;;                  jr_one, but to jump from (varjump+2) to (nextbyte+1), as no ld_b_hl
-;;                  will be before jr_byteloop.
+;;                  jr_one, but to jump from (varjump+2) to (nextbyte+1), as there is no ld_b_hl
+;;                  operation before jr_byteloop.
 ;;
 ld_b_hl     = 0x46
 jr_one      = 0x18 + 0x100 * (          one  - (varjump + 3))
 jr_byteloop = 0x18 + 0x100 * ((nextbyte + 1) - (varjump + 2))
    
 ;;
-;; SET UP CODE: Set up loop internal "variable jump" (varjump) so that it takes
+;; SET UP CODE: Set up loop internal "variable jump" {varjump} code so that it takes
 ;;    into account the differences between odd-wide and even-wide sprites. 
 ;;    - Even-width sprites flip 2 bytes per each loop iteration (and switches them)
 ;;    - Odd-width sprites have a first iteration of the loop in which only the 
@@ -269,7 +270,7 @@ nextbyte:
    ld a, (de)      ;; [2] A = Byte pointed by DE (4 pixels)
    ld b, a         ;; [1] B = A, Copy of A, required by reverse macro
    
-   ;; Reverse (flip) the 4 pixels contained in A
+   ;; Reverse (flip) the 4 pixels contained in A (Using B as temporary storage)
    cpctm_reverse_mode_1_pixels_of_A b ;; [16] 
 
    ;; Switch DE flipped byte and HL byte to be flipped
@@ -280,7 +281,7 @@ nextbyte:
 one:
    ld a, b         ;; [1] A = B = Copy of byte pointed by HL (4 pixels)
 
-   ;; Reverse (flip) the 4 pixels contained in A
+   ;; Reverse (flip) the 4 pixels contained in A (using B as temporary storage)
    cpctm_reverse_mode_1_pixels_of_A b ;; [16]
 
    ld (de), a      ;; [2] Store flipped byte from (HL) at (DE)
