@@ -23,7 +23,7 @@
 pvideomem     = 0xC000         ;; First byte of video memory
 screen_H      = 200            ;; Height of the screen in pixels
 screen_W      = 80             ;; Width of the screen in bytes
-palete_size   = 16             ;; Number of total palette colours
+palete_size   = 4              ;; Number of total palette colours
 border_colour = 0x1F10         ;; 0x10 (Border ID), 0x1F (Colour to set, Pen 0 from palette). Ready to be loaded into HL
 sprite_HxW    = 0x0804         ;; Height (8, 0x08) and Width (4, 0x04) of the sprite in bytes.
 sprite_end_x  = 76             ;; x coordinate where sprite will bounce to the left
@@ -38,7 +38,7 @@ look_right    = 0x00           ;; Looking right
 
 ;; Ascii zero-terminated strings
 str_demo: .asciz "Mode 1 Flipping Demo"
-str_colour  = 0x0003	   ;; Pen 3, Paper 0, as colours to draw the string
+str_colour  = 0x0001	   ;; Pen 3, Paper 0, as colours to draw the string
 
 ;; Palette (16 bytes)
 g_palette: 
@@ -105,7 +105,7 @@ init:
    call  cpct_disableFirmware_asm   ;; Disable firmware
 
    ;; Set Mode 1
-   ld    c, #0                      ;; C = 1 (New video mode)
+   ld    c, #1                      ;; C = 1 (New video mode)
    call  cpct_setVideoMode_asm      ;; Set Mode 1
    
    ;; Set Palette
@@ -120,6 +120,7 @@ init:
    ;; Draw upper string             
    ld    hl, #str_demo              ;; HL points to the string with the demo message
    ld    bc, #str_colour            ;; BC = fg/bg colours used to draw the string
+   ld    de, #pvideomem             ;; DE poinst to the start of video memory: (0,0) coordinate
    call  cpct_drawStringM1_f_asm    ;; Draw the string (fast method)
 
    ret                              ;; return
@@ -135,18 +136,20 @@ init:
 ;; DESTROYS:
 ;;    AF, BC, DE, HL
 ;;
-drawEntity:
+drawEntity::
    ;; Check if sprite has to be flipped or not
-   push  bc                      ;; save x,y coordinates passed as parameters
    ld    a, (g_sprite_looking_at);; A=direction where the sprite is currently looking at
    cp    l                       ;; Check against where it should be looking
    jr    z, looking_good         ;; If Z, sprite is "looking good", nothing to do
 
    ;; Flip the sprite because it is looking oposite
+   push  bc                      ;; save x,y coordinates passed as parameters
    xor   #0x01                   ;; Switch looking direction (0->1, or 1->0)
    ld    (g_sprite_looking_at),a ;; Save new looking direction
    ld    hl, #sprite_HxW         ;; Sprite WidthxHeight (DE already points to the sprite)   
+   ld    de, #g_sprite           ;; DE points to the sprite
    call  cpct_hflipSpriteM1_asm  ;; Flip the sprite
+   pop   bc                      ;; Recover coordinates to draw the sprite
 
 looking_good:
    ;; Calculate the memory location where the sprite will be drawn
@@ -156,8 +159,8 @@ looking_good:
 
    ;; Draw the sprite 
    ;; - DE already points to video mem
-   pop   bc                      ;; Recover coordinates to draw the sprite
    ld    hl, #g_sprite           ;; HL points to the sprite
+   ld    bc, #sprite_HxW         ;; BC = Sprite WidthxHeight
    call  cpct_drawSprite_asm     ;; Draw the sprite on the screen
 
    ret                           ;; Return
@@ -173,7 +176,7 @@ moveRandomSprite:
    ;; Get a Random number from 0 to 7 (to select a random entity)
    call cpct_getRandom_xsp40_u8_asm  ;; Get a pseudo-random 8-bits value in L
    ld     a, l                   ;; A = random number
-   xor #0x03                     ;; A %= 8, to get a random number from 0 to 7
+   and #0x07                     ;; A %= 8, to get a random number from 0 to 7
 
    ;; Point to the Entity selected 
    rla                           ;; A *= 2, as each element in the entities vector is sized 2 bytes
@@ -213,6 +216,7 @@ ent_look_right:
    ld  (hl), a                   ;; Make entity look left
 
 location_updated:
+   dec   hl                      ;; Make HL point again to Entity Location
    ld  (hl), c                   ;; Update entity location
 
    ld     l, b                   ;; Set L=Looking at, to pass it as parameter for drawEntity
