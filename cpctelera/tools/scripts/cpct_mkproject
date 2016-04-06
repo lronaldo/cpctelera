@@ -71,7 +71,7 @@ TAG_LOADADDRESS="%%%CODE_LOAD_ADDRESS%%%"
 TAG_CPCTELERAPATH="%%%CPCTELERA_PATH%%%"
 
 ## Characters not valid for project name
-UNSUPPORTED_CHARACTERS='_|?*@.%;:<>,="()[]/\'
+UNSUPPORTED_CHARACTERS='_|?*@.%;:<>,=()[\]/\\'
 
 ## Show how this script is to be used and exit
 ##

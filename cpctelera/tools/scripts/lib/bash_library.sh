@@ -714,7 +714,8 @@ function containsSubstring {
 }
 
 ## Checks if a string contains any given character from other string. 
-## It echoes the character found if any
+## It echoes the character found if any. Be careful with characters ']' and '\',
+## they should be escaped.
 ##  $1 String to check
 ##  $2 String with characters to look for
 ##
@@ -723,9 +724,10 @@ function containsChars {
    local CHARS="$2"
    local POS
    ## Look for any character and get its position in STR
-   POS=$(($(expr index "$STR" "$CHARS")-1))
+   POS=${STR%%[${CHARS}]*};
+   POS=${#POS}
 
-   if (( POS > 0 )); then
+   if (( POS < ${#STR} )); then
       echo "${STR:POS:1}"
    fi
 }
