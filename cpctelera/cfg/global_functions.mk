@@ -237,8 +237,8 @@ $(eval I2S_C  := $(basename $(1)).c)
 $(eval I2S_H  := $(basename $(1)).h)
 $(eval I2S_NC := $(notdir $(I2S_C)))
 $(eval I2S_NH := $(notdir $(I2S_H)))
-$(eval I2S_C2 := $(shell if [ ! "$(8)" = "" ]; then echo "$(8)/$(I2S_NC)"; else echo "$(I2S_C)"; fi))
-$(eval I2S_H2 := $(shell if [ ! "$(8)" = "" ]; then echo "$(8)/$(I2S_NH)"; else echo "$(I2S_H)"; fi))
+$(eval I2S_C2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NC)"; else echo "$(I2S_C)"; fi))
+$(eval I2S_H2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NH)"; else echo "$(I2S_H)"; fi))
 $(eval I2S_CH := $(I2S_C2) $(I2S_H2))
 $(eval I2S_P  := $(shell if [ "$(7)" = "mask" ]; then echo "-nt -im"; elif [ ! "$(7)" = "tileset" ]; then echo "-nt"; fi))
 $(eval I2S_P  := $(I2S_P) $(shell if [ "$(9)" = "hwpalette" ]; then echo "-oph"; fi))
@@ -250,8 +250,8 @@ $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
 	@if [ ! "$(8)" = "" ]; then \
-	   mv "$(I2S_C)" "$(8)/$(I2S_NC)"; \
-	   mv "$(I2S_H)" "$(8)/$(I2S_NH)"; \
+	   mv "$(I2S_C)" "$(I2S_C2)"; \
+	   mv "$(I2S_H)" "$(I2S_H2)"; \
 	fi
 IMGCFILES  := $(I2S_C2) $(IMGCFILES)
 OBJS2CLEAN := $(I2S_CH) $(OBJS2CLEAN)
