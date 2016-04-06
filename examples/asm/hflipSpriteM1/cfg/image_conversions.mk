@@ -52,12 +52,13 @@
 ##     $(eval $(call IMG2SPRITES,imgs/1.png,0,g,4,8,$(PAL),,src/))        ##
 ############################################################################
 
-## Firmware palette definition in cpct_img2tileset format
-#PALETTE={0 1 4 12 13 16 25 26}
+## Firmware palette definition in cpct_img2tileset format (firmware colour values)
+## 13 = WHITE, 0 = BLACK, 3 = RED, 6 = BRIGHT RED
+PALETTE={13 0 3 6}
 
-## Convert spirit.png into spirit.c and spirit.h
-##   This is a mode 0, 46x54 pixels sprite. The image will be converted 
-## into a C-array called g_spirit (g is prefix for _spirit) without interlaced
-## mask. Conversion will also output an array called g_palette with the 16
-## hardware colour values that define the given PALETTE.
-#$(eval $(call IMG2SPRITES,src/spirit.png,0,g,46,54,$(PALETTE),,,hwpalette))
+## Convert img/monsters.png into src/monsters.c and src/monsters.h
+##   This file contains two mode 1, 20x24 pixels sprites. The image will be converted 
+## into two C-arrays called g_spr_monsters_{0/1} (g_spr is prefix for _monsters) 
+## without interlaced mask. Conversion will also output an array called g_palette with 
+## the 4 hardware colour values that define the given PALETTE. 
+$(eval $(call IMG2SPRITES,img/monsters.png,1,g_spr,20,24,$(PALETTE),,src/,hwpalette))

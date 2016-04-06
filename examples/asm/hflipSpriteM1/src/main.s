@@ -21,12 +21,11 @@
 ;;===============================================================================
 
 pvideomem     = 0xC000         ;; First byte of video memory
-screen_H      = 200            ;; Height of the screen in pixels
 screen_W      = 80             ;; Width of the screen in bytes
 palete_size   = 4              ;; Number of total palette colours
-border_colour = 0x1F10         ;; 0x10 (Border ID), 0x1F (Colour to set, Pen 0 from palette). Ready to be loaded into HL
-sprite_HxW    = 0x0804         ;; Height (8, 0x08) and Width (4, 0x04) of the sprite in bytes.
-sprite_end_x  = 76             ;; x coordinate where sprite will bounce to the left
+border_colour = 0x0010         ;; 0x10 (Border ID), 0x00 (Colour to set: White).
+sprite_HxW    = 0x1805         ;; Height (24, 0x18) and Width (5, 0x05) of the sprite in bytes.
+sprite_end_x  = 75             ;; x coordinate where sprite will bounce to the left
 look_left     = 0x01           ;; Looking Left
 look_right    = 0x00           ;; Looking right
 
@@ -36,35 +35,48 @@ look_right    = 0x00           ;; Looking right
 
 .area _DATA
 
-;; Ascii zero-terminated strings
-str_demo: .asciz "Mode 1 Flipping Demo"
-str_colour  = 0x0001	   ;; Pen 3, Paper 0, as colours to draw the string
+;; ASCII zero-terminated String to be printed at the top of the screen
+;;
+str_demo:: .asciz "[ MODE 1 ] Sprite Flipping Demo"
+str_len      = . - str_demo  ;; Length of the string
+str_colour   = 0x0001	     ;; Pen 1, Paper 0 (Black over background)
 
-;; Palette (16 bytes)
-g_palette: 
-.db 0x1F, 0x14, 0x18, 0x05  ; (14,  0,  4,  7) || Pastel Blue, Black, Magenta, Purple
-.db 0x16, 0x1C, 0x06, 0x1E  ; ( 9,  3, 10, 12) || Green, Red, Cyan, Yellow
-.db 0x00, 0x0E, 0x07, 0x0F  ; (13, 15, 16, 17) || White, Orange, Pink, Pastel Magenta
-.db 0x19, 0x0A, 0x03, 0x0B  ; (22, 24, 25, 26) || Pastel Green, Bright Yellow, Pastel Yellow, Bright White
+;; String location at the centre of the first character line in the screen
+;; pvideomem is (0, 0) location and we have to add to it half the bytes
+;; that will be left after printing the string
+str_location = pvideomem + (screen_W - str_len*2)/2 
 
-;; Sample Character (12x8 px, 3x8 mode1 bytes)
-g_sprite_looking_at: 
-   .db look_left        ;; Stores a value to indicate the direction where the sprite is looking at
-g_sprite:
-   .db 0x00, 0x11, 0x22, 0x33
-   .db 0x00, 0x33, 0x44, 0x31
-   .db 0x00, 0x22, 0x55, 0x11
-   .db 0x00, 0x33, 0x12, 0x55
-   .db 0x00, 0x11, 0x22, 0x33
-   .db 0x00, 0x33, 0x44, 0x31
-   .db 0x00, 0x22, 0x55, 0x11
-   .db 0x00, 0x33, 0x12, 0x55
+;; Sprites and palette are defined in an external file. As they are
+;; defined in C language, their symbols will be preceded by an underscore.
+;; We declare sprite symbols here as global, and the linker will look
+;; for them on the other file.
+.globl _g_spr_monsters_0
+.globl _g_spr_monsters_1
+.globl _g_spr_palette
+
+;; Monster Sprites (20x24 pixels each)
+;;  (This sprites are a modification from Mini Knight Expansion 1, by Master484
+;;   got from OpenGameArt: http://opengameart.org/content/mini-knight-expansion-1-0
+;;   with Public Domain License CC0: http://creativecommons.org/publicdomain/zero/1.0/)
+;;
+;;   Each sprite in this structure is encoded as follows (3 Bytes per sprite):
+;;     1 Byte  - Direction towards the sprite is looking (1=Left, 0=Right)
+;;     2 Bytes - Pointer to the sprite
+;; 
+g_sprites::
+   ;; Sprite 0 (monster 0)
+   .db look_right        ;; Direction towards the sprite is looking at
+   .dw _g_spr_monsters_0 ;; Pointer to the sprite
+   ;; Sprite 1 (monster 0)
+   .db look_right        ;; Direction towards the sprite is looking at
+   .dw _g_spr_monsters_1 ;; Pointer to the sprite
 
 ;; Moving entities. 8 moving entities on the screen,
-;;  each one having next structure:
-;;   - x (1B): Horizontal coordinate
-;;   - lookat (1B): 1 = Look left, 0 = look right 
-g_mentities:
+;;  each one having next structure (2 Bytes per entity):
+;;   - 1 Byte - X Horizontal coordinate
+;;   - 1 Byte - look_at value (1=Left,0=Right)
+;;
+g_mentities::
    .db   0, look_right   ;; Entity 0
    .db  10, look_right   ;; Entity 1
    .db  25, look_right   ;; Entity 2
@@ -91,16 +103,15 @@ g_mentities:
 .globl cpct_hflipSpriteM1_asm
 .globl cpct_drawSprite_asm
 .globl cpct_drawStringM1_f_asm
-.globl cpct_getRandom_xsp40_u8_asm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNC: init
+;; FUNC: initialize
 ;;    Sets CPC to its initial status
 ;; DESTROYS:
 ;;    AF, BC, DE, HL
 ;;
-init:
+initialize::
    ;; Disable Firmware
    call  cpct_disableFirmware_asm   ;; Disable firmware
 
@@ -109,7 +120,7 @@ init:
    call  cpct_setVideoMode_asm      ;; Set Mode 1
    
    ;; Set Palette
-   ld    hl, #g_palette             ;; HL = pointer to the start of the palette array
+   ld    hl, #_g_spr_palette        ;; HL = pointer to the start of the palette array
    ld    de, #palete_size           ;; DE = Size of the palette array (num of colours)
    call  cpct_setPalette_asm        ;; Set the new palette
 
@@ -120,7 +131,7 @@ init:
    ;; Draw upper string             
    ld    hl, #str_demo              ;; HL points to the string with the demo message
    ld    bc, #str_colour            ;; BC = fg/bg colours used to draw the string
-   ld    de, #pvideomem             ;; DE poinst to the start of video memory: (0,0) coordinate
+   ld    de, #str_location          ;; DE points to the place in video memory where the string will be drawn
    call  cpct_drawStringM1_f_asm    ;; Draw the string (fast method)
 
    ret                              ;; return
@@ -132,34 +143,45 @@ init:
 ;; INPUT:
 ;;    B: y pixel coordinate where to draw the sprite
 ;;    C: x pixel coordinate where to draw the sprite
-;;    L: Current sprite "looking_at"
+;;    D: Current entity "looking_at"
+;;   HL: Pointer to sprite structure
 ;; DESTROYS:
 ;;    AF, BC, DE, HL
 ;;
 drawEntity::
    ;; Check if sprite has to be flipped or not
-   ld    a, (g_sprite_looking_at);; A=direction where the sprite is currently looking at
-   cp    l                       ;; Check against where it should be looking
-   jr    z, looking_good         ;; If Z, sprite is "looking good", nothing to do
+   ld    a, (hl)                 ;; A = direction where the entity is currently looking at
+   cp    d                       ;; Check against where the sprite is looking
 
-   ;; Flip the sprite because it is looking oposite
-   push  bc                      ;; save x,y coordinates passed as parameters
+   inc  hl                       ;; | DE = Pointer to the sprite
+   ld    e, (hl)                 ;; |
+   inc  hl                       ;; |
+   ld    d, (hl)                 ;; |
+   push de                       ;; Save pointer to the sprite in the stack for later use
+
+   ;; This Conditional jump uses result from previous "CP E" instruction
+   jr    z, looking_good         ;; If Z, sprite is looking to the right direction, nothing to do
+
+   ;; Flip the sprite because it is looking opposite
+   push  bc                      ;; save x, y coordinates passed as parameters
    xor   #0x01                   ;; Switch looking direction (0->1, or 1->0)
-   ld    (g_sprite_looking_at),a ;; Save new looking direction
-   ld    hl, #sprite_HxW         ;; Sprite WidthxHeight (DE already points to the sprite)   
-   ld    de, #g_sprite           ;; DE points to the sprite
+   dec   hl                      ;; | HL -= 2, to make it point again to the sprite looking_at value
+   dec   hl                      ;; |
+   ld  (hl),a                    ;; Save new looking_at direction
+   ld    bc, #sprite_HxW         ;; B = Sprite Height, C = Width
+   ex    de, hl                  ;; HL points to the sprite (DE was pointing to it)
    call  cpct_hflipSpriteM1_asm  ;; Flip the sprite
    pop   bc                      ;; Recover coordinates to draw the sprite
 
 looking_good:
    ;; Calculate the memory location where the sprite will be drawn
    ld    de, #pvideomem          ;; DE points to the start of video memory
-   call  cpct_getScreenPtr_asm   ;; Return pointer to byte located at (x,y) (C, B) in HL
+   call  cpct_getScreenPtr_asm   ;; Return pointer to byte located at (x, y) (C, B) in HL
    ex    de, hl                  ;; DE = pointer to video memory location to draw the sprite
 
    ;; Draw the sprite 
-   ;; - DE already points to video mem
-   ld    hl, #g_sprite           ;; HL points to the sprite
+   ;; - DE already points to video memory location where sprite will be drawn
+   pop   hl                      ;; HL points to the sprite (Recover from the stack)
    ld    bc, #sprite_HxW         ;; BC = Sprite WidthxHeight
    call  cpct_drawSprite_asm     ;; Draw the sprite on the screen
 
@@ -172,27 +194,39 @@ looking_good:
 ;; DESTROYS:
 ;;    AF, BC, DE, HL
 ;;
-moveRandomSprite:
-   ;; Get a Random number from 0 to 7 (to select a random entity)
-   call cpct_getRandom_xsp40_u8_asm  ;; Get a pseudo-random 8-bits value in L
-   ld     a, l                   ;; A = random number
-   and #0x07                     ;; A %= 8, to get a random number from 0 to 7
+lastMovedEntity: .db 7  ;; Holds the ID of the last entity that has been moved
+moveRandomSprite::
+   ld    hl, #lastMovedEntity    ;; HL points to the ID value of the last entity moved
+   ld     a, (hl)                ;; A = ID of the last entity moved
+   inc    a                      ;; A++ (A = Next entity to be moved)
+   and #0x07                     ;; A %= 8 (If A > 7 then A = 0)
+   ld   (hl), a                  ;; Store A as last moved entity (Update variable value)
+
+   ;; Select the sprite type for this entity (odd entities = Sprite 1, even = Sprite 0)
+   ld     e, a                   ;; E = A (Save A value for later use)
+   ld    hl, #g_sprites          ;; HL points to the vector of sprite types
+   rrca                          ;; Move Least Significant bit of A to the Carry to check if its is ODD or Even
+   jr    nc, even                ;; If Carry=0, LSB of A was 0, so A was even: HL already points to sprite 0
+
+   ;; Odd sprite type: HL must point to sprite 1, 3 bytes away
+   ld    bc, #3                  ;; BC = 3
+   add   hl, bc                  ;; HL += 3 (HL now points to sprite 1)
+
+even:
+   push  hl                      ;; Save HL pointing to the sprite type for later use
 
    ;; Point to the Entity selected 
-   rla                           ;; A *= 2, as each element in the entities vector is sized 2 bytes
-   ld     d, a                   ;; D = A*2 (Saved to be used later on)
+   sla    e                      ;; E *= 2 ( Entity Index (0-7) * 2)
+   ld     d, #0                  ;; D = 0 so that DE = E = Entity Index * 2
    ld    hl, #g_mentities        ;; HL points to the start of entities vector
-   add    l                      ;; | HL += A
-   ld     l, a                   ;; |
-   adc    h                      ;; |
-   sub    l                      ;; |
-   ld     h, a                   ;; | --> Now HL Points to HL[A], the concrete entity selected
+   add   hl, de                  ;; HL += DE, HL points to the concrete entity to be updated
 
    ;; Update entity information
    ld     c, (hl)                ;; C = X coordinate of the entity
    inc   hl                      ;; HL Points to the looking_at value for this entity
-   ld     b, (hl)                ;; B = Looking at value of the entity
-   cp    #look_right             ;; Check if the entity is looking right
+   ld     d, (hl)                ;; D = Looking at value of the entity
+   ld     a, d                   ;; | Check if the entity is looking right
+   cp    #look_right             ;; | 
    jr     z, ent_look_right      ;; If Z, B was looking right
 
    ;; Entity looking left
@@ -200,9 +234,9 @@ moveRandomSprite:
    jr     nz, location_updated   ;; If C != 0, we haven't reached left limit
 
    ;; left limit reached
-   ld     a, #look_right         ;; A = 1 (looking right)
-   ld  (hl), a                   ;; Make entity look right
-   jr     location_updated
+   dec    d                      ;; D = 0 (Look right)
+   ld  (hl), d                   ;; Make entity look right
+   jr     location_updated       ;; Finished moving, update location and continue
 
 ent_look_right:
    ;; Entity looking right
@@ -212,29 +246,30 @@ ent_look_right:
    jr    nz, location_updated    ;; If B != sprite_end_x, we haven't reached right limit
 
    ;; Right limit reached
-   xor    a                      ;; A = 0 (looking left)
-   ld  (hl), a                   ;; Make entity look left
+   inc    d                      ;; D = 1 (looking left)
+   ld  (hl), d                   ;; Make entity look left
 
 location_updated:
    dec   hl                      ;; Make HL point again to Entity Location
    ld  (hl), c                   ;; Update entity location
 
-   ld     l, b                   ;; Set L=Looking at, to pass it as parameter for drawEntity
-
-   ;; Calculate Y location for the entity, given its ID
+   ;; Calculate Y location for the entity, given its ID, using this formulat
+   ;; Y = 24*EntityID + 8
    xor    a                      ;; A = 0 and clear Carry flag
-   ld     a, d                   ;; A = EntityID * 2 (0-7 * 2)
-   rla                           ;; A = EntityID * 4
-   rla                           ;; A = EntityID * 8
-   rla                           ;; A = EntityID * 16
-   add  #24                      ;; A = 24 + EntityID * 16
+   ld     a, e                   ;; A =  2*EntityID (0-7 * 2)
+   rla                           ;; A =  4*EntityID
+   rla                           ;; A =  8*EntityID
+   ld     e, a                   ;; E =  8*EntityID
+   rla                           ;; A = 16*EntityID
+   add    e                      ;; A = 16*EntityID + 8*EntityID = 24*EntityID
+   add   #8                      ;; A = 24*EntityID + 8
    ld     b, a                   ;; B = A (Y location of the entity)
 
-   ;; Draw entity (L=Looking At, B=Y Coordinate, C=X Coordinate)
+   ;; Draw entity (HL=Sprite structure, D=Entity looking_at, B=Y Coordinate, C=X Coordinate)
+   pop   hl                      ;; HL points to the sprite structure
    call drawEntity               ;; Draw the updated entity
 
    ret                           ;; Nothing more to do, return.
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -242,7 +277,7 @@ location_updated:
 ;;    _main:: global symbol is required for correctly compiling and linking
 ;;
 _main:: 
-   call  init                 ;; Initialize the CPC
+   call  initialize           ;; Initialize the CPC
 
 loop:
    call  moveRandomSprite     ;; Moves a Random Sprite
