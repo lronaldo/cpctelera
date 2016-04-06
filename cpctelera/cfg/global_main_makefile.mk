@@ -91,6 +91,6 @@ cleanall: clean
 
 clean: 
 	@$(call PRINT,$(PROJNAME),"Deleting folder: $(OBJDIR)/")
-	$(RM) -r $(OBJDIR)
+	$(RM) -r ./$(OBJDIR)
 	@$(call PRINT,$(PROJNAME),"Deleting objects to clean: $(OBJS2CLEAN)")
-	$(foreach elem, $(OBJS2CLEAN), $(RM) -r $(elem))
+	$(foreach elem, $(OBJS2CLEAN), $(RM) -r ./$(elem))
