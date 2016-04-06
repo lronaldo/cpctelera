@@ -103,6 +103,7 @@ g_mentities::
 .globl cpct_hflipSpriteM1_asm
 .globl cpct_drawSprite_asm
 .globl cpct_drawStringM1_f_asm
+.globl cpct_waitVSYNC_asm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -189,13 +190,13 @@ looking_good:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNC: moveRandomSprite
-;;    Picks up a random sprite and moves it 1 step to its looking_at direction 
+;; FUNC: moveNextEntity
+;;    Picks up the next entity and moves it 1 step to its looking_at direction 
 ;; DESTROYS:
 ;;    AF, BC, DE, HL
 ;;
 lastMovedEntity: .db 7  ;; Holds the ID of the last entity that has been moved
-moveRandomSprite::
+moveNextEntity::
    ld    hl, #lastMovedEntity    ;; HL points to the ID value of the last entity moved
    ld     a, (hl)                ;; A = ID of the last entity moved
    inc    a                      ;; A++ (A = Next entity to be moved)
@@ -280,6 +281,12 @@ _main::
    call  initialize           ;; Initialize the CPC
 
 loop:
-   call  moveRandomSprite     ;; Moves a Random Sprite
+   call  cpct_waitVSYNC_asm ;; Synchronize with VSYNC
 
-   jr    loop                 ;; Repeat forever
+   ;; Move 4 entities in a ROW
+   call  moveNextEntity     ;; Moves next Entity
+   call  moveNextEntity     ;; Moves next Entity
+   call  moveNextEntity     ;; Moves next Entity
+   call  moveNextEntity     ;; Moves next Entity
+
+   jr    loop               ;; Repeat forever
