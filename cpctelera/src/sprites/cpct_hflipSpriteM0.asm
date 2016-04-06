@@ -27,9 +27,9 @@
 ;;   void <cpct_hflipSpriteM0> (<u8> width, <u8> height, <void>*sprite) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
-;;  (1B  L) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
-;;  (1B  H) height - Height of the sprite in pixels / bytes (both are the same). Must be >= 1.
-;;  (2B DE) sprite - Pointer to the sprite array (first byte of consecutive sprite data)
+;;  (1B  C) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
+;;  (1B  B) height - Height of the sprite in pixels / bytes (both are the same). Must be >= 1.
+;;  (2B HL) sprite - Pointer to the sprite array (first byte of consecutive sprite data)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_hflipSpriteM0_asm
