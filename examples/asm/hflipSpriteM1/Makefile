@@ -27,9 +27,6 @@
 ##  * Global paths and tool configuration is located at $(CPCT_PATH)/cfg/##
 ###########################################################################
 
-## Sprite filename (without extension)
-DAV=src/davitsu_round
-
 ##
 ## PROJECT CONFIGURATION (you may change things there to setup this project)
 ##
@@ -39,10 +36,3 @@ include cfg/build_config.mk
 ## USE GLOBAL MAKEFILE (general rules for building CPCtelera projects)
 ##
 include $(CPCT_PATH)/cfg/global_main_makefile.mk
-
-##
-## Generate sprite
-##
-PALETTE={ 14 0 4 7 9 3 10 12 13 15 16 17 22 24 25 26 }
-$(DAV).c $(DAV).h: $(DAV).png
-	cpct_img2tileset -nt -bn dav -m 0 -tw 40 -th 40 -pf $(PALETTE) $(DAV).png
