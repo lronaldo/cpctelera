@@ -58,6 +58,7 @@ extern void cpct_hflipSpriteM2   (u8 width, u8 height, void* sprite) __z88dk_cal
 
 // Sprite flipping functions (ROM-friendly versions)
 extern void cpct_hflipSpriteM0_r (void* sprite, u8 width, u8 height) __z88dk_callee;
+extern void cpct_hflipSpriteM1_r (void* sprite, u8 width, u8 height) __z88dk_callee;
 extern void cpct_hflipSpriteM2_r (void* sprite, u8 width, u8 height) __z88dk_callee;
 
 // Functions to modify behaviour of other functions
