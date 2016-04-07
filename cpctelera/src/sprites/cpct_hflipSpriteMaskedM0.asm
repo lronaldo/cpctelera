@@ -36,31 +36,30 @@
 ;;
 ;; Parameter Restrictions:
 ;;
-;; *** REVIEW ***
-;;
+;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; (Mode 0 data). Sprite must be rectangular and all bytes in the array must be consecutive 
-;; pixels, starting from top-left corner and going left-to-right, top-to-bottom down to the
-;; bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*
-;; You may check screen pixel format for mode 0 (<cpct_px2byteM0>). *Warning!* This function
-;; will admit any 16-bits value as sprite pointer and will *modify* bytes at the given
-;; address. On giving an incorrect address this function will yield undefined behaviour,
-;; probably making your program crash or doing odd things due to part of the memory being
-;; altered by this function.
-;;  * *width* must be the width of the sprite *in bytes* and must be 1 or more. 
-;; Using 0 as *width* parameter for this function could potentially make the program 
-;; hang or crash. Always remember that the *width* must be expressed in bytes 
-;; and *not* in pixels. The correspondence is 1 byte = 2 pixels (mode 0)
+;; with interlaced mask data (Pairs of bytes, 1st: mask data for next byte, 2nd:
+;; mode 0 pixel data byte). You may check screen pixel format for mode 0 (<cpct_px2byteM0>).
+;; Each mask byte will contain enabled bits as those that should be picked from the background
+;;  (transparent) and disabled bits for those that will be printed from sprite colour data. 
+;; Each mask data byte must precede its associated colour data byte. Sprite must be rectangular 
+;; and all bytes in the array must be consecutive pixels, starting from top-left corner 
+;; and going left-to-right, top-to-bottom down to the bottom-right corner. Total amount 
+;; of bytes in pixel array should be 2 x *width* x *height*. 
+;;  * *width* must be the width of the sprite *in bytes*, without accounting for mask bytes, 
+;;  and *must be 1 or more*. Using 0 as *width* parameter for this function could potentially 
+;; make the program hang or crash. Always remember that the *width* must be expressed in bytes
+;; and *NOT* in pixels. The correspondence is 1 byte = 2 pixels (mode 0)
 ;;  * *height* must be the height of the sprite in pixels / bytes (both should be the
 ;; same amount), and must be greater than 0. There is no practical upper limit to this value,
 ;; but giving a height greater than the height of the sprite will yield undefined behaviour,
 ;; as bytes after the sprite array might result modified. 
 ;;
 ;; Known limitations:
-;;
-;; *** REVIEW ***
-;;
-;;  * This function will not work from ROM, as it uses self-modifying code.
+;;  * This function will admit any 16-bits value as *sprite* pointer and will *modify* 
+;; bytes at the given address. On giving an incorrect address this function will yield 
+;; undefined behaviour, probably making your program crash or doing odd things due to 
+;; part of the memory being altered by this function.
 ;;  * This function does not do any kind of boundary check. If you give it 
 ;; incorrect values for *width*, *height* or *sprite* pointer it might 
 ;; potentially alter the contents of memory locations beyond *sprite* boundaries. 
@@ -72,42 +71,42 @@
 ;; their sizes must be a multiple of a byte.
 ;;
 ;; Details:
-;;    This function performs an horizontal flipping of the given sprite. To 
-;; do so, the function inverts byte-order in all sprite rows, and also inverts
-;; pixel order inside each byte of the sprite. The function expects to receive
-;; an sprite in screen pixel format (mode 0), like in this example:
+;;    This function performs an horizontal flipping of the given *sprite* along with its
+;; interlaced mask. To do so, the function inverts the order of the pairs of bytes formed
+;; by each mask byte and its associated pixel-definition byte, for all sprite rows. It also 
+;; inverts pixel order inside each byte of the *sprite* (be it pixel byte or mask byte). 
+;; The function expects to receive an *sprite* in screen pixel format (mode 0), along with
+;; its interlaced mask like in this example:
 ;;
 ;; (start code)
 ;;    // Example call. Sprite has 8x4 pixels (4x4 bytes)
-;;    cpct_hflipSpriteM0Masked(4, 4, sprite);
+;;    cpct_hflipSpriteMaskedM0(4, 4, sprite);
 ;;
-;;    // Operation performed by the call and results
+;;    // Operation performed by the call and results (mM, nN = mask data bytes)
 ;;    //
 ;;    // ---------------------------------------------------------------------------------------------
 ;;    //  |          Received as parameter             |          Result after flipping              |
 ;;    // ---------------------------------------------------------------------------------------------
-;;    //  | sprite => [05][mM][21][nN][73][mM][40][nN] |  sprite => [04][Nn][37][Mm][12][Nn][05][Mm] |
-;;    //  |           [52][mM][23][nN][37][mM][74][nN] |            [47][Nn][73][Mm][32][Nn][25][Mm] |
-;;    //  |           [05][mM][11][nN][31][mM][04][nN] |            [04][Nn][13][Mm][11][Nn][50][Mm] |
-;;    //  |           [00][mM][55][nN][44][mM][00][nN] |            [00][Nn][44][Mm][55][Nn][00][Mm] |
+;;    //  | sprite => [mM][05][nN][21][mM][73][nN][40] |  sprite => [Nn][04][Mm][37][Nn][12][Mm][05] |
+;;    //  |           [mM][52][nN][23][mM][37][nN][74] |            [Nn][47][Mm][73][Nn][32][Mm][25] |
+;;    //  |           [mM][05][nN][11][mM][31][nN][04] |            [Nn][04][Mm][13][Nn][11][Mm][50] |
+;;    //  |           [mM][00][nN][55][mM][44][nN][00] |            [Nn][00][Mm][44][Nn][55][Mm][00] |
 ;;    // ---------------------------------------------------------------------------------------------
 ;;    //  Sprite takes 32 consecutive bytes in memory: 4 rows with 8 bytes (4 bytes pixel data, 
 ;;    //  and 4 bytes mask data)
 ;;    //
 ;; (end code)
 ;;
-;;    As can be seen on the example, the function modifies the bytes of the 
-;; *sprite* in-place. Therefore, the *sprite* becomes horizontally flipped
-;; after the call and will not return to normal status unless another 
-;; horizontally flipping operation is performed.
+;;    As can be seen on the example, the function modifies the bytes of the *sprite* in-place.
+;; Therefore, the *sprite* becomes horizontally flipped after the call and will not return to 
+;; normal status unless another horizontally flipping operation is performed.
 ;;
-;;    This function has a high performance if taking into account that it is not 
-;; using a conversion table. However, it is very slow compared to functions that 
-;; use memory-aligned conversion tables. The advantage is that this function takes
-;; less memory space as it does not require the 256-bytes table to be held in 
-;; memory. Therefore, the main use for this function is to save space in memory
-;; whenever fast flipping is not required. If fast performance is required, it 
-;; is better to consider the use of functions with memory-aligned conversion tables.
+;;    This function performs reasonably well compared to <cpct_hflipSpriteM0>, as time required
+;; for doing the flip is a little bit less than doubled, for double amount of bytes. However, 
+;; for maximum performance, functions making use of memory-aligned conversion tables are advised.
+;; Also, having memory-aligned sprites will permit developing even faster versions. In any case,
+;; The most important advantage of this function is its reduced size, compared to requiring a
+;; function and a 256-bytes aligned table together.
 ;;
 ;; Use example:
 ;;    Next example shows how to create a function for drawing a 2D-Character
@@ -123,7 +122,7 @@
 ;;       if(lookingAt != wasLookingAt) {
 ;;          // Horizontally flip character's sprite when it 
 ;;          // changes the side it is looking at
-;;          cpct_hflipSpriteM0Masked(4, 8, characterSprite);
+;;          cpct_hflipSpriteMaskedM0(4, 8, characterSprite);
 ;;          wasLookingAt = lookingAt;
 ;;       }
 ;;
@@ -137,29 +136,29 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - ?? bytes
-;;  ASM-bindings - ?? bytes
+;;    C-bindings - 62 bytes
+;;  ASM-bindings - 59 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case       |      microSecs (us)       |         CPU Cycles          |
 ;; -----------------------------------------------------------------------
-;;  Even-width |     (32WW + 16)H + 32     |     (128WW +  64)H + 128    |
-;;  Oven-width |     (32WW + 36)H + 37     |     (128WW + 144)H + 148    |
+;;  Even-width |     (80WW + 18)H + 16     |     (320WW +  72)H + 64     |
+;;   Odd-width |     (80WW + 69)H + 16     |     (320WW + 244)H + 64     |
 ;; -----------------------------------------------------------------------
-;;  W=2,H=16   |           800             |           3200              |
-;;  W=5,H=32   |          3237             |          12948              |
+;;  W=2,H=16   |          1584             |           6336              |
+;;  W=5,H=32   |          7344             |          29376              |
 ;; -----------------------------------------------------------------------
 ;;  Asm saving |          -12              |            -48              |
 ;; -----------------------------------------------------------------------
 ;; (end code)
-;;   *W* = *width* % 2, *WW* = *width*/2, *H* = *height*
+;;   *WW* = (int)(*width*/2), *H* = *height*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   
    ;; We need HL to point to the byte previous to the start of the sprite array.
    ;; This is because HL will point to the previous byte of the next row in the 
    ;; array at the end of every loop, and hence we can add always the same quantity
-   ;; (half sprite width, with +1 for odd-width sprites) to point to the centre of next row.
+   ;; (sprite width) to point to the centre of next row.
    dec hl       ;; [2] HL points to the byte previous to the start of the sprite array
 
 ;;
@@ -173,64 +172,91 @@
 ;; same row. So, virtual layout scheme is as follows:
 ;; --------------------------------------------------------------------------
 ;; byte order    |   A   B   C   D       D   C   B   A
-;; pixel values  | [12][34][56][78] --> [87][65][43][21]
+;; pixel values  | [12][mM][34][nN]--> [43][Nn][21][Mm]  :: mM & nN are mask bytes
 ;; --------------------------------------------------------------------------
 ;; byte layout   | [ 0123 4567 ]     [ 1032 5476 ] << Bit order (reversed by pairs)
 ;; (Mode 0,2 px) | [ 0101 0101 ] --> [ 1010 1010 ] << Pixel bits (pixel 1, pixel 0)
 ;;
 nextrow:
    push bc      ;; [4] Save Height/Width into the stack for later recovery
-   ld   b, #0   ;; [2] BC  = C = Width (In order to easily add the width to HL)
+   ld   b, #0   ;; [2] BC = C = Width (In order to easily add it to HL)
    add  hl, bc  ;; [3] HL += BC (Add Width to start-of-row pointer, HL, to make it point to the central byte)
+                ;; ... Remember that sprite Width is half the width of the array, as it does not account for masks
    ld   d, h    ;; [1] | DE = HL, so that DE also points to the central byte of the row
    ld   e, l    ;; [1] | 
-   srl  c       ;; [2] C = C / 2 (Sprite width / 2)
+   srl  c       ;; [2] C = C/2 (Sprite width/2, to act as counter of loops, each loop switching 2 bytes 
+                ;; ... and their respective masks, for a total of 4 bytes reversed and switched per loop)
 
-varjump:
-   ;; Even sprites jump from here directly to firstpair
-   jr  nc, firstpair        ;; [3]
+   ;; Even sprites jump from here directly to firstpair, where HL and DE are moved to point to 
+   ;; both central bytes, like in this diagram: (P: pixel byte, M: mask byte)
+   ;; --------------------------------------------------------------------------------------------------
+   ;;   row bytes->> |[P][M][P][M][P][M][P][M]|[P][M][P][M][P][M][P][M]| 8 pixels per row
+   ;;   Width: 4     |          |             |          |  |          | 4 pixel bytes (2 pixels/byte)
+   ;;                |        HL&DE      -->> | -->>     DE HL         | 4 mask  bytes
+   ;; --------------------------------------------------------------------------------------------------
+   jr  nc, firstpair        ;; [2/3] If Carry=0, last bit of C was 0, so Width is Even, then jump
 
-   ;; Odd sprites first switch the central byte, then start with the rest
-   call switch_bytes_single ;; [5+13]
-   inc  hl                  ;; [2]
-   inc  de                  ;; [2]
-   call switch_bytes_single ;; [5+13]
+   ;; Odd sprites first switch the central byte, then start with the rest, 
+   ;; according to this diagram: (P: pixel byte, M: mask byte, p/m: pixel/mask reversed byte)
+   ;; --------------------------------------------------------------------------------------------------
+   ;;   row bytes->> |[P][M][P][M][P][M]|[P][M][p][m][P][M]| 6 pixels per row
+   ;;   Width: 3     |       |          |          |       | 3 pixel bytes (2 pixels per byte)
+   ;;                |      HL&DE       |        HL&DE     | 3 mask  bytes
+   ;; --------------------------------------------------------------------------------------------------
+   call switch_bytes_single ;; [5+17] Reverse central pixel definition byte (first byte)
+   inc  hl                  ;; [2]    HL++ (HL Points to second central byte, mask definition)
+   inc  de                  ;; [2]    DE++ (DE also points to second central byte, mask definition)
+   call switch_bytes_single ;; [5+17] Reverse central mask definition byte (second byte)
 
    ;;
    ;; INTERNAL LOOP THAT FLIPS THE SPRITE
    ;;    Iterates throw all the bytes inside each row
    ;;
-   ;;    If takes byte 2-by-2, one pointed by DE and the other pointed by HL. It flips
-   ;; pixels inside each byte and then switches both bytes pointed by DE and HL. There is
-   ;; a special case for the central byte, at the label "one", which only flips pixels
-   ;; in that byte and leaves it at the same place.
+   ;;    It takes pairs of bytes 2-by-2, one pointed by DE and the other pointed by HL. 
+   ;; It flips pixels inside each byte and its subsequent mask (the next byte in the pair) 
+   ;; and then switches both pairs of bytes pointed by DE and HL. 
+   ;;    After switching each pair of bytes, HL is increased to point to the next pair 
+   ;; of bytes (first byte of the pair) and DE is decremented by 3, to point to the 
+   ;; first byte of the pair that needs to be switched with that pointer by HL.
    ;;
 nextpair:
-   dec de          ;; [2]
-   dec de          ;; [2]
+   dec de            ;; [2] | DE -= 2 (Make DE retrocede 1 pair of bytes, but still
+   dec de            ;; [2] |  point to the second byte of the pair)
 firstpair:
-   inc hl          ;; [2] 
-   dec de          ;; [2]
+   dec de            ;; [2] DE-- (Make DE point to the first byte of its pair of bytes)
+   inc hl            ;; [2] HL++ (Point to the next pair of bytes)
 
 firstbyte:
-   call switch_bytes ;; [5+27]
-   inc hl            ;; [2]
-   inc de            ;; [2]
-   call switch_bytes ;; [5+27]
+   call switch_bytes ;; [5+27] Reverse and Switch first byte of both pairs of bytes (pixel values)
+   inc hl            ;; [2]    HL++ (HL points to the second byte of the pair, its mask)
+   inc de            ;; [2]    DE++ (DE points to the second byte of the pair, its mask)
+   call switch_bytes ;; [5+27] Reverse and Switch second byte of both pairs of bytes (mask values)
 
    ;; C is the counter of pairs of bytes to be flipped and switched. 
-   dec c           ;; [1]   C-- (one less pair of bytes to be flipped and switched)
-   jr nz, nextpair ;; [2/3] If C != 0, there are still bytes to be flipped and switched, so continue
+   dec c             ;; [1]   C-- (one less pair of bytes to be flipped and switched)
+   jr nz, nextpair   ;; [2/3] If C!=0, there are still paris of bytes to be flipped and switched, so continue
 
-   ;; All bytes in the present row have been flipped and switched. 
+   ;; All pairs of bytes in the present row have been flipped and switched. 
    ;; Recover BC (Height/Width) form the stack, decrement height and check if there are
    ;; still more rows to be flipped
-   pop  bc      ;; [3]   BC contains (B: height, C: width of the sprite)
-   djnz nextrow ;; [3/4] B-- (Height--). If B!=0, there are still more rows pending, so continue
+   pop  bc           ;; [3]   BC contains (B: height, C: width of the sprite)
+   djnz nextrow      ;; [3/4] B-- (Height--). If B!=0, there are still more rows pending, so continue
 
-   ret          ;; [3] All sprite rows flipped. Return.
+   ret               ;; [3] All sprite rows flipped. Return.
 
-  ;; Subroutine to invert and switch a pair of bytes
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; switch_bytes
+  ;;     Subroutine to invert and switch a pair of bytes in mode 0
+  ;;
+  ;; INPUTS:
+  ;;   HL: Pointer to Byte 1 to be inverted and switched with DE
+  ;;   DE: Pointer to Byte 2 to be inverted and switched with HL
+  ;;
+  ;; Modifies:
+  ;;   AF, B
+  ;;
+  ;; In-between entry-point:
+  ;;   switch_bytes_single - Gets byte pointed by HL, reverses it and moves it to DE
   ;;
 switch_bytes:
    ;; Flip byte pointed by DE
@@ -253,4 +279,4 @@ switch_bytes_single:
 
    ld (de), a      ;; [2] Store flipped byte from (HL) at (DE)
   
-   ret             ;; [3]
+   ret             ;; [3] Bytes switched and reversed, return
