@@ -121,7 +121,7 @@
 ;;       }
 ;;
 ;;       // Draw main character's sprite
-;;       pvmem = cpct_getScreenPtr(CPCT_VMEM, x, y);
+;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
 ;;       cpct_drawSprite(characterSprite, pvmem, 4, 8);
 ;;    }
 ;; (end code)

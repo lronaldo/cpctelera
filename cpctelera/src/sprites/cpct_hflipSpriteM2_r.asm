@@ -117,7 +117,7 @@
 ;;       // First draw all ships that are facing left
 ;;       while (leftships--) {
 ;;          // Draw Ship
-;;          u8 pvmem = cpct_getScreenPtr(CPCT_VMEM, ships->x, ships->y);
+;;          u8 pvmem = cpct_getScreenPtr(CPCT_VMEM_START, ships->x, ships->y);
 ;;          cpct_drawSprite(g_shipSprite, pvmem, SHIP_WIDTH, SHIP_HEIGHT);
 ;;
 ;;          // Move the pointer to point to the next ship
@@ -130,7 +130,7 @@
 ;;       // Now draw all ships facing right
 ;;       while (rightships--) {
 ;;          // Draw Ship
-;;          u8 pvmem = cpct_getScreenPtr(CPCT_VMEM, ships->x, ships->y);
+;;          u8 pvmem = cpct_getScreenPtr(CPCT_VMEM_START, ships->x, ships->y);
 ;;          cpct_drawSprite(g_shipSprite, pvmem, SHIP_WIDTH, SHIP_HEIGHT);
 ;;
 ;;          // Move the pointer to point to the next ship

@@ -125,7 +125,7 @@
 ;;       }
 ;;
 ;;       // Draw the flag
-;;       pvmem = cpct_getScreenPtr(CPCT_VMEM, x, y);
+;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
 ;;       cpct_drawSprite(flagSprite, pvmem, 6, 16);
 ;;    }
 ;; (end code)
