@@ -21,7 +21,7 @@
 #include "sprites/sprites.h"
 
 // Sets the transparent mask table for color 0, mode 0
-cpctm_createTransparentMaskTable00M0(g_masktable, 0x0100);
+cpctm_createTransparentMaskTable(g_masktable, 0x0100, M0, 0);
 
 // Some useful constants
 #define MAP_WIDTH_TILES          40
