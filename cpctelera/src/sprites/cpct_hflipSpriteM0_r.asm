@@ -137,15 +137,16 @@
 ;; (start code)
 ;;  Case       |      microSecs (us)       |         CPU Cycles          |
 ;; -----------------------------------------------------------------------
-;;  Best       |  24H + (38WW + 16W)H + 14 |  96H + (152WW + 64W)H + 56  |
+;;  Even-Width |     (37WW + 24)H + 14     |      (148WW +  96)H + 56    |
+;;   Odd-Width |     (37WW + 46)H + 14     |      (148WW + 184)H + 56    |
 ;; -----------------------------------------------------------------------
-;;  W=2,H=16   |          1006             |           4024              |
-;;  W=5,H=32   |          3726             |          14904              |
+;;  W=2,H=16   |           990             |           3960              |
+;;  W=5,H=32   |          3854             |          15416              |
 ;; -----------------------------------------------------------------------
 ;;  Asm saving |          -12              |            -48              |
 ;; -----------------------------------------------------------------------
 ;; (end code)
-;;   *W* = *width* % 2, *WW* = *width*/2, *H* = *height*
+;;   *WW* = *width*/2, *H* = *height*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; This loop is repeated for every vertical row of the sprite
@@ -187,7 +188,7 @@ first:
    ;; This part reverses (DE) byte and places it at (HL) location, 
    ;; taking a byte from the start of the row and placing it at the end
    ;;
-   ex  de, hl     ;; [1] DE <-> HL to use HL to refer to the byte going to be reversed now
+   ex  de, hl      ;; [1] DE <-> HL to use HL to refer to the byte going to be reversed now
 
    ld   a, (hl)    ;; [2] A=byte to be reversed 
    ld   c, a       ;; [1] C=A (Copy to be used later for mixing bits)
