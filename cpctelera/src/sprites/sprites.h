@@ -29,6 +29,7 @@
 
 #include <types.h>
 #include "sprite_types.h"
+#include "sprite_flip_macros.h"
 #include "transparency_tables.h"
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
