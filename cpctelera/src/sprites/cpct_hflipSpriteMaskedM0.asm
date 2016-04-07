@@ -188,7 +188,7 @@ nextrow:
    ;; Even sprites jump from here directly to firstpair, where HL and DE are moved to point to 
    ;; both central bytes, like in this diagram: (P: pixel byte, M: mask byte)
    ;; --------------------------------------------------------------------------------------------------
-   ;;   row bytes->> |[P][M][P][M][P][M][P][M]|[P][M][P][M][P][M][P][M]| 8 pixels per row
+   ;;   row bytes->> |[M][P][M][P][M][P][M][P]|[M][P][M][P][M][P][M][P]| 8 pixels per row
    ;;   Width: 4     |          |             |          |  |          | 4 pixel bytes (2 pixels/byte)
    ;;                |        HL&DE      -->> | -->>     DE HL         | 4 mask  bytes
    ;; --------------------------------------------------------------------------------------------------
@@ -197,14 +197,14 @@ nextrow:
    ;; Odd sprites first switch the central byte, then start with the rest, 
    ;; according to this diagram: (P: pixel byte, M: mask byte, p/m: pixel/mask reversed byte)
    ;; --------------------------------------------------------------------------------------------------
-   ;;   row bytes->> |[P][M][P][M][P][M]|[P][M][p][m][P][M]| 6 pixels per row
+   ;;   row bytes->> |[M][P][M][P][M][P]|[M][P][m][p][M][P]| 6 pixels per row
    ;;   Width: 3     |       |          |          |       | 3 pixel bytes (2 pixels per byte)
    ;;                |      HL&DE       |        HL&DE     | 3 mask  bytes
    ;; --------------------------------------------------------------------------------------------------
-   call switch_bytes_single ;; [5+17] Reverse central pixel definition byte (first byte)
-   inc  hl                  ;; [2]    HL++ (HL Points to second central byte, mask definition)
-   inc  de                  ;; [2]    DE++ (DE also points to second central byte, mask definition)
-   call switch_bytes_single ;; [5+17] Reverse central mask definition byte (second byte)
+   call switch_bytes_single ;; [5+17] Reverse central pair, mask definition byte (first byte)
+   inc  hl                  ;; [2]    HL++ (HL Points to second central byte, pixel definition)
+   inc  de                  ;; [2]    DE++ (DE also points to second central byte, pixel definition)
+   call switch_bytes_single ;; [5+17] Reverse central pair, pixel definition byte (second byte)
 
    ;;
    ;; INTERNAL LOOP THAT FLIPS THE SPRITE
@@ -218,7 +218,7 @@ nextrow:
    ;; first byte of the pair that needs to be switched with that pointer by HL.
    ;;
 nextpair:
-   dec de            ;; [2] | DE -= 2 (Make DE retrocede 1 pair of bytes, but still
+   dec de            ;; [2] | DE -= 2 (Make DE go backwards 1 pair of bytes, but still
    dec de            ;; [2] |  point to the second byte of the pair)
 firstpair:
    dec de            ;; [2] DE-- (Make DE point to the first byte of its pair of bytes)
@@ -232,7 +232,7 @@ firstbyte:
 
    ;; C is the counter of pairs of bytes to be flipped and switched. 
    dec c             ;; [1]   C-- (one less pair of bytes to be flipped and switched)
-   jr nz, nextpair   ;; [2/3] If C!=0, there are still paris of bytes to be flipped and switched, so continue
+   jr nz, nextpair   ;; [2/3] If C!=0, there are still pairs of bytes to be flipped and switched, so continue
 
    ;; All pairs of bytes in the present row have been flipped and switched. 
    ;; Recover BC (Height/Width) form the stack, decrement height and check if there are
