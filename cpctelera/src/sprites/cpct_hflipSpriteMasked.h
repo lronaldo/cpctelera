@@ -1,18 +1,19 @@
 // >> GPL info
-// Macro: cpct_mirrorSpriteMasked
+// Macro: cpct_hflipSpriteMasked
 //   Mirrors a sprite with interlaced mask, left-to-right and viceversa
 //
 // C definition:
-//   #define <cpct_mirrorSpriteMasked> (MODE, Sprite, Width, Height)
+//   #define <cpct_hflipSpriteMasked> (MODE, Sprite, Width, Height)
 //
 // Input parameters:
-//    MODE (M0, M1, M2) - Capitals -
-//    Sprite - u8* to the sprite
-//    Width  - height / width
+//    MODE   - Selector for Graphics mode. Valid values are { M0, M1, M2 } (Always in capitals).
+//    Sprite - Pointer to the sprite
+//    Width  - Width of the sprite *in bytes* (without taking into account mask)
+//    Height - Height of the sprite in bytes or pixels (both quantities should be equal)
 //
 // Known limitations:
 //   * This is a C macro, and it is not possible to use it from Assembly. If you 
-// wanted to use it from assembly, call the equivalent cpct_mirrorSpriteXX function
+// wanted to use it from assembly, call the equivalent cpct_hflipSpriteXX function
 // with double width for the sprite (as it has pairs of bytes with colours and mask
 // instead of only colours). 
 //
@@ -32,4 +33,4 @@
 //   }
 // (end code)
 //
-#define cpct_mirrorSpriteMasked(MODE, SP, W, H) cpct_mirrorSprite ## MODE ((SP),2*(W),(H))
+#define cpct_hflipSpriteMasked(MODE, SP, W, H) cpct_hflipSprite ## MODE (2*(W),(H),(SP))
