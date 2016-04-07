@@ -120,7 +120,7 @@
 ;;       // drawn 30 or more times in order to flip it
 ;;       if(++timesdrawn > 30) {
 ;;          // Horizontally flip the flag to animate it
-;;          cpct_hflipSpriteM0(6, 16, flagSprite);
+;;          cpct_hflipSpriteM1(6, 16, flagSprite);
 ;;          timesdrawn = 0;
 ;;       }
 ;;
