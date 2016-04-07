@@ -1,6 +1,6 @@
 ![CPCtelera Logo][CPCTLogo]
 
-_**Astonishing fast Amstrad CPC game engine for C and Assembler developers**_
+_**Astonishingly fast Amstrad CPC game engine for C and Assembler developers**_
 
 ---------------------------------------------------------------
 
