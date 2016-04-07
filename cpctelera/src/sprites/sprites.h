@@ -29,7 +29,7 @@
 
 #include <types.h>
 #include "sprite_types.h"
-#include "transparency_tables.h"
+#include "transparency_table_macros.h"
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;

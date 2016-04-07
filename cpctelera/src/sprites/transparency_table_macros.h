@@ -16,27 +16,50 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef TRANSPARENCY_TABLES_H
-#define TRANSPARENCY_TABLES_H
+#ifndef _TRANSPARENCY_TABLE_MACROS_H
+#define _TRANSPARENCY_TABLE_MACROS_H
 
-//
-// Title: Transparency Tables
-//
+//----------------------------------------------------------------------------------------
+// Title: Transparency Macros
+//----------------------------------------------------------------------------------------
 
 #include <types.h>
+#include "transparency_tables_m0.h"
+#include "transparency_tables_m1.h"
 
 //
-// Macro: cpctm_createTransparentMaskTable00M0
+// Macro: cpctm_createTransparentMaskTable
 //
-//    Creates a 256-bytes look-up table for drawing normal sprites using 
-// colour index 0 as trasnparent.
+//    Creates a 256-bytes look-up table for drawing standard mode 0 screen pixel formatted 
+// sprites using colour index 0 as transparent.
 //
 // C Definition:
-//    #define cpctm_createTransparentMaskTable00M0(TABLE, ADDRESS)
+//    #define <cpctm_createTransparentMaskTable>(*TABLENAME*, *ADDRESS*, *MODE*, *PEN*)
 //
-// C Usage:
-//    To use it in a C program, you have to define the constant <cpct_transparentMaskTable00M0_address>,
-// selecting the location in memory where you want it to be, and include <sprites/transparency_tables.h>
+// Parameters:
+//    TABLENAME - C-identifier to be used as name for this table
+//    ADDRESS   - Memory address where the start of the table will be located. Take special 
+// care with this value not to overlap other parts of the code.
+//    MODE      - It must be either *M0* or *M1* (M capital)
+//    PEN       - It must be a *decimal* value from 0 to 15 (from 0 to 3 for mode 1) *without*
+// *trailing zeros*.
+// 
+// Known limitations:
+//    * Macro may be used several times, resulting in several copies of the same table in 
+// memory. There is no way to prevent this, so take care when using this macro several times:
+// be sure of what you want to do.
+//    * Any *ADDRESS* value may be used, even addresses that overlap with other parts of your
+// own code or data. If this was the case, compiler will complain with "Overlapped record" 
+// messages. Take this into account to move your data accordingly, as 2 values cannot share the
+// same memory location.
+//    * Most of the time, you will require this table to be *memory aligned*. As this table
+// takes 256 bytes, it only will be aligned if you place it at any 0x??00 location. If any 
+// of the last 2 digits from your 4-digit address is not 0, your table will not be aligned.
+//
+// Details:
+//    This macro generates a dummy __naked function called dummy_cpct_transparentMaskTable00M0_container
+// containing absolute location assembly code along with the definition of a 256 array with 
+// mask values to be used 
 // (start code)
 //    // Include transparency table for mode 0 at 0x2100 (0x2100 - 0x21FF)
 //    #define cpct_transparentMaskTable00M0_address 0x2100
@@ -90,32 +113,17 @@
 //
 #define cpctm_defineMaskTable(TABLE) extern const u8 TABLE[256]
 
-#define cpctm_createTransparentMaskTable00M0(TABLE,ADDRESS) \
+#define cpctm_createTransparentMaskTable(TABLE,ADDRESS,MODE,PEN) \
 cpctm_defineMaskTable(TABLE); \
-void dummy_cpct_transparentMaskTable00M0_container() __naked { \
+void dummy_cpct_transparentMaskTable ## PEN ## MODE ## _container() __naked { \
    __asm \
       .area _ ## TABLE ## _ (ABS) \
       .org ADDRESS \
       _ ## TABLE:: \
-      .db 0xff, 0xaa, 0x55, 0x00, 0xaa, 0xaa, 0x00, 0x00, 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0xaa, 0xaa, 0x00, 0x00, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0xaa, 0xaa, 0x00, 0x00, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0xaa, 0xaa, 0x00, 0x00, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
-      .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 \
+      CPCTM_MASKTABLE ## PEN ## MODE \
       .area _CSEG (REL, CON) \
    __endasm; \
 } \
-void dummy_cpct_transparentMaskTable00M0_container() __naked
+void dummy_cpct_transparentMaskTable ## PEN ## MODE ## _container() __naked
 
 #endif
