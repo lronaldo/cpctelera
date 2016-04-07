@@ -35,8 +35,6 @@
 ;;    > call cpct_hflipSpriteMaskedM0_asm
 ;;
 ;; Parameter Restrictions:
-;;
-;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
 ;; with interlaced mask data (Pairs of bytes, 1st: mask data for next byte, 2nd:
 ;; mode 0 pixel data byte). You may check screen pixel format for mode 0 (<cpct_px2byteM0>).
