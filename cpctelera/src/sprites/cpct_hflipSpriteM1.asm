@@ -73,7 +73,7 @@
 ;;
 ;; (start code)
 ;;    // Example call. Sprite has 16x4 pixels (4x4 bytes)
-;;    cpct_hflipSpriteM0(4, 4, sprite);
+;;    cpct_hflipSpriteM1(4, 4, sprite);
 ;;
 ;;    // Operation performed by the call and results
 ;;    //

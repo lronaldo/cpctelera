@@ -21,7 +21,8 @@
 ;;
 ;; Function: cpct_hflipSpriteMaskedM0
 ;;
-;;   Horizontally flips a sprite, encoded in screen pixel format, *mode 0*.
+;;   Horizontally flips a sprite, encoded in screen pixel format, *mode 0*,  with 
+;; interlaced mask.
 ;;
 ;; C definition:
 ;;   void <cpct_hflipSpriteMaskedM0> (<u8> width, <u8> height, <void>*sprite) __z88dk_callee;
@@ -126,7 +127,7 @@
 ;;
 ;;       // Draw main character's sprite
 ;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
-;;       cpct_drawSprite(characterSprite, pvmem, 4, 8);
+;;       cpct_drawSpriteMasked(characterSprite, pvmem, 4, 8);
 ;;    }
 ;; (end code)
 ;;
