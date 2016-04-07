@@ -53,9 +53,12 @@ extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideom
 
 // Sprite flipping functions
 extern void cpct_hflipSpriteM0   (u8 width, u8 height, void* sprite) __z88dk_callee;
-extern void cpct_hflipSpriteM0_r (void* sprite, u8 width, u8 height) __z88dk_callee;
 extern void cpct_hflipSpriteM1   (u8 width, u8 height, void* sprite) __z88dk_callee;
 extern void cpct_hflipSpriteM2   (u8 width, u8 height, void* sprite) __z88dk_callee;
+
+// Sprite flipping functions (ROM-friendly versions)
+extern void cpct_hflipSpriteM0_r (void* sprite, u8 width, u8 height) __z88dk_callee;
+extern void cpct_hflipSpriteM2_r (void* sprite, u8 width, u8 height) __z88dk_callee;
 
 // Functions to modify behaviour of other functions
 extern void cpct_setBlendMode (CPCT_BlendMode mode) __z88dk_fastcall;
