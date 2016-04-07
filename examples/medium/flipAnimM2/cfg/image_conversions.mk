@@ -61,3 +61,12 @@ PALETTE={0 26}
 ## called g_runner_{0-6} (g is prefix for _runner) without interlaced
 ## mask. 
 $(eval $(call IMG2SPRITES,img/runner.png,2,g,80,94,$(PALETTE),,src/))
+
+## Convert banner.png into banner.c and banner.h
+##   This is a mode 2, 640x52 pixels sprite (a title banner). The image will 
+## be converted into 2 320x52 C-arrays called g_banner_{0/1} (g is prefix for _banner) 
+## without interlaced mask. This is to let us use cpct_drawSprite to draw both
+## sprites, as cpct_drawSprite cannot draw sprites wider than 63 bytes (640 mode 2
+## pixels are 80 bytes, whereas 320 mode 2 pixels will be 40 bytes)
+##
+$(eval $(call IMG2SPRITES,img/banner.png,2,g,320,52,$(PALETTE),,src/))

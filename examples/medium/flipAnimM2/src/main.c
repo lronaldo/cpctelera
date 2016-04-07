@@ -18,12 +18,17 @@
 
 #include <cpctelera.h>
 #include "runner.h"
+#include "banner.h"
 
 // Sprite size (in bytes)
 #define SP_W   10
 #define SP_H   94
 #define SP_X   34
 #define SP_Y   86
+
+// Banner size (in bytes)
+#define BANNER_W  80
+#define BANNER_H  52
 
 // Size of the screen (in bytes)
 #define SCR_W  80
@@ -58,11 +63,14 @@ void initialize() {
    // Set video mode 2 (640x200, 2 colours)
    cpct_setVideoMode(2);
 
+   // Draw Demo banner at top-left corner of the screen (Start of video memory).
+   // We draw it in 2 parts, as cpct_drawSprite cannot draw sprites wider than 63 bytes.
+   cpct_drawSprite(g_banner_0, CPCT_VMEM_START             , BANNER_W/2, BANNER_H);
+   cpct_drawSprite(g_banner_1, CPCT_VMEM_START + BANNER_W/2, BANNER_W/2, BANNER_H);
+
    // Draw instructions
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, 30, 30);
-   cpct_drawStringM2("Animation  Flip Demo", pvideomem, 1);   
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, 30, 50);
-   cpct_drawStringM2(" [Any Key]   Change ", pvideomem, 0);
+   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, 29, 60);
+   cpct_drawStringM2("[Any Key] Run Opposite", pvideomem, 0);
 }
 
 //
@@ -97,6 +105,8 @@ void main(void) {
          u8 i = ANIM_FRAMES;
          while (i--) {
             cpct_hflipSpriteM2(SP_W, SP_H, g_animation[i]);
+            //// This operation can also be done using ROM-friendly version code
+            //cpct_hflipSpriteM2_r(g_animation[i], SP_W, SP_H);
          }
       }
  
