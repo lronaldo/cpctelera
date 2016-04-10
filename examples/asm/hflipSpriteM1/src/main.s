@@ -101,6 +101,7 @@ g_mentities::
 .globl cpct_setPALColour_asm
 .globl cpct_getScreenPtr_asm
 .globl cpct_hflipSpriteM1_asm
+;.globl cpct_hflipSpriteM1_r_asm ;; Alternative ROM-friendly version
 .globl cpct_drawSprite_asm
 .globl cpct_drawStringM1_f_asm
 .globl cpct_waitVSYNC_asm
@@ -169,9 +170,17 @@ drawEntity::
    dec   hl                      ;; | HL -= 2, to make it point again to the sprite looking_at value
    dec   hl                      ;; |
    ld  (hl),a                    ;; Save new looking_at direction
+
+   ;; Flip the sprite
    ld    bc, #sprite_HxW         ;; B = Sprite Height, C = Width
    ex    de, hl                  ;; HL points to the sprite (DE was pointing to it)
-   call  cpct_hflipSpriteM1_asm  ;; Flip the sprite
+   call  cpct_hflipSpriteM1_asm   ;; Flip the sprite
+
+   ;; Sprite could also be flipped using ROM-friendly version, using this code
+   ;; (.globl cpct_hflipSpriteM1_r_asm must be added)
+   ;ld    hl, #sprite_HxW         ;; H = Sprite Height, L = Width
+   ;call  cpct_hflipSpriteM1_r_asm;; Flip the sprite
+
    pop   bc                      ;; Recover coordinates to draw the sprite
 
 looking_good:
