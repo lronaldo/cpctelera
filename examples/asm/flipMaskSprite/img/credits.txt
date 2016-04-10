@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------------------------------
+background.png is based on Hand Painted Texture - Sandstone, by The Chayed - KIIRA
+ - Hand Painted Texture - Sandstone: http://opengameart.org/content/hand-painted-texture-sandstone
+ - The Chayed - KIIRA: http://opengameart.org/users/the-chayed-kiira
+
+Creative Commons Attribution 3.0. Unported License: http://creativecommons.org/licenses/by/3.0/
+---------------------------------------------------------------------------------------------------
+knight.png is based on The Knight - Free Sprite, by pzUH
+ - The Knight - Free Sprite: http://opengameart.org/content/the-knight-free-sprite
+ - pzUH: http://opengameart.org/users/pzuh
+
+Public Domain CC0 1.0 Universal License: http://creativecommons.org/publicdomain/zero/1.0/
+---------------------------------------------------------------------------------------------------

@@ -29,8 +29,8 @@
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel data)
 ;;  (2B DE) memory - Destination video memory pointer
-;;  (1B B ) height - Sprite Height in bytes (>0)
-;;  (1B C ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
+;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B B ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSprite_asm
@@ -171,13 +171,6 @@
 ;; <video memory locations table at 
 ;; http://www.cpcmania.com/Docs/Programming/Painting_pixels_introduction_to_video_memory.htm>.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;
-;; Macro to introduce a JR 0 more clearly
-;;
-.macro jr__0
-   .DW #0x0018    ;; JR #00 (Normally used as a modifiable jump, as jr 0 is an infinite loop)
-.endm
 
    ;; Modify code using width to jump in drawSpriteWidth
    ld    a, #126           ;; [2] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite * 2 (2B)

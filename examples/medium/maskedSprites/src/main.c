@@ -170,6 +170,9 @@ void main(void) {
       if (x < BACK_X || x > (BACK_X + 4*BACK_W-5) ) {
         x -= vx;    // Undo latest movement subtracting vx from current x position
         vx = -vx;   // Change the sense of velocity to start moving opposite
+
+        // Optionally, Sprite may be flipped to look backwards
+        //cpct_hflipSpriteMaskedM0(SPR_W, SPR_H, G_sprite_EMR);
       }
    }
 }

@@ -1,0 +1,4 @@
+runner.png is based on Animated Runner Character by irmirx
+ - Animated Runner Character: http://opengameart.org/content/animated-runner-character
+ - irmirx: https://www.behance.net/irmirx
+Creative Commons Attribution 3.0. Unported (CC BY 3.0) License: http://creativecommons.org/licenses/by/3.0/

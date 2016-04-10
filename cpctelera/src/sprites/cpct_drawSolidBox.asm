@@ -104,13 +104,6 @@
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;
-;; Macro to introduce a JR 0 more clearly
-;; 
-.macro jr__0
-   .DW #0x0018    ;; JR #00 (Normally used as a modifiable jump, as jr 0 is an infinite loop)
-.endm
-
    push  hl         ;; [4] Save HL (Pointer to the first byte of the box) for later use
 
    ;; Modify code using width to jump in drawSpriteWidth

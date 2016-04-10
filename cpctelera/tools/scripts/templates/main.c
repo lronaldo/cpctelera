@@ -19,16 +19,15 @@
 #include <cpctelera.h>
 
 void main(void) {
-   u8* video_memory_start  = (u8*)0xC000;
-   u8  character_line_size = 0x050;
+   u8* pvmem;  // Pointer to video memory
 
    // Clear Screen
-   cpct_memset(video_memory_start, 0, 0x4000);
+   cpct_memset(CPCT_VMEM_START, 0, 0x4000);
 
    // Draw String on the middle of the screen
-   cpct_drawStringM1("Welcome to CPCtelera!",
-                     video_memory_start + character_line_size * 12,
-                     1, 0);
+   pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 20, 96);
+   cpct_drawStringM1("Welcome to CPCtelera!", pvmem, 1, 0);
+
    // Loop forever
    while (1);
 }

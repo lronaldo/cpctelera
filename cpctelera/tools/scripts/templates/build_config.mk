@@ -137,6 +137,9 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
 
+# Convert images
+include cfg/image_conversion.mk
+
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
 OBJDSKINCSDIR := $(OBJDIR)/$(DSKFILESDIR)

@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2014-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 #include <types.h>
 #include "sprite_types.h"
+#include "transparency_table_macros.h"
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;
@@ -49,6 +50,21 @@ extern void cpct_drawSpriteBlended   (void *memory, u8 height, u8 width, void *s
 extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height);
 extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideomem, 
                                               u8 width, u8 height, const void* pmasktable) __z88dk_callee;
+
+// Sprite flipping functions
+extern void cpct_hflipSpriteM0   (u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_hflipSpriteM1   (u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_hflipSpriteM2   (u8 width, u8 height, void* sprite) __z88dk_callee;
+
+// Sprite flipping functions (ROM-friendly versions)
+extern void cpct_hflipSpriteM0_r (void* sprite, u8 width, u8 height) __z88dk_callee;
+extern void cpct_hflipSpriteM1_r (void* sprite, u8 width, u8 height) __z88dk_callee;
+extern void cpct_hflipSpriteM2_r (void* sprite, u8 width, u8 height) __z88dk_callee;
+
+// Masked Sprite flipping functions
+extern void cpct_hflipSpriteMaskedM0(u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_hflipSpriteMaskedM1(u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_hflipSpriteMaskedM2(u8 width, u8 height, void* sprite) __z88dk_callee;
 
 // Functions to modify behaviour of other functions
 extern void cpct_setBlendMode (CPCT_BlendMode mode) __z88dk_fastcall;
