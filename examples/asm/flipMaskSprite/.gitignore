@@ -1,0 +1,4 @@
+src/background.c
+src/background.h
+src/knight.c
+src/knight.h
