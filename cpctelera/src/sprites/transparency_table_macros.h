@@ -30,8 +30,8 @@
 //
 // Macro: cpctm_createTransparentMaskTable
 //
-//    Creates a 256-bytes look-up table for drawing standard mode 0 screen pixel formatted 
-// sprites using colour index 0 as transparent.
+//    Creates a 256-bytes look-up table for drawing standard screen pixel formatted 
+// sprites using a given colour index as transparent.
 //
 // C Definition:
 //    #define <cpctm_createTransparentMaskTable>(*TABLENAME*, *ADDRESS*, *MODE*, *PEN*)
@@ -45,34 +45,65 @@
 // *trailing zeros*.
 // 
 // Known limitations:
-//    * Macro may be used several times, resulting in several copies of the same table in 
-// memory. There is no way to prevent this, so take care when using this macro several times:
-// be sure of what you want to do.
+//    * This macro may be used several times in different files, resulting in several copies 
+// of a same table in memory. There is no way to prevent this, so take care when using this 
+// macro several times: be sure of what you want to do.
 //    * Any *ADDRESS* value may be used, even addresses that overlap with other parts of your
 // own code or data. If this was the case, compiler will complain with "Overlapped record" 
 // messages. Take this into account to move your data accordingly, as 2 values cannot share the
 // same memory location.
 //    * Most of the time, you will require this table to be *memory aligned*. As this table
 // takes 256 bytes, it only will be aligned if you place it at any 0x??00 location. If any 
-// of the last 2 digits from your 4-digit address is not 0, your table will not be aligned.
+// of the last 2 digits from your 4-digit address is not 0, your table will not be 256-byte aligned.
+//
+// Size:
+//    256 (0x100) bytes
 //
 // Details:
-//    This macro generates a dummy __naked function called dummy_cpct_transparentMaskTable00M0_container
-// containing absolute location assembly code along with the definition of a 256 array with 
-// mask values to be used 
+//    This macro generates a dummy __naked function called dummy_cpct_transparentMaskTable<PEN><MODE>_container
+// (without the < > signs, as <PEN> and <MODE> are placeholders for parameters given). The function 
+// created contains absolute location assembly code along with the definition of a 256-bytes array (the 
+// conversion table) with mask values to be used for generating transparencies out of normal screen
+// pixel format values.
+//
+//    This table will be used by functions like <cpct_drawSpriteMaskedAlignedTable> to make normal sprites
+// transparent. The technique is simple: one colour index is considered as transparent. Therefore, pixels
+// of this colour form a mask that is used to remove them from the sprite and background. Then, after
+// removing transparent pixels, a mixing operation is performed, and the sprite is drawn like if it 
+// had an interlaced mask. With this technique, normal sprites may be used as transparent, at the 
+// cost of losing one colour. 
+//
+// Use example:
+//    In a mode 0 pirates game, we have three main characters, all of them pirates, that have 
+// many animated sprites. These sprites are created in screen pixel format without interlaced
+// masks to save a great amount of bytes. To draw these pirates and animations transparent,
+// we use the colour 0 (palette index 0) as transparent. For that, we create the transparent
+// mask table at a 256-byte aligned memory location (0x2100), and then use that table
+// to draw the sprites with the function <cpct_drawSpriteMaskedAlignedTable>:
 // (start code)
-//    // Include transparency table for mode 0 at 0x2100 (0x2100 - 0x21FF)
-//    #define cpct_transparentMaskTable00M0_address 0x2100
-//    #include <sprites/transparency_tables.h>
+//    #include <cpctelera.h>
+//
+//    // Create a 256-byte aligned transparent mask table, for mode 0, 
+//    // using palette colour index 0 as transparent
+//    cpctm_createTransparentMaskTable(transparentMaskTable, 0x2100, M0, 0);
+//
+//    // Draws a pirate sprite at a given (X,Y) location as transparent 
+//    // All pirates are same size, SPR_W: Sprite Width, SPR_H: Sprite Height
+//    drawPirateTransparent(u8* sprite, x, y) {
+//       u8* pmem;         // Pointer to video memory location where the pirate will be drawn
+//       
+//       // Calculate video memory location where to draw the pirate and draw it transparent
+//       // Important: Remember that this drawing function requires sprites to be also memory-aligned!
+//       pmem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
+//       cpct_drawSpriteMaskedAlignedTable(sprite, pmem, SPR_W, SPR_H, transparentMaskTable);
+//    }
 // (end code)
-//    With this definition, you are including <cpct_transparentMaskTable00M0> in your binary
-// at address 0x2100 (256-bytes aligned, from 0x2100 to 0x21FF, never changing the Most significant byte). 
-// You are always required to provide a concrete address for this table at definition time. 
+//    This code creates the 256-byte table and includes it in the binary located at address 0x2100 
+// (256-bytes aligned, from 0x2100 to 0x21FF, never changing the Most significant byte). Then, the
+// function <cpct_drawSpriteMaskedAlignedTable> uses this table to draw pirate sprites as transparent,
+// substituting colour 0 in the sprites by the background pixels. 
 //
 // General recommendations:
-//    * Be vigilant with the use of explicit addresses in SDCC. It is recommended that you group 
-// together all explicitly located items in one single file. Otherwise, memory locations may be 
-// messed up in the final binary by the linker.
 //    * Remember that locating items at a specific memory location is done writing them at a concrete
 // location in the final binary, taking into account where it will be loaded. That can make the size
 // of the final binary increase, and even overwrite parts of the memory you did not intended. For instance,
@@ -85,45 +116,78 @@
 // recommended that you put your explicitly located data items first, previous to the starting
 // memory address of your program. That's easier to manage.
 //
-// Size:
-//    256 (0x100) bytes
-//
-// Details:
-//    Look-up table (array) containing all the masks for the 256 possible combinations of
-// byte pixel data values, assuming firmware colour 0 as being transparent. It is used by
-// sprite-drawing functions to draw the sprites using colour 0 as transparent.
-// 
-//    This table should be placed at a specific location in memory. It is recommended to place 
-// it at a 256-byte aligned memory location (a memory location whose Least signficant byte is 0, 
-// so the address has the form 0x??00). In fact, some functions like <cpct_drawSpriteMaskedAlignedTable> 
-// require it to be 256-byte aligned or they will fail.
-// 
-//    To be able to use this table, all you have to do is defining the macro (constant value) 
-// <cpct_transparentMaskTable00M0_address> before the inclusion of *<sprites/transparency_tables.h>*, 
-// CPCtelera's header file.
-//
-//    Once the table has been defined, you can access it through the symbol <cpct_transparentMaskTable00M0>.
-//
-//
-//
-// Macro: cpct_transparentMaskTable00M0_address
-//
-//    Macro used to set the location where <cpct_transparentMaskTable00M0> must be included in memory.
-// When this macro is defined, <cpct_transparentMaskTable00M0> is included.
-//
-#define cpctm_defineMaskTable(TABLE) extern const u8 TABLE[256]
-
-#define cpctm_createTransparentMaskTable(TABLE,ADDRESS,MODE,PEN) \
-cpctm_defineMaskTable(TABLE); \
+#define cpctm_createTransparentMaskTable(TABLENAME,ADDRESS,MODE,PEN) \
+cpctm_defineMaskTable(TABLENAME); \
 void dummy_cpct_transparentMaskTable ## PEN ## MODE ## _container() __naked { \
    __asm \
-      .area _ ## TABLE ## _ (ABS) \
+      .area _ ## TABLENAME ## _ (ABS) \
       .org ADDRESS \
-      _ ## TABLE:: \
+      _ ## TABLENAME:: \
       CPCTM_MASKTABLE ## PEN ## MODE \
       .area _CSEG (REL, CON) \
    __endasm; \
 } \
 void dummy_cpct_transparentMaskTable ## PEN ## MODE ## _container() __naked
+
+//
+// Macro: cpctm_declareMaskTable
+//
+//    Declares a 256-bytes look-up table for drawing standard screen pixel formatted 
+// sprites using a given colour index as transparent. It does not create the table:
+// it only declares it to make it accessible from different code files.
+//
+// C Definition:
+//    #define <cpctm_declareMaskTable>(*TABLENAME*)
+//
+// Parameters:
+//    TABLENAME - C-identifier of the table to be declared
+//
+// Details:
+//    This macro generates a declaration for the given *TABLENAME*. This declaration
+// is normally expected to be included in a header file so that files including
+// the header become able to access the table *TABLENAME*. *TABLENAME* gets
+// declared as *extern* and will require to be defined in a source code file.
+// If a table is declared using this macro but not defined using 
+// <cpctm_createTransparentMaskTable>, a linker error will happen.
+//
+// Use example:
+//    Imagine we have 3 source files and 1 header file: a.c, b.c, t.c and h.h. Both
+// a.c and b.c make use of a transparency table named g_transparencyMaskTable, which
+// is defined in t.c. For that to be possible, we declare the table in h.h this way:
+// (start code)
+//    // Include guards
+//    #ifndef _H_H_
+//    #define _H_H_
+//
+//    #include <cpctelera.h>
+//
+//    // Declare g_transparencyMaskTable, which is defined in t.c, and used
+//    // in a.c and in b.c also.
+//    cpctm_declareMaskTable(g_transparencyMaskTable);
+//
+//    #endif
+// (end code)
+//    With this declaration, a.c and b.c only have to include h.h to be able to access
+// g_transparencyMaskTable, which is defined in t.c this way:
+// (start code)
+//    #include "h.h"
+//
+//    // Create transparency mask table for mode 1 and palette index 1, at address 0x100
+//    cpctm_createTransparentMaskTable(g_transparencyMaskTable, 0x100, M1, 1);
+// (end code)
+//    Then, for instance, a.c. can make use of the table like in this example:
+// (start code)
+//    #include "h.h"
+//
+//    //.... code ....
+//
+//    // Function to draw a transparent sprite
+//    drawMyTransparentSprite(u8* sprite, u8* mem_loc) {
+//       // All sprites are same width and height
+//       cpct_drawSpriteMaskedAlignedTable(sprite, mem_loc, WIDTH, HEIGHT, g_transparencyMaskTable);
+//    }
+// (end code)
+//
+#define cpctm_declareMaskTable(TABLENAME) extern const u8 TABLENAME[256]
 
 #endif
