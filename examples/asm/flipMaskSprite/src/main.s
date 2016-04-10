@@ -20,13 +20,14 @@
 ;; DEFINED CONSTANTS
 ;;===============================================================================
 
-pvideomem     = 0xC000         ;; First byte of video memory
-palete_size   = 4              ;; Number of total palette colours
-border_colour = 0x0010         ;; 0x10 (Border ID), 0x00 (Colour to set: White).
-tile_HxW      = 0x3214         ;; Height (50 pixels or bytes,  0x32) 
-                               ;; Width  (80 pixels, 20 bytes, 0x14) 1 byte = 4 pixels
-sprite_HxW    = 0x9119         ;; Height (145 pixels or bytes,  0x91) 
-sprite_Width  = 0x19           ;; Width  (100 pixels, 25 bytes, 0x19) 1 byte = 4 pixels
+pvideomem      = 0xC000  ;; First byte of video memory
+palete_size    = 4       ;; Number of total palette colours
+border_colour  = 0x0010  ;; 0x10 (Border ID), 0x00 (Colour to set: White).
+tile_HxW       = 0x3214  ;; Height (50 pixels or bytes,  0x32) 
+                         ;; Width  (80 pixels, 20 bytes, 0x14) 1 byte = 4 pixels
+knight_WxH     = 0x9119  ;; Height (145 pixels or bytes,  0x91) 
+                         ;; Width  (100 pixels, 25 bytes, 0x19) 1 byte = 4 pixels
+knight_offset  = 0x39FB  ;; Offset for location (108,55) with respect to screen (0,0)
 
 ;;===============================================================================
 ;; DATA SECTION
@@ -79,6 +80,7 @@ bg_tile_offsets:
 ;.globl cpct_hflipSpriteM1_asm
 ;.globl cpct_hflipSpriteM1_r_asm ;; Alternative ROM-friendly version
 .globl cpct_drawSprite_asm
+.globl cpct_drawSpriteMasked_asm
 ;.globl cpct_drawStringM1_f_asm
 .globl cpct_waitVSYNC_asm
 
@@ -178,6 +180,17 @@ next_tile:
 
    ret            ;; Return
 
+drawKnight::
+   ld    hl, #knight_offset
+   add   hl, de
+   ex    de, hl
+   ld    hl, #_g_spr_knight
+   ld    bc, #knight_WxH
+   call  cpct_drawSpriteMasked_asm
+
+   ret
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN function. This is the entry point of the application.
@@ -188,6 +201,9 @@ _main::
 
    ld    de, #pvideomem       ;; DE points to the start of video memory, where Background should be drawn
    call  drawFullBackground   ;; Draw the background
+
+   ld    de, #pvideomem       ;; DE points to the start of video memory, where Background should be drawn
+   call  drawKnight           ;; Draw the knight at its concrete offset respect to pvideomem
 
 loop:
    jr    loop                 ;; Repeat forever

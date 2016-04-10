@@ -70,4 +70,4 @@ $(eval $(call IMG2SPRITES,img/background.png,1,g,80,50,$(PALETTE),tileset,src/,h
 ##   This file contains a mode 1, 100x145 pixels, sprite of a kinght looking right. 
 ## The image will be converted a C-array called g_spr_knight that will contain the 
 ## 100x145 pixels in screen mode 1 pixel format WITH interlaced mask. 
-$(eval $(call IMG2SPRITES,img/knight.png,1,g_spr,100,145,$(PALETTE),,src/))
+##$(eval $(call IMG2SPRITES,img/knight.png,1,g_spr,100,145,$(PALETTE),mask,src/))
