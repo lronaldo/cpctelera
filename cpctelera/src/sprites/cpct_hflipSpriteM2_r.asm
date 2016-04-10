@@ -19,7 +19,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_hflipSpriteM2
+;; Function: cpct_hflipSpriteM2_r
 ;;
 ;;   Horizontally flips a sprite, encoded in screen pixel format, *mode 2*
 ;; (ROM-friendly version).
