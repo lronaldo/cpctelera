@@ -169,12 +169,13 @@
 ;; the row and HL to the last one, so HL points to the previous byte of the next row.
 ;; It reverses each byte's pair of colours, and it also reverses byte order inside the 
 ;; same row. So, virtual layout scheme is as follows:
-;; --------------------------------------------------------------------------
-;; byte order    |   A   B   C   D       D   C   B   A
-;; pixel values  | [12][mM][34][nN]--> [43][Nn][21][Mm]  :: mM & nN are mask bytes
-;; --------------------------------------------------------------------------
+;; ------------------------------------------------------------------------------------
+;; byte order    |   A   B   C   D       C   D   A   B
+;; pixel values  | [mM][12][nN][34]--> [Nn][43][Mm][21]  :: mM & nN are mask nibbles
+;; ------------------------------------------------------------------------------------
 ;; byte layout   | [ 0123 4567 ]     [ 1032 5476 ] << Bit order (reversed by pairs)
 ;; (Mode 0,2 px) | [ 0101 0101 ] --> [ 1010 1010 ] << Pixel bits (pixel 1, pixel 0)
+;; ------------------------------------------------------------------------------------
 ;;
 nextrow:
    push bc      ;; [4] Save Height/Width into the stack for later recovery
