@@ -36,9 +36,11 @@
 ##  (8): Output subfolder for generated .C/.H files (in project folder)   ##
 ##  (9): (hwpalette)                                                      ##
 ##     - "hwpalette": output palette array with hardware colour values    ##
+## (10): Aditional options (you can use this to pass aditional modifiers  ##
+##       to cpct_img2tileset)                                             ##
 ##                                                                        ##
 ## Macro is used in this way (one line for each image to be converted):   ##
-##  $(eval $(call IMG2SPRITES,(1),(2),(3),(4),(5),(6),(7),(8),(9)))       ##
+##  $(eval $(call IMG2SPRITES,(1),(2),(3),(4),(5),(6),(7),(8),(9), (10))) ##
 ##                                                                        ##
 ## Important:                                                             ##
 ##  * Do NOT separate macro parameters with spaces, blanks or other chars.##

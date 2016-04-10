@@ -231,6 +231,7 @@ endef
 #                       "tileset": generate a tileset array including pointers to all sprites
 # $(8): Output subfolder for generated .C and .H files (inside project folder)
 # $(9): (hwpalette) "hwpalette":   output palette array as hardware values
+# $(10): Aditional options (you can use this to pass aditional modifiers to cpct_img2tileset)
 #
 define IMG2SPRITES
 $(eval I2S_C  := $(basename $(1)).c)
@@ -245,7 +246,7 @@ $(eval I2S_P  := $(I2S_P) $(shell if [ "$(9)" = "hwpalette" ]; then echo "-oph";
 .SECONDARY: $(I2S_CH)
 $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
-	cpct_img2tileset $(I2S_P) -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1);
+	cpct_img2tileset $(I2S_P) -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(10) $(1);
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
