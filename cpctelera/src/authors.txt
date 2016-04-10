@@ -27,7 +27,7 @@ Awesome collaborators:
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
  
 Bitarrays idea and original implementation:
-   * Alberto García García (Blitzman, albertgg93@gmail.com, <@algertgarcia93 at http://twitter.com/algertgarcia93>)
+   * Alberto García García (Blitzman, albertgg93@gmail.com, <@albertgarcia93 at http://twitter.com/albertgarcia93>)
    * Pablo Martínez González (pablo2093@gmail.com, <@pablo_2093 at http://twitter.com/pablo_2093>)
  
 Some original code and ideas for sprite drawing and firmware enabling/disabling:

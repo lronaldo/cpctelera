@@ -1,6 +1,6 @@
 ![CPCtelera Logo][CPCTLogo]
 
-_**Astonishing fast Amstrad CPC game engine for C and Assembler developers**_
+_**Astonishingly fast Amstrad CPC game engine for C and Assembler developers**_
 
 ---------------------------------------------------------------
 
@@ -37,7 +37,7 @@ If you are a Mac user, you will want to consider installing [CPCtelera-samples-X
 
 ### Authors and License
 
- * (C) Copyright 2014-2015 [CPCtelera's _awesome_ authors](http://lronaldo.github.io/cpctelera/files/authors-txt.html)
+ * (C) Copyright 2014-2016 [CPCtelera's _awesome_ authors](http://lronaldo.github.io/cpctelera/files/authors-txt.html)
  * Distributed under [GNU General Public License v3](http://lronaldo.github.io/cpctelera/files/license-txt.html)
 
 [![Cheesetea Logo][CTLogo]](http://www.cheesetea.com) [![Fremos logo][FRLogo]](http://fremos.cheesetea.com)
