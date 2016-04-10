@@ -79,7 +79,7 @@
 ;;
 ;; (start code)
 ;;    // Example call. Sprite has 16x4 pixels (4x4 bytes)
-;;    cpct_hflipSpriteM1(4, 4, sprite);
+;;    cpct_hflipSpriteMaskedM1(4, 4, sprite);
 ;;
 ;;    // Operation performed by the call and results (mM, nN: mask values)
 ;;    //
@@ -146,18 +146,18 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - ?? bytes
-;;  ASM-bindings - ?? bytes
+;;    C-bindings - 80 bytes
+;;  ASM-bindings - 77 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case       |      microSecs (us)       |         CPU Cycles          |
 ;; -----------------------------------------------------------------------
-;;  Even-width |     (80WW + 18)H + 16     |     (320WW +  72)H + 64     |
-;;   Odd-width |     (80WW + 69)H + 16     |     (320WW + 244)H + 64     |
+;;  Even-width |    (116WW + 18)H + 16     |     (464WW +  72)H + 64     |
+;;   Odd-width |    (116WW + 87)H + 16     |     (464WW + 348)H + 64     |
 ;; -----------------------------------------------------------------------
-;;  W=2,H=16   |          1584             |           6336              |
-;;  W=5,H=32   |          7344             |          29376              |
+;;  W=2,H=16   |          2160             |           8640              |
+;;  W=5,H=32   |         10224             |          40896              |
 ;; -----------------------------------------------------------------------
 ;;  Asm saving |          -12              |            -48              |
 ;; -----------------------------------------------------------------------
@@ -179,13 +179,14 @@
 ;; and goes decreasing DE and increasing HL. At the end, DE points to the first byte of 
 ;; the row and HL to the last one, so HL points to the previous byte of the next row.
 ;; It reverses each byte's pair of colours, and it also reverses byte order inside the 
-;; same row. So, virtual layout scheme is as follows:
-;; --------------------------------------------------------------------------
-;; byte order    |   A   B   C   D       D   C   B   A
-;; pixel values  | [12][mM][34][nN]--> [43][Nn][21][Mm]  :: mM & nN are mask bytes
-;; --------------------------------------------------------------------------
-;; byte layout   | [ 0123 4567 ]     [ 1032 5476 ] << Bit order (reversed by pairs)
-;; (Mode 0,2 px) | [ 0101 0101 ] --> [ 1010 1010 ] << Pixel bits (pixel 1, pixel 0)
+;; same row. So, virtual layout scheme is as follows (mM & nN are mask pairs of bits):
+;; -----------------------------------------------------------------------------------------------
+;; byte order    |          A           B           C                C           B           A
+;; pixel values  | [mMmM][1234][nNnN][5678][mMmM][90AB] --> [MmMm][BA09][NnNn][8765][MmMm][4321]
+;; -----------------------------------------------------------------------------------------------
+;; byte layout   | [ 0123 4567 ]     [ 3210 7654 ] << Bit order (reversed by pairs)
+;; (Mode 1, 4 px)| [ abcd abcd ] --> [ dcba dcba ] << Pixel bits (4 pixels, a-d)
+;; -----------------------------------------------------------------------------------------------
 ;;
 nextrow:
    push bc      ;; [4] Save Height/Width into the stack for later recovery
@@ -213,10 +214,10 @@ nextrow:
    ;;   Width: 3     |       |          |          |       | 3 pixel bytes (2 pixels per byte)
    ;;                |      HL&DE       |        HL&DE     | 3 mask  bytes
    ;; --------------------------------------------------------------------------------------------------
-   call switch_bytes_single ;; [5+17] Reverse central pair, mask definition byte (first byte)
+   call switch_bytes_single ;; [5+26] Reverse central pair, mask definition byte (first byte)
    inc  hl                  ;; [2]    HL++ (HL Points to second central byte, pixel definition)
    inc  de                  ;; [2]    DE++ (DE also points to second central byte, pixel definition)
-   call switch_bytes_single ;; [5+17] Reverse central pair, pixel definition byte (second byte)
+   call switch_bytes_single ;; [5+26] Reverse central pair, pixel definition byte (second byte)
 
    ;;
    ;; INTERNAL LOOP THAT FLIPS THE SPRITE
@@ -237,10 +238,10 @@ firstpair:
    inc hl            ;; [2] HL++ (Point to the next pair of bytes)
 
 firstbyte:
-   call switch_bytes ;; [5+27] Reverse and Switch first byte of both pairs of bytes (pixel values)
+   call switch_bytes ;; [5+45] Reverse and Switch first byte of both pairs of bytes (pixel values)
    inc hl            ;; [2]    HL++ (HL points to the second byte of the pair, its mask)
    inc de            ;; [2]    DE++ (DE points to the second byte of the pair, its mask)
-   call switch_bytes ;; [5+27] Reverse and Switch second byte of both pairs of bytes (mask values)
+   call switch_bytes ;; [5+45] Reverse and Switch second byte of both pairs of bytes (mask values)
 
    ;; C is the counter of pairs of bytes to be flipped and switched. 
    dec c             ;; [1]   C-- (one less pair of bytes to be flipped and switched)
@@ -256,7 +257,7 @@ firstbyte:
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; switch_bytes
-  ;;     Subroutine to invert and switch a pair of bytes in mode 0
+  ;;     Subroutine to invert and switch a pair of bytes in mode 1
   ;;
   ;; INPUTS:
   ;;   HL: Pointer to Byte 1 to be inverted and switched with DE
