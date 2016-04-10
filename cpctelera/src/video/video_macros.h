@@ -86,10 +86,10 @@
 // given pair of coordinates (*X*, *Y*)
 //
 // C Definition:
-//    #define <cpctm_screenPtr> (*VMEM*,*X*,*Y*)
+//    #define <cpctm_screenPtr> (*VMEM*, *X*, *Y*)
 //
 // Parameters:
-//    (2B) VMEM - Start of video memory buffer where (*X*,*Y*) coordinates will be calculated
+//    (2B) VMEM - Start of video memory buffer where (*X*, *Y*) coordinates will be calculated
 //    (1B) X    - X Coordinate of the video memory location *in bytes* (*BEWARE! NOT in pixels!*)
 //    (1B) Y    - Y Coordinate of the video memory location in pixels / bytes (they are same amount)
 //
@@ -109,7 +109,7 @@
 // care.
 //
 // Returns:
-//    void * - Pointer to the (*X*,*Y*) location in the video buffer that starts at *VMEM*
+//    void * - Pointer to the (*X*, *Y*) location in the video buffer that starts at *VMEM*
 //
 // Details:
 //    This macro does the same calculation than the function <cpct_getScreenPtr>. However,
