@@ -378,12 +378,18 @@ echo "${COLOR_CYAN}(Firmware values)${COLOR_NORMAL}"
 ## Pass img2cpc to convert to CPCtelera's C Arrays
 echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}PROCESSING${COLOR_LIGHT_RED}]${COLOR_LIGHT_YELLOW} ${COLOR_CYAN}Converting tiles \
 to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
-${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
+if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" \
--o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE "${FILE}"
-
-## Success message
-echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and \
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE "${FILE}"; then
+   ## Success message
+   echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and \
 '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.h${COLOR_CYAN}' have been created with ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s \
 codification of tiles/sprites from '${COLOR_NORMAL}$FILE${COLOR_CYAN}'.${COLOR_NORMAL}"
-echo
+   echo
+else
+   ## Error message
+   echo "${COLOR_LIGHT_RED}ERROR!${COLOR_WHITE} Some error happened while processing file with img2cpc. Please, "\
+"review files and image conversion optins to fix the problem.${COLOR_NORMAL}"
+   echo
+   exit 20
+fi
