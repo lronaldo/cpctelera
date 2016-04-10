@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCT_VIDEO_MACROS_H
-#define CPCT_VIDEO_MACROS_H
+#ifndef _CPCT_VIDEO_MACROS_H
+#define _CPCT_VIDEO_MACROS_H
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
