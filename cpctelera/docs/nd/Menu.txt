@@ -161,7 +161,7 @@ Group: Sprites  {
    File: cpct_hflipSpriteM1  (sprites/cpct_hflipSpriteM1.asm)
    File: cpct_hflipSpriteM1_r  (sprites/cpct_hflipSpriteM1_r.asm)
    File: cpct_hflipSpriteM2  (sprites/cpct_hflipSpriteM2.asm)
-   File: cpct_hflipSpriteM2  (sprites/cpct_hflipSpriteM2_r.asm)
+   File: cpct_hflipSpriteM2_r  (sprites/cpct_hflipSpriteM2_r.asm)
    File: cpct_hflipSpriteMaskedM0  (sprites/cpct_hflipSpriteMaskedM0.asm)
    File: cpct_hflipSpriteMaskedM1  (sprites/cpct_hflipSpriteMaskedM1.asm)
    File: cpct_hflipSpriteMaskedM2  (sprites/cpct_hflipSpriteMaskedM2.asm)
