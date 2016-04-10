@@ -21,7 +21,7 @@
 .include "../macros/cpct_reverseBits.s"
 
 ;;
-;; C bindings for <cpct_hflipSpriteMaskedM0>
+;; C bindings for <cpct_hflipSpriteMaskedM1>
 ;;
 ;;   12 us, 3 bytes
 ;;
