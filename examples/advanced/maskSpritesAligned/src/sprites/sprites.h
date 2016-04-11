@@ -17,17 +17,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#include <types.h>
+#include <cpctelera.h>
 
-// Define used to set the memory address where transparency table will be
-// included. Please, read more detailed explanations on sprites.c
+// Declare mask table that will be used to draw transparent sprites using
+// palette index 0 as transparent instead of colour 0. This statement only
+// declares the existence of the table, but does not define it. This lets 
+// all files including this header use the table. Definition is in main.c
 //
-#define cpct_transparentMaskTable00M0_address 0x0100
-
-// Declare transparent table symbol, that will be defined at sprites.c (The symbol
-// is included from CPCtelera's header file transparency_tables.h).
-//
-extern __at(cpct_transparentMaskTable00M0_address) const u8 cpct_transparentMaskTable00M0[256];
+cpctm_declareMaskTable(g_masktable);
 
 // Alien sprite 
 //   Generated running this command on the assets folder (command line):
