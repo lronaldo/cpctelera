@@ -260,15 +260,16 @@ endef
 
 
 #################
-# TMX2CSV: General rule to convert TMX tilemaps into C arrays.
+# TMX2C: General rule to convert TMX tilemaps into C arrays.
 # Updates IMGCFILES and OBJS2CLEAN adding new C files that result from 
 # tmx conversions
 #
 # $(1): TMX file to be converted to C array
 # $(2): C identifier for the generated C array
 # $(3): Output folder for C and H files generated (Default same folder)
+# $(4): Aditional options (you can use this to pass aditional modifiers to cpct_tmx2csv)
 #
-define TMX2CSV
+define TMX2C
 $(eval T2C_C  := $(basename $(1)).c)
 $(eval T2C_H  := $(basename $(1)).h)
 $(eval T2C_NC := $(notdir $(T2C_C)))
@@ -280,7 +281,7 @@ $(eval T2C_CH := $(T2C_C2) $(T2C_H2))
 .SECONDARY: $(T2C_CH)
 $(T2C_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into C-arrays...")
-	cpct_tmx2csv -gh -ci $(2) $(T2C_OF) $(1)
+	cpct_tmx2csv -gh -ci $(2) $(T2C_OF) $(4) $(1)
 IMGCFILES  := $(T2C_C2) $(IMGCFILES)
 OBJS2CLEAN := $(T2C_CH) $(OBJS2CLEAN)
 endef
