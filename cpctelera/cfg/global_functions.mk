@@ -257,3 +257,30 @@ $(I2S_CH): $(1)
 IMGCFILES  := $(I2S_C2) $(IMGCFILES)
 OBJS2CLEAN := $(I2S_CH) $(OBJS2CLEAN)
 endef
+
+
+#################
+# TMX2CSV: General rule to convert TMX tilemaps into C arrays.
+# Updates IMGCFILES and OBJS2CLEAN adding new C files that result from 
+# tmx conversions
+#
+# $(1): TMX file to be converted to C array
+# $(2): C identifier for the generated C array
+# $(3): Output folder for C and H files generated (Default same folder)
+#
+define TMX2CSV
+$(eval T2C_C  := $(basename $(1)).c)
+$(eval T2C_H  := $(basename $(1)).h)
+$(eval T2C_NC := $(notdir $(T2C_C)))
+$(eval T2C_NH := $(notdir $(T2C_H)))
+$(eval T2C_OF := $(shell if [ ! "$(3)" = "" ]; then echo "-of $(3)"; else echo ""; fi))
+$(eval T2C_C2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(T2C_NC)"; else echo "$(T2C_C)"; fi))
+$(eval T2C_H2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(T2C_NH)"; else echo "$(T2C_H)"; fi))
+$(eval T2C_CH := $(T2C_C2) $(T2C_H2))
+.SECONDARY: $(T2C_CH)
+$(T2C_CH): $(1)
+	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into C-arrays...")
+	cpct_tmx2csv -gh -ci $(2) $(T2C_OF) $(1)
+IMGCFILES  := $(T2C_C2) $(IMGCFILES)
+OBJS2CLEAN := $(T2C_CH) $(OBJS2CLEAN)
+endef
