@@ -25,7 +25,7 @@
 ;; (ROM-friendly version).
 ;;
 ;; C definition:
-;;   void <cpct_hflipSpriteM0_r> (<void>*sprite, <u8> width, <u8> height) __z88dk_callee;
+;;   void <cpct_hflipSpriteM0_r> (void* sprite, <u8> width, <u8> height) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (2B DE) sprite - Pointer to the sprite array (first byte of consecutive sprite data)

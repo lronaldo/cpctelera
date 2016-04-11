@@ -24,7 +24,7 @@
 ;;   Horizontally flips a sprite, encoded in screen pixel format, *mode 2*.
 ;;
 ;; C definition:
-;;   void <cpct_hflipSpriteM2> (<u8> width, <u8> height, <void>*sprite) __z88dk_callee;
+;;   void <cpct_hflipSpriteM2> (<u8> width, <u8> height, void* sprite) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (1B  C) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
