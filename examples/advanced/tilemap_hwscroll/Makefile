@@ -36,33 +36,3 @@ include cfg/build_config.mk
 ## USE GLOBAL MAKEFILE (general rules for building CPCtelera projects)
 ##
 include $(CPCT_PATH)/cfg/global_main_makefile.mk
-
-## PHONY rules for automatically converting files
-.PHONY: tilemaps tileset
-
-## Convert Tilemaps TMX files to CSV
-##   tilemaps target has to be added to TARGET variable in build_config.mk
-##
-tilemaps: src/tilemap.csv 
-
-## Convert PNG tilesets to .C and .H
-##   tilesets target has to be added to TARGET variable in build_config.mk
-##
-tilesets: obj/tiles.tls.ok
-
-## Rule for converting TMX to CSV
-##
-src/tilemap.csv: src/tilemap.tmx
-	@$(call PRINT,$(PROJNAME),"Converting tilemap $? to $@...")
-	@cpct_tmx2csv $? > $@
-	@$(RM) obj/tilemap.rel
-	@$(call PRINT,$(PROJNAME),"Tilemap $? converted to $@")
-
-## Rule for generating the tileset
-##
-PALETTE=0 6 13 10 12 3 9 18 26 15 25 1 14
-obj/tiles.tls.ok: src/tiles.png
-	@$(call PRINT,$(PROJNAME),"Generating tileset from $?...")
-	@cpct_img2tileset -bn g -m 0 -tw 4 -th 4 -pf { $(PALETTE) } $?
-	@$(call PRINT,$(PROJNAME),"Generated tileset from $?")
-	@touch $@

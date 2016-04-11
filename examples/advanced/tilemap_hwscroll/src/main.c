@@ -18,10 +18,14 @@
 
 #include <cpctelera.h>
 #include "tilemap.h"
+#include "tiles.h"
 
 /////////////////////////////////////////////////////////////////////////////////
-// USEFUL MACROS
-#define MAXSCROLL 80
+// USEFUL MACROS AND CONSTANTS
+#define MAXSCROLL      80
+#define SCR_TILE_WIDTH 40
+#define MAP_WIDTH     120
+#define MAP_HEIGHT     46
 
 /////////////////////////////////////////////////////////////////////////////////
 // STRUCTURES 
@@ -96,11 +100,10 @@ void scrollScreenTilemap(TScreenTilemap *scr, i16 scroll) {
 //
 void initialize_CPC() {
    // Initialize the application
-   cpct_disableFirmware();        // Firmware must be disabled for this application to work
-   cpct_setVideoMode(0);          // Set Mode 0 (160x200, 16 Colours)
+   cpct_disableFirmware();         // Firmware must be disabled for this application to work
+   cpct_setVideoMode(0);           // Set Mode 0 (160x200, 16 Colours)
    cpct_setPalette(g_palette, 13); // Set Palette 
-   cpct_setBorder(0x14);          // Set the border and background colours to black
-   cpct_setPALColour(0, 0x14);    // 
+   cpct_setBorder(HW_BLACK);       // Set the border and background colours to black
 
    // VERY IMPORTANT: Before using EasyTileMap functions (etm), the internal
    // pointer to the tileset must be set. 
