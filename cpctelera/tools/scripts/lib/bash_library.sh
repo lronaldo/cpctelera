@@ -535,6 +535,27 @@ function isFileReadable {
    return 1
 }
 
+## Checks if a given value is a valid C idenfitier or not
+## $1: Value to check as identifier
+##
+function isValidCIdentifier { 
+   local REX='^[a-zA-Z_][a-zA-Z0-9_]*$'
+   if [[ $1 =~ $REX ]]; then
+      return 0
+   fi
+   return 1
+}
+
+## Check if a folder exists and is readable (only folders, not files)
+## $1: Folder to check 
+##
+function isFolderReadable {
+   if [ -d "$1" ] && [ -r "$1" ]; then
+      return 0
+   fi
+   return 1
+}
+
 ## Gets the full path of a given file, from its relative path
 ## $1: File
 ## $2: Return variable where to store the real path
