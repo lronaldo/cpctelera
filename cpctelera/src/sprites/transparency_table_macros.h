@@ -34,7 +34,7 @@
 // sprites using a given colour index as transparent.
 //
 // C Definition:
-//    #define <cpctm_createTransparentMaskTable>(*TABLENAME*, *ADDRESS*, *MODE*, *PEN*)
+//    #define <cpctm_createTransparentMaskTable> (*TABLENAME*, *ADDRESS*, *MODE*, *PEN*)
 //
 // Parameters:
 //    TABLENAME - C-identifier to be used as name for this table
@@ -117,7 +117,7 @@
 // memory address of your program. That's easier to manage.
 //
 #define cpctm_createTransparentMaskTable(TABLENAME,ADDRESS,MODE,PEN) \
-cpctm_defineMaskTable(TABLENAME); \
+cpctm_declareMaskTable(TABLENAME); \
 void dummy_cpct_transparentMaskTable ## PEN ## MODE ## _container() __naked { \
    __asm \
       .area _ ## TABLENAME ## _ (ABS) \
@@ -137,7 +137,7 @@ void dummy_cpct_transparentMaskTable ## PEN ## MODE ## _container() __naked
 // it only declares it to make it accessible from different code files.
 //
 // C Definition:
-//    #define <cpctm_declareMaskTable>(*TABLENAME*)
+//    #define <cpctm_declareMaskTable> (*TABLENAME*)
 //
 // Parameters:
 //    TABLENAME - C-identifier of the table to be declared
