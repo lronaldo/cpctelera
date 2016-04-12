@@ -32,7 +32,7 @@ void initializeRandomGenerators() {
 }
 
 u8 mixedRandomGenerator() {
-   return cpct_getRandom_lcg_u8( cpct_getRandomu8_glfsr16() );
+   return cpct_getRandom_lcg_u8( cpct_getRandom_glfsr16_u8() );
 }
 
 void putpixel(u16 x, u8 y, u8 val) {
