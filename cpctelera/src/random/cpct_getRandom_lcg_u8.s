@@ -19,19 +19,20 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_getRandomUniform_u8_f
+;; Function: cpct_getRandom_lcg_u8
 ;;
-;;    Returns a pseudo-random byte uniformly distributed using fast method (33*Seed mod 257)
+;;    Returns a pseudo-random byte using a fast Linear-Congruential-Algebra (LCG)
+;; method (33*Seed mod 257)
 ;;
 ;; C Definition:
-;;    <u8> <cpct_getRandomUniform_u8_f> (<u8> *entropy_byte*) __z88dk_fastcall;
+;;    <u8> <cpct_getRandom_lcg_u8> (<u8> *entropy_byte*) __z88dk_fastcall;
 ;;
 ;; Input Parameters (1 byte):
 ;;    (1B L) entropy_byte - An optional byte coming from an entropy source to mix up the sequence. 
 ;;                          Use 0 if you have no entropy byte.
 ;;
 ;; Assembly call (Input parameter on L):
-;;    > call cpct_getRandomUniform_u8_f_asm
+;;    > call cpct_getRandom_lcg_u8_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *entropy_byte* this parameter is a byte to be used as sequence mixer. This byte is
@@ -46,28 +47,43 @@
 ;;    * This function *will not work from a ROM*, as it uses self-modifying code.
 ;;
 ;; Important details:
-;;    * This function uses a previous seed to calculate next pseudo-random byte, and 
+;;    * This function uses a previous 8-bits seed to calculate next pseudo-random byte, and 
 ;; stores returned byte minus 1 as seed for the next time. If you want a reproducible sequence
-;; you may set the seed using <cpct_setRandomSeedUniform_u8> to ensure that all calls
+;; you may set the seed using <cpct_setSeed_lcg_u8> to ensure that all calls
 ;; to this function (using 0 as parameter) always return the same sequence. You also 
 ;; may use this as a way to randomize the sequence, by starting with a seed that comes out
 ;; of an entropy source.
 ;;
 ;; Details:
-;;    This function returns a pseudo-random byte uniformly distributed. Each new byte returned
-;; is obtained as a result of the function byte = (33*Seed % 257). Seed is then updated to
-;; the value byte - 1, to be used for the next call to the function. The seed may be manually
-;; updated using the function <cpct_setRandomSeedUniform_u8> to create predictable sequences
-;; (starting always with the same seed) or to randomize the start of a the sequence (by
-;; entering a seed coming out of an entropy source).
+;;    This function returns a pseudo-random byte using a Linear-Congruential-Algebra. Each new 
+;; byte returned is obtained as a result of the next function,
+;; (start code)
+;;    Seed = (33*Seed % 257) - 1;
+;;    return Seed + 1;
+;; (end code)
+;;    Seed is then updated to the value of the LCG function minus 1, to be used for the 
+;; next call to the function. The seed may be manually set using the function <cpct_setSeed_lcg_u8> 
+;; to create predictable sequences (starting always with the same seed) or to randomize the start 
+;; of a the sequence (by entering a seed coming out of an entropy source).
+;;
+;;    Linear-Congruential-Algebra methods are known for being really simple and low-quality
+;; methods. As Marsaglia noted in his works, LCG methods produce numbers equally distributed 
+;; in predictable hyperplanes in the space, which makes them highly predictable and low-quality.
+;; However, these methods might come in handy due to their simplicity, as their cost is also
+;; really low.
 ;;
 ;;    The parameter *entropy_byte* is an addition to this function to let the user improve
 ;; the random quality of the sequence by inputting mixer bytes coming from entropy sources.
 ;; The function does an XOR operation between *entropy_byte* and the previous seed before
-;; doing the calculations for the next random byte. Therefore, if you use *entropy_byte*s 
-;; coming from good entropy sources, you will be effectively mixing up the sequence and getting
-;; better quality random numbers. This could also be used for other purposes, like creating 
-;; restricted or repeating sequences, up to the user imagination.
+;; doing the calculations for the next random byte, this way,
+;; (start code)
+;;    Seed = (33*(Seed ^ entropy_byte) % 257) - 1;
+;;    return Seed + 1;
+;; (end code)
+;;    Therefore, if you use *entropy_byte*s coming from good entropy sources, you will be 
+;; effectively mixing up the sequence and getting better quality random numbers. This could 
+;; also be used for other purposes, like creating restricted or repeating sequences, up to 
+;; the user imagination.
 ;;
 ;;    If you have no entropy source or do not want to use the *entropy_byte*, just input 0
 ;; which will have no effect on the sequence.
@@ -93,24 +109,24 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_getRandomUniform_u8_f::
-cpct_getRandomUniform_u8_f_asm::
+_cpct_getRandom_lcg_u8::
+cpct_getRandom_lcg_u8_asm::
    ;; No need to recover parameters from stack. This function uses,
    ;;  __z88dk_fastcall convention so its unique 8-bits parameter is in L.
-cpct_randUnifu8_seed::
+cpct_randlcgu8_seed::
    ld   a, #00      ;; [2] A = Seed
    ld   c, a        ;; [1] C = Copy of A
    
    xor  l           ;; [1] Use parameter in L = Entropy source (mesh up bits)
 
-   rrca             ;; [1] A = A * 32 (without taking Carry into account)
-   rrca             ;; [1]
-   rrca             ;; [1]
-   xor  #0x1F       ;; [2]
+   rrca             ;; [1] | A = A * 32 
+   rrca             ;; [1] |   (without taking Carry into account)
+   rrca             ;; [1] |
+   xor  #0x1F       ;; [2] |
 
    add  c           ;; [1] A  = 32A + A = 33A
    sbc  #0xFF       ;; [2] A += 1 - Carry
 
-   ld (cpct_randUnifu8_seed + 1), a ;; [4] Save new random number as seed
+   ld (cpct_randlcgu8_seed + 1), a ;; [4] Save new random number as seed
    ld   l, a        ;; [1] L = Return parameter
    ret              ;; [3] Return

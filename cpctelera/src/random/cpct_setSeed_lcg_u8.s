@@ -19,18 +19,18 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_setRandomSeedUniform_u8
+;; Function: cpct_setSeed_lcg_u8
 ;;
-;;    Sets the random seed used by <cpct_getRandomUniform_u8_f>.
+;;    Sets the random seed used by <cpct_getRandom_lcg_u8>.
 ;;
 ;; C Definition:
-;;    void <cpct_setRandomSeedUniform_u8> (<u8> *seed*) __z88dk_fastcall;
+;;    void <cpct_setSeed_lcg_u8> (<u8> *seed*) __z88dk_fastcall;
 ;;
 ;; Input Parameters (1 byte):
 ;;    (1B L) seed - New seed to be set for the random number generator.
 ;;
 ;; Assembly call (Input parameter on L):
-;;    > call cpct_setRandomSeedUniform_u8_asm
+;;    > call cpct_setSeed_lcg_u8_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *seed* New seed byte that will be set internally in the random number generator.
@@ -38,14 +38,14 @@
 ;;
 ;; Known limitations:
 ;;    * This function *will not work from a ROM*. It does not specifically use self-modifying
-;; code, but indirectly modifies the code of <cpct_getRandomUniform_u8_f>.
+;; code, but indirectly modifies the code of <cpct_getRandom_lcg_u8>.
 ;;
 ;; Details:
-;;    This function sets the random *seed* that <cpct_getRandomUniform_u8_f> uses internally
+;;    This function sets the random *seed* that <cpct_getRandom_lcg_u8> uses internally
 ;; for generating pseudo-random numbers. This can be used to randomize the start of the 
 ;; pseudo-random sequence or to make it predictable (setting the same seed again).
 ;;
-;;    Please, do read documentation from <cpct_getRandomUniform_u8_f> for more details about
+;;    Please, do read documentation from <cpct_getRandom_lcg_u8> for more details about
 ;; how this random generator works.
 ;;
 ;; Destroyed Register values: 
@@ -69,14 +69,14 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.globl cpct_randUnifu8_seed
+.globl cpct_randlcgu8_seed
 
-_cpct_setRandomSeedUniform_u8::
-cpct_setRandomSeedUniform_u8_asm::
+_cpct_setSeed_lcg_u8::
+cpct_setSeed_lcg_u8_asm::
    ;; No need to recover parameters from stack. This function uses,
    ;;  __z88dk_fastcall convention so its unique 8-bits parameter is in L.
 
-   ld   a, l                        ;; [1] A = new seed (Passed as parameter in L)
-   ld (cpct_randUnifu8_seed + 1), a ;; [4] Save parameter as new random seed
+   ld   a, l                       ;; [1] A = new seed (Passed as parameter in L)
+   ld (cpct_randlcgu8_seed + 1), a ;; [4] Save parameter as new random seed
 
-   ret                              ;; [3] Return
+   ret                             ;; [3] Return
