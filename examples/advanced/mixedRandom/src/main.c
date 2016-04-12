@@ -19,6 +19,12 @@
 #include <cpctelera.h>
 #include <stdio.h>
 
+//
+// This example shows how to mix LCG and GLFSR random number generators
+// to create a better random number generator.
+// It also shows how to do a visual test of the random occurrence of 
+// the numbers generated
+//
 void initializeRandomGenerators() {
    cpct_setSeed_lcg_u8 (0x55);
    cpct_setSeed_glfsr16(0x1120);
