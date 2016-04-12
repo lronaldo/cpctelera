@@ -67,5 +67,5 @@
 _cpct_setSeed_glfsr16::
 cpct_setSeed_glfsr16_asm::
    ;; HL holds parameter, as this function is __z88dk_fastcall
-   ld  (cpct_randUnif_glfsr16_seed+1), hl ;; [5] Set new seed (Internal Galois Machine State)
-   ret                                    ;; [3] Return
+   ld  (cpct_randUnif_glfsr16_seed), hl ;; [5] Set new seed (Internal Galois Machine State)
+   ret                                  ;; [3] Return

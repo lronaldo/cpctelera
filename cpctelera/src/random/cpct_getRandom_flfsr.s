@@ -19,27 +19,27 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_getRandomu8_glfsr16
-;; Function: cpct_getRandomu16_glfsr16
+;; Function: cpct_getRandom_glfsr16_u8
+;; Function: cpct_getRandom_glfsr16_u16
 ;;
-;;    Return a pseudo-random byte uniformly distributed using Galois Linear-Feedback
-;; Shift Register (G-LFSR) method.
+;;    Return a pseudo-random byte using Galois Linear-Feedback Shift 
+;; Register (G-LFSR) method, with a 16-bits state register.
 ;;
 ;; C Definition:
 ;;    <u8>  <cpct_getRandomu8_glfsr16>  ();
 ;;    <u16> <cpct_getRandomu16_glfsr16> ();
 ;;
 ;; Assembly call (Input parameter on L):
-;;    > call cpct_getRandomu8_glfsr16_asm
-;;    > call cpct_getRandomu16_glfsr16_asm
+;;    > call cpct_getRandom_glfsr16_u8_asm
+;;    > call cpct_getRandom_glfsr16_u16_asm
 ;;
 ;; Known limitations:
 ;;    * This function *will not work from a ROM*, as it uses self-modifying code.
-;;    * Seed (machine state) must never be zero. 
-;;    * Returned value using all 16 bits (<u16>) will never be 0 if using, so it is
+;;    * Seed (machine state) must *never* be zero. 
+;;    * Returned value using all 16 bits (<u16>) will never be 0, so it is
 ;; advisable to use returned value-1 as final random number. This limitation does 
 ;; not affect <u8> return values.
-;;    * Although the whole sequence has a period of 65536 numbers without repetition,
+;;    * Although the whole sequence has a period of 65535 numbers without repetition,
 ;; the way numbers are traversed is quite predictable. This function is not recommended
 ;; when good quality random numbers are required. However, a combination with other
 ;; functions may yield much better results.
@@ -73,13 +73,13 @@
 
 ;; u16 and u8 functions do the same: 
 ;;   one will only consider L as return value whereas the other will use HL
-_cpct_getRandomu8_glfsr16::
-cpct_getRandomu8_glfsr16_asm::
+_cpct_getRandom_glfsr16_u8::
+cpct_getRandom_glfsr16_u8_asm::
 
-_cpct_getRandomu16_glfsr16::
-cpct_getRandomu16_glfsr16_asm::
+_cpct_getRandom_glfsr16_u16::
+cpct_getRandom_glfsr16_u16_asm::
 
-cpct_randUnif_glfsr16_seed::
+cpct_randUnif_glfsr16_seed == .+1
    ld  hl, #0xABCD  ;; [3] DE = Machine state (seed)
 
    ;; Calculate the Galois Linear-Feedback Shift Register Function
@@ -91,17 +91,22 @@ cpct_randUnif_glfsr16_seed::
    rr   h           ;; [2] | Rotate HL to the right, inserting a 0 as the leftmost H bit (carry flag = 0)
    rr   l           ;; [2] |
    jr  nc, end      ;; [2/3] Carry hold previous rightmost bit. We do XOR operations only if it was a 1.
+
+   ;; Apply XOR operations to mix 16-bits status seed with TAPS (the bits
+   ;; that implement the Linear-Feedback Shifting method)
    ld   a, h        ;; [1] | Apply sequence formulae XORing taps marked by HL (which is a mask)
-cpct_randUnif_glfsr16_hightaps::
-   xor  #0xF7       ;; [2] | HL = HL xor TAPS (Bits to be changed according to Galois LFSR for maximum sequence: period 2^16)
-   ld   h, a        ;; [1] |
-   ld   a, l        ;; [1] |
-cpct_randUnif_glfsr16_lowtaps::   
+
+cpct_randUnif_glfsr16_hightaps == .+1
+   xor  #0xF7       ;; [2] | HL = HL xor TAPS 
+   ld   h, a        ;; [1] |  (Bits to be changed according to Galois LFSR for ...
+   ld   a, l        ;; [1] |   maximum sequence: period 2^16)
+
+cpct_randUnif_glfsr16_lowtaps == .+1
    xor  #0xFB       ;; [2] |
    ld   l, a        ;; [1] |
 
 end:
    ;; Save new machine state and return
-   ld (cpct_randUnif_glfsr16_seed+1), hl ;; [5] Saves the new state into its place
+   ld (cpct_randUnif_glfsr16_seed), hl ;; [5] Saves the new state into its place
 
    ret              ;; [3] Return

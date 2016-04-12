@@ -27,8 +27,8 @@
 ;;    <u8> <cpct_setTaps_glfsr16> (<u16> *tapset*) __z88dk_fastcall;
 ;;
 ;; Input Parameters (2 bytes):
-;;    (2B HL) tapset - set of tap bits that <cpct_getRandomu8_glfsr16> will use to produce
-;; pseudo-random numbers. 
+;;    (2B HL) tapset - set of tap bits that <cpct_getRandom_glfsr16_u8> and <cpct_getRandom_glfsr16_u16> 
+;; will use to produce pseudo-random numbers. 
 ;;
 ;; Assembly call:
 ;;    > call cpct_setTaps_glfsr16_asm
@@ -72,8 +72,8 @@
 _cpct_setTaps_glfsr16::
 cpct_setTaps_glfsr16_asm::
    ;; HL holds parameter, as this function is __z88dk_fastcall
-   ld  a, h                                  ;; [1] A = High taps
-   ld  (cpct_randUnif_glfsr16_hightaps+1), a ;; [4] Set high value for taps (to be XORred with H)
-   ld  a, l                                  ;; [1] A = Low taps
-   ld  (cpct_randUnif_glfsr16_lowtaps+1), a  ;; [4] Set low value for taps (to be XORred with L)
-   ret                                       ;; [3] Return
+   ld  a, h                                ;; [1] A = High taps
+   ld  (cpct_randUnif_glfsr16_hightaps), a ;; [4] Set high value for taps (to be XORred with H)
+   ld  a, l                                ;; [1] A = Low taps
+   ld  (cpct_randUnif_glfsr16_lowtaps), a  ;; [4] Set low value for taps (to be XORred with L)
+   ret                                     ;; [3] Return
