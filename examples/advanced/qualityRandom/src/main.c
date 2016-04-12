@@ -20,13 +20,13 @@
 #include <stdio.h>
 
 void initializeRandomGenerators() {
-   cpct_setRandomSeedUniform_u8(0x55);
+   cpct_setSeed_lcg_u8 (0x55);
    cpct_setSeed_glfsr16(0x1120);
    cpct_setTaps_glfsr16(GLFSR16_TAPSET_0512);
 }
 
 u8 mixedRandomGenerator() {
-   return cpct_getRandomUniform_u8_f( cpct_getRandomu8_glfsr16() );
+   return cpct_getRandom_lcg_u8( cpct_getRandomu8_glfsr16() );
 }
 
 void putpixel(u16 x, u8 y, u8 val) {
