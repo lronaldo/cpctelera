@@ -8,8 +8,17 @@
 
 using namespace std;
 
-#define PALETTE_JSON_KEY "palette"
-
+#define PALETTE_JSON_KEY			"palette"
+#define TILEWIDTH_JSON_KEY			"tileWidth"
+#define TILEHEIGHT_JSON_KEY			"tileHeight"
+#define BASENAME_JSON_KEY			"baseName"
+#define ABSOLUTE_BASENAME_JSON_KEY	"absoluteBaseName"
+#define FORMAT_JSON_KEY 			"format"
+#define MODE_JSON_KEY 				"mode"
+#define OUTPUT_FILE_NAME_JSON_KEY 	"outputFileName"
+#define SCANLINE_ORDER_JSON_KEY 	"scanlineOrder"
+#define ZIGZAG_JSON_KEY 			"zigZag"
+#define OUTPUT_SIZE_JSON_KEY 		"outputSize"
 
 class ConversionOptions {
 public:
@@ -83,38 +92,38 @@ public:
 	Json::Value ToJson() {
 		Json::Value root;
 		root[PALETTE_JSON_KEY] = this->Palette.ToJSON();
-		root["tileWidth"] = this->TileWidth;
-		root["tileHeight"] = this->TileHeight;
-		root["absoluteBaseName"] = this->AbsoluteBaseName;
-		root["baseName"] = this->BaseName;
-		root["format"] = ToString(this->Format);
-		root["mode"] = this->Mode;
-		root["outputFileName"] = this->OutputFileName;
-		root["scanlineOrder"] = Json::Value();
+		root[TILEWIDTH_JSON_KEY] = this->TileWidth;
+		root[TILEHEIGHT_JSON_KEY] = this->TileHeight;
+		root[BASENAME_JSON_KEY] = this->BaseName;
+		root[ABSOLUTE_BASENAME_JSON_KEY] = this->AbsoluteBaseName;
+		root[FORMAT_JSON_KEY] = ToString(this->Format);
+		root[MODE_JSON_KEY] = this->Mode;
+		root[OUTPUT_FILE_NAME_JSON_KEY] = this->OutputFileName;
+		root[SCANLINE_ORDER_JSON_KEY] = Json::Value();
 		for (int s : this->ScanlineOrder) {
-			root["scanlineOrder"].append(s);
+			root[SCANLINE_ORDER_JSON_KEY].append(s);
 		}
-		root["zigZag"] = this->ZigZag;
-		root["outputSize"] = this->OutputSize;
+		root[ZIGZAG_JSON_KEY] = this->ZigZag;
+		root[OUTPUT_SIZE_JSON_KEY] = this->OutputSize;
 		return root;
 	};
 
 	void FromJson(Json::Value root) {
 		this->Palette.FromJSON(root[PALETTE_JSON_KEY]);
-		this->TileWidth = root["tileWidth"].asInt();
-		this->TileHeight = root["tileHeight"].asInt();
-		this->BaseName = root["baseName"].asString();
-		this->AbsoluteBaseName = root["absoluteBaseName"].asBool();
-		this->Format = ParseFormat(root["format"].asString());
-		this->Mode = root["mode"].asInt();
-		this->OutputFileName = root["outputFileName"].asString();
+		this->TileWidth = root[TILEWIDTH_JSON_KEY].asInt();
+		this->TileHeight = root[TILEHEIGHT_JSON_KEY].asInt();
+		this->BaseName = root[BASENAME_JSON_KEY].asString();
+		this->AbsoluteBaseName = root[ABSOLUTE_BASENAME_JSON_KEY].asBool();
+		this->Format = ParseFormat(root[FORMAT_JSON_KEY].asString());
+		this->Mode = root[MODE_JSON_KEY].asInt();
+		this->OutputFileName = root[OUTPUT_FILE_NAME_JSON_KEY].asString();
 		this->ScanlineOrder.clear();
-		Json::Value scanlines = root["scanlineOrder"];
+		Json::Value scanlines = root[SCANLINE_ORDER_JSON_KEY];
 		for (int i = 0, li = scanlines.size(); i<li; ++i) {
 			this->ScanlineOrder.push_back(scanlines[i].asInt());
 		}
-		this->ZigZag = root["zigzag"].asBool();
-		this->OutputSize = root["outputSize"].asBool();
+		this->ZigZag = root[ZIGZAG_JSON_KEY].asBool();
+		this->OutputSize = root[OUTPUT_SIZE_JSON_KEY].asBool();
 	};
 
 	void Dump() {
