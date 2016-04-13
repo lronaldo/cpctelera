@@ -46,6 +46,12 @@
 ;; take into account that this approach could not be portable among different versions of
 ;; this API.
 ;;
+;;    In order to prevent the seed from being used as random numbers directly but
+;; cpct_getRandom_mxor_** functions, this function calls <cpct_getRandom_mxor_u32> with
+;; provided seed, then seeds the algorithm with the result (first 32-bits number after
+;; the seed). That guarantees that first pseudo-random numbers got will be pseudo-random,
+;; and not part of those provided by the user as seed.
+;;
 ;;    All functions calling <cpct_nextRandom_mxor_u32> or using <cpct_mxor32_seed> will be 
 ;; affected by this change.
 ;;
@@ -53,25 +59,17 @@
 ;;      All preserved
 ;;
 ;; Required memory:
-;;      12 bytes divided in,
-;;      *  8 bytes (this functions code)
-;;      * +4 bytes (32-bits <cpct_mxor32_seed> seed value)
+;;      Uses <cpct_getRandom_mxor_u32> code directly, so same memory is required.
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;    Case     | microSecs (us) | CPU Cycles
 ;; -----------------------------------------
-;;     Any     |      14        |    52
+;;     Any     |       56       |    224
 ;; -----------------------------------------
 ;; (end code)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Globals required for linking
-.globl _cpct_mxor32_seed
-
-_cpct_setSeed_mxor::
-cpct_setSeed_mxor_asm::
-   ld   (_cpct_mxor32_seed+0), de     ;; [6] |
-   ld   (_cpct_mxor32_seed+2), hl     ;; [5] | Store new seed in cpct_mxor32_seed
-   ret                                ;; [3] return
+;; No code required here
+;; Code is in <cpct_getRandom_mxor_u32>
