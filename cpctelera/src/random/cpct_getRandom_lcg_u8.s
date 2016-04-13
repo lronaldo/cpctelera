@@ -116,7 +116,7 @@ _cpct_getRandom_lcg_u8::
 cpct_getRandom_lcg_u8_asm::
    ;; No need to recover parameters from stack. This function uses,
    ;;  __z88dk_fastcall convention so its unique 8-bits parameter is in L.
-cpct_randlcgu8_seed::
+cpct_randlcgu8_seed == .+1
    ld   a, #00      ;; [2] A = Seed
    ld   c, a        ;; [1] C = Copy of A
    
@@ -130,6 +130,6 @@ cpct_randlcgu8_seed::
    add  c           ;; [1] A  = 32A + A = 33A
    sbc  #0xFF       ;; [2] A += 1 - Carry
 
-   ld (cpct_randlcgu8_seed + 1), a ;; [4] Save new random number as seed
+   ld (cpct_randlcgu8_seed), a ;; [4] Save new random number as seed
    ld   l, a        ;; [1] L = Return parameter
    ret              ;; [3] Return

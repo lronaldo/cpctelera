@@ -76,7 +76,7 @@ cpct_setSeed_lcg_u8_asm::
    ;; No need to recover parameters from stack. This function uses,
    ;;  __z88dk_fastcall convention so its unique 8-bits parameter is in L.
 
-   ld   a, l                       ;; [1] A = new seed (Passed as parameter in L)
-   ld (cpct_randlcgu8_seed + 1), a ;; [4] Save parameter as new random seed
+   ld   a, l                   ;; [1] A = new seed (Passed as parameter in L)
+   ld (cpct_randlcgu8_seed), a ;; [4] Save parameter as new random seed
 
-   ret                             ;; [3] Return
+   ret                         ;; [3] Return

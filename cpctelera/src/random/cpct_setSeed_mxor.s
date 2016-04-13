@@ -34,7 +34,7 @@
 ;;
 ;; Parameter Restrictions:
 ;;    * *newseed* is the new seed byte that will be set internally for Marsaglia's XOR-shift 
-;; random number generator. It should never be set to 0. Functions that use this seed will always
+;; random number generator. It should *never be set to 0*. Functions that use this seed will always
 ;; return 0 if this seed is set to 0.
 ;;
 ;; Details:
@@ -50,7 +50,7 @@
 ;; affected by this change.
 ;;
 ;; Destroyed Register values: 
-;;      -
+;;      All preserved
 ;;
 ;; Required memory:
 ;;      12 bytes divided in,

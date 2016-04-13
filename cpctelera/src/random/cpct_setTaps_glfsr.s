@@ -28,7 +28,7 @@
 ;;
 ;; Input Parameters (2 bytes):
 ;;    (2B HL) tapset - set of tap bits that <cpct_getRandom_glfsr16_u8> and <cpct_getRandom_glfsr16_u16> 
-;; will use to produce pseudo-random numbers. 
+;; will use to produce pseudo-random number sequences. 
 ;;
 ;; Assembly call:
 ;;    > call cpct_setTaps_glfsr16_asm
@@ -36,19 +36,22 @@
 ;; Parameter Restrictions:
 ;;    * *tapset* could theoretically be any 16-value. However, there are only 1024 values that
 ;; will produce complete sequences of 65535 16-bit pseudo-random numbers without repetition. For 
-;; those sequences, a set of 1024 macros <GLFSR16_TAPSET_YYYY> (with YYYY from 0000 to 1023)
-;; are defined. If any of this macros is used as *tapset*, a sequence of 65535 16-bit pseudo-random
+;; those sequences, a set of 1024 enumerated values <GLFSR16_TAPSET_YYYY> (with YYYY from 0000 to 1023)
+;; are defined. If any of this values is used as *tapset*, a sequence of 65535 16-bit pseudo-random
 ;; numbers without repetition is guaranteed. With any other value, shorter sequences will be 
 ;; produced, with no guarantee on their final frequency.
 ;;
 ;; Known limitations:
 ;;    * This function *will not work from a ROM*, as it uses self-modifying code.
 ;;
-;; Important details:
-;;    * TODO
-;;
 ;; Details:
-;;    * TODO
+;;    This function sets the concrete sequence that <cpct_getRandom_glfsr16_u8> and 
+;; <cpct_getRandom_glfsr16_u8> will produce. The sequence is picked up from 1024 different
+;; complete 65535-value sequences codified in TAPSETs (Check <GLFSR16_TAPS>). Therefore,
+;; this is like reordering the 65535 possible values that random generators will produce.
+;; There are 1024 different ordenations, this function picks one, and then pseudo-random
+;; numbers are retrieved in order when calling <cpct_getRandom_glfsr16_u8> or 
+;; <cpct_getRandom_glfsr16_u8>.
 ;;
 ;; Destroyed Register values: 
 ;;      A
