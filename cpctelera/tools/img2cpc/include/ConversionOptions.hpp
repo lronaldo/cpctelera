@@ -27,12 +27,8 @@ public:
 		Format(ASSEMBLER),
 		Mode(0),
 		ScanlineOrder{ 0,1,2,3,4,5,6,7 },
-<<<<<<< HEAD
-		ZigZag(false) { };
-=======
 		ZigZag(false),
 		CreateFlipLut(false) { };
->>>>>>> img2cpc_c
 
 	enum OutputFormat { ASSEMBLER, ASSEMBLER_ASXXXX, BINARY, PURE_C };
 	enum OutputPalette { NONE, FIRMWARE, HARDWARE };
@@ -73,17 +69,12 @@ public:
 	OutputPalette PaletteFormat;
 
 	bool CreateTileset;
-<<<<<<< HEAD
-	bool OneFilePerSourceFile;
-
-=======
 	bool CreateFlipLut;
 	bool NoMaskData;
 	bool OneFilePerSourceFile;
 
 	vector<string> AdditionalIncludes;
 
->>>>>>> img2cpc_c
 	OutputFormat ParseFormat(const string &formatString) {
 		string fmtLower(formatString);
 		transform(fmtLower.begin(), fmtLower.end(), fmtLower.begin(), ::tolower);
@@ -100,18 +91,6 @@ public:
 
 	Json::Value ToJson() {
 		Json::Value root;
-<<<<<<< HEAD
-		root["palette"] = this->Palette.ToJSON();
-		root["tileWidth"] = this->TileWidth;
-		root["tileHeight"] = this->TileHeight;
-		root["baseName"] = this->BaseName;
-		root["format"] = ToString(this->Format);
-		root["mode"] = this->Mode;
-		root["outputFileName"] = this->OutputFileName;
-		root["scanlineOrder"] = Json::Value();
-		for (int s : this->ScanlineOrder) {
-			root["scanlineOrder"].append(s);
-=======
 		root[PALETTE_JSON_KEY] = this->Palette.ToJSON();
 		root[TILEWIDTH_JSON_KEY] = this->TileWidth;
 		root[TILEHEIGHT_JSON_KEY] = this->TileHeight;
@@ -123,7 +102,6 @@ public:
 		root[SCANLINE_ORDER_JSON_KEY] = Json::Value();
 		for (int s : this->ScanlineOrder) {
 			root[SCANLINE_ORDER_JSON_KEY].append(s);
->>>>>>> img2cpc_c
 		}
 		root[ZIGZAG_JSON_KEY] = this->ZigZag;
 		root[OUTPUT_SIZE_JSON_KEY] = this->OutputSize;
@@ -140,11 +118,7 @@ public:
 		this->Mode = root[MODE_JSON_KEY].asInt();
 		this->OutputFileName = root[OUTPUT_FILE_NAME_JSON_KEY].asString();
 		this->ScanlineOrder.clear();
-<<<<<<< HEAD
-		Json::Value scanlines = root["scanlineOrder"];
-=======
 		Json::Value scanlines = root[SCANLINE_ORDER_JSON_KEY];
->>>>>>> img2cpc_c
 		for (int i = 0, li = scanlines.size(); i<li; ++i) {
 			this->ScanlineOrder.push_back(scanlines[i].asInt());
 		}

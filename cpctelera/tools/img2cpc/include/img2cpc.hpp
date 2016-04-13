@@ -24,12 +24,9 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
 int initializeImageLoader();
 int processImage(const string& filename, vector<Tile>& tiles, ConversionOptions &convOptions, ezOptionParser &options);
 int dumpTiles(vector<Tile>& tiles, ConversionOptions &convOptions);
-<<<<<<< HEAD
-=======
 
 void createAndOrTables(ConversionOptions &options);
 void createFlipLut(ConversionOptions &options);
->>>>>>> img2cpc_c
 
 int main(int argc, const char** argv);
 

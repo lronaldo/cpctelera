@@ -141,7 +141,6 @@ public:
 			
 			for (unsigned int i = 0; i<numColors; ++i) {
 				if (i > 0) {
-<<<<<<< HEAD
 					ofs << ", ";
 				}
 				ofs << "#" << toHexString(palette[i]);
@@ -150,31 +149,6 @@ public:
 		}
 	}
 
-	void DumpPaletteASXXXX(ConversionOptions &options, ofstream &ofs) {
-		vector<int> palette = GetPaletteValues(options);
-		unsigned int numColors = palette.size();
-		if (numColors > 0) {
-			ofs << "; Palette uses " << ConversionOptions::ToString(options.PaletteFormat) << " values." << endl;
-			
-			if(!options.BaseName.empty()) {
-				ofs << "_" << options.BaseName << "_";
-			}
-			ofs << "palette::" << endl << ".db ";
-
-			for (unsigned int i = 0; i<numColors; ++i) {
-				if (i > 0) {
-=======
->>>>>>> img2cpc_c
-					ofs << ", ";
-				}
-				ofs << "#" << toHexString(palette[i]);
-			}
-			ofs << endl << endl;
-		}
-	}
-
-<<<<<<< HEAD
-=======
 	void DumpPaletteASXXXX(ConversionOptions &options, ofstream &ofs) {
 		vector<int> palette = GetPaletteValues(options);
 		unsigned int numColors = palette.size();
@@ -196,7 +170,6 @@ public:
 		}
 	}
 
->>>>>>> img2cpc_c
 	void DumpTileMap(vector<Tile> tiles, ConversionOptions &options, ofstream &ofs) {
 		unsigned int numTiles = tiles.size();
 		if (numTiles > 0) {
@@ -208,12 +181,7 @@ public:
 				ofs << tiles[i].Name;
 			}
 			ofs << endl << endl;
-<<<<<<< HEAD
-			if (options.Palette.TransparentIndex >= 0 && !options.InterlaceMasks) {
-=======
-			if (options.Palette.TransparentIndex >= 0 && !(options.NoMaskData || options.InterlaceMasks)) {
->>>>>>> img2cpc_c
-				
+			if (options.Palette.TransparentIndex >= 0 && !(options.NoMaskData || options.InterlaceMasks)) {				
 				if(!options.BaseName.empty()) {
 					ofs << options.BaseName << "_";
 				}
@@ -241,11 +209,7 @@ public:
 				ofs << tiles[i].Name;
 			}
 			ofs << endl << endl;
-<<<<<<< HEAD
-			if (options.Palette.TransparentIndex >= 0 && !options.InterlaceMasks) {
-=======
 			if (options.Palette.TransparentIndex >= 0 && ! (options.NoMaskData || options.InterlaceMasks)) {
->>>>>>> img2cpc_c
 				if(!options.BaseName.empty()) {
 					ofs << "_" << options.BaseName;	
 				}
@@ -311,11 +275,7 @@ public:
 						}
 						ofs << endl;
 					}
-<<<<<<< HEAD
-					if (options.Palette.TransparentIndex >= 0) {
-=======
 					if (options.Palette.TransparentIndex >= 0 && (!options.NoMaskData)) {
->>>>>>> img2cpc_c
 						currentByte = 0;
 						ofs << t.Name << "_MASK:" << endl;
 						for (int y = 0; y<t.TileHeight; ++y) {
@@ -353,17 +313,12 @@ public:
 			int numBytes = t.Data.size();
 			if (numBytes > 0) {
 				ofs << "; Tile " << t.Name << " - " << t.TileWidth << "x" << t.TileHeight << " pixels, " << t.TileWidthInBytes << "x" << t.TileHeight << " bytes." << endl;
-<<<<<<< HEAD
-=======
-
 				if(options.OutputSize) {
 					string defineBase = t.Name;
 					transform(defineBase.begin(), defineBase.end(), defineBase.begin(), ::toupper);
 					ofs << defineBase << "_W = #0x" << toHexString(t.TileWidthInBytes) << endl;
 					ofs << defineBase << "_H = #0x" << toHexString(t.TileHeight) << endl;						
 				}
-
->>>>>>> img2cpc_c
 				ofs << t.Name << "::" << endl;
 				if (options.InterlaceMasks) {
 					int currentByte = 0;
@@ -388,11 +343,7 @@ public:
 						}
 						ofs << endl;
 					}
-<<<<<<< HEAD
-					if (options.Palette.TransparentIndex >= 0) {
-=======
 					if (options.Palette.TransparentIndex >= 0 && (!options.NoMaskData)) {
->>>>>>> img2cpc_c
 						currentByte = 0;
 						ofs << t.Name << "_MASK::" << endl;
 						for (int y = 0; y<t.TileHeight; ++y) {
@@ -439,17 +390,12 @@ public:
 					ofstream ofs(binFileName, ios::binary);
 
 					os << "; Tile " << t.Name << " - " << t.TileWidth << "x" << t.TileHeight << " pixels, " << t.TileWidthInBytes << "x" << t.TileHeight << " bytes." << endl;
-<<<<<<< HEAD
-=======
-
 					if(options.OutputSize) {
 						string defineBase = t.Name;
 						transform(defineBase.begin(), defineBase.end(), defineBase.begin(), ::toupper);
 						os << defineBase << "_W EQU " << t.TileWidthInBytes << endl;
 						os << defineBase << "_H EQU " << t.TileHeight << endl;						
 					}
-
->>>>>>> img2cpc_c
 					os << t.Name << ":" << endl;
 					os << "INCBIN \"" << FileUtils::GetFileName(binFileName) << "\"" << endl;
 
@@ -462,12 +408,7 @@ public:
 						for (int i = 0; i < numBytes; ++i) {
 							ofs << t.Data[i];
 						}
-
-<<<<<<< HEAD
-						if (options.Palette.TransparentIndex >= 0) {
-=======
 						if (options.Palette.TransparentIndex >= 0 && !(options.NoMaskData)) {
->>>>>>> img2cpc_c
 							stringstream ssMask;
 							ssMask << options.OutputFileName << t.Name << "_mask.bin";
 							string maskFileName = ssMask.str();
@@ -507,14 +448,9 @@ public:
 			ofs << "#ifndef _" << sanitizedFileName << "_" << endl;
 			ofs << "#define _" << sanitizedFileName << "_" << endl << endl;
 
-<<<<<<< HEAD
-         // CPCtelera include required for defined types 
-         ofs << "#include <types.h>" << endl << endl;         
-=======
 			for(string i : options.AdditionalIncludes) {
 				ofs << "#include " << i << endl;
 			}
->>>>>>> img2cpc_c
 
 			vector<int> palette = GetPaletteValues(options);
 			unsigned int numColors = palette.size();
@@ -532,17 +468,10 @@ public:
 					ofs << options.BaseName << "_";
 				}
 				ofs << "tileset[" << numTiles << "];" << endl << endl;
-<<<<<<< HEAD
-				if (!options.InterlaceMasks && options.Palette.TransparentIndex >= 0) {
-					ofs << "extern u8* const "; 
-					if(!options.BaseName.empty()) {
-						ofs << options.BaseName << "_";						
-=======
 				if (!(options.InterlaceMasks || options.NoMaskData) && options.Palette.TransparentIndex >= 0) {
 					ofs << "extern u8* const "; 
 					if(!options.BaseName.empty()) {
 						ofs << options.BaseName << "_";		
->>>>>>> img2cpc_c
 					}
 					ofs << "masks_tileset[" << numTiles << "];" << endl << endl;
 				}
@@ -551,15 +480,6 @@ public:
 			for (Tile t : tiles) {
 				int numBytes = t.Data.size();
 				if (numBytes > 0) {
-<<<<<<< HEAD
-					if (options.InterlaceMasks) {
-						ofs << "extern const u8 " << t.Name << "[" << numBytes * 2 << "];" << endl;
-					}
-					else {
-						ofs << "extern const u8 " << t.Name << "[" << numBytes << "];" << endl;
-						if (options.Palette.TransparentIndex >= 0) {
-							ofs << "extern const u8 " << t.Name << "_mask[" << numBytes << "];" << endl;
-=======
 
 					if(options.OutputSize) {
 						string defineBase = t.Name;
@@ -575,7 +495,6 @@ public:
 						ofs << "extern const u8 " << t.Name << "[" << t.TileWidthInBytes << " * " << t.TileHeight << "];" << endl;
 						if (options.Palette.TransparentIndex >= 0 && !options.NoMaskData) {
 							ofs << "extern const u8 " << t.Name << "_mask[" << t.TileWidthInBytes << " * " << t.TileHeight << "];" << endl;
->>>>>>> img2cpc_c
 						}
 					}
 				}
@@ -591,15 +510,8 @@ public:
 		string fileName = ss.str();
 
 		ofstream ofs(fileName);
-<<<<<<< HEAD
-		ofs << "// Data created with Img2CPC - (c) Retroworks - 2007-2015" << endl << endl;
-
-      // CPCtelera include required for defined types 
-      ofs << "#include <types.h>" << endl << endl;
-=======
 		ofs << "#include \"" << FileUtils::GetFileName(options.OutputFileName) << ".h\"" << endl;
 		ofs << "// Data created with Img2CPC - (c) Retroworks - 2007-2015" << endl;
->>>>>>> img2cpc_c
 
 		vector<int> palette = GetPaletteValues(options);
 		unsigned int numColors = palette.size();
@@ -636,11 +548,7 @@ public:
 					ofs << tiles[i].Name;
 				}
 				ofs << endl << "};" << endl;
-<<<<<<< HEAD
-				if (options.Palette.TransparentIndex >= 0 && !options.InterlaceMasks) {
-=======
 				if (options.Palette.TransparentIndex >= 0 && !(options.InterlaceMasks || options.NoMaskData)) {
->>>>>>> img2cpc_c
 					ofs << "u8* const " << options.BaseName << "_masks_tileset[" << numTiles << "] = { " << endl << "\t";
 					for (unsigned int i = 0; i<numTiles; ++i) {
 						if (i > 0) {
@@ -656,14 +564,9 @@ public:
 				int numBytes = t.Data.size();
 				if (numBytes > 0) {
 					ofs << "// Tile " << t.Name << ": " << t.TileWidth << "x" << t.TileHeight << " pixels, " << t.TileWidthInBytes << "x" << t.TileHeight << " bytes." << endl;
-<<<<<<< HEAD
-					if (options.InterlaceMasks) {
-						ofs << "const u8 " << t.Name << "[" << numBytes * 2 << "] = {" << endl;
-=======
 
 					if (options.InterlaceMasks) {
 						ofs << "const u8 " << t.Name << "[2 * " << t.TileWidthInBytes << " * " << t.TileHeight << "] = {" << endl;
->>>>>>> img2cpc_c
 						int currentByte = 0;
 						for (int y = 0; y<t.TileHeight; ++y) {
 							ofs << "\t0x" << toHexString(t.MaskData[currentByte]) << ", 0x" << toHexString(t.Data[currentByte]);
@@ -681,11 +584,7 @@ public:
 					}
 					else {
 						int currentByte = 0;
-<<<<<<< HEAD
-						ofs << "const u8 " << t.Name << "[" << numBytes << "] = {" << endl;
-=======
 						ofs << "const u8 " << t.Name << "[" << t.TileWidthInBytes << " * " << t.TileHeight << "] = {" << endl;
->>>>>>> img2cpc_c
 						for (int y = 0; y<t.TileHeight; ++y) {
 							ofs << "\t0x" << toHexString(t.Data[currentByte]);
 							currentByte++;
@@ -700,15 +599,9 @@ public:
 						}
 						ofs << "};" << endl;
 
-<<<<<<< HEAD
-						if (options.Palette.TransparentIndex >= 0) {
-							currentByte = 0;
-							ofs << "const u8 " << t.Name << "_mask[" << numBytes << "] = {" << endl;
-=======
 						if (options.Palette.TransparentIndex >= 0 && !options.NoMaskData) {
 							currentByte = 0;
 							ofs << "const u8 " << t.Name << "_mask[" << t.TileWidthInBytes << " * " << t.TileHeight << "] = {" << endl;
->>>>>>> img2cpc_c
 							for (int y = 0; y<t.TileHeight; ++y) {
 								ofs << "\t0x" << toHexString(t.MaskData[currentByte]);
 								currentByte++;

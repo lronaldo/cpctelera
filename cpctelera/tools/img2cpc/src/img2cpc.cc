@@ -1,4 +1,3 @@
-
 #include "img2cpc.hpp"
 
 int initializeParser(ezOptionParser &parser) {
@@ -28,10 +27,7 @@ int initializeParser(ezOptionParser &parser) {
 	parser.add("", 0, 1, 0, "Specifies input palette file.", "-p", "--palette");
 	parser.add("", 0, 1, 0, "Specifies transparent color (as index in palette).", "-t", "--transparentColor");
 	parser.add("", 0, 0, 0, "Interlaced masks. Mask values will be interlaced with pixel values.", "-im", "--interlacedMasks");
-<<<<<<< HEAD
-=======
 	parser.add("", 0, 0, 0, "No mask data. And/Or tables will be used.", "-nm", "--noMasks");
->>>>>>> img2cpc_c
 
 	parser.add("", 0, 0, 0, "Don't create tileset. Use this if you are creating sprites and do not need a table with all the tile pointers.", "-nt", "--noTileset");
 
@@ -40,11 +36,8 @@ int initializeParser(ezOptionParser &parser) {
 
 	parser.add("", 0, 0, 0, "Generates PNG images to check tile output.", "-g", "--generatePNG");
 	parser.add("", 0, 0, 0, "Generate one output file per processed file. Files will be named using the base name (if specified) and the source file name .", "--oneFile");
-<<<<<<< HEAD
-=======
 
 	parser.add("", 0, 1, ',', "Additional includes to add to header file when generating C data files.", "--includes");
->>>>>>> img2cpc_c
 
 	parser.add("", 0, 0, 0, "Help. Show usage.", "--help");
 
@@ -108,21 +101,6 @@ int dumpTiles(vector<Tile>& tiles, ConversionOptions &convOptions) {
 			}
 
 			switch (convOptions.Format) {
-<<<<<<< HEAD
-			case ConversionOptions::ASSEMBLER:
-				generator.GenerateASM(currentTiles, convOptions);
-				break;
-			case ConversionOptions::ASSEMBLER_ASXXXX:
-				generator.GenerateASXXXX(currentTiles, convOptions);
-				break;
-			case ConversionOptions::BINARY:
-				generator.GenerateBIN(currentTiles, convOptions);
-				break;
-			case ConversionOptions::PURE_C:
-				generator.GenerateC(currentTiles, convOptions);
-				generator.GenerateH(currentTiles, convOptions);
-				break;
-=======
 				case ConversionOptions::ASSEMBLER:
 					generator.GenerateASM(currentTiles, convOptions);
 					break;
@@ -136,7 +114,6 @@ int dumpTiles(vector<Tile>& tiles, ConversionOptions &convOptions) {
 					generator.GenerateC(currentTiles, convOptions);
 					generator.GenerateH(currentTiles, convOptions);
 					break;
->>>>>>> img2cpc_c
 			}		
 		} while(it != tiles.end());
 	}
@@ -210,8 +187,6 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
 		if (options.isSet("-bn")) {
 			options.get("-bn")->getString(convOptions.BaseName);
 		}
-<<<<<<< HEAD
-=======
 		convOptions.AbsoluteBaseName = options.isSet("-abn");
 	
 		if(convOptions.AbsoluteBaseName && options.lastArgs.size() > 1) {
@@ -219,7 +194,6 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
 			return -1;
 		}
 		convOptions.OutputSize = options.isSet("-osz");
->>>>>>> img2cpc_c
 
 		string outputFmt;
 		options.get("-of")->getString(outputFmt);
@@ -246,10 +220,6 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
 			cout << endl;
 		}
 
-<<<<<<< HEAD
-		if (options.isSet("-z")) {
-			convOptions.ZigZag = true;
-=======
 		convOptions.ZigZag = options.isSet("-z");
 		convOptions.CreateFlipLut = options.isSet("-f");
 		convOptions.NoMaskData = options.isSet("-nm");
@@ -260,14 +230,11 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
 			} else {
 				cout << "Warning: Additional includes for output format different than C files. Ignored." << endl;
 			}
->>>>>>> img2cpc_c
 		}
 
 		convOptions.InterlaceMasks = convOptions.Palette.TransparentIndex >= 0 && options.isSet("-im");
 	}
 	return result;
-<<<<<<< HEAD
-=======
 }
 
 void createFlipLut(ConversionOptions &convOptions) {
@@ -428,7 +395,6 @@ void createAndOrTables(ConversionOptions &convOptions) {
 		    }
 			break;
 	}
->>>>>>> img2cpc_c
 }
 
 int main(int argc, const char** argv)
@@ -454,11 +420,7 @@ int main(int argc, const char** argv)
 		cout << "Couldn't parse conversion options. Use img2cpc --help for more information." << endl;
 		return optionsResult;
 	}
-<<<<<<< HEAD
 	//convOptions.Dump();
-=======
-		//convOptions.Dump();
->>>>>>> img2cpc_c
 
 	vector<string *> &lastArgs = options.lastArgs;
 	vector<Tile> tiles;
@@ -472,8 +434,6 @@ int main(int argc, const char** argv)
 		}
 	}
 
-<<<<<<< HEAD
-=======
 	if(convOptions.CreateFlipLut) {
 		createFlipLut(convOptions);
 	}
@@ -481,7 +441,6 @@ int main(int argc, const char** argv)
 		createAndOrTables(convOptions);		
 	}
 
->>>>>>> img2cpc_c
 	dumpTiles(tiles, convOptions);
 	
 	return 0;
