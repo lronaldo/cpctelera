@@ -3,6 +3,7 @@ SRCDIR=src
 OBJDIR=obj
 BINDIR=bin
 LIBDIR=lib
+MKDIR=mkdir
 
 CC=gcc
 CXX=g++
@@ -19,7 +20,7 @@ SRCS = $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/*.cpp)
 OBJS = $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cc,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
 APPNAME = $(BINDIR)/img2cpc
 
-all: $(APPNAME)
+all: createFolders $(APPNAME)
 
 $(APPNAME): $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
@@ -35,6 +36,10 @@ showVars:
 	$(info $(HEADERS))
 	$(info $(SRCS))
 	$(info $(OBJS))
+
+createFolders:
+    $(MKDIR) -p $(OBJDIR)
+    $(MKDIR) -p $(BINDIR)
 
 clean:
 	$(RM) $(OBJDIR)/*
