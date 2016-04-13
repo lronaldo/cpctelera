@@ -19,20 +19,20 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_nextRandom_mxor_u8
+;; Function: cpct_nextRandom_mxor532_u8
 ;;
 ;;    Calculates next 32-bits state for a Marsaglia's XOR-Shift pseudo-random 
-;; 8-bits generator, with the tuple (1,1,3) .
+;; 8-bits generator, with the tuple (5,3,2). 
 ;;
 ;; C Definition:
-;;    <u32> <cpct_nextRandom_mxor_u8> (<u32> *seed*) __z88dk_fastcall;
+;;    <u32> <cpct_nextRandom_mxor532_u8> (<u32> *seed*) __z88dk_fastcall;
 ;;
 ;; Input Parameters (4 bytes):
 ;;    (4B DE:HL) *state* - Previous state that the XOR-Shift algorithm will use 
 ;; to calculate its follower in the sequence.
 ;;
 ;; Assembly call (Input parameter on DE:HL):
-;;    > call cpct_nextRandom_mxor_u8_asm
+;;    > call cpct_nextRandom_mxor532_u8_asm
 ;;
 ;; Return value (Assembly calls, return DE:HL = seed, A=L=random 8-bits):
 ;;    <u32> - Next internal state of the pseudo-random generator. The 8 Least Significant
@@ -67,93 +67,9 @@
 ;;
 ;;    The sequence calculated by this function is based on a modified version of 
 ;; <Marsaglia's XOR-shift generator at http://www.jstatsoft.org/article/view/v008i14/xorshift.pdf> 
-;; using the tuple (3, 1, 1) for 8-bit values. This tuple is implemented really fast 
-;; on a Z80 (<Patrik Rak originally showed a similar implementation for tuple (1, 1, 3) at 
-;; http://www.worldofspectrum.org/forums/discussion/23070/redirect/p1>). 
-;; Assuming that the 32-bits state s is composed of 4 8-bits numbers s=(x, z, y, w), 
-;; this algorithm produces a new state s'=(x',z',y',w') doing these operations:
-;; (start code)
-;;   x' = y;
-;;   y' = z;
-;;   z' = w;
-;;   t  = x ^ (x << 3);
-;;   t  = t ^ (t >> 1);
-;;   w' = w ^ (w << 1) ^ t;
-;; (end code)
-;;     where <</>> are left/right bit shifting operations, and ^ is the exclusive OR (XOR) 
-;; bitwise operation.
-;;
-;; Destroyed Register values: 
-;;      AF, BC, DE, HL
-;;
-;; Required memory:
-;;      17 bytes
-;;
-;; Time Measures:
-;; (start code)
-;;    Case     | microSecs (us) | CPU Cycles
-;; -----------------------------------------
-;;    Any      |      19        |    76
-;; -----------------------------------------
-;; (end code)
-;;
-;; Random quality measures:
-;;  * Dieharder tests rank: (99 Pass, 4 Weak, 11 Failed) (301/342 = 88.01%)
-;;  * Pseudo-random bit stream velocity: 2,375 us / bit. (8 bits produced in 19 us)
-;;
-;; Credits:
-;;   * Original <XOR-shifting algorithm published by George Marsaglia at 
-;; http://www.jstatsoft.org/article/view/v008i14/xorshift.pdf>
-;;   * Initial code for the 8-bits version of (1,1,3) tuple from Patrik Rak 
-;; (<World of Spectrum forums at http://www.worldofspectrum.org/forums/discussion/23070/redirect/p1>)
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-_cpct_nextRandom_mxor_u8::
-cpct_nextRandom_mxor_u8_asm::
-   ;; INPUT:
-   ;;  DE:HL == xz yw  (32 bits state)
-   ;;  xz yw -> yw zt ==> x'z' = yw, y' = z, w' = t
-   ;;  
-   ;; OUTPUT:
-   ;;  DE:HL == x'z' y'w' (new 32 bits state, L = w' = 8 random bits generated) 
-
-   ;; Move old bytes of the state. DE:HL is now xz yw
-   ;; Interchanging it makes DE:HL be yw xz, leaving x' and z' in DE 
-   ex  de, hl  ;; [1]  x' = y, z' = w
- 
-   ;; Calculate t = x ^ (x << 3)
-   ld   a, h   ;; [1] A = x
-   add  a      ;; [1]
-   add  a      ;; [1]
-   add  a      ;; [1] A = (x << 3)
-   xor  h      ;; [1] A = t = x ^ (x << 3)
-   ld   h, a   ;; [1] H = t
-   
-   ;; Calculate t = t ^ (t >> 1)
-   rra         ;; [1] A = (t >> 1)  (A already contained t)
-   xor  h      ;; [1] A = t' = t ^ (t >> 1)
-
-   ;; Calculate w' = w ^ (w << 1) ^ t'
-   ld   h, a   ;; [1] H = t'
-   ld   a, e   ;; [1] A = w
-   add  a      ;; [1] A = (w << 1)
-   xor  e      ;; [1] A = w ^ (w << 1)
-   xor  h      ;; [1] A = w' = w ^ (w << 1) ^ t'
-
-   ;; Store y' and w' and return
-   ld   h, l   ;; [1] H = y' = z
-   ld   l, a   ;; [1] L = w'
-
-   ret         ;; [3] New state is returned in DE:HL, being L the 8 random bits generated
-
-;;;
-;;; Little better quality random (same algorithm, with tuple (5, 3 ,2))
-;;;
-;; Random quality measures:
-;;  * Dieharder tests rank: (103 Pass, 4 Weak, 7 Failed) (305/342 = 89.18%)
-;;  * Pseudo-random bit stream velocity: 3,250 us / bit. (8 bits produced in 26 us)
-;;
+;; using the tuple (5, 3, 2) for 8-bit values. Assuming that the 32-bits state s is 
+;; composed of 4 8-bits numbers s=(x, z, y, w), this algorithm produces a new state 
+;; s'=(x',z',y',w') doing these operations:
 ;; (start code)
 ;;   x' = y;
 ;;   y' = z;
@@ -162,6 +78,38 @@ cpct_nextRandom_mxor_u8_asm::
 ;;   t  = t ^ (t >> 3);
 ;;   w' = w ^ (w << 5) ^ t;
 ;; (end code)
+;;     where <</>> are left/right bit shifting operations, and ^ is the exclusive OR (XOR) 
+;; bitwise operation.
+;;
+;; Destroyed Register values: 
+;;      AF, BC, DE, HL
+;;
+;; Required memory:
+;;      24 bytes
+;;
+;; Time Measures:
+;; (start code)
+;;    Case     | microSecs (us) | CPU Cycles
+;; -----------------------------------------
+;;    Any      |      26        |    104
+;; -----------------------------------------
+;; (end code)
+;;
+;; Random quality measures:
+;;  * Dieharder tests rank: (103 Pass, 4 Weak, 7 Failed) (305/342 = 89.18%)
+;;  * Pseudo-random bit stream velocity: 3,250 us / bit. (8 bits produced in 26 us)
+;;  * It has somewhat better quality than its homonimous function <cpct_nextRandom_mxor_u8>,
+;; which uses tuple (1,1,3) instead of (5,3,2).
+;;
+;; Credits:
+;;   * Original <XOR-shifting algorithm published by George Marsaglia at 
+;; http://www.jstatsoft.org/article/view/v008i14/xorshift.pdf>
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+_cpct_nextRandom_mxor532_u8::
+cpct_nextRandom_mxor532_u8_asm::
+;;
 ;; INPUT:
 ;;  DE:HL == xz yw  (32 bits state)
 ;;  xz yw -> yw zt ==> x'z' = yw, y' = z, w' = t
@@ -169,30 +117,37 @@ cpct_nextRandom_mxor_u8_asm::
 ;; OUTPUT:
 ;;  DE:HL == x'z' y'w' (new 32 bits state, L = w' = 8 random bits generated) 
 ;;  
-;;   ex  de, hl  ;; 1
-;;
-;;   ld   a, e   ;; 1  A = w
-;;   add a       ;; 1
-;;   add a       ;; 1
-;;   add a       ;; 1
-;;   add a       ;; 1
-;;   add a       ;; 1  A = (w << 5)
-;;   xor  e      ;; 1
-;;   ld   c, a   ;; 1  C = w ^ (w << 5)
-;;
-;;   ld   a, h   ;; 1  A = x
-;;   add  a      ;; 1
-;;   add  a      ;; 1  A = (x << 2)
-;;   xor  h      ;; 1  A = x ^ (x << 2) = t
-;;   ld   h, a   ;; 1  H = t
-;;   
-;;   rra         ;; 1
-;;   srl  a      ;; 2
-;;   srl  a      ;; 2  A = t >> 3
-;;   xor  h      ;; 1  A = t ^ (t >> 3) = t'
-;;   xor  c      ;; 1  A = w ^ (w << 5) ^ t' = w'
-;;
-;;   ld   h, l   ;; 1  H = y' = z
-;;   ld   l, a   ;; 1  L = w'
-;;
-;;   ret         ;; [3] New state is returned in DE:HL, being L the 8 random bits generated
+   ex  de, hl  ;; [1]  Invert DE and HL for comodity: easy way to move bytes to their final place
+
+   ;; First operation, C = w ^ (w << 5)
+   ld   a, e   ;; [1]  A = w
+   add  a      ;; [1]
+   add  a      ;; [1]
+   add  a      ;; [1]
+   add  a      ;; [1]
+   add  a      ;; [1]  A = (w << 5)
+   xor  e      ;; [1]
+   ld   c, a   ;; [1]  C = w ^ (w << 5)
+
+   ;; Second operation t = x ^ (x << 2)
+   ld   a, h   ;; [1]  A = x
+   add  a      ;; [1]
+   add  a      ;; [1]  A = (x << 2)
+   xor  h      ;; [1]  A = x ^ (x << 2) = t
+   ld   h, a   ;; [1]  H = t
+   
+   ;; Third and Fourth operations 
+   ;; t' = t ^ (t >> 3)
+   ;; w' = w ^ (w << 5) ^ t'
+   rra         ;; [1]
+   srl  a      ;; [2]
+   srl  a      ;; [2]  A = t >> 3
+   xor  h      ;; [1]  A = t ^ (t >> 3) = t'
+   xor  c      ;; [1]  A = w ^ (w << 5) ^ t' = w'
+
+   ;; Finally, reorder bytes to put them in their final place, 
+   ;; and copy return value from A to L
+   ld   h, l   ;; [1]  H = y' = z
+   ld   l, a   ;; [1]  L = w'
+
+   ret         ;; [3] New state is returned in DE:HL, being L the 8 random bits generated

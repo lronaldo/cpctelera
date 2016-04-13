@@ -21,8 +21,8 @@
 ;;
 ;; Function: cpct_getRandom_xsp40_u8
 ;;
-;;    Generates 8 deterministic, pseudo-random bits each time it is called. It 
-;; uses 40 state-bits, giving a period of (962.072.672.512) numbers without repeating.
+;;    Generates an 8-bits, high-quality, pseudo-random number with each call. It
+;; uses 40 state-bits, giving a period of 962.072.672.512 numbers without repeating.
 ;;
 ;; C Definition:
 ;;    <u8> <cpct_getRandom_xsp40_u8> ();
@@ -30,25 +30,27 @@
 ;; Assembly call:
 ;;    > call cpct_getRandom_xsp40_u8_asm
 ;;
-;; Return value:
-;;    <u8> - 8-bits pseudo-randomly generated. It also updates its internal state.
+;; Return value (Assembly calls, return L=A=random 8-bits):
+;;    <u8> - Next 8-bits pseudo-random value.
 ;;
 ;; Important details:
 ;;    * This function *will not work from a ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
-;;   This function implements a sequence of 40-bits states with period (962.072.672.512). 
+;;    This function implements a sequence of 40-bits states with period (962.072.672.512). 
 ;; For each produced state, a random sequence of 8-bits is returned. To do this, 
 ;; the function has a 40-bits internal state, that is modified each time it is called. 
+;; The result is a high-quality pseudo-random number generator that could virtually
+;; be considered random for general purposes of Z80-based software.
 ;;
-;;   The sequence calculated by this function is based on a modified version of 
+;;    The sequence calculated by this function is based on a modified version of 
 ;; <Marsaglia's XORshift+ generator at http://www.jstatsoft.org/article/view/v008i14/xorshift.pdf> 
 ;; using the tuple (1, 2, 3), with the constant C=255, for an extended matrix T, 
 ;; composed by 4x4 8-bit shift matrices. This T matrix is populated with A=(I+L^a)*(I+R^b), 
 ;; B=0, C=(I+R^c), and D=0. Selected tuple does not yield a full-period (which would be 
 ;; 2^40 - 2^8), but it is very close and is enough for passing all Dieharder tests.
 ;;
-;; To clarify operations, assuming that the 40-bits state s is composed of 5 8-bits 
+;;    To clarify operations, assuming that the 40-bits state s is composed of 5 8-bits 
 ;; numbers s=(x, z, y, w, v), this algorithm produces a new state s'=(x',z',y',w',v') 
 ;; proceeding this way:
 ;; (start code)
@@ -62,7 +64,7 @@
 ;;   returned value = w' ^ v' 
 ;; (end code)
 ;;
-;;   This operations are performed in an optimized fashion. 
+;;   These operations are performed in an optimized fashion. 
 ;;
 ;; Destroyed Register values: 
 ;;      AF, DE, HL

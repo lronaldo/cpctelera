@@ -22,7 +22,7 @@
 ;; Function: cpct_getRandom_mxor_u16
 ;;
 ;;    Gets a high-quality 16-bit pseudo-random number using Marsaglia's XOR-shift 
-;; algorithm.
+;; algorithm (using a 32-bits state)
 ;;
 ;; C Definition:
 ;;    <u16> <cpct_getRandom_mxor_u16> ();
@@ -30,22 +30,31 @@
 ;; Assembly call:
 ;;    > call cpct_getRandom_mxor_u16_asm
 ;;
+;; Return value (Assembly calls, return HL=random 16-bits):
+;;    <u16> - Next 16-bits pseudo-random value.
+;;
 ;; Known limitations:
 ;;    * This function *cannot be used from ROM*, as is uses self-modifying code.
 ;;
 ;; Details:
 ;;    This function uses <cpct_nextRandom_mxor_u32> to produce a stream of random 
-;; words (16-bits each word) in groups of 2. Then, it returns each one of the last 2 random 
-;; words produced previous to calling <cpct_nextRandom_mxor_u32> again. It uses 
-;; <cpct_mxor32_seed> as storage buffer for the last 2 random words got from 
-;; <cpct_nextRandom_mxor_u32>.
+;; 32-bits numbers, and then gets 2 16-bits values out of each 32-bits number generated.
+;; Then, it returns each one of the last 2 random values produced before calling 
+;; <cpct_nextRandom_mxor_u32> again. It uses <cpct_mxor32_seed> as state storage buffer 
+;; for the 32-bits number got from <cpct_nextRandom_mxor_u32>.
+;;
+;;    As <cpct_nextRandom_mxor_u32> produces (2^32)-1 32-bits numbers without repetition, 
+;; this function will produce (2^33)-1 16-bits values without repetition.
 ;;
 ;;    It is important to know that this function will have 2 different behaviors:
-;;    * [*available*] 1 out of every 2 calls, it will only return the next random-word 
+;;    * [*available*] 1 out of every 2 calls, it will only return the next random 16-bits value
 ;; from the buffer (<cpct_mxor32_seed>).
 ;;    * [*production*] 1 out of every 2 calls, it will also call <cpct_nextRandom_mxor_u32> 
-;; to produce 2 new random words.
+;; to produce a new 32-bits number (2 new 16-bits values).
 ;;    This behaviour is reflected in the time measures.
+;;
+;;    This function uses Marsaglia's XOR-shift standard algorithm with a concrete shift tuple. 
+;; Check <cpct_nextRandom_mxor_u32> to know details on how this is produced.
 ;;
 ;; Destroyed Register values: 
 ;;      AF, BC, DE, HL

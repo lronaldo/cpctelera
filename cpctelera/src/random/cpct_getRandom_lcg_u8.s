@@ -34,6 +34,9 @@
 ;; Assembly call (Input parameter on L):
 ;;    > call cpct_getRandom_lcg_u8_asm
 ;;
+;; Return value (Assembly calls, return L=A=random 8-bits):
+;;    <u8> - Next 8-bits pseudo-random value.
+;;
 ;; Parameter Restrictions:
 ;;    * *entropy_byte* this parameter is a byte to be used as sequence mixer. This byte is
 ;; XORed with previous seed before calculating next pseudo-random number from the sequence.

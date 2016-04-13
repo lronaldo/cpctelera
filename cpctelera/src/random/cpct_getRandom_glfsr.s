@@ -35,6 +35,9 @@
 ;; Assembly call (Input parameter on L):
 ;;    > call cpct_getRandom_glfsr16_u8_asm
 ;;
+;; Return value (Assembly calls, return L=A=random 8-bits, HL=random 16-bits):
+;;    <u8> - Next 8-bits pseudo-random value.
+;;
 ;; Known limitations:
 ;;    * This function *will not work from a ROM*, as it uses self-modifying code.
 ;;    * Seed (machine state) must *never* be zero. 
@@ -130,6 +133,9 @@
 ;;
 ;; Assembly call (Input parameter on L):
 ;;    > call cpct_getRandom_glfsr16_u16_asm
+;;
+;; Return value (Assembly calls, return HL=random 16-bits):
+;;    <u16> - Next 16-bits pseudo-random value.
 ;;
 ;; Consult for more information:
 ;;    <cpct_getRandom_glfsr16_u8>, which is the same function.

@@ -29,14 +29,14 @@
 ;; Known limitations:
 ;;    * This seed should never be set to 0. Functions that use this seed will always
 ;; return 0 if this seed is set to 0.
-;;    * If directly accessed from ASM, do not forget to put an underscore in from 
-;; (_cpct_mxor32_seed).
+;;    * You may assing a value to this seed direcly from C or ASM. If directly accessed 
+;; from ASM, do not forget to put an underscore in front (_cpct_mxor32_seed).
 ;;
 ;; Used by:
-;;    This variable is used by these functions,
-;;    * cpct_getRandom_mxor_u32
-;;    * cpct_getRandom_mxor_u16
-;;    * cpct_getRandom_mxor_u8
+;;    This seed variable is used by these functions,
+;;    * <cpct_getRandom_mxor_u32>
+;;    * <cpct_getRandom_mxor_u16>
+;;    * <cpct_getRandom_mxor_u8>
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
