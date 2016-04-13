@@ -26,7 +26,6 @@ class TileExtractor {
 	unsigned int TileHeight;
 	unsigned int ModeIncrement;
 	unsigned int Pitch;
-	string BaseName;
 
 public:
 	ConversionOptions Options;

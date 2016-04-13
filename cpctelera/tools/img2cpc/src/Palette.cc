@@ -5,7 +5,7 @@
 int TPalette::getNearestIndex(Color &color) {
 	int paletteIdx = -1;
 	double currentDistance = numeric_limits<double>::max();
-	for(int i=0,li=this->Current.size(); i<li; ++i) {
+	for (int i = 0, li = this->Current.size(); i<li; ++i) {
 		double dist = color.Distance(this->Current[i]);
 		if (dist < currentDistance) {
 			currentDistance = dist;
@@ -17,12 +17,12 @@ int TPalette::getNearestIndex(Color &color) {
 
 vector<int> TPalette::GetPaletteAsFW() {
 	vector<int> result;
-	for(Color color : this->Current) {
+	for (Color color : this->Current) {
 		double currentDistance = numeric_limits<double>::max();
 		int fwColor = -1;
-		for(int fwIdx=0,lFwIdx=TPalette::Firmware.size(); fwIdx<lFwIdx; ++fwIdx) {
-			double dist = color.Distance(this->Current[fwIdx]);
-			if(dist < currentDistance) {
+		for (int fwIdx = 0, lFwIdx = TPalette::Firmware.size(); fwIdx<lFwIdx; ++fwIdx) {
+			double dist = color.Distance(TPalette::Firmware[fwIdx]);
+			if (dist < currentDistance) {
 				currentDistance = dist;
 				fwColor = fwIdx;
 			}
@@ -34,13 +34,13 @@ vector<int> TPalette::GetPaletteAsFW() {
 
 vector<int> TPalette::GetPaletteAsHW() {
 	vector<int> result;
-	for(Color color : this->Current) {
+	for (Color color : this->Current) {
 		double currentDistance = numeric_limits<double>::max();
 		int hwColor = -1;
 		map<int, Color&>::const_iterator it;
-		for(it=TPalette::Hardware.begin(); it!=TPalette::Hardware.end();++it) {
+		for (it = TPalette::Hardware.begin(); it != TPalette::Hardware.end(); ++it) {
 			double dist = color.Distance(it->second);
-			if(dist < currentDistance) {
+			if (dist < currentDistance) {
 				currentDistance = dist;
 				hwColor = it->first;
 			}
@@ -52,63 +52,65 @@ vector<int> TPalette::GetPaletteAsHW() {
 
 int TPalette::ParseFW(vector<string> &fwIndices) {
 	int fwIndicesSize = fwIndices.size();
-	if(fwIndicesSize < 1 || fwIndicesSize > 16) {
-      cout << "Error." << endl
-           << "There must be at least one palette value and 16 palette values maximum." << endl;
-      return -2;
-    }
-    int fwPalSize = TPalette::Firmware.size();
-    for(string fwIdx : fwIndices) {
-      long int realIdx = strtol(fwIdx.c_str(), nullptr, 0);
-      if(realIdx >=0 && realIdx < fwPalSize) {
-        this->Current.push_back(TPalette::Firmware[realIdx]);
-      } else {
-        cout << "Error." << endl
-             << "Palette index " << fwIdx << " is out of bounds [0," << fwPalSize - 1 << "]" << endl;
-        return -2;
-      }
-    }
-    return 0;
+	if (fwIndicesSize < 1 || fwIndicesSize > 16) {
+		cout << "Error." << endl
+			<< "There must be at least one palette value and 16 palette values maximum." << endl;
+		return -2;
+	}
+	int fwPalSize = TPalette::Firmware.size();
+	for (string fwIdx : fwIndices) {
+		long int realIdx = strtol(fwIdx.c_str(), nullptr, 0);
+		if (realIdx >= 0 && realIdx < fwPalSize) {
+			this->Current.push_back(TPalette::Firmware[realIdx]);
+		}
+		else {
+			cout << "Error." << endl
+				<< "Palette index " << fwIdx << " is out of bounds [0," << fwPalSize - 1 << "]" << endl;
+			return -2;
+		}
+	}
+	return 0;
 };
 
 int TPalette::ParseHW(vector<string> &hwIndices) {
 	int hwIndicesSize = hwIndices.size();
-	if(hwIndicesSize < 1 || hwIndicesSize > 16) {
-      cout << "Error." << endl
-           << "There must be at least one palette value and 16 palette values maximum." << endl;
-      return -2;
-    }
-    map<int, Color&> &hwPalette = TPalette::Hardware;
-    for(string hwIdx : hwIndices) {
+	if (hwIndicesSize < 1 || hwIndicesSize > 16) {
+		cout << "Error." << endl
+			<< "There must be at least one palette value and 16 palette values maximum." << endl;
+		return -2;
+	}
+	map<int, Color&> &hwPalette = TPalette::Hardware;
+	for (string hwIdx : hwIndices) {
 
-      long int realIdx = strtol(hwIdx.c_str(), nullptr, 0);
+		long int realIdx = strtol(hwIdx.c_str(), nullptr, 0);
 
-      if(hwPalette.count(realIdx) != 0) {
-        this->Current.push_back(hwPalette.at(realIdx));
-      } else {
-        cout << "Error." << endl
-             << "Hardware color value " << hwIdx << " is not valid." << endl;
-        return -2;
-      }
-    }
-    return 0;
+		if (hwPalette.count(realIdx) != 0) {
+			this->Current.push_back(hwPalette.at(realIdx));
+		}
+		else {
+			cout << "Error." << endl
+				<< "Hardware color value " << hwIdx << " is not valid." << endl;
+			return -2;
+		}
+	}
+	return 0;
 };
 
 int TPalette::ParseRGB(vector<string> &rgbValues) {
 	//cout << "RGB!!";
 
 	int rgbValuesSize = rgbValues.size();
-	if(rgbValuesSize < 1 || rgbValuesSize > 16) {
-      cout << "Error." << endl
-           << "There must be at least one palette value and 16 palette values maximum." << endl;
-      return -2;
-    }
-    for(string val : rgbValues) {
-      long int intValue = strtol(val.c_str(), nullptr, 0);
-      Color currentColor((unsigned char)((intValue & 0xFF0000) >> 16), (unsigned char)((intValue & 0xFF00) >> 8), (unsigned char)(intValue & 0xFF));
-      this->Current.push_back(currentColor);
-    }
-    return 0;
+	if (rgbValuesSize < 1 || rgbValuesSize > 16) {
+		cout << "Error." << endl
+			<< "There must be at least one palette value and 16 palette values maximum." << endl;
+		return -2;
+	}
+	for (string val : rgbValues) {
+		long int intValue = strtol(val.c_str(), nullptr, 0);
+		Color currentColor((unsigned char)((intValue & 0xFF0000) >> 16), (unsigned char)((intValue & 0xFF00) >> 8), (unsigned char)(intValue & 0xFF));
+		this->Current.push_back(currentColor);
+	}
+	return 0;
 };
 
 int TPalette::ParseFile(string &fileName) {
@@ -119,44 +121,48 @@ int TPalette::ParseFile(string &fileName) {
 	return this->FromJSON(root);
 };
 
-int TPalette::FromJSON(Json::Value &root) { 
-	string type = root.get("type","rgb").asString();
+int TPalette::FromJSON(Json::Value &root) {
+	string type = root.get("type", "rgb").asString();
 	transform(type.begin(), type.end(), type.begin(), ::tolower);
 
 	vector<string> valuesVector;
 	const Json::Value values = root["values"];
-	if(values != Json::Value::null) {
-		for (int i=0, li=values.size(); i < li; ++i) {
+	if (values != Json::Value::null) {
+		for (int i = 0, li = values.size(); i < li; ++i) {
 			valuesVector.push_back(values[i].asString());
-	   	}
+		}
 
-		if(type == "firmware") {
+		if (type == "firmware") {
 			this->ParseFW(valuesVector);
-		} else if(type == "hardware") {
+		}
+		else if (type == "hardware") {
 			this->ParseHW(valuesVector);
-		} else if(type == "rgb") {
+		}
+		else if (type == "rgb") {
 			this->ParseRGB(valuesVector);
-		} else {
+		}
+		else {
 			cout << "Error." << endl
-			     << "Palette type '" << root["type"] << "' not supported." << endl
-			     << "Supported types are 'firmware','hardware' and 'rgb'." << endl;
+				<< "Palette type '" << root["type"] << "' not supported." << endl
+				<< "Supported types are 'firmware','hardware' and 'rgb'." << endl;
 			return -1;
 		}
-	} else {
+	}
+	else {
 		cout << "Error." << endl
-		     << "No values specified for palette." << endl; 
-		return -1;		
+			<< "No values specified for palette." << endl;
+		return -1;
 	}
 
 	Json::Value transValue = root["transparent"];
-	if(transValue != Json::Value::null) {
+	if (transValue != Json::Value::null) {
 		int maxValue = this->Current.size();
-	    int value = transValue.asInt();
-	    this->TransparentIndex = value;
-	    if(this->TransparentIndex < 0 || this->TransparentIndex >= maxValue) {
-	    	cout << "Error." << endl << "Transparent color must be between 0 and " << maxValue - 1 << "." << endl;
-	      	return -1;
-	    }
+		int value = transValue.asInt();
+		this->TransparentIndex = value;
+		if (this->TransparentIndex < 0 || this->TransparentIndex >= maxValue) {
+			cout << "Error." << endl << "Transparent color must be between 0 and " << maxValue - 1 << "." << endl;
+			return -1;
+		}
 	}
 
 	return 0;
@@ -167,7 +173,7 @@ Json::Value TPalette::ToJSON() {
 
 	result["type"] = "rgb";
 	Json::Value values;
-	for(Color c : this->Current) {
+	for (Color c : this->Current) {
 		values.append(c.toInt());
 	}
 	result["values"] = values;
@@ -178,18 +184,18 @@ Json::Value TPalette::ToJSON() {
 
 void TPalette::Dump() {
 	cout << "[" << endl;
-	for(Color c : this->Current) {
+	for (Color c : this->Current) {
 		cout << "\t";
 		c.Dump();
 		cout << endl;
 	}
 	cout << "]" << endl;
 
-    if(this->TransparentIndex >= 0) {
-      cout << "Transparent color is: ";
-      this->Current[this->TransparentIndex].Dump(); 
-      cout << endl;
-  	}
+	if (this->TransparentIndex >= 0) {
+		cout << "Transparent color is: ";
+		this->Current[this->TransparentIndex].Dump();
+		cout << endl;
+	}
 };
 
 vector<Color> TPalette::Firmware = {
