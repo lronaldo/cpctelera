@@ -25,6 +25,7 @@ Awesome collaborators:
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
    * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
    * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
+   * <Syx at http://www.cpcwiki.eu/forum/profile/?u=324>
  
 Bitarrays idea and original implementation:
    * Alberto García García (Blitzman, albertgg93@gmail.com, <@albertgarcia93 at http://twitter.com/albertgarcia93>)
@@ -97,20 +98,20 @@ Section: 3rdparty software authors
 
 Section: Testers & Bug Reporters
 
- * <Martin C. Doege at https://github.com/mdoege> 
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
- * <Ervin / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=82> 
+ * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
  * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
- * <gryken2014 at https://github.com/gryken2014>
+ * <gryken2014 at https://github.com/gryken2014> / <Github at https://github.com>
  * Roald Strauss (<mr_lou / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=96>)
  * Toni Ramírez (<@amstradgamer at http://twitter.com/amstradgamer)
- * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / CPCWiki
- * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / CPCWiki
+ * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+ * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / <CPCWiki at http://www.cpcwiki.eu>
  * Carlos (<@neophox at http://twitter.com/neophox>)
- * <gryken2014 at https://github.com/gryken2014>
+ * <gryken2014 at https://github.com/gryken2014> / <Github at https://github.com>
  * <Tim Riemann / Octoate at http://www.octoate.de>
  * <Martin C. Doege at https://github.com/mdoege>
- * <Trewdbal at https://github.com/Trewdbal>
+ * <Trewdbal at https://github.com/Trewdbal> / <Github at https://github.com> 
+ * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
 
 Section: Assets 
 
@@ -141,4 +142,5 @@ Section: Special Thanks
  * <Prodatron at http://www.prodatron.net/> / Symbiosis for producting such a great deal of incredible software for the Amstrad CPC and for being always helpful and kind.
  * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs, Z80 programming and random number generators)
  * <Z88DK at http://www.z88dk.org/forum/> developers for sharing their really nice Z80 codebase.
+
  
