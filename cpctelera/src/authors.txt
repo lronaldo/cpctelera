@@ -19,12 +19,12 @@ Project owner:
    * <ronaldo at http://twitter.com/frangallegobr> / (<Cheesetea at http://www.cheesetea.com>, <Fremos at http://fremos.cheesetea.com>, <ByteRealms at http://www.byterealms.com>)
  
 Awesome collaborators:
-   * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
-   * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
-   * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
-   * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
-   * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
+   * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
+   * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
+   * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
+   * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
+   * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
  
 Bitarrays idea and original implementation:
    * Alberto García García (Blitzman, albertgg93@gmail.com, <@albertgarcia93 at http://twitter.com/albertgarcia93>)
@@ -92,7 +92,7 @@ Section: 3rdparty software authors
    * <Hervé Drolon at mailto:drolon@infonie.fr>
    * <Floris van den Berg at mailto:flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
 
-<WinApe emulator at http://winape.net>: 
+ <WinApe emulator at http://winape.net>: 
    * <Richard Wilson at mailto:rich@bitwise-systems.com>
 
 Section: Testers & Bug Reporters
@@ -107,7 +107,24 @@ Section: Testers & Bug Reporters
  * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / CPCWiki
  * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / CPCWiki
  * Carlos (<@neophox at http://twitter.com/neophox>)
+ * <gryken2014 at https://github.com/gryken2014>
+ * <Tim Riemann / Octoate at http://www.octoate.de>
+ * <Martin C. Doege at https://github.com/mdoege>
+ * <Trewdbal at https://github.com/Trewdbal>
 
+Section: Assets 
+
+ * SpritesEMR, Persea, Fremos Logo, Frame Tile Sprite, Death with an oil lamp, Background and others by Emilio Molina Reig (<Dardalorth at https://twitter.com/dardalorth> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
+ * Goku, No13, Vegeta by <SunWay at mailto:oferrer@carlio.es> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
+ * GNG Like tiles by <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
+* <Hand Painted Texture at http://opengameart.org/content/hand-painted-texture-sandstone> by <The Chayed - KIIRA at http://opengameart.org/users/the-chayed-kiira>
+ * <The Knight - Free Sprite at http://opengameart.org/content/the-knight-free-sprite> by <pzUH at http://opengameart.org/users/pzuh>
+ * <Mini Knight Expansion 1 at http://opengameart.org/content/mini-knight-expansion-1-0> by <Master484 at http://opengameart.org/users/master484>
+ * <Animated Runner Character at http://opengameart.org/content/animated-runner-character> by <irmirx at https://www.behance.net/irmirx>
+ * <SCI-FI Background at http://opengameart.org/content/sci-fi-background> by <hassekf at http://opengameart.org/users/hassekf>
+ * <Pixel Art Dungeon Items at http://opengameart.org/content/pixel-art-dungeon-items> by <SpinachChicken at http://opengameart.org/users/spinachchicken>
+ * <Little Candele Monsters at http://opengameart.org/content/little-candle-monsters> by <C-TOY at http://c-toy.blogspot.com.es>
+ 
 Section: Special Thanks
 
    Developers, collaborators and others that helped a great deal
