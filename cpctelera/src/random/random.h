@@ -19,8 +19,10 @@
 //
 // Title: Random
 //
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef _CPCT_RANDOM_H_
+#define _CPCT_RANDOM_H_
+
+#include "random_types.h"
 
 //
 // Uniform Random Generators
@@ -31,9 +33,8 @@ extern u8   cpct_getRandom_lcg_u8  (u8 entropy_byte) __z88dk_fastcall;
 extern void cpct_setSeed_lcg_u8    (u8      newseed) __z88dk_fastcall;
 
 // Based on Galois Linear-Feedback Shift Register
-#include "glfsr16taps.h"
-extern void cpct_setSeed_glfsr16      (u16 newseed) __z88dk_fastcall;
-extern void cpct_setTaps_glfsr16      (u16    taps) __z88dk_fastcall;
+extern void cpct_setSeed_glfsr16      (u16       newseed) __z88dk_fastcall;
+extern void cpct_setTaps_glfsr16      (GLFSR16_TAPS taps) __z88dk_fastcall;
 extern u8   cpct_getRandom_glfsr16_u8 ();
 extern u16  cpct_getRandom_glfsr16_u16();
 

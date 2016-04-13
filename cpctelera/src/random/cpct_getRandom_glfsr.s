@@ -17,21 +17,23 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_random
 
+;;
+;; Title: cpct_getRandom_glfsr16
+;;    Pseudo-random number generator that uses a 16-bits Galois Linear-Feedback Shift Register
+;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_getRandom_glfsr16_u8
-;; Function: cpct_getRandom_glfsr16_u16
 ;;
 ;;    Return a pseudo-random byte using Galois Linear-Feedback Shift 
 ;; Register (G-LFSR) method, with a 16-bits state register.
 ;;
 ;; C Definition:
-;;    <u8>  <cpct_getRandomu8_glfsr16>  ();
-;;    <u16> <cpct_getRandomu16_glfsr16> ();
+;;    <u8>  <cpct_getRandom_glfsr16_u8>  ();
 ;;
 ;; Assembly call (Input parameter on L):
 ;;    > call cpct_getRandom_glfsr16_u8_asm
-;;    > call cpct_getRandom_glfsr16_u16_asm
 ;;
 ;; Known limitations:
 ;;    * This function *will not work from a ROM*, as it uses self-modifying code.
@@ -44,11 +46,54 @@
 ;; when good quality random numbers are required. However, a combination with other
 ;; functions may yield much better results.
 ;;
-;; Important details:
-;;      TODO
-;;
 ;; Details:
-;;      TODO
+;;      This function implements a Galois Linear-Feedback Shift Register with a 16
+;; bits state. This Shift Register does produce 65535 16-bits values without repetition,
+;; then cycles again. That is, it is like having the 65536 (excluding 0) possible 16-bits
+;; values ordered in a pseudo-random manner, and getting each one at a time. 
+;;
+;;      The implementation of the Shift Register is based on some specific 16-bits
+;; values denominated TAPS (Check <GLFSR16_TAPSET>). These values are bit-masks that
+;; select some bits to implement a linear polynomial shifting operation. Depending
+;; on the bits selected in the bit-mask, the polynomial implemented changes. There
+;; exists 1024 different polynomials that mathematically ensure a 65535-value traversal
+;; without repetition. Any other polynomial will have a shorter period. These
+;; 1024 TAPSETs that implement the polynomials with full 16-bits traversals are 
+;; defined in <GLFSR16_TAPSET> enumeration. Use <cpct_setTaps_glfsr16> with any of the 
+;; these tapsets to select your desired traversal.
+;;
+;; Use example:
+;;    Basic use of this function does not require any kind of set-up, just calling
+;; the function each time you want a pseudo-random number
+;; (start code)
+;;    // Get next pseudo-random 8-bits number
+;;    u8 getRandomNumber() {
+;;       return cpct_getRandom_glfsr16_u8();
+;;    }
+;; (end code)
+;;    However, this will return always the same sequence, in the same order. You might
+;; consider setting the staring seed at some initialization point,
+;; (start code)
+;;    // Count loops until user presses a key
+;;    u16 countUntilUserPressesAKey() {
+;;       u16 loops;
+;;       do {
+;;          loops++;
+;;          cpct_scanKeyboard();
+;;       } while ( !cpct_isAnyKeyPressed() );
+;;
+;;       return loops;
+;;    }
+;;
+;;    // Initialization code (set initial seed)
+;;    u16 loops = countUntilUserPressesAKey();
+;;    cpct_setSeed_glfsr16(loops);
+;; (end code)
+;;    This code will set the starting state of the internal shift register to a value 
+;; depending on when the user has pressed a key, which will randomize the starting 
+;; point in the 65535-values sequence that the pseudo-random generator produces.
+;; However, take into account that the 65535-value traversal will be in the same
+;; order, unless you changed it calling <cpct_setTaps_glfsr16>.
 ;;
 ;; Destroyed Register values: 
 ;;      AF, HL
@@ -66,10 +111,41 @@
 ;; -------------------------------------
 ;; (end code)
 ;;
-;; Credits:
+;; Credits and References:
 ;;    This function is based on Galois Linear-Feedback Shift Register method.
+;;  - On Linear-Feedback Shift Registers: https://es.wikipedia.org/wiki/LFSR
+;;  - Theory on LSFRs: http://web.archive.org/web/20010605005727/homepage.mac.com/afj/lfsr.html
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_getRandom_glfsr16_u16
+;;
+;;    Return a pseudo-random 16-bits value using Galois Linear-Feedback Shift 
+;; Register (G-LFSR) method, with a 16-bits state register.
+;;
+;; C Definition:
+;;    <u16> <cpct_getRandom_glfsr16_u16> ();
+;;
+;; Assembly call (Input parameter on L):
+;;    > call cpct_getRandom_glfsr16_u16_asm
+;;
+;; Consult for more information:
+;;    <cpct_getRandom_glfsr16_u8>, which is the same function.
+;;
+;; Details:
+;;    This function is exactly the same as <cpct_getRandom_glfsr16_u8>. Both 
+;; functions share the 100% of their code. The only difference is the return
+;; type: <cpct_getRandom_glfsr16_u8> returns a <u8> (in L register) and 
+;; <cpct_getRandom_glfsr16_u16> returns a <u16> (in HL register). So, from
+;; C perspective, same code is called, and 16 bits are returned, but sometimes
+;; only 8 bits are used (when <cpct_getRandom_glfsr16_u8>). From assembly 
+;; point of view, you call the same function, and may decide to use return in
+;; L (8 bits) or in HL (16 bits) at your will.
+;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;; u16 and u8 functions do the same: 
 ;;   one will only consider L as return value whereas the other will use HL
