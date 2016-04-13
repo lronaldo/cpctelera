@@ -123,22 +123,22 @@ Group: Memutils  {
 
 Group: Random  {
 
+   File: cpct_getRandom_glfsr16  (random/cpct_getRandom_glfsr.s)
+   File: cpct_getRandom_lcg_u8  (random/cpct_getRandom_lcg_u8.s)
    File: cpct_getRandom_mxor_u16  (random/cpct_getRandom_mxor_u16.s)
    File: cpct_getRandom_mxor_u32  (random/cpct_getRandom_mxor_u32.s)
    File: cpct_getRandom_mxor_u8  (random/cpct_getRandom_mxor_u8.s)
    File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
-   File: cpct_getRandomu8_glfsr16  (random/cpct_getRandom_flfsr.s)
-   File: cpct_getRandomUniform_u8_f  (random/cpct_getRandomUniform_u8_f.s)
    File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
    File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
-   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32_24_25_4.s)
    File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
-   File: cpct_setRandomSeedUniform_u8  (random/cpct_setRandomSeedUniform_u8.s)
-   File: cpct_setSeed_glfsr16  (random/cpct_setSeed_flfsr.s)
+   File: cpct_nextRandom_mxor532_u8  (random/cpct_nextRandom_mxor532_u8.s)
+   File: cpct_setSeed_glfsr16  (random/cpct_setSeed_glfsr.s)
+   File: cpct_setSeed_lcg_u8  (random/cpct_setSeed_lcg_u8.s)
    File: cpct_setSeed_mxor  (random/cpct_setSeed_mxor.s)
    File: cpct_setSeed_xsp40_u8  (random/cpct_setSeed_xsp40_u8.asm)
-   File: cpct_setTaps_glfsr16  (random/cpct_setTaps_flfsr.s)
-   File: GLFSR16_TAPSET_YYYY  (random/glfsr16taps.h)
+   File: cpct_setTaps_glfsr16  (random/cpct_setTaps_glfsr.s)
+   File: Defined Types  (random/random_types.h)
    File: Random  (random/random.h)
    }  # Group: Random
 
