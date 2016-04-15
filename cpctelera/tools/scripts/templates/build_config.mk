@@ -36,7 +36,7 @@
 ##   If you change folder structure, CPCT_PATH should reflect this change.
 ##   This variable should always have the absolute path value.
 ##
-CPCT_PATH := %%%CPCTELERA_PATH%%%
+CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
 
 ####
 ## SECTION 1: Project configuration 
@@ -148,6 +148,7 @@ OBJSUBDIRS    := $(OBJDSKINCSDIR) $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR
 
 # Calculate all source files
 CFILES         := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
+CFILES         := $(IMGCFILES) $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
