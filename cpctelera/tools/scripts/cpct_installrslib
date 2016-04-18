@@ -26,10 +26,21 @@
 ##    Installs and configures CPCRSLib to be used together with CPCtelera
 ##
 ## Usage:
-##    <cpct_insallrslib> [options] 
+##    <cpct_installrslib> [options] 
 ##
 ## Description:
-##    TODO
+##    This script automatically downloads CPCRSLib from sourceforge, installs
+## it and configures it to be easily used within CPCtelera framework. CPCRSLib
+## is installed inside a folder called z80libs/ where other compatible libs
+## may be installed. 
+##
+##    This script patches, compiles and sets up CPCRSLib on installation.
+## However, you may have reasons to recompile CPCRSLib (for instance, you
+## may want to modify and use its tilemap features). If that was the case,
+## you should enter z80libs/cpcrslib_SDCC/ and type in 'make' to recompile
+## the library after modifications. Do not launch this script again, because
+## it will erase previous installation and do a clean installation, therefore
+## erasing your changes.
 ##
 ## Command line options:
 ##    -h | --help                     - Shows help information on the terminal.
@@ -58,6 +69,19 @@ function usage() {
    echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options]"
    echo
    echo "${COLOR_CYAN}  Installs and configures CPCRSLib to be used together with CPCtelera."
+   echo
+   echo "${COLOR_LIGHT_BLUE}Description:"
+   echo "${COLOR_CYAN}   This script automatically downloads ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} from \
+sourceforge, installs it and configures it to be easily used within CPCtelera framework. \
+${COLOR_WHITE}CPCRSLib${COLOR_CYAN} is installed inside a folder called ${COLOR_WHITE}z80libs/${COLOR_CYAN} \
+where other compatible libs may be installed. "
+   echo
+   echo "   This script patches, compiles and sets up ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} on installation. \
+However, you may have reasons to recompile ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} (for instance, you may want to \
+modify and use its tilemap features). If that was the case, you should enter ${COLOR_WHITE}z80libs/cpcrslib_SDCC/ \
+${COLOR_CYAN}and type in '${COLOR_WHITE}make${COLOR_CYAN}' to recompile the library after modifications. \
+${COLOR_YELLOW}Do not launch this script again${COLOR_CYAN}, because it will erase previous installation and \
+will do a clean installation, therefore erasing your changes."
 
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
