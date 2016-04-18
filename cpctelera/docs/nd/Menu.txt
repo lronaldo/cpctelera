@@ -75,6 +75,18 @@ Group: Bitarray  {
    File: Useful macros  (bitarray/bitarray_macros.h)
    }  # Group: Bitarray
 
+Group: Commandline  {
+
+   File: cpct_bin2c  (commandline/cpct_bin2c)
+   File: cpct_img2tileset  (commandline/cpct_img2tileset)
+   File: cpct_installrslib  (commandline/cpct_installrslib)
+   File: cpct_mkproject  (commandline/cpct_mkproject)
+   File: cpct_rgas2c  (commandline/cpct_rgas2c)
+   File: cpct_sp2tile  (commandline/cpct_sp2tiles)
+   File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
+   File: cpct_winape  (commandline/cpct_winape)
+   }  # Group: Commandline
+
 Group: Easytilemaps  {
 
    File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
