@@ -24,7 +24,7 @@
 ;;    Draws a complete tilemap made of 2x4-bytes tiles.
 ;;
 ;; C Definition:
-;;    void <cpct_etm_drawlTilemap2x4_f> (<u8> *map_width*, <u8> *map_height*, 
+;;    void <cpct_etm_drawTilemap2x4_f> (<u8> *map_width*, <u8> *map_height*, 
 ;; <u8>* *pvideomem*, <u8>* *ptilemap*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):

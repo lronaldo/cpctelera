@@ -25,6 +25,9 @@ int initializeImageLoader();
 int processImage(const string& filename, vector<Tile>& tiles, ConversionOptions &convOptions, ezOptionParser &options);
 int dumpTiles(vector<Tile>& tiles, ConversionOptions &convOptions);
 
+void createAndOrTables(ConversionOptions &options);
+void createFlipLut(ConversionOptions &options);
+
 int main(int argc, const char** argv);
 
 #endif

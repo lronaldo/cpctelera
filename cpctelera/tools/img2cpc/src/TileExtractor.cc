@@ -14,6 +14,12 @@ vector<Tile> TileExtractor::GetTiles(const string &fileName) {
 		unsigned int tileWidth = this->Options.TileWidth > 0 ? this->Options.TileWidth : imageWidth;
 		unsigned int tileHeight = this->Options.TileHeight > 0 ? this->Options.TileHeight : imageHeight;
 
+		unsigned int numTilesY = (imageHeight / tileHeight) + ((imageHeight % tileHeight) > 0 ? 1 : 0);
+		unsigned int numTilesX = (imageWidth / tileWidth) + ((imageWidth % tileWidth) > 0 ? 1 : 0);
+		unsigned int totalTiles = numTilesY * numTilesX;
+
+		unsigned int numDigits = (int) log10 ((double) totalTiles) + 1;
+
 		this->ModeIncrement = this->getModeIncrement();
 
 		int tileIdx = 0;
@@ -41,11 +47,15 @@ vector<Tile> TileExtractor::GetTiles(const string &fileName) {
 
 				stringstream nameStream;
 				if(!baseName.empty()) {
-					nameStream << baseName << "_";
+					nameStream << baseName;;
+					if(!this->Options.AbsoluteBaseName) {
+						nameStream  << "_" << currentFileName;					
+					}
+				} else {
+					nameStream << currentFileName;
 				}
-				nameStream << currentFileName;
 				if (realTileHeight != imageHeight || realTileWidth != imageWidth) {
-					nameStream << "_" << tileIdx;
+					nameStream << "_" << setw(numDigits) << setfill('0') << tileIdx;
 				}
 				theTile.Name = nameStream.str();
 				

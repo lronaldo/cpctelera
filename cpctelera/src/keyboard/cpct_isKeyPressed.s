@@ -40,10 +40,9 @@
 ;; would be meaningless. If given value asks for a Matrix Line greater than 9,
 ;; unexpected results may happen.
 ;;
-;; Return value:
+;; Return value (for Assembly, L=A=key_status):
 ;;    <u8> - *false* (0, if not pressed) or *true* (>0, if pressed). Take into
-;; account that *true* is not 1, but any non-0 number. Return value is placed 
-;; in registers A and L (same value for both)
+;; account that *true* is not 1, but any non-0 number. 
 ;;
 ;; Details:
 ;;    Checks if a concrete key is pressed or not. It does it looking   

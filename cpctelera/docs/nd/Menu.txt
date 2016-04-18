@@ -1,4 +1,4 @@
-Format: 1.52
+Format: 1.51
 
 
 Title: . .
@@ -101,6 +101,8 @@ Group: Keyboard  {
    File: cpct_isKeyPressed  (keyboard/cpct_isKeyPressed.s)
    File: cpct_scanKeyboard  (keyboard/cpct_scanKeyboard.s)
    File: cpct_scanKeyboard_f  (keyboard/cpct_scanKeyboard_f.s)
+   File: cpct_scanKeyboard_i  (keyboard/cpct_scanKeyboard_i.s)
+   File: cpct_scanKeyboard_if  (keyboard/cpct_scanKeyboard_if.s)
    File: Keyboard Mappings&amp;Constants  (keyboard/keyboard.h)
    File: Keyboard Technicals  (keyboard/keyboard.txt)
    }  # Group: Keyboard

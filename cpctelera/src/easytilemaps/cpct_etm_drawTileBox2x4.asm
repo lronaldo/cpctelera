@@ -26,14 +26,14 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_etm_drawTileBox2x4> (<u8> *x*, <u8> *y*, <u8> *w*, <u8> *h*, <u8> *map_width*,
-;;                                    void* *pvideomem*, const void* *ptilemap*, ) __z88dk_callee;
+;;                                    void* *pvideomem*, const void* *ptilemap* ) __z88dk_callee;
 ;;
 ;; Input Parameters (9 bytes):
-;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
 ;;    (1B  C) x         - x tile-coordinate of the starting tile inside the tilemap
 ;;    (1B  B) y         - y tile-coordinate of the starting tile inside the tilemap
 ;;    (1B  L) w         - width in tiles of the tile-box to be redrawn
 ;;    (1B  H) h         - height in tiles of the tile-box to be redrawn
+;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
 ;;    * Always received on the stack
 ;;    (2B) pvideomem    - Pointer to upper left corner of the *tilemap* in video memory.
 ;;    (2B) ptilemap     - Pointer to the start of the tilemap
