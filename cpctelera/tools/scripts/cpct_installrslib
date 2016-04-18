@@ -1,0 +1,205 @@
+#!/bin/bash
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2015-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_installrslib
+##    Installs and configures CPCRSLib to be used together with CPCtelera
+##
+## Usage:
+##    <cpct_insallrslib> [options] 
+##
+## Description:
+##    TODO
+##
+## Command line options:
+##    -h | --help                     - Shows help information on the terminal.
+##
+
+##
+## Global configuration
+##
+
+# Script configuration
+CPCT_TOOLS_FOLDER=$(dirname $0)/..
+CPCT_FOLDER=${CPCT_TOOLS_FOLDER}/..
+WWW_CPCRSLIB="http://downloads.sourceforge.net/project/cpcrslib/cpcrslib_SDCC/cpcrslib_SDCC.zip?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fcpcrslib%2F&ts=1460984697&use_mirror=heanet"
+Z80LIBS_PATH=${CPCT_FOLDER}/z80libs
+CPCRSLIB_DIR=cpcrslib_SDCC
+CPCRSLIB_ZIP=${Z80LIBS_PATH}/cpcrslib.zip
+CPCRSLIB_PATH=${Z80LIBS_PATH}/${CPCRSLIB_DIR}/
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options]"
+   echo
+   echo "${COLOR_CYAN}  Installs and configures CPCRSLib to be used together with CPCtelera."
+
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+## Shows a colored error message on screen
+##  $1: Message to show
+##
+function showErrorMsg {
+   echo "${COLOR_RED}[Error]${COLOR_CYAN} ${1}${COLOR_NORMAL}"
+}
+
+## Create a new installation of CPCRSLib inside CPCtelera tools folder
+##  Returns 0 on install success, errorCode otherwise
+##
+function installCPCRSLib {
+   local ERRORMSG="is not installed on the system and is required to automatically download and install \
+CPCRSLib. Please, install it and run this script again. "
+   
+   ## Check required commands are installed
+   if ! isCommandAvailable "wget"; then
+      showErrorMsg "Command '${COLOR_WHITE}wget${COLOR_CYAN}' $ERRORMSG" 
+      return 1
+   elif ! isCommandAvailable "unzip"; then
+      showErrorMsg "Command '${COLOR_WHITE}unzip${COLOR_CYAN}' $ERRORMSG" 
+      return 2
+   fi
+
+   # Download and install CPCRSLib
+   #
+   echo
+   echo "${COLOR_CYAN}This script will automatically ${COLOR_LIGHT_CYAN}download and CPCRSLib \
+${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} z80libs folder for you."
+   echo
+   echo "${COLOR_CYAN} Downloading CPCRSLib from (${COLOR_WHITE}${WWW_CPCRSLIB}${COLOR_CYAN})...${COLOR_NORMAL}"
+   wget -nv --progress=bar -O "$CPCRSLIB_ZIP" "$WWW_CPCRSLIB"
+   echo "${COLOR_CYAN}Unpacking CPCRSLib...${COLOR_NORMAL}"
+   unzip -o -q "$CPCRSLIB_ZIP" -d "$Z80LIBS_PATH" 
+   rm "$CPCRSLIB_ZIP"
+
+   ## Do some required replacements for CPCRSLib to compile properly
+   replaceTag "\"tilemap\.s\"" "\"TileMap\.s\"" "${CPCRSLIB_PATH}/src/tilemap/cpc_TileMapV.s"
+   replaceTag "\"tilemapC\.h\"" "\"TileMapC\.h\"" "${CPCRSLIB_PATH}/src/tilemap/cpc_TileMapV.s"
+   replaceTag "\"firmware\.s\"" "\"Firmware\.s\"" "${CPCRSLIB_PATH}/src/utils/cpc_DisableFirmware.s"
+   replaceTag "\"firmware\.s\"" "\"Firmware\.s\"" "${CPCRSLIB_PATH}/src/utils/cpc_EnableFirmware.s"
+
+   ## Disable an unused file
+   mv "${CPCRSLIB_PATH}/src/tilemap/multiplication1.s" "${CPCRSLIB_PATH}/src/tilemap/multiplication1.s.old"
+
+   ## Set up Makefile
+   cp "${CPCT_TOOLS_FOLDER}/scripts/templates/cpcrslib/Makefile" "${CPCRSLIB_PATH}/Makefile"
+
+   ## Compile CPCRSLib
+   echo "${COLOR_CYAN}Compiling CPCRSLib...${COLOR_NORMAL}"
+   cd ${CPCRSLIB_PATH}
+   make
+   cd -
+
+   ## Success Message
+   echo
+   echo "${COLOR_INVERTED_GREEN}[SUCCESS]${COLOR_NORMAL}"
+   echo
+
+   echo "${COLOR_LIGHT_CYAN}CPCRSLib${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
+${CPCRSLIB_PATH}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
+   echo
+   echo "${COLOR_CYAN}You may know create ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} enabled projects using any of these commands:"
+   echo
+   echo "   ${COLOR_WHITE}cpct_mkproject ${COLOR_LIGHT_CYAN}--cpcrslib ${COLOR_WHITE}<foldername>"
+   echo "   ${COLOR_WHITE}cpct_mkproject ${COLOR_LIGHT_CYAN}-c ${COLOR_WHITE}<foldername>"
+   echo 
+   echo "${COLOR_CYAN}Check ${COLOR_WHITE}cpct_mkproject${COLOR_CYAN} help for more details."
+   echo ${COLOR_NORMAL}
+
+   return 0
+}
+
+## Removes previous installation of CPCRSLib
+function removePreviousCPCRSLibinstallation {
+   ## Carefully removing to prevent problems with dirs
+   echo "${COLOR_LIGHT_CYAN} Removing previous CPCRSLib installation at ${Z80LIBS_PATH}/${CPCRSLIB_DIR}"
+   cd ${Z80LIBS_PATH}
+   rm -rf ./${CPCRSLIB_DIR}
+   cd -
+}
+
+
+## Check CPCRSLib Installation and install it, in case
+function checkCPCRSLibInstallation {    
+   ## Check and create required folder
+   if [ ! -d $Z80LIBS_PATH ]; then
+      mkdir -p $Z80LIBS_PATH
+   fi
+
+   ## Welcome message
+   echo
+   echo "${COLOR_GREEN}%%%%%%%%%%%%%%%%%%%%%%%%%"
+   echo "${COLOR_GREEN}%% ${COLOR_LIGHT_WHITE}CPCRSLib installer script"
+   echo "${COLOR_GREEN}%%%%%%%%%%%%%%%%%%%%%%%%%"
+   echo
+
+   ## Check if CPCRSLib is installed
+   if [ -d "${CPCRSLIB_PATH}" ]; then
+      echo "${COLOR_LIGHT_YELLOW}[Warning] ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} appears to be already installed in your system. \
+If you proceed to reinstall it, existing installation ${COLOR_LIGHT_CYAN}will be removed first."
+      echo
+      askSimpleQuestion y Y n N "${COLOR_CYAN} Do you want to ${COLOR_LIGHT_CYAN}reinstall ${COLOR_WHITE}CPCRSlib${COLOR_CYAN}? ${COLOR_LIGHT_YELLOW}(y/n)" ANS
+      echo ${COLOR_LIGHT_WHITE}$ANS
+      if [[ "$ANS" == "y" || "$ANS" == "Y" ]]; then
+         removePreviousCPCRSLibinstallation
+         installCPCRSLib
+      else 
+         echo "${COLOR_LIGHT_CYAN}No change was made to your installation."
+         echo "${COLOR_RED}Aborting installation. ${COLOR_NORMAL}"
+         exit -1
+      fi
+   else
+      echo "${COLOR_CYAN}Proceeding to install and setup CPCRSLib on your system."
+      installCPCRSLib
+   fi
+}
+
+# Proccess command line parameters
+while (( $# > 0 )); do
+   case "$1" in
+      "-h" | "--help")
+        usage
+      ;;
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         else
+            paramError "'${1}' unexpected parameter."
+         fi
+      ;; 
+   esac
+   shift
+done
+
+# Check installation and reinstall it, in case
+checkCPCRSLibInstallation
