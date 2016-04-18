@@ -39,6 +39,7 @@
 ## required by your project.
 ##
 ## Command line options:
+##    -c | --cpcrslib                - Generates a CPCRSLib enabled project
 ##    -n | --project-name [projname] - Lets you name your project in a different
 ## way than the project folder.
 ##    -l | --load-address [loadaddr] - Lets you establish the memory address where
@@ -54,6 +55,7 @@ source $(dirname $0)/lib/bash_library.sh
 PROJECTNAME=
 PROJECTDIR=
 LOADADDRESS=4000
+CPCRSLIB=false
 
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
@@ -86,6 +88,8 @@ inside <project_folder_name>. So, <project_folder_name> must not previously exis
 current folder."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo "${COLOR_LIGHT_BLUE}  -c | --cpcrslib"
+   echo "${COLOR_CYAN}       Generates a CPCRSLib enabled project."
    echo "${COLOR_LIGHT_BLUE}  -n | --project-name  ${COLOR_LIGHT_CYAN}<name>"
    echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder_name> name. <name> \
 must not contain spaces."
@@ -121,6 +125,12 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Generate a CPCRSLib enabled project
+      "-c" | "--cpcrslib")
+         CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/cpcrslib/build_config.mk
+         SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/cpcrslib/main.c
+         CPCRSLIB=true
+      ;;
       ## Get an specific project name
       "-n" | "--project-name")
          if isEmpty "$2"; then
@@ -166,6 +176,9 @@ done
 ###############################################################
 ## Some checks
 ##
+if isEmpty "$PROJECTDIR"; then
+   paramError "No name was given to create project main folder."
+fi
 if isEmpty "$PROJECTNAME"; then
    PROJECTNAME="$PROJECTDIR"
 fi
@@ -190,6 +203,12 @@ NEW_MAKE=${PROJECTDIR}/Makefile
 
 # Welcome message
 stageMessage "CPCtelera" "Creating new project in ${COLOR_WHITE}${PROJECTDIR}/"
+
+## CPCRSLib enabled
+if $CPCRSLIB; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Enabling ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} linking..."
+   drawOK
+fi
 
 ## Create directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Creating project folder structure..."
