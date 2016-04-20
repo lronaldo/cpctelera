@@ -2,9 +2,9 @@ File: CPCtelera Reference Manual
 
 (see cpct_logo.png)
 
-*Astonishing fast Amstrad CPC game engine for C and Assembler developers*. 
+*Astonishingly fast Amstrad CPC game engine for C and Assembler developers*. 
 
-CPCtelera has been created by these *<Authors>*, and is distributed under *GPL v3 <License>*. 
+CPCtelera has been created by these *<Authors>*, and is distributed under *LGPL v3 <License>* (low-level library, examples, building system and scripts).
 
 We give *big thanks* to all users, contributors and supporters, and all respects to our *incredible <Donors>*.
 
@@ -13,26 +13,32 @@ We give *big thanks* to all users, contributors and supporters, and all respects
 Section: Welcome to CPCtelera!
    If you want to create games for Amstrad CPC, you are at the right place. Welcome to CPCtelera! 
 
-   CPCtelera is a low-level game library for C and assembler programmers wanting to create games on Amstrad CPC. You have an easy-to-use, very optimized library with a lot of ready-to-use basic functionalities:
-     * Draw normal and masked sprites
+   CPCtelera is a game development framework including a low-level game library for C and assembler programmers wanting to create games on Amstrad CPC. You have an easy-to-use, optimized library with a lot of ready-to-use basic functionalities:
+     * Draw different types of sprites, with and without transparency effects
      * Draw solid colour boxes and speed up sprite trail erasing!
+     * Flip and blend sprites and apply different effects to them
      * Reproduce audio and sound effects
      * Create fade-in / fade-out effects with your sound FX and music!
      * Mix-up sound effects with music, using the 3 audio channels for both at the same time!
      * Draw strings and characters using ROM characters without using firmware.
      * Change the complete hardware palette and individual palette colours
      * Draw very fast tiles aligned with character lines in the screen.
-     * Change default screen video memory location (do hardware double buffering!)
+     * Change default screen video memory location 
+     * Do hardware double buffering and scrolling effects.
      * Synchronize with VSYNC
      * Change Video Modes (0, 1, 2 and undocumented mode 3!)
      * Measure performance of your game loop (and know how many free CPU cycles you still have for doing more things in your routines!)
      * Scan the keyboard for pressed keys with the fastest keyboard scanning routine available!
      * Disable and re-enable firmware operation at will
      * Enable and disable lower and higher ROM access
+     * Easily manage and draw tilemaps in the screen
      * Optimize array storage using bitarrays (arrays of 1-bit, 2-bit and 4-bit elements available!)
+     * Easily hook a user function to system interrupts to generate timers and events and automatically do frequency related tasks
+     * Locate parts of your code and data in specify memory places
+     * Generate custom-quality random number sequences
 
    However, CPCtelera is much more than a low-level library. CPCtelera comes with a complete build system for easing your project creation and management. CPCtelera offers you:
-     * Integrated set of compiling and generation tools (SDCC 3.4.3, iDSK 0.13, Hex2Bin 2.0, 2cdt)
+     * Integrated set of compiling and generation tools (SDCC 3.5.5, iDSK 0.13, Hex2Bin 2.0, 2cdt)
      * Easy and automated project creation and management
      * Automatic generation of CDT and DSK files
      * Program completely in C, completely in Assembler or mix both languages at will. You won't even have to touch a line of the build system!
@@ -40,17 +46,24 @@ Section: Welcome to CPCtelera!
      * Automatic generation of binaries, assembler output, symbol files and everything you need for debugging your program.
      * Automatic identification of your project source files in C and ASM (.c and .s). Add new source files to your src/ directory and they will be automatically recognized an compiled!
      * Automatic detection of src/ directory structure up to 1 level of subfolders without any modification!
+     * Automatically launch and run your programs into an emulator with a single command.
+     * Automatically load symbol files for debugging on launching your programs.   
+     * Automatically convert binary files into source code arrays and link them into your project
+     * Automatically convert and use PNG, JPG, GIF images into sprites and tiles
+     * Automatically convert TMX tilemaps into C-arrays and use them in your games
 
    Moreover, CPCtelera also comes with some authoring tools (in the folder cpctelera/tools/) for your game content as well as some command line tools for format conversions:
      * Create your musics with Arkos Tracker
-     * Create your sprites, tiles and maps with Retro Game Asset Studio 0.97! (And export them directly to CPCtelera C Array!)
+     * Create your sprites, tiles and maps with Retro Game Asset Studio! (And export them directly to CPCtelera C Array!)
      * Convert any binary file to C Array and include it in your project with <cpct_bin2c>
      * Convert a big sprite in a C Array into tiles of your desired size with <cpct_sp2tiles>!
      * Convert old sprites in assembler CPCRSLib format into C Arrays with <cpct_rgas2c>!
+     * Convert any kind of PC image or sprite sheet into C or assembler code and add it to your project with <cpct_img2tileset> and Img2CPC
+     * Generate and manage special kinds of DSK using DSKGen.
 
    And, of course, CPCtelera comes with a complete API documentation and lots of well documented examples for you to quickly and easily learn it!
 
-   All these features included in a single bundle for you to download and use, free and under GPL v3.0. License. You have all source code available for you to analyse, explore, improve and distribute!
+   All these features included in a single bundle for you to download and use, free and under LGPL v3.0. License. You have all source code available for you to analyse, explore, improve and distribute!
 
 Section: Donors
    
@@ -71,17 +84,17 @@ Section: Supporting CPCtelera
       * *Beta Testing and reporting*: report your findings testing CPCtelera at any new platform or in new ways. You may leave us a <Github issue at https://github.com/lronaldo/cpctelera/issues>.
       * *New tools*: creating new tools or adapting your tools to be included with CPCtelera is an awesome idea! 
 
-   Any donation to our team will be used either in hardware / software to support this project, or as an aid for other Amstrad CPC related projects we manage (such us, for instance, <#CPCRetroDev anual contest at http://concursocpc.byterealms.com>!)
+   Any donation to our team will be used either in hardware / software to support this project, or as an aid for other Amstrad CPC related projects we manage (such us, for instance, <#CPCRetroDev anual contest at http://cpcretrodev.byterealms.com>!)
 
 Section: Installing CPCtelera
 
-   CPCtelera works under Windows, Linux and OSX. It has been tested in Windows XP, 7 and 8, and in Ubuntu / Debian, Arch, Manjaro, Elementary OS and Raspbian Linux distributions. It works either on Intel architectures or on ARM's.
+   CPCtelera works under Windows, Linux and OSX. It has been tested in Windows XP, 7, 8 and 10, and in Ubuntu / Debian, Arch, Manjaro, Elementary OS and Raspbian Linux distributions. It works either on Intel architectures or on ARM's.
 
 Topic: Downloading CPCtelera
 
    You can download CPCtelera from these sources
 
-   * Download <current stable version 1.2.3 at https://github.com/lronaldo/cpctelera/archive/v1.2.3.zip>
+   * Download <current stable version 1.4. at https://github.com/lronaldo/cpctelera/archive/v1.4.zip>
 
    * Get Latest version from github:
    > git clone https://github.com/lronaldo/cpctelera
@@ -141,7 +154,7 @@ Topic: Installing CPCtelera in your system
    These are the steps to install CPCtelera in your system
 
    1.  - Install required <Software Requirements>
-   2.  - Download and unzip <current stable version 1.2.3 of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.2.3.zip> (read "some considerations" below)
+   2.  - Download and unzip <current stable version 1.4. of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.4.zip> (read "some considerations" below)
    3.  - Open a terminal an enter cpctelera/ folder. 
    > cd cpctelera/
    4.  - Launch *setup.sh* 
