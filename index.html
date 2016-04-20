@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>CPCtelera: Astonishing fast Amstrad CPC game engine</title>
+    <title>CPCtelera: Astonishingly fast Amstrad CPC game engine</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -19,16 +19,18 @@
 
 <img src="https://github.com/lronaldo/cpctelera/blob/master/cpctelera/docs/images/cpct_logo.png?raw=true" alt="CPCtelera Logo">
 
-<p><strong>Astonishing fast Amstrad CPC game engine for C developers</strong></p>
+<p><strong>Astonishingly fast Amstrad CPC game engine for C developers</strong></p>
 
 <hr>
 
 <p><em><strong>CPCtelera</strong></em> is an integrated development framework for creating <em><strong>Amstrad CPC</strong></em> games and content which includes:
 <ul>
 <li>A low-level library with support for: graphics, audio, keyboard, firmware, strings, video hardware manipulation and memory management.
+</li><li>A complete set of programming examples to learn from.
 </li><li>An API for developing games and software in C and Assembler.
 </li><li>A complete multi-platform building system with support for building CDTs and DSKs automatically.
 </li><li>Tools for content authoring (audio, graphics and level editing)
+</li><li>Automatic installers and wrappers for third party tools (such us emulators or other low-level libraries)
 </li>
 </ul>
 
@@ -61,8 +63,6 @@
 
 <p>If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. </p>
 
-<p>If you are a Mac user, you will want to consider installing <a href="https://github.com/dfreniche/cpctelera_samples_xcode">CPCtelera-samples-Xcode</a> by <a href="http://blog.freniche.com">Diego Freniche</a>, along with <em><strong>CPCtelera</strong></em>. This package creates Xcode projects from examples and lets you build them directly from Xcode.</p>
-
 <h3>
 <a id="donors" class="anchor" href="#donors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Donors
 </h3>
@@ -85,8 +85,9 @@
 </h3>
 
 <ul>
-<li>(C) Copyright 2014-2015 <a href="http://lronaldo.github.io/cpctelera/files/authors-txt.html">CPCtelera's <em>awesome</em> authors</A>
-</li><li>Distributed under <a href="http://lronaldo.github.io/cpctelera/files/license-txt.html">GNU General Public License v3</a>
+<li>(C) Copyright 2014-2016 <a href="http://lronaldo.github.io/cpctelera/files/authors-txt.html">CPCtelera's <em>awesome</em> authors</A>
+</li><li><em><strong>CPCtelera</strong></em> low-level library, examples  and scripts are distributed under <a href="http://lronaldo.github.io/cpctelera/files/license-txt.html">GNU Lesser General Public License v3</a>
+</li><li>Content authoring tools included within <em><strong>CPCtelera</strong></em> (under <i>cpctelera/tools</i> folder) have their own licenses. Check each of them in their respective folders for more details.
 </li>
 </ul>
 
@@ -108,11 +109,11 @@
       <header>
         <div style="width: 100%; height: 120px;"><div style="float:left; height: 40px;"><script src="http://coinwidget.com/widget/coin.js"></script><script> CoinWidgetCom.go({ wallet_address: "14QmiHoAfosnuybbrnWEEKBQoaAARtXWis", currency: "bitcoin", counter: "count", alignment: "bl", qrcode: true, auto_show: false, lbl_button: "Support CPCtelera!", lbl_address: "CPCtelera's Bitcoin Address", lbl_count: "Awesome Supporters", lbl_amount: "BTC"});</script></div><div style="float: left; height: 40px;"><form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----"><input type="image" src="https://github.com/lronaldo/cpctelera/blob/master/cpctelera/docs/images/paypaldonations.jpg?raw=true" border="0" name="submit" alt="PayPal – The safer, easier way to pay online."> <img alt="" border="0" src="https://www.paypalobjects.com/es_ES/i/scr/pixel.gif" width="1" height="1"></form></div></div>
 
-        <p class="view"><a href="https://github.com/lronaldo/cpctelera/releases/tag/v1.3">Current release: v1.3</a></p>
+        <p class="view"><a href="https://github.com/lronaldo/cpctelera/releases/tag/v1.4">Current release: v1.4</a></p>
 
         <ul>
-          <li><a href="https://github.com/lronaldo/cpctelera/archive/v1.3.zip">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/lronaldo/cpctelera/archive/v1.3.tar.gz">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/lronaldo/cpctelera/archive/v1.4.zip">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/lronaldo/cpctelera/archive/v1.4.tar.gz">Download <strong>TAR Ball</strong></a></li>
           <li><a href="https://github.com/lronaldo/cpctelera">View On <strong>GitHub</strong></a></li>
         </ul>
 
