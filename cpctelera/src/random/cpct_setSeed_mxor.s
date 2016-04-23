@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -21,7 +21,8 @@
 ;;
 ;; Function: cpct_setSeed_mxor
 ;;
-;;    Sets the new 32-bits seed value for Marsaglia's XOR-shift random number generator.
+;;    Sets the new 32-bits seed value for Marsaglia's XOR-shift random number 
+;; generator.
 ;;
 ;; C Definition:
 ;;    void <cpct_setSeed_mxor> (<u32> *newseed*) __z88dk_fastcall;
@@ -46,30 +47,38 @@
 ;; take into account that this approach could not be portable among different versions of
 ;; this API.
 ;;
-;;    In order to prevent the seed from being used as random numbers directly but
-;; cpct_getRandom_mxor_** functions, this function calls <cpct_getRandom_mxor_u32> with
-;; provided seed, then seeds the algorithm with the result (first 32-bits number after
-;; the seed). That guarantees that first pseudo-random numbers got will be pseudo-random,
-;; and not part of those provided by the user as seed.
+;;    If you are using <cpct_getRandom_mxor_u8> or <cpct_getRandom_mxor_u16>, only setting the
+;; seed will not ensure you get the same sequence. Depending on the internal index state of
+;; this two generators, you may get part of your seed as first random values. To prevent this
+;; from happening, you have to call <cpct_restoreState_mxor_u8> or <cpct_restoreState_mxor_u16>
+;; right after setting the seed with <cpct_setSeed_mxor>. This will ensure you get a predictable
+;; random sequence.
 ;;
-;;    All functions calling <cpct_nextRandom_mxor_u32> or using <cpct_mxor32_seed> will be 
-;; affected by this change.
+;;    Setting the mxor seed affects all functions using that seed, namely <cpct_nextRandom_mxor_u32>, 
+;; <cpct_nextRandom_mxor_u16> and <cpct_nextRandom_mxor_u8>.
 ;;
 ;; Destroyed Register values: 
 ;;      All preserved
 ;;
 ;; Required memory:
-;;      Uses <cpct_getRandom_mxor_u32> code directly, so same memory is required.
+;;      8 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;    Case     | microSecs (us) | CPU Cycles
 ;; -----------------------------------------
-;;     Any     |       56       |    224
+;;     Any     |       14       |    56
 ;; -----------------------------------------
 ;; (end code)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; No code required here
-;; Code is in <cpct_getRandom_mxor_u32>
+.globl _cpct_mxor32_seed
+
+_cpct_setSeed_mxor::
+cpct_setSeed_mxor_asm::
+   ;; Only sets the seed. Does not restore internal index state of MXOR generators.
+   ld   (_cpct_mxor32_seed+0), de     ;; [6] |
+   ld   (_cpct_mxor32_seed+2), hl     ;; [5] | Store new value as next seed
+
+   ret                                ;; [3]

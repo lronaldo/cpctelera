@@ -54,6 +54,8 @@ extern u8   cpct_getRandom_mxor_u8      ();
 extern u16  cpct_getRandom_mxor_u16     ();
 extern u32  cpct_getRandom_mxor_u32     ();
 extern void cpct_setSeed_mxor           (u32 newseed) __z88dk_fastcall;
+extern void cpct_restoreState_mxor_u8   ();
+extern void cpct_restoreState_mxor_u16  ();
 
 // -- Based on Marsaglia's XOR-shift+ algorithm
 //
@@ -67,16 +69,22 @@ extern void cpct_setSeed_xsp40_u8    (u16 seed8, u32 seed32) __z88dk_callee;
 /// random numbers. Most of the time, a Marsaglia XOR-shift RNG is best
 /// choice for generating random numbers
 ///
-///  cpct_rand8  - returns a random  <u8> value ( 8-bits). It uses <cpct_getRandom_mxor_u8>.
-///  cpct_rand16 - returns a random <u16> value (16-bits). It uses <cpct_getRandom_mxor_u16>.
-///  cpct_rand32 - returns a random <u32> value (32-bits). It uses <cpct_getRandom_mxor_u32>.
-///  cpct_rand   - alias for <cpct_rand8>
-///  cpct_srand  - sets the seed for the random number generator (32 bits). It uses <cpct_setSeed_mxor>.
+///  cpct_rand8         - returns a random  <u8> value ( 8-bits). It uses <cpct_getRandom_mxor_u8>.
+///  cpct_rand16        - returns a random <u16> value (16-bits). It uses <cpct_getRandom_mxor_u16>.
+///  cpct_rand32        - returns a random <u32> value (32-bits). It uses <cpct_getRandom_mxor_u32>.
+///  cpct_srand8(SEED)  - Sets seed for MXOR generators (SEED = 32 bits value) and restores 
+///    internal state of <cpct_getRandom_mxor_u8>.
+///  cpct_srand16(SEED) - Sets seed for MXOR generators (SEED = 32 bits value) and restores 
+///    internal state of <cpct_getRandom_mxor_u16>.
+///  cpct_rand          - alias for <cpct_rand8>
+///  cpct_srand         - alias for <cpct_srand8>
 ///
-#define cpct_rand8  cpct_getRandom_mxor_u8
-#define cpct_rand16 cpct_getRandom_mxor_u16
-#define cpct_rand32 cpct_getRandom_mxor_u32
-#define cpct_rand   cpct_rand8
-#define cpct_srand  cpct_setSeed_mxor
+#define cpct_rand8         cpct_getRandom_mxor_u8
+#define cpct_rand16        cpct_getRandom_mxor_u16
+#define cpct_rand32        cpct_getRandom_mxor_u32
+#define cpct_srand8(SEED)  cpct_setSeed_mxor((SEED)); cpct_restoreState_mxor_u8();
+#define cpct_srand16(SEED) cpct_setSeed_mxor((SEED)); cpct_restoreState_mxor_u16();
+#define cpct_rand          cpct_rand8
+#define cpct_srand         cpct_srand8
 
 #endif

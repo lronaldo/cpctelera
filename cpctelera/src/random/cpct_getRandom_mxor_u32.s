@@ -77,10 +77,8 @@ cpct_getRandom_mxor_u32::
    ld   de, (_cpct_mxor32_seed+0)     ;; [6] | 
    ld   hl, (_cpct_mxor32_seed+2)     ;; [5] | DE:HL = Current 32-bits seed
 
-_cpct_setSeed_mxor::       ;; Set seed uses this code. Check <cpct_setSeed_mxor> documentation
-cpct_setSeed_mxor_asm::
-
    call cpct_nextRandom_mxor_u32_asm  ;; [5+37] Calculate next 32-bits pseudo-random value
+
    ld   (_cpct_mxor32_seed+0), de     ;; [6] |
    ld   (_cpct_mxor32_seed+2), hl     ;; [5] | Store new value as next seed
 

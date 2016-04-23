@@ -78,25 +78,25 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Opcodes used as data
-JR_opcode   = 0x18
-LD_E_opcode = 0x16
-
 ;; Globals required for linking
 .globl _cpct_mxor32_seed
 .globl cpct_nextRandom_mxor_u32_asm
 
+;; Include opcodes for self-modifying code
+.include "../macros/cpct_opcodes.s"
+
 _cpct_getRandom_mxor_u16::
 cpct_getRandom_mxor_u16::
 
+cpct_seedJump_mxor_u16:
 next_jump:
    jr   generate    ;; [3] Jumps to "generate" 1 out of 2 times, to generate the next 2 random words
-;; ld e,#generate   ;; [2] This instruction is modified by next code, to become LD E,xx half of the time.
-                    ;;     LD E, xx is a dummy instruction whose only purpose is not to jump
+;; ld d,#generate   ;; [2] This instruction is modified by next code, to become LD D,xx half of the time.
+                    ;;     LD D, xx is a dummy instruction whose only purpose is not to jump
 
    ;; Return second word as random value
    ld   hl, (_cpct_mxor32_seed+0)  ;; [5] HL = second word (Most Significant one)
-   ld    a, #JR_opcode             ;; [2] | Set initial instruction to be a JR (0x18) for next call
+   ld    a, #opc_JR                ;; [2] | Set initial instruction to be a JR (0x18) for next call
    ld (next_jump), a               ;; [4] | This will jump to "generate", to generate 2 new random words
    ret                             ;; [3] Returns next 16-bits random value
 
@@ -109,6 +109,6 @@ generate:
    ld   (_cpct_mxor32_seed+2), hl     ;; [5] | Store new value as next seed
 
    ;; Return first word as random value (HL already holds it)
-   ld    a, #LD_E_opcode           ;; [2] | Set initial instruction to be LD E, xx (0x16) for next call
+   ld    a, #opc_LD_D              ;; [2] | Set initial instruction to be LD E, xx (0x16) for next call
    ld (next_jump), a               ;; [4] | This is a dummy instruction set only to prevent jumping to "generate"
    ret                             ;; [3] Returns next 16-bits random value

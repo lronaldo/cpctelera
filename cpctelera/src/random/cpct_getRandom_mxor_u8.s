@@ -84,7 +84,8 @@ cpct_getRandom_mxor_u8::
 .globl _cpct_mxor32_seed
 .globl cpct_nextRandom_mxor_u32_asm
 
-n_randoms = .+1
+cpct_randomIdx_mxor_u8 == .+1
+n_randoms              =  .+1
    ld    a, #1          ;; [2] A = random bytes left in the seed buffer + 1
    dec   a              ;; [1]   If there are more than 0 random bytes on the buffer
    jr   nz, next_rand   ;; [2/3] just return the next one
