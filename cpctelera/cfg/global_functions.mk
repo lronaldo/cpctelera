@@ -3,16 +3,16 @@
 ##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -230,32 +230,58 @@ endef
 # $(7): (mask,tileset,) "mask":    generate interlaced mask for all sprites converted
 #                       "tileset": generate a tileset array including pointers to all sprites
 # $(8): Output subfolder for generated .C and .H files (inside project folder)
+# $(9): (hwpalette) "hwpalette":   output palette array as hardware values
+# $(10): Aditional options (you can use this to pass aditional modifiers to cpct_img2tileset)
 #
 define IMG2SPRITES
 $(eval I2S_C  := $(basename $(1)).c)
 $(eval I2S_H  := $(basename $(1)).h)
 $(eval I2S_NC := $(notdir $(I2S_C)))
 $(eval I2S_NH := $(notdir $(I2S_H)))
-$(eval I2S_C2 := $(shell if [ ! "$(8)" = "" ]; then echo "$(8)/$(I2S_NC)"; else echo "$(I2S_C)"; fi))
-$(eval I2S_H2 := $(shell if [ ! "$(8)" = "" ]; then echo "$(8)/$(I2S_NH)"; else echo "$(I2S_H)"; fi))
+$(eval I2S_C2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NC)"; else echo "$(I2S_C)"; fi))
+$(eval I2S_H2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NH)"; else echo "$(I2S_H)"; fi))
 $(eval I2S_CH := $(I2S_C2) $(I2S_H2))
+$(eval I2S_P  := $(shell if [ "$(7)" = "mask" ]; then echo "-nt -im"; elif [ ! "$(7)" = "tileset" ]; then echo "-nt"; fi))
+$(eval I2S_P  := $(I2S_P) $(shell if [ "$(9)" = "hwpalette" ]; then echo "-oph"; fi))
 .SECONDARY: $(I2S_CH)
 $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
-	@if [ "$(7)" = "mask" ]; then \
-	   cpct_img2tileset -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) -im $(1); \
-	elif [ "$(7)" = "tileset" ]; then \
-	   cpct_img2tileset     -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1); \
-	else \
-	   cpct_img2tileset -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1); \
-	fi
+	cpct_img2tileset $(I2S_P) -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(10) $(1);
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
 	@if [ ! "$(8)" = "" ]; then \
-	   mv "$(I2S_C)" "$(8)/$(I2S_NC)"; \
-	   mv "$(I2S_H)" "$(8)/$(I2S_NH)"; \
+	   mv "$(I2S_C)" "$(I2S_C2)"; \
+	   mv "$(I2S_H)" "$(I2S_H2)"; \
 	fi
 IMGCFILES  := $(I2S_C2) $(IMGCFILES)
 OBJS2CLEAN := $(I2S_CH) $(OBJS2CLEAN)
+endef
+
+
+#################
+# TMX2C: General rule to convert TMX tilemaps into C arrays.
+# Updates IMGCFILES and OBJS2CLEAN adding new C files that result from 
+# tmx conversions
+#
+# $(1): TMX file to be converted to C array
+# $(2): C identifier for the generated C array
+# $(3): Output folder for C and H files generated (Default same folder)
+# $(4): Aditional options (you can use this to pass aditional modifiers to cpct_tmx2csv)
+#
+define TMX2C
+$(eval T2C_C  := $(basename $(1)).c)
+$(eval T2C_H  := $(basename $(1)).h)
+$(eval T2C_NC := $(notdir $(T2C_C)))
+$(eval T2C_NH := $(notdir $(T2C_H)))
+$(eval T2C_OF := $(shell if [ ! "$(3)" = "" ]; then echo "-of $(3)"; else echo ""; fi))
+$(eval T2C_C2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(T2C_NC)"; else echo "$(T2C_C)"; fi))
+$(eval T2C_H2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(T2C_NH)"; else echo "$(T2C_H)"; fi))
+$(eval T2C_CH := $(T2C_C2) $(T2C_H2))
+.SECONDARY: $(T2C_CH)
+$(T2C_CH): $(1)
+	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into C-arrays...")
+	cpct_tmx2csv -gh -ci $(2) $(T2C_OF) $(4) $(1)
+IMGCFILES  := $(T2C_C2) $(IMGCFILES)
+OBJS2CLEAN := $(T2C_CH) $(OBJS2CLEAN)
 endef

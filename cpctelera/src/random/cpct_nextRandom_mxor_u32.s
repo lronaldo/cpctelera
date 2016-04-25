@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_random
@@ -34,6 +34,9 @@
 ;; Assembly call (Input parameter on DE:HL):
 ;;    > call cpct_nextRandom_mxor_u32_asm
 ;;
+;; Return value (Assembly calls, return in DE:HL):
+;;    <u32> - Next 32-bits pseudo-random value in the sequence. 
+;;
 ;; Parameter Restrictions:
 ;;    * *seed* could be any 32-bits number *except 0*. A 0 as input will always produce
 ;; another 0 as output.
@@ -49,7 +52,7 @@
 ;; https://en.wikipedia.org/wiki/Diehard_tests>
 ;;
 ;; Details:
-;;   This function implements a sequence of 32-bits values with period (2^32)-1. This means 
+;;    This function implements a sequence of 32-bits values with period (2^32)-1. This means 
 ;; that it produces consecutive 32-bits values that do not repeat until 4.294.967.295 numbers
 ;; have been generated. To do this, the function receives a 32-bit value as parameter (that
 ;; should be different from 0) and returns the next 32-bit value in the sequence.
@@ -60,9 +63,11 @@
 ;; http://www.z88dk.org/forum/viewtopic.php?id=6730>). The algorithm performs these 3
 ;; consecutive operations on the given number (*seed*):
 ;; (start code)
-;;   seed ^= seed << 8
-;;   seed ^= seed >> 9
-;;   seed ^= seed << 23
+;;    // Tuple (8, 9, 23) for Marsaglia's XORshift algoritm
+;;    // that this function applies to a given seed, to calculate next
+;;    seed ^= seed << 8
+;;    seed ^= seed >> 9
+;;    seed ^= seed << 23
 ;; (end code)
 ;;
 ;;   This operations are performed in an optimized fashion. To better understand optimizations

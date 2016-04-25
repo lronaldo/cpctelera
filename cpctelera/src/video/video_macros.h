@@ -3,21 +3,21 @@
 //  Copyright (C) 2014-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCT_VIDEO_MACROS_H
-#define CPCT_VIDEO_MACROS_H
+#ifndef _CPCT_VIDEO_MACROS_H
+#define _CPCT_VIDEO_MACROS_H
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -78,6 +78,58 @@
 // <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
 //
 #define cpct_memPage6(PAGE) ((PAGE) >> 2)
+
+//
+// Macro: cpctm_screenPtr
+//
+//    Macro that calculates the video memory location (byte pointer) of a 
+// given pair of coordinates (*X*, *Y*)
+//
+// C Definition:
+//    #define <cpctm_screenPtr> (*VMEM*, *X*, *Y*)
+//
+// Parameters:
+//    (2B) VMEM - Start of video memory buffer where (*X*, *Y*) coordinates will be calculated
+//    (1B) X    - X Coordinate of the video memory location *in bytes* (*BEWARE! NOT in pixels!*)
+//    (1B) Y    - Y Coordinate of the video memory location in pixels / bytes (they are same amount)
+//
+// Parameter Restrictions:
+//    * *VMEM* will normally be the start of the video memory buffer where you want to 
+// draw something. It could theoretically be any 16-bits value. 
+//    * *X* must be in the range [0-79] for normal screen sizes (modes 0,1,2). Screen is
+// always 80 bytes wide in these modes and this function is byte-aligned, so you have to 
+// give it a byte coordinate (*NOT a pixel one!*).
+//    * *Y* must be in the range [0-199] for normal screen sizes (modes 0,1,2). Screen is 
+// always 200 pixels high in these modes. Pixels and bytes always coincide in vertical
+// resolution, so this coordinate is the same in bytes that in pixels.
+//    * If you give incorrect values to this function, the returned pointer could
+// point anywhere in memory. This function will not cause any damage by itself, 
+// but you may destroy important parts of your memory if you use its result to 
+// write to memory, and you gave incorrect parameters by mistake. Take always
+// care.
+//
+// Returns:
+//    void * - Pointer to the (*X*, *Y*) location in the video buffer that starts at *VMEM*
+//
+// Details:
+//    This macro does the same calculation than the function <cpct_getScreenPtr>. However,
+// as it is a macro, if all 3 parameters (*VMEM*, *X*, *Y*) are constants, the calculation
+// will be done at compile-time. This will free the binary from code or data, just puting in
+// the result of this calculation (2 bytes with the resulting address). It is highly 
+// recommended to use this macro instead of the function <cpct_getScreenPtr> when values
+// involved are all constant. 
+//
+//    Take care of using this macro with variable values. In this latest case, the compiler 
+// will generate in-place code for doing the calculation. Therefore, that will take binary
+// space for the code and CPU time for the calculation. Moreover, calculation will be slower
+// than if it were done using <cpct_getScreenPtr> and code could be duplicated if this macro
+// is used in several places. Therefore, for variable values, <cpct_getScreenPtr> is recommended.
+//
+//    Sum up of recommendations:
+//    All constant values - Use this macro <cpctm_screenPtr>
+//    Any variable value  - Use the function <cpct_getScreenPtr>
+//
+#define cpctm_screenPtr(VMEM,X,Y) (void*)((VMEM) + 80 * ((unsigned int)((Y) >> 3)) + 2048 * ((Y) & 7) + (X))
 
 ////////////////////////////////////////////////////////////////////////
 // Group: Setting the border

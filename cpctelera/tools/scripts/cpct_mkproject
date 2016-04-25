@@ -1,19 +1,19 @@
 #!/bin/bash
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2015-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -39,6 +39,7 @@
 ## required by your project.
 ##
 ## Command line options:
+##    -c | --cpcrslib                - Generates a CPCRSLib enabled project
 ##    -n | --project-name [projname] - Lets you name your project in a different
 ## way than the project folder.
 ##    -l | --load-address [loadaddr] - Lets you establish the memory address where
@@ -54,6 +55,7 @@ source $(dirname $0)/lib/bash_library.sh
 PROJECTNAME=
 PROJECTDIR=
 LOADADDRESS=4000
+CPCRSLIB=false
 
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
@@ -61,6 +63,8 @@ TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates
 CPCTELERA_DIRECTORY=$(dirname $(dirname "$SCRIPT_FULL_PATH"))
 SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/main.c
 MAKE_TEMPLATE=${TEMPLATE_DIRECTORY}/Makefile
+IMGCON_TEMPLATE=${TEMPLATE_DIRECTORY}/image_conversion.mk
+TMXCON_TEMPLATE=${TEMPLATE_DIRECTORY}/tilemap_conversion.mk
 CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/build_config.mk
 ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE})
 
@@ -84,6 +88,8 @@ inside <project_folder_name>. So, <project_folder_name> must not previously exis
 current folder."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo "${COLOR_LIGHT_BLUE}  -c | --cpcrslib"
+   echo "${COLOR_CYAN}       Generates a CPCRSLib enabled project."
    echo "${COLOR_LIGHT_BLUE}  -n | --project-name  ${COLOR_LIGHT_CYAN}<name>"
    echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder_name> name. <name> \
 must not contain spaces."
@@ -119,6 +125,12 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Generate a CPCRSLib enabled project
+      "-c" | "--cpcrslib")
+         CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/cpcrslib/build_config.mk
+         SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/cpcrslib/main.c
+         CPCRSLIB=true
+      ;;
       ## Get an specific project name
       "-n" | "--project-name")
          if isEmpty "$2"; then
@@ -164,6 +176,9 @@ done
 ###############################################################
 ## Some checks
 ##
+if isEmpty "$PROJECTDIR"; then
+   paramError "No name was given to create project main folder."
+fi
 if isEmpty "$PROJECTNAME"; then
    PROJECTNAME="$PROJECTDIR"
 fi
@@ -182,10 +197,18 @@ SOURCE_DIR=${PROJECTDIR}/src
 CONFIG_DIR=${PROJECTDIR}/cfg
 NEW_MAIN=${SOURCE_DIR}/main.c
 NEW_BUILD=${CONFIG_DIR}/build_config.mk
+NEW_IMGCON=${CONFIG_DIR}/image_conversion.mk
+NEW_TMXCON=${CONFIG_DIR}/tilemap_conversion.mk
 NEW_MAKE=${PROJECTDIR}/Makefile
 
 # Welcome message
 stageMessage "CPCtelera" "Creating new project in ${COLOR_WHITE}${PROJECTDIR}/"
+
+## CPCRSLib enabled
+if $CPCRSLIB; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Enabling ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} linking..."
+   drawOK
+fi
 
 ## Create directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Creating project folder structure..."
@@ -198,6 +221,8 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Copying files from project templates
 cp ${SRC_TEMPLATE} ${NEW_MAIN}
 cp ${CFG_TEMPLATE} ${NEW_BUILD}
 cp ${MAKE_TEMPLATE} ${NEW_MAKE}
+cp ${IMGCON_TEMPLATE} ${NEW_IMGCON}
+cp ${TMXCON_TEMPLATE} ${NEW_TMXCON}
 drawOK
 
 # Configuring project values into CFG_TEMPLATE

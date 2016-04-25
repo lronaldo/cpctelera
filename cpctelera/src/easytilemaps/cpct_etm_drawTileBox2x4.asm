@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
@@ -26,14 +26,14 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_etm_drawTileBox2x4> (<u8> *x*, <u8> *y*, <u8> *w*, <u8> *h*, <u8> *map_width*,
-;;                                    void* *pvideomem*, const void* *ptilemap*, ) __z88dk_callee;
+;;                                    void* *pvideomem*, const void* *ptilemap* ) __z88dk_callee;
 ;;
 ;; Input Parameters (9 bytes):
-;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
 ;;    (1B  C) x         - x tile-coordinate of the starting tile inside the tilemap
 ;;    (1B  B) y         - y tile-coordinate of the starting tile inside the tilemap
 ;;    (1B  L) w         - width in tiles of the tile-box to be redrawn
 ;;    (1B  H) h         - height in tiles of the tile-box to be redrawn
+;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
 ;;    * Always received on the stack
 ;;    (2B) pvideomem    - Pointer to upper left corner of the *tilemap* in video memory.
 ;;    (2B) ptilemap     - Pointer to the start of the tilemap

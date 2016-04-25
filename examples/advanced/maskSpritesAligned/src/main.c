@@ -4,21 +4,24 @@
 //  Copyright (C) 2015 Dardalorth / Fremos / Carlio
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
 #include "sprites/sprites.h"
+
+// Sets the transparent mask table for color 0, mode 0
+cpctm_createTransparentMaskTable(g_masktable, 0x0100, M0, 0);
 
 // Some useful constants
 #define MAP_WIDTH_TILES          40
@@ -113,6 +116,6 @@ void main(void) {
       pscra = cpct_getScreenPtr(CPCT_VMEM_START, TILEWIDTH_BYTES*a->tx, TILEHEIGHT_BYTES*a->ty);
       // Draw the alien in its new location
       cpct_drawSpriteMaskedAlignedTable(g_alien, pscra, ALIEN_WIDTH_BYTES, 
-                                        ALIEN_HEIGHT_BYTES, cpct_transparentMaskTable00M0);
+                                        ALIEN_HEIGHT_BYTES, g_masktable);
    }
 }

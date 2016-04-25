@@ -19,12 +19,13 @@ Project owner:
    * <ronaldo at http://twitter.com/frangallegobr> / (<Cheesetea at http://www.cheesetea.com>, <Fremos at http://fremos.cheesetea.com>, <ByteRealms at http://www.byterealms.com>)
  
 Awesome collaborators:
-   * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
-   * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
-   * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
-   * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
-   * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
+   * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
+   * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
+   * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
+   * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
+   * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
+   * <Syx at http://www.cpcwiki.eu/forum/profile/?u=324>
  
 Bitarrays idea and original implementation:
    * Alberto García García (Blitzman, albertgg93@gmail.com, <@albertgarcia93 at http://twitter.com/albertgarcia93>)
@@ -42,8 +43,11 @@ Arkos player original code:
 Random number generation:
    * George Marsaglia
 
-Graphics:
+Graphical assets:
    * <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
+   * <C-TOY at http://c-toy.blogspot.com.es/>
+   * <hassekf at http://opengameart.org/users/hassekf>
+   * <SpinachChicken at http://opengameart.org/users/spinachchicken>
 
 (see logos_composite_long.png)
 
@@ -89,22 +93,39 @@ Section: 3rdparty software authors
    * <Hervé Drolon at mailto:drolon@infonie.fr>
    * <Floris van den Berg at mailto:flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
 
-<WinApe emulator at http://winape.net>: 
+ <WinApe emulator at http://winape.net>: 
    * <Richard Wilson at mailto:rich@bitwise-systems.com>
 
 Section: Testers & Bug Reporters
 
- * <Martin C. Doege at https://github.com/mdoege> 
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
- * <Ervin / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=82> 
+ * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
  * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
- * <gryken2014 at https://github.com/gryken2014>
+ * <gryken2014 at https://github.com/gryken2014> / <Github at https://github.com>
  * Roald Strauss (<mr_lou / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=96>)
  * Toni Ramírez (<@amstradgamer at http://twitter.com/amstradgamer)
- * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / CPCWiki
- * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / CPCWiki
+ * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+ * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / <CPCWiki at http://www.cpcwiki.eu>
  * Carlos (<@neophox at http://twitter.com/neophox>)
+ * <gryken2014 at https://github.com/gryken2014> / <Github at https://github.com>
+ * <Tim Riemann / Octoate at http://www.octoate.de>
+ * <Martin C. Doege at https://github.com/mdoege>
+ * <Trewdbal at https://github.com/Trewdbal> / <Github at https://github.com> 
+ * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
 
+Section: Assets 
+
+ * SpritesEMR, Persea, Fremos Logo, Frame Tile Sprite, Death with an oil lamp, Background and others by Emilio Molina Reig (<Dardalorth at https://twitter.com/dardalorth> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
+ * Goku, No13, Vegeta by <SunWay at mailto:oferrer@carlio.es> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
+ * GNG Like tiles by <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
+* <Hand Painted Texture at http://opengameart.org/content/hand-painted-texture-sandstone> by <The Chayed - KIIRA at http://opengameart.org/users/the-chayed-kiira>
+ * <The Knight - Free Sprite at http://opengameart.org/content/the-knight-free-sprite> by <pzUH at http://opengameart.org/users/pzuh>
+ * <Mini Knight Expansion 1 at http://opengameart.org/content/mini-knight-expansion-1-0> by <Master484 at http://opengameart.org/users/master484>
+ * <Animated Runner Character at http://opengameart.org/content/animated-runner-character> by <irmirx at https://www.behance.net/irmirx>
+ * <SCI-FI Background at http://opengameart.org/content/sci-fi-background> by <hassekf at http://opengameart.org/users/hassekf>
+ * <Pixel Art Dungeon Items at http://opengameart.org/content/pixel-art-dungeon-items> by <SpinachChicken at http://opengameart.org/users/spinachchicken>
+ * <Little Candele Monsters at http://opengameart.org/content/little-candle-monsters> by <C-TOY at http://c-toy.blogspot.com.es>
+ 
 Section: Special Thanks
 
    Developers, collaborators and others that helped a great deal
@@ -121,4 +142,5 @@ Section: Special Thanks
  * <Prodatron at http://www.prodatron.net/> / Symbiosis for producting such a great deal of incredible software for the Amstrad CPC and for being always helpful and kind.
  * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs, Z80 programming and random number generators)
  * <Z88DK at http://www.z88dk.org/forum/> developers for sharing their really nice Z80 codebase.
+
  

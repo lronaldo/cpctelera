@@ -1,0 +1,5 @@
+monsters.png is a modification of Mini Knight Expansion 1, by Master484
+ - Mini Knight Expansion 1: http://opengameart.org/content/mini-knight-expansion-1-0
+ - Master484: http://opengameart.org/users/master484
+
+Public Domain License CC0: http://creativecommons.org/publicdomain/zero/1.0/

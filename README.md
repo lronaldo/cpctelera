@@ -6,9 +6,11 @@ _**Astonishingly fast Amstrad CPC game engine for C and Assembler developers**_
 
 _**CPCtelera**_ is an integrated development framework for creating _**Amstrad CPC**_ games and content which includes:
  * A low-level library with support for: graphics, audio, keyboard, firmware, strings, video hardware manipulation and memory management.
+ * A complete set of programming examples to learn from.
  * An API for developing games and software in *C* and Assembler.
  * A complete multi-platform building system with support for building CDTs and DSKs automatically.
  * Tools for content authoring (audio, graphics and level editing)
+ * Automatic installers and wrappers for third party tools (such us emulators or other low-level libraries)
 
 _**CPCtelera**_ has been conceived with these aims in mind:
  * Delivering a convenient, usable and fast environment for developing games
@@ -28,8 +30,6 @@ _**CPCtelera**_ has been conceived with these aims in mind:
 
 If you test it in any platform (listed here or not) and have problems, please feel free to report them to us. 
 
-If you are a Mac user, you will want to consider installing [CPCtelera-samples-Xcode](https://github.com/dfreniche/cpctelera_samples_xcode) by [Diego Freniche](http://blog.freniche.com), along with _**CPCtelera**_. This package creates Xcode projects from examples and lets you build them directly from Xcode.
-
 ### Contact information and support
 
  * email:    cpctelera@cheesetea.com
@@ -38,7 +38,8 @@ If you are a Mac user, you will want to consider installing [CPCtelera-samples-X
 ### Authors and License
 
  * (C) Copyright 2014-2016 [CPCtelera's _awesome_ authors](http://lronaldo.github.io/cpctelera/files/authors-txt.html)
- * Distributed under [GNU General Public License v3](http://lronaldo.github.io/cpctelera/files/license-txt.html)
+ * _**CPCtelera**_ low-level library, examples and scripts are distributed under [GNU Lesser General Public License v3](http://lronaldo.github.io/cpctelera/files/license-txt.html)
+ * Content authoring tools included within _**CPCtelera**_ (under _cpctelera/tools_ folder) have their own licenses. Check each of them in their respective folders for more details.
 
 [![Cheesetea Logo][CTLogo]](http://www.cheesetea.com) [![Fremos logo][FRLogo]](http://fremos.cheesetea.com)
 

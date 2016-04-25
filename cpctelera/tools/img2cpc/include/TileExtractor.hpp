@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <iomanip>
 #include <FreeImage.h>
 #include "Palette.hpp"
 #include "ConversionOptions.hpp"
