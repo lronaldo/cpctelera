@@ -43,7 +43,9 @@ typedef enum cpct_e_keyID cpct_keyID;
 /// Function Declarations
 ///
 extern void cpct_scanKeyboard     ();
+extern void cpct_scanKeyboard_i   ();
 extern void cpct_scanKeyboard_f   ();
+extern void cpct_scanKeyboard_if  ();
 extern   u8 cpct_isKeyPressed     (cpct_keyID key) __z88dk_fastcall;
 extern   u8 cpct_isAnyKeyPressed  ();
 extern   u8 cpct_isAnyKeyPressed_f();
