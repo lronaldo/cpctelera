@@ -54,17 +54,18 @@ void initialize() {
 
    // Draw floor. As cpct_drawSolidBox cannot draw boxes wider than 63 bytes
    // and Screen width is 80 bytes, we draw 2 boxes of SCR_W/2 (40 bytes) each
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START,       0, FLOOR_Y);
+   // cpctm_screenPtr as we use constant values
+   pvideomem = cpctm_screenPtr(CPCT_VMEM_START,       0, FLOOR_Y);
    cpct_drawSolidBox(pvideomem, FLOOR_COLOR, SCR_W/2, FLOOR_HEIGHT);
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, SCR_W/2, FLOOR_Y);
+   pvideomem = cpctm_screenPtr(CPCT_VMEM_START, SCR_W/2, FLOOR_Y);
    cpct_drawSolidBox(pvideomem, FLOOR_COLOR, SCR_W/2, FLOOR_HEIGHT);
 
    // Draw instructions
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START,  0, 20);
+   pvideomem = cpctm_screenPtr(CPCT_VMEM_START,  0, 20);
    cpct_drawStringM0("  Sprite Flip Demo  ", pvideomem, 2, 0);   
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START,  0, 34);
+   pvideomem = cpctm_screenPtr(CPCT_VMEM_START,  0, 34);
    cpct_drawStringM0("[Cursor]",   pvideomem, 4, 0);
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, 40, 34);
+   pvideomem = cpctm_screenPtr(CPCT_VMEM_START, 40, 34);
    cpct_drawStringM0("Left/Right", pvideomem, 3, 0);
 }
 

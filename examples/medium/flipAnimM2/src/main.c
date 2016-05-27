@@ -69,7 +69,7 @@ void initialize() {
    cpct_drawSprite(g_banner_1, CPCT_VMEM_START + BANNER_W/2, BANNER_W/2, BANNER_H);
 
    // Draw instructions
-   pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, 29, 60);
+   pvideomem = cpctm_screenPtr(CPCT_VMEM_START, 29, 60);
    cpct_drawStringM2("[Any Key] Run Opposite", pvideomem, 0);
 }
 
@@ -89,8 +89,9 @@ void main(void) {
 
    // Sprites and the floor are always drawn at the same place. 
    // We only need to calculate them once
-   pvmem_spr   = cpct_getScreenPtr(CPCT_VMEM_START, SP_X, SP_Y);
-   pvmem_floor = cpct_getScreenPtr(CPCT_VMEM_START, FLOOR_X, FLOOR_Y);
+   // cpctm_screenPtr as we use constant values
+   pvmem_spr   = cpctm_screenPtr(CPCT_VMEM_START, SP_X, SP_Y);
+   pvmem_floor = cpctm_screenPtr(CPCT_VMEM_START, FLOOR_X, FLOOR_Y);
 
    // Infinite animation loop
    //

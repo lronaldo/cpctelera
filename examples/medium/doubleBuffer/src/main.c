@@ -87,7 +87,7 @@ void main(void) {
    // We have to draw it into 2 parts because drawSprite function cannot draw
    // sprites wider than 63 bytes (and we have to draw 80). So we draw the
    // logo in two 40-bytes wide parts.
-   pvmem = cpct_getScreenPtr(SCR_BUFF, 0,   52);
+   pvmem = cpctm_screenPtr(SCR_BUFF, 0,   52);
    cpct_drawSprite(G_CPCt_left,  pvmem,          CPCT_W, CPCT_H);
    cpct_drawSprite(G_CPCt_right, pvmem + CPCT_W, CPCT_W, CPCT_H);
 

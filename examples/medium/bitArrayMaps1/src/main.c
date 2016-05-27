@@ -88,7 +88,8 @@ void initialize() {
    // Initialize Base Pointer of the map in video memory. This is 
    // the place where the map will start to be drawn (0,0). This
    // location is (MAP_START_X, MAP_START_Y) with respect to CPCT_VMEM_START.
-   pmem = cpct_getScreenPtr(CPCT_VMEM_START, MAP_START_X, MAP_START_Y);
+   // cpctm_screenPtr as we use constant values
+   pmem = cpctm_screenPtr(CPCT_VMEM_START, MAP_START_X, MAP_START_Y);
    map_setBaseMem(pmem);
 
    // Set cursor at the top-left corner of the screen
