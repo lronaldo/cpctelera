@@ -178,6 +178,8 @@ fi
 ## Read and convert file
 ##
 function convertTMX2CSV {
+   local LINEBYTES=0
+
    ## Convert binary to C Array and output to stdout
    STATUS=filestart
    TOTAL_BYTES_CONVERTED=0
@@ -215,7 +217,12 @@ function convertTMX2CSV {
                for A in ${BYTES[@]}; do
                   if isInt "$A"; then
                      printf "%s," $((A - 1))
+                     LINEBYTES=$((LINEBYTES+1))
                      TOTAL_BYTES_CONVERTED=$((TOTAL_BYTES_CONVERTED+1))
+                     if (( LINEBYTES == WIDTH_BYTES )); then
+                        LINEBYTES=0
+                        printf "\n"
+                     fi
                   fi
                done
             fi        
@@ -235,6 +242,9 @@ convertTMX2CSV >> $TMPFILE
 ## Define the comment to put on fileheader
 FILEHEADER="//\n\
 // File $FILENAME converted to csv using cpct_tmx2csv [$(date +"%Y%m%d %T %Z")]\n\
+//   * Width:  ${WIDTH_BYTES}
+//   * Height: ${HEIGHT_BYTES}
+//   * Bytes:  $((WIDTH_BYTES*HEIGHT_BYTES)) 
 //\n"
 
 ## Output the C Array declaration and the number of bytes to stdout
@@ -246,7 +256,7 @@ $(printf "$FILEHEADER")
 
 // Generated CSV tilemap from $FILENAME
 const u8 ${C_IDENTIFIER}[${WIDTH_BYTES}*${HEIGHT_BYTES}] = {
-   $(cat $TMPFILE)
+$(cat $TMPFILE)
 };
 _E_O_F_
 else
@@ -262,6 +272,9 @@ $(printf "$FILEHEADER")
 #include <types.h>
 
 // Generated CSV tilemap from $FILENAME
+//   $((WIDTH_BYTES*HEIGHT_BYTES)) bytes (${WIDTH_BYTES} x ${HEIGHT_BYTES})
+#define ${C_IDENTIFIER}_W  ${WIDTH_BYTES}
+#define ${C_IDENTIFIER}_H  ${HEIGHT_BYTES}
 extern const u8 ${C_IDENTIFIER}[${WIDTH_BYTES}*${HEIGHT_BYTES}];
 _E_O_F_
 fi
