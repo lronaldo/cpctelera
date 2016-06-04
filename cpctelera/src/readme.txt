@@ -76,6 +76,7 @@ Section: Donors
    23/09/2015 - Arnaud Bouche 
    24/11/2015 - Toni Ramirez
    21/04/2016 - Oscar Martínez Gómez
+   26/05/2016 - Oliver Lenz
 
 Section: Supporting CPCtelera
    We, as authors of CPCtelera, have started this journey to create a usable, free, convenient and up-to-date game engine. There are lots of things to do and improve in order to achieve our goals. If you want to help us, we are more than happy. Any kind of help is always welcome, but we prefer any of these ways,
