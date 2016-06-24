@@ -43,6 +43,8 @@
 ## in memory at the desired memory address.
 ##
 ## Command line options:
+##    -bl  | --bytes-per-line [bytes] - Set the number of bytes that every generated 
+## 										line will contain in the .s file
 ##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be 
 ##                                      written to.
 ##    -id  | --c-identifier [ident]   - Sets the identifier that will be used to
@@ -93,6 +95,9 @@ in memory at the desired memory address.
    ${COLOR_LIGHT_YELLOW}
 OPTIONS
    ${COLOR_LIGHT_BLUE}
+   -bl  | --bytes-per-line [bytes] ${COLOR_CYAN}
+   	     Set the number of bytes that every generated line will contain in \
+the .s file ${COLOR_LIGHT_BLUE}
    -od  | --output-directory [dir] ${COLOR_CYAN}
          Sets directory where .s/.h files will be written to \
    ${COLOR_LIGHT_BLUE}
@@ -100,7 +105,8 @@ OPTIONS
          Sets the identifier that will be used to access the array from C \
 programs ${COLOR_LIGHT_BLUE}
    -h   | --help ${COLOR_CYAN}
-         Shows help information on the terminal
+         Shows help information on the terminal \
+   ${COLOR_NORMAL}
 UsageHereDoc
    exit 1
 }
@@ -116,6 +122,21 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Set the number of bytes that everty converted line from the .s will have
+      "-bl" | "--bytes-per-line")
+         
+         ## Must be an integer greater or equal than 1
+         if isEmpty "$2"; then
+            paramError "Parameter -bl (--bytes-per-line) must be followed by an integer." 20
+         elif ! isInt "$2"; then
+            paramError "'$2' is not an integer. -bl (--bytes-per-line) requires and integer." 21
+         elif (( $2 < 1 )); then
+            paramError "'$2' is lower than 1. -bl (--bytes-per-line) requires an integer greater or equal than 1." 22
+         fi         	
+
+         BYTESPERLINE="$2"
+         shift
+      ;;
       ## Set the output directory to where .s/.h files will be written
       "-od" | "--output-directory")
          
