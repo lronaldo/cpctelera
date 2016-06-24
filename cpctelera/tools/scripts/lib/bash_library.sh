@@ -505,6 +505,42 @@ function isHex {
    return 1
 }
 
+## Check if a given value is a C-hexadecimal value or not
+## $1: Value to be tested
+##
+function isCHex {
+   if [[ $1 =~ ^0[x|X][0-9A-Fa-f]+$ ]]; then
+      return 0
+   fi
+   return 1  
+}
+
+## Check if a given value is a C-binary value or not
+## $1: Value to be tested
+##
+function isCBin {
+   if [[ $1 =~ ^0[b|B][0-1]+$ ]]; then
+      return 0
+   fi
+   return 1  
+}
+
+## Check if a given value is a valid C integer value 
+## either in decimal, hexadecimal or binary
+## $1: Value to be tested
+##
+function isCIntValue {
+   if isInt "$1"; then 
+      return 0
+   elif isCHex "$1"; then
+      return 0
+   elif isCBin "$1"; then
+      return 0
+   fi
+   return 1  
+}
+
+
 ## Check if a given value is empty
 ## $1: Value to check
 ##
