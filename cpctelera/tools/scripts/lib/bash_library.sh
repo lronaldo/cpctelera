@@ -953,3 +953,38 @@ file. Please, check the file ('$CFILE') and verify that variable '$VARNAME' is c
       tail -n +$((LINE+1)) "$CFILE"
    ) > $TMP && mv "$TMP" "$CFILE"
 }
+
+## Checks that a given Executable exists and has execution permissions
+## If it does not have execution permission, asks the user for setting them.
+##  $1: Executable file
+##
+function checkExecutableExists {
+  ERRCPSTR="This file is required for this script to work properly. Please, \
+check CPCtelera installation is okay and this file is in its place and has \
+required user permissions."
+  if   [ ! -e "$1" ]; then
+     Error "'$1' does not exist. $ERRCPSTR"
+  elif [ ! -f "$1" ]; then
+     Error "'$1' is not a regular file and it should be. $ERRCPSTR"
+  elif [ ! -r "$1" ]; then 
+     Error "'$1' is not readable. $ERRCPSTR"
+  elif [ ! -x "$1" ]; then
+     echo "${COLOR_LIGHT_YELLOW}WARNING:${COLOR_CYAN}"
+     echo "   '${COLOR_WHITE}$1${COLOR_CYAN}' is not executable. Execution \
+permission is required for this script to work.${COLOR_LIGHT_CYAN}"
+     echo
+     askSimpleQuestion y n "Do you want this script to try to make it \
+executable? (y/n)" ANSWER
+     echo "${COLOR_NORMAL}"
+     echo
+     if [[ "$ANSWER" == "n" ]]; then
+        paramError "'$1' has not been modified. This script cannot continue. Aborting. "
+     fi
+     echo "${COLOR_CYAN}Changing '${COLOR_WHITE}$1${COLOR_CYAN}' execution permission... "
+     if ! chmod +x "$1"; then
+        Error "Your user has not got enough privileges to change '$1' execution permission. \
+Please, change it manually and run this script again."
+     fi
+     echo "${COLOR_LIGHT_GREEN}Success!${COLOR_NORMAL}"
+  fi
+}
