@@ -41,8 +41,13 @@
 ## sound effects into two source code files (.s/.h) with definition and declaration
 ## of am array containing all music data. The data array will be absolutely located
 ## in memory at the desired memory address.
+##	  By default, generated binary data will be placed at location 0x100 in memory.
+## You can change that location using -m modifier.
+##
 ##
 ## Command line options:
+##    -m   | --memory-address         - Set the memory base address where song binary
+##                                      data will be located.
 ##    -bl  | --bytes-per-line [bytes] - Set the number of bytes that every generated 
 ## 										line will contain in the .s file
 ##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be 
@@ -92,8 +97,13 @@ Description:${COLOR_CYAN}
 sound effects into two source code files (.s/.h) with definition and declaration \
 of am array containing all music data. The data array will be absolutely located \
 in memory at the desired memory address.
+   By default, generated binary data will be placed at location 0x100 in memory. \
+You can change that location using -m modifier.
    ${COLOR_LIGHT_YELLOW}
 OPTIONS
+   ${COLOR_LIGHT_BLUE}
+   -m   | --memory-address ${COLOR_CYAN}
+         Set the memory base address where song binary data will be located. \
    ${COLOR_LIGHT_BLUE}
    -bl  | --bytes-per-line [bytes] ${COLOR_CYAN}
    	     Set the number of bytes that every generated line will contain in \
@@ -122,6 +132,18 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Set the number of bytes that everty converted line from the .s will have
+      "-m" | "--memory-address")
+         ## Must be an integer greater or equal than 1
+         if isEmpty "$2"; then
+            paramError "Parameter -m (--memory-address) must be followed by a memory address." 24
+         elif ! isCIntValue "$2"; then
+         	paramError "'$2' is not a valid integer memory address for -m (--memory-address). " 25
+         fi
+
+         MEMADDR="$2"
+         shift
+      ;;
       ## Set the number of bytes that everty converted line from the .s will have
       "-bl" | "--bytes-per-line")
          
