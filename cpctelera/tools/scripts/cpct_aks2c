@@ -230,8 +230,8 @@ fi
 
 ## Calculate output filenames and routes
 if isEmpty "$OUTPUT_FILENAME"; then
-   SFILE="${OUTPUTDIR}/$(filenameWithNoExt "$FILE").s"
-   HFILE="${OUTPUTDIR}/$(filenameWithNoExt "$FILE").h"
+   SFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").s"
+   HFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").h"
 else
    SFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.s"
    HFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.h"
@@ -333,6 +333,6 @@ cat > "$HFILE" <<HereDocument
 #define ${C_IDENTIFIER}_size     ${SIZE_BYTES}
 
 /// Song '${C_IDENTIFIER}' array declaration
-void ${C_IDENTIFIER}[${C_IDENTIFIER}_size];
+extern void ${C_IDENTIFIER}[${C_IDENTIFIER}_size];
 HereDocument
 echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
