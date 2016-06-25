@@ -46,16 +46,12 @@
 ##
 ##
 ## Command line options:
-##    -m   | --memory-address         - Set the memory base address where song binary
-##                                      data will be located.
-##    -bl  | --bytes-per-line [bytes] - Set the number of bytes that every generated 
-## 										line will contain in the .s file
-##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be 
-##                                      written to.
-##    -id  | --c-identifier [ident]   - Sets the identifier that will be used to
-##                                      access the array from C programs.
+##    -o   | --output-filename        - Set the basename for output filenames (name without extension)
+##    -m   | --memory-address         - Set the memory base address where song binary data will be located.
+##    -bl  | --bytes-per-line [bytes] - Set the number of bytes that every generated line will contain in the .s file
+##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be written to.
+##    -id  | --c-identifier [ident]   - Sets the identifier that will be used to access the array from C programs.
 ##    -h   | --help                   - Shows help information on the terminal.
-##
 ##
 
 ## Bash Include files
@@ -102,11 +98,14 @@ You can change that location using -m modifier.
    ${COLOR_LIGHT_YELLOW}
 OPTIONS
    ${COLOR_LIGHT_BLUE}
+   -o   | --output-filename ${COLOR_CYAN}
+         Set the basename for output filenames (name without extension) \
+   ${COLOR_LIGHT_BLUE}
    -m   | --memory-address ${COLOR_CYAN}
-         Set the memory base address where song binary data will be located. \
+         Set the memory base address where song binary data will be located \
    ${COLOR_LIGHT_BLUE}
    -bl  | --bytes-per-line [bytes] ${COLOR_CYAN}
-   	     Set the number of bytes that every generated line will contain in \
+         Set the number of bytes that every generated line will contain in \
 the .s file ${COLOR_LIGHT_BLUE}
    -od  | --output-directory [dir] ${COLOR_CYAN}
          Sets directory where .s/.h files will be written to \
@@ -132,13 +131,31 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Set the basename for output files
+      "-o" | "--output-filename")
+
+         ## A filename is required
+         if isEmpty "$2"; then
+            paramError "Parameter -o (--output-filename) must be followed by the name of the file." 27
+         fi
+
+         OUTPUT_FILENAME="$2"
+         shift
+      ;;
       ## Set the number of bytes that everty converted line from the .s will have
       "-m" | "--memory-address")
+
          ## Must be an integer greater or equal than 1
          if isEmpty "$2"; then
             paramError "Parameter -m (--memory-address) must be followed by a memory address." 24
          elif ! isCIntValue "$2"; then
          	paramError "'$2' is not a valid integer memory address for -m (--memory-address). " 25
+         fi
+
+         ## Check memory address is inside 64K Boundaries
+         MD=$(any2Dec "$2")
+         if (( MD < 0 || MD > 65535 )); then
+         	paramError "'$2' memory address is outside 64K boundaries (0 to 65535). " 26
          fi
 
          MEMADDR="$2"
