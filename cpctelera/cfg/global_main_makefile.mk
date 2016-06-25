@@ -37,13 +37,15 @@ all: $(OBJSUBDIRS) $(TARGET)
 
 ## COMPILING SOURCEFILES AND SAVE OBJFILES IN THEIR CORRESPONDENT SUBDIRS
 $(foreach OF, $(BIN_OBJFILES), $(eval $(call BINFILE2C, $(OF), $(OF:%.$(C_EXT)=%.$(BIN_EXT)))))
+$(foreach OF, $(GENC_OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(C_EXT))))))
+$(foreach OF, $(GENASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(ASM_EXT))))))
 $(foreach OF, $(C_OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(C_EXT))))))
 $(foreach OF, $(ASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(ASM_EXT))))))
 ## Generate an Add-BIN-to-DSK rule for each Binary file in DSKFILESDIR
 $(foreach SF, $(DSKINCSRCFILES), $(eval $(call ADDBINFILETODSK, $(DSK), $(SF), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(SF)).$(DSKINC_EXT))))
 
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
-$(IHXFILE): $(OBJFILES) 
+$(IHXFILE): $(GENOBJFILES) $(OBJFILES) 
 	@$(call PRINT,$(PROJNAME),"Linking binary file")
 	$(Z80CC) $(Z80CCLINKARGS) $^ -o "$@"
 
