@@ -36,7 +36,7 @@
 ##   If you change folder structure, CPCT_PATH should reflect this change.
 ##   This variable should always have the absolute path value.
 ##
-CPCT_PATH := /home/ronaldo/trabajo/git/cpctelera/cpctelera#%%%CPCTELERA_PATH%%%
+CPCT_PATH := %%%CPCTELERA_PATH%%%
 
 ####
 ## SECTION 1: Project configuration 
@@ -140,6 +140,7 @@ include $(CPCT_PATH)/cfg/global_functions.mk
 # Convert images and tilemaps
 include cfg/image_conversion.mk
 include cfg/tilemap_conversion.mk
+include cfg/music_conversion.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
@@ -148,15 +149,19 @@ OBJSUBDIRS    := $(OBJDSKINCSDIR) $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR
 
 # Calculate all source files
 CFILES         := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
-CFILES         := $(IMGCFILES) $(filter-out $(IMGCFILES), $(CFILES))
+CFILES         := $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
+ASMFILES       := $(filter-out $(IMGASMFILES), $(ASMFILES))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
 
 # Calculate all object files
 BIN_OBJFILES   := $(patsubst %.$(BIN_EXT), %.$(C_EXT), $(BIN2CFILES))
 CFILES         := $(filter-out $(BIN_OBJFILES), $(CFILES))
+GENC_OBJFILES  := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(IMGCFILES)))
+GENASM_OBJFILES:= $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(IMGASMFILES)))
 C_OBJFILES     := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(BIN_OBJFILES) $(CFILES)))
 ASM_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
 DSKINCOBJFILES := $(foreach FILE, $(DSKINCSRCFILES), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(FILE)).$(DSKINC_EXT))
 OBJFILES       := $(C_OBJFILES) $(ASM_OBJFILES)
+GENOBJFILES    := $(GENC_OBJFILES) $(GENASM_OBJFILES)
