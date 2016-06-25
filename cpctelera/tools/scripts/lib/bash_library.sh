@@ -505,6 +505,16 @@ function isHex {
    return 1
 }
 
+## Check if a given value is a binary value or not
+## $1: value to be tested
+##
+function isBin {
+   if [[ $1 =~ ^[0-1]+$ ]]; then
+      return 0
+   fi
+   return 1
+}
+
 ## Check if a given value is a C-hexadecimal value or not
 ## $1: Value to be tested
 ##
@@ -525,6 +535,44 @@ function isCBin {
    return 1  
 }
 
+## Converts a binary number to a decimal one. The
+## number may have 0b/0B prefix or not.
+## $1: binary number
+##
+function bin2Dec {
+   local B="$1"
+   if [ ${B:0:2} = "0b" ] || [ ${B:0:2} = "0B" ]; then
+     B="${B:2}"
+   fi
+   echo $((2#$B))
+}
+
+## Converts a hexadecimal number to a decimal one. The number
+## may have 0x/0X prefix or no prefix at all
+## $1: hexadecimal number
+##
+function hex2Dec {
+   local H="$1"
+   if [ "${H:0:2}" != "0x" ] && [ "${H:0:2}" != "0X" ]; then
+     H="0x${H}"
+   fi
+   printf "%d" "$H"
+}
+
+## Converts a number to decimal, be it a Binary or an hexadecimal one
+## $1: number to convert to decimal
+##
+function any2Dec {
+   local N="$1"
+   if isInt "$N"; then
+      echo "$N"
+   elif isBin "$N" || isCBin "$N"; then 
+      echo $(bin2Dec "$N")
+   elif isHex "$N" || isCHex "$N"; then
+      echo $(hex2Dec "$N")
+   fi
+}
+
 ## Check if a given value is a valid C integer value 
 ## either in decimal, hexadecimal or binary
 ## $1: Value to be tested
@@ -537,7 +585,7 @@ function isCIntValue {
    elif isCBin "$1"; then
       return 0
    fi
-   return 1  
+   return 1
 }
 
 
