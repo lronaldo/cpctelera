@@ -285,3 +285,30 @@ $(T2C_CH): $(1)
 IMGCFILES  := $(T2C_C2) $(IMGCFILES)
 OBJS2CLEAN := $(T2C_CH) $(OBJS2CLEAN)
 endef
+
+#################
+# AKS2C: General rule to convert AKS music files into data arrays usable from C and ASM.
+# Updates IMGASMFILES and OBJS2CLEAN adding new .s/.h files that result from AKS conversions
+#
+# $(1): AKS file to be converted to data array
+# $(2): C identifier for the generated data array (will have underscore in front on ASM)
+# $(3): Output folder for .s and .h files generated (Default same folder)
+# $(4): Memory address where music data will be loaded
+# $(5): Aditional options (you can use this to pass aditional modifiers to cpct_aks2c)
+#
+define AKS2C
+$(eval A2C_S  := $(basename $(1)).s)
+$(eval A2C_H  := $(basename $(1)).h)
+$(eval A2C_NS := $(notdir $(A2C_S)))
+$(eval A2C_NH := $(notdir $(A2C_H)))
+$(eval A2C_OF := $(shell if [ ! "$(3)" = "" ]; then echo "-od $(3)"; else echo ""; fi))
+$(eval A2C_S2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(A2C_NS)"; else echo "$(A2C_S)"; fi))
+$(eval A2C_H2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(A2C_NH)"; else echo "$(A2C_H)"; fi))
+$(eval A2C_SH := $(A2C_S2) $(A2C_H2))
+.SECONDARY: $(A2C_SH)
+$(A2C_SH): $(1)
+	@$(call PRINT,$(PROJNAME),"Converting music in $(1) into data arrays...")
+	cpct_aks2c -m "$(4)" $(A2C_OF) -id $(2) $(1)
+IMGASMFILES := $(A2C_S2) $(IMGASMFILES)
+OBJS2CLEAN  := $(A2C_SH) $(OBJS2CLEAN)
+endef
