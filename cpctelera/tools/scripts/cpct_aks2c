@@ -140,8 +140,6 @@ while (( $# >= 1 )); do
          fi
 
          OUTPUT_FILENAME="$2"
-         SFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.s"
-         HFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.h"
          shift
       ;;
       ## Set the number of bytes that everty converted line from the .s will have
@@ -220,10 +218,6 @@ while (( $# >= 1 )); do
          fi
 
          FILE="$1"
-         if isEmpty "$OUTPUT_FILENAME"; then
-            SFILE="${OUTPUTDIR}/$(filenameWithNoExt "$FILE").s"
-            HFILE="${OUTPUTDIR}/$(filenameWithNoExt "$FILE").h"
-         fi
       ;;
    esac
    shift
@@ -232,6 +226,15 @@ done
 ## File parameter must have been passed (not empty)
 if isEmpty "$FILE"; then
    paramError "A <filename> parameter is required." 12
+fi
+
+## Calculate output filenames and routes
+if isEmpty "$OUTPUT_FILENAME"; then
+   SFILE="${OUTPUTDIR}/$(filenameWithNoExt "$FILE").s"
+   HFILE="${OUTPUTDIR}/$(filenameWithNoExt "$FILE").h"
+else
+   SFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.s"
+   HFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.h"
 fi
 
 ## Check AKSToBin and Wine if Required
