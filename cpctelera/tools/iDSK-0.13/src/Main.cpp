@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
     		exit(EXIT_FAILURE);
     	}
     	int Indice;
-	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); iter++)
+	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); ++iter)
 	{
 		char* amsdosF = GetNomAmsdos(basename((char *)(*iter).c_str()));			 
 		cerr << "Fichier Amsdos : " << amsdosF << endl;
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     		exit(EXIT_FAILURE);
     	}
 
-   	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); iter++)
+   	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); ++iter)
    	{
    		char* nomBase=basename((char*)iter->c_str());
     		string amsdosfile = GetNomAmsdos( nomBase );
@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
     			exit(EXIT_FAILURE);
     		}
     		int Indice;
-		for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); iter++)
+		for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); ++iter)
 		{
 			char* amsdosF = GetNomAmsdos(basename( (char*)(*iter).c_str()));			 
 			cerr << "Fichier Amsdos : " << amsdosF << endl;
@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
     	}
     	int Indice;
 
-	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); iter++)
+	for(vector<string>::iterator iter=AmsdosFileList.begin(); iter!=AmsdosFileList.end(); ++iter)
 	{
     		char* amsdosF = GetNomAmsdos(basename( (char*)(*iter).c_str()));			 
 		cerr << "Fichier Amsdos : " << amsdosF << endl;

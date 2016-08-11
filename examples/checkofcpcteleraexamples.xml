@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+    <cppcheck version="1.75"/>
+    <errors>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file0="easy/keyboard/src/main.c" file="easy\keyboard\src\main.c" line="36"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file0="easy/strings/src/main.c" file="easy\strings\src\main.c" line="50"/>
+        </error>
+        <error id="unknownEvaluationOrder" severity="error" msg="Expression &amp;#039;colours[0]=++colours[0]&amp;amp;15&amp;#039; depends on order of evaluation of side effects" verbose="Expression &amp;#039;colours[0]=++colours[0]&amp;amp;15&amp;#039; depends on order of evaluation of side effects">
+            <location file0="easy/strings/src/main.c" file="easy\strings\src\main.c" line="78"/>
+        </error>
+        <error id="unknownEvaluationOrder" severity="error" msg="Expression &amp;#039;colours[3]=++colours[3]&amp;amp;15&amp;#039; depends on order of evaluation of side effects" verbose="Expression &amp;#039;colours[3]=++colours[3]&amp;amp;15&amp;#039; depends on order of evaluation of side effects">
+            <location file0="easy/strings/src/main.c" file="easy\strings\src\main.c" line="88"/>
+        </error>
+        <error id="unknownEvaluationOrder" severity="error" msg="Expression &amp;#039;colours[1]=++colours[1]&amp;amp;3&amp;#039; depends on order of evaluation of side effects" verbose="Expression &amp;#039;colours[1]=++colours[1]&amp;amp;3&amp;#039; depends on order of evaluation of side effects">
+            <location file0="easy/strings/src/main.c" file="easy\strings\src\main.c" line="105"/>
+        </error>
+        <error id="unknownEvaluationOrder" severity="error" msg="Expression &amp;#039;colours[1]=++colours[1]&amp;amp;3&amp;#039; depends on order of evaluation of side effects" verbose="Expression &amp;#039;colours[1]=++colours[1]&amp;amp;3&amp;#039; depends on order of evaluation of side effects">
+            <location file0="easy/strings/src/main.c" file="easy\strings\src\main.c" line="111"/>
+        </error>
+        <error id="unknownEvaluationOrder" severity="error" msg="Expression &amp;#039;colours[1]=++colours[1]&amp;amp;3&amp;#039; depends on order of evaluation of side effects" verbose="Expression &amp;#039;colours[1]=++colours[1]&amp;amp;3&amp;#039; depends on order of evaluation of side effects">
+            <location file0="easy/strings/src/main.c" file="easy\strings\src\main.c" line="117"/>
+        </error>
+        <error id="unknownEvaluationOrder" severity="error" msg="Expression &amp;#039;colours[4]=++colours[4]&amp;amp;3&amp;#039; depends on order of evaluation of side effects" verbose="Expression &amp;#039;colours[4]=++colours[4]&amp;amp;3&amp;#039; depends on order of evaluation of side effects">
+            <location file0="easy/strings/src/main.c" file="easy\strings\src\main.c" line="123"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;p&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;p&amp;#039; is assigned a value that is never used.">
+            <location file0="games/platformClimber/src/entities/entities.c" file="games\platformClimber\src\entities\entities.c" line="120"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file0="medium/maskedSprites/src/main.c" file="medium\maskedSprites\src\main.c" line="74"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;pvmem&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;pvmem&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file0="medium/maskedSprites/src/main.c" file="medium\maskedSprites\src\main.c" line="146"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;pvideomem&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level.">
+            <location file0="medium/tiles/src/main.c" file="medium\tiles\src\main.c" line="54"/>
+        </error>
+    </errors>
+</results>

@@ -210,7 +210,7 @@ template <class G_t>
 void make_clique(const std::set<unsigned int> &X , G_t &G)
 {
   std::set<unsigned int>::const_iterator n1, n2;
-  for (n1 = X.begin(); n1 != X.end(); n1++)
+  for (n1 = X.begin(); n1 != X.end(); ++n1)
     for (n2 = n1, ++n2; n2 != X.end(); ++n2)
       add_edge(*n1, *n2, G);
 }
