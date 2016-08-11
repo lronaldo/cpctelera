@@ -111,7 +111,7 @@ static bool operand_sane(const operand *o, const assignment &a, unsigned short i
   // Go to the second byte. If the operand is only a single byte, it cannot be
   // an unsupported register combination or split between register and memory.
   oi2 = oi;
-  ++oi2;
+  oi2++;
   if (oi2 == oi_end)
     return(true);
   
@@ -162,7 +162,7 @@ static bool operand_is_ax(const operand *o, const assignment &a, unsigned short 
     return(false);
 
   oi2 = oi;
-  ++oi2;
+  oi2++;
   if (oi2 == oi_end)
     return(false);
   

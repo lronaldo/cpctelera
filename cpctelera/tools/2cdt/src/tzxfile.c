@@ -195,7 +195,7 @@ void TZX_WriteBlocks(TZX_FILE *pTZXFile, FILE *fh)
             /* does block have additional data ? */
             BlockHasData = TZX_BlockHasData(BlockID);
 
-	        if (!BlockHasData || pBlock->pBlockData!=NULL)
+            if ((!BlockHasData) || ((BlockHasData) && (pBlock->pBlockData!=NULL)))
             {
                 /* block requires data and has data, or block doesn't require data */
 

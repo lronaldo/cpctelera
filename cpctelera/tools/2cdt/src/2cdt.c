@@ -1005,6 +1005,9 @@ int		main(int argc, char *argv[])
 
 		if (pTZXFile!=NULL)
 		{
+			int nFile;
+
+
 			if (BlankBeforeUse)
 			{
 				TZX_BLOCK *pBlock;

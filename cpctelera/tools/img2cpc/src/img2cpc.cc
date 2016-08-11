@@ -93,7 +93,7 @@ int dumpTiles(vector<Tile>& tiles, ConversionOptions &convOptions) {
 
 				while(it!=tiles.end() && it->SourceFileName == currentFileName) {
 					currentTiles.push_back(*it);
-					++it;
+					it++;
 				}
 			} else {
 				it = tiles.end();
