@@ -11,6 +11,7 @@ Section: Donnors
    23/09/2015 - Arnaud Bouche
    24/11/2015 - Toni Ramirez
    21/04/2016 - Oscar Martínez Gómez
+   29/05/2016 - Oliver Lenz
 
 Section: Project authors
    
