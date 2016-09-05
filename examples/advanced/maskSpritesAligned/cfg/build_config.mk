@@ -36,11 +36,6 @@
 ##   If you change folder structure, CPCT_PATH should reflect this change.
 ##   This variable should always have the absolute path value.
 ##
-
-## CPCTELERA MAIN PATH
-##   Sets CPCTelera main path for accessing tools and configuration. If you
-##   change folder structure, change CPCT_PATH value for its absolute path.
-##
 THIS_FILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 CPCT_PATH      := $(THIS_FILE_PATH)../../../../cpctelera/
 
