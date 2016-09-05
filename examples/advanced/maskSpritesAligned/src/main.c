@@ -18,7 +18,9 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "sprites/sprites.h"
+#include "sprites/tiles.h"
+#include "sprites/map.h"
+#include "sprites/alien.h"
 
 // Sets the transparent mask table for color 0, mode 0
 cpctm_createTransparentMaskTable(g_masktable, 0x0100, M0, 0);
