@@ -57,7 +57,7 @@
 ## Palette used in this example: Only colors 0-6 (among 16 possible in mode 0)
 ## are used in the code. [0: Black, 18: Bright Green, 5: Mauve, 6: Bright Red,
 ## 9: Green, 11: Sky Blue, 12: Yellow].
-PALETTE={0 18 5 6 9 11}
+PALETTE={0 18 5 6 9 11 12}
 
 ## Alien image conversion
 ##    This command will convert img/alien.png into src/sprites/alien.{c|h} files.

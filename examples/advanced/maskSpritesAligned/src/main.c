@@ -51,7 +51,7 @@ typedef struct {
 void initialization (){ 
    cpct_disableFirmware();          // Disable firmware to prevent it from interfering
    cpct_setPalette(g_palette, 7);   // Set palette using hardware colour values
-   cpct_setBorder (g_palette[0]);   // Set border colour same as background (0)
+   cpct_setBorder (HW_BLACK);       // Set border colour same as background (Black)
    cpct_setVideoMode(0);            // Change to Mode 0 (160x200, 16 colours)
 
    // Set the internal tileset for drawing Tilemaps
