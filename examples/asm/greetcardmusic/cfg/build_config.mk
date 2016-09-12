@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -27,7 +27,7 @@
 ## help you understand what they do. Please, change everything you want. ##
 ###########################################################################
 
-## CPCTELERA MAIN PATH
+# CPCTELERA MAIN PATH
 ##   Sets CPCTelera main path for accessing tools and configuration. If you
 ##   change folder structure, change CPCT_PATH value for its absolute path.
 ##
@@ -100,7 +100,7 @@ TARGET := $(CDT) $(DSK) $(DSKINC)
 ##
 ## OBJS2CLEAN: Additional objects to be removed when running "make clean"
 ##
-OBJS2CLEAN := $(DAV).c $(DAV).h
+OBJS2CLEAN :=
 
 ####
 ## SECTION 2: TOOL PATH CONFIGURATION
@@ -133,21 +133,31 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
 
+# Convert images and tilemaps
+include cfg/image_conversion.mk
+include cfg/tilemap_conversion.mk
+include cfg/music_conversion.mk
+
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
 OBJDSKINCSDIR := $(OBJDIR)/$(DSKFILESDIR)
 OBJSUBDIRS    := $(OBJDSKINCSDIR) $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(DIR)))
 
 # Calculate all source files
-CFILES         := $(DAV).c $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
+CFILES         := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
+CFILES         := $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
+ASMFILES       := $(filter-out $(IMGASMFILES), $(ASMFILES))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
 
 # Calculate all object files
 BIN_OBJFILES   := $(patsubst %.$(BIN_EXT), %.$(C_EXT), $(BIN2CFILES))
 CFILES         := $(filter-out $(BIN_OBJFILES), $(CFILES))
+GENC_OBJFILES  := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(IMGCFILES)))
+GENASM_OBJFILES:= $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(IMGASMFILES)))
 C_OBJFILES     := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(BIN_OBJFILES) $(CFILES)))
 ASM_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
 DSKINCOBJFILES := $(foreach FILE, $(DSKINCSRCFILES), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(FILE)).$(DSKINC_EXT))
 OBJFILES       := $(C_OBJFILES) $(ASM_OBJFILES)
+GENOBJFILES    := $(GENC_OBJFILES) $(GENASM_OBJFILES)

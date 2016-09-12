@@ -26,11 +26,12 @@ screen_W      = 80             ;; Width of the screen in bytes
 init_colour   = 0x0001         ;; Background = 0x00, Foreground = 0x01
 palete_size   = 16             ;; Number of total palette colours
 border_colour = 0x1F10         ;; 0x10 (Border ID), 0x1F (Colour to set, Pen 0 from palette). Ready to be loaded into HL
-initxy_sprite = 0xC805         ;; (x, y) = (5, 200) = (0x05, 0xC8) Initial Sprite coordinates
-sprite_HxW    = 0x2814         ;; Height (40, 0x28) and Width (20, 0x14) of the sprite in bytes. To be loaded in BC   
-sprite_end_y  = 60             ;; y coordinate where sprite will stop its entering animation
-clip_Height   = screen_H - 40  ;; Minimum height at which to do clipping (200 - sprite_Height)
-xy_str_dav    = 0x4020         ;; y = 64 (0x40), x = 32 (0x20) (ready to be loaded into BC, B=y, C=x)  
+initxy_sprite = 0xC711         ;; (x, y) = (17, 200) = (0x11, 0xC8) Initial Sprite coordinates in bytes
+sprite_HxW    = 0x852D         ;; Height (133, 0x85) and Width (45, 0x2D) of the sprite in bytes. To be loaded in BC   
+sprite_end_y  = 20             ;; y coordinate where sprite will stop its entering animation
+clip_Height   = screen_H - 133 ;; Minimum height at which to do clipping (200 - sprite_Height)
+xy_str_dav    = 0x0212         ;; y = 2 (0x02), x = 18 (0x12) (ready to be loaded into BC, B=y, C=x)  
+itmusiccicles = 6              ;; Number of interrupt cycles between music calls
 
 ;;===============================================================================
 ;; DATA SECTION
@@ -38,31 +39,29 @@ xy_str_dav    = 0x4020         ;; y = 64 (0x40), x = 32 (0x20) (ready to be load
 
 .area _DATA
 
+;; Interrupt status counter
+iscount:  .db itmusiccicles
+
 ;; Ascii zero-terminated strings
 str_happy: .asciz "Happy"
 str_bday:  .asciz "Birthday"
-str_dav:   .asciz "@Davitsu"
+str_dav:   .asciz "@octopusjig"
 
-;; Palette (16 bytes)
-g_palette: 
-.db 0x1F, 0x14, 0x18, 0x05  ; (14,  0,  4,  7) || Pastel Blue, Black, Magenta, Purple
-.db 0x16, 0x1C, 0x06, 0x1E  ; ( 9,  3, 10, 12) || Green, Red, Cyan, Yellow
-.db 0x00, 0x0E, 0x07, 0x0F  ; (13, 15, 16, 17) || White, Orange, Pink, Pastel Magenta
-.db 0x19, 0x0A, 0x03, 0x0B  ; (22, 24, 25, 26) || Pastel Green, Bright Yellow, Pastel Yellow, Bright White
-
-;; Sprite (defined in its own C file)
-.globl _dav_davitsu_round
+;; Sprite and Palette (defined in its own C file)
+.globl _g_octopusjig
+.globl _g_palette
+.globl _g_music
 
 ;; Scrolling data structures for both scrolling strings (Happy / BDay)
 tscroll_happy: 
    .dw   str_happy       ;; String pointer (2 bytes)
-   .db   1, 15*8         ;; x, y starting coordinates (y=15th character line)
+   .db   1, 20*8         ;; x, y starting coordinates (y=20th character line)
    .db  -1               ;; x velocity
    .db   screen_W-5*4-1  ;; maxX coordinate: line-size (80) - 5 chars * 4 bytes/char - 1 (to set boundary 1 byte before)
 
 tscroll_bday: 
    .dw   str_bday        ;; String pointer (2 bytes)
-   .db   47, 18*8        ;; x, y starting coordinates (y=18th character line)
+   .db   47, 23*8        ;; x, y starting coordinates (y=23th character line)
    .db    1              ;; x velocity 
    .db   screen_W-8*4-1  ;; maxX coordinate: line-size (80) - 8 chars * 4 bytes/char - 1 (to set boundary 1 byte before)
 
@@ -83,6 +82,24 @@ tscroll_bday:
 .globl cpct_drawSprite_asm
 .globl cpct_waitVSYNC_asm
 .globl cpct_drawStringM0_asm
+.globl cpct_akp_musicInit_asm
+.globl cpct_akp_musicPlay_asm
+.globl cpct_setInterruptHandler_asm
+
+interrupt_handler:
+   ;; Check interrupt counter variable
+   ld    a, (iscount)         ;; Get value of iscount variable
+   dec   a                    ;; --iscount
+   jr    nz, doNotPlayMusic   ;; Do not play music if iscount != 0
+
+   ;; Play music
+   call  cpct_akp_musicPlay_asm  ;; Play the music
+   ld    a, #itmusiccicles       ;; Restore interrupt counter variable intial value
+
+doNotPlayMusic:
+   ld   (iscount), a    ;; Store new value of iscount variable
+
+   ret                  ;; Return from interrupt
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -100,13 +117,21 @@ init:
    call  cpct_setVideoMode_asm      ;; Set Mode 0
    
    ;; Set Palette
-   ld    hl, #g_palette             ;; HL = pointer to the start of the palette array
+   ld    hl, #_g_palette            ;; HL = pointer to the start of the palette array
    ld    de, #palete_size           ;; DE = Size of the palette array (num of colours)
    call  cpct_setPalette_asm        ;; Set the new palette
 
    ;; Change border colour
    ld    hl, #border_colour         ;; L=Border colour value, H=Palette Colour to be set (Border=16)
    call  cpct_setPALColour_asm      ;; Set the border (colour 16)
+
+   ;; Initialize music
+   ld    de, #_g_music              ;; DE points to the start of the song to be initialized
+   call  cpct_akp_musicInit_asm     ;; Initalize arkos tracker player with the song pointed by DE
+
+   ;; 
+   ld    hl, #interrupt_handler       ;; HL points to the interrupt handler routine
+   call  cpct_setInterruptHandler_asm ;; Set the new interrupt handler routine
 
    ret                              ;; return
 
@@ -135,14 +160,14 @@ drawSpriteClipped:
    jr     c, no_clip             ;; If Carry, (A < 160), no need to do clipping
 
    ;; Perform clippling (A = vertical size of the sprite to be drawn)
-   sub   #screen_H+1             ;; A2 =  A - (screen_Height + 1)
-   neg                           ;; A3 = -A2 = screen_Height - A + 1
+   sub   #screen_H               ;; A2 =  A - screen_Height
+   neg                           ;; A3 = -A2 = screen_Height - A
    ld     b, a                   ;; B = Reduced sprite height (clipped) to be drawn
 
 no_clip:
    ;; Draw the sprite 
    ;; - DE already points to video mem, and BC contains WidthxHeight)
-   ld    hl, #_dav_davitsu_round ;; HL points to the sprite
+   ld    hl, #_g_octopusjig      ;; HL points to the sprite
    call  cpct_drawSprite_asm     ;; Draw the sprite on the screen
 
    ret                           ;; Return
@@ -365,9 +390,9 @@ _main::
    call  init                 ;; Initialize the CPC
    call  moveSprite           ;; Do the complete sprite animation and return when finished
 
-   ;; Draw davitsu string
-   ld    hl, #str_dav         ;; HL points to @Davitsu string
-   ld    bc, #xy_str_dav      ;; BC = y, x coordinates where to draw @Davitsu string
+   ;; Draw octopusjig string
+   ld    hl, #str_dav         ;; HL points to @octopusjig string
+   ld    bc, #xy_str_dav      ;; BC = y, x coordinates where to draw @octopusjig string
    call  redrawString         ;; Draw the string with the initial colour
 
 loop:
