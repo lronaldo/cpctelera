@@ -31,7 +31,7 @@ sprite_HxW    = 0x852D         ;; Height (133, 0x85) and Width (45, 0x2D) of the
 sprite_end_y  = 20             ;; y coordinate where sprite will stop its entering animation
 clip_Height   = screen_H - 133 ;; Minimum height at which to do clipping (200 - sprite_Height)
 xy_str_dav    = 0x0212         ;; y = 2 (0x02), x = 18 (0x12) (ready to be loaded into BC, B=y, C=x)  
-itmusiccicles = 6              ;; Number of interrupt cycles between music calls
+itmusiccycles = 6              ;; Number of interrupt cycles between music calls
 
 ;;===============================================================================
 ;; DATA SECTION
@@ -40,14 +40,14 @@ itmusiccicles = 6              ;; Number of interrupt cycles between music calls
 .area _DATA
 
 ;; Interrupt status counter
-iscount:  .db itmusiccicles
+iscount:  .db itmusiccycles
 
 ;; Ascii zero-terminated strings
 str_happy: .asciz "Happy"
 str_bday:  .asciz "Birthday"
 str_dav:   .asciz "@octopusjig"
 
-;; Sprite and Palette (defined in its own C file)
+;; Sprite, Palette and music (defined in their own generated source files)
 .globl _g_octopusjig
 .globl _g_palette
 .globl _g_music
@@ -87,19 +87,16 @@ tscroll_bday:
 .globl cpct_setInterruptHandler_asm
 
 interrupt_handler:
-   ;; Check interrupt counter variable
-   ld    a, (iscount)         ;; Get value of iscount variable
-   dec   a                    ;; --iscount
-   jr    nz, doNotPlayMusic   ;; Do not play music if iscount != 0
+   ;; Update interrupt counter variable (iscount)
+   ld   hl, #iscount          ;; HL points to interrupt counter variable (iscount)
+   dec (hl)                   ;; --iscount
+   ret  nz                    ;; Do not play music if iscount != 0 (so, return)
 
    ;; Play music
+   ld    (hl), #itmusiccycles    ;; Restore interrupt counter variable intial value
    call  cpct_akp_musicPlay_asm  ;; Play the music
-   ld    a, #itmusiccicles       ;; Restore interrupt counter variable intial value
 
-doNotPlayMusic:
-   ld   (iscount), a    ;; Store new value of iscount variable
-
-   ret                  ;; Return from interrupt
+   ret                           ;; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
