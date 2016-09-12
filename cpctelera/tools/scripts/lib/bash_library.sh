@@ -566,6 +566,13 @@ function dec2Bin {
    echo "obase=2;$1" | bc
 }
 
+## Converts and integer decimal number to hexadecimal base
+## $1: integer decimal number
+##
+function dec2Hex {
+   echo "obase=16;$1" | bc
+}
+
 ## Converts a number to decimal, be it a Binary or an hexadecimal one
 ## $1: number to convert to decimal
 ##
