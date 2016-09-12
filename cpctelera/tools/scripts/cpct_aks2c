@@ -320,6 +320,10 @@ echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
 
 ## STEP 4: Generate H-FILE (header data with declarations to let data be accessable from C)
 
+# Calculate memory address where music ends (in hexadecimal)
+ENDADDR=0x`dec2Hex $((MD + SIZE_BYTES))`
+
+# Generate output header file
 printf "Generating '$HFILE' with C declarations..."
 cat > "$HFILE" <<HereDocument
 ///
@@ -331,6 +335,7 @@ cat > "$HFILE" <<HereDocument
 /// Song '${C_IDENTIFIER}' metadata macros
 #define ${C_IDENTIFIER}_address  ${MEMADDR}
 #define ${C_IDENTIFIER}_size     ${SIZE_BYTES}
+#define ${C_IDENTIFIER}_end      ${ENDADDR}
 
 /// Song '${C_IDENTIFIER}' array declaration
 extern void ${C_IDENTIFIER}[${C_IDENTIFIER}_size];
