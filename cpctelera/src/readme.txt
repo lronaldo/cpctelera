@@ -123,7 +123,7 @@ _Under Windows_:
    
    Under Windows <Cygwin at http://www.cygwin.com> is required for CPCtelera to work. You may download Cygwin 32 / 64 and install it along with these packages (you may launch cygwin's setup.exe at any time to install them),
 
-   * Commands: *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*, *wget*, *unzip*
+   * Commands: *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*, *wget*, *unzip*, *bc*
    * Libraries: *libboost-devel*, *libintl-devel*
 
 IMPORTANT NOTE:
