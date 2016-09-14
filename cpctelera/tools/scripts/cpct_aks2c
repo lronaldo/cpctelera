@@ -239,11 +239,19 @@ fi
 
 ## Check AKSToBin and Wine if Required
 checkExecutableExists "$AKS2BIN"
-if ! checkSystem cygwin; then
+echo
+if checkSystem cygwin; then
+   ## Calculate windows valid paths for input files
+   FILE_CP=`cygpath -w $FILE`
+   BINTMP_CP=`cygpath -w $BINTMP`
+else
    EnsureCommandAvailable wine "wine has not been found on the system, \
 and it's required for this script to work. Please, install wine or \
 check the installation and run this script again."
    AKS2BIN="wine $AKS2BIN"
+   ## Paths for input files are already valid under *nix
+   FILE_CP=$FILE
+   BINTMP_CP=$BINTMP
 fi
 
 ###############################################################
@@ -253,7 +261,7 @@ fi
 
 ## STEP 1: Convert AKS file to Binary
 printf "Converting '$FILE' to binary..."
-$AKS2BIN -a "$MEMADDR" "$FILE" "$BINTMP" > "$EXPORTMP" 2>&1
+$AKS2BIN -a "$MEMADDR" "$FILE_CP" "$BINTMP_CP" > "$EXPORTMP" 2>&1
 
 # Check if song has been correctly exported
 if ! grep "Song exported" < "$EXPORTMP" > /dev/null; then
