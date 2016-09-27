@@ -18,9 +18,7 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "sprites/tiles.h"
-#include "sprites/map.h"
-#include "sprites/alien.h"
+#include "sprites/sprites.h"
 
 // Sets the transparent mask table for color 0, mode 0
 cpctm_createTransparentMaskTable(g_masktable, 0x0100, M0, 0);
@@ -51,7 +49,7 @@ typedef struct {
 void initialization (){ 
    cpct_disableFirmware();          // Disable firmware to prevent it from interfering
    cpct_setPalette(g_palette, 7);   // Set palette using hardware colour values
-   cpct_setBorder (HW_BLACK);       // Set border colour same as background (Black)
+   cpct_setBorder (g_palette[0]);   // Set border colour same as background (0)
    cpct_setVideoMode(0);            // Change to Mode 0 (160x200, 16 colours)
 
    // Set the internal tileset for drawing Tilemaps
