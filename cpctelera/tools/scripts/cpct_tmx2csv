@@ -271,7 +271,8 @@ function convertTMX2CSV {
          ;;
          ## Looking for start of CSV values. 
          looking4CSV)  
-            re="^.*\<data\>.*\<encoding\>.*\<csv\>.*$"
+            #re="^.*\<data.*encoding.*csv.*\>.*$"
+            re="^.*\<data.*encoding.*csv.*\>.*$"
             if [[ $LINE =~ $re ]]; then
                ## Found line that signals data start, change to convertingbytes status
                ## and set token separator to comma, as we have comma separated values
@@ -324,6 +325,7 @@ FILEHEADER="//\n\
 //   * Height: ${HEIGHT_BYTES} rows
 //   * Bytes:  $((WIDTH_BYTES*HEIGHT_BYTES)) bytes (${WIDTH_BYTES} x ${HEIGHT_BYTES})
 //\n"
+
 
 ## Output the C Array declaration and the number of bytes to stdout
 if $GENERATE_C; then
