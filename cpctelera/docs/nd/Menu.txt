@@ -77,6 +77,7 @@ Group: Bitarray  {
 
 Group: Commandline  {
 
+   File: cpct_aks2c  (commandline/cpct_aks2c)
    File: cpct_bin2c  (commandline/cpct_bin2c)
    File: cpct_img2tileset  (commandline/cpct_img2tileset)
    File: cpct_installrslib  (commandline/cpct_installrslib)
