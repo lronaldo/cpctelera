@@ -20,12 +20,13 @@
 ;;
 ;; ASM bindings for <cpct_etm_redrawTileBox>
 ;;
-;;   12 microSecs, 8 bytes
+;;   13 microSecs, 9 bytes
 ;;
 cpct_etm_drawTileBox2x4_asm::
 
    pop  hl                     ;; [3] HL = Return address
    ld (simulated_return+1), hl ;; [5] Save return address for simulated return
+   ex   de, hl                 ;; [1] HL = Parameters (H=Height in tiles, L=Width in tiles)
 
    ;; Leave pvideomem and ptilemap in the stack as they will be recovered later
    ;; during function operation

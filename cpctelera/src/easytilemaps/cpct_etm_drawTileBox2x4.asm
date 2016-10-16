@@ -31,8 +31,8 @@
 ;; Input Parameters (9 bytes):
 ;;    (1B  C) x         - x tile-coordinate of the starting tile inside the tilemap
 ;;    (1B  B) y         - y tile-coordinate of the starting tile inside the tilemap
-;;    (1B  L) w         - width in tiles of the tile-box to be redrawn
-;;    (1B  H) h         - height in tiles of the tile-box to be redrawn
+;;    (1B  E) w         - width in tiles of the tile-box to be redrawn
+;;    (1B  D) h         - height in tiles of the tile-box to be redrawn
 ;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
 ;;    * Always received on the stack
 ;;    (2B) pvideomem    - Pointer to upper left corner of the *tilemap* in video memory.
@@ -53,8 +53,8 @@
 ;;    ld    a, #map_width  ;; A = map_width
 ;;    ld    b, #y          ;; B = x tile-coordinate
 ;;    ld    c, #x          ;; C = y tile-coordinate
-;;    ld    h, #h          ;; H = height in tiles of the tile-box
-;;    ld    l, #w          ;; L =  width in tiles of the tile-box
+;;    ld    d, #h          ;; H = height in tiles of the tile-box
+;;    ld    e, #w          ;; L =  width in tiles of the tile-box
 ;;    call  cpct_etm_drawTileBox2x4_asm ;; Call the function
 ;; (end code)
 ;;
@@ -128,7 +128,7 @@
 ;;
 ;; Required memory:
 ;;      C-bindings - 143 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
-;;    ASM-bindings - 139 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
+;;    ASM-bindings - 140 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -136,7 +136,7 @@
 ;; --------------------------------------------------------------------------------------------
 ;;    Any      | 98 + PX + MY + 7PPY + (37 + 103W)H | 392 + 4PX + 4MY + 28PPY + (148 + 412W)H |
 ;; --------------------------------------------------------------------------------------------
-;;  ASM-Saving |            - 11                    |               - 44                      |
+;;  ASM-Saving |            - 10                    |               - 40                      |
 ;; --------------------------------------------------------------------------------------------
 ;;  W=2, H=3   |         [ 845 - 937 ]              |           [ 3380 - 3748 ]               |
 ;; --------------------------------------------------------------------------------------------
