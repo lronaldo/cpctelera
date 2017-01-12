@@ -28,6 +28,7 @@
 
 #include <types.h>
 #include "relocation.h"
+#include "banks.h"
 
 // Standard memory management functions
 extern void cpct_memset    (void *array, u8  value, u16 size) __z88dk_callee;
@@ -37,6 +38,9 @@ extern void cpct_memcpy    (void *to, const void *from, u16 size) __z88dk_callee
 
 // Stack manipulation
 extern void cpct_setStackLocation(void *memory) __z88dk_fastcall;
+
+// Memory pagination
+extern void cpct_pageMemory(u8 configAndBankValue) __z88dk_fastcall;
 
 // Macro to check conditions at compile time and issue errors
 #define BUILD_BUG_ON(condition) ((void)sizeof(char[2 - 2*!!(condition)]))
