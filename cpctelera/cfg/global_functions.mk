@@ -285,3 +285,25 @@ $(T2C_CH): $(1)
 IMGCFILES  := $(T2C_C2) $(IMGCFILES)
 OBJS2CLEAN := $(T2C_CH) $(OBJS2CLEAN)
 endef
+
+#################
+# IMG2SPRITESMASK: General rule to convert images into C arrays representing
+# sprites masked. Updates IMGCFILES and OBJS2CLEAN adding new C files
+# that result from image conversions
+#
+# $(1): Image file to be converted into C sprite
+# $(2): Graphics mode (0,1,2) for the generated values
+# $(3): Prefix to add to all C-identifiers generated
+# $(4): Width in pixels of each sprite/tile/etc that will be generated
+# $(5): Height in pixels of each sprite/tile/etc that will be generated
+# $(6): Firmware palette used to convert the image file into C values
+#
+define IMG2SPRITESMASK
+IMGCFILES  := $(basename $(1)).c $(IMGCFILES)
+OBJS2CLEAN := $(basename $(1)).c $(basename $(1)).h $(OBJS2CLEAN)
+.SECONDARY: $(basename $(1)).c $(basename $(1)).h
+$(basename $(1)).c $(basename $(1)).h: $(1)
+	@$(call PRINT,$(PROJNAME),"Generating C-arrays for images in $(1)...")
+	@cpct_img2tileset -im -nt -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(1)
+	@$(call PRINT,$(PROJNAME),"C-arrays generated for $(1)")
+endef
