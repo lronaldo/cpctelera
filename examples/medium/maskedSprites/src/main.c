@@ -45,20 +45,22 @@ void drawFrame() {
   // Colour pattern for frame boxes (2 pixels of PEN colour 15)
   pattern = cpct_px2byteM0 (15, 15);
   
+  // cpctm_screenPtr as we use constant values
+  
   // Draw top box
-  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X),  (BACK_Y - 8) );
+  pvmem = cpctm_screenPtr(CPCT_VMEM_START, (BACK_X),  (BACK_Y - 8) );
   cpct_drawSolidBox(pvmem, pattern, 4*BACK_W,  8);
 
   // Draw bottom box
-  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X),  (BACK_Y + 8*BACK_H) );
+  pvmem = cpctm_screenPtr(CPCT_VMEM_START, (BACK_X),  (BACK_Y + 8*BACK_H) );
   cpct_drawSolidBox(pvmem, pattern, 4*BACK_W,  8);
 
   // Draw left box
-  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X - 4), (BACK_Y - 8) );
+  pvmem = cpctm_screenPtr(CPCT_VMEM_START, (BACK_X - 4), (BACK_Y - 8) );
   cpct_drawSolidBox(pvmem, pattern,  4, 8*(BACK_H + 2) );
 
   // Draw right box
-  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, (BACK_X + 4*BACK_W),  (BACK_Y - 8));
+  pvmem = cpctm_screenPtr(CPCT_VMEM_START, (BACK_X + 4*BACK_W),  (BACK_Y - 8));
   cpct_drawSolidBox(pvmem, pattern,  4, 8*(BACK_H + 2) );
 }
 
