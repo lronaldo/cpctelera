@@ -619,8 +619,9 @@ void DSK::FixEndianDsk( bool littleToBig) {
 	
 	if ( ! littleToBig ) 
 		Infos->DataSize = FIX_SHORT( Infos->DataSize );	
-    for ( int t = 0; t < Infos->NbTracks; t++ )
+   for ( int t = 0; t < Infos->NbTracks; t++ ) {
         FixEndianTrack( Infos, t, 9 );
+   }
 	if ( littleToBig )	
 		Infos->DataSize = FIX_SHORT( Infos->DataSize );		
 	FillBitmap();
@@ -1070,7 +1071,7 @@ void DSK::RemoveFile ( int item ) {
 		memcpy( &TabDir[ j ], GetInfoDirEntry( j ), sizeof( StDirEntry ));
 		
 	strcpy( NomFic, GetNomAmsdos( TabDir[ i ].Nom ) );
-	char *p ;
+	//char *p ;
 	
 	//do {
 		TabDir[ i ].User = USER_DELETED;
