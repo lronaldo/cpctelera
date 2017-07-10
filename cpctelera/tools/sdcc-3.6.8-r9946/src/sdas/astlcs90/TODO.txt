@@ -1,0 +1,4 @@
+Parser error with af' and hl+a.
+
+Optimize extended opcode/addressmode generation.
+Currently done manually for every insn..

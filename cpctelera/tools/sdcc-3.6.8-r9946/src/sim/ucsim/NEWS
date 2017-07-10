@@ -1,0 +1,59 @@
+0.4.1-pre3
+
+Redirection of output of commands.
+
+
+0.4.1-pre4
+
+Redesigned of option handling.
+Start of libtool introduction.
+
+
+0.4.1-pre5
+
+Fix of cl_cmdline::syntax_match.
+
+
+0.4.1-pre6
+
+Stack tracking.
+Error handling.
+
+
+0.5.0
+
+Expressions
+Memory simulation redesigned: address space, chip, address decoder
+Fix of command interpreter
+Document updated
+
+
+0.5.1
+
+Implementation of missing instruction ORL C,\bit of MCS51
+Apply changes of SDCC cvs
+Fix of AVR instruction decoder
+Bug fixes
+
+
+0.5.2
+
+Bug fixes to run sdcc regression tests
+
+
+0.5.3
+
+Eliminate need of flex (for compile)
+Fix of some includes
+
+
+0.6.0
+
+New commands: "memory info" (same as "info memory"), "get error" (same
+as "show error").
+
+Simulator interface (virtual hw element).
+
+Simulator control over serial line terminal. Escape character is ^x
+(CTRL-x) but it is configurable for every uarts. Available functions
+are: start, stop, quit, reset, close.

@@ -1,0 +1,165 @@
+#
+#
+#
+
+VERSION         = @VERSION@
+VERSIONHI       = @VERSIONHI@
+VERSIONLO       = @VERSIONLO@
+VERSIONP        = @VERSIONP@
+
+SHELL           = /bin/sh
+CC              = @CC@
+CPP             = @CPP@
+INSTALL         = @INSTALL@
+STRIP           = @STRIP@
+MAKEDEP         = @MAKEDEP@
+
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
+
+srcdir          = @srcdir@
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
+datadir         = @datadir@
+datarootdir     = @datarootdir@
+includedir      = @includedir@
+mandir          = @mandir@
+man1dir         = $(mandir)/man1
+man2dir         = $(mandir)/man2
+infodir         = @info@
+
+EXEEXT          = @EXEEXT@
+
+VPATH           = @srcdir@
+
+CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/..
+CFLAGS          = @CFLAGS@ @WALL_FLAG@ -DINDEXLIB -DUNIX -I. -I$(srcdir)
+LDFLAGS         = @LDFLAGS@
+
+OBJDIR = obj
+
+ASXXLIB = $(srcdir)/../asxxsrc
+
+ASXXLIBSRC = strcmpi.c
+
+SRC = lk_readnl.c lkaomf51.c lkar.c lkarea.c lkdata.c lkelf.c lkeval.c \
+        lkhead.c lklex.c lklib.c lklibr.c lklist.c lkmain.c lkmem.c \
+        lknoice.c lkout.c lkrel.c lkrloc.c lkrloc3.c lks19.c lksdcclib.c \
+        lksym.c sdld.c lksdcdb.c lkbank.c
+
+LKSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c)
+
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
+ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
+LKOBJECTS = $(OBJS) $(LKOBJS) $(ASXXLIBOBJS)
+
+$(LKOBJECTS) : aslink.h
+
+ASLINK          = $(top_builddir)/bin/sdld$(EXEEXT)
+
+transform       = @program_transform_name@
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: sdcc-ld8051 sdcc-ldz80 sdcc-ldgb sdcc-ld6808 sdcc-ldstm8
+
+sdcc-ld8051: checkconf $(ASLINK)
+
+sdcc-ldz80: checkconf $(top_builddir)/bin/sdldz80$(EXEEXT)
+
+sdcc-ldgb: checkconf $(top_builddir)/bin/sdldgb$(EXEEXT)
+
+sdcc-ld6808: checkconf $(top_builddir)/bin/sdld6808$(EXEEXT)
+
+sdcc-ldstm8: checkconf $(top_builddir)/bin/sdldstm8$(EXEEXT)
+
+$(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdldstm8$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT): $(ASLINK)
+	cp -p $(ASLINK) $@
+
+$(ASLINK): $(LKOBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(LKOBJECTS)
+
+# Compiling and installing everything and running test
+# ----------------------------------------------------
+install: all installdirs
+	$(INSTALL) $(top_builddir)/bin/sdld$(EXEEXT) $(DESTDIR)$(bindir)/`echo 'sdld' | sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo 'sdld' | sed '$(transform)'`$(EXEEXT)
+	if [ "`grep stm8 $(top_builddir)/ports.build`" = "stm8" ]; \
+	then \
+	  $(INSTALL) $(top_builddir)/bin/sdldstm8$(EXEEXT) $(DESTDIR)$(bindir)/`echo 'sdldstm8' | sed '$(transform)'`$(EXEEXT); \
+	  $(STRIP) $(DESTDIR)$(bindir)/`echo 'sdldstm8' | sed '$(transform)'`$(EXEEXT); \
+	fi
+	if [ "`grep hc08 $(top_builddir)/ports.build`" = "hc08" ]; \
+	then \
+	  $(INSTALL) $(top_builddir)/bin/sdld6808$(EXEEXT) $(DESTDIR)$(bindir)/`echo 'sdld6808' | sed '$(transform)'`$(EXEEXT); \
+	  $(STRIP) $(DESTDIR)$(bindir)/`echo 'sdld6808' | sed '$(transform)'`$(EXEEXT); \
+	fi
+	if [ "`grep z80 $(top_builddir)/ports.build`" = "z80" ]; \
+	then \
+	  $(INSTALL) $(top_builddir)/bin/sdldz80$(EXEEXT) $(DESTDIR)$(bindir)/`echo 'sdldz80' | sed '$(transform)'`$(EXEEXT); \
+	  $(STRIP) $(DESTDIR)$(bindir)/`echo 'sdldz80' | sed '$(transform)'`$(EXEEXT); \
+	  $(INSTALL) $(top_builddir)/bin/sdldgb$(EXEEXT) $(DESTDIR)$(bindir)/`echo 'sdldgb' | sed '$(transform)'`$(EXEEXT); \
+	  $(STRIP) $(DESTDIR)$(bindir)/`echo 'sdldgb' | sed '$(transform)'`$(EXEEXT); \
+	fi
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	for ld in $(top_builddir)/bin/sdld $(top_builddir)/bin/sdldz80 $(top_builddir)/bin/sdldgb $(top_builddir)/bin/sdldstm8 $(top_builddir)/bin/sdld6808; \
+	do \
+	  rm -f $(DESTDIR)$(bindir)/`echo \`basename $$ld\` | sed '$(transform)'`$(EXEEXT); \
+	done
+
+
+# Performing self-test
+# --------------------
+check:
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+
+
+# Creating dependencies
+# ---------------------
+dep: Makefile.dep
+
+Makefile.dep: $(LKSOURCES) $(top_builddir)/*.h
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) >Makefile.dep
+
+ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
+                                   clean distclean mostlyclean realclean)" ""
+  -include Makefile.dep
+endif
+include $(srcdir)/clean.mk
+
+# My rules
+# --------
+$(OBJDIR)/.stamp:
+	mkdir -p $(OBJDIR)
+	touch $(OBJDIR)/.stamp
+
+$(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+
+# Remaking configuration
+# ----------------------
+checkconf:
+	@if [ -f $(top_builddir)/devel ]; then\
+          $(MAKE) -f ../conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+        fi
+
+# End of Makefile

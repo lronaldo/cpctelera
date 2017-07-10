@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{57BCB0F8-EF4A-4688-9B36-55A8F6DC93BF}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\SDCC.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\SDCC.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\bin_vc\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\bin_vc\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Release/sdcpp.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>.;..\sdbinutils\include;.\win32;.\libcpp;.\libcpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;WIN32;_CONSOLE;HAVE_CONFIG_H;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\Release/sdcpp.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
+      <ObjectFileName>.\Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\..\bin_vc\$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ProgramDatabaseFile>.\Release/sdcpp.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release/sdcpp.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/sdcpp.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;..\sdbinutils\include;.\win32;.\libcpp;.\libcpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;WIN32;_CONSOLE;HAVE_CONFIG_H;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>.\Debug/sdcpp.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
+      <ObjectFileName>.\Debug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\..\bin_vc\$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\Debug/sdcpp.pdb</ProgramDatabaseFile>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug/sdcpp.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\sdbinutils\libiberty\alloca.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\concat.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\fopen_unlocked.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\getpwd.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\hashtab.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\hex.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\lbasename.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\md5.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\obstack.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\safe-ctype.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\vasprintf.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\xexit.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\xmalloc.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\xmemdup.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\xstrdup.c" />
+    <ClCompile Include="..\sdbinutils\libiberty\xstrerror.c" />
+    <ClCompile Include="c-incpath.c" />
+    <ClCompile Include="c-ppoutput.c" />
+    <ClCompile Include="cppdefault.c" />
+    <ClCompile Include="options.c" />
+    <ClCompile Include="opts-common.c" />
+    <ClCompile Include="opts.c" />
+    <ClCompile Include="prefix.c" />
+    <ClCompile Include="sdcpp-diagnostic.c" />
+    <ClCompile Include="sdcpp-opts.c" />
+    <ClCompile Include="sdcpp.c" />
+    <ClCompile Include="version.c" />
+    <ClCompile Include="libcpp\charset.c" />
+    <ClCompile Include="libcpp\directives.c" />
+    <ClCompile Include="libcpp\errors.c" />
+    <ClCompile Include="libcpp\expr.c" />
+    <ClCompile Include="libcpp\files.c" />
+    <ClCompile Include="libcpp\identifiers.c" />
+    <ClCompile Include="libcpp\init.c" />
+    <ClCompile Include="libcpp\lex.c" />
+    <ClCompile Include="libcpp\line-map.c" />
+    <ClCompile Include="libcpp\macro.c" />
+    <ClCompile Include="libcpp\mkdeps.c" />
+    <ClCompile Include="libcpp\symtab.c" />
+    <ClCompile Include="libcpp\traditional.c" />
+    <ClCompile Include="win32\dirent.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ansidecl.h" />
+    <ClInclude Include="auto-host.h" />
+    <CustomBuild Include="auto-host_vc_in.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) auto-host.h &gt; nul</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) auto-host.h &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">auto-host.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">auto-host.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: auto-host.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: auto-host.h</Message>
+    </CustomBuild>
+    <ClInclude Include="c-incpath.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="cppdefault.h" />
+    <ClInclude Include="hwint.h" />
+    <ClInclude Include="intl.h" />
+    <ClInclude Include="md5.h" />
+    <ClInclude Include="options.h" />
+    <ClInclude Include="opts.h" />
+    <ClInclude Include="output.h" />
+    <ClInclude Include="prefix.h" />
+    <ClInclude Include="sdcpp.h" />
+    <ClInclude Include="symcat.h" />
+    <ClInclude Include="system.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="libcpp\internal.h" />
+    <ClInclude Include="libcpp\system.h" />
+    <ClInclude Include="libcpp\ucnid.h" />
+    <ClInclude Include="libcpp\include\cpp-id-data.h" />
+    <ClInclude Include="libcpp\include\cpplib.h" />
+    <ClInclude Include="libcpp\include\line-map.h" />
+    <ClInclude Include="libcpp\include\mkdeps.h" />
+    <ClInclude Include="libcpp\include\symtab.h" />
+    <ClInclude Include="win32\dirent.h" />
+    <ClInclude Include="..\sdbinutils\include\libiberty.h" />
+    <ClInclude Include="..\sdbinutils\include\safe-ctype.h" />
+    <ClInclude Include="..\sdbinutils\include\splay-tree.h" />
+    <ClInclude Include="..\sdbinutils\include\filenames.h" />
+    <ClInclude Include="..\sdbinutils\include\hashtab.h" />
+    <ClInclude Include="..\sdbinutils\include\obstack.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="sdcpp.opt">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f opt-gather.awk %(Identity) &gt; $(TMP)\genopts.tmp
+gawk -f opt-functions.awk -f optc-gen.awk -v header_name="config.h system.h options.h" $(TMP)\genopts.tmp &gt; options.c
+gawk -f opt-functions.awk -f opth-gen.awk $(TMP)\genopts.tmp &gt; options.h
+del $(TMP)\genopts.tmp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f opt-gather.awk %(Identity) &gt; $(TMP)\genopts.tmp
+gawk -f opt-functions.awk -f optc-gen.awk -v header_name="config.h system.h options.h" $(TMP)\genopts.tmp &gt; options.c
+gawk -f opt-functions.awk -f opth-gen.awk $(TMP)\genopts.tmp &gt; options.h
+del $(TMP)\genopts.tmp</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">options.c;options.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">options.c;options.h;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: options.c and options.h</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: options.c and options.h</Message>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="opt-functions.awk" />
+    <None Include="opt-gather.awk" />
+    <None Include="optc-gen.awk" />
+    <None Include="opth-gen.awk" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

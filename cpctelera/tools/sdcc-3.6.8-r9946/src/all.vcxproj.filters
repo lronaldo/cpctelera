@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Info">
+      <UniqueIdentifier>{07e1e828-c225-4c91-8104-30ebdbfdcc2b}</UniqueIdentifier>
+      <Extensions>. .txt</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ChangeLog">
+      <Filter>Info</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="bin_vc\makebin.exe" />
+    <CustomBuild Include="bin_vc\packihx.exe" />
+    <CustomBuild Include="bin_vc\sdas6808.exe" />
+    <CustomBuild Include="bin_vc\sdas8051.exe" />
+    <CustomBuild Include="bin_vc\sdasgb.exe" />
+    <CustomBuild Include="bin_vc\sdasz80.exe" />
+    <CustomBuild Include="bin_vc\sdcc.exe" />
+    <CustomBuild Include="bin_vc\sdcclib.exe" />
+    <CustomBuild Include="bin_vc\sdcpp.exe" />
+    <CustomBuild Include="bin_vc\sdld.exe" />
+    <CustomBuild Include="bin_vc\sdcdb.exe" />
+    <CustomBuild Include="bin_vc\sdranlib.exe" />
+    <CustomBuild Include="bin_vc\sdasrab.exe" />
+  </ItemGroup>
+</Project>

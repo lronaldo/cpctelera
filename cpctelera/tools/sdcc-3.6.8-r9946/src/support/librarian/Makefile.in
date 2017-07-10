@@ -1,0 +1,53 @@
+VPATH        = @srcdir@
+srcdir       = @srcdir@
+top_builddir = @top_builddir@
+
+include $(top_builddir)/Makefile.common
+
+OBJECTS 	= sdcclib.o
+
+SOURCES		= $(patsubst %.o,%.c,$(OBJECTS))
+
+TARGET		= $(top_builddir)/bin/sdcclib$(EXEEXT)
+
+all: $(TARGET)
+
+install: all installdirs
+	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo sdcclib|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sdcclib|sed '$(transform)'`$(EXEEXT)
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/`echo sdcclib|sed '$(transform)'`$(EXEEXT)
+
+# Performing self-test
+# --------------------
+check:
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+
+
+# Creating dependencies
+# ---------------------
+dep:
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS)
+
+.c.o:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+
+
+checkconf:
+
+include $(srcdir)/clean.mk

@@ -1,0 +1,90 @@
+SDCC Binary Kit Install Help
+----------------------------
+
+For Linux users:
+================
+To install:
+
+* Extract the binary kit to a temporary directory.
+  This will create a new directory called 'sdcc-3.6.0' in the temporary directory.
+    cd ~
+    mkdir tmp
+    cd tmp
+    tar xjf path/to/binary/kit/sdcc-3.6.0-i386-unknown-linux2.5.tar.bz2
+
+* Change to the sdcc directory and copy all files to /usr/local
+    cd sdcc-3.6.0
+    cp -r * /usr/local
+
+This will install sdcc binaries into: /usr/local/bin/
+header files into:                    /usr/local/share/sdcc/include/
+non-free header files into:           /usr/local/share/sdcc/non-free/include/
+library files into:                   /usr/local/share/sdcc/lib/
+non-free library files into:          /usr/local/share/sdcc/non-free/lib/
+and documentation into:               /usr/local/share/sdcc/doc/
+
+You can test the install by entering:
+    /usr/local/bin/sdcc -v
+
+This should return sdcc's version number.
+
+Even if the default search paths look into /usr/local, sdcc is fully
+relocatable. Try `sdcc --print-search-dirs` if you have problems with header
+or library files. See sdccman.pdf for more detailed information.
+
+
+For Windows 9X/NT/2000/XP/Vista/7/8 users:
+==========================================
+To install:
+
+* If you would like to keep a copy of your previous version,
+  rename the directory where it's installed first
+* Run sdcc-3.6.0-setup.exe for 32 bit Windows or
+  Run sdcc-3.6.0-x64-setup.exe for 64 bit Windows
+
+By default this will install sdcc binaries into: C:\Program Files\SDCC\bin\
+header files into:                               C:\Program Files\SDCC\include\
+non-free header files into:                      C:\Program Files\SDCC\non-free\include\
+library files into:                              C:\Program Files\SDCC\lib\
+non-free library files into:                     C:\Program Files\SDCC\non-free\lib\
+and documentation into:                          C:\Program Files\SDCC\doc\
+
+You can test the install by opening a DOS box and entering:
+    sdcc -v
+
+This should return sdcc's version number.
+
+sdcc for windows is fully relocatable. Try `sdcc --print-search-dirs` if you
+have problems with header or library files. See sdccman.pdf for more
+detailed information.
+
+
+For Mac OS X users:
+===================
+To install:
+
+* Extract the binary kit to a temporary directory.
+  This will create a new directory called 'sdcc-3.6.0' in the temporary directory.
+    cd ~
+    mkdir tmp
+    cd tmp
+    tar xjf path/to/binary/kit/sdcc-3.6.0-universal-apple-macosx.tar.bz2
+
+* Change to the sdcc directory and copy all files to /Developer/sdcc
+    cp -r sdcc /Developer/sdcc
+
+This will install sdcc binaries into: /Developer/sdcc/bin/
+header files into:                    /Developer/sdcc/share/sdcc/include/
+non-free header files into:           /Developer/sdcc/share/sdcc/non-free/include/
+library files into:                   /Developer/sdcc/share/sdcc/lib/
+non-free library files into:          /Developer/sdcc/share/sdcc/non-free/lib/
+and documentation into:               /Developer/sdcc/share/sdcc/doc/
+
+You can test the install by entering:
+    /Developer/sdcc/bin/sdcc -v
+
+This should return sdcc's version number.
+
+Even if the default search paths look into /usr/local, sdcc is fully
+relocatable. Try `sdcc --print-search-dirs` if you have problems with header
+or library files. See sdccman.pdf for more detailed information.

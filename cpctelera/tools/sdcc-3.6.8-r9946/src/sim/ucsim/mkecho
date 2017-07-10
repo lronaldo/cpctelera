@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ -f ${1}/devel ]; then
+	shift
+	echo "$@"
+fi
+
+# End of mkecho

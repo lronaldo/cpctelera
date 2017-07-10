@@ -1,0 +1,101 @@
+#
+#
+#
+
+VERSION         = @VERSION@
+VERSIONHI       = @VERSIONHI@
+VERSIONLO       = @VERSIONLO@
+VERSIONP        = @VERSIONP@
+
+SHELL           = /bin/sh
+CPP             = @CPP@
+INSTALL         = @INSTALL@
+CP              = @CP@
+
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
+
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
+datadir         = @datadir@
+datarootdir     = @datarootdir@
+includedir      = @includedir@
+mandir          = @mandir@
+man1dir         = $(mandir)/man1
+man2dir         = $(mandir)/man2
+infodir         = @infodir@
+VPATH           = @srcdir@
+srcdir          = @srcdir@
+
+non_free_include_dir_suffix = @non_free_include_dir_suffix@
+non_free_inclib_dir_suffix = @non_free_inclib_dir_suffix@
+
+sdcc_includedir    = $(DESTDIR)$(datadir)/$(non_free_include_dir_suffix)
+
+CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir)
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all:
+
+# Compiling and installing everything and running test
+# ----------------------------------------------------
+install: all installdirs
+	if [ "`grep pic14 $(top_builddir)/ports.build`" = pic14 ]; then \
+	  $(CP) $(srcdir)/pic14/*.h $(sdcc_includedir)/pic14; \
+	fi
+	if [ "`grep pic16 $(top_builddir)/ports.build`" = pic16 ]; then \
+	  $(CP) $(srcdir)/pic16/*.h $(sdcc_includedir)/pic16; \
+	fi
+	rm -rf `find $(sdcc_includedir) -type d -name '.svn'`
+	# some files in CVS are executable :-(
+	find $(sdcc_includedir) -type f -exec chmod 644 {} \;
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	rm -rf $(sdcc_includedir)
+	rm -rf $(DESTDIR)$(datadir)/$(non_free_inclib_dir_suffix)
+
+
+# Performing self-test
+# --------------------
+check:
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	[ -d $(sdcc_includedir) ] || mkdir -p $(sdcc_includedir)
+	[ -d $(sdcc_includedir)/pic14 ] || mkdir -p $(sdcc_includedir)/pic14
+	[ -d $(sdcc_includedir)/pic16 ] || mkdir -p $(sdcc_includedir)/pic16
+
+
+# Creating dependencies
+# ---------------------
+dep:
+
+include $(srcdir)/clean.mk
+
+# My rules
+# --------
+
+
+# Remaking configuration
+# ----------------------
+checkconf:
+	@if [ -f $(top_builddir)/devel ]; then \
+	  $(MAKE) -f $(srcdir)/conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" \
+	  freshconf; \
+	fi
+
+# End of main_in.mk/main.mk

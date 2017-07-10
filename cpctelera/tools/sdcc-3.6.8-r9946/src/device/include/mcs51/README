@@ -1,0 +1,6 @@
+sdcc/device/include/mcs51
+-------------------------
+
+A lot of the include files in this subdirectory used to be in the directory
+one level up from here. Since CVS doesn't support moving files, these files
+were removed there and added here.

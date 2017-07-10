@@ -1,0 +1,355 @@
+replace {
+	pula
+	psha
+	lda	%1
+} by {
+	; Peephole 1a	- removed redundant pula/psha
+	lda	%1
+}
+
+replace {
+	pula
+	psha
+	lda	%1,s
+} by {
+	; Peephole 1b	- removed redundant pula/psha
+	lda	%1,s
+}
+
+replace {
+	pula
+	psha
+	clra
+} by {
+	; Peephole 1c	- removed redundant pula/psha
+	clra
+}
+
+
+replace {
+	bcs	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2a	- eliminated jmp
+	bcc	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bcc	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2b	- eliminated jmp
+	bcs	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	beq	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2c	- eliminated jmp
+	bne	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bne	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2d	- eliminated jmp
+	beq	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	brclr	%3,%2,%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2e	- eliminated jmp
+	brset	%3,%2,%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	brset	%3,%2,%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2f	- eliminated jmp
+	brclr	%3,%2,%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bls	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2g	- eliminated jmp
+	bhi	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bhi	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2h	- eliminated jmp
+	bls	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	ble	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2i	- eliminated jmp
+	bgt	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bgt	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2j	- eliminated jmp
+	ble	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bge	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2k	- eliminated jmp
+	blt	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	blt	%1
+	jmp	%5
+%1:
+} by {
+	; Peephole 2l	- eliminated jmp
+	bge	%5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bmi     %1
+	jmp     %5
+%1:
+} by {
+	; Peephole 2m   - eliminated jmp
+	bpl     %5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace {
+	bpl     %1
+	jmp     %5
+%1:
+} by {
+	; Peephole 2n   - eliminated jmp
+	bmi     %5
+%1:
+} if labelInRange(%5), labelRefCountChange(%1 -1)
+
+replace restart {
+	jmp	%5
+} by {
+	; Peephole 3	- shortened jmp to bra
+	bra	%5
+} if labelInRange(%5)
+
+replace {
+	lda	%1
+	tsta
+} by {
+	; Peephole 4a	- eliminated redundant tsta
+	lda	%1
+}
+
+replace {
+	lda	%1,s
+	tsta
+} by {
+	; Peephole 4b	- eliminated redundant tsta
+	lda	%1,s
+}
+
+replace {
+	ldx	%1
+	tstx
+} by {
+	; Peephole 4c	- eliminated redundant tstx
+	ldx	%1
+}
+
+replace {
+	ldx	%1,s
+	tstx
+} by {
+	; Peephole 4d	- eliminated redundant tstx
+	ldx	%1,s
+}
+
+
+replace {
+	jmp	%5
+} by {
+	; Peephole 6a  - replaced jmp to rts with rts
+	rts
+} if optimizeReturn(), labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
+
+replace {
+	bra	%5
+} by {
+	; Peephole 6b  - replaced jmp to rts with rts
+	rts
+} if optimizeReturn(), labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
+
+replace restart {
+	psha
+	lda	%1
+	sta	1,s
+} by {
+	; Peephole 7  - optimized stack allocation
+	lda	%1
+	psha
+}
+
+// These two have been disabled, since the check for volatile doesn't work: notVolatile checks if %1 is volatile, however we need to know if (%1) is volatile.
+
+//replace restart {
+//	lda	%1
+//	sta	%1
+//} by {
+//	; Peephole 8a  - removed redundant sta
+//	lda	%1
+//} if notVolatile %1
+
+//replace restart {
+//	sta	%1
+//	lda	%1
+//} by {
+//	; Peephole 8b  - removed redundant lda
+//	sta	%1
+//} if notVolatile %1
+
+replace {
+        bne     %1
+%1:
+} by {
+        ; Peephole 9a   - eliminated branch
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace {
+        beq     %1
+%1:
+} by {
+        ; Peephole 9b   - eliminated branch
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+        bra     %1
+%1:
+} by {
+        ; Peephole 9c   - eliminated branch
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	bra     %1
+%2:
+%1:
+} by {
+	; Peephole 9d   - eliminated branch
+%2:
+%1:
+} if labelRefCountChange(%1 -1)
+
+replace {
+	cmp	#%2
+	beq	%1
+} by {
+	; Peephole 10a   - combined cmp/beq
+	cbeqa	#%2,%1
+}
+
+replace {
+	cmp	*%2
+	beq	%1
+} by {
+	; Peephole 10b   - combined cmp/beq
+	cbeq	*%2,%1
+}
+
+replace {
+	cmp	%2,s
+	beq	%1
+} by {
+	; Peephole 10c   - combined cmp/beq
+	cbeq	%2,s,%1
+}
+
+replace {
+        deca
+        bne     %1
+} by {
+        ; Peephole 11a   - combined deca/bne
+        dbnza   %1
+}
+
+replace {
+        decx
+        bne     %1
+} by {
+        ; Peephole 11b   - combined decx/bne
+        dbnzx   %1
+}
+
+replace {
+        dec     *%2
+        bne     %1
+} by {
+        ; Peephole 10c   - combined dec/bne
+        dbnz    *%2,%1
+}
+
+replace {
+        dec     %2,s
+        bne     %1
+} by {
+        ; Peephole 10d   - combined dec/bne
+        dbnz    %2,s,%1
+}
+
+// should be one of the last peepholes
+replace restart {
+%1:
+} by {
+	; Peephole 500    removed redundant label %1
+} if labelRefCount(%1 0)
+
+replace restart {
+	jsr	%1
+	rts
+} by {
+	; Peephole 501 did tail call optimization.
+	jmp	%1
+} if optimizeReturn()
+

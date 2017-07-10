@@ -1,0 +1,253 @@
+#!/bin/sh
+
+AC_PREREQ(2.60)
+AC_INIT
+AC_CONFIG_SRCDIR([Makefile.in])
+AC_CONFIG_HEADER(config.h)
+
+
+wi_LIB_READLINE
+
+# Required programs
+# ===========================================================================
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AC_CHECK_PROG(AUTOCONF, autoconf, autoconf, :)
+AC_CHECK_PROG(STRIP, strip, strip, :)
+AC_CHECK_PROG(AS, as, as, :)
+AC_CHECK_PROG(CP, cp, cp, :)
+
+AC_LANG_C
+
+AC_ARG_PROGRAM
+# Checking for header files.
+# ===========================================================================
+AC_CHECK_HEADERS(unistd.h sys/wait.h)
+socket_type=unknown
+AC_CHECK_HEADERS(sys/socket.h, socket_type=sys_socket_h)
+if test $socket_type = unknown; then
+  AC_CHECK_HEADERS(winsock2.h, socket_type=winsock2_h)
+fi
+
+# Checking for functions/libs
+# ===========================================================================
+if test $socket_type = winsock2_h; then
+  LIBS="-lws2_32 $LIBS"
+else
+  AC_CHECK_LIB(socket,socket)
+  AC_CHECK_LIB(nsl,xdr_short)
+fi
+
+
+# Macro definitions
+# ===========================================================================
+
+# Check whether the compiler for the current language is SunPRO.
+
+AC_DEFUN([bor_IS_SUNPRO],
+[AC_CACHE_CHECK([whether we are using the SunPRO _AC_LANG compiler],
+  [bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro],
+  [_AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [[#if !defined __SUNPRO_C && !defined __SUNPRO_CC
+       choke me
+#endif
+]])],
+    [bor_compiler_sunpro=yes],
+    [bor_compiler_sunpro=no])
+bor_cv_[]_AC_LANG_ABBREV[]_compiler_sunpro=$bor_compiler_sunpro
+])])
+
+# bor_IS_VALID_OPTION macro checks if the current compiler, selected by 
+# AC_LANG, supports option specified as the 1st parameter. The test fails if
+# the compiler returns an error or in case something is writeen to stderr.
+# For example: bor_VALID_OPT(fPIC)
+
+AC_DEFUN([bor_IS_VALID_OPTION],
+[ac_test_[]_AC_LANG_PREFIX[]FLAGS=${[]_AC_LANG_PREFIX[]FLAGS+set}
+bor_save_[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
+AC_CACHE_CHECK(whether $_AC_LANG_PREFIX accepts -$1, bor_cv_[]_AC_LANG_ABBREV[]_$1,
+  [bor_save_[]_AC_LANG_ABBREV[]_werror_flag=$ac_[]_AC_LANG_ABBREV[]_werror_flag
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=yes
+   
+   []_AC_LANG_PREFIX[]FLAGS="-$1"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+     [bor_cv_[]_AC_LANG_ABBREV[]_$1=yes],
+     [bor_cv_[]_AC_LANG_ABBREV[]_$1=no])
+   ac_[]_AC_LANG_ABBREV[]_werror_flag=$bor_save_[]_AC_LANG_ABBREV[]_werror_flag])
+   []_AC_LANG_PREFIX[]FLAGS=$bor_save_[]_AC_LANG_PREFIX[]FLAGS
+])
+
+# This macro expands DIR and assigns it to RET.
+# If DIR is NONE, then it's replaced by DEFAULT.
+#
+# Based on AC_DEFINE_DIR
+#
+# Examples:
+#
+#  adl_EXPAND(prefix, "/usr/local", expanded_prefix)
+
+AC_DEFUN([adl_EXPAND], [
+  test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+  test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
+  ac_expand=[$]$1
+  test "x$ac_expand" = xNONE && ac_expand="[$]$2"
+  ac_expand=`eval echo [$]ac_expand`
+  $3=`eval echo [$]ac_expand`
+])
+
+# adl_NORMALIZE_PATH
+#
+#  - empty paths are changed to '.'
+#  - trailing slashes are removed
+#  - repeated slashes are squeezed except a leading doubled slash '//'
+#    (which might indicate a networked disk on some OS).
+#
+#
+# REFERENCE_STRING is used to turn '/' into '\' and vice-versa: if
+# REFERENCE_STRING contains some backslashes, all slashes and backslashes
+# are turned into backslashes, otherwise they are all turned into slashes.
+#
+# This makes processing of DOS filenames quite easier, because you can turn a
+# filename to the Unix notation, make your processing, and turn it back to
+# original notation.
+
+dnl Available from the GNU Autoconf Macro Archive at:
+dnl http://www.gnu.org/software/ac-archive/htmldoc/normpath.html
+dnl
+AC_DEFUN([adl_NORMALIZE_PATH],
+[case ":[$]$1:" in
+dnl change empty paths to '.'
+  ::) $1='.' ;;
+dnl strip trailing slashes
+  :*[[\\/]]:) $1=`echo "[$]$1" | sed 's,[[\\/]]*[$],,'` ;;
+  :*:) ;;
+esac
+dnl squeze repeated slashes
+case ifelse($2,,"[$]$1",$2) in
+dnl if the path contains any backslashes, turn slashes into backslashes
+
+dnl Bernhard Held 2003-04-06
+dnl This was the original line. It does not:
+dnl - convert the first slash
+dnl - replace a slash with a double-backslash
+dnl *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\,g'` ;;
+    *\\*) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1\\\\\\\\,g
+                                  s,^[[\\/]],\\\\\\\\,'` ;;
+
+dnl if the path contains slashes, also turn backslashes into slashes
+ *) $1=`echo "[$]$1" | sed 's,\(.\)[[\\/]][[\\/]]*,\1/,g'` ;;
+esac])
+
+
+dnl adl_NORMALIZE_DEFINE_UNQUOTED(var, DEFINE, REFERENCE_STRING)
+AC_DEFUN([adl_NORMALIZE_DEFINE_UNQUOTED], [
+  ac_ndu=[$]$1
+  adl_NORMALIZE_PATH([ac_ndu], [$]$3)
+  AC_DEFINE_UNQUOTED($2, "${ac_ndu}", [XXX])
+])
+
+
+# Checking characteristics of compilers and other programs
+# ===========================================================================
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+  AC_CACHE_CHECK(whether preprocessor accepts -MM or -M,sdcc_cv_MM,
+  echo "#include <stdio.h>" >_test_.c
+  echo "" >>_test_.c
+  $CPP -v -MM _test_.c 1>&5 2>&5
+  if test "$?" = "0"; then
+    sdcc_cv_MM="-MM"
+  else
+    sdcc_cv_MM="-M"
+  fi
+  rm -f _test_.*)
+
+  # This is the first time when CFLAGS are set/modified!!
+  bor_IS_VALID_OPTION(ggdb)
+  if test "$bor_cv_c_ggdb" = "yes"; then
+    CFLAGS="-ggdb ${CFLAGS}"
+  fi
+
+  bor_IS_VALID_OPTION(pipe)
+  if test "$bor_cv_c_pipe" = "yes"; then
+    CFLAGS="-pipe $CFLAGS"
+  fi
+
+  WALL_FLAG="-Wall"
+  C99_FLAG="--std=c99"
+  MAKEDEP="$CC $sdcc_cv_MM"
+else
+  bor_IS_SUNPRO
+  if test "$bor_cv_c_compiler_sunpro" = "yes"; then
+    C99_FLAG="-xc99"
+    CFLAGS="-xO2 ${C99_FLAG} ${CFLAGS}"
+    WALL_FLAG=
+    MAKEDEP="$CC ${C99_FLAG} -xM1"
+  fi
+fi
+
+AC_SUBST(MAKEDEP)
+AC_SUBST(WALL_FLAG)
+AC_SUBST(C99_FLAG)
+
+# Try to append a c99 flag
+# -------------------------------------------------------------------------
+AC_PROG_CC_C99
+if test "$ac_cv_prog_cc_c99" != "no"; then
+  CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
+fi
+
+# Set standard installation paths
+# ===========================================================================
+
+# In the Makefiles we need paths with '/' as directory separator, even if
+# crosscompiling for Win32.
+# And we want to preserve the macros (e.g. ${prefix}) in the Makefiles.
+# The variables in the Makefiles are replaced by AC_SUBST()
+#
+# In sdccconf.h the '/' in paths can be replaced by "\\" (normalized), if
+#
+# The macros are expanded for the header.
+# The variables in the header are replaced by AC_*DEFINE*()
+# sdccconf_h_dir_separator contains a backslash.
+AC_ARG_VAR(sdccconf_h_dir_separator, needed in sdccconf.h: either "/" (default) or "\\")
+if test "x${sdccconf_h_dir_separator}" = "x"; then
+    sdccconf_h_dir_separator="/"
+fi
+
+# Makefiles
+###########
+
+# lib_dir_suffix:
+# *nix default: "sdcc/lib"
+AC_ARG_VAR(lib_dir_suffix, appended to datadir to define SDCC's library root directory)
+if test "${lib_dir_suffix}" = ""; then
+    lib_dir_suffix="sdcc/lib"
+fi
+AC_SUBST(lib_dir_suffix)
+
+AC_SUBST(EXEEXT)
+
+# sdccconf.h
+############
+
+AC_DEFINE_UNQUOTED(DIR_SEPARATOR_STRING, "${sdccconf_h_dir_separator}", [XXX])
+
+# datadir:
+# default: "${prefix}/share"
+adl_EXPAND(datadir, "NONE", expanded_datadir)
+adl_NORMALIZE_DEFINE_UNQUOTED(expanded_datadir, DATADIR, sdccconf_h_dir_separator)
+
+# lib suffix
+norm_lib_dir_suffix=${lib_dir_suffix}
+adl_NORMALIZE_PATH([norm_lib_dir_suffix], [$sdccconf_h_dir_separator])
+AC_DEFINE_UNQUOTED(LIB_DIR_SUFFIX,
+                   DIR_SEPARATOR_STRING "${norm_lib_dir_suffix}", [XXX])
+
+
+# Generating output files
+# ===========================================================================
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
+
+# End of configure/configure.in

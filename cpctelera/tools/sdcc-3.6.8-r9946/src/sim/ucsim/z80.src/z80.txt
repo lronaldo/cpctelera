@@ -1,0 +1,1402 @@
+
+Last week somebody asked for a list of opcodes.
+Well, here is mine. Have fun!
+
+| Herbert Oppmann | email: htoppman@cip.informatik.uni-erlangen.de |
+| irc: mtx        |  mail: Drausnickstrasse 29, D-8520 Erlangen    |
+
+------------ 8< ---------- 8< ---------------
+8080/Z80/HD64180 opcodes
+
+Legend:
+HX, LX	highbyte/lowbyte of IX
+HY, LY	dito IY
+
+	8080 subset
+*	Z80 only
+/	"illegal" Z80
++	HD 64180 (reacts with a trap to illegal Z80 opcodes)
+
+Hex		Instruction		Comment (applies to Z80 only)
+-----------------------------------------------
+00		NOP
+01 nnnn		LD	BC,nnnn
+02		LD	(BC),A
+03		INC	BC
+04		INC	B
+05		DEC	B
+06 nn		LD	B,nn
+07		RLCA
+08	      *	EX	AF,AF'
+09		ADD	HL,BC
+0A		LD	A,(BC)
+0B		DEC	BC
+0C		INC	C
+0D		DEC	C
+0E nn		LD	C,nn
+0F		RRCA
+10 dd	      *	DJNZ	dd
+11 nnnn		LD	DE,nnnn
+12		LD	(DE),A
+13		INC	DE
+14		INC	D
+15		DEC	D
+16 nn		LD	D,nn
+17		RLA
+18 dd	      *	JR	dd
+19		ADD	HL,DE
+1A		LD	A,(DE)
+1B		DEC	DE
+1C		INC	E
+1D		DEC	E
+1E nn		LD	E,nn
+1F		RRA
+20 dd	      * JR	NZ,dd
+21 nnnn		LD	HL,nnnn
+22 nnnn		LD	(nnnn),HL
+23		INC	HL
+24		INC	H
+25		DEC	H
+26 nn		LD	H,nn
+27		DAA
+28 dd	      *	JR	Z,dd
+29		ADD	HL,HL
+2A nnnn		LD	HL,(nnnn)
+2B		DEC	HL
+2C		INC	L
+2D		DEC	L
+2E nn		LD	L,nn
+2F		CPL
+30 dd	      *	JR	NC,dd
+31 nnnn		LD	SP,nnnn
+32 nnnn		LD	(nnnn),A
+33		INC	SP
+34		INC	(HL)
+35		DEC	(HL)
+36 nn		LD	(HL),nn
+37		SCF
+38 dd	      *	JR	C,dd
+39		ADD	HL,SP
+3A nnnn		LD	A,(nnnn)
+3B		DEC	SP
+3C		INC	A
+3D		DEC	A
+3E nn		LD	A,nn
+3F		CCF
+40		LD	B,B
+41		LD	B,C
+42		LD	B,D
+43		LD	B,E
+44		LD	B,H
+45		LD	B,L
+46		LD	B,(HL)
+47		LD	B,A
+48		LD	C,B
+49		LD	C,C
+4A		LD	C,D
+4B		LD	C,E
+4C		LD	C,H
+4D		LD	C,L
+4E		LD	C,(HL)
+4F		LD	C,A
+50		LD	D,B
+51		LD	D,C
+52		LD	D,D
+53		LD	D,E
+54		LD	D,H
+55		LD	D,L
+56		LD	D,(HL)
+57		LD	D,A
+58		LD	E,B
+59		LD	E,C
+5A		LD	E,D
+5B		LD	E,E
+5C		LD	E,H
+5D		LD	E,L
+5E		LD	E,(HL)
+5F		LD	E,A
+60		LD	H,B
+61		LD	H,C
+62		LD	H,D
+63		LD	H,E
+64		LD	H,H
+65		LD	H,L
+66		LD	H,(HL)
+67		LD	H,A
+68		LD	L,B
+69		LD	L,C
+6A		LD	L,D
+6B		LD	L,E
+6C		LD	L,H
+6D		LD	L,L
+6E		LD	L,(HL)
+6F		LD	L,A
+70		LD	(HL),B
+71		LD	(HL),C
+72		LD	(HL),D
+73		LD	(HL),E
+74		LD	(HL),H
+75		LD	(HL),L
+76		HALT
+77		LD	(HL),A
+78		LD	A,B
+79		LD	A,C
+7A		LD	A,D
+7B		LD	A,E
+7C		LD	A,H
+7D		LD	A,L
+7E		LD	A,(HL)
+7F		LD	A,A
+80		ADD	A,B
+81		ADD	A,C
+82		ADD	A,D
+83		ADD	A,E
+84		ADD	A,H
+85		ADD	A,L
+86		ADD	A,(HL)
+87		ADD	A,A
+88		ADC	A,B
+89		ADC	A,C
+8A		ADC	A,D
+8B		ADC	A,E
+8C		ADC	A,H
+8D		ADC	A,L
+8E		ADC	A,(HL)
+8F		ADC	A,A
+90		SUB	B
+91		SUB	C
+92		SUB	D
+93		SUB	E
+94		SUB	H
+95		SUB	L
+96		SUB	(HL)
+97		SUB	A
+98		SBC	A,B
+99		SBC	A,C
+9A		SBC	A,D
+9B		SBC	A,E
+9C		SBC	A,H
+9D		SBC	A,L
+9E		SBC	A,(HL)
+9F		SBC	A,A
+A0		AND	B
+A1		AND	C
+A2		AND	D
+A3		AND	E
+A4		AND	H
+A5		AND	L
+A6		AND	(HL)
+A7		AND	A
+A8		XOR	B
+A9		XOR	C
+AA		XOR	D
+AB		XOR	E
+AC		XOR	H
+AD		XOR	L
+AE		XOR	(HL)
+AF		XOR	A
+B0		OR	B
+B1		OR	C
+B2		OR	D
+B3		OR	E
+B4		OR	H
+B5		OR	L
+B6		OR	(HL)
+B7		OR	A
+B8		CP	B
+B9		CP	C
+BA		CP	D
+BB		CP	E
+BC		CP	H
+BD		CP	L
+BE		CP	(HL)
+BF		CP	A
+C0		RET	NZ
+C1		POP	BC
+C2 nnnn		JP	NZ,nnnn
+C3 nnnn		JP	nnnn
+C4 nnnn		CALL	NZ,nnnn
+C5		PUSH	BC
+C6 nn		ADD	A,nn
+C7		RST	0
+C8		RET	Z
+C9		RET
+CA nnnn		JP	Z,nnnn
+CB 00	      *	RLC	B
+CB 01	      *	RLC	C
+CB 02	      *	RLC	D
+CB 03	      *	RLC	E
+CB 04	      *	RLC	H
+CB 05	      *	RLC	L
+CB 06	      *	RLC	(HL)
+CB 07	      *	RLC	A
+CB 08	      *	RRC	B
+CB 09	      *	RRC	C
+CB 0A	      *	RRC	D
+CB 0B	      *	RRC	E
+CB 0C	      *	RRC	H
+CB 0D	      *	RRC	L
+CB 0E	      *	RRC	(HL)
+CB 0F	      *	RRC	A
+CB 10	      *	RL	B
+CB 11	      *	RL	C
+CB 12	      *	RL	D
+CB 13	      *	RL	E
+CB 14	      *	RL	H
+CB 15	      *	RL	L
+CB 16	      *	RL	(HL)
+CB 17	      *	RL	A
+CB 18	      *	RR	B
+CB 19	      *	RR	C
+CB 1A	      *	RR	D
+CB 1B	      *	RR	E
+CB 1C	      *	RR	H
+CB 1D	      *	RR	L
+CB 1E	      *	RR	(HL)
+CB 1F	      *	RR	A
+CB 20	      *	SLA	B
+CB 21	      *	SLA	C
+CB 22	      *	SLA	D
+CB 23	      *	SLA	E
+CB 24	      *	SLA	H
+CB 25	      *	SLA	L
+CB 26	      *	SLA	(HL)
+CB 27	      *	SLA	A
+CB 28	      *	SRA	B
+CB 29	      *	SRA	C
+CB 2A	      *	SRA	D
+CB 2B	      *	SRA	E
+CB 2C	      *	SRA	H
+CB 2D	      *	SRA	L
+CB 2E	      *	SRA	(HL)
+CB 2F	      *	SRA	A
+CB 30	      /	SLIA	B	(Shift Left Inverted Arithmetic)
+CB 31	      /	SLIA	C	like SLA, but shifts in a 1 bit
+CB 32	      /	SLIA	D
+CB 33	      /	SLIA	E
+CB 34	      /	SLIA	H
+CB 35	      /	SLIA	L
+CB 36	      /	SLIA	(HL)
+CB 37	      /	SLIA	A
+CB 38	      *	SRL	B
+CB 39	      *	SRL	C
+CB 3A	      *	SRL	D
+CB 3B	      *	SRL	E
+CB 3C	      *	SRL	H
+CB 3D	      *	SRL	L
+CB 3E	      *	SRL	(HL)
+CB 3F	      *	SRL	A
+CB 40	      *	BIT	0,B
+CB 41	      *	BIT	0,C
+CB 42	      *	BIT	0,D
+CB 43	      *	BIT	0,E
+CB 44	      *	BIT	0,H
+CB 45	      *	BIT	0,L
+CB 46	      *	BIT	0,(HL)
+CB 47	      *	BIT	0,A
+CB 48	      *	BIT	1,B
+CB 49	      *	BIT	1,C
+CB 4A	      *	BIT	1,D
+CB 4B	      *	BIT	1,E
+CB 4C	      *	BIT	1,H
+CB 4D	      *	BIT	1,L
+CB 4E	      *	BIT	1,(HL)
+CB 4F	      *	BIT	1,A
+CB 50	      *	BIT	2,B
+CB 51	      *	BIT	2,C
+CB 52	      *	BIT	2,D
+CB 53	      *	BIT	2,E
+CB 54	      *	BIT	2,H
+CB 55	      *	BIT	2,L
+CB 56	      *	BIT	2,(HL)
+CB 57	      *	BIT	2,A
+CB 58	      *	BIT	3,B
+CB 59	      *	BIT	3,C
+CB 5A	      *	BIT	3,D
+CB 5B	      *	BIT	3,E
+CB 5C	      *	BIT	3,H
+CB 5D	      *	BIT	3,L
+CB 5E	      *	BIT	3,(HL)
+CB 5F	      *	BIT	3,A
+CB 60	      *	BIT	4,B
+CB 61	      *	BIT	4,C
+CB 62	      *	BIT	4,D
+CB 63	      *	BIT	4,E
+CB 64	      *	BIT	4,H
+CB 65	      *	BIT	4,L
+CB 66	      *	BIT	4,(HL)
+CB 67	      *	BIT	4,A
+CB 68	      *	BIT	5,B
+CB 69	      *	BIT	5,C
+CB 6A	      *	BIT	5,D
+CB 6B	      *	BIT	5,E
+CB 6C	      *	BIT	5,H
+CB 6D	      *	BIT	5,L
+CB 6E	      *	BIT	5,(HL)
+CB 6F	      *	BIT	5,A
+CB 70	      *	BIT	6,B
+CB 71	      *	BIT	6,C
+CB 72	      *	BIT	6,D
+CB 73	      *	BIT	6,E
+CB 74	      *	BIT	6,H
+CB 75	      *	BIT	6,L
+CB 76	      *	BIT	6,(HL)
+CB 77	      *	BIT	6,A
+CB 78	      *	BIT	7,B
+CB 79	      *	BIT	7,C
+CB 7A	      *	BIT	7,D
+CB 7B	      *	BIT	7,E
+CB 7C	      *	BIT	7,H
+CB 7D	      *	BIT	7,L
+CB 7E	      *	BIT	7,(HL)
+CB 7F	      *	BIT	7,A
+CB 80	      *	RES	0,B
+CB 81	      *	RES	0,C
+CB 82	      *	RES	0,D
+CB 83	      *	RES	0,E
+CB 84	      *	RES	0,H
+CB 85	      *	RES	0,L
+CB 86	      *	RES	0,(HL)
+CB 87	      *	RES	0,A
+CB 88	      *	RES	1,B
+CB 89	      *	RES	1,C
+CB 8A	      *	RES	1,D
+CB 8B	      *	RES	1,E
+CB 8C	      *	RES	1,H
+CB 8D	      *	RES	1,L
+CB 8E	      *	RES	1,(HL)
+CB 8F	      *	RES	1,A
+CB 90	      *	RES	2,B
+CB 91	      *	RES	2,C
+CB 92	      *	RES	2,D
+CB 93	      *	RES	2,E
+CB 94	      *	RES	2,H
+CB 95	      *	RES	2,L
+CB 96	      *	RES	2,(HL)
+CB 97	      *	RES	2,A
+CB 98	      *	RES	3,B
+CB 99	      *	RES	3,C
+CB 9A	      *	RES	3,D
+CB 9B	      *	RES	3,E
+CB 9C	      *	RES	3,H
+CB 9D	      *	RES	3,L
+CB 9E	      *	RES	3,(HL)
+CB 9F	      *	RES	3,A
+CB A0	      *	RES	4,B
+CB A1	      *	RES	4,C
+CB A2	      *	RES	4,D
+CB A3	      *	RES	4,E
+CB A4	      *	RES	4,H
+CB A5	      *	RES	4,L
+CB A6	      *	RES	4,(HL)
+CB A7	      *	RES	4,A
+CB A8	      *	RES	5,B
+CB A9	      *	RES	5,C
+CB AA	      *	RES	5,D
+CB AB	      *	RES	5,E
+CB AC	      *	RES	5,H
+CB AD	      *	RES	5,L
+CB AE	      *	RES	5,(HL)
+CB AF	      *	RES	5,A
+CB B0	      *	RES	6,B
+CB B1	      *	RES	6,C
+CB B2	      *	RES	6,D
+CB B3	      *	RES	6,E
+CB B4	      *	RES	6,H
+CB B5	      *	RES	6,L
+CB B6	      *	RES	6,(HL)
+CB B7	      *	RES	6,A
+CB B8	      *	RES	7,B
+CB B9	      *	RES	7,C
+CB BA	      *	RES	7,D
+CB BB	      *	RES	7,E
+CB BC	      *	RES	7,H
+CB BD	      *	RES	7,L
+CB BE	      *	RES	7,(HL)
+CB BF	      *	RES	7,A
+CB C0	      *	SET	0,B
+CB C1	      *	SET	0,C
+CB C2	      *	SET	0,D
+CB C3	      *	SET	0,E
+CB C4	      *	SET	0,H
+CB C5	      *	SET	0,L
+CB C6	      *	SET	0,(HL)
+CB C7	      *	SET	0,A
+CB C8	      *	SET	1,B
+CB C9	      *	SET	1,C
+CB CA	      *	SET	1,D
+CB CB	      *	SET	1,E
+CB CC	      *	SET	1,H
+CB CD	      *	SET	1,L
+CB CE	      *	SET	1,(HL)
+CB CF	      *	SET	1,A
+CB D0	      *	SET	2,B
+CB D1	      *	SET	2,C
+CB D2	      *	SET	2,D
+CB D3	      *	SET	2,E
+CB D4	      *	SET	2,H
+CB D5	      *	SET	2,L
+CB D6	      *	SET	2,(HL)
+CB D7	      *	SET	2,A
+CB D8	      *	SET	3,B
+CB D9	      *	SET	3,C
+CB DA	      *	SET	3,D
+CB DB	      *	SET	3,E
+CB DC	      *	SET	3,H
+CB DD	      *	SET	3,L
+CB DE	      *	SET	3,(HL)
+CB DF	      *	SET	3,A
+CB E0	      *	SET	4,B
+CB E1	      *	SET	4,C
+CB E2	      *	SET	4,D
+CB E3	      *	SET	4,E
+CB E4	      *	SET	4,H
+CB E5	      *	SET	4,L
+CB E6	      *	SET	4,(HL)
+CB E7	      *	SET	4,A
+CB E8	      *	SET	5,B
+CB E9	      *	SET	5,C
+CB EA	      *	SET	5,D
+CB EB	      *	SET	5,E
+CB EC	      *	SET	5,H
+CB ED	      *	SET	5,L
+CB EE	      *	SET	5,(HL)
+CB EF	      *	SET	5,A
+CB F0	      *	SET	6,B
+CB F1	      *	SET	6,C
+CB F2	      *	SET	6,D
+CB F3	      *	SET	6,E
+CB F4	      *	SET	6,H
+CB F5	      *	SET	6,L
+CB F6	      *	SET	6,(HL)
+CB F7	      *	SET	6,A
+CB F8	      *	SET	7,B
+CB F9	      *	SET	7,C
+CB FA	      *	SET	7,D
+CB FB	      *	SET	7,E
+CB FC	      *	SET	7,H
+CB FD	      *	SET	7,L
+CB FE	      *	SET	7,(HL)
+CB FF	      *	SET	7,A
+CC nnnn		CALL	Z,nnnn
+CD nnnn		CALL	nnnn
+CE nn		ADC	A,nn
+CF		RST	8
+D0		RET	NC
+D1		POP	DE
+D2 nnnn		JP	NC,nnnn
+D3 nn		OUT	(nn),A
+D4 nnnn		CALL	NC,nnnn
+D5		PUSH	DE
+D6 nn		SUB	nn
+D7		RST	10H
+D8		RET	C
+D9	      *	EXX
+DA nnnn		JP	C,nnnn
+DB nn		IN	A,(nn)
+DC nnnn		CALL	C,nnnn
+All other DD combinations not listed below:
+ DD is ignored, all following bytes are treated as instructions
+DD 09	      *	ADD	IX,BC
+DD 19	      *	ADD	IX,DE
+DD 21 nnnn    *	LD	IX,nnnn
+DD 22 nnnn    *	LD	(nnnn),IX
+DD 23	      *	INC	IX
+DD 24	      /	INC	HX
+DD 25	      /	DEC	HX
+DD 26 nn      /	LD	HX,nn
+DD 29	      *	ADD	IX,IX
+DD 2A nnnn    *	LD	IX,(nnnn)
+DD 2B	      *	DEC	IX
+DD 2C	      /	INC	LX
+DD 2D	      /	DEC	LX
+DD 2E nn      /	LD	LX,nn
+DD 34 dd      *	INC	(IX+dd)
+DD 35 dd      *	DEC	(IX+dd)
+DD 36 dd nn   *	LD	(IX+dd),nn
+DD 39	      *	ADD	IX,SP
+DD 44	      /	LD	B,HX
+DD 45	      /	LD	B,LX
+DD 46 dd      *	LD	B,(IX+dd)
+DD 4C	      /	LD	C,HX
+DD 4D	      /	LD	C,LX
+DD 4E dd      *	LD	C,(IX+dd)
+DD 54	      /	LD	D,HX
+DD 55	      /	LD	D,LX
+DD 56 dd      *	LD	D,(IX+dd)
+DD 5C	      /	LD	E,H
+DD 5D	      /	LD	E,L
+DD 5E dd      *	LD	E,(IX+dd)
+DD 60	      /	LD	HX,B
+DD 61	      /	LD	HX,C
+DD 62	      /	LD	HX,D
+DD 63	      /	LD	HX,E
+DD 64	      /	LD	HX,HX
+DD 65	      /	LD	HX,LX
+DD 66 dd      *	LD	H,(IX+dd)
+DD 67	      /	LD	HX,A
+DD 68	      /	LD	LX,B
+DD 69	      /	LD	LX,C
+DD 6A	      /	LD	LX,D
+DD 6B	      /	LD	LX,E
+DD 6C	      /	LD	LX,HX
+DD 6D	      /	LD	LX,LX
+DD 6E dd      *	LD	L,(IX+dd)
+DD 6F	      /	LD	LX,A
+DD 70 dd      *	LD	(IX+dd),B
+DD 71 dd      *	LD	(IX+dd),C
+DD 72 dd      *	LD	(IX+dd),D
+DD 73 dd      *	LD	(IX+dd),E
+DD 74 dd      *	LD	(IX+dd),H
+DD 75 dd      *	LD	(IX+dd),L
+DD 77 dd      *	LD	(IX+dd),A
+DD 7C	      /	LD	A,HX
+DD 7D	      /	LD	A,LX
+DD 7E dd      *	LD	A,(IX+dd)
+DD 84	      /	ADD	A,HX
+DD 85	      /	ADD	A,LX
+DD 86 dd      *	ADD	A,(IX+dd)  /* add +dd, kpb */
+DD 8C	      /	ADC	A,HX
+DD 8D	      /	ADC	A,LX
+DD 8E dd      *	ADC	A,(IX+dd)  /* add +dd, kpb */
+DD 94	      /	SUB	HX
+DD 95	      /	SUB	LX
+DD 96 dd      *	SUB	(IX+dd)
+DD 9C	      /	SBC	A,HX
+DD 9D	      /	SBC	A,LX
+DD 9E dd      *	SBC	A,(IX+dd)
+DD A4	      /	AND	HX
+DD A5	      /	AND	LX
+DD A6 dd      *	AND	(IX+dd)
+DD AC	      /	XOR	HX
+DD AD	      /	XOR	LX
+DD AE dd      *	XOR	(IX+dd)
+DD B4	      /	OR	HX
+DD B5	      /	OR	LX
+DD B6 dd      *	OR	(IX+dd)
+DD BC	      /	CP	HX
+DD BD	      /	CP	LX
+DD BE dd      *	CP	(IX+dd)
+DD CB dd 00   /	RLC	(IX+dd)->B	result is placed in a register
+DD CB dd 01   /	RLC	(IX+dd)->C	additionally
+DD CB dd 02   /	RLC	(IX+dd)->D
+DD CB dd 03   /	RLC	(IX+dd)->E
+DD CB dd 04   /	RLC	(IX+dd)->H
+DD CB dd 05   /	RLC	(IX+dd)->L
+DD CB dd 06   *	RLC	(IX+dd)
+DD CB dd 07   /	RLC	(IX+dd)->A
+DD CB dd 08   /	RRC	(IX+dd)->B
+DD CB dd 09   /	RRC	(IX+dd)->C
+DD CB dd 0A   /	RRC	(IX+dd)->D
+DD CB dd 0B   /	RRC	(IX+dd)->E
+DD CB dd 0C   /	RRC	(IX+dd)->H
+DD CB dd 0D   /	RRC	(IX+dd)->L
+DD CB dd 0E   *	RRC	(IX+dd)
+DD CB dd 0F   /	RRC	(IX+dd)->A
+DD CB dd 10   /	RL	(IX+dd)->B
+DD CB dd 11   /	RL	(IX+dd)->C
+DD CB dd 12   /	RL	(IX+dd)->D
+DD CB dd 13   /	RL	(IX+dd)->E
+DD CB dd 14   /	RL	(IX+dd)->H
+DD CB dd 15   /	RL	(IX+dd)->L
+DD CB dd 16   *	RL	(IX+dd)
+DD CB dd 17   /	RL	(IX+dd)->A
+DD CB dd 18   /	RR	(IX+dd)->B
+DD CB dd 19   /	RR	(IX+dd)->C
+DD CB dd 1A   /	RR	(IX+dd)->D
+DD CB dd 1B   /	RR	(IX+dd)->E
+DD CB dd 1C   /	RR	(IX+dd)->H
+DD CB dd 1D   /	RR	(IX+dd)->L
+DD CB dd 1E   *	RR	(IX+dd)
+DD CB dd 1F   /	RR	(IX+dd)->A
+DD CB dd 20   /	SLA	(IX+dd)->B
+DD CB dd 21   /	SLA	(IX+dd)->C
+DD CB dd 22   /	SLA	(IX+dd)->D
+DD CB dd 23   /	SLA	(IX+dd)->E
+DD CB dd 24   /	SLA	(IX+dd)->H
+DD CB dd 25   /	SLA	(IX+dd)->L
+DD CB dd 26   *	SLA	(IX+dd)
+DD CB dd 27   /	SLA	(IX+dd)->A
+DD CB dd 28   /	SRA	(IX+dd)->B
+DD CB dd 29   /	SRA	(IX+dd)->C
+DD CB dd 2A   /	SRA	(IX+dd)->D
+DD CB dd 2B   /	SRA	(IX+dd)->E
+DD CB dd 2C   /	SRA	(IX+dd)->H
+DD CB dd 2D   /	SRA	(IX+dd)->L
+DD CB dd 2E   *	SRA	(IX+dd)
+DD CB dd 2F   /	SRA	(IX+dd)->A
+DD CB dd 30   /	SLIA	(IX+dd)->B
+DD CB dd 31   /	SLIA	(IX+dd)->C
+DD CB dd 32   /	SLIA	(IX+dd)->D
+DD CB dd 33   /	SLIA	(IX+dd)->E
+DD CB dd 34   /	SLIA	(IX+dd)->H
+DD CB dd 35   /	SLIA	(IX+dd)->L
+DD CB dd 36   /	SLIA	(IX+dd)
+DD CB dd 37   /	SLIA	(IX+dd)->A
+DD CB dd 38   /	SRL	(IX+dd)->B
+DD CB dd 39   /	SRL	(IX+dd)->C
+DD CB dd 3A   /	SRL	(IX+dd)->D
+DD CB dd 3B   /	SRL	(IX+dd)->E
+DD CB dd 3C   /	SRL	(IX+dd)->H
+DD CB dd 3D   /	SRL	(IX+dd)->L
+DD CB dd 3E   *	SRL	(IX+dd)
+DD CB dd 3F   /	SRL	(IX+dd)->A
+DD CB dd 46   *	BIT	0,(IX+dd)	all other BIT combinations
+DD CB dd 4E   *	BIT	1,(IX+dd)	react like the documented ones
+DD CB dd 56   *	BIT	2,(IX+dd)	because there is no write
+DD CB dd 5E   *	BIT	3,(IX+dd)
+DD CB dd 66   *	BIT	4,(IX+dd)
+DD CB dd 6E   *	BIT	5,(IX+dd)
+DD CB dd 76   *	BIT	6,(IX+dd)
+DD CB dd 7E   *	BIT	7,(IX+dd)
+DD CB dd 80   /	RES	0,(IX+dd)->B
+DD CB dd 81   /	RES	0,(IX+dd)->C
+DD CB dd 82   /	RES	0,(IX+dd)->D
+DD CB dd 83   /	RES	0,(IX+dd)->E
+DD CB dd 84   /	RES	0,(IX+dd)->H
+DD CB dd 85   /	RES	0,(IX+dd)->L
+DD CB dd 86   *	RES	0,(IX+dd)
+DD CB dd 87   /	RES	0,(IX+dd)->A
+DD CB dd 88   /	RES	1,(IX+dd)->B
+DD CB dd 89   /	RES	1,(IX+dd)->C
+DD CB dd 8A   /	RES	1,(IX+dd)->D
+DD CB dd 8B   /	RES	1,(IX+dd)->E
+DD CB dd 8C   /	RES	1,(IX+dd)->H
+DD CB dd 8D   /	RES	1,(IX+dd)->L
+DD CB dd 8E   *	RES	1,(IX+dd)
+DD CB dd 8F   /	RES	1,(IX+dd)->A
+DD CB dd 90   /	RES	2,(IX+dd)->B
+DD CB dd 91   /	RES	2,(IX+dd)->C
+DD CB dd 92   /	RES	2,(IX+dd)->D
+DD CB dd 93   /	RES	2,(IX+dd)->E
+DD CB dd 94   /	RES	2,(IX+dd)->H
+DD CB dd 95   /	RES	2,(IX+dd)->L
+DD CB dd 96   *	RES	2,(IX+dd)
+DD CB dd 97   /	RES	2,(IX+dd)->A
+DD CB dd 98   /	RES	3,(IX+dd)->B
+DD CB dd 99   /	RES	3,(IX+dd)->C
+DD CB dd 9A   /	RES	3,(IX+dd)->D
+DD CB dd 9B   /	RES	3,(IX+dd)->E
+DD CB dd 9C   /	RES	3,(IX+dd)->H
+DD CB dd 9D   /	RES	3,(IX+dd)->L
+DD CB dd 9E   *	RES	3,(IX+dd)
+DD CB dd 9F   /	RES	3,(IX+dd)->A
+DD CB dd A0   /	RES	4,(IX+dd)->B
+DD CB dd A1   /	RES	4,(IX+dd)->C
+DD CB dd A2   /	RES	4,(IX+dd)->D
+DD CB dd A3   /	RES	4,(IX+dd)->E
+DD CB dd A4   /	RES	4,(IX+dd)->H
+DD CB dd A5   /	RES	4,(IX+dd)->L
+DD CB dd A6   *	RES	4,(IX+dd)
+DD CB dd A7   /	RES	4,(IX+dd)->A
+DD CB dd A8   /	RES	5,(IX+dd)->B
+DD CB dd A9   /	RES	5,(IX+dd)->C
+DD CB dd AA   /	RES	5,(IX+dd)->D
+DD CB dd AB   /	RES	5,(IX+dd)->E
+DD CB dd AC   /	RES	5,(IX+dd)->H
+DD CB dd AD   /	RES	5,(IX+dd)->L
+DD CB dd AE   *	RES	5,(IX+dd)
+DD CB dd AF   /	RES	5,(IX+dd)->A
+DD CB dd B0   /	RES	6,(IX+dd)->B
+DD CB dd B1   /	RES	6,(IX+dd)->C
+DD CB dd B2   /	RES	6,(IX+dd)->D
+DD CB dd B3   /	RES	6,(IX+dd)->E
+DD CB dd B4   /	RES	6,(IX+dd)->H
+DD CB dd B5   /	RES	6,(IX+dd)->L
+DD CB dd B6   *	RES	6,(IX+dd)
+DD CB dd B7   /	RES	6,(IX+dd)->A
+DD CB dd B8   /	RES	7,(IX+dd)->B
+DD CB dd B9   /	RES	7,(IX+dd)->C
+DD CB dd BA   /	RES	7,(IX+dd)->D
+DD CB dd BB   /	RES	7,(IX+dd)->E
+DD CB dd BC   /	RES	7,(IX+dd)->H
+DD CB dd BD   /	RES	7,(IX+dd)->L
+DD CB dd BE   *	RES	7,(IX+dd)
+DD CB dd BF   /	RES	7,(IX+dd)->A
+DD CB dd C0   /	SET	0,(IX+dd)->B
+DD CB dd C1   /	SET	0,(IX+dd)->C
+DD CB dd C2   /	SET	0,(IX+dd)->D
+DD CB dd C3   /	SET	0,(IX+dd)->E
+DD CB dd C4   /	SET	0,(IX+dd)->H
+DD CB dd C5   /	SET	0,(IX+dd)->L
+DD CB dd C6   *	SET	0,(IX+dd)
+DD CB dd C7   /	SET	0,(IX+dd)->A
+DD CB dd C8   /	SET	1,(IX+dd)->B
+DD CB dd C9   /	SET	1,(IX+dd)->C
+DD CB dd CA   /	SET	1,(IX+dd)->D
+DD CB dd CB   /	SET	1,(IX+dd)->E
+DD CB dd CC   /	SET	1,(IX+dd)->H
+DD CB dd CD   /	SET	1,(IX+dd)->L
+DD CB dd CE   *	SET	1,(IX+dd)
+DD CB dd CF   /	SET	1,(IX+dd)->A
+DD CB dd D0   /	SET	2,(IX+dd)->B
+DD CB dd D1   /	SET	2,(IX+dd)->C
+DD CB dd D2   /	SET	2,(IX+dd)->D
+DD CB dd D3   /	SET	2,(IX+dd)->E
+DD CB dd D4   /	SET	2,(IX+dd)->H
+DD CB dd D5   /	SET	2,(IX+dd)->L
+DD CB dd D6   *	SET	2,(IX+dd)
+DD CB dd D7   /	SET	2,(IX+dd)->A
+DD CB dd D8   /	SET	3,(IX+dd)->B
+DD CB dd D9   /	SET	3,(IX+dd)->C
+DD CB dd DA   /	SET	3,(IX+dd)->D
+DD CB dd DB   /	SET	3,(IX+dd)->E
+DD CB dd DC   /	SET	3,(IX+dd)->H
+DD CB dd DD   /	SET	3,(IX+dd)->L
+DD CB dd DE   *	SET	3,(IX+dd)
+DD CB dd DF   /	SET	3,(IX+dd)->A
+DD CB dd E0   /	SET	4,(IX+dd)->B
+DD CB dd E1   /	SET	4,(IX+dd)->C
+DD CB dd E2   /	SET	4,(IX+dd)->D
+DD CB dd E3   /	SET	4,(IX+dd)->E
+DD CB dd E4   /	SET	4,(IX+dd)->H
+DD CB dd E5   /	SET	4,(IX+dd)->L
+DD CB dd E6   *	SET	4,(IX+dd)
+DD CB dd E7   /	SET	4,(IX+dd)->A
+DD CB dd E8   /	SET	5,(IX+dd)->B
+DD CB dd E9   /	SET	5,(IX+dd)->C
+DD CB dd EA   /	SET	5,(IX+dd)->D
+DD CB dd EB   /	SET	5,(IX+dd)->E
+DD CB dd EC   /	SET	5,(IX+dd)->H
+DD CB dd ED   /	SET	5,(IX+dd)->L
+DD CB dd EE   *	SET	5,(IX+dd)
+DD CB dd EF   /	SET	5,(IX+dd)->A
+DD CB dd F0   /	SET	6,(IX+dd)->B
+DD CB dd F1   /	SET	6,(IX+dd)->C
+DD CB dd F2   /	SET	6,(IX+dd)->D
+DD CB dd F3   /	SET	6,(IX+dd)->E
+DD CB dd F4   /	SET	6,(IX+dd)->H
+DD CB dd F5   /	SET	6,(IX+dd)->L
+DD CB dd F6   *	SET	6,(IX+dd)
+DD CB dd F7   /	SET	6,(IX+dd)->A
+DD CB dd F8   /	SET	7,(IX+dd)->B
+DD CB dd F9   /	SET	7,(IX+dd)->C
+DD CB dd FA   /	SET	7,(IX+dd)->D
+DD CB dd FB   /	SET	7,(IX+dd)->E
+DD CB dd FC   /	SET	7,(IX+dd)->H
+DD CB dd FD   /	SET	7,(IX+dd)->L
+DD CB dd FE   *	SET	7,(IX+dd)
+DD CB dd FF   /	SET	7,(IX+dd)->A
+DD E1	      *	POP	IX
+DD E3	      *	EX	(SP),IX
+DD E5	      *	PUSH	IX
+DD E9	      *	JP	(IX)
+DD F9	      *	LD	SP,IX
+DE nn		SBC	A,nn
+DF		RST	18H
+E0		RET	PO
+E1		POP	HL
+E2 nnnn		JP	PO,nnnn
+E3		EX	(SP),HL
+E4 nnnn		CALL	PO,nnnn
+E5		PUSH	HL
+E6 nn		AND	nn
+E7		RST	20H
+E8		RET	PE
+E9		JP	(HL)
+EA nnnn		JP	PE,nnnn
+EB		EX	DE,HL
+EC nnnn		CALL	PE,nnnn
+All other ED combinations not listed below:
+ in the range ED40 - ED7F: valid opcodes are mirrored
+ elsewhere: ED and the next byte is ignored,
+  all following bytes treated as instructions
+ED 00 nn      +	IN0	B,(nn)
+ED 01 nn      +	OUT0	(nn),B
+ED 04	      +	TST	B
+ED 08 nn      +	IN0	C,(nn)
+ED 09 nn      +	OUT0	(nn),C
+ED 0C	      +	TST	C
+ED 10 nn      +	IN0	D,(nn)
+ED 11 nn      +	OUT0	(nn),D
+ED 14	      +	TST	D
+ED 18 nn      +	IN0	E,(nn)
+ED 19 nn      +	OUT0	(nn),E
+ED 1C	      +	TST	E
+ED 20 nn      +	IN0	H,(nn)
+ED 21 nn      +	OUT0	(nn),H
+ED 24	      +	TST	H
+ED 28 nn      +	IN0	L,(nn)
+ED 29 nn      +	OUT0	(nn),L
+ED 2C	      +	TST	L
+ED 30 nn      +	IN0	(nn)		set flags only
+ED 34	      +	TST	(HL)
+ED 38 nn      +	IN0	A,(nn)
+ED 39 nn      +	OUT0	(nn),A
+ED 3C	      +	TST	A
+ED 40	      *	IN	B,(C)
+ED 41	      *	OUT	(C),B
+ED 42	      *	SBC	HL,BC
+ED 43 nnnn    *	LD	(nnnn),BC
+ED 44	      *	NEG
+ED 45	      *	RETN
+ED 46	      *	IM	0
+ED 47	      *	LD	I,A
+ED 48	      *	IN	C,(C)
+ED 49	      *	OUT	(C),C
+ED 4A	      *	ADC	HL,BC
+ED 4B nnnn    *	LD	BC,(nnnn)
+ED 4C	      +	MULT	BC
+ED 4D	      *	RETI
+ED 4F	      *	LD	R,A
+ED 50	      *	IN	D,(C)
+ED 51	      *	OUT	(C),D
+ED 52	      *	SBC	HL,DE
+ED 53 nnnn    *	LD	(nnnn),DE
+ED 56	      *	IM	1
+ED 57	      *	LD	A,I
+ED 58	      *	IN	E,(C)
+ED 59	      *	OUT	(C),E
+ED 5A	      *	ADC	HL,DE
+ED 5B nnnn    *	LD	DE,(nnnn)
+ED 5C	      +	MULT	DE
+ED 5E	      *	IM	2
+ED 5F	      *	LD	A,R
+ED 60	      *	IN	H,(C)
+ED 61	      *	OUT	(C),H
+ED 62	      *	SBC	HL,HL
+ED 63 nnnn    *	LD	(nnnn),HL	opcode 22 does the same faster
+ED 64 nn      +	TST	nn
+ED 67	      *	RRD
+ED 68	      *	IN	L,(C)
+ED 69	      *	OUT	(C),L
+ED 6A	      *	ADC	HL,HL
+ED 6B nnnn    *	LD	HL,(nnnn)	opcode 2A does the same faster
+ED 6C	      +	MULT	HL
+ED 6F	      *	RLD
+ED 70	      /	IN	(C)		set flags only (TSTI)
+	      ^--- can be viewed as *, because SGS manual and HD64180
+		manual list this instruction as valid Z80
+ED 71	      /	OUT	(C),0
+ED 72	      *	SBC	HL,SP
+ED 73 nnnn    *	LD	(nnnn),SP
+ED 74 nn      +	TSTIO	nn
+ED 76	      +	SLP
+ED 78	      *	IN	A,(C)
+ED 79	      *	OUT	(C),A
+ED 7A	      *	ADC	HL,SP
+ED 7B nnnn    *	LD	SP,(nnnn)
+ED 7C	      +	MULT	SP
+ED 83	      +	OTIM
+ED 8B	      +	OTDM
+ED 93	      + OTIMR
+ED 9B	      +	OTDMR
+ED A0	      *	LDI
+ED A1	      *	CPI
+ED A2	      *	INI
+ED A3	      *	OUTI
+ED A8	      *	LDD
+ED A9	      *	CPD
+ED AA	      *	IND
+ED AB	      *	OUTD
+ED B0	      *	LDIR
+ED B1	      *	CPIR
+ED B2	      *	INIR
+ED B3	      *	OTIR
+ED B8	      *	LDDR
+ED B9	      *	CPDR
+ED BA	      *	INDR
+ED BB	      *	OTDR
+EE nn		XOR	nn
+EF		RST	28H
+F0		RET	P
+F1		POP	AF
+F2 nnnn		JP	P,nnnn
+F3		DI
+F4 nnnn		CALL	P,nnnn
+F5		PUSH	AF
+F6 nn		OR	nn
+F7		RST	30H
+F8		RET	M
+F9		LD	SP,HL
+FA nnnn		JP	M,nnnn
+FB		EI
+FC nnnn		CALL	M,nnnn
+FD ...	      *	like DD ..., with IY instead of IX
+FE nn		CP	nn
+FF		RST	38H
+
+
+From: peterm@maths.grace.cri.nz (Peter McGavin)
+Newsgroups: comp.sys.sinclair
+Subject: Re: Undocumented Z80 opcodes
+Date: 05 Jan 1994 20:44:15 GMT
+Organization: Applied Maths, Industrial Research Ltd, NZ
+NNTP-Posting-Host: kea.grace.cri.nz
+In-reply-to: agulbra@tigern.nvg.unit.no's message of 5 Jan 1994 17:47:59 +0100
+
+In article, <2geqvv$nlq@tigern.nvg.unit.no>,
+agulbra@tigern.nvg.unit.no (Arnt Gulbrandsen) wrote:
+>I believe that list originally was written by from David Librik
+><librik@cory.eecs.berkeley.edu>.  David (with someone else, I think)
+>reverse-engineered the Z80 and wrote a list of what he found, a list
+>which I think I sent to Peter.
+
+Actually I got it from Simon Owen (S.N.Owen@newcastle.ac.uk).
+
+Here it is:  (sorry it's a bit wide)
+------------------------------------------------------------------------------
+
+Key:
+	+	Instruction is unchanged by index prefix
+	*	Instruction thought of as 'undocumented'
+
+Notes:
+
+ IM  *    -    is either IM 0 or IM 1  (more likely IM 0), hard to decide which
+
+ IN  X,(C)  reads into nowhere (not even (HL)) but affects the flags.
+ OUT (C),X  performs OUT (C),0
+
+ *NOP indicated instruction has no effect on anything [ 2M cycles delay ? ]
+
+ instructions with an ED prefix cannot have a preceding DD prefix as well.
+
+ Instructions like  LD  B,RL (IX+d) perform RL (IX+d) and load B with the result
+   AS WELL AS affecting the contents of (IX+d). 2 for price of 1 !
+
+List:
+
++-------------------------------+-------------------+------------------+------------------+-------------------------+
+| Hex | Dec   |   Normal        |    DD Prefix      |    CB Prefix     |    ED Prefix     |    DDCB prefix          |
++-------------------------------+-------------------+------------------+------------------+-------------------------+
+|[ 00 | 000 ] |   NOP           |   +NOP            |    RLC   B       |   *NOP           |   *LD    B,RLC (IX+d)   |
+|[ 01 | 001 ] |   LD   BC,nn    |   +LD   BC,nn     |    RLC   C       |   *NOP           |   *LD    C,RLC (IX+d)   |
+|[ 02 | 002 ] |   LD   (BC),A   |   +LD   (BC),A    |    RLC   D       |   *NOP           |   *LD    D,RLC (IX+d)   |
+|[ 03 | 003 ] |   INC  BC       |   +INC  BC        |    RLC   E       |   *NOP           |   *LD    E,RLC (IX+d)   |
+|[ 04 | 004 ] |   INC  B        |   +INC  B         |    RLC   H       |   *NOP           |   *LD    H,RLC (IX+d)   |
+|[ 05 | 005 ] |   DEC  B        |   +DEC  B         |    RLC   L       |   *NOP           |   *LD    L,RLC (IX+d)   |
+|[ 06 | 006 ] |   LD   B,n      |   +LD   B,n       |    RLC   (HL)    |   *NOP           |    RLC   (IX+d)         |
+|[ 07 | 007 ] |   RLCA          |   +RLCA           |    RLC   A       |   *NOP           |   *LD    A,RLC (IX+d)   |
+|[ 08 | 008 ] |   EX   AF,AF'   |   +EX   AF,AF'    |    RRC   B       |   *NOP           |   *LD    B,RRC (IX+d)   |
+|[ 09 | 009 ] |   ADD  HL,BC    |    ADD  IX,BC     |    RRC   C       |   *NOP           |   *LD    C,RRC (IX+d)   |
+|[ 0a | 010 ] |   LD   A,(BC)   |   +LD   A,(BC)    |    RRC   D       |   *NOP           |   *LD    D,RRC (IX+d)   |
+|[ 0b | 011 ] |   DEC  BC       |   +DEC  BC        |    RRC   E       |   *NOP           |   *LD    E,RRC (IX+d)   |
+|[ 0c | 012 ] |   INC  C        |   +INC  C         |    RRC   H       |   *NOP           |   *LD    H,RRC (IX+d)   |
+|[ 0d | 013 ] |   DEC  C        |   +DEC  C         |    RRC   L       |   *NOP           |   *LD    L,RRC (IX+d)   |
+|[ 0e | 014 ] |   LD   C,n      |   +LD   C,n       |    RRC  (HL)     |   *NOP           |    RRC   (IX+d)         |
+|[ 0f | 015 ] |   RRCA          |   +RRCA           |    RRC   A       |   *NOP           |   *LD    A,RRC (IX+d)   |
+|[ 10 | 016 ] |   DJNZ d        |   +DJNZ d         |    RL    B       |   *NOP           |   *LD    B,RL  (IX+d)   |
+|[ 11 | 017 ] |   LD   DE,nn    |   +LD   DE,nn     |    RL    C       |   *NOP           |   *LD    C,RL  (IX+d)   |
+|[ 12 | 018 ] |   LD   (DE),A   |   +LD   (DE),A    |    RL    D       |   *NOP           |   *LD    D,RL  (IX+d)   |
+|[ 13 | 019 ] |   INC  DE       |   +INC  DE        |    RL    E       |   *NOP           |   *LD    E,RL  (IX+d)   |
+|[ 14 | 020 ] |   INC  D        |   +INC  D         |    RL    H       |   *NOP           |   *LD    H,RL  (IX+d)   |
+|[ 15 | 021 ] |   DEC  D        |   +DEC  D         |    RL    L       |   *NOP           |   *LD    L,RL  (IX+d)   |
+|[ 16 | 022 ] |   LD   D,n      |   +LD   D,n       |    RL    (HL)    |   *NOP           |    RL    (IX+d)         |
+|[ 17 | 023 ] |   RLA           |   +RLA            |    RL    A       |   *NOP           |   *LD    A,RL  (IX+d)   |
+|[ 18 | 024 ] |   JR   d        |   +JR   d         |    RR    B       |   *NOP           |   *LD    B,RR  (IX+d)   |
+|[ 19 | 025 ] |   ADD  HL,DE    |    ADD  IX,DE     |    RR    C       |   *NOP           |   *LD    C,RR  (IX+d)   |
+|[ 1a | 026 ] |   LD   A,(DE)   |   +LD   A,(DE)    |    RR    D       |   *NOP           |   *LD    D,RR  (IX+d)   |
+|[ 1b | 027 ] |   DEC  DE       |   +DEC  DE        |    RR    E       |   *NOP           |   *LD    E,RR  (IX+d)   |
+|[ 1c | 028 ] |   INC  E        |   +INC  E         |    RR    H       |   *NOP           |   *LD    H,RR  (IX+d)   |
+|[ 1d | 029 ] |   DEC  E        |   +DEC  E         |    RR    L       |   *NOP           |   *LD    L,RR  (IX+d)   |
+|[ 1e | 030 ] |   LD   E,n      |   +LD   E,n       |    RR    (HL)    |   *NOP           |    RR    (IX+d)         |
+|[ 1f | 031 ] |   RRA           |   +RRA            |    RR    A       |   *NOP           |   *LD    A,RR  (IX+d)   |
+|[ 20 | 032 ] |   JR   NZ,d     |   +JR   NZ,d      |    SLA   B       |   *NOP           |   *LD    B,SLA (IX+d)   |
+|[ 21 | 033 ] |   LD   HL,nn    |    LD   IX,nn     |    SLA   C       |   *NOP           |   *LD    C,SLA (IX+d)   |
+|[ 22 | 034 ] |   LD   (nn),HL  |    LD   (nn),IX   |    SLA   D       |   *NOP           |   *LD    D,SLA (IX+d)   |
+|[ 23 | 035 ] |   INC  HL       |    INC  IX        |    SLA   E       |   *NOP           |   *LD    E,SLA (IX+d)   |
+|[ 24 | 036 ] |   INC  H        |   *INC  IXh       |    SLA   H       |   *NOP           |   *LD    H,SLA (IX+d)   |
+|[ 25 | 037 ] |   DEC  H        |   *DEC  IXh       |    SLA   L       |   *NOP           |   *LD    L,SLA (IX+d)   |
+|[ 26 | 038 ] |   LD   H,n      |   *LD   IXh,n     |    SLA   (HL)    |   *NOP           |    SLA   (IX+d)         |
+|[ 27 | 039 ] |   DAA           |   +DAA            |    SLA   A       |   *NOP           |   *LD    A,SLA (IX+d)   |
+|[ 28 | 040 ] |   JR   Z,d      |   +JR   Z,d       |    SRA   B       |   *NOP           |   *LD    B,SRA (IX+d)   |
+|[ 29 | 041 ] |   ADD  HL,HL    |    ADD  IX,IX     |    SRA   C       |   *NOP           |   *LD    C,SRA (IX+d)   |
+|[ 2a | 042 ] |   LD   HL,(nn)  |    LD   IX,(nn)   |    SRA   D       |   *NOP           |   *LD    D,SRA (IX+d)   |
+|[ 2b | 043 ] |   DEC  HL       |    DEC  IX        |    SRA   E       |   *NOP           |   *LD    E,SRA (IX+d)   |
+|[ 2c | 044 ] |   INC  L        |   *INC  IXl       |    SRA   H       |   *NOP           |   *LD    H,SRA (IX+d)   |
+|[ 2d | 045 ] |   DEC  L        |   *DEC  IXl       |    SRA   L       |   *NOP           |   *LD    L,SRA (IX+d)   |
+|[ 2e | 046 ] |   LD   L,n      |   *LD   IXl,n     |    SRA   (HL)    |   *NOP           |    SRA   (IX+d)         |
+|[ 2f | 047 ] |   CPL           |   +CPL            |    SRA   A       |   *NOP           |   *LD    A,SRA (IX+d)   |
+|[ 30 | 048 ] |   JR   NC,d     |   +JR   NC,d      |    SLL   B       |   *NOP           |   *LD    B,SLL (IX+d)   |
+|[ 31 | 049 ] |   LD   SP,nn    |   +LD   SP,nn     |    SLL   C       |   *NOP           |   *LD    C,SLL (IX+d)   |
+|[ 32 | 050 ] |   LD   (nn),A   |   +LD   (nn),A    |    SLL   D       |   *NOP           |   *LD    D,SLL (IX+d)   |
+|[ 33 | 051 ] |   INC  SP       |   +INC  SP        |    SLL   E       |   *NOP           |   *LD    E,SLL (IX+d)   |
+|[ 34 | 052 ] |   INC  (HL)     |    INC  (IX+d)    |    SLL   H       |   *NOP           |   *LD    H,SLL (IX+d)   |
+|[ 35 | 053 ] |   DEC  (HL)     |    DEC  (IX+d)    |    SLL   L       |   *NOP           |   *LD    L,SLL (IX+d)   |
+|[ 36 | 054 ] |   LD   (HL),n   |    LD   (IX+d),n  |    SLL   (HL)    |   *NOP           |    SLL   (IX+d)         |
+|[ 37 | 055 ] |   SCF           |   +SCF            |    SLL   A       |   *NOP           |   *LD    A,SLL (IX+d)   |
+|[ 38 | 056 ] |   JR   C,d      |   +JR   C,d       |    SRL   B       |   *NOP           |   *LD    B,SRL (IX+d)   |
+|[ 39 | 057 ] |   ADD  HL,SP    |    ADD  IX,SP     |    SRL   C       |   *NOP           |   *LD    C,SRL (IX+d)   |
+|[ 3a | 058 ] |   LD   A,(nn)   |   +LD   A,(nn)    |    SRL   D       |   *NOP           |   *LD    D,SRL (IX+d)   |
+|[ 3b | 059 ] |   DEC  SP       |   +DEC  SP        |    SRL   E       |   *NOP           |   *LD    E,SRL (IX+d)   |
+|[ 3c | 060 ] |   INC  A        |   +INC  A         |    SRL   H       |   *NOP           |   *LD    H,SRL (IX+d)   |
+|[ 3d | 061 ] |   DEC  A        |   +DEC  A         |    SRL   L       |   *NOP           |   *LD    L,SRL (IX+d)   |
+|[ 3e | 062 ] |   LD   A,n      |   +LD   A,n       |    SRL   (HL)    |   *NOP           |    SRL   (IX+d)         |
+|[ 3f | 063 ] |   CCF           |   +CCF            |    SRL   A       |   *NOP           |   *LD    A,SRL (IX+d)   |
+|[ 40 | 064 ] |   LD   B,B      |   +LD   B,B       |    BIT   0,B     |    IN    B,(C)   |   *BIT   0,(IX+d)       |
+|[ 41 | 065 ] |   LD   B,C      |   +LD   B,C       |    BIT   0,C     |    OUT   (C),B   |   *BIT   0,(IX+d)       |
+|[ 42 | 066 ] |   LD   B,D      |   +LD   B,D       |    BIT   0,D     |    SBC   HL,BC   |   *BIT   0,(IX+d)       |
+|[ 43 | 067 ] |   LD   B,E      |   +LD   B,E       |    BIT   0,E     |    LD    (nn),BC |   *BIT   0,(IX+d)       |
+|[ 44 | 068 ] |   LD   B,H      |   *LD   B,IXh     |    BIT   0,H     |    NEG           |   *BIT   0,(IX+d)       |
+|[ 45 | 069 ] |   LD   B,L      |   *LD   B,IXl     |    BIT   0,L     |    RETN          |   *BIT   0,(IX+d)       |
+|[ 46 | 070 ] |   LD   B,(HL)   |    LD   B,(IX+d)  |    BIT   0,(HL)  |    IM    0       |    BIT   0,(IX+d)       |
+|[ 47 | 071 ] |   LD   B,A      |   +LD   B,A       |    BIT   0,A     |    LD    I,A     |   *BIT   0,(IX+d)       |
+|[ 48 | 072 ] |   LD   C,B      |   +LD   C,B       |    BIT   1,B     |    IN    C,(C)   |   *BIT   1,(IX+d)       |
+|[ 49 | 073 ] |   LD   C,C      |   +LD   C,C       |    BIT   1,C     |    OUT   (C),C   |   *BIT   1,(IX+d)       |
+|[ 4a | 074 ] |   LD   C,D      |   +LD   C,D       |    BIT   1,D     |    ADC   HL,BC   |   *BIT   1,(IX+d)       |
+|[ 4b | 075 ] |   LD   C,E      |   +LD   C,E       |    BIT   1,E     |    LD    BC,(nn) |   *BIT   1,(IX+d)       |
+|[ 4c | 076 ] |   LD   C,H      |   *LD   C,IXh     |    BIT   1,H     |   *NEG           |   *BIT   1,(IX+d)       |
+|[ 4d | 077 ] |   LD   C,L      |   *LD   C,IXl     |    BIT   1,L     |    RETI          |   *BIT   1,(IX+d)       |
+|[ 4e | 078 ] |   LD   C,(HL)   |    LD   C,(IX+d)  |    BIT   1,(HL)  |   *IM    * (0?)  |    BIT   1,(IX+d)       |
+|[ 4f | 079 ] |   LD   C,A      |   +LD   C,A       |    BIT   1,A     |    LD    R,A     |   *BIT   1,(IX+d)       |
+|[ 50 | 080 ] |   LD   D,B      |   +LD   D,B       |    BIT   2,B     |    IN    D,(C)   |   *BIT   2,(IX+d)       |
+|[ 51 | 081 ] |   LD   D,C      |   +LD   D,C       |    BIT   2,C     |    OUT   (C),D   |   *BIT   2,(IX+d)       |
+|[ 52 | 082 ] |   LD   D,D      |   +LD   D,D       |    BIT   2,D     |    SBC   HL,DE   |   *BIT   2,(IX+d)       |
+|[ 53 | 083 ] |   LD   D,E      |   +LD   D,E       |    BIT   2,E     |    LD    (nn),DE |   *BIT   2,(IX+d)       |
+|[ 54 | 084 ] |   LD   D,H      |   *LD   D,IXh     |    BIT   2,H     |   *NEG           |   *BIT   2,(IX+d)       |
+|[ 55 | 085 ] |   LD   D,L      |   *LD   D,IXl     |    BIT   2,L     |   *RETN          |   *BIT   2,(IX+d)       |
+|[ 56 | 086 ] |   LD   D,(HL)   |    LD   D,(IX+d)  |    BIT   2,(HL)  |    IM    1       |    BIT   2,(IX+d)       |
+|[ 57 | 087 ] |   LD   D,A      |   +LD   D,A       |    BIT   2,A     |    LD    A,I     |   *BIT   2,(IX+d)       |
+|[ 58 | 088 ] |   LD   E,B      |   +LD   E,B       |    BIT   3,B     |    IN    E,(C)   |   *BIT   3,(IX+d)       |
+|[ 59 | 089 ] |   LD   E,C      |   +LD   E,C       |    BIT   3,C     |    OUT   (C),E   |   *BIT   3,(IX+d)       |
+|[ 5a | 090 ] |   LD   E,D      |   +LD   E,D       |    BIT   3,D     |    ADC   HL,DE   |   *BIT   3,(IX+d)       |
+|[ 5b | 091 ] |   LD   E,E      |   +LD   E,E       |    BIT   3,E     |    LD    DE,(nn) |   *BIT   3,(IX+d)       |
+|[ 5c | 092 ] |   LD   E,H      |   *LD   E,IXh     |    BIT   3,H     |   *NEG           |   *BIT   3,(IX+d)       |
+|[ 5d | 093 ] |   LD   E,L      |   *LD   E,IXl     |    BIT   3,L     |   *RETI          |   *BIT   3,(IX+d)       |
+|[ 5e | 094 ] |   LD   E,(HL)   |    LD   E,(IX+d)  |    BIT   3,(HL)  |    IM    2       |    BIT   3,(IX+d)       |
+|[ 5f | 095 ] |   LD   E,A      |   +LD   E,A       |    BIT   3,A     |    LD    A,R     |   *BIT   3,(IX+d)       |
+|[ 60 | 096 ] |   LD   H,B      |   *LD   IXh,B     |    BIT   4,B     |    IN    H,(C)   |   *BIT   4,(IX+d)       |
+|[ 61 | 097 ] |   LD   H,C      |   *LD   IXh,C     |    BIT   4,C     |    OUT   (C),H   |   *BIT   4,(IX+d)       |
+|[ 62 | 098 ] |   LD   H,D      |   *LD   IXh,D     |    BIT   4,D     |    SBC   HL,HL   |   *BIT   4,(IX+d)       |
+|[ 63 | 099 ] |   LD   H,E      |   *LD   IXh,E     |    BIT   4,E     |    LD    (nn),HL |   *BIT   4,(IX+d)       |
+|[ 64 | 100 ] |   LD   H,H      |   *LD   IXh,IXh   |    BIT   4,H     |   *NEG           |   *BIT   4,(IX+d)       |
+|[ 65 | 101 ] |   LD   H,L      |   *LD   IXh,IXl   |    BIT   4,L     |   *RETN          |   *BIT   4,(IX+d)       |
+|[ 66 | 102 ] |   LD   H,(HL)   |    LD   H,(IX+d)  |    BIT   4,(HL)  |   *IM    0       |    BIT   4,(IX+d)       |
+|[ 67 | 103 ] |   LD   H,A      |   *LD   IXh,A     |    BIT   4,A     |    RRD           |   *BIT   4,(IX+d)       |
+|[ 68 | 104 ] |   LD   L,B      |   *LD   IXl,B     |    BIT   5,B     |    IN    L,(C)   |   *BIT   5,(IX+d)       |
+|[ 69 | 105 ] |   LD   L,C      |   *LD   IXl,C     |    BIT   5,C     |    OUT   (C),L   |   *BIT   5,(IX+d)       |
+|[ 6a | 106 ] |   LD   L,D      |   *LD   IXl,D     |    BIT   5,D     |    ADC   HL,HL   |   *BIT   5,(IX+d)       |
+|[ 6b | 107 ] |   LD   L,E      |   *LD   IXl,E     |    BIT   5,E     |    LD    HL,(nn) |   *BIT   5,(IX+d)       |
+|[ 6c | 108 ] |   LD   L,H      |   *LD   IXl,IXh   |    BIT   5,H     |   *NEG           |   *BIT   5,(IX+d)       |
+|[ 6d | 109 ] |   LD   L,L      |   *LD   IXl,IXl   |    BIT   5,L     |   *RETI          |   *BIT   5,(IX+d)       |
+|[ 6e | 110 ] |   LD   L,(HL)   |    LD   L,(IX+d)  |    BIT   5,(HL)  |   *IM    * (0?)  |    BIT   5,(IX+d)       |
+|[ 6f | 111 ] |   LD   L,A      |   *LD   IXl,A     |    BIT   5,A     |    RLD           |   *BIT   5,(IX+d)       |
+|[ 70 | 112 ] |   LD   (HL),B   |    LD   (IX+d),B  |    BIT   6,B     |   *IN    X,(C)   |   *BIT   6,(IX+d)       |
+|[ 71 | 113 ] |   LD   (HL),C   |    LD   (IX+d),C  |    BIT   6,C     |   *OUT   (C),X(0)|   *BIT   6,(IX+d)       |
+|[ 72 | 114 ] |   LD   (HL),D   |    LD   (IX+d),D  |    BIT   6,D     |    SBC   HL,SP   |   *BIT   6,(IX+d)       |
+|[ 73 | 115 ] |   LD   (HL),E   |    LD   (IX+d),E  |    BIT   6,E     |    LD    (nn),SP |   *BIT   6,(IX+d)       |
+|[ 74 | 116 ] |   LD   (HL),H   |    LD   (IX+d),H  |    BIT   6,H     |   *NEG           |   *BIT   6,(IX+d)       |
+|[ 75 | 117 ] |   LD   (HL),L   |    LD   (IX+d),L  |    BIT   6,L     |   *RETN          |   *BIT   6,(IX+d)       |
+|[ 76 | 118 ] |   HALT          |   +HALT           |    BIT   6,(HL)  |   *IM    1       |    BIT   6,(IX+d)       |
+|[ 77 | 119 ] |   LD   (HL),A   |    LD   (IX+d),A  |    BIT   6,A     |   *NOP           |   *BIT   6,(IX+d)       |
+|[ 78 | 120 ] |   LD   A,B      |   +LD   A,B       |    BIT   7,B     |    IN    A,(C)   |   *BIT   7,(IX+d)       |
+|[ 79 | 121 ] |   LD   A,C      |   +LD   A,C       |    BIT   7,C     |    OUT   (C),A   |   *BIT   7,(IX+d)       |
+|[ 7a | 122 ] |   LD   A,D      |   +LD   A,D       |    BIT   7,D     |    ADC   HL,SP   |   *BIT   7,(IX+d)       |
+|[ 7b | 123 ] |   LD   A,E      |   +LD   A,E       |    BIT   7,E     |    LD    SP,(nn) |   *BIT   7,(IX+d)       |
+|[ 7c | 124 ] |   LD   A,H      |   *LD   A,IXh     |    BIT   7,H     |   *NEG           |   *BIT   7,(IX+d)       |
+|[ 7d | 125 ] |   LD   A,L      |   *LD   A,IXl     |    BIT   7,L     |   *RETI          |   *BIT   7,(IX+d)       |
+|[ 7e | 126 ] |   LD   A,(HL)   |    LD   A,(IX+d)  |    BIT   7,(HL)  |   *IM    2       |    BIT   7,(IX+d)       |
+|[ 7f | 127 ] |   LD   A,A      |   +LD   A,A       |    BIT   7,A     |   *NOP           |   *BIT   7,(IX+d)       |
+|[ 80 | 128 ] |   ADD  A,B      |   +ADD  A,B       |    RES   0,B     |   *NOP           |   *LD    B,RES 0,(IX+d) |
+|[ 81 | 129 ] |   ADD  A,C      |   +ADD  A,C       |    RES   0,C     |   *NOP           |   *LD    C,RES 0,(IX+d) |
+|[ 82 | 130 ] |   ADD  A,D      |   +ADD  A,D       |    RES   0,D     |   *NOP           |   *LD    D,RES 0,(IX+d) |
+|[ 83 | 131 ] |   ADD  A,E      |   +ADD  A,E       |    RES   0,E     |   *NOP           |   *LD    E,RES 0,(IX+d) |
+|[ 84 | 132 ] |   ADD  A,H      |   *ADD  A,IXh     |    RES   0,H     |   *NOP           |   *LD    H,RES 0,(IX+d) |
+|[ 85 | 133 ] |   ADD  A,L      |   *ADD  A,IXl     |    RES   0,L     |   *NOP           |   *LD    L,RES 0,(IX+d) |
+|[ 86 | 134 ] |   ADD  A,(HL)   |    ADD  A,(IX+d)  |    RES   0,(HL)  |   *NOP           |    RES   0,(IX+d)       |
+|[ 87 | 135 ] |   ADD  A,A      |   +ADD  A,A       |    RES   0,A     |   *NOP           |   *LD    A,RES 0,(IX+d) |
+|[ 88 | 136 ] |   ADC  A,B      |   +ADC  A,B       |    RES   1,B     |   *NOP           |   *LD    B,RES 1,(IX+d) |
+|[ 89 | 137 ] |   ADC  A,C      |   +ADC  A,C       |    RES   1,C     |   *NOP           |   *LD    C,RES 1,(IX+d) |
+|[ 8a | 138 ] |   ADC  A,D      |   +ADC  A,D       |    RES   1,D     |   *NOP           |   *LD    D,RES 1,(IX+d) |
+|[ 8b | 139 ] |   ADC  A,E      |   +ADC  A,E       |    RES   1,E     |   *NOP           |   *LD    E,RES 1,(IX+d) |
+|[ 8c | 140 ] |   ADC  A,H      |   *ADC  A,IXh     |    RES   1,H     |   *NOP           |   *LD    H,RES 1,(IX+d) |
+|[ 8d | 141 ] |   ADC  A,L      |   *ADC  A,IXl     |    RES   1,L     |   *NOP           |   *LD    L,RES 1,(IX+d) |
+|[ 8e | 142 ] |   ADC  A,(HL)   |    ADC  A,(IX+d)  |    RES   1,(HL)  |   *NOP           |    RES   1,(IX+d)       |
+|[ 8f | 143 ] |   ADC  A,A      |   +ADC  A,A       |    RES   1,A     |   *NOP           |   *LD    A,RES 1,(IX+d) |
+|[ 90 | 144 ] |   SUB  B        |   +SUB  B         |    RES   2,B     |   *NOP           |   *LD    B,RES 2,(IX+d) |
+|[ 91 | 145 ] |   SUB  C        |   +SUB  C         |    RES   2,C     |   *NOP           |   *LD    C,RES 2,(IX+d) |
+|[ 92 | 146 ] |   SUB  D        |   +SUB  D         |    RES   2,D     |   *NOP           |   *LD    D,RES 2,(IX+d) |
+|[ 93 | 147 ] |   SUB  E        |   +SUB  E         |    RES   2,E     |   *NOP           |   *LD    E,RES 2,(IX+d) |
+|[ 94 | 148 ] |   SUB  H        |   *SUB  IXh       |    RES   2,H     |   *NOP           |   *LD    H,RES 2,(IX+d) |
+|[ 95 | 149 ] |   SUB  L        |   *SUB  IXl       |    RES   2,L     |   *NOP           |   *LD    L,RES 2,(IX+d) |
+|[ 96 | 150 ] |   SUB  (HL)     |    SUB  (IX+d)    |    RES   2,(HL)  |   *NOP           |    RES   2,(IX+d)       |
+|[ 97 | 151 ] |   SUB  A        |   +SUB  A         |    RES   2,A     |   *NOP           |   *LD    A,RES 2,(IX+d) |
+|[ 98 | 152 ] |   SBC  A,B      |   +SBC  A,B       |    RES   3,B     |   *NOP           |   *LD    B,RES 3,(IX+d) |
+|[ 99 | 153 ] |   SBC  A,C      |   +SBC  A,C       |    RES   3,C     |   *NOP           |   *LD    C,RES 3,(IX+d) |
+|[ 9a | 154 ] |   SBC  A,D      |   +SBC  A,D       |    RES   3,D     |   *NOP           |   *LD    D,RES 3,(IX+d) |
+|[ 9b | 155 ] |   SBC  A,E      |   +SBC  A,E       |    RES   3,E     |   *NOP           |   *LD    E,RES 3,(IX+d) |
+|[ 9c | 156 ] |   SBC  A,H      |   *SBC  A,IXh     |    RES   3,H     |   *NOP           |   *LD    H,RES 3,(IX+d) |
+|[ 9d | 157 ] |   SBC  A,L      |   *SBC  A,IXl     |    RES   3,L     |   *NOP           |   *LD    L,RES 3,(IX+d) |
+|[ 9e | 158 ] |   SBC  A,(HL)   |    SBC  A,(IX+d)  |    RES   3,(HL)  |   *NOP           |    RES   3,(IX+d)       |
+|[ 9f | 159 ] |   SBC  A,A      |   +SBC  A,A       |    RES   3,A     |   *NOP           |   *LD    A,RES 3,(IX+d) |
+|[ a0 | 160 ] |   AND  B        |   +AND  B         |    RES   4,B     |    LDI           |   *LD    B,RES 4,(IX+d) |
+|[ a1 | 161 ] |   AND  C        |   +AND  C         |    RES   4,C     |    CPI           |   *LD    C,RES 4,(IX+d) |
+|[ a2 | 162 ] |   AND  D        |   +AND  D         |    RES   4,D     |    INI           |   *LD    D,RES 4,(IX+d) |
+|[ a3 | 163 ] |   AND  E        |   +AND  E         |    RES   4,E     |    OUTI          |   *LD    E,RES 4,(IX+d) |
+|[ a4 | 164 ] |   AND  H        |   *AND  IXh       |    RES   4,H     |   *NOP           |   *LD    H,RES 4,(IX+d) |
+|[ a5 | 165 ] |   AND  L        |   *AND  IXl       |    RES   4,L     |   *NOP           |   *LD    L,RES 4,(IX+d) |
+|[ a6 | 166 ] |   AND  (HL)     |    AND  (IX+d)    |    RES   4,(HL)  |   *NOP           |    RES   4,(IX+d)       |
+|[ a7 | 167 ] |   AND  A        |   +AND  A         |    RES   4,A     |   *NOP           |   *LD    A,RES 4,(IX+d) |
+|[ a8 | 168 ] |   XOR  B        |   +XOR  B         |    RES   5,B     |    LDD           |   *LD    B,RES 5,(IX+d) |
+|[ a9 | 169 ] |   XOR  C        |   +XOR  C         |    RES   5,C     |    CPD           |   *LD    C,RES 5,(IX+d) |
+|[ aa | 170 ] |   XOR  D        |   +XOR  D         |    RES   5,D     |    IND           |   *LD    D,RES 5,(IX+d) |
+|[ ab | 171 ] |   XOR  E        |   +XOR  E         |    RES   5,E     |    OUTD          |   *LD    E,RES 5,(IX+d) |
+|[ ac | 172 ] |   XOR  H        |   *XOR  IXh       |    RES   5,H     |   *NOP           |   *LD    H,RES 5,(IX+d) |
+|[ ad | 173 ] |   XOR  L        |   *XOR  IXl       |    RES   5,L     |   *NOP           |   *LD    L,RES 5,(IX+d) |
+|[ ae | 174 ] |   XOR  (HL)     |    XOR  (IX+d)    |    RES   5,(HL)  |   *NOP           |    RES   5,(IX+d)       |
+|[ af | 175 ] |   XOR  A        |   +XOR  A         |    RES   5,A     |   *NOP           |   *LD    A,RES 5,(IX+d) |
+|[ b0 | 176 ] |   OR   B        |   +OR   B         |    RES   6,B     |    LDIR          |   *LD    B,RES 6,(IX+d) |
+|[ b1 | 177 ] |   OR   C        |   +OR   C         |    RES   6,C     |    CPIR          |   *LD    C,RES 6,(IX+d) |
+|[ b2 | 178 ] |   OR   D        |   +OR   D         |    RES   6,D     |    INIR          |   *LD    D,RES 6,(IX+d) |
+|[ b3 | 179 ] |   OR   E        |   +OR   E         |    RES   6,E     |    OTIR          |   *LD    E,RES 6,(IX+d) |
+|[ b4 | 180 ] |   OR   H        |   *OR   IXh       |    RES   6,H     |   *NOP           |   *LD    H,RES 6,(IX+d) |
+|[ b5 | 181 ] |   OR   L        |   *OR   IXl       |    RES   6,L     |   *NOP           |   *LD    L,RES 6,(IX+d) |
+|[ b6 | 182 ] |   OR   (HL)     |    OR   (IX+d)    |    RES   6,(HL)  |   *NOP           |    RES   6,(IX+d)       |
+|[ b7 | 183 ] |   OR   A        |   +OR   A         |    RES   6,A     |   *NOP           |   *LD    A,RES 6,(IX+d) |
+|[ b8 | 184 ] |   CP   B        |   +CP   B         |    RES   7,B     |    LDDR          |   *LD    B,RES 7,(IX+d) |
+|[ b9 | 185 ] |   CP   C        |   +CP   C         |    RES   7,C     |    CPDR          |   *LD    C,RES 7,(IX+d) |
+|[ ba | 186 ] |   CP   D        |   +CP   D         |    RES   7,D     |    INDR          |   *LD    D,RES 7,(IX+d) |
+|[ bb | 187 ] |   CP   E        |   +CP   E         |    RES   7,E     |    OTDR          |   *LD    E,RES 7,(IX+d) |
+|[ bc | 188 ] |   CP   H        |   *CP   IXh       |    RES   7,H     |   *NOP           |   *LD    H,RES 7,(IX+d) |
+|[ bd | 189 ] |   CP   L        |   *CP   IXl       |    RES   7,L     |   *NOP           |   *LD    L,RES 7,(IX+d) |
+|[ be | 190 ] |   CP   (HL)     |    CP   (IX+d)    |    RES   7,(HL)  |   *NOP           |    RES   7,(IX+d)       |
+|[ bf | 191 ] |   CP   A        |   +CP   A         |    RES   7,A     |   *NOP           |   *LD    A,RES 7,(IX+d) |
+|[ c0 | 192 ] |   RET  NZ       |   +RET  NZ        |    SET   0,B     |   *NOP           |   *LD    B,SET 0,(IX+d) |
+|[ c1 | 193 ] |   POP  BC       |   +POP  BC        |    SET   0,C     |   *NOP           |   *LD    C,SET 0,(IX+d) |
+|[ c2 | 194 ] |   JP   NZ,nn    |   +JP   NZ,nn     |    SET   0,D     |   *NOP           |   *LD    D,SET 0,(IX+d) |
+|[ c3 | 195 ] |   JP   nn       |   +JP   nn        |    SET   0,E     |   *NOP           |   *LD    E,SET 0,(IX+d) |
+|[ c4 | 196 ] |   CALL NZ,nn    |   +CALL NZ,nn     |    SET   0,H     |   *NOP           |   *LD    H,SET 0,(IX+d) |
+|[ c5 | 197 ] |   PUSH BC       |   +PUSH BC        |    SET   0,L     |   *NOP           |   *LD    L,SET 0,(IX+d) |
+|[ c6 | 198 ] |   ADD  A,n      |   +ADD  A,n       |    SET   0,(HL)  |   *NOP           |    SET   0,(IX+d)       |
+|[ c7 | 199 ] |   RST  0        |   +RST  0         |    SET   0,A     |   *NOP           |   *LD    A,SET 0,(IX+d) |
+|[ c8 | 100 ] |   RET  Z        |   +RET  Z         |    SET   1,B     |   *NOP           |   *LD    B,SET 1,(IX+d) |
+|[ c9 | 201 ] |   RET           |   +RET            |    SET   1,C     |   *NOP           |   *LD    C,SET 1,(IX+d) |
+|[ ca | 202 ] |   JP   Z,nn     |   +JP   Z,nn      |    SET   1,D     |   *NOP           |   *LD    D,SET 1,(IX+d) |
+|[ cb | 203 ] |   [Prefix]      |   *[See DDCB info]|    SET   1,E     |   *NOP           |   *LD    E,SET 1,(IX+d) |
+|[ cc | 204 ] |   CALL Z,nn     |   +CALL Z,nn      |    SET   1,H     |   *NOP           |   *LD    H,SET 1,(IX+d) |
+|[ cd | 205 ] |   CALL nn       |   +CALL nn        |    SET   1,L     |   *NOP           |   *LD    L,SET 1,(IX+d) |
+|[ ce | 206 ] |   ADC  A,n      |   +ADC  A,n       |    SET   1,(HL)  |   *NOP           |    SET   1,(IX+d)       |
+|[ cf | 207 ] |   RST  8        |   +RST  8         |    SET   1,A     |   *NOP           |   *LD    A,SET 1,(IX+d) |
+|[ d0 | 208 ] |   RET  NC       |   +RET  NC        |    SET   2,B     |   *NOP           |   *LD    B,SET 2,(IX+d) |
+|[ d1 | 209 ] |   POP  DE       |   +POP  DE        |    SET   2,C     |   *NOP           |   *LD    C,SET 2,(IX+d) |
+|[ d2 | 210 ] |   JP   NC,nn    |   +JP   NC,nn     |    SET   2,D     |   *NOP           |   *LD    D,SET 2,(IX+d) |
+|[ d3 | 211 ] |   OUT  (n),A    |   +OUT  (n),A     |    SET   2,E     |   *NOP           |   *LD    E,SET 2,(IX+d) |
+|[ d4 | 212 ] |   CALL NC,nn    |   +CALL NC,nn     |    SET   2,H     |   *NOP           |   *LD    H,SET 2,(IX+d) |
+|[ d5 | 213 ] |   PUSH DE       |   +PUSH DE        |    SET   2,L     |   *NOP           |   *LD    L,SET 2,(IX+d) |
+|[ d6 | 214 ] |   SUB  n        |   +SUB  n         |    SET   2,(HL)  |   *NOP           |    SET   2,(IX+d)       |
+|[ d7 | 215 ] |   RST  10H      |   +RST  10H       |    SET   2,A     |   *NOP           |   *LD    A,SET 2,(IX+d) |
+|[ d8 | 216 ] |   RET  C        |   +RET  C         |    SET   3,B     |   *NOP           |   *LD    B,SET 3,(IX+d) |
+|[ d9 | 217 ] |   EXX           |   +EXX            |    SET   3,C     |   *NOP           |   *LD    C,SET 3,(IX+d) |
+|[ da | 218 ] |   JP   C,nn     |   +JP   C,nn      |    SET   3,D     |   *NOP           |   *LD    D,SET 3,(IX+d) |
+|[ db | 219 ] |   IN   A,(n)    |   +IN   A,(n)     |    SET   3,E     |   *NOP           |   *LD    E,SET 3,(IX+d) |
+|[ dc | 220 ] |   CALL C,nn     |   +CALL C,nn      |    SET   3,H     |   *NOP           |   *LD    H,SET 3,(IX+d) |
+|[ dd | 221 ] |   [IX Prefix]   |   +[IX Prefix]    |    SET   3,L     |   *NOP           |   *LD    L,SET 3,(IX+d) |
+|[ de | 222 ] |   SBC  A,n      |   +SBC  A,n       |    SET   3,(HL)  |   *NOP           |    SET   3,(IX+d)       |
+|[ df | 223 ] |   RST  18H      |   +RST  18H       |    SET   3,A     |   *NOP           |   *LD    A,SET 3,(IX+d) |
+|[ e0 | 224 ] |   RET  PO       |   +RET  PO        |    SET   4,B     |   *NOP           |   *LD    B,SET 4,(IX+d) |
+|[ e1 | 225 ] |   POP  HL       |    POP  IX        |    SET   4,C     |   *NOP           |   *LD    C,SET 4,(IX+d) |
+|[ e2 | 226 ] |   JP   PO,nn    |   +JP   PO,nn     |    SET   4,D     |   *NOP           |   *LD    D,SET 4,(IX+d) |
+|[ e3 | 227 ] |   EX   (SP),HL  |    EX   (SP),IX   |    SET   4,E     |   *NOP           |   *LD    E,SET 4,(IX+d) |
+|[ e4 | 228 ] |   CALL PO,nn    |   +CALL PO,nn     |    SET   4,H     |   *NOP           |   *LD    H,SET 4,(IX+d) |
+|[ e5 | 229 ] |   PUSH HL       |    PUSH IX        |    SET   4,L     |   *NOP           |   *LD    L,SET 4,(IX+d) |
+|[ e6 | 230 ] |   AND  n        |   +AND  n         |    SET   4,(HL)  |   *NOP           |    SET   4,(IX+d)       |
+|[ e7 | 231 ] |   RST  20H      |   +RST  20H       |    SET   4,A     |   *NOP           |   *LD    A,SET 4,(IX+d) |
+|[ e8 | 232 ] |   RET  PE       |   +RET  PE        |    SET   5,B     |   *NOP           |   *LD    B,SET 5,(IX+d) |
+|[ e9 | 233 ] |   JP   (HL)     |    JP   (IX)      |    SET   5,C     |   *NOP           |   *LD    C,SET 5,(IX+d) |
+|[ ea | 234 ] |   JP   PE,nn    |   +JP   PE,nn     |    SET   5,D     |   *NOP           |   *LD    D,SET 5,(IX+d) |
+|[ eb | 235 ] |   EX   DE,HL    |   +EX   DE,HL     |    SET   5,E     |   *NOP           |   *LD    E,SET 5,(IX+d) |
+|[ ec | 236 ] |   CALL PE,nn    |   +CALL PE,nn     |    SET   5,H     |   *NOP           |   *LD    H,SET 5,(IX+d) |
+|[ ed | 237 ] |   [Prefix]      |   +[Prefix]       |    SET   5,L     |   *NOP           |   *LD    L,SET 5,(IX+d) |
+|[ ee | 238 ] |   XOR  n        |   +XOR  n         |    SET   5,(HL)  |   *NOP           |    SET   5,(IX+d)       |
+|[ ef | 239 ] |   RST  28H      |   +RST  28H       |    SET   5,A     |   *NOP           |   *LD    A,SET 5,(IX+d) |
+|[ f0 | 240 ] |   RET  P        |   +RET  P         |    SET   6,B     |   *NOP           |   *LD    B,SET 6,(IX+d) |
+|[ f1 | 241 ] |   POP  AF       |   +POP  AF        |    SET   6,C     |   *NOP           |   *LD    C,SET 6,(IX+d) |
+|[ f2 | 242 ] |   JP   P,nn     |   +JP   P,nn      |    SET   6,D     |   *NOP           |   *LD    D,SET 6,(IX+d) |
+|[ f3 | 243 ] |   DI            |   +DI             |    SET   6,E     |   *NOP           |   *LD    E,SET 6,(IX+d) |
+|[ f4 | 244 ] |   CALL P,nn     |   +CALL P,nn      |    SET   6,H     |   *NOP           |   *LD    H,SET 6,(IX+d) |
+|[ f5 | 245 ] |   PUSH AF       |   +PUSH AF        |    SET   6,L     |   *NOP           |   *LD    L,SET 6,(IX+d) |
+|[ f6 | 246 ] |   OR   n        |   +OR   n         |    SET   6,(HL)  |   *NOP           |    SET   6,(IX+d)       |
+|[ f7 | 247 ] |   RST  30H      |   +RST  30H       |    SET   6,A     |   *NOP           |   *LD    A,SET 6,(IX+d) |
+|[ f8 | 248 ] |   RET  M        |   +RET  M         |    SET   7,B     |   *NOP           |   *LD    B,SET 7,(IX+d) |
+|[ f9 | 249 ] |   LD   SP,HL    |    LD   SP,IX     |    SET   7,C     |   *NOP           |   *LD    C,SET 7,(IX+d) |
+|[ fa | 250 ] |   JP   M,nn     |   +JP   M,nn      |    SET   7,D     |   *NOP           |   *LD    D,SET 7,(IX+d) |
+|[ fb | 251 ] |   EI            |   +EI             |    SET   7,E     |   *NOP           |   *LD    E,SET 7,(IX+d) |
+|[ fc | 252 ] |   CALL M,nn     |   +CALL M,nn      |    SET   7,H     |   *NOP           |   *LD    H,SET 7,(IX+d) |
+|[ fd | 253 ] |   [IY Prefix]   |   +[IY Prefix]    |    SET   7,L     |   *NOP           |   *LD    L,SET 7,(IX+d) |
+|[ fe | 254 ] |   CP   n        |   +CP   n         |    SET   7,(HL)  |   *NOP           |    SET   7,(IX+d)       |
+|[ ff | 255 ] |   RST  38H      |   +RST  38H       |    SET   7,A     |   *NOP           |   *LD    A,SET 7,(IX+d) |
++-------------+-----------------+-------------------+------------------+------------------+-------------------------+
+--
+Peter McGavin.   (peterm@maths.grace.cri.nz)
+
+From: agulbra@tigern.nvg.unit.no (Arnt Gulbrandsen)
+Newsgroups: comp.sys.sinclair
+Subject: Re: Undocumented Z80 opcodes
+Date: 6 Jan 1994 13:31:44 +0100
+Organization: University of Trondheim, Norway
+NNTP-Posting-Host: tigern.nvg.unit.no
+
+In article <PETERM.94Jan6094415@kea.grace.cri.nz>,
+Peter McGavin <peterm@maths.grace.cri.nz> wrote:
+>In article, <2geqvv$nlq@tigern.nvg.unit.no>,
+>agulbra@tigern.nvg.unit.no (Arnt Gulbrandsen) wrote:
+>>I believe that list originally was written by from David Librik
+>><librik@cory.eecs.berkeley.edu>.  David (with someone else, I think)
+>>reverse-engineered the Z80 and wrote a list of what he found, a list
+>>which I think I sent to Peter.
+>
+>Actually I got it from Simon Owen (S.N.Owen@newcastle.ac.uk).
+>
+>Here it is:  (sorry it's a bit wide)
+
+Not the same.  Here's the big one.
+
+--Arnt
+
+Date: Fri, 19 Nov 1993 00:40:23 -0800
+From: David Librik <librik@cory.EECS.Berkeley.EDU>
+Message-Id: <199311190840.AAA06896@cory.EECS.Berkeley.EDU>
+Subject: Undocumented Z-80 Instructions
+
+
+Here is my article on undocumented Z-80 instructions.  Please go over
+your data and add anything you can to this list, and send it back to me.
+Thanks!
+
+- David Librik
+librik@cs.Berkeley.edu
+
+          ------------------
+
+There's been some discussion about the so-called "undocumented" opcodes
+of the Z-80 microprocessor.  These are officially-undefined machine-
+language instructions that often have powerful and useful effects;
+they are so often used by Z-80 system programmers that they are de-facto
+"documented".  Here is an article I posted a few years ago on another
+computer system.
+
+By the way, the reason these instructions exist even though they were
+not part of the original CPU design: the Z-80 was the most complex
+microprocessor ever to be completely hard-wired (no microcode).  As a
+result -- as anyone who's ever taken a logic design course can tell
+you -- it's much easier to have "undefined states" do whatever-comes-
+easiest.
+
+* 2/28/88  2:37 pm   librik / pega / cerl *
+
+The undocumented Z80 opcodes.  While Zilog claims that
+these should not be "trusted", I have yet to hear of a
+Z80 that does not support them; and at least one operating
+system uses them.
+
+* HX and LX instructions.  These instructions manipulate
+  the high- and low-order 8 bits of the sixteen bit IX and
+  IY registers.  (Here, I give the opcodes for HX and LX,
+  to get HY and LY, use FD instead of DD in the opcodes.)
+
+* SLL.  This instruction shifts an 8-bit quantity left
+  (logical), then inserts 1 into the low-order bit.
+
+* Shift/Bit Set/Bit Reset with autocopy.  These instructions
+  perform bit shifts (RLC, RRC, RL, RR, SLA, SRA, SLL, SRL),
+  bit set (SET) and bit reset (RES) operations on (IX+jj)
+  [and (IY+jj)], but also automatically copy the result
+  into an 8-bit register.
+
+* Null port accesses.  IN and OUT without data.
+
+dd24    inc hx     dd62    ld hx,d    dd8c    adc a,hx
+dd25    dec hx     dd63    ld hx,e    dd8d    adc a,lx
+dd26nn  ld hx,nn   dd64    ld hx,hx   dd94    sub hx
+dd2c    inc lx     dd65    ld hx,lx   dd95    sub lx
+dd2d    dec lx     dd67    ld hx,a    dd9c    sbc a,hx
+dd2enn  ld lx,nn   dd68    ld lx,b    dd9d    sbc a,lx
+dd44    ld b,hx    dd69    ld lx,c    dda4    and hx
+dd45    ld b,lx    dd6a    ld lx,d    dda5    and lx
+dd4c    ld c,hx    dd6b    ld lx,e    ddac    xor hx
+dd4d    ld c,lx    dd6c    ld lx,hx   ddad    xor lx
+dd54    ld d,hx    dd6d    ld lx,lx   ddb4    or hx
+dd55    ld d,lx    dd6f    ld lx,a    ddb5    or lx
+dd5c    ld e,hx    dd7c    ld a,hx    ddbc    cp hx
+dd5d    ld e,lx    dd7d    ld a,lx    ddbd    cp lx
+dd60    ld hx,b    dd84    add a,hx
+dd61    ld hx,c    dd85    add a,lx
+
+The corresponding instructions for HY and LY may be obtained
+by using FD in place of DD.
+
+cb30    sll b                   cb34    sll h
+cb31    sll c                   cb35    sll l
+cb32    sll d                   cb36    sll (hl)
+cb33    sll e                   cb37    sll a
+
+* The following instructions perform the indicated operation
+* on (ix+jj) and copy results into register 'r' (see below).
+ddcbjj00-ddcbjj07       rlc r,(ix+jj)
+ddcbjj08-ddcbjj0f       rrc r,(ix+jj)
+ddcbjj10-ddcbjj17       rl r,(ix+jj)
+ddcbjj18-ddcbjj1f       rr r,(ix+jj)
+ddcbjj20-ddcbjj27       sla r,(ix+jj)
+ddcbjj28-ddcbjj2f       sra r,(ix+jj)
+ddcbjj30-ddcbjj37       sll r,(ix+jj)
+ddcbjj38-ddcbjj3f       srl r,(ix+jj)
+
+ddcbjj80-ddcbjj87       res r,0,(ix+jj)
+ddcbjj88-ddcbjj8f       res r,1,(ix+jj)
+ddcbjj90-ddcbjj97       res r,2,(ix+jj)
+ddcbjj98-ddcbjj9f       res r,3,(ix+jj)
+ddcbjja0-ddcbjja7       res r,4,(ix+jj)
+ddcbjja8-ddcbjjaf       res r,5,(ix+jj)
+ddcbjjb0-ddcbjjb7       res r,6,(ix+jj)
+ddcbjjb8-ddcbjjbf       res r,7,(ix+jj)
+
+ddcbjjc0-ddcbjjc7       set r,0,(ix+jj)
+ddcbjjc8-ddcbjjcf       set r,1,(ix+jj)
+ddcbjjd0-ddcbjjd7       set r,2,(ix+jj)
+ddcbjjd8-ddcbjjdf       set r,3,(ix+jj)
+ddcbjje0-ddcbjje7       set r,4,(ix+jj)
+ddcbjje8-ddcbjjef       set r,5,(ix+jj)
+ddcbjjf0-ddcbjjf7       set r,6,(ix+jj)
+ddcbjjf8-ddcbjjff       set r,7,(ix+jj)
+
+In the last 3 tables, the corresponding instructions for
+(IY+jj) may be obtained by using FD in place of DD.
+
+The value for 'r' is determined as follows:
+        Last digit of opcode:           register 'r':
+              0 or 8                         B
+              1 or 9                         C
+              2 or A                         D
+              3 or B                         E
+              4 or C                         H
+              5 or D                         L
+              6 or E                    (no effect)
+              7 or F                         A
+
+*
+ed70    in --,(c)
+* gets input from port stored in (c), but does not store it.
+* another reference claims this is: in (hl),(c) but I see no
+* evidence for that, other than symmetry.
+*
+ed71    out (c),--
+* seems to send a 00 to port stored in (c).
+* the same reference as as above calls this: out (hl),(c).
+
+A full article on this material is available upon request.
+This information from NORTHERN BYTES, volume 5 number 8.
+
+	--------
+
+In addition to the information in the above article, I should mention
+for completeness' sake all the other undefined opcodes and their
+(generally redundant) effects.  I shall list the ordinary Z-80
+instructions which they mimic.
+
+ed63nnnn					ld (nnnn),hl
+ed6bnnnn					ld hl,(nnnn)
+ed4c, ed54, ed5c, ed64, ed6c, ed74, ed7c	neg
+      ed55, ed5d, ed65, ed6d, ed75, ed7d	retn
+
+The following are no-ops:
+
+ed80-9f, eda4-a7, edac-af, edb4-b7, edbc-bf, ed00-3f, edc0-ff,
+ed4e, ed66, ed6e, ed76, ed77, ed7e, ed7f
+
+Additional information from NANOS' Reference Card for the Z-80 microprocessor.
+
+David Librik
+librik/pega/nova (on PLATO/NovaNET)
+
+

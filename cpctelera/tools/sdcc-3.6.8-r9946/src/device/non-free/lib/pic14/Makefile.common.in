@@ -1,0 +1,85 @@
+###########################################################
+### Makefile.common.in for the SDCC/PIC14 Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider AT web.de>
+###
+### The library is currently maintained by
+###	Raphael Neider <rneider AT web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See GPL for details.
+###
+### $Id: Makefile.common.in 8895 2013-11-11 00:17:19Z tecodev $
+###
+
+#################################################
+### verboseness
+#Q	?= 		# be verbose
+Q	?= @		# be quiet
+# be really quiet (suppress "Entering/Leaving directory...")
+#MAKEFLAGS := $(filter-out -s,$(MAKEFLAGS)) -s
+
+#################################################
+### compiler switches
+# ARCH might be overwritten in libio
+ARCH   ?= 877
+
+CFLAGS ?=
+CFLAGS += -mpic14 -p16f$(ARCH)
+CFLAGS += --std-c99
+CFLAGS += -I. -I$(top_srcdir)/../../include/pic14 -I$(top_srcdir)/../../non-free/include/pic14
+CFLAGS += --no-warn-non-free
+
+#################################################
+### optimization flags
+
+#################################################
+### debugging PIC14 port
+#CFLAGS += --debug-ralloc
+#CFLAGS += --debug-xtra
+#CFLAGS += --pcode-verbose
+CFLAGS += --i-code-in-asm
+
+#################################################
+### debugging SDCC's optimizations
+#CFLAGS += --nooverlay
+#CFLAGS += --nogcse
+#CFLAGS += --nolabelopt
+#CFLAGS += --noinvariant
+#CFLAGS += --noinduction
+#CFLAGS += --nojtbound
+#CFLAGS += --noloopreverse
+
+#################################################
+### assembler switches
+ASFLAGS ?=
+ASFLAGS += -pp16f$(ARCH)
+ASFLAGS += -I$(top_srcdir)/../../include/pic14 -I$(top_srcdir)/../../non-free/include/pic14
+ASFLAGS += -I. -I$(srcdir)
+
+#################################################
+### linker switches
+LDFLAGS ?=
+LDFLAGS += -m -l -w
+
+#################################################
+### librarian switches
+LIBFLAGS ?=
+LIBFLAGS += -c
+
+#################################################
+### programs to use
+CPP	= $(top_builddir)/../../../bin/sdcpp
+CC	= $(top_builddir)/../../../bin/sdcc
+AS	= @GPASM@
+LD	= @GPLINK@
+LIB	= @GPLIB@
+
+SED	?= @SED@
+GREP	?= @EGREP@
+
+MKDIR	?= @MKDIR@
+RMDIR	?= @RMDIR@
+CP	?= @CP@
+MV	?= @MV@
+RM	?= @RM@

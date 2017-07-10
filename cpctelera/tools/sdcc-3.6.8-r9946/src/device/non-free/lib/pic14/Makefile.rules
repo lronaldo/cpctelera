@@ -1,0 +1,70 @@
+###########################################################
+### Makefile.rules for the SDCC/PIC14 Library
+###
+### Copyright (C) 2005 by Raphael Neider <rneider AT web.de>
+###
+### The library is currently maintained by
+###	Raphael Neider <rneider AT web.de>
+###
+### This file may be distributed under the terms of the the
+### GNU General Public License (GPL). See GPL for details.
+###
+### $Id: Makefile.rules 5205 2008-08-07 21:44:41Z borutr $
+###
+
+# update dependencies
+$(top_builddir)/$(builddir)/%.d : %.c
+ifndef SILENT
+	@echo "[  CPP  ] ==> $(patsubst $(top_builddir)/%,%,$@)"
+endif
+	$(Q)$(CPP) $(CPPFLAGS) -o "$@" "$<"
+
+# assemble
+$(top_builddir)/$(builddir)/%.o : %.S
+ifndef SILENT
+	@echo "[  AS   ] ==> $(patsubst $(top_builddir)/%,%,$@)"
+endif
+	$(Q)$(CPP) $(CPPFLAGS) -P -o "$*.Spp" "$<"
+	$(Q)$(AS) $(ASFLAGS) -o "$@" -c "$*.Spp"
+	$(Q)$(RM) "$*.Spp"
+
+# compile
+$(top_builddir)/$(builddir)/%.o : %.c
+ifndef SILENT
+	@echo "[  CC   ] ==> $(patsubst $(top_builddir)/%,%,$@)"
+endif
+	$(Q)$(CC) $(CFLAGS) -o "$@" -c "$<"
+
+# create library
+ifneq (,$(strip $(LIB_O)))
+%.lib : $(LIB_O)
+ifndef SILENT
+	@echo "[  LIB  ] $(patsubst $(top_builddir)/%,%,$@) <== $(patsubst $(top_builddir)/$(builddir)/%,%,$^)"
+endif
+	$(Q)$(RM) "$@"; $(LIB) $(LIBFLAGS) "$@" $^
+else
+%.lib : recurse
+ifndef SILENT
+	@echo "[  LIB  ] $(patsubst $(top_builddir)/%,%,$@) <== **/*.o"
+endif
+	$(Q)$(RM) "$@"; LIB_O=`find "$(top_builddir)/$(builddir)" -name "*.o"`; [ "x$${LIB_O}" = "x" ] || $(LIB) $(LIBFLAGS) "$@" $${LIB_O}
+endif
+
+.PHONY : recurse force
+
+# build sub-directories
+ifneq (,$(strip $(SUBDIRS)))
+recurse : force
+	$(Q)+for DIR in $(SUBDIRS) ; do \
+		[ -f "$(srcdir)/$${DIR}.ignore" ] && $(GREP) "^$${ARCH}$$" "$${DIR}.ignore" > /dev/null 2>&1 || ( \
+			$(MKDIR) "$(top_builddir)/$(builddir)/$${DIR}"; \
+			CFLAGS="$(CFLAGS)" $(MAKE) -C "$${DIR}" builddir="$(builddir)/$${DIR}" $(MAKECMDGOALS); \
+		) || exit 1; \
+	done
+else
+recurse :
+	@# nothing to do
+endif
+
+# target to force remaking of (seemingly) independent targets
+force :
