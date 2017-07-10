@@ -54,7 +54,7 @@ CPCT_PATH      := $(patsubst %cfg/,%,$(THIS_FILE_PATH))
 
 # PATHs FOR BUILDING TOOLS BINARIES
 #  Absolute paths for SDCC, Hex2bin, iDSK and 2CDT 
-SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.5.5/bin/
+SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.6.8-r9946/bin/
 HEX2BIN_PATH := $(CPCT_PATH)tools/hex2bin-2.0/bin/
 IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.13/bin/
 2CDT_PATH    := $(CPCT_PATH)tools/2cdt/bin/
