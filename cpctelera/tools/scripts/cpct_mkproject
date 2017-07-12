@@ -40,6 +40,7 @@
 ##
 ## Command line options:
 ##    -c | --cpcrslib                - Generates a CPCRSLib enabled project
+##    -s | --no-vs-code              - Prevents creation of .vscode/ subfolder
 ##    -n | --project-name [projname] - Lets you name your project in a different
 ## way than the project folder.
 ##    -l | --load-address [loadaddr] - Lets you establish the memory address where
@@ -56,6 +57,7 @@ PROJECTNAME=
 PROJECTDIR=
 LOADADDRESS=4000
 CPCRSLIB=false
+VSCODE=true
 
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
@@ -67,6 +69,7 @@ IMGCON_TEMPLATE=${TEMPLATE_DIRECTORY}/image_conversion.mk
 TMXCON_TEMPLATE=${TEMPLATE_DIRECTORY}/tilemap_conversion.mk
 MUSCON_TEMPLATE=${TEMPLATE_DIRECTORY}/music_conversion.mk
 CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/build_config.mk
+VSCODE_TEMPLATE_DIR=${TEMPLATE_DIRECTORY}/vscode/
 ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE} \
                     ${IMGCON_TEMPLATE} ${TMXCON_TEMPLATE} ${MUSCON_TEMPLATE})
 
@@ -92,9 +95,13 @@ current folder."
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -c | --cpcrslib"
    echo "${COLOR_CYAN}       Generates a CPCRSLib enabled project."
+   echo
    echo "${COLOR_LIGHT_BLUE}  -n | --project-name  ${COLOR_LIGHT_CYAN}<name>"
    echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder_name> name. <name> \
 must not contain spaces."
+   echo
+   echo "${COLOR_LIGHT_BLUE}  -s | --no-vs-code"
+   echo "${COLOR_CYAN}       Prevents creation of .vscode/ subfolder."
    echo
    echo "${COLOR_LIGHT_BLUE}  -l | --load-address ${COLOR_LIGHT_CYAN}<hexadecimal address>"
    echo "${COLOR_CYAN}       Establishes the hexadecimal address where the binary of the project will be loaded \
@@ -142,6 +149,9 @@ while (( $# >= 1 )); do
          fi
          PROJECTNAME="$2"
          shift
+      ;;
+      "-s" | "--no-vs-code")
+         VSCODE=false
       ;;
       ## Get Load Address
       "-l" | "--load-address")
@@ -203,6 +213,7 @@ NEW_IMGCON=${CONFIG_DIR}/image_conversion.mk
 NEW_TMXCON=${CONFIG_DIR}/tilemap_conversion.mk
 NEW_MUSCON=${CONFIG_DIR}/music_conversion.mk
 NEW_MAKE=${PROJECTDIR}/Makefile
+NEW_VSCODE=${PROJECTDIR}/.vscode
 
 # Welcome message
 stageMessage "CPCtelera" "Creating new project in ${COLOR_WHITE}${PROJECTDIR}/"
@@ -228,6 +239,14 @@ cp ${IMGCON_TEMPLATE} ${NEW_IMGCON}
 cp ${TMXCON_TEMPLATE} ${NEW_TMXCON}
 cp ${MUSCON_TEMPLATE} ${NEW_MUSCON}
 drawOK
+
+## Copy VSCode config directory template
+if $VSCODE; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Copying basic VS Code project configuration..."
+   cp -r ${VSCODE_TEMPLATE_DIR} ${NEW_VSCODE}
+   drawOK
+fi
+
 
 # Configuring project values into CFG_TEMPLATE
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring project name to: ${COLOR_WHITE}${PROJECTNAME}"
