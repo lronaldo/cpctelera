@@ -133,7 +133,11 @@ Group: Memutils  {
    File: cpct_memset  (memutils/cpct_memset.asm)
    File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
    File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
+   File: cpct_pageMemory  (memutils/cpct_pageMemory_asmbinding.s)
+   File: cpct_pageMemory  (memutils/cpct_pageMemory.asm)
+   File: cpct_pageMemory  (memutils/cpct_pageMemory_cbindings.s)
    File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
+   File: Memory Pagination Utilities  (memutils/banks.h)
    File: Memory Relocation Utilities  (memutils/relocation.h)
    }  # Group: Memutils
 
