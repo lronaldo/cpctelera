@@ -96,7 +96,7 @@ Topic: Downloading CPCtelera
 
    You can download CPCtelera from these sources
 
-   * Download <current stable version 1.4. at https://github.com/lronaldo/cpctelera/archive/v1.4.zip>
+   * Download <current stable version 1.4.2. at https://github.com/lronaldo/cpctelera/archive/v1.4.2.zip>
 
    * Get Latest version from github:
    > git clone https://github.com/lronaldo/cpctelera
@@ -108,7 +108,7 @@ Topic: Software Requirements
 _Under Linux_:
    Install these packages on your Linux distribution. Although they are pretty standard, names may slightly vary on some distributions.
 
-   * Commands: *gcc*, *g++*, *make*, *bison*, *flex*
+   * Commands: *gcc*, *g++*, *make*, *bison*, *flex*, *mono*
    * Libraries: *libboost-dev*, *libfreeimage-dev*
 
    Next are recommented packages. They are not required for CPCtelera to work, but some included tool may require them:
@@ -126,15 +126,6 @@ _Under Windows_:
    * Commands: *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*, *wget*, *unzip*, *bc*
    * Libraries: *libboost-devel*, *libintl-devel*
 
-IMPORTANT NOTE:
-
-   Windows users have reported some common issues installing CPCtelera. Please, have a look at this list if you have any problem,
-
-   * _Antivirus and scanning software_. This kind of software is causing random issues that cause Cygwin and CPCtelera not to operate properly. Common problems include failing to compile and/or execute programs, privilege problems on executing programs and random crashes of Cygwin. If you experience this problems, try disabling your antivirus or scanning software. Once being sure that this is the reason for your problems, you may want to configure your software not to interfere with Cygwin.
-   * _Windows 8/10 privilege problems_. Under some unclarified circumstances, some users have privilege problems executing Cygwin sofware, and that affects CPCtelera. In this cases, the most common workaround is launching Cygwin terminal with administrator privileges.
-
-   If you experience any diffenrent problem with Windows/Cygwin, please report to us so that we can include it in this list. 
-
 _Under OSX_:
 
    Under OSX <XCode at https://itunes.apple.com/es/app/xcode/id497799835?mt=12>  and <Homebrew at http://brew.sh/> are required for installing CPCtelera. Follow these steps,
@@ -143,10 +134,8 @@ _Under OSX_:
    2. - Install <Homebrew at http://brew.sh/> if you didn't have it.
    3. - Open a terminal and install XCode Command Line tools with this command,
    > xcode-select --install
-   4. - Install libboost and freeimage from homebrew with these commands,
-   > brew install boost freeimage
-   5. - Optionally, install recommended packages, that some tools included with CPCtelera may require
-   > brew install wine wget
+   4. - Install required packages from homebrew with these commands,
+   > brew install boost freeimage mono wine wget
 
 Some things to take into account on OSX,
    * Some previous OSX systems may not understand the xcode-select --install command. On those systems, there usually are menu options from the XCode GUI to install Command Line Tools. If you need more advice, there is a <nice explanation on stack overflow about the XCode Command Line Tools at http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools>. 
@@ -156,7 +145,7 @@ Topic: Installing CPCtelera in your system
    These are the steps to install CPCtelera in your system
 
    1.  - Install required <Software Requirements>
-   2.  - Download and unzip <current stable version 1.4. of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.4.zip> (read "some considerations" below)
+   2.  - Download and unzip <current stable version 1.4.2. of CPCtelera at https://github.com/lronaldo/cpctelera/archive/v1.4.2.zip> (read "some considerations" below)
    3.  - Open a terminal an enter cpctelera/ folder. 
    > cd cpctelera/
    4.  - Launch *setup.sh* 
@@ -171,6 +160,20 @@ CPCtelera is ready to be used in your system.
    * However, CPCTelera can be installed anywhere in your system, provided the path does not contain any spaces.
    * *setup.sh* checks software dependencies. If some dependency is not met, you will receive an error message requesting you to install it and then launch *setup.sh* again.
 
+Topic: Troubleshooting
+
+   Users have reported some occasional issues installing CPCtelera. Please, have a look at this list if you have any problem,
+
+   * _Antivirus and scanning software_. This kind of software is causing random issues that cause Cygwin and CPCtelera not to operate properly. Common problems include failing to compile and/or execute programs, privilege problems on executing programs and random crashes of Cygwin. If you experience this problems, try disabling your antivirus or scanning software. Once being sure that this is the reason for your problems, you may want to configure your software not to interfere with Cygwin.
+   * _Windows 8/10 privilege problems_. Under some unclarified circumstances, some users have privilege problems executing Cygwin sofware, and that affects CPCtelera. In this cases, the most common workaround is launching Cygwin terminal with administrator privileges.
+   * _Windows 8/10 executable conflicts_. Some users experience compilation or execution problems due to other Windows being using other software installed outside cygwin. This usually happens with MinWG (gcc, g++), SDCC and git, but may happen with other software aswell. On some installations, Windows PATH variable gives priority to previously installed software. So, when compiling with gcc, sdcc or using git, problems happen due to Windows version of the software being executed. In this cases, please check Windows PATH variable and adjust it accordingly.
+   * _'yywrap' symbol not being defined_. Previous versions of CPCtelera may fail to build and have this issue reported in the tool_building.log. This is due to changes outside of our control. However, there is a simple fix for this problem. Please, follow this steps:   
+    1. - Launch *./setup.sh* (If launched previously, ask for clean reinstall *./setup.sh -cri*)
+    2. - Wait until it fails at ~47% and then edit this file: cpctelera-1.4/cpctelera/tools/sdcc-3.5.5/obj/support/sdbinutils/binutils/syslex.c
+    3. - Comment out line 74 of *syslex.c* adding // at its start. It should look like this: //    #define yywrap yywrap
+    4. - Launch ./setup.sh again
+
+   If you experience any diffenrent problem with Windows/Cygwin, please report to us so that we can include it in this list. 
 
 Section: Starting with CPCtelera
 
