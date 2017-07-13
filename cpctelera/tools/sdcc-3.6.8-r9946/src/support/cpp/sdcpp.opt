@@ -1,0 +1,336 @@
+; Options for the SDCPP front end.
+; Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+;
+; This file is part of GCC.
+;
+; GCC is free software; you can redistribute it and/or modify it under
+; the terms of the GNU General Public License as published by the Free
+; Software Foundation; either version 2, or (at your option) any later
+; version.
+;
+; GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+; WARRANTY; without even the implied warranty of MERCHANTABILITY or
+; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+; for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with GCC; see the file COPYING.  If not, write to the Free
+; Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
+; 02110-1301, USA.
+
+; See the GCC internals manual for a description of this file's format.
+
+; Please try to keep this file in ASCII collating order.
+
+Language
+SDCPP
+
+-help
+Common
+Display this information
+
+-version
+Common
+Display the compiler's version
+
+;***-output-pch=
+;***SDCPP Joined Separate
+
+A
+SDCPP Joined Separate
+-A<question>=<answer>	Assert the <answer> to <question>.  Putting '-' before <question> disables the <answer> to <question>
+
+C
+SDCPP
+Do not discard comments
+
+CC
+SDCPP
+Do not discard comments in macro expansions
+
+D
+SDCPP Joined Separate
+-D<macro>[=<val>]	Define a <macro> with <val> as its value.  If just <macro> is given, <val> is taken to be 1
+
+H
+SDCPP
+Print the name of header files as they are used
+
+I
+SDCPP Joined Separate
+-I <dir>	Add <dir> to the end of the main include path.  -I- gives more include path control; see info documentation
+
+M
+SDCPP
+Generate make dependencies
+
+MD
+SDCPP Separate
+Generate make dependencies and compile
+
+MF
+SDCPP Joined Separate
+-MF <file>	Write dependency output to the given file
+
+MG
+SDCPP
+Treat missing header files as generated files
+
+MM
+SDCPP
+Like -M but ignore system header files
+
+MMD
+SDCPP Separate
+Like -MD but ignore system header files
+
+MP
+SDCPP
+Generate phony targets for all headers
+
+MQ
+SDCPP Joined Separate
+-MQ <target>	Add a MAKE-quoted target
+
+MT
+SDCPP Joined Separate
+-MT <target>	Add an unquoted target
+
+P
+SDCPP
+Do not generate #line directives
+
+U
+SDCPP Joined Separate
+-U<macro>	Undefine <macro>
+
+Wall
+SDCPP
+Enable most warning messages
+
+Wcomment
+SDCPP
+Warn about possibly nested block comments, and C++ comments spanning more than one physical line
+
+Wcomments
+SDCPP
+Synonym for -Wcomment
+
+Wdeprecated
+SDCPP
+Warn about deprecated compiler features
+
+Wendif-labels
+SDCPP
+Warn about stray tokens after #elif and #endif
+
+Werror
+Common
+Treat all warnings as errors
+
+Wfatal-errors
+SDCPP Var(flag_fatal_errors)
+Exit on the first error occurred
+
+Wimport
+SDCPP
+Deprecated.  This switch has no effect.
+
+;***Winvalid-pch
+;***SDCPP
+;***Warn about PCH files that are found but not used
+
+Wsystem-headers
+Common
+Do not suppress warnings from system headers
+
+Wtraditional
+SDCPP Var(warn_traditional)
+Warn about features not present in traditional C
+
+Wtrigraphs
+SDCPP
+Warn if trigraphs are encountered that might affect the meaning of the program
+
+Wundef
+SDCPP
+Warn if an undefined macro is used in an #if directive
+
+Wunused-macros
+SDCPP
+Warn about macros defined in the main file that are not used
+
+Wvariadic-macros
+SDCPP
+Do not warn about using variadic macros when -pedantic
+
+ansi
+SDCPP
+A synonym for -std=c89.
+
+d
+Common SDCPP Joined
+-d<letters>	Enable dumps from specific passes of the compiler
+
+fdollars-in-identifiers
+SDCPP
+Permit '$' as an identifier character
+
+fexec-charset=
+SDCPP Joined RejectNegative
+-fexec-charset=<cset>	Convert all strings and character constants to character set <cset>
+
+finput-charset=
+SDCPP Joined RejectNegative
+-finput-charset=<cset>      Specify the default character set for source files.
+
+;***fpch-deps
+;***SDCPP
+
+fpreprocessed
+SDCPP
+Treat the input file as already preprocessed
+
+fshow-column
+SDCPP
+
+fsigned-char
+SDCPP
+Make \"char\" signed by default
+
+ftabstop=
+SDCPP Joined RejectNegative UInteger
+-ftabstop=<number>	Distance between tab stops for column reporting
+
+funsigned-char
+SDCPP
+Make \"char\" unsigned by default
+
+fwide-exec-charset=
+SDCPP Joined RejectNegative
+-fwide-exec-charset=<cset>	Convert all wide strings and character constants to character set <cset>
+
+fworking-directory
+SDCPP
+Generate a #line directive pointing at the current working directory
+
+idirafter
+SDCPP Joined Separate
+-idirafter <dir>	Add <dir> to the end of the system include path
+
+imacros
+SDCPP Joined Separate
+-imacros <file>	Accept definition of macros in <file>
+
+imultilib
+C ObjC C++ ObjC++ Joined Separate
+-imultilib <dir> Set <dir> to be the multilib include subdirectory
+
+include
+SDCPP Joined Separate
+-include <file>	Include the contents of <file> before other files
+
+iprefix
+SDCPP Joined Separate
+-iprefix <path>	Specify <path> as a prefix for next two options
+
+isysroot
+SDCPP Joined Separate
+-isysroot <dir>	Set <dir> to be the system root directory
+
+isystem
+SDCPP Joined Separate
+-isystem <dir>	Add <dir> to the start of the system include path
+
+iquote
+SDCPP Joined Separate
+-iquote <dir>	Add <dir> to the end of the quote include path
+
+iwithprefix
+SDCPP Joined Separate
+-iwithprefix <dir>	Add <dir> to the end of the system include path
+
+iwithprefixbefore
+SDCPP Joined Separate
+-iwithprefixbefore <dir>	Add <dir> to the end of the main include path
+
+lang-asm
+C Undocumented
+
+lang-objc
+SDCPP Undocumented
+
+nostdinc
+SDCPP
+Do not search standard system include directories (those specified with -isystem will still be used)
+
+o
+SDCPP Joined Separate
+-o <file>	Place output into <file>
+
+obj-ext=
+SDCPP Joined
+-obj-ext=<extension>	Define object file extension, used for generation of make dependencies
+
+pedantic
+SDCPP Var(pedantic)
+Issue warnings needed for strict compliance to the standard
+
+pedantic-errors
+Common SDCPP
+Like -pedantic but issue them as errors
+
+pedantic-parse-number
+SDCPP
+Pedantic parse number
+
+remap
+SDCPP
+Remap file names when including files
+
+std=c89
+SDCPP
+Conform to the ISO 1990 C standard
+
+std=c99
+SDCPP
+Conform to the ISO 1999 C standard
+
+std=c11
+SDCPP
+Conform to the ISO 2011 C standard
+
+std=iso9899:1990
+C ObjC
+Conform to the ISO 1990 C standard
+
+std=iso9899:199409
+SDCPP
+Conform to the ISO 1990 C standard as amended in 1994 (and ratified in 1995)
+
+std=iso9899:1999
+C ObjC
+Conform to the ISO 1999 C standard
+
+traditional-cpp
+SDCPP
+Enable traditional preprocessing
+
+;*** ISO C trigraphs are enabled by default on sdcpp
+no-trigraphs
+SDCPP
+-no-trigraphs	Disble ISO C trigraphs support
+
+v
+SDCPP
+Enable verbose output
+
+;***version
+;***SDCPP Var(version_flag)
+;***Display the compiler's version
+
+w
+Common Var(inhibit_warnings)
+Suppress warnings
+
+; This comment is to ensure we retain the blank line above.

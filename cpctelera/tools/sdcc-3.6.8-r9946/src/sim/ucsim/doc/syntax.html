@@ -1,0 +1,350 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>Command syntax of &#181;Csim</title>
+  </head>
+  <body style="    background-color: white;"> Content:
+    <ul>
+      <li><a href="#syntax">Syntax</a> </li>
+      <li><a href="#expr">Expressions</a> </li>
+      <li><a href="#redir">Redirection</a> </li>
+    </ul>
+    <h2><a name="syntax">Command syntax of <i>&#181;Csim</i></a></h2>
+    <i>&#181;Csim</i> uses a very simple command interpreter. Command can be entered
+    after <i>&#181;Csim</i> displays the prompt and interpreted when ENTER key is
+    pressed. Commands must start with the name of the command following
+    parameters. Name of the command can be abbreviated if abbreviation is
+    unique. Some commands have more than one names.
+    <p>Syntactically parameters can be a string, bit name, array, number or
+      symbol. Interpretation of these syntactical elements depends on actual
+      command. </p>
+    <p>If the command line can not be recognized as a known command, <i>&#181;Csim</i>
+      tries to evaluate the command line as an <i>expression</i>. <a href="#expr">See
+        below</a> for information about operands and operators which can be used
+      in expressions. </p>
+    <h3><a name="command_name">Command names</a></h3>
+    Name of the command must be the first word of the command line. It is not
+    necessary to enter whole name if abbreviation is unique. Help command can be
+    used to check out if a command has more names:
+    <pre>&gt; <font color="green">help run</font>
+run [start [stop]] Go
+Names of command: <b>go r run</b>
+...
+</pre> Some commands just groups other commands. These commands have a set of
+    so-called <i>sub-commands</i>. Sub-command must be second word in the
+    command line. For example:
+    <pre>&gt; <font color="green">help set</font>
+set <b>subcommand</b>     Set, see `set' command for more help
+Names of command: set
+long help of set
+&gt; <font color="green">set</font>
+"set" must be followed by the name of a subcommand
+List of subcommands:
+<b>set option</b> name|nr value
+                   Set value of an option
+<b>set error</b> on|off|unset
+                   Set value of an error
+<b>set memory</b> memory_type address data...
+                   Place list of data into memory
+<b>set bit</b> addr 0|1   Set specified bit to 0 or 1
+<b>set hardware</b> cathegory params...
+                   Set parameters of specified hardware element
+</pre>
+    <h3>Type of parameters</h3>
+    <h4><a name="string_type">String type</a></h4>
+    To distinguish strings and symbols, strings can be surrounded by (double)
+    quotes. Quotes can be omitted if command parameter is interpreted as string
+    and actual parameter start with a letter (so it doesn't look to be a number)
+    and doesn't contain space. Let's look an example:
+    <pre>0&gt; <font color="green">set opt 7 <b>s51&gt;</b></font>
+0s51&gt;<font color="green">set opt 7 <b>".s51&gt; "</b></font>
+0.s51&gt; 
+</pre>
+    <h4><a name="bit_type">Bit type</a></h4>
+    If parameter contains a dot (.) it is treated as bit specification. Part
+    before the dot gives memory address and part after the dot means bit number
+    in the specified data.
+    <pre>0&gt; <font color="green">dump <b>p1.1</b></font>
+      P1.1 0x90 ff 1
+0&gt; <font color="green">dump <b>0x80.1</b></font>
+      P4.1 0x80 ff 1
+0&gt; 
+</pre>
+    <h4><a name="array_type">Array type</a></h4>
+    Parameters contain [ character are treated as arrays. Arrays can be used to
+    specify hardware elements. Array index selects an object if more than one
+    exists:
+    <pre>0&gt; <font color="green">info hw <b>port[0]</b></font>
+port[0]
+P0    11111111 0xff 255 . (Value in SFR register)
+Pin0  11111111 0xff 255 . (Output of outside circuits)
+Port0 11111111 0xff 255 . (Value on the port pins)
+0&gt; 
+</pre>
+    <h4><a name="number_type">Number type</a></h4>
+    Some commands accept parameters which in most cases can be numbers. Numbers
+    can be entered in C-style form. If the number begins with <tt><b>0x</b></tt>
+    or <tt><b>0X</b></tt> it is interpreted as a hexadecimal number. If it
+    begins with <tt><b>0</b></tt> followed by digits it is interpreted as octal
+    number. In other cases it is interpreted as decimal number.
+    <h4><a name="symbol_type">Symbol type</a></h4>
+    If a command parameter can not be classified in other ways (doesn't start
+    with a digit or a quote, doesn't contain dot or [) then it will be treated
+    as a <b>symbol</b>. Symbols can be interpreted in several ways.
+    <h3>Interpretation of parameters</h3>
+    <h4><a name="address_param">Address parameters</a></h4>
+    Many commands requires memory addresses as parameters. Addresses can be
+    specified using number or symbol type of parameters. Value of symbols
+    depends on processor type. For example MCS52 family of controllers defines
+    more symbols than MCS51 family.
+    <h4><a name="number_param">Number, data parameters</a></h4>
+    When a command expects a number it should get a number. <font color="red">Note</font>,
+    that symbols is not converted to number they can be used as address only!
+    <h4><a name="string_param">String parameters</a></h4>
+    Strings can be entered without quotes if they are recognized as strings (see
+    above) and do not contain spaces.
+    <h4><a name="data_list_param">Data list parameters</a></h4>
+    Data list can be any space separated list of numbers and strings. If you
+    include a string in the list, it is broken to list of bytes where every byte
+    is ASCII code of a string's character.
+    <pre>&gt; <font color="green">where xram "ab" 0x43</font>
+0xf961 61 62 63                abc
+&gt; 
+</pre>
+    <h4><a name="memory_param">Memory parameters</a></h4>
+    Where memory type is expected, name of the memory should be used. Most
+    commands accept memory chip and address space too. See <a href="memory.html">memory
+      simulation</a> for more information.
+    <h4><a name="hw_param">Hardware element parameters</a></h4>
+    Hardware elements can be specified by using arrays, where array name is name
+    of the element and the array index selects one if more than one exists.
+    <h4><a name="bit_param">Bit parameters</a></h4>
+    Bits can be specified by several ways. One way is using bit type of command
+    parameter:
+    <pre>0&gt; <font color="green">dump 0.2</font>
+    0x00.2 0x00 00 0
+0&gt; <font color="green">dump 0xc3.2</font>
+    0xc3.2 0xc3 00 0
+0&gt; <font color="green">dump p2.3</font>
+      P2.3 0xa0 ff 1
+0&gt;
+</pre> In this way, any IRAM or SFR location can be addressed as the above
+    example shows.
+    <p>Other way is using bit address either by value or by symbolic name: </p>
+    <pre>0&gt; <font color="green">dump ea</font>
+     IE0.7 0xa8 00 0
+0&gt; <font color="green">dump 34</font>
+    0x24.2 0x24 24 1
+0&gt; <font color="green">dump 0xc7</font>
+   SCON1.7 0xc0 00 0
+0&gt; 
+</pre> Of course, only addressable bits can be accessed in this way.
+    <hr>
+    <h2><a name="expr">Expressions</a></h2>
+    If first word of the command line is not recognized as a known command, the
+    command line will be evaluated as an expression and the result value printed
+    (in decimal):
+    <pre>0&gt; <font color="green">12*(34+56)</font>
+1080
+0&gt; 
+</pre>
+    <h3>Operands</h3>
+    Operands of the expressions can be
+    <ul>
+      <li>number; </li>
+      <li>memory (either address space, or memory chip); </li>
+      <li>or bit</li>
+    </ul>
+    <h4>Number operands</h4>
+    Numbers can be entered in decimal, octal (starting with 0 followed by a
+    number), or hexadecimal (started with 0x):
+    <pre>0&gt; <font color="green">12</font>
+12
+0&gt; <font color="green">012</font>
+10
+0&gt; <font color="green">0x12</font>
+18
+0&gt; 
+</pre> Numbers must be integers (floating point is not supported) and not bigger
+    than the value which can be stored as <b>long int</b>.
+    <h4>Memory operands</h4>
+    Memory can be an address space location or a memory chip cell. It can be
+    specified in following form:
+    <pre>name[address]</pre>
+    where <i>name</i> is the name of the address space or memory chip and <i>address</i>
+    is an expression specifying location (index) of the cell.
+    <p>Registers in SFR address space can also be specified using pre-defined
+      names (symbols) of the registers. </p>
+    <pre>0&gt; <font color="green">xram[0x543]</font>
+67
+0&gt; <font color="green">xram_chip[1347]</font>
+67
+0&gt; <font color="green">rom[12*(34+56)]</font>
+56
+0&gt; <font color="green">sp</font>
+7
+0&gt; <font color="green">rom[256*dph+dpl]</font>
+88
+0&gt; 
+</pre> Value of the memory operand is always a positive integer number.
+    <h4>Bit operands</h4>
+    Bit operands are evaluated to 0 or 1. Any bit of any memory location can be
+    specified as bit using following form:
+    <pre>memory.bitnumber</pre>
+    where <i>memory</i> is a memory location as a memory operand and <i>bitnumber</i>
+    is number of the bit within the specified memory cell specified as an
+    expression. Note, that dot (.) is part of the syntax, not an operator.
+    <p>Alternatively, name of the bit can be used to specify named SFR bits. </p>
+    <pre>0&gt; <font color="green">p0.3</font>
+1
+0&gt; <font color="green">xram[12*(34+56)].9-2</font>
+0
+0&gt; <font color="green">it0</font>
+0
+0&gt; 
+</pre>
+    <h3>Operators</h3>
+    <table border="1">
+      <tbody>
+        <tr>
+          <th>Type</th>
+          <th>Operator</th>
+          <th>Meaning</th>
+        </tr>
+        <tr>
+          <td>Primary</td>
+          <td>( )</td>
+          <td>Group of sub-expressions</td>
+        </tr>
+        <tr>
+          <td>One operand</td>
+          <td>- &amp;</td>
+          <td>Unary minus, address of</td>
+        </tr>
+        <tr>
+          <td rowspan="2">Arithmetic</td>
+          <td>* /</td>
+          <td>Multiply, divide</td>
+        </tr>
+        <tr>
+          <td>+ -</td>
+          <td>Add, substract</td>
+        </tr>
+        <tr>
+          <td>Assignment</td>
+          <td>=</td>
+          <td>Assign to</td>
+        </tr>
+      </tbody>
+    </table>
+    Arithmetic operators and parenthesises work as usual.
+    <p>Assigment operator can be used to modify memory cells and bits of the
+      cells. Result will be the assigned value. </p>
+    <pre>0&gt; <font color="green">p0=23</font>
+23
+0&gt; <font color="green">i h port[0]</font>
+port[0]
+P0    00010111 0x17  23 . (Value in SFR register)
+Pin0  11111111 0xff 255 . (Output of outside circuits)
+Port0 00010111 0x17  23 . (Value on the port pins)
+0&gt; <font color="green">p0.0= 0</font>
+0
+0&gt; <font color="green">i h p[0]</font>
+port[0]
+P0    00010110 0x16  22 . (Value in SFR register)
+Pin0  11111111 0xff 255 . (Output of outside circuits)
+Port0 00010110 0x16  22 . (Value on the port pins)
+0&gt; <font color="green">xram[256*dph+dpl]= rom[0]</font>
+108
+0&gt; <font color="green">dump rom 0 0</font>
+0x0000 6c                      l
+0&gt; <font color="green">dump sfr dph dph</font>
+0x83 00                      .
+0&gt; <font color="green">dump sfr dpl dpl</font>
+0x82 00                      .
+0&gt; <font color="green">dump xram 0 0</font>
+0x0000 6c                      l
+0&gt; <font color="green">0x6c</font>
+108
+0&gt; <font color="green">dump ea</font>
+     IE0.7 0xa8 00 0
+0&gt; <font color="green">ea= 1111</font>
+1
+0&gt; <font color="green">dump ea</font>
+     IE0.7 0xa8 80 1
+0&gt; 
+</pre> When a symbolic name of the SFR is used, it results value of the named
+    register not the value of the symbol. "Address of" operator can be used to
+    get value of the symbol.
+    <pre>0&gt; <font color="green">dpl</font>
+0
+0&gt; <font color="green">&amp;dpl</font>
+130
+0&gt; <font color="green">ea</font>
+1
+0&gt; <font color="green">&amp;ea</font>
+175
+0&gt; <font color="green">256*dph+dpl</font>
+46630
+0&gt; <font color="green">&amp;xram[256*dph+dpl]</font>
+46630
+0&gt; 
+</pre>
+    <hr>
+    <h2><a name="redir">Redirection</a></h2>
+    Output of any command can be redirected to a file. Same syntax can be used
+    for this as for UNIX shell. The only difference is that <i>&#181;Csim</i>
+    doesn't allow to put redirection at the beginning of the command!
+    <pre>$ <font color="#118811">s51 remo.hex</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+55470 words read from remo.hex
+0&gt; <font color="#118811">dump &gt;/tmp/rom.dump rom</font>
+0&gt; <font color="#118811">quit</font>
+$ <font color="#118811">cat /tmp/rom.dump</font>
+0x0000 02 01 60 02 00 3c 06 07 ..`..&lt;..
+0x0008 08 09 0a 02 2f 6b 0e 0f ..../k..
+0x0010 10 11 12 02 00 ac 16 17 ........
+0x0018 18 19 1a 1b 1c 1d 1e 1f ........
+0x0020 20 21 22 02 01 1c 26 27  !"...&amp;'
+0x0028 28 29 2a 32 2c 2d 2e 2f ()*2,-./
+0x0030 02 0f a7 02 0e 9c 02 0d ........
+0x0038 d2 02 08 41 c0 82 c0 83 ...A....
+0x0040 c0 d0 c0 e0 c0 00 a2 90 ........
+0x0048 c0 d0 c2 90 78 18 06 30 ....x..0
+$ <font color="#118811">s51 remo.hex</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+55470 words read from remo.hex
+0&gt; <font color="#118811">dump rom 0x50 &gt;&gt;/tmp/rom.dump</font>
+0&gt; <font color="#118811">quit</font>
+$ <font color="#118811">cat /tmp/rom.dump</font>
+0x0000 02 01 60 02 00 3c 06 07 ..`..&lt;..
+0x0008 08 09 0a 02 2f 6b 0e 0f ..../k..
+0x0010 10 11 12 02 00 ac 16 17 ........
+0x0018 18 19 1a 1b 1c 1d 1e 1f ........
+0x0020 20 21 22 02 01 1c 26 27  !"...&amp;'
+0x0028 28 29 2a 32 2c 2d 2e 2f ()*2,-./
+0x0030 02 0f a7 02 0e 9c 02 0d ........
+0x0038 d2 02 08 41 c0 82 c0 83 ...A....
+0x0040 c0 d0 c0 e0 c0 00 a2 90 ........
+0x0048 c0 d0 c2 90 78 18 06 30 ....x..0
+0x0050 03 4b 20 92 48 30 07 05 .K .H0..
+0x0058 c2 07 02 00 9d 30 08 05 .....0..
+0x0060 20 93 3a c2 08 90 08 60  .:....`
+0x0068 e0 b4 ff 03 02 00 9d 04 ........
+0x0070 f0 14 f8 03 03 03 54 1f ......T.
+0x0078 90 08 62 25 82 f5 82 e5 ..b%....
+0x0080 83 34 00 f5 83 e8 54 07 .4....T.
+0x0088 f8 08 74 80 23 d8 fd f8 ..t.#...
+0x0090 e0 30 93 07 c8 f4 58 f0 .0....X.
+0x0098 02 00 9d 48 f0 d0 d0 92 ...H....
+$ 
+</pre>
+    <hr>
+  </body>
+</html>

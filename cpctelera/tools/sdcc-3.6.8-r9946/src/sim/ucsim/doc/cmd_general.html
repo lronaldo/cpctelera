@@ -1,0 +1,811 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>General commands of &#181;Csim</title>
+  </head>
+  <body style="                      background-color: white;">
+    <h2>General commands of <i>&#181;Csim</i></h2>
+    <h3><a name="conf">conf</a></h3>
+    Conf command can be used to display different kind of information about <i>&#181;Csim</i>.
+    It can be followed by a subcommand:
+    <p><a href="#conf_">conf</a> <br>
+      conf <a href="#conf_objects">objects</a> </p>
+    <blockquote>
+      <h4><a name="conf_">conf</a></h4>
+      This command (without a subcommand) prints out configuration of the
+      simulator:
+      <pre>0&gt; <font color="#118811">conf</font>
+ucsim version 0.5.0-pre3
+Type of microcontroller: 51 CMOS
+Controller has 9 hardware element(s).
+  timer0[0]
+  timer1[1]
+  uart[0]
+  port[0]
+  port[1]
+  port[2]
+  port[3]
+  irq[0]
+  _51_dummy[0]
+0&gt;
+</pre> First line contains version number of the program. Second line informs
+      about type of the simulated microcontroller. Third line prints out how
+      many hardware elements are simulated.
+      <h4><a name="conf_objects">conf <i>objects</i></a></h4>
+      This command is for development only. </blockquote>
+    <hr>
+    <h3><a name="h">?,help <i>[command]</i></a></h3>
+    Help command. It prints out short description of the commands.
+    <p>If a command name is given as parameter then <i>&#181;Csim</i> prints out all
+      command that has similar names: </p>
+    <pre>0&gt; <font color="#118811">? s</font>
+show subcommand    Generic command for showing things about the uCsim
+set subcommand     Set, see `set' command for more help
+stop               Stop
+step               Step
+state              State of microcontroller
+statistic [mem [startaddr [endaddr]]]
+                   Statistic of memory accesses
+0&gt; <font color="#118811">? s o</font>
+show option [name] Show internal data of options
+set option name|nr value
+                   Set value of an option
+0&gt; 
+</pre> Some commands have more than one name which can produce interesting
+    result:
+    <pre>0&gt; <font color="#118811">? t r</font>
+timer delete id    Delete a timer
+timer start id     Start a timer
+0&gt; 
+</pre> It looks that names of listed subcommands start with no "r" but take a
+    closer look on that commands:
+    <pre>0&gt; <font color="#118811">? t d</font>
+timer delete id    Delete a timer
+Names of command: delete remove
+long help of timer delete
+0&gt; <font color="#118811">? t start</font>
+timer start id     Start a timer
+Names of command: run start
+long help of timer run
+0&gt; </pre>
+    <p>If parameter is unique name of a command then long description of the
+      command is printed out. </p>
+    <hr>
+    <h3><a name="q">quit</a></h3>
+    Quit. This command terminates actual console, it does not ask you to confirm
+    your intention. Simulator always reads commands from a file so end of file
+    condition finishes too. If command console is on standard input/output,
+    pressing the CTRL-D will quit just like the quit command.
+    <p>Note that if <a href="invoke.html#Zoption">-Z option</a> was used at
+      invocation then the quit command does not terminate the simulator program.
+      In this case <a href="#kill">kill</a> command can be used to terminate
+      the simulator. See for more information about <a href="mulcons.html">using
+        multiple consoles</a>. </p>
+    <pre>$ <font color="#118811">s51</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; <font color="#118811">q</font>
+$ </pre>
+    <hr>
+    <h3><a name="kill">kill</a></h3>
+    This command terminates the simulator. It does not ask for confirmation. It
+    doesn't matter how many consoles are used and what commands are running on
+    them.
+    <hr>
+    <h3><a name="exec">exec <i>file</i></a></h3>
+    Reads commands from "file" and executes them. This command opens a new
+    console (which will use same in/out file as the actual one) to execute the
+    file. This means the "quit" command in the file will not exit the simulator:
+    <pre>drdani@emma:~$ <font color="#118811">cat /tmp/x</font>
+get opt
+quit
+conf
+drdani@emma:~$ <font color="#118811">s51</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">exec "/tmp/x"</font>
+1&gt; get opt
+ 0. config_file(by application) is hidden!
+ 1. console_on(by application) is hidden!
+ 2. cpu_type(by application) is hidden!
+ 3. debug(by console1): FALSE - Debug messages to console1
+ 4. debug(by console0): FALSE - Debug messages to console0
+ 5. debug(by application): FALSE - Print debug messages (-V)
+ 6. irq_stop(by mcs51_controller): FALSE - Stop when IRQ accepted
+ 7. null_prompt(by application): FALSE - Use \0 as prompt (-P)
+ 8. prompt(by console1): "" - Prompt string of console1
+ 9. prompt(by console0): "" - Prompt string of console0
+10. prompt(by application): (null) - String of prompt (-p)
+11. serial_in_file(by application) is hidden!
+12. serial_out_file(by application) is hidden!
+13. xtal(by application): 11059200.000 - Frequency of XTAL in Hz
+1&gt; quit
+0&gt; 
+</pre>
+    <hr>
+    <h3><a name="expression">expression <i>expr</i></a></h3>
+    Executes "expr" as an expression. For more about expressions, see <a href="syntax.html">command
+      syntax</a>.
+    <pre>0&gt; <font color="#118811">expr 1 + 2</font>
+3
+0&gt; <font color="#118811">expr xram[256*dph+dpl]= &amp;sp</font>
+129
+0&gt; 
+</pre>
+    <hr>
+    <h3><a name="show">show</a></h3>
+    Show command can be used to display different kind of information. It must
+    be followed by a subcommand. Subcommands are:
+    <p>show <a href="#show_copying">copying</a> <br>
+      show <a href="#show_warranty">warranty</a> <br>
+      show <a href="#show_option">option</a> <br>
+      show <a href="#show_error">error</a> </p>
+    <blockquote>
+      <h4><a name="show_copying">show copying</a></h4>
+      This command can be used to list licensing information. It is first 10
+      point of the version 2 of GNU General Public License. If you do not accept
+      GPL simply do not use the program.
+      <hr>
+      <h4><a name="show_warranty">show warranty</a></h4>
+      This command prints out last 2 point of the license ("NO WARRANTY"
+      message).
+      <hr>
+      <h4><a name="show_option">show option</a></h4>
+      This command is for development only.
+      <hr>
+      <h4><a name="show_error">show error</a></h4>
+      Errors or warnings are events which can happen in the simulated system
+      during simulation. Report of that events can be turned on or off using <a
+        href="#set_error"><b>set error</b></a> command. Errors are organized in
+      parent-child relationship. Childs are listed under the parent:
+      <pre>0&gt; <font color="#118811">sh er</font>
+Error: non-classified [on/ON]
+  Error: memory [on/ON]
+    Error: invalid_address [unset/ON]
+    Error: non_decoded [unset/ON]
+  Error: stack [off/OFF]
+    Error: stack_tracker [unset/OFF]
+      Error: stack_tracker_wrong_handle [unset/OFF]
+      Error: operation_on_empty_stack [unset/OFF]
+      Warning: stack_operation_unmatched_to_top_of_stack [unset/OFF]
+      Warning: stack_looks_corrupted [unset/OFF]
+0&gt; </pre>
+      First element is the type (Error or Warning). Error stops the simulation.
+      Warning is just reported and simulation goes on. Next element is the name
+      of the error. Last element shows actual value and state. Value can be:
+      <dl>
+        <dt><b>on</b></dt>
+        <dd>state is ON </dd>
+        <dt><b>off</b></dt>
+        <dd>state is OFF </dd>
+        <dt><b>unset</b></dt>
+        <dd>state is inherited from the parent. </dd>
+      </dl>
+      If state is <b>ON</b> and the event happens, it is reported. If state is
+      <b>OFF</b> then the event is silently ignored. </blockquote>
+    <hr>
+    <h3><a name="get">get</a></h3>
+    This command can be used to get value of various kind of things. It requires
+    a subcommand to specify what is going to be set. Known subcommands are:
+    <p>get <a href="#get_sfr">sfr</a> <br>
+      get <a href="#get_option">option</a> <br>
+      get <a href="#get_error">error</a> </p>
+    <blockquote>
+      <h4><a name="get_sfr">get sfr <i>address...</i></a></h4>
+      This command can be used to check values of SFR location(s) if SFR exists
+      in simulated memory. Note that <a href="cmd_dump.html#dump_memory">dump
+        memory</a> or <a href="cmd_dump.html#ds">ds</a> can be used as well.
+      <p>Parameters are interpreted as SFR names or addresses and values of
+        addressed locations are dumped out. </p>
+      <pre>$ <font color="#118811">s51 </font>
+ucsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">get sfr pcon p1 0 0x80 kahd scon 256</font>
+0x87 00 .
+0x90 ff .
+Warning: Invalid address 0
+0x80 ff .
+Warning: Invalid address kahd
+0x98 00 .
+Warning: Invalid address 256
+0&gt; </pre>
+      <hr>
+      <h4><a name="get_option">get option <i>[name]</i></a></h4>
+      Get actual value of option(s). Some options can be set by <a href="#set_option"><b>set
+          option</b></a> to modify behaviour of the simulator. Using <b>get
+        option</b> you can get actual value of these options. If you use this
+      command without parameter you get list of all options known by the
+      program. In this way you can figure out which options can be used.
+      <pre>$ <font color="#118811">s51 -V</font>
+ucsim 0.5.0, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">get opt</font>
+ 3. debug(by console0): FALSE - Debug messages to console0
+ 4. debug(by application): FALSE - Print debug messages (-V)
+ 5. irq_stop(by mcs51_controller): FALSE - Stop when IRQ accepted
+ 6. null_prompt(by application): FALSE - Use \0 as prompt (-P)
+ 7. prompt(by console0): "" - Prompt string of console0
+ 8. prompt(by application): (null) - String of prompt (-p)
+11. xtal(by application): 11059200.000 - Frequency of XTAL in Hz
+0&gt; 
+</pre> First element of the list is the number of the option. It is followed by
+      name of the option (<b>debug</b>, <b>irq_stop</b>, etc.). Number or the
+      name can be used to identify the option in <b>get option</b> and <a href="#set_option"><b>set
+          option</b></a> command. Next element shows which part of the simulator
+      created the option.
+      <p>Next element of the list is the value of the option. It can be an
+        integer or a floating point number, a string or a boolean value. </p>
+      <p>Last part describes the option. </p>
+      <p>Some options can have same name. An example is the <b>debug</b>
+        option. One is created by the application to store value given by -V
+        (see <a href="invoke.html">invocation</a>). This will be used as
+        default value when a new instance of a console is created: </p>
+      <pre>$ <font color="#118811">cat /tmp/x</font>
+get opt debug
+$ <font color="#118811">s51</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">get opt debug</font>
+ 3. debug(by console0): FALSE - Debug messages to console0
+ 4. debug(by application): FALSE - Print debug messages (-V)
+0&gt; <font color="#118811">set opt 4 1</font>
+0&gt; <font color="#118811">get opt debug</font>
+ 3. debug(by console0): FALSE - Debug messages to console0
+ 4. debug(by application): TRUE - Print debug messages (-V)
+0&gt; <font color="#118811">exec "/tmp/x"</font>
+1&gt; get opt debug
+ 3. debug(by console1): TRUE - Debug messages to console1
+ 4. debug(by console0): FALSE - Debug messages to console0
+ 5. debug(by application): TRUE - Print debug messages (-V)
+1&gt; 
+0&gt; 
+</pre>
+      <hr>
+      <h4><a name="get_error">get error</a></h4>
+      Same as <a href="#show_error">show error</a>. </blockquote>
+    <hr>
+    <h3><a name="set">set</a></h3>
+    This command can be used to set various kind of things. It requires a
+    subcommand to specify what is going to be set. Known subcommands are:
+    <p>set <a href="#set_option">option</a> <br>
+      set <a href="#set_error">error</a> <br>
+      set <a href="#set_memory">memory</a> <br>
+      set <a href="#set_bit">bit</a> <br>
+      set <a href="#set_hardware">hardware</a> </p>
+    <blockquote>
+      <h4><a name="set_option">set option <i>name|nr value</i></a></h4>
+      <p>Set option value. Options described at (<a href="#get_option"><b>get
+            option</b></a>) command can be set using this command. First
+        parameter must be an option name or number and second the new value.
+        Interpretation of the value depends on type of the option. Value for a
+        boolean type of option interpreted as follows: if first character of the
+        value is one of <tt>1</tt>, <tt>t</tt>, <tt>T</tt>, <tt>y</tt>, <tt>Y</tt>
+        then value will be TRUE otherwise it will be FALSE. </p>
+      <pre>$ <font color="#118811">s51 -V</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; <font color="#118811">get opt</font>
+ 0. config_file(by application) is hidden!
+ 1. console_on(by application) is hidden!
+ 2. cpu_type(by application) is hidden!
+ 3. debug(by console0): TRUE - Debug messages to console0
+ 4. debug(by application): TRUE - Print debug messages (-V)
+ 5. irq_stop(by mcs51_controller): FALSE - Stop when IRQ accepted
+ 6. null_prompt(by application): FALSE - Use \0 as prompt (-P)
+ 7. prompt(by console0): "" - Prompt string of console0
+ 8. prompt(by application): (null) - String of prompt (-p)
+ 9. serial_in_file(by application) is hidden!
+10. serial_out_file(by application) is hidden!
+11. xtal(by application): 11059200.000 - Frequency of XTAL in Hz
+&gt; <font color="#118811">set opt debug f</font>
+Ambiguous option name, use number instead
+&gt; <font color="#118811">set opt 3 f</font>
+&gt; <font color="#118811">get opt debug</font>
+ 3. debug(by console0): FALSE - Debug messages to console0
+ 4. debug(by application): TRUE - Print debug messages (-V)
+&gt; </pre>
+      <hr>
+      <h4><a name="set_error">set error <i>error_name on|off|unset</i></a></h4>
+      This command can be used to set if an error event should be reported or
+      not. Actual settings can be retrieved by <a href="show_error">show error</a>
+      command.<br>
+      <hr>
+      <h4><a name="set_console">set console <i>interactive
+            [on|off]|noninteractive|raw|edited</i><br>
+        </a></h4>
+      <hr>
+      <h4><a name="set_memory">set memory <i>memory_type address data...</i></a></h4>
+      This command can be used to modify content of any simulated memory. First
+      parameter must be a class name to specify type of memory. Class names can
+      de checked by <a href="cmd_general.html#info_memory">info memory</a>
+      command. Chips and address spaces can be used as well.
+      <p>Second parameter specifies start address of the modification. </p>
+      <p>Remaining parameters will be written into the memory starting at
+        address specified by second parameter. Data list can include numbers as
+        well as strings. See <a href="syntax.html">syntax</a> for more details.
+      </p>
+      <p>Modified memory locations will be dumped out. </p>
+      <pre>0&gt; <font color="#118811">set mem xram 1 "ab\tcd\0ef\012ghq" 2 "ABC"</font>
+0x0001 61 62 09 63 64 00 65 66 ab.cd.ef
+0x0009 0a 67 68 71 02 41 42 43 .ghq.ABC
+0&gt; <font color="#118811">set mem sfr pcon 0x34</font>
+0x87 34                      4
+0&gt; <font color="#118811">set mem xram_chip 1 2</font>
+0x0001 02                      .
+0&gt; </pre>
+      <hr>
+      <h4><a name="set_bit">set bit <i>address 0|1</i></a></h4>
+      Set one bit to 0 or 1. First parameter specifies the bit. It can be the
+      address of the bit (number or symbolic name) or it can be specified in <i>address<b>.</b>bitnumber</i>
+      format where <i>address</i> addresses SFR area and <i>bitnumber</i> is
+      number of bit in specified SFR location. Using this syntax any SFR (and
+      8051's internal RAM) location can be modified it need not be really bit
+      addressable.
+      <p>Second parameter interpreted as 1 if it is not zero. </p>
+      <p>Modified memory location is dumped out. </p>
+      <pre>$ <font color="#118811">s51 </font>
+ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; <font color="#118811">set bit tf1 1</font>
+0x88 80 .
+&gt; <font color="#118811">set bit 130 0</font>
+0x80 fb .
+&gt; <font color="#118811">set bit pcon.2 1</font>
+0x87 04 .
+&gt; <font color="#118811">set bit 10.7 1</font>
+0x0a 80 .
+&gt; 
+</pre>
+      <hr>
+      <h4><a name="set_hardware">set hardware <i>hardware_id data</i></a></h4>
+      This command can be used to set value into a hardware element of the
+      controller (<a href="#conf">conf</a> command lists them).
+      <p>Actually only <b>port</b> element of MCS51 accepts this method. It can
+        be used to set value of external circuits which connected to ports of
+        simulated controller. First parameter specifies port element (as an
+        array), second is the new value. </p>
+      <pre>0&gt; <font color="#118811">conf</font>
+Type of microcontroller: 51 CMOS
+Controller has 9 hardware element(s).
+  timer0[0]
+  timer1[1]
+  uart[0]
+  port[0]
+  port[1]
+  port[2]
+  port[3]
+  irq[0]
+  _51_dummy[0]
+0&gt; <font color="#118811">set hw port[0] 12</font>
+0&gt; <font color="#118811">i h po[0]</font>
+port[0]
+P0    11111111 0xff 255 . (Value in SFR register)
+Pin0  00001100 0x0c  12 . (Output of outside circuits)
+Port0 00001100 0x0c  12 . (Value on the port pins)
+0&gt; <font color="#118811">set hw port[0] 23</font>
+0&gt; <font color="#118811">i h po[0]</font>
+port[0]
+P0    11111111 0xff 255 . (Value in SFR register)
+Pin0  00010111 0x17  23 . (Output of outside circuits)
+Port0 00010111 0x17  23 . (Value on the port pins)
+0&gt; <font color="#118811">set hw irq[0] 12</font>
+Nothing to do
+0&gt; 
+</pre> </blockquote>
+    <hr>
+    <h3><a name="state">state</a></h3>
+    State of the simulator and the simulated microcontroller:
+    <pre>&gt; <font color="#118811">state</font>
+CPU state= OK PC= 0x004349 XTAL= 1.10592e+07
+Total time since last reset= 0.614873 sec (6800004 clks)
+Time in isr = 0.0144227 sec (159504 clks) 2.3%
+Time in idle= 0 sec (0 clks)   0%
+Max value of stack pointer= 0x000049, avg= 0x000026
+&gt; 
+</pre> The "CPU state" in the first line is an internal information. PC is value
+    of the program counter. First line shows XTAL frequency too.
+    <p>Following lines contain information about simulated time. First, full
+      simulated time (elapsed from last reset) is printed out in seconds and
+      number of clock periods then same data is printed out about time spent in
+      interrupt service routines as well as in idle mode. Last data in lines of
+      ISR and IDLE time shows ratio of ISRs, Idle times and main program. </p>
+    <p>Last line informs about maximum value of the stack pointer and a "not
+      very well" calculated average value of it. </p>
+    <hr>
+    <h3><a name="reset">reset</a></h3>
+    Reset command. It resets the microcontroller. It has same effect as active
+    signal on the RST pin.
+    <pre>$ <font color="#118811">s51 -V remoansi.hex</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+&gt; <font color="#118811">i r</font>
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000000 02 01 60 LJMP  0160
+&gt; <font color="#118811">s</font>
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000160 c2 90    CLR   P1.0
+&gt; <font color="#118811">s</font>
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000162 c2 97    CLR   P1.7
+&gt; <font color="#118811">res</font>
+&gt; <font color="#118811">i r</font>
+000000 00 00 00 00 00 00 00 00 ........
+000000 00 .  ACC= 0x00   0 .  B= 0x00   DPTR= 0x0000 @DPTR= 0x00   0 .
+000000 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+   000000 02 01 60 LJMP  0160
+&gt; </pre>
+    <hr>
+    <h3><a name="info">info</a></h3>
+    This command prints out information about different things which must be
+    specified as parameter to the command. Following subcommands are known:
+    <p>info <a href="#info_breakpoints">breakpoints</a> <br>
+      info <a href="#info_registers">registers</a> <br>
+      info <a href="#info_hardware">hardware</a> <br>
+      info <a href="#info_stack">stack</a> <br>
+      info <a href="#info_memory">memory</a> <br>
+      info <a href="#info_variables">variables</a> </p>
+    <blockquote>
+      <h4><a name="info_breakpoints">info breakpoints</a></h4>
+      This subcommand prints out information about breakpoints:
+      <pre>0&gt; <font color="#118811">b 12</font>
+Breakpoint 1 at 0x00000c: MOV   R7,A
+0&gt; <font color="#118811">tb 43</font>
+Breakpoint 2 at 0x00002b: MOV   R7,A
+0&gt; <font color="#118811">b sfr w 0x80</font>
+0&gt; <font color="#118811">i b</font>
+Num Type       Disp Hit   Cnt   Address  What
+1   fetch      keep 1     1     0x00000c MOV   R7,A
+2   fetch      del  1     1     0x00002b MOV   R7,A
+3   event      keep 1     1     0x000080 write
+0&gt; 
+</pre> As you see above, the command can be shortened to "i b". The list of
+      breakpoints contains 7 columns:
+      <dl>
+        <dt><b>Num</b> </dt>
+        <dd>Number of the breakpoint. </dd>
+        <dt><b>Type</b> </dt>
+        <dd>This column shows type of the breakpoint. It can be <i>fetch</i>
+          for normal breakpoints or <i>event</i> for event breakpoints. First
+          the normal breakpoints are listed and then the event breakpoints. </dd>
+        <dt><b>Disp</b> </dt>
+        <dd>This shows if the breakpoint is temporary (<i>del</i>) or not (<i>keep</i>).
+          </dd> <dt><b>Hit</b> </dt>
+        <dd>How many times the breakpoint must be hit before it really stops the
+          program. </dd>
+        <dt><b>Cnt</b> </dt>
+        <dd>Counter of breakpoint hits. This counter decrements and the
+          breakpoint is activated if it reaches zero. </dd>
+        <dt><b>Address</b> </dt>
+        <dd>Address where the breakpoint is set. </dd>
+        <dt><b>What</b> </dt>
+        <dd>For normal breakpoints this field contains disassembled instruction
+          where the breakpoint is set. For event breakpoints it contains type of
+          event. </dd>
+      </dl>
+      <hr>
+      <h4><a name="info_registers">info registers</a></h4>
+      This subcommand prints out full register set of the CPU. Output of this
+      command depends of type of CPU.
+      <h5>Registers of MCS51 family</h5>
+      <pre>$ <font color="#118811">s51 remoansi.hex</font> 
+ucsim 0.2.12, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+58659 bytes read from remoansi.hex
+&gt; <font color="#118811">sopt stopit 1</font>
+&gt; <font color="#118811">g</font>
+5
+ * 000023 02 01 1c LJMP  011c
+&gt; <font color="#118811">i r</font>
+000000 18 02 16 ba 00 02 00 0a ........
+000018 4a J  ACC= 0x0a  10 .  B= 0x00   DPTR= 0x16ba @DPTR= 0x00   0 .
+000002 16 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+ * 000023 02 01 1c LJMP  011c
+&gt; </pre>
+      In first line the actual register bank is dumped out. Register banks
+      reside in internal RAM, address at the beginning of the line shows start
+      address of actual register bank selected by RS0 and RS1 bits of PSW
+      register.
+      <p>Next two lines begin with value of indirectly addressed internal RAM
+        cells. Second line shows IRAM cell pointed by R0 while third line shows
+        IRAM addressed by R1. </p>
+      <p>Second line displays some important registers. First one is the
+        accumulator. Its value dumped out in hexadecimal, decimal form and then
+        the ASCII character of its value. It is followed by value of the B
+        register which is dumped out in hexadecimal form only. Next is DPTR
+        register in hexadecimal and then external RAM cell which is addressed by
+        DPTR. This is dumped out in hexadecimal, decimal and ASCII too. </p>
+      <p>In third line you find program status word in hexadecimal and then some
+        flag bits of PSW register. Last line is disassembled instruction at PC.
+      </p>
+      <h5>Registers of AVR family</h5>
+      <pre>$ <font color="#118811">savr test_arith.hex</font>
+ucsim 0.2.37, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; 83 words read from test_arith.hex
+83 words read from test_arith.hex
+&gt; <font color="#118811">run</font>
+
+Stop at 0x000047: (105) User stopped
+F 0x000047
+&gt; <font color="#118811">i r</font>
+000000 00 2c 21 23 20 35 19 14 03 00 00 00 00 00 00 00 .,!# 5..........
+000010 00 01 1e 89 01 00 10 e2 14 00 01 10 00 00 00 00 ................
+ITHSVNZC  SREG= 0x03   3 .
+00000011  SP  = 0x000000
+X= 0x1001 [X]= 0x00   0 .  Y= 0x0000 [Y]= 0x00   0 .  Z= 0x0000 [Z]= 0x00   0 .
+ * 000047 940c 0047 jmp   0x000047
+&gt; 
+</pre> First two lines show first 32 bytes of internal RAM which is the register
+      set of AVR controllers.
+      <p>At the beginning of next two lines bits of status register are printed.
+        These lines present hexadecimal, decimal and ASCII values of the status
+        register too, and value of the stack pointer. </p>
+      <p>Following line shows indirect addressing registers X, Y, and Z as well
+        as pointed memory values. </p>
+      <p>Last line is disassembled instruction at PC. </p>
+      <h5>Registers of Z80 family</h5>
+      <pre>$ <font color="#118811">sz80</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">i r</font>
+SZ-A--P-C  Flags= 0x00   0 .  A= 0x00   0 .
+00-0--0-0
+BC= 0x0000 [BC]= 00   0 .  DE= 0x0000 [DE]= 00   0 .  HL= 0x0000 [HL]= 00   0 .
+IX= 0x0000 [IX]= 00   0 .  IY= 0x0000 [IY]= 00   0 .  SP= 0x0000 [SP]= 00   0 .
+ ? 0x0000 00          NOP
+0&gt; 
+</pre>
+      <h5>Registers of XA family</h5>
+      <pre>$ <font color="#118811">sxa</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+The XA Simulator is in development, UNSTABLE, DEVELOPERS ONLY!
+0&gt; <font color="#118811">i r</font>
+CA---VNZ | R0:0100 R1:0302 R2:0504 R3:0706
+00---000 | R4:0908 R5:0b0a R6:0d0c SP:0100 ES:0000  DS:0000
+ ? 0x0302 02 03             ADD   R0l,[R3]
+0&gt; 
+</pre>
+      <h5>Registers of HC08 family</h5>
+      <pre>$ <font color="#118811">shc08</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">i r</font>
+V--HINZC  Flags= 0x60  96 `  A= 0x00   0 .
+0--00000      H= 0x00   0 .  X= 0x00   0 .
+SP= 0x00ff [SP+1]= 00   0 .
+ ? 0x0000 00 01 02    brset #0,*0x01,0x0005
+0&gt; 
+</pre>
+      <hr>
+      <h4><a name="info_hardware">info hardware|hw <i>identifier</i></a></h4>
+      This subcommand prints out information about a unit of the controller. <b>identifier</b>
+      specifies hardware element. One form of it is a name. Names of hardware
+      elements can be checked by <a href="#conf">conf</a> command. This form is
+      accepted only when name is unique. If more than one element exists with
+      the same name then name must be followed by id number in square brackets
+      in same form as it is listed by <a href="#conf">conf</a> command.
+      <p>Output format of this command depends on CPU family and type of the CPU
+        too because requested unit can be different in different type of
+        controller even in the same CPU family. </p>
+      <pre>$ <font color="#118811">s51 -t 51</font>
+ucsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">conf</font>
+ucsim version 0.5.0-pre3
+Type of microcontroller: 51 CMOS
+Controller has 8 hardware element(s).
+  timer0[0]
+  timer1[1]
+  uart[0]
+  port[0]
+  port[1]
+  port[2]
+  port[3]
+  irq[0]
+  _51_dummy[0]
+0&gt; <font color="#118811">i h port[2]</font>
+port[2]
+P2    11111111 0xff 255 . (Value in SFR register)
+Pin2  11111111 0xff 255 . (Output of outside circuits)
+Port2 11111111 0xff 255 . (Value on the port pins)
+0&gt; <font color="#118811">i h t[0]</font>
+timer0[0] 0x0000 13 bit timer OFF irq=0 dis prio=0
+0&gt; <font color="#118811">i h u</font>
+uart[0] Shift, fixed clock MultiProc=none irq=dis prio=0
+Receiver OFF RB8=0 irq=0
+Transmitter TB8=0 irq=0
+0&gt; 
+</pre> Timer #2 differs a little bit from other timers of MCS51:
+      <pre>$ <font color="#118811">s51 -t 52</font>
+ucsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">i h timer0</font>
+timer0[0] 0x0000 13 bit timer OFF irq=0 dis prio=0
+0&gt; <font color="#118811">i h t[2]</font>
+timer2[2] 0x0000 reload 0x0000 timer OFF irq=0 dis prio=0
+0&gt; 
+</pre>
+      <hr>
+      <h4><a name="info_stack">info stack</a></h4>
+      This command prints out information about data stored in the CPU's stack
+      and operations which put them there.
+      <pre>$ <font color="#118811">s51 ~/remo.hex</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+55470 words read from /home/staff/drdani/remo.hex
+0&gt; <font color="#118811">set opt irq_stop true</font>
+0&gt; <font color="#118811">r</font>
+Simulation started, PC=0x000000
+Stop at 0x000023: (2) Interrupt
+F 0x000023
+0&gt; <font color="#118811">i s</font>
+OP   SP before-after   L DATA/ADDR   INSTRUCTION
+call 0x000022-0x000024 2 0x002976    0x022a 12 29 76 LCALL 2976
+call 0x000024-0x000026 2 0x002379    0x2976 12 23 79 LCALL 2379
+call 0x000026-0x000028 2 0x003612    0x2517 12 36 12 LCALL 3612
+intr 0x000028-0x00002a 2 0x000023    0x366f 20 0c 02 JB    21.4,3674
+0&gt; 
+</pre> First column shows the operation which can be <b>call</b> or <b>push</b>
+      or <b>intr</b> (interrupt call). Next column contains value of the SP
+      register before and after the operation. Column "L" shows size of the
+      data, and the next column the data itself. Note, that for call operations
+      (call, and intr) the <b>called</b> address is printed, not the pushed
+      one! Last column is the instruction which has been executed when the
+      operation occurred.
+      <hr>
+      <h4><a name="info_memory">info memory</a></h4>
+      This command shows information about <a href="memory.html">memory system</a>:
+      chips, address spaces and address decoders.
+      <pre>$ <font color="#118811">s51</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">i m</font>
+Memory chips:
+  0x000000-0x010000    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x000080      128 iram_chip (8,%02x,0x%02x)
+  0x000000-0x010000    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x000080      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x010000    65536 rom (8,%02x,0x%04x)
+  0x000000-0x000080      128 iram (8,%02x,0x%02x)
+  0x000080-0x000080      128 sfr (8,%02x,0x%02x)
+  0x000000-0x010000    65536 xram (8,%02x,0x%04x)
+Address decoders:
+ 0 rom 0x0000 0xffff -&gt; rom_chip 0x0000 activated
+ 0 iram 0x00 0x7f -&gt; iram_chip 0x00 activated
+ 0 sfr 0x80 0xff -&gt; sfr_chip 0x00 activated
+ 0 xram 0x0000 0xffff -&gt; xram_chip 0x0000 activated
+0&gt; 
+</pre> First column shows address ranges, next one is the size followed by the
+      name of the memory. This name can be used in other commands (such as <a href="cmd_dump.html#dump">dump</a>,
+      <a href="#set_memory">set memory</a>, etc.). Last column shows some
+      technical information (width in bits, format specifier to print out
+      content and address).
+      <p>Address decoders are associated with address spaces. Each address space
+        has a list of decoders. First column of the address decoder information
+        is the number of the decoder. Next three columns specifies name and area
+        of the address space which is handled by the decoder. After "-&gt;" sign
+        the name and the address of the memory chip is printed where the decoder
+        maps the area of the address space. </p>
+      <p>Memory system of other controller family can be different. </p>
+      <pre>$ <font color="#118811">savr</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">i m</font>
+Memory chips:
+  0x000000-0x00ffff    65536 rom_chip (16,%04x,0x%04x)
+  0x000000-0x00007f      128 iram_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x00ffff    65536 rom (16,%04x,0x%04x)
+  0x000000-0x00ffff    65536 iram (8,%02x,0x%04x)
+Address decoders:
+ 0 rom 0x0000 0xffff -&gt; rom_chip 0x0000 activated
+ 0 iram 0x0000 0x007f -&gt; iram_chip 0x00 activated
+0&gt; 
+</pre>
+      <hr>
+      <h4><a name="info_variables">info variables</a></h4>
+    </blockquote>
+    <hr>
+    <h3><a name="timer">timer</a></h3>
+    Handling of timers. Don't be confused! This command doesn't handle timer
+    element of the controller. It manages "clock counters" which can be used to
+    profile applications.
+    <p>Known subcommands are: </p>
+    <p>timer <a href="#timer_add">add</a> <br>
+      timer <a href="#timer_delete">delete</a> <br>
+      timer <a href="#timer_get">get</a> <br>
+      timer <a href="#timer_start">start</a> <br>
+      timer <a href="#timer_stop">stop</a> <br>
+      timer <a href="#timer_set">set</a> </p>
+    <p>Each subcommand can (some must) be followed by a timer id which can be a
+      number or a string. Timers are numbered from 1. You can use any number
+      greater than 0 to identify a timer. Or you can use a simbolic name, in
+      this case simulator uses the first unused number to allocate a new timer.
+    </p>
+    <blockquote>
+      <h4><a name="timer_add">timer add|create|make <i>id [direction [in_isr]]</i></a></h4>
+      To create a new timer. New timers are turned ON by default and initialized
+      to value 0. <b>Direction</b> is an integer (can be positive or negative)
+      number which is added to the actual value in every step. If <b>in_isr</b>
+      is TRUE the timer counts only when execution is in an interrupt handler.
+      <hr>
+      <h4><a name="timer_delete">timer delete|remove <i>id</i></a></h4>
+      To remove a timer if you don't need it any more.
+      <hr>
+      <h4><a name="timer_get">timer get <i>[id]</i></a></h4>
+      To get value of timers. If you don't use timer id in this command
+      simulator prints out value of all timers including predefined ones. See
+      example below.
+      <hr>
+      <h4><a name="timer_start">timer start|run <i>id</i></a></h4>
+      To turn a timer ON.
+      <hr>
+      <h4><a name="timer_stop">timer stop <i>id</i></a></h4>
+      To turn a timer OFF. It still exist but doesn't count xtal periods.
+      <hr>
+      <h4><a name="timer_set">timer set|value <i>id value</i></a></h4>
+      To set value of the timer (number of xtal periods). <b>value</b> is the
+      new value.
+      <pre>0&gt; <font color="#118811">tim a 3</font>
+0&gt; <font color="#118811">tim g</font>
+timer #0("time") ON: 0.463255 sec (5123232 clks)
+timer #0("isr") ON: 0.0051888 sec (57384 clks)
+timer #0("idle") ON,ISR: 0 sec (0 clks)
+timer #3("unnamed") ON: 0 sec (0 clks)
+0&gt; <font color="#118811">tim a "a"</font>
+0&gt; <font color="#118811">tim g</font>
+timer #0("time") ON: 0.463255 sec (5123232 clks)
+timer #0("isr") ON: 0.0051888 sec (57384 clks)
+timer #0("idle") ON,ISR: 0 sec (0 clks)
+timer #1("a") ON: 0 sec (0 clks)
+timer #3("unnamed") ON: 0 sec (0 clks)
+0&gt; 
+</pre> </blockquote>
+    <hr>
+  </body>
+</html>
