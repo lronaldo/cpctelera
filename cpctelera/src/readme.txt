@@ -108,7 +108,7 @@ Topic: Software Requirements
 _Under Linux_:
    Install these packages on your Linux distribution. Although they are pretty standard, names may slightly vary on some distributions.
 
-   * Commands: *gcc*, *g++*, *make*, *bison*, *flex*, *mono* (mono-runtime)
+   * Commands: *gcc*, *g++*, *make*, *bison*, *flex*, *mono* (mono-complete)
    * Libraries: *libboost-dev*, *libfreeimage-dev*
 
    Next are recommented packages. They are not required for CPCtelera to work, but some included tool may require them (like *cpct_winape* script):
