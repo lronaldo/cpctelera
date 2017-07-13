@@ -18,7 +18,7 @@
 .module cpct_sprites
 
 ;; Required macro definitions
-.include "../macros/cpct_reverseBits.s"
+.include "src/macros/cpct_reverseBits.s"
 
 ;;
 ;; ASM bindings for <cpct_hflipSpriteMaskedM0>
