@@ -240,7 +240,8 @@ while (( $# >= 1 )); do
             ## Check for parenthesis first
             if (( ${#NEXT} > 1 )) && [[ "${NEXT:(-1)}" == "$RPAR" ]]; then
                RPAR_FOUND=1
-               NEXT=${NEXT:0:-1}
+               NLEN1=$(( ${#NEXT} - 1 ))
+               NEXT=${NEXT:0:$NLEN1}
             fi
             if [[ "$NEXT" == "$RPAR" ]]; then
                RPAR_FOUND=1
