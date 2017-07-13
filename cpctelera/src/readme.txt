@@ -126,6 +126,8 @@ _Under Windows_:
    * Commands: *gcc-core*, *gcc-g++*, *make*, *bison*, *flex*, *wget*, *unzip*, *bc*
    * Libraries: *libboost-devel*, *libintl-devel*
 
+   Additionally, Windows 8/10 may ask you to install *.NET framework* during examples building. This is required to run Arkos Tracker and its command line tools. Proceed to install it when prompted.
+
 _Under OSX_:
 
    Under OSX <XCode at https://itunes.apple.com/es/app/xcode/id497799835?mt=12>  and <Homebrew at http://brew.sh/> are required for installing CPCtelera. Follow these steps,
