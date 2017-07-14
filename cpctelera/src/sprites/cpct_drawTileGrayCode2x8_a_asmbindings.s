@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2015 Augusto Ruiz / RetroWorks (@Augurui)
+;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU General Public License as published by
@@ -18,9 +19,9 @@
 .module cpct_sprites
 
 ;;
-;; ASM bindings for <cpct_drawTileGrayCode2x8_a>
+;; ASM bindings for <cpct_drawTileGrayCode2x8_af>
 ;;
-cpct_drawTileGrayCode2x8_a_asm::
+cpct_drawTileGrayCode2x8_af_asm::
 
 
-.include /cpct_drawTileGrayCode2x8_a.asm/
+.include /cpct_drawTileGrayCode2x8_af.asm/

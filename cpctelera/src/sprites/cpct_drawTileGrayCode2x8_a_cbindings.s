@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2015 Augusto Ruiz / RetroWorks (@Augurui)
+;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU General Public License as published by
@@ -18,11 +19,11 @@
 .module cpct_sprites
 
 ;;
-;; C bindings for <cpct_drawTileGrayCode2x8_a>
+;; C bindings for <cpct_drawTileGrayCode2x8_af>
 ;;
 ;;   12 us, 3 bytes
 ;;
-_cpct_drawTileGrayCode2x8_a::
+_cpct_drawTileGrayCode2x8_af::
 
    ;; GET Parameters from the stack
    pop  hl     ;; [3] HL = Return Address
@@ -31,4 +32,4 @@ _cpct_drawTileGrayCode2x8_a::
                ;;     ...  and put returning address in the stack again
                ;;     ... as this function uses __z88dk_callee convention
 
-.include /cpct_drawTileGrayCode2x8_a.asm/
+.include /cpct_drawTileGrayCode2x8_af.asm/
