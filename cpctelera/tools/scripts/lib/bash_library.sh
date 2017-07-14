@@ -881,6 +881,25 @@ function checkValidCIdentifier() {
    return 1
 }
 
+## Gets the index of a substring inside a string. Indexes go from 1 onwards.
+##   $1: String
+##   $2: Search substring
+##
+## Echoes the index where substring starts, 0 when substring has not been 
+## found in the string.
+##
+function getIndexOf() {
+  local STRING="$1"
+  local SEARCH="$2"
+  local PREV=${STRING%%${SEARCH}*}
+
+  if [ "$PREV" = "$STRING" ]; then
+    echo 0
+  else
+    echo $(( ${#PREV} + 1 ))
+  fi
+}
+
 ## Gets the first token from a string. Token is a group of characters, 
 ## starting from string character 0, and ending before the first appearance
 ## of a given SPACE character or string (whitespace, $2).
@@ -894,7 +913,8 @@ function getStringToken() {
    local SPACE="$2"
    local IDX
    
-   IDX=$(expr index "$STRING" "$SPACE"); 
+#   IDX=$(expr index "$STRING" "$SPACE"); 
+   IDX=$(getIndexOf "$STRING" "$SPACE")
    if (( $IDX != 0 )); then
       echo ${STRING:0:${IDX}-1}
    else
