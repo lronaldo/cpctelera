@@ -1,0 +1,53 @@
+File: Asset Conversion Utilities
+
+CPCtelera includes many ways to convert your assets (graphics, audio, tilemaps) into binary information ready to be used in your game. Following explanations will help you use these systems of automatic conversion.
+
+Section: Graphics Autoconversion
+
+CPCtelera helps you autoconvert almost any present graphic file (PNG, GIF, TIFF, BMP, ...) into pixel-formatted arrays ready to be used in your programs. Lets start with an example. Supose we want to convert a 20x10 pixels sprite we have created in PNG, to use it in a mode 0 game. To do it, we proceed this way,
+
+  1. - Create a folder called *img/* in our project
+  2. - Move *sprite.png* file to *img/sprite.png*
+  3. - Edit the file *cfg/image_conversion.mk* and add this line
+  > $(eval $(call IMG2SPRITES,img/sprite.png,0,g,20,10,{14 0 3 4 9 10 11 12 13 16 23 26 6 15 18 24},,src/,hwpalette))
+
+From this moment on, each time we compile our project, two new files will be generated: *src/sprite.c* & *src/sprite.h*. Then, the only thing we have to do is to #include<src/sprite.h> wherever we want to use our sprite and use it. The array with the pixel definition of the sprite will be called *g_sprite*.
+
+This is the proccess, but lets see now how it works and what does the previous line mean. That line calls the Makefile macro IMG2SPRITES (defined in cpctelera/cfg/global_functions.mk). This macro is a bridge to use the script *cpct_img2sprites* from inside your compilation process. Therefore, the information given to IMG2SPRITES through parameters is in turn passed to *cpct_img2sprites* which will do the job of converting your images or sprites.
+
+We can add as many lines to *cfg/image_conversion.mk* calling IMG2SPRITES as we want. Each line will do a new conversion. This lets us convert as many images and sprites as required. To use it for our needs, lets understand the parameters given to IMG2SPRITES. Consider this placeholder-filled call,
+  > $(eval $(call IMG2SPRITES,(1),(2),(3),(4),(5),(6),(7),(8),(9),(10)))
+
+These are ten places for the ten different parameters we can give to IMG2SPRITES,
+  * (1): This is the image file to be converted. In our example, that is *img/sprite.png*, but could be anything.
+  * (2): Screen mode (0,1,2). Data conversion is different depending on the screen mode: pixel format and available colours change. So do not forget to correctly put your desired screen mode.
+  * (3): Prefix for C-Identifiers. In our example, we convert sprite.png into g_sprite. This 'g' is the prefix we selected. You can add whatever prefix you prefer for your identifiers. Conversion will use the name of the file for the identifier, along with your selected prefix and numeric suffixes if there are several sprites to convert.
+  * (4): Width in pixels of the sprite/s to convert. Important: always make the width of your sprites even. With odd wides your can have extrange problems because they will not be byte-aligned.
+  * (5): Height in pixels of the sprite/s to convert.
+  * (6): Firmware palette to be used for conversion. In order to do a propper conversion to pixel values, the conversor needs to know which colours will be used when drawing the sprite into the screen. So, here you have to give the complete palette using firmware vales. The format is a list of space-separated numeric values, enclosed into brackets, as in the example.
+  * (7): Optional. Valid values: *mask*, *tileset*. Optionally, produce an inline mask or a tileset reference array. If you pass *mask*, converted sprites will include an inline mask to be use for transparency. If you pass *tileset*, converted sprites will be considered as tiles and an array of pointers to each one of them (a tileset) will be generated. 
+  * (8): Output subfolder for generated .c/.h files. This is where you want generated files to be placed, *inside your project folder*. Normally, you will want them inside your *src/* project folder, because they are code files. But you can place them in other existing places like *src/sprites/* or *src/tilesets*.
+  * (9): Optional. Valid values: *hwpalette*. Optionally, produce an array with the values composing the palette converted into hardware values. Generated array will be named *g_palette*.
+  * (10): Optional. Additional parameters for *cpct_img2sprites*. You can add here additional command line parameters that will be passed "as is" to *cpct_img2sprites*. If you know how to use this utility, you can use this parameter for advanced things. 
+
+Important considerations:
+  * This is a Makefile macro, not a function. 
+  * Parameters are passed "as is", *including all the spaces you write*. 
+  * So, *do not add spaces to parameters*.
+  * To leave a parameter blank do not write anything into it. That may left you with 2 or more commas written toghether, as in our previous example.
+  * Last parameters, if they are blank, there is no need to put even the commas. Again, as in previous example.
+
+Some examples:
+  You will find examples in the examples/ folder of CPCtelera. Most examples do use sprites or tilesets and the autoconversion tools to convert them into code.
+
+  Here you are some more.
+
+  > PALETTE={6 2 8 24}
+  > $(eval $(call IMG2SPRITES,assets/monsters.png,1,mym,16,8,$(PALETTE),mask,src/monsters/))
+
+In this example, we define the macro PALETTE previous to the call to IMG2SPRITES for clarity. You can use the same strategy with other values. The file *assets/monsters.png* contains a set of 18 sprites of monsters, each one of 16x8 pixels. All of them will be converted into arrays called *mym_monsters_XX[4*8]*, with XX in the range [00-17], and containing pixel values and mask values for transparency. Palette only has 4 colours because sprites are being converted to mode 1. This will generated the files *src/monsters/monsters.c* & *src/monsters/monsters.h*.
+
+  > PALETTE={3 6}
+  > $(eval $(call IMG2SPRITES,maps/map1tiles.bmp,2,gt,8,8,$(PALETTE),tileset,src/,hwpalette))
+
+File *maps/map1tiles.bmp* is being converted into *src/map1tiles.c* & *src/map1tiles.h*, with 120 small 8x8 pixel sprites that will be considered as tiles. It will generate 120 arrays named gt_map1tiles_XXX[1*8] with XXX ranging [000-119]. It will also generate a *g_tileset* array containing 120 pointers to each one of the *gt_map1tiles_XXX* arrays, and a *g_palette* array containing values [ 0x1C, 0x0C ], which are corresponding hardware values for 3 and 6 in hexadecimal.
