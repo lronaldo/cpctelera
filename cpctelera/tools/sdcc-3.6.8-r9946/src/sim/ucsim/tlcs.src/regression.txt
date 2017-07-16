@@ -1,0 +1,18 @@
+
+Summary for 'tlcs90': 88 failures, 9594 tests, 1783 test cases, 2805727 bytes, 14862813 ticks
+   Failure: gen/tlcs90/bug1057979/bug1057979
+   Failure: gen/tlcs90/bug3474855/bug3474855
+   Failure: gen/tlcs90/gcc-torture-execute-20010224-1/gcc-torture-execute-20010224-1
+   Failure: gen/tlcs90/gcc-torture-execute-20030221-1/gcc-torture-execute-20030221-1
+   Failure: gen/tlcs90/gcc-torture-execute-20030626-2/gcc-torture-execute-20030626-2
+   Failure: gen/tlcs90/gcc-torture-execute-20031012-1/gcc-torture-execute-20031012-1
+   Failure: gen/tlcs90/gcc-torture-execute-20111208-1/gcc-torture-execute-20111208-1
+   Failure: gen/tlcs90/gcc-torture-execute-950426-1/gcc-torture-execute-950426-1
+   Failure: gen/tlcs90/gcc-torture-execute-980506-3/gcc-torture-execute-980506-3
+   Failure: gen/tlcs90/gcc-torture-execute-string-opt-5/gcc-torture-execute-string-opt-5
+   Failure: gen/tlcs90/memory/memory
+   Failure: results/tlcs90/setjmp.out
+   Failure: gen/tlcs90/snprintf/snprintf_type_STRING
+   Failure: gen/tlcs90/string/string
+
+drdani@anb:~/prj/s6/support/regression$ 

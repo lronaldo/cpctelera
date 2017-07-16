@@ -33,7 +33,7 @@
 ;;   (2B HL) intHandler - A pointer to the function that will handle interrupts from now on
 ;; 
 ;; Assembly call:
-;;    > call cpct_setInterruptHandler
+;;    > call cpct_setInterruptHandler_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *intHandler* (HL) can theoretically be any 16-bit value. However, it must point to 

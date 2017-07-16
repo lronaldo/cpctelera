@@ -1,0 +1,206 @@
+#
+# uCsim Makefile
+#
+# (c) Drotos Daniel, Talker Bt. 1997,99
+#
+
+STARTYEAR	= 1997
+
+SHELL		= /bin/sh
+
+include packages.mk
+#PKGS		= cmd.src sim.src gui.src s51.src avr.src z80.src doc
+
+VPATH		= @srcdir@
+srcdir		= @srcdir@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: checkconf
+	$(MAKE) -f main.mk all
+	@for pkg in cmd.src sim.src gui.src; do \
+	  $(MAKE) -C $$pkg $$pkg ; \
+	done
+	@for pkg in $(PKGS); do \
+	  $(MAKE) -C $$pkg $$pkg ; \
+	done
+	$(MAKE) -f main.mk main_app
+
+libs: main.mk
+	$(MAKE) -f main.mk libs
+
+
+# Compiling and installing everything and runing test
+# ---------------------------------------------------
+.PHONY: install INSTALL Install
+install:
+	$(MAKE) -f main.mk install
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg install ;\
+	done
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	$(MAKE) -f main.mk uninstall
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg uninstall ;\
+	done
+
+
+# Deleting all files created by building the program
+# --------------------------------------------------
+clean:
+	$(MAKE) -f $(srcdir)/clean.mk clean EXEEXT=$(EXEEXT)
+	@for pkg in $(PKGS_ALL); do\
+	  $(MAKE) -C $$pkg -f ../$(srcdir)/$$pkg/clean.mk clean EXEEXT=$(EXEEXT) ;\
+	done
+
+
+# Deleting all files created by configuring or building the program
+# -----------------------------------------------------------------
+distclean: clean
+	$(MAKE) -f $(srcdir)/clean.mk distclean
+	@for pkg in $(PKGS_ALL); do\
+	  $(MAKE) -C $$pkg -f ../$(srcdir)/$$pkg/clean.mk distclean ;\
+	done
+	rm -rf doc/*~ doc/*.bak Makefile packages.mk libtool
+
+
+# Like clean but some files may still exist
+# -----------------------------------------
+mostlyclean: clean
+	$(MAKE) -f clean.mk mostlyclean
+	@for pkg in $(PKGS_ALL); do\
+	  $(MAKE) -C $$pkg -f ../$(srcdir)/$$pkg/clean.mk mostlyclean ;\
+	done
+
+
+# Deleting everything that can reconstructed by this Makefile. It deletes
+# everything deleted by distclean plus files created by bison, stc.
+# -----------------------------------------------------------------------
+realclean: distclean
+	$(MAKE) -f clean.mk realclean
+	@for pkg in $(PKGS_ALL); do\
+	  $(MAKE) -C $$pkg -f ../$(srcdir)/$$pkg/clean.mk realclean ;\
+	done
+
+
+# Creating distribution
+# ---------------------
+dist: distclean
+	@if [ -f devel ]; then\
+	  rm -f devel; mkdist; touch devel;\
+	else\
+	  mkdist;\
+	fi
+
+
+# Performing self-test
+# --------------------
+check:
+	$(MAKE) -f main.mk check
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg check ;\
+	done
+
+test:
+	$(MAKE) -f main.mk test
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg test ;\
+	done
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating dependencies
+# ---------------------
+dep:
+	$(MAKE) -f main.mk dep
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C $$pkg dep ;\
+	done
+
+
+# My rules
+# --------
+putcopyright:
+	'./put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
+
+start:
+	date '+%Y.%m.%d-%H:%M' >.start
+
+newer: distclean
+	@if [ -f .start ]; then \
+	  tar cvf - \
+	    `find . -newer .start -type f -print` |\
+	  gzip -9c >ucsim-newer-`cat .start`_`date '+%Y.%m.%d-%H:%M'`_`hostname`.tgz; \
+	else \
+	  echo ".start file not found.\n"; \
+	  exit 1; \
+	fi
+
+print-newer:
+	@if [ -f .start ]; then \
+	  find . -newer .start -type f -print ;\
+	else \
+	  echo ".start file not found.\n" ;\
+	  exit 1 ;\
+	fi
+
+new_files:
+	diff -rNu $$HOME/clean-source/sdcc/sim/ucsim .|\
+	grep '^diff' | grep -v .svn | awk '{print $$4}'
+
+lines:
+	@find . \( -name '*.[ch]' -o -name '*.cc' -o -name '*.hh' \) \
+	-exec cat {} \; | clines
+
+
+# Remaking configuration
+# ----------------------
+configure: configure.ac
+	@$(top_srcdir)/mkecho $(top_builddir) "RE-CREATING CONFIGURE"
+	autoconf configure.ac >configure
+	chmod 755 configure
+
+config.status: configure
+	@$(top_srcdir)/mkecho $(top_builddir) "RE-CHECKING CONFIGURATION (re-creating config.status from configure)"
+	@if [ -x ./config.status ]; then \
+	  ./config.status -recheck;\
+	else\
+	  if [ -x ./conf ]; then\
+	    ./conf;\
+	  else\
+	    ./configure;\
+	  fi\
+	fi
+
+makefiles: config.status
+	@$(top_srcdir)/mkecho $(top_builddir) "RE-MAKING MAKEFILES"
+	$(SHELL) ./config.status
+
+main.mk: $(srcdir)/main_in.mk config.status
+	@$(top_srcdir)/mkecho $(top_builddir) "RE-MAKING MAIN.MK"
+	$(SHELL) ./config.status
+
+freshconf: echo_freshconf configure main.mk ddconfig.h
+
+ddconfig.h: ddconfig_in.h config.status
+	$(SHELL) ./config.status
+
+echo_freshconf:
+	@$(top_srcdir)/mkecho $(top_builddir) "FRESHCONF"
+
+checkconf:
+	@$(top_srcdir)/mkecho $(top_builddir) "CHECKCONF"
+	@if [ -f devel ]; then $(MAKE) freshconf; fi
+
+# End of Makefile

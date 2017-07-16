@@ -1,0 +1,381 @@
+-07	n					INCX (0ffn)
+-0F	n					DECX (0ffn)
+
+-12	n					MUL HL,n
+-13	n					DIV HL,n
+-14+ix	n	m				ADD ix,mn
+-17	d	c				LDAR HL,$+2+cd
+-18	d					DJNZ $+2+d
+-19	d					DJNZ BC,$+2+d
+-1A	n	m				JP mn
+-1B	d	c				JRL $+2+cd
+-1C	n	m				CALL mn
+-1D	d	c				CALR $+2+cd
+
+-27	n					LD A,(0ffn)
+-2F	n					LD (0ffn),A
+
+-30+r	n					LD r,n
+-37	w	n				LD (0ffw),n
+-38+rr	n	m				LD rr,mn
+-3F	w	n	m			LDW (0ffw),mn
+
+-47	n					LD HL,(0ffn)
+-4F	n					LD (0ffn),HL
+
+-60	n					ADD A,(0ffn)
+-61	n					ADC A,(0ffn)
+-62	n					SUB A,(0ffn)
+-63	n					SBC A,(0ffn)
+-64	n					AND A,(0ffn)
+-65	n					XOR A,(0ffn)
+-66	n					OR A,(0ffn)
+-67	n					CP A,(0ffn)
+-68	n					ADD A,n
+-69	n					ADC A,n
+-6A	n					SUB A,n
+-6B	n					SBC A,n
+-6C	n					AND A,n
+-6D	n					XOR A,n
+-6E	n					OR A,n
+-6F	n					CP A,n
+
+-70	n					ADD HL,(0ffn)
+-71	n					ADC HL,(0ffn)
+-72	n					SUB HL,(0ffn)
+-73	n					SBC HL,(0ffn)
+-74	n					AND HL,(0ffn)
+-75	n					XOR HL,(0ffn)
+-76	n					OR HL,(0ffn)
+-77	n					CP HL,(0ffn)
+-78	n	m				ADD HL,mn
+-79	n	m				ADC HL,mn
+-7A	n	m				SUB HL,mn
+-7B	n	m				SBC HL,mn
+-7C	n	m				AND HL,mn
+-7D	n	m				XOR HL,mn
+-7E	n	m				OR HL,mn
+-7F	n	m				CP HL,mn
+
+-87	n					INC (0ffn)
+-8F	n					DEC (0ffn)
+
+-90+rr						INC rr
+-97	n					INCW (0ffn)
+-98+rr						DEC rr
+-9F	n					DECW (0ffn)
+
+-A8+b	n					BIT b,(0ffn)
+
+-B0+b	n					RES b,(0ffn)
+
+-B8+b	n					SET b,(0ffn)
+
+-C0+cc	d					JR [cc,]$+2+d
+
+-E0+gg	10					RLD (gg)
+-E0+gg	11					RRD (gg)
+-E0+gg	12					MUL HL,(gg)
+-E0+gg	13					DIV HL,(gg)
+-E0+gg	14+ix					ADD ix,(gg)
+-E0+gg	18+b					TSET b,(gg)
+-E0+gg	28+r					LD r,(gg)
+-E0+gg	48+rr					LD rr,(gg)
+-E0+gg	50+rr					EX (gg),rr
+-E0+gg	60					ADD A,(gg)
+-E0+gg	61					ADC A,(gg)
+-E0+gg	62					SUB A,(gg)
+-E0+gg	63					SBC A,(gg)
+-E0+gg	64					AND A,(gg)
+-E0+gg	65					XOR A,(gg)
+-E0+gg	66					OR A,(gg)
+-E0+gg	67					CP A,(gg)
+-E0+gg	70					ADD HL,(gg)
+-E0+gg	71					ADC HL,(gg)
+-E0+gg	72					SUB HL,(gg)
+-E0+gg	73					SBC HL,(gg)
+-E0+gg	74					AND HL,(gg)
+-E0+gg	75					XOR HL,(gg)
+-E0+gg	76					OR HL,(gg)
+-E0+gg	77					CP HL,(gg)
+-E0+gg	87					INC (gg)
+-E0+gg	8F					DEC (gg)
+-E0+gg	97					INCW (gg)
+-E0+gg	9F					DECW (gg)
+-E0+gg	A0					RLC (gg)
+-E0+gg	A1					RRC (gg)
+-E0+gg	A2					RL (gg)
+-E0+gg	A3					RR (gg)
+-E0+gg	A4					SLA (gg)
+-E0+gg	A5					SRA (gg)
+-E0+gg	A6					SLL (gg)
+-E0+gg	A7					SRL (gg)
+-E0+gg	A8+b					BIT b,(gg)
+-E0+gg	B0+b					RES b,(gg)
+-E0+gg	B8+b					SET b,(gg)
+
+-E3	n	m	10			RLD (mn)
+-E3	n	m	11			RRD (mn)
+-E3	n	m	12			MUL HL,(mn)
+-E3	n	m	13			DIV HL,(mn)
+-E3	n	m	14+ix			ADD ix,(mn)
+-E3	n	m	18+b			TSET b,(mn)
+-E3	n	m	28+r			LD r,(mn)
+-E3	n	m	48+rr			LD rr,(nm)
+-E3	n	m	50+rr			EX (mn),rr
+-E3	n	m	60			ADD A,(mn)
+-E3	n	m	61			ADC A,(mn)
+-E3	n	m	62			SUB A,(mn)
+-E3	n	m	63			SBC A,(mn)
+-E3	n	m	64			AND A,(mn)
+-E3	n	m	65			XOR A,(mn)
+-E3	n	m	66			OR A,(mn)
+-E3	n	m	67			CP A,(mn)
+-E3	n	m	70			ADD HL,(mn)
+-E3	n	m	71			ADC HL,(mn)
+-E3	n	m	72			SUB HL,(mn)
+-E3	n	m	73			SBC HL,(mn)
+-E3	n	m	74			AND HL,(mn)
+-E3	n	m	75			XOR HL,(mn)
+-E3	n	m	76			OR HL,(mn)
+-E3	n	m	77			CP HL,(mn)
+-E3	n	m	87			INC (mn)
+-E3	n	m	8F			DEC (mn)
+-E3	n	m	97			INCW (mn)
+-E3	n	m	9F			DECW (mn)
+-E3	n	m	A0			RLC (mn)
+-E3	n	m	A1			RRC (mn)
+-E3	n	m	A2			RL (mn)
+-E3	n	m	A3			RR (mn)
+-E3	n	m	A4			SLA (mn)
+-E3	n	m	A5			SRA (mn)
+-E3	n	m	A6			SLL (mn)
+-E3	n	m	A7			SRL (mn)
+-E3	n	m	A8+b			BIT b,(mn)
+-E3	n	m	B0+b			RES b,(mn)
+-E3	n	m	B8+b			SET b,(mn)
+
+-E7	n	10				RLD (0ffn)
+-E7	n	11				RRD (0ffn)
+-E7	n	12				MUL HL,(0ffn)
+-E7	n	13				DIV HL,(0ffn)
+-E7	n	14+ix				ADD ix,(0ffn)
+-E7	n	18+b				TSET b,(0ffn)
+-E7	n	28+r				LD r,(0ffn)
+-E7	n	48+rr				LD rr,(0ffn)
+-E7	n	50+rr				EX (0ffn),rr
+-E7	n	A0				RLC (0ffn)
+-E7	n	A1				RRC (0ffn)
+-E7	n	A2				RL (0ffn)
+-E7	n	A3				RR (0ffn)
+-E7	n	A4				SLA (0ffn)
+-E7	n	A5				SRA (0ffn)
+-E7	n	A6				SLL (0ffn)
+-E7	n	A7				SRL (0ffn)
+
+-E8+gg	20+r					LD (gg),r
+-E8+gg	37	n				LD (gg),n
+-E8+gg	3F	n	m			LDW (gg),mn
+-E8+gg	40+rr					LD (gg),rr
+-E8+gg	68	n				ADD (gg),n
+-E8+gg	69	n				ADC (gg),n
+-E8+gg	6A	n				SUB (gg),n
+-E8+gg	6B	n				SBC (gg),n
+-E8+gg	6C	n				AND (gg),n
+-E8+gg	6D	n				XOR (gg),n
+-E8+gg	6E	n				OR (gg),n
+-E8+gg	6F	n				CP (gg),n
+-E8+gg	C0+cc					JP [cc,]gg
+-E8+gg	D0+cc					CALL [cc,]gg
+
+-EB	n	m	20+r			LD (mn),r
+-EB	w	v	37	n		LD (vw),n
+-EB	w	v	3F	n	m	LDW (vw),mn
+-EB	n	m	40+rr			LD (mn),rr
+-EB	w	v	68	n		ADD (vw),n
+-EB	w	v	69	n		ADC (vw),n
+-EB	w	v	6A	n		SUB (vw),n
+-EB	w	v	6B	n		SBC (vw),n
+-EB	w	v	6C	n		AND (vw),n
+-EB	w	v	6D	n		XOR (vw),n
+-EB	w	v	6E	n		OR (vw),n
+-EB	w	v	6F	n		CP (vw),n
+-EB	n	m	C0+cc			JP cc,mn
+-EB	n	m	D0+cc			CALL cc,mn
+
+-EF	n	20+r				LD (0ffn),r
+-EF	n	40+rr				LD (0ffn),rr
+-EF	w	68	n			ADD (0ffw),n
+-EF	w	69	n			ADC (0ffw),n
+-EF	w	6A	n			SUB (0ffw),n
+-EF	w	6B	n			SBC (0ffw),n
+-EF	w	6C	n			AND (0ffw),n
+-EF	w	6D	n			XOR (0ffw),n
+-EF	w	6E	n			OR (0ffw),n
+-EF	w	6F	n			CP (0ffw),n
+
+-F0+ix	d	10				RLD (ix+d)
+-F0+ix	d	11				RRD (ix+d)
+-F0+ix	d	12				MUL HL,(ix+d)
+-F0+ix	d	13				DIV HL,(ix+d)
+-F0+jx	d	14+ix				ADD ix,(jx+d)
+-F0+ix	d	18+b				TSET b,(ix+d)
+-F0+ix	d	28+r				LD r,(ix+d)
+-F0+ix	d	48+rr				LD rr,(ix+d)
+-F0+ix	d	50+rr				EX (ix+d),rr
+-F0+ix	d	60				ADD A,(ix+d)
+-F0+ix	d	61				ADC A,(ix+d)
+-F0+ix	d	62				SUB A,(ix+d)
+-F0+ix	d	63				SBC A,(ix+d)
+-F0+ix	d	64				AND A,(ix+d)
+-F0+ix	d	65				XOR A,(ix+d)
+-F0+ix	d	66				OR A,(ix+d)
+-F0+ix	d	67				CP A,(ix+d)
+-F0+ix	d	70				ADD HL,(ix+d)
+-F0+ix	d	71				ADC HL,(ix+d)
+-F0+ix	d	72				SUB HL,(ix+d)
+-F0+ix	d	73				SBC HL,(ix+d)
+-F0+ix	d	74				AND HL,(ix+d)
+-F0+ix	d	75				XOR HL,(ix+d)
+-F0+ix	d	76				OR HL,(ix+d)
+-F0+ix	d	77				CP HL,(ix+d)
+-F0+ix	d	87				INC (ix+d)
+-F0+ix	d	8F				DEC (ix+d)
+-F0+ix	d	97				INCW (ix+d)
+-F0+ix	d	9F				DECW (ix+d)
+-F0+ix	d	A0				RLC (ix+d)
+-F0+ix	d	A1				RRC (ix+d)
+-F0+ix	d	A2				RL (ix+d)
+-F0+ix	d	A3				RR (ix+d)
+-F0+ix	d	A4				SLA (ix+d)
+-F0+ix	d	A5				SRA (ix+d)
+-F0+ix	d	A6				SLL (ix+d)
+-F0+ix	d	A7				SRL (ix+d)
+-F0+ix	d	A8+b				BIT b,(ix+d)
+-F0+ix	d	B0+b				RES b,(ix+d)
+-F0+ix	d	B8+b				SET b,(ix+d)
+
+-F3	10					RLD (HL+A)
+-F3	11					RRD (HL+A)
+-F3	12					MUL HL,(HL+A)
+-F3	13					DIV HL,(HL+A)
+-F3	14+ix					ADD ix,(HL+A)
+-F3	18+b					TSET b,(HL+A)
+-F3	28+r					LD r,(HL+A)
+-F3	48+rr					LD rr,(HL+A)
+-F3	50+rr					EX (HL+A),rr
+-F3	60					ADD A,(HL+A)
+-F3	61					ADC A,(HL+A)
+-F3	62					SUB A,(HL+A)
+-F3	63					SBC A,(HL+A)
+-F3	64					AND A,(HL+A)
+-F3	65					XOR A,(HL+A)
+-F3	66					OR A,(HL+A)
+-F3	67					CP A,(HL+A)
+-F3	70					ADD HL,(HL+A)
+-F3	71					ADC HL,(HL+A)
+-F3	72					SUB HL,(HL+A)
+-F3	73					SBC HL,(HL+A)
+-F3	74					AND HL,(HL+A)
+-F3	75					XOR HL,(HL+A)
+-F3	76					OR HL,(HL+A)
+-F3	77					CP HL,(HL+A)
+-F3	87					INC (HL+A)
+-F3	8F					DEC (HL+A)
+-F3	97					INCW (HL+A)
+-F3	9F					DECW (HL+A)
+-F3	A0					RLC (HL+A)
+-F3	A1					RRC (HL+A)
+-F3	A2					RL (HL+A)
+-F3	A3					RR (HL+A)
+-F3	A4					SLA (HL+A)
+-F3	A5					SRA (HL+A)
+-F3	A6					SLL (HL+A)
+-F3	A7					SRL (HL+A)
+-F3	A8+b					BIT b,(HL+A)
+-F3	B0+b					RES b,(HL+A)
+-F3	B8+b					SET b,(HL+A)
+
+-F4+ix	d	20+r				LD (ix+d),r
+-F4+ix	d	37	n			LD (ix+d),n
+-F4+ix	d	38+rr				LDA rr,ix+d
+-F4+ix	d	3F	n	m		LDW (ix+d),mn
+-F4+ix	d	40+rr				LD (ix+d),rr
+-F4+ix	d	68	n			ADD (ix+d),n
+-F4+ix	d	69	n			ADC (ix+d),n
+-F4+ix	d	6A	n			SUB (ix+d),n
+-F4+ix	d	6B	n			SBC (ix+d),n
+-F4+ix	d	6C	n			AND (ix+d),n
+-F4+ix	d	6D	n			XOR (ix+d),n
+-F4+ix	d	6E	n			OR (ix+d),n
+-F4+ix	d	6F	n			CP (ix+d),n
+-F4+ix	d	C0+cc				JP [cc,]ix+d
+-F4+ix	d	D0+cc				CALL [cc,]ix+d
+
+-F7	20+r					LD (HL+A),r
+-F7	37	n				LD (HL+A),n
+-F7	38+rr					LDA rr,HL+A
+-F7	3F	n	m			LDW (HL+A),mn
+-F7	40+rr					LD (HL+A),rr
+-F7	68	n				ADD (HL+A),n
+-F7	69	n				ADC (HL+A),n
+-F7	6A	n				SUB (HL+A),n
+-F7	6B	n				SBC (HL+A),n
+-F7	6C	n				AND (HL+A),n
+-F7	6D	n				XOR (HL+A),n
+-F7	6E	n				OR (HL+A),n
+-F7	6F	n				CP (HL+A),n
+-F7	C0+cc					JP [cc,]HL+A
+-F7	D0+cc					CALL [cc,]HL+A
+
+-F8+g	12					MUL HL,g
+-F8+g	13					DIV HL,g
+-F8+gg	14+ix					ADD ix,gg
+-F8+g	18+b					TSET b,g
+-F8+g	30+r					LD r,g
+-F8+gg	38+rr					LD rr,gg
+-F8+g	60					ADD A,g
+-F8+g	61					ADC A,g
+-F8+g	62					SUB A,g
+-F8+g	63					SBC A,g
+-F8+g	64					AND A,g
+-F8+g	65					XOR A,g
+-F8+g	66					OR A,g
+-F8+g	67					CP A,g
+-F8+g	68	n				ADD g,n
+-F8+g	69	n				ADC g,n
+-F8+g	6A	n				SUB g,n
+-F8+g	6B	n				SBC g,n
+-F8+g	6C	n				AND g,n
+-F8+g	6D	n				XOR g,n
+-F8+g	6E	n				OR g,n
+-F8+g	6F	n				CP g,n
+-F8+gg	70					ADD HL,gg
+-F8+gg	71					ADC HL,gg
+-F8+gg	72					SUB HL,gg
+-F8+gg	73					SBC HL,gg
+-F8+gg	74					AND HL,gg
+-F8+gg	75					XOR HL,gg
+-F8+gg	76					OR HL,gg
+-F8+gg	77					CP HL,gg
+-F8+g	A0					RLC g
+-F8+g	A1					RRC g
+-F8+g	A2					RL g
+-F8+g	A3					RR g
+-F8+g	A4					SLA g
+-F8+g	A5					SRA g
+-F8+g	A6					SLL g
+-F8+g	A7					SRL g
+-F8+g	A8+b					BIT b,g
+-F8+g	B0+b					RES b,g
+-F8+g	B8+b					SET b,g
+
+-FE	58					LDI
+-FE	59					LDIR
+-FE	5A					LDD
+-FE	5B					LDDR
+-FE	5C					CPI
+-FE	5D					CPIR
+-FE	5E					CPD
+-FE	5F					CPDR
+-FE	D0+cc					RET cc

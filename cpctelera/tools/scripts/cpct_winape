@@ -47,6 +47,7 @@
 ## commands are required (they should be installed in the system).
 ##
 ## Command line options:
+##    -a | --any-dsk                  - Lauches WinAPE and loads first DSK file to match *.dsk
 ##    -n | --no-execute               - Lauches WinAPE but does not automatically RUN any DSK program.
 ##    -s | --symbols <symbols_file>   - Loads a symbols file for debugging (NoICE format .noi).
 ##    -d | --disable-symbols-autoload - Prevents this script from trying to autoload a symbols 
@@ -104,6 +105,8 @@ For this last operation, wget and unzip commands are required (they should be in
 the system)."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo "${COLOR_LIGHT_BLUE}  -a | --any-dsk"
+   echo "${COLOR_CYAN}       Lauches WinAPE and loads first DSK file to match *.dsk."
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches WinAPE but does not automatically RUN any DSK program."
    echo "${COLOR_LIGHT_BLUE}  -s | --symbols <symbols_file>"
@@ -327,6 +330,9 @@ while (( $# > 0 )); do
       ;;
       "-d" | "--disable-symbols-autoload")
          AUTOLOADSYMS=false
+      ;;
+      "-a" | "--any-dsk")
+         FILE="*.dsk"
       ;;
       "-h" | "--help")
         usage

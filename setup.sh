@@ -70,7 +70,7 @@ CPCT_LOGS_DIR=${CPCT_MAIN_DIR}/logs
 CPCT_TOOLS_2CDT_DIR=${CPCT_TOOLS_DIR}/2cdt
 CPCT_TOOLS_HEX2BIN_DIR=${CPCT_TOOLS_DIR}/hex2bin-2.0
 CPCT_TOOLS_IDSK_DIR=${CPCT_TOOLS_DIR}/iDSK-0.13
-CPCT_TOOLS_SDCC_DIR=${CPCT_TOOLS_DIR}/sdcc-3.5.5
+CPCT_TOOLS_SDCC_DIR=${CPCT_TOOLS_DIR}/sdcc-3.6.8-r9946
 CPCT_TOOLS_IMG2CPC_DIR=${CPCT_TOOLS_DIR}/img2cpc
 CPCT_TOOLS_RGAS_DIR=${CPCT_TOOLS_DIR}/rgas-1.2.2
 CPCT_TOOLS_ARKOS_DIR=${CPCT_TOOLS_DIR}/arkosTracker-1.0
@@ -97,12 +97,12 @@ CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAK
 CPCT_EXAMPLES_BUILD_LOG=${CPCT_LOGS_DIR}/examples_building.log
 CPCT_TOOLS_BUILD_LOG=${CPCT_LOGS_DIR}/tool_building.log
 CPCT_LIB_BUILD_LOG=${CPCT_LOGS_DIR}/library_building.log
-CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES_CLEAN=20588
-CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES=82012
-CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES_CLEAN=23766
-CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES=386761
+CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES_CLEAN=23300
+CPCT_EXAMPLES_BUILD_LOG_TOTAL_BYTES=109638
+CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES_CLEAN=24132
+CPCT_TOOLS_BUILD_LOG_TOTAL_BYTES=422411
 CPCT_LIB_BUILD_LOG_TOTAL_BYTES_CLEAN=319
-CPCT_LIB_BUILD_LOG_TOTAL_BYTES=29847
+CPCT_LIB_BUILD_LOG_TOTAL_BYTES=32364
 
 ## Substitution tags
 CPCT_TAG_MAINPATH="%%%CPCTELERA_PATH%%%"
@@ -110,16 +110,22 @@ CPCT_TAG_SCRIPTSPATH="%%%CPCTELERA_SCRIPTS_PATH%%%"
 
 ## Required stuff for running CPCtelera
 REQUIRED_COMMANDS=(gcc g++ make bison flex)
-COMMAND_EXPLANATION[0]="${REQUIRED_COMMANDS[0]} compiler is required to compile tools. Please \
+COMM_NUM=0
+COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} compiler is required to compile tools. Please \
 install it or build-essentials and run setup again."
-COMMAND_EXPLANATION[1]="${REQUIRED_COMMANDS[1]} compiler is required to compile tools. Please \
+COMM_NUM=$((COMM_NUM + 1))
+COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} compiler is required to compile tools. Please \
 install it or build-essentials and run setup again."
-COMMAND_EXPLANATION[2]="${REQUIRED_COMMANDS[2]} is required for all CPCtelera's build systems. \
+COMM_NUM=$((COMM_NUM + 1))
+COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} is required for all CPCtelera's build systems. \
 Please, install it and run setup again."
-COMMAND_EXPLANATION[3]="${REQUIRED_COMMANDS[3]} is required to compile SDCC. Please, install it \
+COMM_NUM=$((COMM_NUM + 1))
+COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} is required to compile SDCC. Please, install it \
 and run setup again."
-COMMAND_EXPLANATION[4]="${REQUIRED_COMMANDS[4]} is required to compile SDCC. Please, install it \
+COMM_NUM=$((COMM_NUM + 1))
+COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} is required to compile SDCC. Please, install it \
 and run setup again."
+COMM_NUM=$((COMM_NUM + 1))
 GCC_MINIMUM_VERSION="4.6"
 
 REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
@@ -134,6 +140,10 @@ fi
 if ! checkSystem "cygwin"; then
    REQUIRED_LIBRARIES+=( "FreeImage.h" )
    LIBRARIES_EXPLANATION+=( "Freeimage (development) is required to build Img2CPC. Please, install freeimage / libfreeimage-dev / freeimage-devel or similar in your system and run setup again." )
+   REQUIRED_COMMANDS+=( mono )
+   COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} is required to convert arkos audio files to code automatically. Please, install it \
+and run setup again." 
+   COMM_NUM=$((COMM_NUM + 1))
 fi
 
 ## On cygwin, machine echo is disabled by default as it is too slow

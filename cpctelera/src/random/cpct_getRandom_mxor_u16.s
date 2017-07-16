@@ -83,7 +83,7 @@
 .globl cpct_nextRandom_mxor_u32_asm
 
 ;; Include opcodes for self-modifying code
-.include "../macros/cpct_opcodes.s"
+.include "src/macros/cpct_opcodes.s"
 
 _cpct_getRandom_mxor_u16::
 cpct_getRandom_mxor_u16::

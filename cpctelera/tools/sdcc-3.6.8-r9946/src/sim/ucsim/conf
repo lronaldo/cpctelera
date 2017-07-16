@@ -1,0 +1,117 @@
+#!/bin/bash
+
+[ -f Makefile ] && make distclean
+
+TARGET=linux
+
+PREFIX="${HOME}/local"
+DD_HOSTS="p4 anb anb1 render mms box mazsola v3"
+PERF_FLAG=""
+OPT_FLAG="-O2"
+COMP="no"
+
+while [ -n "$1" ]; do
+    case "$1" in
+	-p)
+	    PERF_FLAG="-pg"
+	    ;;
+	-d)
+	    OPT_FLAG="-O0"
+	    ;;
+	-c)
+	    COMP="yes"
+	    ;;
+	[lLxX]*) TARGET=linux;;
+	[mMwW]6*) TARGET=w64;;
+	[mMwW]*) TARGET=mingw;;
+	*) echo "Unknown target \"${1}\"" >&2; exit 1;;
+    esac
+    shift
+done
+
+#if [ -f devel ]; then
+#    export CXXFLAGS="-O0"
+#    export CFLAGS="-g -O0"
+#fi
+
+export CXXFLAGS="-g $OPT_FLAG $PERF_FLAG"
+export CFLAGS="-g $OPT_FLAG $PERF_FLAG"
+
+#if [ -n "$PERF_FLAG" ]; then
+#    CXXFLAGS="${CXXFLAGS} ${PERF_FLAG}"
+#    CFLAGS="${CFLAGS} ${PERF_FLAG}"
+#fi
+
+case $TARGET in
+    linux|l)
+	if echo $DD_HOSTS|grep $(hostname) >/dev/null 2>&1 ; then
+	    export PREFIX='/usr/local'
+	fi
+	./configure --prefix=${PREFIX} \
+	    --enable-ucsim \
+	    --disable-dlso \
+	    --enable-serio \
+	    --enable-avr-port \
+	    --enable-z80-port \
+	    --enable-xa-port \
+	    --enable-stm8-port \
+	    --enable-st7-port \
+	    "$@"
+	;;
+    mingw|win|w)
+	if [ -d	/usr/local/cross-tools/mingw32 ] ; then
+	    export CC=/usr/local/cross-tools/mingw32/bin/gcc
+	    export CXX=/usr/local/cross-tools/mingw32/bin/g++
+	else
+	#if echo $DD_HOSTS|grep $(hostname) >/dev/null 2>&1; then
+	    export CC=i686-w64-mingw32-gcc
+	    export CXX=i686-w64-mingw32-g++
+	    export HOST_OPT='--host=i686-w64-mingw32'
+	    export LDFLAGS='-static-libgcc -static-libstdc++'
+	    export PREFIX='/usr/local'
+	fi
+	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
+	./configure --prefix=${PREFIX} \
+	    --enable-ucsim \
+	    --disable-dlso \
+	    --disable-serio \
+	    --enable-avr-port \
+	    --enable-z80-port \
+	    --enable-xa-port \
+	    --enable-stm8-port \
+	    --enable-st7-port \
+	    $HOST_OPT "$@"
+	;;
+    w64)
+	export CC=x86_64-w64-mingw32-gcc
+	export CXX=x86_64-w64-mingw32-g++
+	export HOST_OPT='--host=x86_64-w64-mingw32'
+	export LDFLAGS='-static-libgcc -static-libstdc++'
+	export PREFIX='/usr/local'
+	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
+	./configure --prefix=${PREFIX} \
+	    --enable-ucsim \
+	    --disable-dlso \
+	    --disable-serio \
+	    --enable-avr-port \
+	    --enable-z80-port \
+	    --enable-xa-port \
+	    --enable-stm8-port \
+	    --enable-st7-port \
+	    $HOST_OPT "$@"
+	;;
+    *)
+	echo >&2 "Do not know how to configure!"
+	;;
+esac
+
+if [ "$COMP" = "yes" ]; then
+    make clean
+    make
+    cd s51.src;make;cd ..
+    if [ -n "$PERF_FLAG" ]; then
+	mv s51.src/s51 s51.src/s51p
+    fi
+fi
+
+# End of conf

@@ -1,0 +1,114 @@
+# Makefile for kano-networks talker
+
+SHELL		= /bin/sh
+CXX		= @CXX@
+CXXCPP		= @CXXCPP@
+INSTALL		= @INSTALL@
+STRIP		= @STRIP@
+CP		= /bin/cp
+MAKEDEP         = @MAKEDEP@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
+CPPFLAGS        = @CPPFLAGS@ -I. -I$(top_builddir)
+#		  -I$(top_builddir)/cmd.src -I$(top_builddir)/sim.src
+CFLAGS          = @CFLAGS@ @WALL_FLAG@
+CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
+
+LIBS		= @CURSES_LIBS@ @LIBS@
+
+EXEEXT		= @EXEEXT@
+
+curses_ok	= @curses_ok@
+
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
+datadir         = @datadir@
+datarootdir     = @datarootdir@
+includedir      = @includedir@
+mandir          = @mandir@
+man1dir         = $(mandir)/man1
+man2dir         = $(mandir)/man2
+infodir         = @infodir@
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+
+OBJECTS		= main.o fileio.o frontend.o posix_signal.o
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: serio.src
+
+ifeq ($(curses_ok),yes)
+serio.src: checkconf serialview$(EXEEXT)
+else
+serio.src: checkconf
+endif
+
+
+# Compiling and installing everything and runing test
+# ---------------------------------------------------
+install: all installdirs
+	$(INSTALL) serialview$(EXEEXT) $(DESTDIR)$(bindir)/serialview$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/serialview$(EXEEXT)
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/serialview$(EXEEXT)
+
+
+# Performing self-test
+# --------------------
+check:
+
+test:
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	test -d $(DESTDIR)$(bindir) || $(INSTALL) -d $(DESTDIR)$(bindir)
+
+
+# Creating dependencies
+# ---------------------
+dep: Makefile.dep
+
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h $(srcdir)/*.hh
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
+
+ifeq "$(findstring $(MAKECMDGOALS),uninstall installcheck installdirs checkconf \
+                                   clean distclean mostlyclean realclean)" ""
+  -include Makefile.dep
+endif
+include $(srcdir)/clean.mk
+
+
+# My rules
+# --------
+serialview$(EXEEXT): $(OBJECTS)
+	$(CXX) -o $@ $(LDFLAGS) $(OBJECTS) $(LIBS)
+
+.cc.o:
+	$(CXX) $(CXXFLAGS)  $(CPPFLAGS) -c $< -o $@
+
+# Remaking configuration
+# ----------------------
+checkconf:
+	@if [ -f $(top_builddir)/devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" top_srcdir=$(top_srcdir) freshconf;\
+	fi
+
+# End of gui.src/serio.src/Makefile.in
