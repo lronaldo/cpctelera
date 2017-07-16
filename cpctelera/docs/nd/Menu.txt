@@ -45,6 +45,7 @@ File: License  (no auto-title, license.txt)
 Text: ______________________________________________________________________
 File: Aliases for builtin types  (types.h)
 File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
+File: Visual Studio Code  (buildsys/vscode_integration.txt)
 
 Group: Audio  {
 
