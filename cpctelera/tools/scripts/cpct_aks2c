@@ -1,0 +1,343 @@
+#!/bin/bash
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU Lesser General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU Lesser General Public License for more details.
+##
+##  You should have received a copy of the GNU Lesser General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_aks2c
+##
+##    Converts an Arkos Tracker (aks) music file into an absolutely located
+## data array to be compiled directly into a binary program.
+##
+## Usage:
+##    <cpct_aks2c> [options] [aksfile]
+##
+## Requisites:
+##    This scripts uses AKSToBIN.exe utility by Targhan to convert an aks
+## file into a data Array. AKSToBIN.exe is included in Arkos Tracker 1.0, which
+## is included into CPCtelera. AKSToBIN.exe works natively on Windows systems
+## but requires wine to be installed under Linux or Mac OSX Systems.
+##
+## Description:
+##    This script converts an Arkos Tracker (aks) file containing music and or
+## sound effects into two source code files (.s/.h) with definition and declaration
+## of am array containing all music data. The data array will be absolutely located
+## in memory at the desired memory address.
+##	  By default, generated binary data will be placed at location 0x100 in memory.
+## You can change that location using -m modifier.
+##
+##
+## Command line options:
+##    -o   | --output-filename        - Set the basename for output filenames (name without extension)
+##    -m   | --memory-address         - Set the memory base address where song binary data will be located.
+##    -bl  | --bytes-per-line [bytes] - Set the number of bytes that every generated line will contain in the .s file
+##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be written to.
+##    -id  | --c-identifier [ident]   - Sets the identifier that will be used to access the array from C programs.
+##    -h   | --help                   - Shows help information on the terminal.
+##
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## AKS2BIN utility location
+AKS2BIN=${CPCT_PATH}/tools/arkosTracker-1.0/tools/AKSToBIN.exe
+
+## Configuration Variables
+MEMADDR=0x100
+C_IDENTIFIER="g_music"
+BINTMP=$(createTempFile)
+EXPORTMP=$(createTempFile)
+TXTBINTMP=$(createTempFile)
+BYTESPERLINE=16
+OUTPUT_FILENAME=
+OUTPUTDIR=.
+SFILE=music.s
+HFILE=music.h
+
+## Show how this script is to be used and exit
+##
+function usage() {
+cat <<UsageHereDoc
+${COLOR_LIGHT_YELLOW}USAGE${COLOR_LIGHT_BLUE}
+   $(basename $0) [options] <aksfile>
+   ${COLOR_CYAN}
+   Converts an Arkos Tracker (aks) music file into an absolutely located \
+data array to be compiled directly into a binary program.
+${COLOR_LIGHT_YELLOW}
+Requisites:${COLOR_CYAN}
+   This scripts uses AKSToBIN.exe utility by Targhan to convert an aks file \
+into a data array. AKSToBIN.exe is included in Arkos Tracker 1.0, which is \
+included into CPCtelera. AKSToBIN.exe works natively on Windows systems but \
+requires wine to be installed under Linux or Mac OSX Systems.
+   ${COLOR_LIGHT_YELLOW}
+Description:${COLOR_CYAN}
+   This script converts an Arkos Tracker (aks) file containing music and or \
+sound effects into two source code files (.s/.h) with definition and declaration \
+of am array containing all music data. The data array will be absolutely located \
+in memory at the desired memory address.
+   By default, generated binary data will be placed at location 0x100 in memory. \
+You can change that location using -m modifier.
+   ${COLOR_LIGHT_YELLOW}
+OPTIONS
+   ${COLOR_LIGHT_BLUE}
+   -o   | --output-filename ${COLOR_CYAN}
+         Set the basename for output filenames (name without extension) \
+   ${COLOR_LIGHT_BLUE}
+   -m   | --memory-address ${COLOR_CYAN}
+         Set the memory base address where song binary data will be located \
+   ${COLOR_LIGHT_BLUE}
+   -bl  | --bytes-per-line [bytes] ${COLOR_CYAN}
+         Set the number of bytes that every generated line will contain in \
+the .s file ${COLOR_LIGHT_BLUE}
+   -od  | --output-directory [dir] ${COLOR_CYAN}
+         Sets directory where .s/.h files will be written to \
+   ${COLOR_LIGHT_BLUE}
+   -id  | --c-identifier [ident] ${COLOR_CYAN}
+         Sets the identifier that will be used to access the array from C \
+programs ${COLOR_LIGHT_BLUE}
+   -h   | --help ${COLOR_CYAN}
+         Shows help information on the terminal \
+   ${COLOR_NORMAL}
+UsageHereDoc
+   exit 1
+}
+
+##############################################################
+###############################################################
+## Check command line parameters
+##
+
+if (( $# < 1 )); then
+   usage
+fi
+
+while (( $# >= 1 )); do
+   case $1 in
+      ## Set the basename for output files
+      "-o" | "--output-filename")
+
+         ## A filename is required
+         if isEmpty "$2"; then
+            paramError "Parameter -o (--output-filename) must be followed by the name of the file." 27
+         fi
+
+         OUTPUT_FILENAME="$2"
+         shift
+      ;;
+      ## Set the number of bytes that everty converted line from the .s will have
+      "-m" | "--memory-address")
+
+         ## Must be an integer greater or equal than 1
+         if isEmpty "$2"; then
+            paramError "Parameter -m (--memory-address) must be followed by a memory address." 24
+         elif ! isCIntValue "$2"; then
+         	paramError "'$2' is not a valid integer memory address for -m (--memory-address). " 25
+         fi
+
+         ## Check memory address is inside 64K Boundaries
+         MD=$(any2Dec "$2")
+         if (( MD < 0 || MD > 65535 )); then
+         	paramError "'$2' memory address is outside 64K boundaries (0 to 65535). " 26
+         fi
+
+         MEMADDR="$2"
+         shift
+      ;;
+      ## Set the number of bytes that everty converted line from the .s will have
+      "-bl" | "--bytes-per-line")
+         
+         ## Must be an integer greater or equal than 1
+         if isEmpty "$2"; then
+            paramError "Parameter -bl (--bytes-per-line) must be followed by an integer." 20
+         elif ! isInt "$2"; then
+            paramError "'$2' is not an integer. -bl (--bytes-per-line) requires and integer." 21
+         elif (( $2 < 1 )); then
+            paramError "'$2' is lower than 1. -bl (--bytes-per-line) requires an integer greater or equal than 1." 22
+         fi         	
+
+         BYTESPERLINE="$2"
+         shift
+      ;;
+      ## Set the output directory to where .s/.h files will be written
+      "-od" | "--output-directory")
+         
+         ## Must be a valid, existing directory
+         if isEmpty "$2"; then
+            paramError "Parameter -od (--output-directory) must be followed by a valid directory." 10
+         elif [ ! -d "$2" ]; then
+            paramError "'$2' does not exist or is not a valid directory for -od (--output-directory)." 11
+         elif [ ! -r "$2" -o ! -w "$2" ]; then
+            paramError "User has no read+write permission in directory '$2'." 12
+         fi
+
+         OUTPUTDIR="$2"
+         shift
+      ;;
+      "-id" | "--c-identifier")
+         
+         ## Must be a valid C-identifier
+         if isEmpty "$2"; then
+            paramError "Parameter -id (--c-identifier) must be followed by a valid C-identifier." 4
+         elif ! checkValidCIdentifier "$2"; then
+            paramError "'$2' is not a valid C-identifier for -id (--c-identifier)." 5
+         fi
+
+         C_IDENTIFIER="$2"
+         shift
+      ;;
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Get main parameter (filename)
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 10
+         elif ! isEmpty "$FILE"; then
+            paramError "Unrecognized parameter '$1'. Have you already provided a <filename> parameter?" 11
+         else
+            EnsureExists file "$1"
+         fi
+
+         FILE="$1"
+      ;;
+   esac
+   shift
+done
+
+## File parameter must have been passed (not empty)
+if isEmpty "$FILE"; then
+   paramError "A <filename> parameter is required." 12
+fi
+
+## Calculate output filenames and routes
+if isEmpty "$OUTPUT_FILENAME"; then
+   SFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").s"
+   HFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").h"
+else
+   SFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.s"
+   HFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.h"
+fi
+
+## Check AKSToBin and Wine if Required
+checkExecutableExists "$AKS2BIN"
+if ! checkSystem cygwin; then
+   EnsureCommandAvailable wine "wine has not been found on the system, \
+and it's required for this script to work. Please, install wine or \
+check the installation and run this script again."
+   AKS2BIN="wine $AKS2BIN"
+fi
+
+###############################################################
+###############################################################
+## Convert music to data array
+##
+
+## STEP 1: Convert AKS file to Binary
+printf "Converting '$FILE' to binary..."
+$AKS2BIN -a "$MEMADDR" "$FILE" "$BINTMP" > "$EXPORTMP" 2>&1
+
+# Check if song has been correctly exported
+if ! grep "Song exported" < "$EXPORTMP" > /dev/null; then
+   COLF="'${COLOR_WHITE}$FILE${COLOR_LIGHT_YELLOW}'"
+   Error "There was an error exporting song $COLF. Please check that $COLF is \
+a valid AKS song file and run this script again."
+fi
+echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
+
+## STEP 2: Convert Binary file to Text-Hexadecimal-Binary for later parsing
+## and get its size in bytes
+od -An -t x1 -v "$BINTMP" > "$TXTBINTMP"
+SIZE_BYTES=$(wc -c < "$BINTMP")
+
+## STEP 3: Generate S-FILE (Assembly data output)
+
+printf "Generating '$SFILE' with data array..."
+# Generate header, absolute location code and identifier
+cat > "$SFILE" <<HereDocument
+;;;
+;;; File generated by cpct_aks2c CPCtelera script
+;;; Souce file of this conversion: ${FILE}
+;;; Generation time: $(date)
+;;;
+
+;;; Set absolute memory addressing
+.area __${C_IDENTIFIER} (ABS)
+.org $MEMADDR
+
+;;; Music data start ($SIZE_BYTES bytes)
+;;;
+_${C_IDENTIFIER}::
+HereDocument
+
+# Convert binary to an absolutely located data array
+i=0
+while read LINE; do
+   BYTES=( $LINE )
+   LNBYTES=${#BYTES[@]}
+   b=0
+   while (( b < LNBYTES )); do
+      ## Line Start
+      if (( i == 0 )); then
+         printf ".db 0x%s" ${BYTES[$b]}
+         b=$((b+1))
+         i=1
+      fi
+
+      ## Line body
+      while (( i < BYTESPERLINE && b < LNBYTES )); do
+         printf ", 0x%s" ${BYTES[$b]}
+         b=$((b+1))
+         i=$((i+1))
+      done
+
+      ## Line ending
+      if (( i >= BYTESPERLINE )); then
+         printf "\n"
+         i=0
+      fi
+   done 
+done < "$TXTBINTMP" >> "$SFILE"
+echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
+
+## STEP 4: Generate H-FILE (header data with declarations to let data be accessable from C)
+
+# Calculate memory address where music ends (in hexadecimal)
+ENDADDR=0x`dec2Hex $((MD + SIZE_BYTES))`
+
+# Generate output header file
+printf "Generating '$HFILE' with C declarations..."
+cat > "$HFILE" <<HereDocument
+///
+/// File generated by cpct_aks2c CPCtelera script
+/// Souce file of this conversion: ${FILE}
+/// Generation time: $(date)
+///
+
+/// Song '${C_IDENTIFIER}' metadata macros
+#define ${C_IDENTIFIER}_address  ${MEMADDR}
+#define ${C_IDENTIFIER}_size     ${SIZE_BYTES}
+#define ${C_IDENTIFIER}_end      ${ENDADDR}
+
+/// Song '${C_IDENTIFIER}' array declaration
+extern void ${C_IDENTIFIER}[${C_IDENTIFIER}_size];
+HereDocument
+echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"

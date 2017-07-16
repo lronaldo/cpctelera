@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -20,47 +20,36 @@
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
 ##------------------------------------------------------------------------##
-## This file is intended for users to automate tilemap conversion from    ##
-## original files (like Tiled .tmx) into C-arrays.                        ##
+## This file is intended for users to automate image conversion from JPG, ##
+## PNG, GIF, etc. into C-arrays.                                          ##
 ##                                                                        ##
-## Macro used for conversion is TMX2C, which has up to 4 parameters:      ##
-##  (1): TMX file to be converted to C array                              ##
-##  (2): C identifier for the generated C array                           ##
-##  (3): Output folder for C and H files generated (Default same folder)  ##
-##  (4): Bits per item (1,2,4 or 6 to codify tilemap into a bitarray).    ##
-##       Blanck for normal integer tilemap array (8 bits per item)        ##
-##  (5): Aditional options (aditional modifiers for cpct_tmx2csv)         ##
+## Macro used for conversion is IMG2SPRITES, which has up to 9 parameters:##
+##  (1): Image file to be converted into C sprite (PNG, JPG, GIF, etc)    ##
+##  (2): Graphics mode (0,1,2) for the generated C sprite                 ##
+##  (3): Prefix to add to all C-identifiers generated                     ##
+##  (4): Width in pixels of each sprite/tile/etc that will be generated   ##
+##  (5): Height in pixels of each sprite/tile/etc that will be generated  ##
+##  (6): Firmware palette used to convert the image file into C values    ##
+##  (7): (mask / tileset /)                                               ##
+##     - "mask":    generate interlaced mask for all sprites converted    ##
+##     - "tileset": generate a tileset array with pointers to all sprites ##
+##  (8): Output subfolder for generated .C/.H files (in project folder)   ##
+##  (9): (hwpalette)                                                      ##
+##     - "hwpalette": output palette array with hardware colour values    ##
 ##                                                                        ##
 ## Macro is used in this way (one line for each image to be converted):   ##
-##  $(eval $(call TMX2C,(1),(2),(3),(4),(5)))                             ##
+##  $(eval $(call IMG2SPRITES,(1),(2),(3),(4),(5),(6),(7),(8),(9)))       ##
 ##                                                                        ##
 ## Important:                                                             ##
 ##  * Do NOT separate macro parameters with spaces, blanks or other chars.##
 ##    ANY character you put into a macro parameter will be passed to the  ##
 ##    macro. Therefore ...,src/sprites,... will represent "src/sprites"   ##
 ##    folder, whereas ...,  src/sprites,... means "  src/sprites" folder. ##
-##  * You can omit parameters by leaving them empty.                      ##
-##  * Parameters (4) and (5) are optional and generally not required.     ##
+##                                                                        ##
+##  * You can omit parameters but leaving them empty. Therefore, if you   ##
+##  wanted to specify an output folder but do not want your sprites to    ##
+##  have mask and/or tileset, you may omit parameter (7) leaving it empty ##
+##     $(eval $(call IMG2SPRITES,imgs/1.png,0,g,4,8,$(PAL),,src/))        ##
 ############################################################################
 
-## Conversion Examples
-##
-
-## Convert img/tilemap.tmx to src/tilemap.c and src/tilemap.h
-##		This file contains a tilemap created with Tiled that uses tiles
-## in img/tiles.png. This macro will convert the tilemap into a C-array
-## named g_tilemap, containing all the IDs of the tiles that are located 
-## at each given location of the C-array. 
-##
-
-#$(eval $(call TMX2C,img/tilemap.tmx,g_tilemap,src/,4))
-
-## Convert img/level0b.tmx to src/levels/level0b.c and src/levels/level0b.h
-##		This file contains another tilemap created with Tiled. This macro 
-## will convert the tilemap into a C bitarray of 4-bits per item. The array
-## will be named g_level0_4bit. For each tile ID included into the final 
-## bitarray, only 4 bits will be used. Therefore, each byte of the array 
-## will contain 2 tile IDs.
-##
-
-#$(eval $(call TMX2C,img/level0b.tmx,g_level0_4bit,src/levels/,4))
+## No images in this project

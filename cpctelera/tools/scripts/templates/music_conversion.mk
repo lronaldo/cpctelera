@@ -20,47 +20,34 @@
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
 ##------------------------------------------------------------------------##
-## This file is intended for users to automate tilemap conversion from    ##
-## original files (like Tiled .tmx) into C-arrays.                        ##
+## This file is intended for users to automate music conversion from      ##
+## original files (like Arkos Tracker .aks) into data arrays.             ##
 ##                                                                        ##
-## Macro used for conversion is TMX2C, which has up to 4 parameters:      ##
-##  (1): TMX file to be converted to C array                              ##
-##  (2): C identifier for the generated C array                           ##
-##  (3): Output folder for C and H files generated (Default same folder)  ##
-##  (4): Bits per item (1,2,4 or 6 to codify tilemap into a bitarray).    ##
-##       Blanck for normal integer tilemap array (8 bits per item)        ##
-##  (5): Aditional options (aditional modifiers for cpct_tmx2csv)         ##
+## Macro used for conversion is AKS2C, which has up to 5 parameters:      ##
+##  (1): AKS file to be converted to data array                           ##
+##  (2): C identifier for the generated data array (will have underscore  ##
+##       in front in ASM)                                                 ##
+##  (3): Output folder for .s and .h files generated (Default same folder)##
+##  (4): Memory address where music data will be loaded                   ##
+##  (5): Aditional options (you can use this to pass aditional modifiers  ##
+##       to cpct_aks2c)                                                   ##
 ##                                                                        ##
 ## Macro is used in this way (one line for each image to be converted):   ##
-##  $(eval $(call TMX2C,(1),(2),(3),(4),(5)))                             ##
+##  $(eval $(call AKS2C,(1),(2),(3),(4),(5))                              ##
 ##                                                                        ##
 ## Important:                                                             ##
 ##  * Do NOT separate macro parameters with spaces, blanks or other chars.##
 ##    ANY character you put into a macro parameter will be passed to the  ##
-##    macro. Therefore ...,src/sprites,... will represent "src/sprites"   ##
-##    folder, whereas ...,  src/sprites,... means "  src/sprites" folder. ##
+##    macro. Therefore ...,src/music,... will represent "src/music"       ##
+##    folder, whereas ...,  src/music,... means "  src/sprites" folder.   ##
 ##  * You can omit parameters by leaving them empty.                      ##
-##  * Parameters (4) and (5) are optional and generally not required.     ##
+##  * Parameter  (5) (Aditional options) is  optional and  generally not  ##
+##    required.                                                           ##
 ############################################################################
 
-## Conversion Examples
+## Convert music/song.aks to src/music/song.s and src/music/song.h
+##		This file contains a music created with Arkos Tracker. This macro 
+## will convert the music into a data array called g_mysong that will be
+## placed at the 0x42A0 memory address in an absolue way.
 ##
-
-## Convert img/tilemap.tmx to src/tilemap.c and src/tilemap.h
-##		This file contains a tilemap created with Tiled that uses tiles
-## in img/tiles.png. This macro will convert the tilemap into a C-array
-## named g_tilemap, containing all the IDs of the tiles that are located 
-## at each given location of the C-array. 
-##
-
-#$(eval $(call TMX2C,img/tilemap.tmx,g_tilemap,src/,4))
-
-## Convert img/level0b.tmx to src/levels/level0b.c and src/levels/level0b.h
-##		This file contains another tilemap created with Tiled. This macro 
-## will convert the tilemap into a C bitarray of 4-bits per item. The array
-## will be named g_level0_4bit. For each tile ID included into the final 
-## bitarray, only 4 bits will be used. Therefore, each byte of the array 
-## will contain 2 tile IDs.
-##
-
-#$(eval $(call TMX2C,img/level0b.tmx,g_level0_4bit,src/levels/,4))
+#$(eval $(call AKS2C,music/song.aks,g_mysong,src/music/,0x42A0))

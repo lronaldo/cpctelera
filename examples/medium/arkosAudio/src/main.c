@@ -17,7 +17,7 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "music/music.h"
+#include "molusk.h" // This file is geneated on compilation from music/molusk.aks
 
 //
 // Defined type to know the status of a Key 

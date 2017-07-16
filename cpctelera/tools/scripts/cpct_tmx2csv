@@ -48,8 +48,8 @@
 ##    -gh | --generate-h             - Generates a H file with the declaration of the array for C file (implies -gc)
 ##    -of | --output-folder <folder> - Changes the output folder for generated C/H files (Default: .)
 ##    -ci | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
+##    -ba | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
 ##
-
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh
@@ -86,6 +86,8 @@ as ${COLOR_LIGHT_BLUE}CSV${COLOR_CYAN} in tilemap properties."
    echo "${COLOR_CYAN}       Changes the output folder for generated C/H files (Default: .)"
    echo "${COLOR_LIGHT_BLUE}  -ci | --c-identifier <id>"
    echo "${COLOR_CYAN}       Sets the C-identifier that will be used for the generated array (Default: filename)"
+   echo "${COLOR_LIGHT_BLUE}  -ba | --bitarray <bits>"
+   echo "${COLOR_CYAN}       Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)"
    echo "${COLOR_NORMAL}"
    exit 1
 }
@@ -99,8 +101,11 @@ C_IDENTIFIER=
 OUTPUT_FOLDER=
 GENERATE_H=false
 GENERATE_C=false
+WIDTH_ITEMS=0
 WIDTH_BYTES=0
 HEIGHT_BYTES=0
+BITARRAY=8
+CONVERTEDBITS=0
 if (( $# < 1 )); then
    usage
 fi
@@ -131,6 +136,20 @@ while (( $# >= 1 )); do
          OUTPUT_FOLDER="${2}/"
          shift
       ;;
+      ## Output in bitarray format
+      "-ba" | "--bitarray")
+         if isEmpty "$2"; then
+            paramError "Option '-ba' ('--bitarray') requires the number of bits per item as parameter." 12
+         elif ! isInt "$2" ; then
+            paramError "Number of bits parameter for '-ba' ('--bitarray') must be an integer value ('$2' not valid)." 13
+         elif (( $2 != 1 && $2 != 2 && $2 != 4 && $2 != 6 )); then
+            paramError "No bitarrays of '$2' allowed (only 1, 2, 4 or 6 bits)." 14
+         fi
+
+         BITARRAY="$2"
+         shift
+      ;;
+      ## Define the c-identifier used for output
       "-ci" | "--c-identifier")
          if isEmpty "$2"; then
             paramError "Option '-ci' | '--c-identifier' requires a valid c identifier as parameter." 10
@@ -173,16 +192,61 @@ if (( ${#C_IDENTIFIER} == 0 )); then
    C_IDENTIFIER="$BASENAME"
 fi
 
+##
+
+###############################################################
+###############################################################
+## Converts the next integer item from TMX into its output
+## (be it bits or bytes)
+##
+function convertNextItem {
+   local ITEM="$1"
+   local COMP
+   
+   ## Print item-1 unless it is a 0
+   if (( ITEM )); then
+      ITEM=$((ITEM - 1))
+   fi
+   
+   ## Do conversions for bitarrays
+   if (( BITARRAY < 8 )); then
+      case $BITARRAY in 
+         1) ITEM=$((ITEM & 1))
+         ;;
+         2) ITEM=$(dec2Bin $((ITEM & 3)))
+         ;;
+         4) ITEM=$(dec2Bin $((ITEM & 15)))
+         ;;
+         6) ITEM=$(dec2Bin $((ITEM & 63)))
+         ;;
+      esac
+      ITEM=$(printf "%0${BITARRAY}d" $ITEM)
+      CONVERTEDBITS=$(( CONVERTEDBITS + BITARRAY ))
+      if (( CONVERTEDBITS > 8 )); then
+         CONVERTEDBITS=$(( CONVERTEDBITS - 8 ))
+         COMP=$(( BITARRAY - CONVERTEDBITS ))
+         if (( COMP )); then
+            ITEM="${ITEM:0:$COMP}, 0b${ITEM:$COMP}"
+         else
+            ITEM=", 0b${ITEM}"
+         fi
+      fi
+   else   
+      ITEM="${ITEM},"
+   fi
+   printf "%s" "$ITEM"
+}
+
 ###############################################################
 ###############################################################
 ## Read and convert file
 ##
 function convertTMX2CSV {
-   local LINEBYTES=0
+   local LINEITEMS=0
 
    ## Convert binary to C Array and output to stdout
    STATUS=filestart
-   TOTAL_BYTES_CONVERTED=0
+   TOTAL_ITEMS_CONVERTED=0
    while read LINE; do
       case $STATUS in
          ## Looking for the layer containing CSV values (to know height and width)
@@ -191,18 +255,33 @@ function convertTMX2CSV {
             if [[ $LINE =~ $re ]]; then
                ## Found the first layer, height and width will be taken from here
                STATUS=looking4CSV
-               WIDTH_BYTES=$(echo $LINE | grep -Eo 'width="[0-9]+"' | grep -Eo '[0-9]+')
+               WIDTH_ITEMS=$(echo $LINE | grep -Eo 'width="[0-9]+"' | grep -Eo '[0-9]+')
                HEIGHT_BYTES=$(echo $LINE | grep -Eo 'height="[0-9]+"' | grep -Eo '[0-9]+')
+
+               ## Calculate width in bytes
+               if (( BITARRAY < 8 )); then
+                  WIDTH_BYTES=$((WIDTH_ITEMS * BITARRAY / 8))
+                  if (( WIDTH_BYTES * 8 / BITARRAY != WIDTH_ITEMS )); then
+                     paramError "Tilemap has a width of $WIDTH_ITEMS items, which would not fit into byte boundaries with $BITARRAY bits per item." 30
+                  fi
+               else
+                  WIDTH_BYTES=$WIDTH_ITEMS
+               fi
             fi
          ;;
          ## Looking for start of CSV values. 
          looking4CSV)  
-            re="^.*\<data\>.*\<encoding\>.*\<csv\>.*$"
+            #re="^.*\<data.*encoding.*csv.*\>.*$"
+            re="^.*\<data.*encoding.*csv.*\>.*$"
             if [[ $LINE =~ $re ]]; then
                ## Found line that signals data start, change to convertingbytes status
                ## and set token separator to comma, as we have comma separated values
                STATUS=convertingbytes
                IFS="${IFS},"$'\r'
+               ## In case of bitarray output, set up binary start for first item
+               if (( BITARRAY < 8 )); then
+                  printf "  0b"
+               fi
             fi
          ;;
          ## Converting comma separated values into tiles
@@ -216,11 +295,11 @@ function convertTMX2CSV {
                BYTES=( $LINE )
                for A in ${BYTES[@]}; do
                   if isInt "$A"; then
-                     printf "%s," $((A - 1))
-                     LINEBYTES=$((LINEBYTES+1))
-                     TOTAL_BYTES_CONVERTED=$((TOTAL_BYTES_CONVERTED+1))
-                     if (( LINEBYTES == WIDTH_BYTES )); then
-                        LINEBYTES=0
+                     convertNextItem "$A"
+                     LINEITEMS=$((LINEITEMS+1))
+                     TOTAL_ITEMS_CONVERTED=$((TOTAL_ITEMS_CONVERTED+1))
+                     if (( LINEITEMS == WIDTH_ITEMS )); then
+                        LINEITEMS=0
                         printf "\n"
                      fi
                   fi
@@ -242,10 +321,11 @@ convertTMX2CSV >> $TMPFILE
 ## Define the comment to put on fileheader
 FILEHEADER="//\n\
 // File $FILENAME converted to csv using cpct_tmx2csv [$(date +"%Y%m%d %T %Z")]\n\
-//   * Width:  ${WIDTH_BYTES}
-//   * Height: ${HEIGHT_BYTES}
-//   * Bytes:  $((WIDTH_BYTES*HEIGHT_BYTES)) 
+//   * Width:  ${WIDTH_ITEMS} columns (${WIDTH_BYTES} bytes, $BITARRAY bits per column)
+//   * Height: ${HEIGHT_BYTES} rows
+//   * Bytes:  $((WIDTH_BYTES*HEIGHT_BYTES)) bytes (${WIDTH_BYTES} x ${HEIGHT_BYTES})
 //\n"
+
 
 ## Output the C Array declaration and the number of bytes to stdout
 if $GENERATE_C; then
@@ -273,6 +353,8 @@ $(printf "$FILEHEADER")
 
 // Generated CSV tilemap from $FILENAME
 //   $((WIDTH_BYTES*HEIGHT_BYTES)) bytes (${WIDTH_BYTES} x ${HEIGHT_BYTES})
+//   ${WIDTH_ITEMS}*${HEIGHT_BYTES} items ($BITARRAY bits per item)
+//
 #define ${C_IDENTIFIER}_W  ${WIDTH_BYTES}
 #define ${C_IDENTIFIER}_H  ${HEIGHT_BYTES}
 extern const u8 ${C_IDENTIFIER}[${WIDTH_BYTES}*${HEIGHT_BYTES}];

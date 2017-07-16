@@ -1,0 +1,5 @@
+Important:
+
+   Due to recent changes in RGAS, it stopped working under Windows XP. Windows 7 or higher is required to run newer versions. If you still want to use RGAS with your Windows XP, you may want to get an earlier version (1.0 or lower).
+
+   You can get RGAS 1.0 by grabbing all files from this link: https://github.com/lronaldo/cpctelera/tree/97d500e650aac80b738fa936239306a32487e8b7/cpctelera/tools/rgas-1.0
