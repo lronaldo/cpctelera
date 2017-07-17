@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2017 Augusto Ruiz / RetroWorks (@augurui)
+;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -69,13 +70,36 @@
 ;; the BANK 0, which is the first 64 Kb of memory, because you want the selected 
 ;; RAM page to be loaded in the first 64Kb.
 ;;
+;;    In order to easily use the banks, there are macro definitions available to
+;; use either in C or in assembly (see <Memory Pagination Macros>). For C users, 
+;; they are directly available when one of these headers is included: *cpctelera.h*,
+;; *memutils/banks.h*. Assembly users may include *memutils/cpct_setBank_const.asm*.
+;;
 ;; Destroyed Register values: 
-;; AF, BC
+;;    AF, BC
+;;
+;;    L (when called through C-interface)
+;;
+;; Required memory:
+;;    C-binding   - 9 bytes
+;;    ASM-binding - 8 bytes
+;;
+;; Time Measures:
+;; (start code)
+;;   Case      | microSecs (us) | CPU Cycles |
+;; -------------------------------------------
+;;    Any      |       13       |    52      |
+;; -------------------------------------------
+;; Asm saving  |       -1       |    -4      |
+;; -------------------------------------------
+;; (end code)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 pageMemory:
-  or   #0xC0		;; Set the function to 0b11000000
-  ld   bc, #0x7F00
-  out  (c), a
-ret
+  or   #0xC0		    ;; [2] Use Gate Array function 3: Ram Banking (0b11-------).
+                    ;;     Rest of A register holds our desired memory bank configuration
+  ld   bc, #0x7F00  ;; [3] We are going to use port 0x7F (Gate Array, for memory configuration)
+  out  (c), a       ;; [4] Submit this order to Gate Array
+  
+  ret               ;; [3] Then Return
