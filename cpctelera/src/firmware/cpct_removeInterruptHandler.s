@@ -59,7 +59,7 @@
 ;; own uses.
 ;;
 ;; Destroyed Register values: 
-;;    HL
+;;    HL, DE
 ;;
 ;; Required memory:
 ;;    16 bytes
@@ -115,7 +115,7 @@
 ;; operation.
 ;;
 ;; Destroyed Register values: 
-;;    HL
+;;    HL, DE
 ;;
 ;; Required memory:
 ;;    16 bytes
@@ -141,7 +141,7 @@ cpct_removeInterruptHandler_asm::
    ld   hl, #0xC9FB               ;; [3] FB C9 (take into account little endian) => EI : RET
 
    ld (firmware_RST_jp), hl       ;; [5] Setup new "null interrupt handler" and enable interrupts again
-   ei                             ;; [1]
+   ei                             ;; [1] Reenable interrupts
    ex   de, hl                    ;; [1] HL = Pointer to previous interrupt handler (return value)
 
    ret                            ;; [3] Return
