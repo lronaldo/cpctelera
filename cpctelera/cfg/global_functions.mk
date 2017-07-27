@@ -101,9 +101,11 @@ endef
 # $(1): DSK file name to be created
 #
 define CREATEEMPTYDSK
-	if [ ! -e $(1) ]; then \
-  		$(IDSK) $(1) -n; \
-  	fi
+	@if [ -e "$(1)" ]; then \
+        rm -f "$(1)"; \
+        echo "Removed preexisting $(1) to generate a new one"; \
+ 	fi 
+	@$(IDSK) $(1) -n; 
 endef
 
 #################
