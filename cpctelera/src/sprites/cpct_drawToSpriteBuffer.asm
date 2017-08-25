@@ -141,6 +141,12 @@
       
    ;; Perform the copy
    copy_loop:
+      ;; Make BC = sprite width to use it as counter for LDIR,
+      ;; which will copy next sprite line
+      sprite_width = .+1
+      ld   c, #00    ;; [2] BC = Sprite Width (B is always 0, and 00 is a placeholder that gets modified)
+
+      ;; Copy next sprite line to the sprite buffer
       ldir           ;; [6*C-1] Copy one whole line of bytes from sprite to backbuffer
       
       ;; Update the Destiny Pointer. DE must point to the place where the
@@ -152,11 +158,6 @@
       add hl, bc     ;; [3] Add the offset to the Destiny Pointer (BackBuffer Pointer)
       ex  de, hl     ;; [1] Restore the Destiny Pointer to DE (and HL to what it was)
       
-      ;; After calculations, make BC = sprite width again to use it 
-      ;; as counter for LDIR in the next copy loop
-      sprite_width = .+1
-      ld   c, #00    ;; [2] BC = Sprite Width (B is always 0, and 00 is a placeholder that gets modified)
-
       dec  a         ;; [1]   One less iteration to complete Sprite Height
    jr  nz, copy_loop ;; [2/3] Repeat copy_loop if A!=0 (Iterations pending)
 

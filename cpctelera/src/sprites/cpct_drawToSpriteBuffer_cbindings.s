@@ -27,8 +27,8 @@
 _cpct_drawToSpriteBuffer::
    ;; GET Parameters from the stack following __z88dk_callee convention
    pop hl        ;; [3] HL= Return Address
-   pop de        ;; [3] DE= Pointer to Back Buffer 
    pop bc        ;; [3] C = Back_Buffer_Width (B is ignored)
+   pop de        ;; [3] DE= Pointer to Back Buffer 
    ld  a, c      ;; [1] A = Back_Buffer_Width
    pop bc        ;; [3] B = Sprite Width, C = Sprite height
    ex (sp), hl   ;; [6] HL = Pointer to Sprite,
