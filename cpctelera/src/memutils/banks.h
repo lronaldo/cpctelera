@@ -18,14 +18,97 @@
 
 
 //
-// Title: Memory Pagination Utilities
-//
-// Constants to paginate memory
+// Title: Memory Pagination Macros
 //
 
 #ifndef CPCT_BANKING_H
 #define CPCT_BANKING_H
 
+//
+// Macro: BANK_NUM_SHIFT
+//
+//    Defines the number of bit to shift the number of a desired bank to the left
+// if order to use it inside a 1-byte command for the Gate Array. Refer to the 
+// tehcnical explanation to see bits labelled as "b" (bits 3-5) which specify
+// the bank number to be selected. So, a normal number from 0 to 8 must be shifted
+// left to be placed in the bits where it is expected by the Gate Array.
+//
+#define BANK_NUM_SHIFT 3
+
+// Macros: BANK_X
+//
+//    Each one of this macros specify a memory bank configuration. This configuration
+// is represented by a 3-bits number (0-8 in decimal) that must be passed to the Gate
+// array to select the concrete memory configuration. Review documentation about
+// <cpct_pageMemory> function for reference on RAM Banks.
+//
+// (start code)
+//           |                  RAM Configuration
+//    Macro  |     RAM_4          RAM_5          RAM_6          RAM_7
+//  ---------|------------------------------------------------------------
+//    BANK_0 |  10000-13FFF    14000-17FFF    18000-1BFFF    1C000-1FFFF
+//    BANK_1 |  20000-23FFF    24000-27FFF    28000-1BFFF    2C000-1FFFF
+//    BANK_2 |  30000-33FFF    34000-37FFF    38000-3BFFF    3C000-3FFFF
+//    BANK_3 |  40000-43FFF    44000-47FFF    48000-4BFFF    4C000-4FFFF
+//    BANK_4 |  50000-53FFF    54000-57FFF    58000-5BFFF    5C000-5FFFF
+//    BANK_5 |  60000-63FFF    64000-67FFF    68000-6BFFF    6C000-6FFFF
+//    BANK_6 |  70000-73FFF    74000-77FFF    78000-7BFFF    7C000-7FFFF
+//    BANK_7 |  80000-83FFF    84000-87FFF    88000-8BFFF    8C000-8FFFF
+// (end code)
+//
+#define BANK_0 (0 << BANK_NUM_SHIFT)
+#define BANK_1 (1 << BANK_NUM_SHIFT)
+#define BANK_2 (2 << BANK_NUM_SHIFT)
+#define BANK_3 (3 << BANK_NUM_SHIFT)
+#define BANK_4 (4 << BANK_NUM_SHIFT)
+#define BANK_5 (5 << BANK_NUM_SHIFT)
+#define BANK_6 (6 << BANK_NUM_SHIFT)
+#define BANK_7 (7 << BANK_NUM_SHIFT)
+
+// Macros: RAMCFG_X
+//
+//    Each one of this macros specify a RAM Configuration (how 16K memory pages
+// are spread among the 64K available memory space). The Gate Array has 3 bits
+// to specify the RAM configuration, so 8 posible configurations are available.
+// These are the memory configurations:
+//
+// (start code)
+//             |    PAGE 0         PAGE 1         PAGE 2         PAGE 3
+//    Macro    |   0000-3FFF      4000-7FFF      8000-BFFF      C000-FFFF
+//  -----------|------------------------------------------------------------
+//    RAMCFG_0 |    RAM_0           RAM_1          RAM_2          RAM_3
+//    RAMCFG_1 |    RAM_0           RAM_1          RAM_2          RAM_7
+//    RAMCFG_2 |    RAM_4           RAM_5          RAM_6          RAM_7
+//    RAMCFG_3 |    RAM_0           RAM_3          RAM_2          RAM_7
+//    RAMCFG_4 |    RAM_0           RAM_4          RAM_2          RAM_3
+//    RAMCFG_5 |    RAM_0           RAM_5          RAM_2          RAM_3
+//    RAMCFG_6 |    RAM_0           RAM_6          RAM_2          RAM_3
+//    RAMCFG_7 |    RAM_0           RAM_7          RAM_2          RAM_3
+// (end code)
+//
+#define RAMCFG_0 0
+#define RAMCFG_1 1
+#define RAMCFG_2 2
+#define RAMCFG_3 3
+#define RAMCFG_4 4
+#define RAMCFG_5 5
+#define RAMCFG_6 6
+#define RAMCFG_7 7
+
+// Macro: DEFAULT_MEM_CFG
+//
+//    This represents the standard configuration of the system, where 
+// the address space only maps the lower 64K (RAMCFG_0 | BANK_0). This
+// is the configuration the system boots in. This default memory 
+// configuration uses the standard upper 64kb RAM but they are not 
+// addressable, as the RAM configuration has mapped only the lower 64kb.
+//
+#define DEFAULT_MEM_CFG RAMCFG_0 | BANK_0
+
+#endif
+
+// Section: Technical details on memory pagination
+//
 // Info from http://www.cpcwiki.eu/index.php/Gate_Array#Register_3_-_RAM_Banking
 // Memory banking is done in the CPC by using the Register 3 in the Gate Array.
 // The memory configuration is defined by specifiying which bank of 64 kb to use as, 
@@ -43,54 +126,3 @@
 // 2	x	RAM Config (0..7)
 // 1	x
 // 0	x
-
-#define BANK_NUM_SHIFT 3
-
-// BANK NUMBERS:
-// As these constants are specified in bits 3-5, the constants are 
-// shifted so that they can be OR'd with the RAM configuration parameter.
-
-// BANK_0: RAM_4 -> 10000-13FFF, RAM_5 -> 14000-17FFF, RAM_6 -> 18000-1BFFF, RAM_7 -> 1C000-1FFFF
-#define BANK_0 (0 << BANK_NUM_SHIFT)
-// BANK_1: RAM_4 -> 20000-23FFF, RAM_5 -> 24000-27FFF, RAM_6 -> 28000-1BFFF, RAM_7 -> 2C000-1FFFF
-#define BANK_1 (1 << BANK_NUM_SHIFT)
-// BANK_2: RAM_4 -> 30000-33FFF, RAM_5 -> 34000-37FFF, RAM_6 -> 38000-3BFFF, RAM_7 -> 3C000-3FFFF
-#define BANK_2 (2 << BANK_NUM_SHIFT)
-// BANK_3: RAM_4 -> 40000-43FFF, RAM_5 -> 44000-47FFF, RAM_6 -> 48000-4BFFF, RAM_7 -> 4C000-4FFFF
-#define BANK_3 (3 << BANK_NUM_SHIFT)
-// BANK_4: RAM_4 -> 50000-53FFF, RAM_5 -> 54000-57FFF, RAM_6 -> 58000-5BFFF, RAM_7 -> 5C000-5FFFF
-#define BANK_4 (4 << BANK_NUM_SHIFT)
-// BANK_5: RAM_4 -> 60000-63FFF, RAM_5 -> 64000-67FFF, RAM_6 -> 68000-6BFFF, RAM_7 -> 6C000-6FFFF
-#define BANK_5 (5 << BANK_NUM_SHIFT)
-// BANK_6: RAM_4 -> 70000-73FFF, RAM_5 -> 74000-77FFF, RAM_6 -> 78000-7BFFF, RAM_7 -> 7C000-7FFFF
-#define BANK_6 (6 << BANK_NUM_SHIFT)
-// BANK_7: RAM_4 -> 80000-83FFF, RAM_5 -> 84000-87FFF, RAM_6 -> 88000-8BFFF, RAM_7 -> 8C000-8FFFF
-#define BANK_7 (7 << BANK_NUM_SHIFT)
-
-// RAM CONFIGURATIONS:
-// Specify which 16kb pages are mapped to each page in the addresable RAM range.
-
-// RAMCFG_0: 0000-3FFF -> RAM_0, 4000-7FFF -> RAM_1, 8000-BFFF -> RAM_2, C000-FFFF -> RAM_3
-// Only the lower 64kb are accessible.
-#define RAMCFG_0 0
-// RAMCFG_1: 0000-3FFF -> RAM_0, 4000-7FFF -> RAM_1, 8000-BFFF -> RAM_2, C000-FFFF -> RAM_7
-#define RAMCFG_1 1
-// RAMCFG_2: 0000-3FFF -> RAM_4, 4000-7FFF -> RAM_5, 8000-BFFF -> RAM_6, C000-FFFF -> RAM_7
-#define RAMCFG_2 2
-// RAMCFG_3: 0000-3FFF -> RAM_0, 4000-7FFF -> RAM_3, 8000-BFFF -> RAM_2, C000-FFFF -> RAM_7
-#define RAMCFG_3 3
-// RAMCFG_4: 0000-3FFF -> RAM_0, 4000-7FFF -> RAM_4, 8000-BFFF -> RAM_2, C000-FFFF -> RAM_3
-#define RAMCFG_4 4
-// RAMCFG_5: 0000-3FFF -> RAM_0, 4000-7FFF -> RAM_5, 8000-BFFF -> RAM_2, C000-FFFF -> RAM_3
-#define RAMCFG_5 5
-// RAMCFG_6: 0000-3FFF -> RAM_0, 4000-7FFF -> RAM_6, 8000-BFFF -> RAM_2, C000-FFFF -> RAM_3
-#define RAMCFG_6 6
-// RAMCFG_7: 0000-3FFF -> RAM_0, 4000-7FFF -> RAM_7, 8000-BFFF -> RAM_2, C000-FFFF -> RAM_3
-#define RAMCFG_7 7
-
-// The default memory configuration uses the standard upper 64kb RAM
-// but it is not addressable, as the RAM configuration has mapped only 
-// the lower 64kb.
-#define DEFAULT_MEM_CFG RAMCFG_0 | BANK_0
-
-#endif
