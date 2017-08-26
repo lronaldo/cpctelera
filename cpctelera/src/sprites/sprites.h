@@ -54,6 +54,7 @@ extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideom
 
 // Sprite to Sprite-Buffer Drawing Functions
 extern void cpct_drawToSpriteBuffer  (u16 buffer_width, void* buffer, u8 height, u8 width, void* sprite) __z88dk_callee;
+extern void cpct_drawToSpriteBufferMasked (u16 buffer_width, void* buffer, u8 height, u8 width, void* sprite) __z88dk_callee;
 
 // Sprite flipping functions
 extern void cpct_hflipSpriteM0   (u8 width, u8 height, void* sprite) __z88dk_callee;
