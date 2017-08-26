@@ -1,7 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2017 Bouche Arnaud
-;;  Copyright (C) 2017 @Docent / CPCWiki
 ;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -23,18 +22,19 @@
 ;;
 ;; Function: cpct_drawToSpriteBuffer
 ;;
-;;    Draws an sprite into another sprite. This lets using the destination sprite
+;;    Draws an sprite inside another sprite. This lets using the destination sprite
 ;; as a temporary screen back buffer.
 ;;
 ;; C Definition:
-;;    void <cpct_drawToSpriteBuffer> (<u16> *buffer_width*, void* *buffer*, <u8> *height*, <u8> *width*, void* *sprite*) __z88dk_callee;
+;;    void <cpct_drawToSpriteBuffer> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
+;;                                     <u8> *height*, <u8> *width*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
-;;    (2B HL) sprite      - Source Sprite Pointer (array with pixel data)
-;;    (2B DE) buffer      - Destination buffer sprite pointer (also an array)
-;;    (1B A) height       - Sprite Height in bytes (>0)
-;;    (1B C) width        - Sprite Width in bytes (>0)
-;;    (1B B) buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
+;;    (1B B)  buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
+;;    (2B DE) inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
+;;    (1B A)  height       - Sprite Height in bytes (>0)
+;;    (1B C)  width        - Sprite Width in bytes (>0)
+;;    (2B HL) sprite       - Source Sprite Pointer (array with pixel data)
 ;;
 ;; Assembly Call (Input parameters on Registers)
 ;;    > call cpct_drawToSpriteBuffer_asm
@@ -51,7 +51,12 @@
 ;; array should be *width* x *height*. You may check screen pixel format for 
 ;; mode 0 (<cpct_px2byteM0>) and mode 1 (<cpct_px2byteM1>) as for mode 2 is 
 ;; linear (1 bit = 1 pixel).
-;;  * *buffer* must be a pointer to an array with same restrictions as *sprite*.
+;;  * *inbuffer_ptr* must be a pointer to the place where *sprite* will be drawn 
+;; inside the sprite buffer. It can point to any of the bytes in the array of
+;; the destination sprite buffer. That will be the place where the first byte
+;; of the *sprite* will be copied to (its top-left corner). It is important to
+;; check that there is enough space for the sprite to be copied from that byte on.
+;; Otherwise, the copy loop will continue outside the sprite buffer boundaries.
 ;;  * *width* must be the width of the sprite *in bytes*, the width must be 
 ;; expressed in bytes and *not* in pixels. The correspondence is:
 ;;    mode 0      - 1 byte = 2 pixels
@@ -81,15 +86,55 @@
 ;;
 ;; Details:
 ;;    This function copies a generic WxH bytes sprite from memory to a 
-;; buffer-memory or another sprite.  The original sprite must be stored as 
-;; an array (i.e. with all of its pixels stored as consecutive bytes in memory).
-;; It works in a similar way to <cpct_drawSprite>, but taking into account that
-;; destination memory (the back-buffer sprite) will be arranged linear, with 
+;; buffer-memory or another sprite.  Both the sprite to-be-copied and the
+;; destination-sprite (the sprite-buffer) must be linear arrays (i.e. with 
+;; all of their pixels stored as consecutive bytes in memory). It works in 
+;; a similar way to <cpct_drawSprite>, but taking into account that
+;; destination memory (the sprite-buffer) will be arranged linear, with 
 ;; *buffer_width* offset between lines. This makes it useful to compose 
 ;; sprites before drawing them to the screen, and also using sprites as
 ;; back-buffer instead of a hardware back-buffer. For detailed information 
 ;; about how sprite copying works,  and how video memory is formatted, 
 ;; take a look at <cpct_drawSprite>.
+;;
+;;    This code shows a great example of what can be done with this function:
+;; (start code)
+;;  // Size of the Background 
+;;  #define BACK_W  60
+;;  #define BACK_H 100
+;;
+;;  // Size of Entities
+;;  #define ENT_W    4
+;;  #define ENT_H    8
+;;
+;;  // Redraws the action screen. It first draws Main Character and Enemy
+;;  // over the Background Sprite, then draws the composite background
+;;  // sprite to the screen after waiting to VSYNC. This sequence
+;;  // minimizes the amount of data to be writen to the screen after
+;;  // waiting to VSYNC, eliminating flicking and tearing.
+;;  void redrawActionScreen(u8 *scr_p, TEntity *en, TEntity *ch) {
+;;      cpct_drawToSpriteBuffer(BACK_W, g_background + ch->y*BACK_W + ch->x, ENT_H, ENT_W, g_character);
+;;      cpct_drawToSpriteBuffer(BACK_W, g_background + en->y*BACK_W + en->x, ENT_H, ENT_W, g_enemy);
+;;      cpct_waitVSync();
+;;      cpct_drawSprite(g_background, scr_p, BACK_W, BACK_H);
+;;  }
+;; (end code)
+;;     
+;;     Drawing to sprites instead of the screen lets us do as many draw 
+;; operations as required without worrying about the raster and flickering
+;; or tearing effects. As nothing is being changed in video memory, no 
+;; problematic effects are produced. Once the image is composed in one or 
+;; a few sprites, these can be drawn to the screen. This minimizes the 
+;; total cycles required to copy data from memory to video memory.
+;;
+;;     Also, as destination sprite is a normal sprite with its data distributed
+;; linear in memory, calculating a position inside the sprite is easier than in
+;; video memory. It only requires multiplying the y coordinate by the Width of
+;; the sprite-buffer (to jump from its start point to the y-th line), then adding
+;; the x coordinate. Everything is also added to the starting point of the sprite
+;; buffer. Moreover, this calculations can be easily sped up by carefully selecting
+;; the width of the sprite-buffer. If it is a power of 2, then multiplications
+;; will become simple shifts, speeding up the proccess.
 ;;
 ;; Destroyed Register values:
 ;;       AF, BC, DE, HL
@@ -114,7 +159,8 @@
 ;;  H = Sprite height in bytes
 ;;
 ;; Credits:
-;;    Original routine was discussed and developed in CPCWiki by @Docent and @Arnaud,
+;;    Original routine was discussed and developed in CPCWiki by @Docent, 
+;;    @Xifos, @demoniak and @Arnaud. Thanks to all of them for their help and support,
 ;;
 ;;    http://www.cpcwiki.eu/forum/programming/help-for-speed-up-to-copy-sprite-array-to-another/
 ;;
