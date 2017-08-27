@@ -27,13 +27,13 @@
 ;; 
 ;; C Definition:
 ;;    void <cpct_drawToSpriteBufferMasked> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
-;;                                           <u8> *height*, <u8> *width*, void* *sprite*) __z88dk_callee;
+;;                                           <u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
 ;;    (1B B)  buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
 ;;    (2B DE) inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
-;;    (1B A)  height       - Sprite Height in bytes (>0)
 ;;    (1B C)  width        - Sprite Width in bytes (>0)
+;;    (1B A)  height       - Sprite Height in bytes (>0)
 ;;    (2B HL) sprite       - Source Sprite Pointer (array with pixel data)
 ;;
 ;; Assembly Call (Input parameters on Registers)
@@ -45,16 +45,7 @@
 ;; and can potentially cause random memory outside buffer to be overwriten, leading
 ;; to unforeseen consequencies.
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; along with mask data. Each mask byte will contain enabled bits as those that should
-;; be picked from the background (transparent) and disabled bits for those that will
-;; be printed from sprite colour data. Each mask data byte must precede its associated
-;; colour data byte.
-;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
-;; starting from top-left corner and going left-to-right, top-to-bottom down to the
-;; bottom-right corner. Total amount of bytes in pixel array should be 
-;; 2 x *width* x *height* (mask data doubles array size). You may check screen 
-;; pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 (<cpct_px2byteM1>) as 
-;; for mode 2 is linear (1 bit = 1 pixel).
+;; along with mask data, take a look at <cpct_drawSpriteMasked>.
 ;;  * *inbuffer_ptr* must be a pointer to the place where *sprite* will be drawn 
 ;; inside the sprite buffer. It can point to any of the bytes in the array of
 ;; the destination sprite buffer. That will be the place where the first byte
@@ -92,39 +83,7 @@
 ;;    This function copies a generic WxH bytes sprite from memory to a 
 ;; buffer-memory or another sprite.  The original sprite must be stored as an array (i.e. with 
 ;; all of its pixels stored as consecutive bytes in memory). It works in
-;; a similar way to <cpct_drawSprite>, but taking care about transparency
-;; information encoded in mask bytes. For detailed information about 
-;; how sprite copying works, and how video memory is formatted, take a 
-;; look at <cpct_drawSprite>.
-;;
-;;    For this routine to work, the sprite must contain mask information: inside 
-;; the sprite array, for each byte containing screen colour information, there 
-;; *must* be a preceding byte with mask information. So, the format is
-;; as depicted in example 1:
-;; (start code)
-;; Array storage format:  <-byte 1-> <-byte 2-> <-byte 3-> <-byte 4->
-;;                        <- mask -> <-colour-> <- mask -> <-colour->
-;; ------------------------------------------------------------------------------
-;;        u8* sprite =  {    0xFF,     0x00,       0x00,     0xC2,   .... };
-;; ------------------------------------------------------------------------------
-;; Video memory output:   <- 1st Screen byte -> <- 2nd Screen byte -> 
-;; ______________________________________________________________________________
-;;         Example 1: Definition of a masked sprite and byte format
-;; (end)
-;;     In example 1, each "Screen byte" will become 1 byte outputted to a buffer-memory
-;; resulting of the combination of 3 bytes: 1-byte mask, 1-byte sprite colour data 
-;; and 1-byte previous screen colour data. The combination of these 3 bytes results
-;; in sprite colour data being "blended" with previous screen colour data, adding
-;; sprite pixels with background pixels (the ones over transparent pixels).
-;;
-;;    The way this function works is by getting sprite bytes two by two, 
-;; operating with them, and copying them to video memory (or backbuffer). Each 
-;; two bytes got (mask + sprite colour information) are mixed with an AND 
-;; opreation to remove (set to 0) sprite background pixels. After that, an OR
-;; operation between the resulting byte and the background (the present byte 
-;; at video memory location where we want to write) is performed. That 
-;; effectively mixes sprite colours with background colours, after removing 
-;; background pixels from the sprite.
+;; a similar way to <cpct_drawSpriteMasked>.
 ;;
 ;; Destroyed Register values:
 ;;       AF, AF', BC, DE, HL
