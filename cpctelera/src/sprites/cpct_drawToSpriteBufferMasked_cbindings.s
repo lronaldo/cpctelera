@@ -31,7 +31,7 @@ _cpct_drawToSpriteBufferMasked::
    pop bc        ;; [3] C = Back_Buffer_Width (B is ignored)
    pop de        ;; [3] DE= Pointer to Back Buffer 
    ld  a, c      ;; [1] A = Back_Buffer_Width
-   pop bc        ;; [3] B = Sprite Width, C = Sprite height
+   pop bc        ;; [3] B = Sprite height, C = Sprite Width
    ex (sp), hl   ;; [6] HL = Pointer to Sprite,
                  ;;    (SP) = Return Address. This address is the only required
                  ;;    thing to be kept in the stack with this convention.
