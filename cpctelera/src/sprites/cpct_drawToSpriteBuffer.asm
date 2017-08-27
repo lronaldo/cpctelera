@@ -32,8 +32,8 @@
 ;; Input Parameters (7 bytes):
 ;;    (1B B)  buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
 ;;    (2B DE) inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
-;;    (1B A)  height       - Sprite Height in bytes (>0)
 ;;    (1B C)  width        - Sprite Width in bytes (>0)
+;;    (1B A)  height       - Sprite Height in bytes (>0)
 ;;    (2B HL) sprite       - Source Sprite Pointer (array with pixel data)
 ;;
 ;; Assembly Call (Input parameters on Registers)
@@ -113,8 +113,8 @@
 ;;  // minimizes the amount of data to be writen to the screen after
 ;;  // waiting to VSYNC, eliminating flicking and tearing.
 ;;  void redrawActionScreen(u8 *scr_p, TEntity *en, TEntity *ch) {
-;;      cpct_drawToSpriteBuffer(BACK_W, g_background + ch->y*BACK_W + ch->x, ENT_H, ENT_W, g_character);
-;;      cpct_drawToSpriteBuffer(BACK_W, g_background + en->y*BACK_W + en->x, ENT_H, ENT_W, g_enemy);
+;;      cpct_drawToSpriteBuffer(BACK_W, g_background + ch->y*BACK_W + ch->x, ENT_W, ENT_H, g_character);
+;;      cpct_drawToSpriteBuffer(BACK_W, g_background + en->y*BACK_W + en->x, ENT_W, ENT_H, g_enemy);
 ;;      cpct_waitVSync();
 ;;      cpct_drawSprite(g_background, scr_p, BACK_W, BACK_H);
 ;;  }
