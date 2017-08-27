@@ -17,6 +17,7 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
+#include "asm\back_buffer.h"
 
 // Sprites
 #include "sprites\back.h"
@@ -165,13 +166,13 @@ void DrawSWDoubleBuffer()
 {
 	u8 i;
 	for(i = 0; i < VIEW_CX; i++)
-		cpct_drawToSpriteBuffer(VIEW_CX, gBackBuffer + i, G_BACK_00_H, G_BACK_00_W, g_tileset[(gPosScroll + i)%gNbTileset]);
+		cpct_drawToSpriteBuffer(VIEW_CX, gBackBuffer + i, G_BACK_00_W, G_BACK_00_H, g_tileset[(gPosScroll + i)%gNbTileset]);
 
-	cpct_drawToSpriteBufferMaskedAlignedTable(VIEW_CX, gBackBuffer + POS_TITLE_X, G_TITLE_H, G_TITLE_W, g_title, gMaskTable);
+	cpct_drawToSpriteBufferMaskedAlignedTable(VIEW_CX, gBackBuffer + POS_TITLE_X, G_TITLE_W, G_TITLE_H,  g_title, gMaskTable);
 	
-	cpct_drawToSpriteBufferMaskedAlignedTable(VIEW_CX, cpctm_backBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X - G_FIRE_0_W, POS_SHIP_Y + 2), G_FIRE_0_H, G_FIRE_0_W, (gPosScroll % 2) == 0 ? g_fire_0 : g_fire_1, gMaskTable);
-	cpct_drawToSpriteBufferMasked(VIEW_CX, cpctm_backBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X, POS_SHIP_Y), G_SHIP_H, G_SHIP_W, g_ship);
-		
+	cpct_drawToSpriteBufferMaskedAlignedTable(VIEW_CX, cpctm_backBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X - G_FIRE_0_W, POS_SHIP_Y + 2), G_FIRE_0_W, G_FIRE_0_H, (gPosScroll % 2) == 0 ? g_fire_0 : g_fire_1, gMaskTable);
+	cpct_drawToSpriteBufferMasked(VIEW_CX, cpctm_backBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X, POS_SHIP_Y), G_SHIP_W, G_SHIP_H, g_ship);
+
 	CopyToScreen();
 }
 
