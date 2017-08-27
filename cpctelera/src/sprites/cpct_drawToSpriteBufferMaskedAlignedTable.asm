@@ -27,12 +27,12 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_drawBackBufferMaskedAlignedTable> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
-;;                                           <u8> *width*, <u8> *height*,  void* *sprite*, <u8>* *mask_table*) __z88dk_callee;
+;;                                           <u8> *width*, <u8> *height*, void* *sprite*, <u8>* *mask_table*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
-;;    (1B B)   buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
+;;    (1B A)   buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
 ;;    (2B DE)  inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
-;;    (1B A)   height       - Sprite Height in bytes (>0)
+;;    (1B B)   height       - Sprite Height in bytes (>0)
 ;;    (1B C)   width        - Sprite Width in bytes (>0)
 ;;    (2B HL)  sprite       - Source Sprite Pointer (array with pixel data)
 ;;    (2B HL') mask_table   - Pointer to the aligned mask table used to create transparency
