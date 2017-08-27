@@ -54,7 +54,7 @@ extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideom
 
 // Sprite to Sprite-Buffer Drawing Functions
 #define cpctm_backBufferPtr(MEM, WIDTH, X, Y) (MEM + (WIDTH)*(Y) + X)
-extern void cpct_drawToSpriteBuffer  (u16 buffer_width, void* buffer, u8 height, u8 width, void* sprite) __z88dk_callee;
+extern void cpct_drawToSpriteBuffer  (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite) __z88dk_callee;
 extern void cpct_drawToSpriteBufferMasked (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite) __z88dk_callee;
 extern void cpct_drawToSpriteBufferMaskedAlignedTable (u16 buffer_width, void* buffer, u8 height, u8 width, 
                                                        void* sprite, u8* mask_table) __z88dk_callee;
