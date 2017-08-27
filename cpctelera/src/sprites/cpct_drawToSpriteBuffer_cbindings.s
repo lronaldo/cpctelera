@@ -1,7 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2017 Bouche Arnaud
-;;  Copyright (C) 2017 @Docent / CPCWiki
 ;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -19,6 +18,8 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
+.include "../macros/cpct_math.s"
+
 ;;
 ;; C bindings for <cpct_drawToSpriteBuffer>
 ;;
@@ -30,7 +31,7 @@ _cpct_drawToSpriteBuffer::
    pop bc        ;; [3] C = Back_Buffer_Width (B is ignored)
    pop de        ;; [3] DE= Pointer to Back Buffer 
    ld  a, c      ;; [1] A = Back_Buffer_Width
-   pop bc        ;; [3] B = Sprite Width, C = Sprite height
+   pop bc        ;; [3] C = Sprite height, B = Sprite Width 
    ex (sp), hl   ;; [6] HL = Pointer to Sprite,
                  ;;    (SP) = Return Address. This address is the only required
                  ;;    thing to be kept in the stack with this convention.
