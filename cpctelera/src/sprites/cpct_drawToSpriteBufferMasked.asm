@@ -127,7 +127,7 @@
 ;; background pixels from the sprite.
 ;;
 ;; Destroyed Register values:
-;;       AF, BC, DE, HL
+;;       AF, AF', BC, DE, HL
 ;;
 ;; Required memory:
 ;;    C-bindings   - 30 bytes
@@ -137,10 +137,10 @@
 ;; (start code)
 ;;   Case      |   microSecs (us)   |     CPU Cycles
 ;;  -----------------------------------------------------
-;;   Any       |  14 + (15 + 15W)H   | 56 + (60 + 60W)H
+;;   Any       |  13 + (17 + 12W)H   | 52 + (68 + 48W)H
 ;;  -----------------------------------------------------
-;;   W=2,H=16  |         734        |        2936
-;;   W=4,H=32  |        2414        |        9656
+;;   W=2,H=16  |         749        |        2996
+;;   W=4,H=32  |        2573        |        10292
 ;;  -----------------------------------------------------
 ;;  Asm saving |         -19        |        -76
 ;;  -----------------------------------------------------
@@ -158,50 +158,40 @@
 
    ;; Calculate offset to be added to Destiny pointer (DE, BackBuffer Pointer)
    ;; After copying each sprite line, to point to the start of the next line
-   sub b                         ;; [1] A = Back_Buffer_Width - Sprite Width
+   sub c                         ;; [1] A = Offset = Back_Buffer_Width - Sprite Width
    ld (offset_to_next_line), a   ;; [4] Modify the offset size inside the copy loop
 
-   ;; IXL Holds the Width of the sprite
-  ld__ixl_b ;; [3] IXL = Sprite Width
-
-   ;; A Holds the Height of the sprite to be used as counter for the
-   ;; copy loop. There will be as many iterations as Height lines
-   ld  a, c       ;; [1] A = Sprite Height
-
-   ;; BC will hold either the offset from the end of one line to the
-   ;; start of the other, or the width of the sprite. None of them
-   ;; will be greater than 256, so B will always be 0.
-   ld  b, #00     ;; [2] Set B to 0 so as BC holds the value of C 
+   ;; Modify the Sprite Width in the placeholder that is located inside the copy loop.
+   ;; This lets the copy loop to easily restore the Sprite Width on every iteration
+   ld  a, c                      ;; [1] A = Sprite Width
+   ld (sprite_width_restore), a  ;; [4] Modify the Sprite Width value inside the copy loop
 
    ;; Perform the copy
    copy_loop:
-      ;; Make BC = sprite width to use it as counter for line_loop,
-      ;; which will copy next sprite line
-	   ld__c_ixl ;; [3] C = IXL = Sprite Width
-       ex	af, af' ;; [1] A' <=> A
-	
-	line_loop :
-		ld    a ,(de)   ;; [2] Get next background byte into A
-		and (hl)        ;; [2] Erase background part that is to be overwritten (Mask step 1)
-		inc  hl         ;; [2] HL += 1 => Point HL to Sprite Colour information
-		or  (hl)        ;; [2] Add up background and sprite information in one byte (Mask step 2)
-		ld  (de), a     ;; [2] Save modified background + sprite data information into memory
-		inc  de         ;; [2] Next bytes (sprite and memory)
-		inc  hl         ;; [2] 
-
-		dec   c         ;; [1]   One less iteration to complete Sprite Width
-	jr 	nz, line_loop ;; [2/3] Repeat line_loop if C!=0 (Iterations pending)
+      sprite_width_restore = .+1
+      ld c, #00         ;; [2] Restore Sprite Width into c to use it as counter for line_loop
+                        ;;     (00 is a placedholder that will be self-modified)
+      line_loop :
+         ld    a ,(de)  ;; [2] Get next background byte into A
+         and (hl)       ;; [2] Erase background part that is to be overwritten (Mask step 1)
+         inc  hl        ;; [2] HL += 1 => Point HL to Sprite Colour information
+         or  (hl)       ;; [2] Add up background and sprite information in one byte (Mask step 2)
+         ld  (de), a    ;; [2] Save modified background + sprite data information into memory
+         inc  de        ;; [2] Next bytes (sprite and memory)
+         inc  hl        ;; [2] 
+   
+         dec   c        ;; [1]   One less iteration to complete Sprite Width
+      jr nz, line_loop  ;; [2/3] Repeat line_loop if C!=0 (Iterations pending)
       
       ;; Update the Destiny Pointer. DE must point to the place where the
-      ;; next sprite line will be copied. So we have to add Backbuffer Width - Sprite Width
-      ex  de, hl     ;; [1] HL holds temporarily the Destiny Pointer (points to backbuffer)
-                     ;;     Only for math purposes
+      ;; next sprite line will be copied. So we have to add 'Backbuffer Width - Sprite Width'
+      ;; which is the offset to the start of the next line to be drawn inside the sprite buffer
+      ;;    DE + A (DE=Destiny Pointer inside the sprite buffer, A=Offset to next Line)
       offset_to_next_line = .+1
-      ld   c, #00    ;; [2] BC = Offset = Backbuffer Width - Sprite Width (00 is a placeholder that gets modified)
-      add hl, bc     ;; [3] Add the offset to the Destiny Pointer (BackBuffer Pointer)
-      ex  de, hl     ;; [1] Restore the Destiny Pointer to DE (and HL to what it was)
-      ex	af, af'  ;; [1] A <=> A'
-      dec  a         ;; [1] One less iteration to complete Sprite Height
-   jr  nz, copy_loop ;; [2/3] Repeat copy_loop if A!=0 (Iterations pending)
+      ld  a, #00     ;; [2] A = Offset_to_next_line (00 is a place holder that will be self-modified)
+      add_de_a       ;; [5] DE += A (Macro)
+
+   djnz copy_loop    ;; [3/4] B--, One less iteration to complete Sprite Height
+                     ;;          Repeat copy_loop if B!=0 (Iterations pending)
 
    ret               ;; [3] Return to the caller

@@ -18,7 +18,7 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "../macros/cpct_undocumentedOpcodes.s"		
+.include "../macros/cpct_math.s"
 
 ;;
 ;; C bindings for <cpct_drawToSpriteBufferMasked>
