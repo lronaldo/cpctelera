@@ -27,7 +27,7 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_drawBackBufferMaskedAlignedTable> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
-;;                                           <u8> *height*, <u8> *width*, void* *sprite*, <u8>* *mask_table*) __z88dk_callee;
+;;                                           <u8> *width*, <u8> *height*,  void* *sprite*, <u8>* *mask_table*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
 ;;    (1B B)   buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
@@ -128,15 +128,15 @@
 
    ;; Calculate offset to be added to Destiny pointer (DE, BackBuffer Pointer)
    ;; After copying each sprite line, to point to the start of the next line
-   sub b                         ;; [1] A = Back_Buffer_Width - Sprite Width
+   sub c                         ;; [1] A = Back_Buffer_Width - Sprite Width
    ld (offset_to_next_line), a   ;; [4] Modify the offset size inside the copy loop
 
    ;; IXL Holds the Width of the sprite
-   ld__ixl_b ;; [3] IXL = Sprite Width
+   ld__ixl_c ;; [3] IXL = Sprite Width
 
    ;; A Holds the Height of the sprite to be used as counter for the
    ;; copy loop. There will be as many iterations as Height lines
-   ld  a, c       ;; [1] A = Sprite Height
+   ld  a, b      ;; [1] A = Sprite Height
 
    ;; BC will hold either the offset from the end of one line to the
    ;; start of the other, or the width of the sprite. None of them
