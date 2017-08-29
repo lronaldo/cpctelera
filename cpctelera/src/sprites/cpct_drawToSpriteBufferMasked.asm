@@ -34,7 +34,7 @@
 ;;    (2B DE) inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
 ;;    (1B C)  width        - Sprite Width in bytes (>0)
 ;;    (1B A)  height       - Sprite Height in bytes (>0)
-;;    (2B HL) sprite       - Source Sprite Pointer (array with pixel data)
+;;    (2B HL) sprite       - Source Sprite Pointer (array with pixel data along with mask data)
 ;;
 ;; Assembly Call (Input parameters on Registers)
 ;;    > call cpct_drawToSpriteBufferMasked_asm
