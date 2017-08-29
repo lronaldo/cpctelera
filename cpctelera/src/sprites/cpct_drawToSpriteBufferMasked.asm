@@ -44,15 +44,15 @@
 ;; a buffer sprite that is shorter will probably cause sprite lines to be displaced,
 ;; and can potentially cause random memory outside buffer to be overwriten, leading
 ;; to unforeseen consequencies.
-;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; along with mask data, take a look at <cpct_drawSpriteMasked>.
 ;;  * *inbuffer_ptr* must be a pointer to the place where *sprite* will be drawn 
 ;; inside the sprite buffer. It can point to any of the bytes in the array of
 ;; the destination sprite buffer. That will be the place where the first byte
 ;; of the *sprite* will be copied to (its top-left corner). It is important to
 ;; check that there is enough space for the sprite to be copied from that byte on.
 ;; Otherwise, the copy loop will continue outside the sprite buffer boundaries.
-;;  * *width* must be the width of the sprite *in bytes*, the width must be 
+;;  * *width* must be the width of the sprite *in bytes*, *excluding mask data*, and 
+;; must be 1 or more. Using 0 as *width* parameter for this function could potentially 
+;; make the program hang or crash. Always remember that the *width* must be 
 ;; expressed in bytes and *not* in pixels. The correspondence is:
 ;;    mode 0      - 1 byte = 2 pixels
 ;;    modes 1 / 3 - 1 byte = 4 pixels
@@ -61,8 +61,8 @@
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
-;;  * *buffer_width* must be the width of the sprite used as buffer *in bytes*, 
-;;  must be greater than 0 and greater or equal than *width*.
+;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
+;; along with mask data, take a look at <cpct_drawSpriteMasked>.
 ;; 
 ;; Known limitations:
 ;;     * This function does not do any kind of boundary check or clipping. If you 
@@ -86,7 +86,7 @@
 ;; a similar way to <cpct_drawSpriteMasked>.
 ;;
 ;; Destroyed Register values:
-;;       AF, AF', BC, DE, HL
+;;       AF, BC, DE, HL
 ;;
 ;; Required memory:
 ;;    C-bindings   - 30 bytes
