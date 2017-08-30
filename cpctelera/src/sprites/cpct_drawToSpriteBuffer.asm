@@ -27,7 +27,7 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_drawToSpriteBuffer> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
-;;                                     <u8> *height*, <u8> *width*, void* *sprite*) __z88dk_callee;
+;;                                     <u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
 ;;    (1B B)  buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
