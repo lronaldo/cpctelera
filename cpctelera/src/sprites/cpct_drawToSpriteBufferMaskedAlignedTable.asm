@@ -32,8 +32,8 @@
 ;; Input Parameters (7 bytes):
 ;;    (1B A)   buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
 ;;    (2B DE)  inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
-;;    (1B B)   height       - Sprite Height in bytes (>0)
 ;;    (1B C)   width        - Sprite Width in bytes (>0)
+;;    (1B B)   height       - Sprite Height in bytes (>0)
 ;;    (2B HL)  sprite       - Source Sprite Pointer (array with pixel data)
 ;;    (2B HL') mask_table   - Pointer to the aligned mask table used to create transparency
 ;;
@@ -143,30 +143,30 @@
    ;; will be greater than 256, so B will always be 0.
    ld  b, #00     ;; [2] Set B to 0 so as BC holds the value of C 
 	
-	;; Perform the copy	
-	copy_loop :
-      ;; Make BC = sprite width to use it as counter for line_loop, which will copy next sprite line
-	   ld__c_ixl   ;; [3] C = IXL = Sprite Width
-       ex af, af'  ;; [1] A' <=> A : Switch Sprite Height to empty A' 
+   ;; Perform the copy	
+   copy_loop :
+        ;; Make BC = sprite width to use it as counter for line_loop, which will copy next sprite line
+	ld__c_ixl   ;; [3] C = IXL = Sprite Width
+        ex af, af'  ;; [1] A' <=> A : Switch Sprite Height to empty A' 
 
 	line_loop :
-		exx               ;; [1] HL' <-> HL : Switch to Sprite
+		exx                   ;; [1] HL' <-> HL : Switch to Sprite
 		ld	a, (hl);      ;; [2] Get Sprite into A
 		inc	hl            ;; [2] HL += 1 => Point HL to Sprite Colour information
-		exx               ;; [1] HL' <-> HL : Switch to Masked Aligned Table
+		exx                   ;; [1] HL' <-> HL : Switch to Masked Aligned Table
 		ld	l, a          ;; [1] Get Sprite into L
 		ld	a, (de);      ;; [2] Get next background byte into A
-		and (hl)          ;; [2] Erase background part that is to be overwritten (Mask step 1)
-		or l;             ;; [2] Add up background and sprite information in one byte (Mask step 2)
-		ld(de), a;        ;; [2] Save modified background + sprite data information into memory
+		and (hl)              ;; [2] Erase background part that is to be overwritten (Mask step 1)
+		or l;                 ;; [2] Add up background and sprite information in one byte (Mask step 2)
+		ld(de), a;            ;; [2] Save modified background + sprite data information into memory
 		inc	de            ;; [2] Next bytes (sprite and memory)
-		dec 	c         ;; [1] One less iteration to complete Sprite Width
+		dec 	c             ;; [1] One less iteration to complete Sprite Width
 		jr 	nz, line_loop ;; [2/3] Repeat line_loop if C!=0 (Iterations pending)
 
      ;; Update the Destiny Pointer. DE must point to the place where the
      ;; next sprite line will be copied. So we have to add Backbuffer Width - Sprite Width
     ex  de, hl        ;; [1] HL holds temporarily the Destiny Pointer (points to backbuffer)
-			          ;; Only for math purposes
+		      ;;  Only for math purposes
     offset_to_next_line = .+1
     ld   c, #00       ;; [2] BC = Offset = Backbuffer Width - Sprite Width (00 is a placeholder that gets modified)
     add hl, bc        ;; [3] Add the offset to the Destiny Pointer (BackBuffer Pointer)
@@ -175,4 +175,4 @@
     dec  a            ;; [1] One less iteration to complete Sprite Height
     jr  nz, copy_loop ;; [2/3] Repeat copy_loop if A!=0 (Iterations pending)
 
-   ret               ;; [3] Return to the caller
+   ret                ;; [3] Return to the caller
