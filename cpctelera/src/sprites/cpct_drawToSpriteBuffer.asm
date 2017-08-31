@@ -27,13 +27,13 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_drawToSpriteBuffer> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
-;;                                     <u8> *height*, <u8> *width*, void* *sprite*) __z88dk_callee;
+;;                                     <u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
 ;;    (1B B)  buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
 ;;    (2B DE) inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
-;;    (1B A)  height       - Sprite Height in bytes (>0)
 ;;    (1B C)  width        - Sprite Width in bytes (>0)
+;;    (1B A)  height       - Sprite Height in bytes (>0)
 ;;    (2B HL) sprite       - Source Sprite Pointer (array with pixel data)
 ;;
 ;; Assembly Call (Input parameters on Registers)
@@ -113,8 +113,8 @@
 ;;  // minimizes the amount of data to be writen to the screen after
 ;;  // waiting to VSYNC, eliminating flicking and tearing.
 ;;  void redrawActionScreen(u8 *scr_p, TEntity *en, TEntity *ch) {
-;;      cpct_drawToSpriteBuffer(BACK_W, g_background + ch->y*BACK_W + ch->x, ENT_H, ENT_W, g_character);
-;;      cpct_drawToSpriteBuffer(BACK_W, g_background + en->y*BACK_W + en->x, ENT_H, ENT_W, g_enemy);
+;;      cpct_drawToSpriteBuffer(BACK_W, g_background + ch->y*BACK_W + ch->x, ENT_W, ENT_H, g_character);
+;;      cpct_drawToSpriteBuffer(BACK_W, g_background + en->y*BACK_W + en->x, ENT_W, ENT_H, g_enemy);
 ;;      cpct_waitVSync();
 ;;      cpct_drawSprite(g_background, scr_p, BACK_W, BACK_H);
 ;;  }
@@ -168,17 +168,17 @@
 
    ;; Calculate offset to be added to Destiny pointer (DE, BackBuffer Pointer)
    ;; After copying each sprite line, to point to the start of the next line
-   sub b                         ;; [1] A = Back_Buffer_Width - Sprite Width
+   sub c                         ;; [1] A = Back_Buffer_Width - Sprite Width
    ld (offset_to_next_line), a   ;; [4] Modify the offset size inside the copy loop
 
    ;; Set the sprite with inside the loop to be restored
    ;; into BC (counter) previous to starting the copy of every line
-   ld  a, b                ;; [1] A = Sprite Width
-   ld (sprite_width), a    ;; [4] Set the sprite width inside the copy loop
+   ld  a, c                        ;; [1] A = Sprite Width
+   ld (sprite_width_restore), a    ;; [4] Set the sprite width inside the copy loop
 
    ;; A Holds the Height of the sprite to be used as counter for the
    ;; copy loop. There will be as many iterations as Height lines
-   ld  a, c       ;; [1] A = Sprite Height
+   ld  a, b       ;; [1] A = Sprite Height
 
    ;; BC will hold either the offset from the end of one line to the
    ;; start of the other, or the width of the sprite. None of them
@@ -189,7 +189,7 @@
    copy_loop:
       ;; Make BC = sprite width to use it as counter for LDIR,
       ;; which will copy next sprite line
-      sprite_width = .+1
+      sprite_width_restore = .+1
       ld   c, #00    ;; [2] BC = Sprite Width (B is always 0, and 00 is a placeholder that gets modified)
 
       ;; Copy next sprite line to the sprite buffer
@@ -208,4 +208,3 @@
    jr  nz, copy_loop ;; [2/3] Repeat copy_loop if A!=0 (Iterations pending)
 
    ret               ;; [3] Return to the caller
-      

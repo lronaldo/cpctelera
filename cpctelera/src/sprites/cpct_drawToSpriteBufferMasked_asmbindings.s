@@ -21,10 +21,10 @@
 .include "../macros/cpct_math.s"
 
 ;;
-;; ASM bindings for <cpct_drawToSpriteBuffer>
+;; ASM bindings for <cpct_drawToSpriteBufferMasked>
 ;;
 ;;   0 us, 0 bytes
 ;;
-cpct_drawToSpriteBuffer_asm::
+cpct_drawToSpriteBufferMasked_asm::
 
-.include /cpct_drawToSpriteBuffer.asm/
+.include /cpct_drawToSpriteBufferMasked.asm/
