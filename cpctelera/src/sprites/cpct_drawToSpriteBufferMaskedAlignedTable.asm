@@ -132,11 +132,11 @@
    ld (offset_to_next_line), a   ;; [4] Modify the offset size inside the copy loop
 
    ;; IXL Holds the Width of the sprite
-   ld__ixl_c ;; [3] IXL = Sprite Width
+   ld__ixl_c      ;; [3] IXL = Sprite Width
 
    ;; A Holds the Height of the sprite to be used as counter for the
    ;; copy loop. There will be as many iterations as Height lines
-   ld  a, b      ;; [1] A = Sprite Height
+   ld  a, b       ;; [1] A = Sprite Height
 
    ;; BC will hold either the offset from the end of one line to the
    ;; start of the other, or the width of the sprite. None of them
