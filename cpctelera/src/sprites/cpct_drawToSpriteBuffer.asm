@@ -173,7 +173,7 @@
 
    ;; Set the sprite with inside the loop to be restored
    ;; into BC (counter) previous to starting the copy of every line
-   ld  a, c                ;; [1] A = Sprite Width
+   ld  a, c                        ;; [1] A = Sprite Width
    ld (sprite_width_restore), a    ;; [4] Set the sprite width inside the copy loop
 
    ;; A Holds the Height of the sprite to be used as counter for the
@@ -208,4 +208,3 @@
    jr  nz, copy_loop ;; [2/3] Repeat copy_loop if A!=0 (Iterations pending)
 
    ret               ;; [3] Return to the caller
-      
