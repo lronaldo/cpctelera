@@ -20,10 +20,10 @@
 #include <cpctelera.h>
 
 // Sprites
-#include "sprites\back.h"
-#include "sprites\ship.h"
-#include "sprites\title.h"
-#include "sprites\fire.h"
+#include "sprites/back.h"
+#include "sprites/ship.h"
+#include "sprites/title.h"
+#include "sprites/fire.h"
 
 // Double buffer location
 #define SCREEN_BUFF				0x8000
