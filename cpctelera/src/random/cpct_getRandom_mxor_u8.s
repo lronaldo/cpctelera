@@ -79,7 +79,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 _cpct_getRandom_mxor_u8::
-cpct_getRandom_mxor_u8::
+cpct_getRandom_mxor_u8_asm::
 
 .globl _cpct_mxor32_seed
 .globl cpct_nextRandom_mxor_u32_asm
