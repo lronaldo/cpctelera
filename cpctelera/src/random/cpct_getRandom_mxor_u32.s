@@ -72,7 +72,7 @@
 .globl cpct_nextRandom_mxor_u32_asm
 
 _cpct_getRandom_mxor_u32::
-cpct_getRandom_mxor_u32::
+cpct_getRandom_mxor_u32_asm::
    ;; Calculate next 32-bits random value using Marsaglia's XOR-shift
    ld   de, (_cpct_mxor32_seed+0)     ;; [6] | 
    ld   hl, (_cpct_mxor32_seed+2)     ;; [5] | DE:HL = Current 32-bits seed

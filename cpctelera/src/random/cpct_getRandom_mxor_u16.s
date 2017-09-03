@@ -86,7 +86,7 @@
 .include "src/macros/cpct_opcodes.s"
 
 _cpct_getRandom_mxor_u16::
-cpct_getRandom_mxor_u16::
+cpct_getRandom_mxor_u16_asm::
 
 cpct_seedJump_mxor_u16:
 next_jump:
