@@ -223,12 +223,12 @@ void DrawSWDoubleBuffer()
 		const u8* fireSp = (gPosScroll % 2) == 0 ? g_fire_0 : g_fire_1;
 		u8  x = POS_SHIP_X - G_FIRE_0_W;
 		u8  y = POS_SHIP_Y + 2;
-		backBufferPtr = cpctm_backBufferPtr(gBackBuffer, VIEW_CX, x, y);
+		backBufferPtr = cpctm_spriteBufferPtr(gBackBuffer, VIEW_CX, x, y);
 		
 		cpct_drawToSpriteBufferMaskedAlignedTable(VIEW_CX, backBufferPtr, G_FIRE_0_W, G_FIRE_0_H, fireSp, gMaskTable);
 	}
 
-	backBufferPtr = cpctm_backBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X, POS_SHIP_Y);
+	backBufferPtr = cpctm_spriteBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X, POS_SHIP_Y);
 	cpct_drawToSpriteBufferMasked(VIEW_CX, backBufferPtr, G_SHIP_W, G_SHIP_H, g_ship);
 
 	/** Copy backBuffer to screen memory */
