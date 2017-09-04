@@ -18,13 +18,20 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "../macros/cpct_undocumentedOpcodes.s" 
+.include "../macros/cpct_undocumentedOpcodes.s"
+.include "../macros/cpct_maths.s" 
 
 ;;
 ;; ASM bindings for <cpct_drawToSpriteBufferMaskedAlignedTable>
 ;;
-;;   0 us, 0 bytes
+;;   3 us, 1 byte
 ;;
 cpct_drawToSpriteBufferMaskedAlignedTable_asm::
 
+   ;; User *should* preserve IX before calling this function, if required
+
 .include /cpct_drawToSpriteBufferMaskedAlignedTable.asm/
+
+   ;; Ret is included in C-bindings, so it must be here also
+   ;; because the asm file does not include it
+   ret             ;; [3] Return to caller

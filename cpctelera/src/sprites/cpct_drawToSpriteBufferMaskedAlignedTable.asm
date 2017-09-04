@@ -27,15 +27,16 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_drawBackBufferMaskedAlignedTable> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
-;;                                           <u8> *width*, <u8> *height*, void* *sprite*, <u8>* *mask_table*) __z88dk_callee;
+;;                                           <u8> *width*, <u8> *height*, void* *sprite*, 
+;;                                           <u8>* *mask_table*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
 ;;    (1B A)   buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
 ;;    (2B DE)  inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
-;;    (1B C)   width        - Sprite Width in bytes (>0)
-;;    (1B B)   height       - Sprite Height in bytes (>0)
-;;    (2B HL)  sprite       - Source Sprite Pointer (array with pixel data)
-;;    (2B HL') mask_table   - Pointer to the aligned mask table used to create transparency
+;;    (1B IXL) width        - Sprite Width in bytes (>0)
+;;    (1B IXH) height       - Sprite Height in bytes (>0)
+;;    (2B BC)  sprite       - Source Sprite Pointer (array with pixel data)
+;;    (2B HL)  mask_table   - Pointer to the aligned mask-table used to create transparency
 ;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format.
@@ -97,22 +98,22 @@
 ;; colours, after removing background pixels from the sprite.
 ;;
 ;; Destroyed Register values:
-;;       AF, AF', BC, DE, HL, HL'
+;;       AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings   - 30 bytes
-;;    ASM-bindings - 24 bytes
+;;    C-bindings   -  53 bytes
+;;    ASM-bindings -  37 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case      |   microSecs (us)   |     CPU Cycles
 ;;  -----------------------------------------------------
-;;   Any       |  14 + (15 + 20W)H   | 56 + (60 + 80W)H
+;;   Any       |  48 + (14 + 19W)H  |  192 + (56 + 76W)H
 ;;  -----------------------------------------------------
-;;   W=2,H=16  |         894        |        3576
-;;   W=4,H=32  |        3054        |        12216
+;;   W=2,H=16  |         880        |         3520
+;;   W=4,H=32  |        2928        |        11712
 ;;  -----------------------------------------------------
-;;  Asm saving |         -21        |        -84
+;;  Asm saving |         -37        |         -148
 ;;  -----------------------------------------------------
 ;; (end code)
 ;;  W = Sprite width in bytes
@@ -128,51 +129,40 @@
 
    ;; Calculate offset to be added to Destiny pointer (DE, BackBuffer Pointer)
    ;; After copying each sprite line, to point to the start of the next line
-   sub c                         ;; [1] A = Back_Buffer_Width - Sprite Width
+   sub__ixl                      ;; [2] A = Back_Buffer_Width - Sprite Width
    ld (offset_to_next_line), a   ;; [4] Modify the offset size inside the copy loop
 
-   ;; IXL Holds the Width of the sprite
-   ld__ixl_c      ;; [3] IXL = Sprite Width
+   ;; Update sprite_width's placeholder inside the copy_loop. This placeholder
+   ;; is meant to restore sprite_width into IXL at the start of every iteration,
+   ;; before it is used as counter and depleted
+   ld__a_ixl               ;; [2] A = Sprite Width (To be saved )
+   ld (sprite_width), a    ;; [4] Save sprite width into its copy_loop placeholder
 
-   ;; A Holds the Height of the sprite to be used as counter for the
-   ;; copy loop. There will be as many iterations as Height lines
-   ld  a, b       ;; [1] A = Sprite Height
+   ;; Perform the copy	 
+   copy_loop:
+     sprite_width = .+2 ;; Placeholder location for sprite_width
+      ld__ixl  #00      ;; [3] IXL = Sprite Width (#00 is a placeholder)
 
-   ;; BC will hold either the offset from the end of one line to the
-   ;; start of the other, or the width of the sprite. None of them
-   ;; will be greater than 256, so B will always be 0.
-   ld  b, #00     ;; [2] Set B to 0 so as BC holds the value of C 
-	
-   ;; Perform the copy	
-   copy_loop :
-        ;; Make BC = sprite width to use it as counter for line_loop, which will copy next sprite line
-	ld__c_ixl   ;; [3] C = IXL = Sprite Width
-        ex af, af'  ;; [1] A' <=> A : Switch Sprite Height to empty A' 
+      line_loop:
+         ld    a, (bc)  ;; [2] Get next byte from the sprite
+         ld    l, a     ;; [1] Access mask table element (table must be 256-byte aligned)
+         ld    a, (de)  ;; [2] Get the value of the byte of the screen where we are going to draw
+         and (hl)       ;; [2] Erase background part that is to be overwritten (Mask step 1)
+         or    l        ;; [1] Add up background and sprite information in one byte (Mask step 2)
+         ld  (de), a    ;; [2] Save modified background + sprite data information into memory
+         inc  de        ;; [2] Next bytes (sprite and memory)
+         inc  bc        ;; [2] Next byte from the sprite (must be 256-bytes aligned)
 
-	line_loop :
-		exx                   ;; [1] HL' <-> HL : Switch to Sprite
-		ld	a, (hl);      ;; [2] Get Sprite into A
-		inc	hl            ;; [2] HL += 1 => Point HL to Sprite Colour information
-		exx                   ;; [1] HL' <-> HL : Switch to Masked Aligned Table
-		ld	l, a          ;; [1] Get Sprite into L
-		ld	a, (de);      ;; [2] Get next background byte into A
-		and (hl)              ;; [2] Erase background part that is to be overwritten (Mask step 1)
-		or l;                 ;; [2] Add up background and sprite information in one byte (Mask step 2)
-		ld(de), a;            ;; [2] Save modified background + sprite data information into memory
-		inc	de            ;; [2] Next bytes (sprite and memory)
-		dec 	c             ;; [1] One less iteration to complete Sprite Width
-		jr 	nz, line_loop ;; [2/3] Repeat line_loop if C!=0 (Iterations pending)
+         dec__ixl       ;; [2] IXL holds sprite width, we decrease it to count pixels in this line.
+      jr nz, line_loop  ;; [2/3] While not 0, we are still painting this sprite line 
 
-     ;; Update the Destiny Pointer. DE must point to the place where the
-     ;; next sprite line will be copied. So we have to add Backbuffer Width - Sprite Width
-    ex  de, hl        ;; [1] HL holds temporarily the Destiny Pointer (points to backbuffer)
-		      ;;  Only for math purposes
-    offset_to_next_line = .+1
-    ld   c, #00       ;; [2] BC = Offset = Backbuffer Width - Sprite Width (00 is a placeholder that gets modified)
-    add hl, bc        ;; [3] Add the offset to the Destiny Pointer (BackBuffer Pointer)
-    ex  de, hl        ;; [1] Restore the Destiny Pointer to DE (and HL to what it was)
-    ex	af, af'       ;; [1] A <=> A' : Switch to Sprite Height A counter
-    dec  a            ;; [1] One less iteration to complete Sprite Height
-    jr  nz, copy_loop ;; [2/3] Repeat copy_loop if A!=0 (Iterations pending)
+      ;; Update the Destiny Pointer. DE must point to the place where the
+      ;; next sprite line will be copied. So we have to add Backbuffer Width - Sprite Width
+     offset_to_next_line = .+1
+      ld   a, #00       ;; [2] A = Offset = Backbuffer Width - Sprite Width (00 is a placeholder that gets modified)
+      add_de_a          ;; [5] DE += Offset. Make Destiny Pointer point to start of next line
 
-   ret                ;; [3] Return to the caller
+      dec__ixh          ;; [2] One less iteration to complete Sprite Height
+   jr nz, copy_loop     ;; [2/3] Repeat copy_loop if IXH!=0 (Iterations pending)
+
+   ;; Ret is included in C/ASM bindings files

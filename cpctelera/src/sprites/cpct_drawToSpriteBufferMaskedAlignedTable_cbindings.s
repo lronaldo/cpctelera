@@ -19,24 +19,31 @@
 .module cpct_sprites
 
 .include "../macros/cpct_undocumentedOpcodes.s"	
+.include "../macros/cpct_maths.s" 
+
+;;( u16 buffer_width, void* buffer, u8 width, u8 height
+;;  void* sprite, u8* mask_table) __z88dk_callee;
 
 ;;
 ;; C bindings for <cpct_drawToSpriteBufferMaskedAlignedTable>
 ;;
-;;   21 us, 8 bytes
+;;   37 us, 17 bytes
 ;;
 _cpct_drawToSpriteBufferMaskedAlignedTable::
    ;; GET Parameters from the stack following __z88dk_callee convention
-   pop hl        ;; [3] HL = Return Address
-   pop bc        ;; [3] C = Back_Buffer_Width (B is ignored)
-   pop de        ;; [3] DE = Pointer to Back Buffer 
-   ld  a, c      ;; [1] A = Back_Buffer_Width
-   pop bc        ;; [3] B = Sprite Height, C = Sprite Width
-   exx           ;; [1] HL <-> HL'
-   pop hl        ;; [3] HL' = Masked Aligned Table
-   exx           ;; [1] HL' <-> HL
-   ex (sp), hl   ;; [6] HL = Pointer to Sprite,
+   ld (restore_ix), ix  ;; [6] Save IX to restore it before returning
+   pop hl        ;; [3] HL  = Return Address
+   pop bc        ;; [3] C   = Back_Buffer_Width (B is ignored)
+   pop de        ;; [3] DE  = Pointer to Back Buffer 
+   ld  a, c      ;; [1] A   = Back_Buffer_Width
+   pop ix        ;; [5] IXH = Sprite Height, IXL = Sprite Width
+   pop bc        ;; [3] BC  = Pointer to the Sprite to be drawn
+   ex (sp), hl   ;; [6] HL  = Pointer to the Mask Table (must be 256-byte aligned),
                  ;;    (SP) = Return Address. This address is the only required
                  ;;    thing to be kept in the stack with this convention.
 				 
 .include /cpct_drawToSpriteBufferMaskedAlignedTable.asm/
+
+restore_ix = .+2
+   ld   ix, #0000  ;; [4] Restore IX before returning
+   ret             ;; [3] Return to caller
