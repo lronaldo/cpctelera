@@ -86,6 +86,20 @@
    .dw #0x2DDD  ;; Opcode for dec ixl
 .endm
 
+;; Macro: sub__ixl
+;;    Opcode for "SUB IXL" instruction
+;; 
+.macro sub__ixl
+   .dw #0x95DD  ;; Opcode for sub ixl
+.endm
+
+;; Macro: sub__ixh
+;;    Opcode for "SUB IXH" instruction
+;; 
+.macro sub__ixh
+   .dw #0x94DD  ;; Opcode for sub ixh
+.endm
+
 ;; Macro: ld__ixl    Value
 ;;    Opcode for "LD IXL, Value" instruction
 ;;  
@@ -94,4 +108,14 @@
 ;; 
 .macro ld__ixl    Value 
    .db #0xDD, #0x2E, Value  ;; Opcode for ld ixl, Value
+.endm
+
+;; Macro: ld__ixh    Value
+;;    Opcode for "LD IXH, Value" instruction
+;;  
+;; Parameters:
+;;    Value - An inmediate 8-bits value that will be loaded into IXH
+;; 
+.macro ld__ixh    Value 
+   .db #0xDD, #0x26, Value  ;; Opcode for ld ixh, Value
 .endm
