@@ -12,12 +12,12 @@ BIN  = bin
 #   LFLAGS1   flags after output file spec, before obj file list
 #   LFLAGS2   flags after obj file list (libraries, etc)
 
-CFLAGS  = -O3 -fsigned-char -DUNIX
+CFLAGS  = -O3 -fsigned-char
 LFLAGS1 =
 LFLAGS2 = -s 
 
 TARGET = $(BIN)/2cdt
-FILES  = 2cdt tzxfile
+FILES  = 2cdt tzxfile opth
 F_OBJ  = $(foreach F, $(FILES), $(OBJ)/$(F).o)
 
 all: Makefile $(OBJ) $(F_OBJ) $(TARGET)
