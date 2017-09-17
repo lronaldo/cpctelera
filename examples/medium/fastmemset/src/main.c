@@ -3,23 +3,20 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-
-// Pointer to the memory location where screen video memory starts by default
-#define SCR_VMEM  (u8*)0xC000
 
 // Funtion Pointer type, to point to memset functions that receive a pointer and 2 16-bit integers
 typedef void (*TMemsetFunc)(void*, u16, u16) __z88dk_callee;
@@ -58,9 +55,9 @@ void doSomeClears8(u8 colour, u8 vsyncs) {
    for(i=0; i < 2 ; i++) {
       u8 pattern = cpct_px2byteM0(colour, colour);
       waitNVSYNCs(vsyncs);
-      cpct_memset(SCR_VMEM, pattern, 0x4000);
+      cpct_memset(CPCT_VMEM_START, pattern, 0x4000);
       waitNVSYNCs(vsyncs);
-      cpct_memset(SCR_VMEM,       0, 0x4000);
+      cpct_memset(CPCT_VMEM_START,       0, 0x4000);
    }
 }
 
@@ -74,9 +71,9 @@ void doSomeClears(TMemsetFunc func, u8 colour, u8 vsyncs) {
    for(i=0; i < 2 ; i++) {
       u16 pattern = getColourPattern(colour, colour, colour, colour);
       waitNVSYNCs(vsyncs);
-      func(SCR_VMEM, pattern, 0x4000);
+      func(CPCT_VMEM_START, pattern, 0x4000);
       waitNVSYNCs(vsyncs);
-      func(SCR_VMEM,       0, 0x4000);
+      func(CPCT_VMEM_START,       0, 0x4000);
    }
 }
 

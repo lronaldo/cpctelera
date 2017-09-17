@@ -1,0 +1,70 @@
+app
+G	conf
+G	conf objects
+G	help,?
+G	quit
+G	kill
+ G	exec file
+ G	expression,let expr
+G	show copying
+G	show warranty
+G	show option [name]
+G	show error
+G	get option [name]
+G	set option name|nr value
+G	set error error_name on|off|unset
+
+sim
+E	run,go,r [start [stop]]
+E	stop
+E	step,s
+E	next,n
+	gui start
+	gui stop
+
+uc
+G	state
+	statistic [mem [startaddr [endaddr]]
+ GM	file "file"
+ GM	download,dl
+E	pc [addr]
+G	reset
+D	dump mem_type [start [stop [bytes_per_line]]
+D	dump bitname...
+D	dch [start [stop]]
+D	dc [start [stop]]
+D	disassemble [start [offset [lines]]]
+ GM	fill mem_type start end data
+ GM	where mem_type data...
+ GM	Where mem_type data...
+B	break addr [hit]
+B	break mem_type r|w addr [hit]
+B	tbreak addr [hit]
+B	tbreak mem_type r|w addr [hit]
+B	clear [addr...]
+B	delete [nr...]
+G	get sfr addr...
+G	set memory mem_type addr data...
+G	set bit addr 0|1
+G	set hardware,hw cath params...
+G	info breakpoints
+G	info registers
+G	info hardware,hw cath
+G	info stack
+G	info memory
+G	timer add,create,make id [direction [in_isr]]
+G	timer delete,remove id
+G	timer get [id]
+G	timer run,start id
+G	timer stop id
+G	timer value,set id value
+	memory createchip,cchip id size cellsize
+	memory createaddressspace,createaddrspace,createaspace,caddressspace,caddrspace,caspace id startaddr size
+	memory createaddressdecoder,createaddrdecoder,createadecoder,caddressdecoder,caddrdecoder,cadecoder addressspace begin end chip begin
+G	memory info
+
+	s51
+	
+D		di [start [stop]]
+D		dx [start [stop]]
+D		ds [start [stop]]

@@ -3,16 +3,16 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -175,11 +175,11 @@ i8 moveEntityY (TEntity* ent, i8 my) {
       // Move umy pixels up, taking care not to pass 0 limit
       if (umy <= ent->y) {
          ent->y        -= umy;
-         ent->videopos  = cpct_getScreenPtr((u8*)0xC000, ent->x, ent->y);
+         ent->videopos  = cpct_getScreenPtr(CPCT_VMEM_START, ent->x, ent->y);
          moved          = my;
       } else if ( ent->y ) {
          // movement tryied to pass 0 limit, adjusting to 0 
-         ent->videopos  = (u8*)0xC000 + ent->x;
+         ent->videopos  = CPCT_VMEM_START + ent->x;
          moved          = -ent->y;
          ent->y         = 0;
       }
@@ -204,7 +204,7 @@ i8 moveEntityY (TEntity* ent, i8 my) {
       }
       if (moved) {
          // Recalculating video pos when y has been changed
-         ent->videopos = cpct_getScreenPtr((u8*)0xC000, ent->x, ent->y);
+         ent->videopos = cpct_getScreenPtr(CPCT_VMEM_START, ent->x, ent->y);
       }
    }
 
@@ -270,7 +270,7 @@ void updateEntity(TEntity *ent) {
             moveEntityX(ent, -1);
          }
       } else if (anim->frame_id == 0xFF) {
-         cpct_drawSolidBox((u8*)0xC000, 0xFF, 4, 8);
+         cpct_drawSolidBox(CPCT_VMEM_START, 0xFF, 4, 8);
       } else {
          ent->status = es_stop;
       }

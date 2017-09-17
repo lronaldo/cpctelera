@@ -3,16 +3,16 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -68,7 +68,7 @@ void main(void) {
       cpct_setVideoMode(0);
 
       // Let's start drawing strings at the start of video memory (0xC000)
-      pvideomem = (u8*)0xC000;
+      pvideomem = CPCT_VMEM_START;
 
       // Draw 25 strings, 1 for each character line on the screen
       for (times=0; times < 25; times++) {
@@ -96,7 +96,7 @@ void main(void) {
       cpct_setVideoMode(1);
       
       // Let's start drawing strings at the start of video memory (0xC000)
-      pvideomem = (u8*)0xC000;
+      pvideomem = CPCT_VMEM_START;
 
       // Draw 25 strings, 1 for each character line on the screen    
       for (times=0; times < 25; times++) {
@@ -131,7 +131,7 @@ void main(void) {
       cpct_setVideoMode(2);
 
       // Let's start drawing strings at the start of video memory (0xC000)    
-      pvideomem = (u8*)0xC000;
+      pvideomem = CPCT_VMEM_START;
 
       // Draw 25 strings, 1 for each character line on the screen    
       for (times=0; times < 25; times++) {

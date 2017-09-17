@@ -3,26 +3,29 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
 #include "tilemap.h"
+#include "tiles.h"
 
 /////////////////////////////////////////////////////////////////////////////////
-// USEFUL MACROS
-#define VIDEOMEM (u8*)0xC000
-#define MAXSCROLL 80
+// USEFUL MACROS AND CONSTANTS
+#define MAXSCROLL      80
+#define SCR_TILE_WIDTH 40
+#define MAP_WIDTH     120
+#define MAP_HEIGHT     46
 
 /////////////////////////////////////////////////////////////////////////////////
 // STRUCTURES 
@@ -97,24 +100,23 @@ void scrollScreenTilemap(TScreenTilemap *scr, i16 scroll) {
 //
 void initialize_CPC() {
    // Initialize the application
-   cpct_disableFirmware();        // Firmware must be disabled for this application to work
-   cpct_setVideoMode(0);          // Set Mode 0 (160x200, 16 Colours)
+   cpct_disableFirmware();         // Firmware must be disabled for this application to work
+   cpct_setVideoMode(0);           // Set Mode 0 (160x200, 16 Colours)
    cpct_setPalette(g_palette, 13); // Set Palette 
-   cpct_setBorder(0x14);          // Set the border and background colours to black
-   cpct_setPALColour(0, 0x14);    // 
+   cpct_setBorder(HW_BLACK);       // Set the border and background colours to black
 
    // VERY IMPORTANT: Before using EasyTileMap functions (etm), the internal
    // pointer to the tileset must be set. 
    cpct_etm_setTileset2x4(g_tileset);   
 
    // Clean up the screen 
-   cpct_memset(VIDEOMEM, 0x00, 0x4000);
+   cpct_memset(CPCT_VMEM_START, 0x00, 0x4000);
 
    // Draw the full tilemap for the first time
    cpct_etm_drawTileBox2x4(0, 0,                       // (X, Y) upper-left corner of the tilemap
                            SCR_TILE_WIDTH, MAP_HEIGHT, // (Width, Height) of the Box to be drawn (all the screen)
                            MAP_WIDTH,                  // Width of the full tilemap (which is wider than the screen)
-                           VIDEOMEM,                   // Pointer to the start of video memory (upper-left corner of the
+                           CPCT_VMEM_START,                   // Pointer to the start of video memory (upper-left corner of the
                                                        // ...tilemap in the screen)
                            g_tilemap);                 // Pointer to the first tile of the tilemap to be drawn (upper-left
                                                        // ... corner of the tilemap viewport window)
@@ -124,7 +126,7 @@ void initialize_CPC() {
 // Main application's code
 //
 void main(void) {
-   TScreenTilemap scr = { VIDEOMEM, g_tilemap, 0 }; // Screen tilemap properties
+   TScreenTilemap scr = { CPCT_VMEM_START, g_tilemap, 0 }; // Screen tilemap properties
    i16 scroll_offset;                                // Requested scroll offset
 
    initialize_CPC(); // Initialize the machine and set up all necessary things

@@ -4,16 +4,16 @@
 ##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -505,6 +505,104 @@ function isHex {
    return 1
 }
 
+## Check if a given value is a binary value or not
+## $1: value to be tested
+##
+function isBin {
+   if [[ $1 =~ ^[0-1]+$ ]]; then
+      return 0
+   fi
+   return 1
+}
+
+## Check if a given value is a C-hexadecimal value or not
+## $1: Value to be tested
+##
+function isCHex {
+   if [[ $1 =~ ^0[x|X][0-9A-Fa-f]+$ ]]; then
+      return 0
+   fi
+   return 1  
+}
+
+## Check if a given value is a C-binary value or not
+## $1: Value to be tested
+##
+function isCBin {
+   if [[ $1 =~ ^0[b|B][0-1]+$ ]]; then
+      return 0
+   fi
+   return 1  
+}
+
+## Converts a binary number to a decimal one. The
+## number may have 0b/0B prefix or not.
+## $1: binary number
+##
+function bin2Dec {
+   local B="$1"
+   if [ ${B:0:2} = "0b" ] || [ ${B:0:2} = "0B" ]; then
+     B="${B:2}"
+   fi
+   echo $((2#$B))
+}
+
+## Converts a hexadecimal number to a decimal one. The number
+## may have 0x/0X prefix or no prefix at all
+## $1: hexadecimal number
+##
+function hex2Dec {
+   local H="$1"
+   if [ "${H:0:2}" != "0x" ] && [ "${H:0:2}" != "0X" ]; then
+     H="0x${H}"
+   fi
+   printf "%d" "$H"
+}
+
+## Converts and integer decimal number to binary base.
+## $1: integer decimal number
+##
+function dec2Bin {
+   echo "obase=2;$1" | bc
+}
+
+## Converts and integer decimal number to hexadecimal base
+## $1: integer decimal number
+##
+function dec2Hex {
+   echo "obase=16;$1" | bc
+}
+
+## Converts a number to decimal, be it a Binary or an hexadecimal one
+## $1: number to convert to decimal
+##
+function any2Dec {
+   local N="$1"
+   if isInt "$N"; then
+      echo "$N"
+   elif isBin "$N" || isCBin "$N"; then 
+      echo $(bin2Dec "$N")
+   elif isHex "$N" || isCHex "$N"; then
+      echo $(hex2Dec "$N")
+   fi
+}
+
+## Check if a given value is a valid C integer value 
+## either in decimal, hexadecimal or binary
+## $1: Value to be tested
+##
+function isCIntValue {
+   if isInt "$1"; then 
+      return 0
+   elif isCHex "$1"; then
+      return 0
+   elif isCBin "$1"; then
+      return 0
+   fi
+   return 1
+}
+
+
 ## Check if a given value is empty
 ## $1: Value to check
 ##
@@ -530,6 +628,27 @@ function isCommandLineOption {
 ##
 function isFileReadable {
    if [ -f "$1" ] && [ -r "$1" ]; then
+      return 0
+   fi
+   return 1
+}
+
+## Checks if a given value is a valid C idenfitier or not
+## $1: Value to check as identifier
+##
+function isValidCIdentifier { 
+   local REX='^[a-zA-Z_][a-zA-Z0-9_]*$'
+   if [[ $1 =~ $REX ]]; then
+      return 0
+   fi
+   return 1
+}
+
+## Check if a folder exists and is readable (only folders, not files)
+## $1: Folder to check 
+##
+function isFolderReadable {
+   if [ -d "$1" ] && [ -r "$1" ]; then
       return 0
    fi
    return 1
@@ -714,7 +833,8 @@ function containsSubstring {
 }
 
 ## Checks if a string contains any given character from other string. 
-## It echoes the character found if any
+## It echoes the character found if any. Be careful with characters ']' and '\',
+## they should be escaped.
 ##  $1 String to check
 ##  $2 String with characters to look for
 ##
@@ -723,9 +843,10 @@ function containsChars {
    local CHARS="$2"
    local POS
    ## Look for any character and get its position in STR
-   POS=$(($(expr index "$STR" "$CHARS")-1))
+   POS=${STR%%[${CHARS}]*};
+   POS=${#POS}
 
-   if (( POS > 0 )); then
+   if (( POS < ${#STR} )); then
       echo "${STR:POS:1}"
    fi
 }
@@ -760,6 +881,25 @@ function checkValidCIdentifier() {
    return 1
 }
 
+## Gets the index of a substring inside a string. Indexes go from 1 onwards.
+##   $1: String
+##   $2: Search substring
+##
+## Echoes the index where substring starts, 0 when substring has not been 
+## found in the string.
+##
+function getIndexOf() {
+  local STRING="$1"
+  local SEARCH="$2"
+  local PREV=${STRING%%${SEARCH}*}
+
+  if [ "$PREV" = "$STRING" ]; then
+    echo 0
+  else
+    echo $(( ${#PREV} + 1 ))
+  fi
+}
+
 ## Gets the first token from a string. Token is a group of characters, 
 ## starting from string character 0, and ending before the first appearance
 ## of a given SPACE character or string (whitespace, $2).
@@ -773,7 +913,8 @@ function getStringToken() {
    local SPACE="$2"
    local IDX
    
-   IDX=$(expr index "$STRING" "$SPACE"); 
+#   IDX=$(expr index "$STRING" "$SPACE"); 
+   IDX=$(getIndexOf "$STRING" "$SPACE")
    if (( $IDX != 0 )); then
       echo ${STRING:0:${IDX}-1}
    else
@@ -872,4 +1013,96 @@ function makeWithProgressSupervision {
       Error "${ERRORMSG}. Please, check '${MAKELOG}' for details. Aborting. "
    fi
    drawOK
+}
+
+## Extracts the value of a variable from a given config file. The config file should
+## have variables in the format VAR=value, being each variable in a single line.
+## If variable is not found in the config file, it issues a non-recoverable error.
+##    $1: Name of the variable
+##    $2: Config file
+##
+## Returns value of the variable via echo
+##
+function extractVarValueFromConfigFile {
+   local VARNAME="$1"
+   local CFILE="$2"
+   local VALUE
+
+   ## Get the value of the variable and check it is not empty
+   VALUE=$(cat $CFILE | grep -m 1 "^ *${VARNAME}.*=" | grep -o "=.*$")
+   if (( ${#VALUE} == 0 )); then
+      Error "Variable '$VARNAME' not found in config file '$CFILE'. This may be due to config \
+file not existing or not being readable, or to some kind of data corruption inside this config \
+file. Please, check the file ('$CFILE') and verify that variable '$VARNAME' is correctly defined." 11  
+   fi
+
+   ## Return the value of the variable by printing it
+   echo "${VALUE:1}"
+}
+
+## Updates the value of a variable in a config file, by changing the line of the
+## file that defines the value of the variable. Variables in the config file should
+## be in the format VAR=value, one single variable per line. If it does not find 
+## the file or the variable, it issues a non-recoverable error.
+##    $1: Name of the variable
+##    $2: New value 
+##    $3: Config file
+##
+function updateVarValueInConfigFile() {
+   local VARNAME="$1"
+   local NEWVALUE="$2"
+   local CFILE="$3"
+   local LINE
+   local TMP
+
+   ## Get the line where variable is located
+   LINE=$(cat $CFILE | grep -m 1 -n "^ *${VARNAME}.*=" | grep -o "^[0-9]*")
+   if ! isInt $LINE; then
+      Error "Variable '$VARNAME' not found in config file '$CFILE'. This may be due to config \
+file not existing or not being readable, or to some kind of data corruption inside this config \
+file. Please, check the file ('$CFILE') and verify that variable '$VARNAME' is correctly defined." 11  
+   fi
+
+   ## Update the line with its new contents
+   TMP=$(createTempFile)
+   (
+      head -$((LINE-1)) "$CFILE"
+      echo "${VARNAME}=${NEWVALUE}"
+      tail -n +$((LINE+1)) "$CFILE"
+   ) > $TMP && mv "$TMP" "$CFILE"
+}
+
+## Checks that a given Executable exists and has execution permissions
+## If it does not have execution permission, asks the user for setting them.
+##  $1: Executable file
+##
+function checkExecutableExists {
+  ERRCPSTR="This file is required for this script to work properly. Please, \
+check CPCtelera installation is okay and this file is in its place and has \
+required user permissions."
+  if   [ ! -e "$1" ]; then
+     Error "'$1' does not exist. $ERRCPSTR"
+  elif [ ! -f "$1" ]; then
+     Error "'$1' is not a regular file and it should be. $ERRCPSTR"
+  elif [ ! -r "$1" ]; then 
+     Error "'$1' is not readable. $ERRCPSTR"
+  elif [ ! -x "$1" ]; then
+     echo "${COLOR_LIGHT_YELLOW}WARNING:${COLOR_CYAN}"
+     echo "   '${COLOR_WHITE}$1${COLOR_CYAN}' is not executable. Execution \
+permission is required for this script to work.${COLOR_LIGHT_CYAN}"
+     echo
+     askSimpleQuestion y n "Do you want this script to try to make it \
+executable? (y/n)" ANSWER
+     echo "${COLOR_NORMAL}"
+     echo
+     if [[ "$ANSWER" == "n" ]]; then
+        paramError "'$1' has not been modified. This script cannot continue. Aborting. "
+     fi
+     echo "${COLOR_CYAN}Changing '${COLOR_WHITE}$1${COLOR_CYAN}' execution permission... "
+     if ! chmod +x "$1"; then
+        Error "Your user has not got enough privileges to change '$1' execution permission. \
+Please, change it manually and run this script again."
+     fi
+     echo "${COLOR_LIGHT_GREEN}Success!${COLOR_NORMAL}"
+  fi
 }

@@ -1,0 +1,108 @@
+File: Asset Conversion Utilities
+
+CPCtelera includes many ways to convert your assets (graphics, audio, tilemaps) into binary information ready to be used in your game. This system presents a great advantage from doing it manually. Namely, it does de conversion automatically each time you call *make* to build your project, without requiring you to bother. Also, it does this conversion only when required: if the source assets have not changed, they are not converted again. Conversely, when assets change, they are automatically converted again when you run *make*. This lets you integrate asset conversion into your workflow without requiring you to constantly suppervise them. Plenty of time is saved in this way.
+
+Following explanations will help you use these systems of automatic conversion.
+
+Section: Graphics Autoconversion
+
+CPCtelera helps you autoconvert almost any present graphic file (PNG, GIF, TIFF, BMP, ...) into pixel-formatted arrays ready to be used in your programs. Lets start with an example. Supose we want to convert a 20x10 pixels sprite we have created in PNG, to use it in a mode 0 game. To do it, we proceed this way,
+
+  1. - Create a folder called *img/* in our project
+  2. - Move *sprite.png* file to *img/sprite.png*
+  3. - Edit the file *cfg/image_conversion.mk* and add this line
+  > $(eval $(call IMG2SPRITES,img/sprite.png,0,g,20,10,{14 0 3 4 9 10 11 12 13 16 23 26 6 15 18 24},,src/,hwpalette))
+
+From this moment on, each time we compile our project, two new files will be generated: *src/sprite.c* & *src/sprite.h*. Then, the only thing we have to do is to #include<src/sprite.h> wherever we want to use our sprite and use it. The array with the pixel definition of the sprite will be called *g_sprite*.
+
+This is the proccess, but lets see now how it works and what does the previous line mean. That line calls the Makefile macro IMG2SPRITES (defined in cpctelera/cfg/global_functions.mk). This macro is a bridge to use the script *cpct_img2sprites* from inside your compilation process. Therefore, the information given to IMG2SPRITES through parameters is in turn passed to *cpct_img2sprites* which will do the job of converting your images or sprites.
+
+We can add as many lines to *cfg/image_conversion.mk* calling IMG2SPRITES as we want. Each line will do a new conversion. This lets us convert as many images and sprites as required. To use it for our needs, lets understand the parameters given to IMG2SPRITES. Consider this placeholder-filled call,
+  > $(eval $(call IMG2SPRITES,(1),(2),(3),(4),(5),(6),(7),(8),(9),(10)))
+
+These are ten places for the ten different parameters we can give to IMG2SPRITES,
+  * (1): This is the image file to be converted. In our example, that is *img/sprite.png*, but could be anything.
+  * (2): Screen mode (0,1,2). Data conversion is different depending on the screen mode: pixel format and available colours change. So do not forget to correctly put your desired screen mode.
+  * (3): Prefix for C-Identifiers. In our example, we convert sprite.png into g_sprite. This 'g' is the prefix we selected. You can add whatever prefix you prefer for your identifiers. Conversion will use the name of the file for the identifier, along with your selected prefix and numeric suffixes if there are several sprites to convert.
+  * (4): Width in pixels of the sprite/s to convert. Important: always make the width of your sprites even. With odd wides your can have extrange problems because they will not be byte-aligned.
+  * (5): Height in pixels of the sprite/s to convert.
+  * (6): Firmware palette to be used for conversion. In order to do a propper conversion to pixel values, the conversor needs to know which colours will be used when drawing the sprite into the screen. So, here you have to give the complete palette using firmware vales. The format is a list of space-separated numeric values, enclosed into brackets, as in the example.
+  * (7): Optional. Valid values: *mask*, *tileset*. Optionally, produce an inline mask or a tileset reference array. If you pass *mask*, converted sprites will include an inline mask to be use for transparency. If you pass *tileset*, converted sprites will be considered as tiles and an array of pointers to each one of them (a tileset) will be generated. 
+  * (8): Output subfolder for generated .c/.h files. This is where you want generated files to be placed, *inside your project folder*. Normally, you will want them inside your *src/* project folder, because they are code files. But you can place them in other existing places like *src/sprites/* or *src/tilesets*.
+  * (9): Optional. Valid values: *hwpalette*. Optionally, produce an array with the values composing the palette converted into hardware values. Generated array will be named *g_palette*.
+  * (10): Optional. Additional parameters for *cpct_img2sprites*. You can add here additional command line parameters that will be passed "as is" to *cpct_img2sprites*. If you know how to use this utility, you can use this parameter for advanced things. 
+
+Important considerations:
+  * This is a Makefile macro, not a function. 
+  * Parameters are passed "as is", *including all the spaces you write*. 
+  * So, *do not add spaces to parameters*.
+  * To leave a parameter blank do not write anything into it. That may left you with 2 or more commas written toghether, as in our previous example.
+  * Last parameters, if they are blank, there is no need to put even the commas. Again, as in previous example.
+
+Some examples:
+  You will find examples in the examples/ folder of CPCtelera. Most examples do use sprites or tilesets and the autoconversion tools to convert them into code.
+
+  Here you are some more.
+
+  > PALETTE={6 2 8 24}
+  > $(eval $(call IMG2SPRITES,assets/monsters.png,1,mym,16,8,$(PALETTE),mask,src/monsters/))
+
+In this example, we define the macro PALETTE previous to the call to IMG2SPRITES for clarity. You can use the same strategy with other values. The file *assets/monsters.png* contains a set of 18 sprites of monsters, each one of 16x8 pixels. All of them will be converted into arrays called *mym_monsters_XX[4*8]*, with XX in the range [00-17], and containing pixel values and mask values for transparency. Palette only has 4 colours because sprites are being converted to mode 1. This will generated the files *src/monsters/monsters.c* & *src/monsters/monsters.h*.
+
+  > PALETTE={3 6}
+  > $(eval $(call IMG2SPRITES,maps/map1tiles.bmp,2,gt,8,8,$(PALETTE),tileset,src/,hwpalette))
+
+File *maps/map1tiles.bmp* is being converted into *src/map1tiles.c* & *src/map1tiles.h*, with 120 small 8x8 pixel sprites that will be considered as tiles. It will generate 120 arrays named gt_map1tiles_XXX[1*8] with XXX ranging [000-119]. It will also generate a *g_tileset* array containing 120 pointers to each one of the *gt_map1tiles_XXX* arrays, and a *g_palette* array containing values [ 0x1C, 0x0C ], which are corresponding hardware values for 3 and 6 in hexadecimal.
+
+Section: Tilemap Autoconversion
+
+CPCtelera is able to convert tilemaps designed with <tiled at http://www.mapeditor.org/> and saved in TMX-CSV format. At present moment, this conversion has some limitations,
+  * Maps con only have one layer of tiles.
+  * Only one tileset shall be used.
+  * You should have 255 different tiles at most.
+If you meet these conditions, *cpct_tmx2csv* command line tool and its macro counterpart TMX2CSV are here to make your life easy. Lets see an example. Supose we wanted to convert a tilemap that represents the first level of a game. We edit the file *cfg/tilemap_conversion.mk* and add this line,
+
+  > $(eval $(call TMX2C,maps/level1.tmx,g_level1,src/))
+
+This Makefile macro works pretty similar to IMG2SPRITES but it is much simpler. It takes the file *maps/level1.tmx* from inside your project folder, extract the map definition (that should have been previously designed with <tiled at http://www.mapeditor.org/>), converts it to a C-array called *g_level1* and places the output as two files inside your *src/* subfolder. That is, files *src/level1.c* & *src/level1.h* are generated.
+
+Concretely, this is what parameters of TMX2C mean,
+
+  > $(eval $(call TMX2C,(1),(2),(3),(4)))
+
+  * (1): TMX file to convert. This TMX file must be a <tiled at http://www.mapeditor.org/> TMX-CSV file, containing a tilemap that meet requirements expressed before.
+  * (2): C-identifier for the generated array. The conversion generates an array of <u8> values (0-255) containing all the tiles fromo the tileset, and named as you say in this parameter.
+  * (3): Output subfolder. Conversion generates a pair of .c/.h files with declaration and definition of the array. These two files will be placed inside this subfolder of your project.
+  * (4): Optional. Aditional command line options you may want to pass to *cpct_tmx2csv*. If you know the tool, you can create advenced behaviour using this parameter.
+
+You can find more examples of tileset autoconversion in the *cpctelera/examples/* folder.
+
+Section: Music Autoconversion
+
+CPCtelera can also convert Arkos Tracker .AKS music files automatically. It is also done with the Makefile macro AKS2C that you can add to the file *cfg/music_conversion.mk* inside your project folder. Lets see how it is done. Supose we have two music files we want to convert for our game. We proceed to edit *cfg/music_conversion.mk* and add this lines,
+
+  > $(eval $(call AKS2C,music/ingamebso.aks,myIngameMusic,src/music/,0x0040))
+  > $(eval $(call AKS2C,music/menusong.aks,menuMusic,src/music/,0x2CA1))
+
+These two calls to AKS2C Makefile Macro convert the files *music/ingamebso.aks* & *music/menusong.aks* and generate *src/music/ingamebso.s*, *src/music/ingamebso.h*, *src/music/menusong.s* & *src/music/menusong.h*. Data is generated in a .s assembly file because Arkos Tracker songs require to be placed at specific locations into memory. In this case, the 4th parameter of both macros determines where in memory will songs be located. Then, generated assembly files include the data of the songs (arrays, as in C) and a specific declaration to put them into the given memory locations. Header files declare the C bindings for these songs so that you can use them as normal arrays, as they actually are. These declarations use the 2nd parameter to define their C-identifier names, *myIngameMusic* and *menuMusic*. 
+
+The only problem that Arkos Tracker poses is that music must be placed at a given, concrete, memory location. This problem means that a certain bit of programmer supervision is requiered. For instance, if the musician edits *music/ingamebso.aks* and its size changes, programmer will have to change memory locations of consecutive data. For instance, lets say that *ingamebso.aks* gets bigger after its edition. That may make it overlap with the start of *menusong.aks*, which is sit a 0x2CA1, just after *ingamebso.aks*. If this happens, programmer will have to manually change the placement of *menusong.aks* to solve the issue.
+
+In order to help with this issues, AKS2C (and *cpct_aks2c*) generate some symbols in the header files giving information about the location, ending and size of the songs in memory. This will be of use in these cases.
+
+Lets now have a look at the concrete parameters for AKS2C Makefile macro,
+
+  > $(eval $(call AKS2C,(1),(2),(3),(4),(5))
+  
+  * (1): AKS musis file to be converted. This file will be normally created and edited with Arkos Tracker 1. It can be anywere inside your project folder.
+  * (2): C-identifier for the generated array. The conversion of the music will generate an array of bytes and this will be the C-identifier you will use to refer to and access the values.
+  * (3): Output subfolder. Two files .s/.h will be generated inside this subfolder of your project. You will normally want to place them down your *src/* folder (or inside any subfolder) but you may place them wherever you wanted.
+  * (4): Absolute memory address for the song. As told before, this is a requirement for Arkos Tracker songs. Songs must be placed at a concrete location in memory. You must specify this location in this parameter.
+  * (5): Optional. Aditional command line options for *cpct_aks2c*. This lets you create advanced behaviour by letting you directly control de command line tool.
+
+You can find more examples of music autoconversion in the *cpctelera/examples/* folder.
+
+Compatibility notice:
+
+  AKS2C Makefile macro uses *cpct_aks2c* command line tool, which in turn depends on *AKStoBIN.exe* tool. This tool is a Windows .NET executable. Under Linux or Mac OSX systems it requires *mono* (mono-complete) to be installed in order to run. Also, under Windows systems it requires .NET 3.5 or greater to be installed. Take it into account when using this tool.
+

@@ -3,16 +3,16 @@
 ##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -32,17 +32,20 @@
 BINADDRLOG=$(OBJDIR)/binaryAddresses.log
 
 # MAIN TARGET
+.DEFAULT_GOAL := all
 all: $(OBJSUBDIRS) $(TARGET)
 
 ## COMPILING SOURCEFILES AND SAVE OBJFILES IN THEIR CORRESPONDENT SUBDIRS
 $(foreach OF, $(BIN_OBJFILES), $(eval $(call BINFILE2C, $(OF), $(OF:%.$(C_EXT)=%.$(BIN_EXT)))))
+$(foreach OF, $(GENC_OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(C_EXT))))))
+$(foreach OF, $(GENASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(ASM_EXT))))))
 $(foreach OF, $(C_OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(C_EXT))))))
 $(foreach OF, $(ASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(ASM_EXT))))))
 ## Generate an Add-BIN-to-DSK rule for each Binary file in DSKFILESDIR
 $(foreach SF, $(DSKINCSRCFILES), $(eval $(call ADDBINFILETODSK, $(DSK), $(SF), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(SF)).$(DSKINC_EXT))))
 
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
-$(IHXFILE): $(OBJFILES) 
+$(IHXFILE): $(GENOBJFILES) $(OBJFILES) 
 	@$(call PRINT,$(PROJNAME),"Linking binary file")
 	$(Z80CC) $(Z80CCLINKARGS) $^ -o "$@"
 
@@ -90,6 +93,6 @@ cleanall: clean
 
 clean: 
 	@$(call PRINT,$(PROJNAME),"Deleting folder: $(OBJDIR)/")
-	$(RM) -r $(OBJDIR)
+	$(RM) -r ./$(OBJDIR)
 	@$(call PRINT,$(PROJNAME),"Deleting objects to clean: $(OBJS2CLEAN)")
-	$(foreach elem, $(OBJS2CLEAN), $(RM) -r $(elem))
+	$(foreach elem, $(OBJS2CLEAN), $(RM) -r ./$(elem))

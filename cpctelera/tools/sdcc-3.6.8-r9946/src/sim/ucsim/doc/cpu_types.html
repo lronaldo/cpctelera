@@ -1,0 +1,127 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>?Csim: CPU types</title>
+  </head>
+  <body bgcolor="white">
+    <h1>Select type of CPU</h1>
+    The simulator supports following type of microprocessors from MCS51 family:
+    <p><a href="#51">8051/8031</a> <br>
+      <a href="#52">8052/8032</a> <br>
+      <a href="#ds390">DS390</a> <br>
+      <a href="#51r">8051R</a> <br>
+      <a href="#89c51r">89C51R</a> <br>
+      <a href="#251">80251</a> </p>
+    <h3><a name="51">8051/8031</a></h3>
+    You can select this type of microcontroller using one of the following
+    parameter for -t option:
+    <ul>
+      <li>51 (HMOS type) </li>
+      <li>8051 (HMOS type) </li>
+      <li>8751 (HMOS type) </li>
+      <li>C51 (CMOS type) </li>
+      <li>80C51 (CMOS type) </li>
+      <li>87C51 (CMOS type) </li>
+      <li>31 (HMOS type) </li>
+      <li>8031 (HMOS type) </li>
+      <li>C31 (CMOS type) </li>
+      <li>80C31 (CMOS type) </li>
+    </ul>
+    It includes core 51 features:
+    <ul>
+      <li>64k external RAM </li>
+      <li>64k ROM </li>
+      <li>128 byte internal RAM </li>
+      <li>2 timers (timer #0, timer #1) </li>
+      <li>Serial interface </li>
+      <li>4 8-bit quazi bi-directional ports </li>
+    </ul>
+    CMOS types also include:
+    <ul>
+      <li>Idle mode </li>
+      <li>Power down mode </li>
+    </ul>
+    
+      <h3><a name="52">8052/8032</a></h3>
+     You can select this type of microcontroller using one of the following
+    parameter for -t option:
+    <ul>
+      <li>52 (HMOS type) </li>
+      <li>8052 (HMOS type) </li>
+      <li>8752 (HMOS type) </li>
+      <li>C52 (CMOS type) </li>
+      <li>80C52 (CMOS type) </li>
+      <li>87C52 (CMOS type) </li>
+      <li>32 (HMOS type) </li>
+      <li>8032 (HMOS type) </li>
+      <li>C32 (CMOS type) </li>
+      <li>80C32 (CMOS type) </li>
+    </ul>
+    It includes same features as <a href="#51">8051/8031</a> microcontrollers
+    and additionally:
+    <ul>
+      <li>3 timers (timer #0, timer #1, timer #2) </li>
+      <li>256 bytes of internal RAM </li>
+    </ul>
+    
+      <h3><a name="ds390">DS390</a></h3>
+     You can select this type of microcontroller using <b>DS390</b> as
+    parameter for -t option (this is a CMOS type). It includes same features as
+    <a href="#52">8052</a> and adds:
+    <ul>
+      <li>24 bit flat mode </li>
+      <li>support for dual DPTR register </li>
+      <li>128k external RAM </li>
+      <li>128k ROM </li>
+      <li>4k internal SRAM usable </li>
+      <li>10 bit stack mode </li>
+      <li>"timed access" of SFRs </li>
+    </ul>
+    
+      <h3><a name="51r">8051R</a></h3>
+     You can select this type of microcontroller using one of the following
+    parameter for -t option (all are CMOS types):
+    <ul>
+      <li>51R </li>
+      <li>51RA </li>
+      <li>51RB </li>
+      <li>51RC </li>
+      <li>C51RA </li>
+      <li>C51RB </li>
+      <li>C51RC </li>
+    </ul>
+    It includes all features that <a href="#52">8052/8032</a> does and
+    additionally:
+    <ul>
+      <li>Extended interrupt priority system (4 priority levels) </li>
+      <li>Extended serial line interface (automatic address recognition) </li>
+      <li>Watchdog timer </li>
+    </ul>
+    
+      <h3><a name="89c51r">89C51R</a></h3>
+     You can select this type of microcontroller using <tt>89C51R</tt>
+    parameter for -t option (this CPU is always CMOS). This is a Philips clone,
+    excluding duplicated DPTR it is similar to 8051XR from Intel.
+    <p>It includes all features that <a href="#51r">8051R</a> does and
+      additionally: </p>
+    <ul>
+      <li>PCA (Programmable Counter Array): 5 16-bit counter, one of them can
+        act as watchdog timer. </li>
+      <li>Duplicated DPTR. </li>
+    </ul>
+    
+      <h3><a name="251">80251</a></h3>
+     You can select this type of microcontroller using one of the following
+    parameter for -t option (all are CMOS types):
+    <ul>
+      <li>251 </li>
+      <li>C251 </li>
+    </ul>
+    <p>It includes all features that <a href="#89c51r">89C51R</a> does and
+      additionally: </p>
+    <ul>
+      <li>Nothing implemented yet. </li>
+    </ul>
+    <hr>
+  </body>
+</html>

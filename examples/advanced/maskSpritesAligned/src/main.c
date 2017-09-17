@@ -4,24 +4,28 @@
 //  Copyright (C) 2015 Dardalorth / Fremos / Carlio
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "sprites/sprites.h"
+#include "sprites/tiles.h"
+#include "sprites/map.h"
+#include "sprites/alien.h"
+
+// Sets the transparent mask table for color 0, mode 0
+cpctm_createTransparentMaskTable(g_masktable, 0x0100, M0, 0);
 
 // Some useful constants
-#define SCR_VMEM        (u8*)0xC000
 #define MAP_WIDTH_TILES          40
 #define MAP_HEIGHT_TILES         50
 #define ALIEN_WIDTH_BYTES         6
@@ -47,7 +51,7 @@ typedef struct {
 void initialization (){ 
    cpct_disableFirmware();          // Disable firmware to prevent it from interfering
    cpct_setPalette(g_palette, 7);   // Set palette using hardware colour values
-   cpct_setBorder (g_palette[0]);   // Set border colour same as background (0)
+   cpct_setBorder (HW_BLACK);       // Set border colour same as background (Black)
    cpct_setVideoMode(0);            // Change to Mode 0 (160x200, 16 colours)
 
    // Set the internal tileset for drawing Tilemaps
@@ -55,7 +59,7 @@ void initialization (){
 
    // Draw the background tilemap
    cpct_etm_drawTilemap2x4_f(MAP_WIDTH_TILES, MAP_HEIGHT_TILES, 
-                             SCR_VMEM, g_background);  
+                             CPCT_VMEM_START, g_background);  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -107,13 +111,13 @@ void main(void) {
 
       // Redraw a tilebox over the alien to erase it (redrawing background over it)
       cpct_etm_drawTileBox2x4(a->tx, a->ty, ALIEN_WIDTH_TILES, ALIEN_HEIGHT_TILES, 
-                              MAP_WIDTH_TILES, SCR_VMEM, g_background);
+                              MAP_WIDTH_TILES, CPCT_VMEM_START, g_background);
       // Move the alien and calculate it's new location on screen
       a->tx += a->vx; 
       a->ty += a->vy;
-      pscra = cpct_getScreenPtr(SCR_VMEM, TILEWIDTH_BYTES*a->tx, TILEHEIGHT_BYTES*a->ty);
+      pscra = cpct_getScreenPtr(CPCT_VMEM_START, TILEWIDTH_BYTES*a->tx, TILEHEIGHT_BYTES*a->ty);
       // Draw the alien in its new location
       cpct_drawSpriteMaskedAlignedTable(g_alien, pscra, ALIEN_WIDTH_BYTES, 
-                                        ALIEN_HEIGHT_BYTES, cpct_transparentMaskTable00M0);
+                                        ALIEN_HEIGHT_BYTES, g_masktable);
    }
 }

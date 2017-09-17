@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>Mikrocontroller Simulator</title>
+  </head>
+  <body style="    background-color: white;"> [ <a href="news.html">News</a> ]
+    [ <a href="#download">Download</a> ] [ <a href="#install">Installation</a>
+    ] [ <a href="#use">Usage</a> ] [ <a href="mailto:drdani@mazsola.iit.uni-miskolc.hu">Mail
+      to developer</a> ]
+    <p> </p>
+    <pre><tt><font size="+1">
+        _____     _           
+       / ____|   (_)          
+ _   _| |     ___ _ _ __ ___  
+| | | | |    / __| | '_ ` _ \ 
+| |_| | |____\__ \ | | | | | |
+\ ._,_|\_____|___/_|_| |_| |_|
+| |                           
+|_|                           
+  </font></tt></pre>
+    <h1>Software simulator for microcontrollers</h1>
+    <b><i>&#181;Csim</i></b> can be used to simulate microcontrollers. It supports
+    MCS51 family, AVR core, Z80, HC08, ST7, STM8, TLCS90 and XA51. It can run on
+    Linux, Windows, OSX, BSD, and other systems.<br>
+    <br>
+    See <a href="news.html">what's new</a> in current version.<br>
+    <h2><a name="download">Download</a></h2>
+    There are two places where you can download <i>&#181;Csim</i> from:<br>
+    <ol>
+      <li>SDCC homepage. <i>&#181;Csim</i> is part of the SDCC (Small Device C
+        Compiler) project. You can download source of SDCC and precompiled
+        binaries from <a href="http://sdcc.sf.net">http://sdcc.sf.net</a>.</li>
+      <li><i>&#181;Csim</i> site. Standalone source package is available on the <i>&#181;Csim</i>
+        web site:<br>
+        <a href="http://mazsola.iit.uni-miskolc.hu/ucsim/download">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a>
+      </li>
+    </ol>
+    <p><!-- INSTALL --></p>
+    <h2><a name="install">How to install</a></h2>
+    UNIX version is distributed in source.
+    <ol>
+      <li>Get archive file, uncompress and untar it. These steps will produce a
+        directory <b>ucsim-X.Y.Z</b> where X.Y.Z is the version number. </li>
+      <li>Go to the directory and configure the package. Issue <tt><b>configure</b></tt>
+        command. It will determine your system and make <b>Makefile</b>.
+        Installation directory can be specified with <b><tt>--prefix=<i>dir</i></tt></b><!-- -- -->
+        option to the <tt><b>configure</b></tt>. Default directory is <tt>/usr/local</tt>.
+        Executable file will be placed in <tt>bin</tt> subdirectory. </li>
+      <li>Compile the package with <tt><b>make</b></tt> command. </li>
+      <li>Install executables <b>s51</b>, <b>savr</b>, <b>shc08</b>, <b>sxa</b>,
+        <b>sz80, etc.</b> to any directory you want. It can be done with <tt><b>make
+            install</b></tt> command which will place files in installation
+        directory specified with <tt><b>--prefix=<i>dir</i></b><!-- --
+--></tt> option of <tt><b>configure</b></tt>. Note that you may have to have
+        special privilege to do this if installation directory is not writeable
+        by you. </li>
+    </ol>
+    <!-- USE -->
+    <h2><a name="use">How to use</a></h2>
+    <ul>
+      <li> <a href="invoke.html">Invocation</a>.<br>
+        Starting the simulator program. </li>
+    </ul>
+    <p><b>Features of the simulator</b> </p>
+    <ul>
+      <li><a href="analyzer.html">Code analyser</a>. <br>
+        The simulator tries to figure out places of valid instructions in code
+        area.</li>
+      <li><a href="cpu_types.html">Processor types</a>. <br>
+        The simulator can simulate different type of microcontrollers. </li>
+      <li><a href="mulcons.html">Multiple consoles</a>. <br>
+        The simulator can handle more than one command consoles and accepts
+        command from multiple sources. It also can be driven by other programs
+        such as debugger interfaces. </li>
+      <li><a href="serial.html">Serial interfaces</a>. <br>
+        The simulator can virtually connect a terminal to serial interface of
+        the simulated CPU. </li>
+      <li><a href="memory.html">Memory simulation</a>. <br>
+        Simulated CPU provides address spaces, storage is simulated by memory
+        chips, address decoders connects them together. </li>
+      <li><a href="simif.html">Simulator interface</a>.<br>
+        This is a special interface which provides services for the simulated
+        program. This services can be used to control the simulator (for example
+        run/stop) and access some host features (print, file I/O).</li>
+      <li><a href="syntax.html">Command syntax</a> and <a href="cmd.html">command
+          reference</a>. <i>(Now updated up to 0.6)</i> <br>
+        The simulator can be controlled via a command line interface. It accepts
+        simple commands. </li>
+    </ul>
+    <hr>
+    <table border="0">
+      <tbody>
+        <tr>
+          <td><a href="mailto:drdani@mazsola.iit.uni-miskolc.hu"><img src="post.jpg"
+                align="top" border="0"></a></td>
+          <td><i>&#169; 1997,99 Dániel Drótos, Talker Bt.</i> <br>
+            <a href="mailto:drdani@mazsola.iit.uni-miskolc.hu">drdani@mazsola.iit.uni-miskolc.hu</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

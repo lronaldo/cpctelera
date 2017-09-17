@@ -4,16 +4,16 @@
 //  Copyright (C)      2015 Maximo / Cheesetea / ByteRealms (@rgallego87)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ void main(void) {
       else if (cpct_isKeyPressed(Key_CursorDown)  && y < (SCR_H - SP_H) ) ++y;
       
       // Get video memory byte for coordinates x, y of the sprite (in bytes)
-      pvideomem = cpct_getScreenPtr((u8*)0xC000, x, y);
+      pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
 
       // Draw the sprite in the video memory location got from coordinates x, y
       cpct_drawSprite(G_spriteLogoCT, pvideomem, SP_W, SP_H);

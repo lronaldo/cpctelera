@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_video
@@ -41,7 +41,7 @@
 ;; loop. This count is returned when VSYNC is detected and the function ends.
 ;; For more reference about VSYNC and this waiting loop, see <cpct_waitVSYNC>.
 ;;
-;;    The main utility of counting loop iteration is to have an stimation of
+;;    The main utility of counting loop iteration is to have an estimate of
 ;; free cycles in a main loop. If you are planning to make a game or application
 ;; running at 50/25/12.5 FPS, all your CPU operations must fit into the allowed
 ;; time for that. A way to know if you still have time to include more operations

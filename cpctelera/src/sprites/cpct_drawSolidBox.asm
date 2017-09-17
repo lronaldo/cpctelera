@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
@@ -103,13 +103,6 @@
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;
-;; Macro to introduce a JR 0 more clearly
-;; 
-.macro jr__0
-   .DW #0x0018    ;; JR #00 (Normally used as a modifiable jump, as jr 0 is an infinite loop)
-.endm
 
    push  hl         ;; [4] Save HL (Pointer to the first byte of the box) for later use
 

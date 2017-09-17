@@ -1,0 +1,9 @@
+hassekf - SCI-FI Background (modified)
+ * http://opengameart.org/content/sci-fi-background
+ * http://opengameart.org/users/hassekf
+
+SpinachChicken - Pixel Art Dungeon Items (modified)
+ * http://opengameart.org/content/pixel-art-dungeon-items
+ * http://opengameart.org/users/spinachchicken
+ 
+License CC0: http://creativecommons.org/publicdomain/zero/1.0/

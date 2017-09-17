@@ -44,6 +44,8 @@ File: Authors  (no auto-title, authors.txt)
 File: License  (no auto-title, license.txt)
 Text: ______________________________________________________________________
 File: Aliases for builtin types  (types.h)
+File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
+File: Visual Studio Code  (buildsys/vscode_integration.txt)
 
 Group: Audio  {
 
@@ -66,11 +68,36 @@ Group: Bitarray  {
    File: cpct_bitWeights  (bitarray/cpct_bitWeightsVector.s)
    File: cpct_get2Bits  (bitarray/cpct_get2Bits.asm)
    File: cpct_get4Bits  (bitarray/cpct_get4Bits.asm)
+   File: cpct_get6Bits  (bitarray/cpct_get6Bits.asm)
    File: cpct_getBit  (bitarray/cpct_getBit.asm)
    File: cpct_set2Bits  (bitarray/cpct_set2Bits.asm)
    File: cpct_set4Bits  (bitarray/cpct_set4Bits.asm)
+   File: cpct_set6Bits  (bitarray/cpct_set6Bits.asm)
    File: cpct_setBit  (bitarray/cpct_setBit.asm)
+   File: Useful macros  (bitarray/bitarray_macros.h)
    }  # Group: Bitarray
+
+Group: Commandline  {
+
+   File: cpct_aks2c  (commandline/cpct_aks2c)
+   File: cpct_bin2c  (commandline/cpct_bin2c)
+   File: cpct_img2tileset  (commandline/cpct_img2tileset)
+   File: cpct_installrslib  (commandline/cpct_installrslib)
+   File: cpct_mkproject  (commandline/cpct_mkproject)
+   File: cpct_rgas2c  (commandline/cpct_rgas2c)
+   File: cpct_sp2tile  (commandline/cpct_sp2tiles)
+   File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
+   File: cpct_winape  (commandline/cpct_winape)
+   }  # Group: Commandline
+
+Group: Easytilemaps  {
+
+   File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
+   File: cpct_etm_drawTilemap2x4_f  (easytilemaps/cpct_etm_drawTilemap2x4_f.asm)
+   File: cpct_etm_drawTileRow2x4  (easytilemaps/cpct_etm_drawTileRow2x4.s)
+   File: cpct_etm_setTileset2x4  (easytilemaps/cpct_etm_setTileset2x4.s)
+   File: EasyTilemaps  (easytilemaps/easytilemaps.h)
+   }  # Group: Easytilemaps
 
 Group: Firmware  {
 
@@ -89,14 +116,63 @@ Group: Keyboard  {
    File: cpct_isKeyPressed  (keyboard/cpct_isKeyPressed.s)
    File: cpct_scanKeyboard  (keyboard/cpct_scanKeyboard.s)
    File: cpct_scanKeyboard_f  (keyboard/cpct_scanKeyboard_f.s)
+   File: cpct_scanKeyboard_i  (keyboard/cpct_scanKeyboard_i.s)
+   File: cpct_scanKeyboard_if  (keyboard/cpct_scanKeyboard_if.s)
    File: Keyboard Mappings&amp;Constants  (keyboard/keyboard.h)
    File: Keyboard Technicals  (keyboard/keyboard.txt)
    }  # Group: Keyboard
+
+Group: Macros  {
+
+   File: cpct_reverseBits.s  (no auto-title, macros/cpct_reverseBits.s)
+   File: cpct_undocumentedOpcodes.s  (no auto-title, macros/cpct_undocumentedOpcodes.s)
+   File: Opcodes  (macros/cpct_opcodes.s)
+   }  # Group: Macros
+
+Group: Memutils  {
+
+   File: cpct_memcpy  (memutils/cpct_memcpy.asm)
+   File: cpct_memset  (memutils/cpct_memset.asm)
+   File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
+   File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
+   File: cpct_pageMemory  (memutils/cpct_pageMemory_asmbinding.s)
+   File: cpct_pageMemory  (memutils/cpct_pageMemory.asm)
+   File: cpct_pageMemory  (memutils/cpct_pageMemory_cbindings.s)
+   File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
+   File: Memory Pagination Utilities  (memutils/banks.h)
+   File: Memory Relocation Utilities  (memutils/relocation.h)
+   }  # Group: Memutils
+
+Group: Random  {
+
+   File: cpct_getRandom_glfsr16  (random/cpct_getRandom_glfsr.s)
+   File: cpct_getRandom_lcg_u8  (random/cpct_getRandom_lcg_u8.s)
+   File: cpct_getRandom_mxor_u16  (random/cpct_getRandom_mxor_u16.s)
+   File: cpct_getRandom_mxor_u32  (random/cpct_getRandom_mxor_u32.s)
+   File: cpct_getRandom_mxor_u8  (random/cpct_getRandom_mxor_u8.s)
+   File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
+   File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
+   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
+   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
+   File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
+   File: cpct_nextRandom_mxor532_u8  (random/cpct_nextRandom_mxor532_u8.s)
+   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
+   File: cpct_restoreState_mxor_u16  (random/cpct_restoreState_mxor_u16.s)
+   File: cpct_restoreState_mxor_u8  (random/cpct_restoreState_mxor_u8.s)
+   File: cpct_setSeed_glfsr16  (random/cpct_setSeed_glfsr.s)
+   File: cpct_setSeed_lcg_u8  (random/cpct_setSeed_lcg_u8.s)
+   File: cpct_setSeed_mxor  (random/cpct_setSeed_mxor.s)
+   File: cpct_setSeed_xsp40_u8  (random/cpct_setSeed_xsp40_u8.asm)
+   File: cpct_setTaps_glfsr16  (random/cpct_setTaps_glfsr.s)
+   File: Defined Types  (random/random_types.h)
+   File: Random  (random/random.h)
+   }  # Group: Random
 
 Group: Sprites  {
 
    File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.asm)
    File: cpct_drawSprite  (sprites/cpct_drawSprite.asm)
+   File: cpct_drawSpriteBlended  (sprites/cpct_drawSpriteBlended.asm)
    File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.asm)
    File: cpct_drawSpriteMaskedAlignedTable  (sprites/cpct_drawSpriteMaskedAlignedTable.asm)
    File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.asm)
@@ -105,10 +181,23 @@ Group: Sprites  {
    File: cpct_drawTileAligned4x4_f  (sprites/cpct_drawTileAligned4x4_f.asm)
    File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.asm)
    File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.asm)
+   File: cpct_drawTileGrayCode2x8_af  (sprites/cpct_drawTileGrayCode2x8_af.asm)
+   File: cpct_hflipSpriteM0  (sprites/cpct_hflipSpriteM0.asm)
+   File: cpct_hflipSpriteM0_r  (sprites/cpct_hflipSpriteM0_r.asm)
+   File: cpct_hflipSpriteM1  (sprites/cpct_hflipSpriteM1.asm)
+   File: cpct_hflipSpriteM1_r  (sprites/cpct_hflipSpriteM1_r.asm)
+   File: cpct_hflipSpriteM2  (sprites/cpct_hflipSpriteM2.asm)
+   File: cpct_hflipSpriteM2_r  (sprites/cpct_hflipSpriteM2_r.asm)
+   File: cpct_hflipSpriteMaskedM0  (sprites/cpct_hflipSpriteMaskedM0.asm)
+   File: cpct_hflipSpriteMaskedM1  (sprites/cpct_hflipSpriteMaskedM1.asm)
+   File: cpct_hflipSpriteMaskedM2  (sprites/cpct_hflipSpriteMaskedM2.asm)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0.asm)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
-   File: Sprite Macros&amp;Constants  (sprites/sprites.h)
-   File: Transparency Tables  (sprites/transparency_tables.h)
+   File: cpct_setBlendMode  (sprites/cpct_setBlendMode.s)
+   File: Sprite Types  (sprites/sprite_types.h)
+   File: Transparency Macros  (sprites/transparency_table_macros.h)
+   File: Transparency Tables for Mode 0  (sprites/transparency_tables_m0.h)
+   File: Transparency Tables for Mode 1  (sprites/transparency_tables_m1.h)
    }  # Group: Sprites
 
 Group: Strings  {
@@ -128,6 +217,7 @@ Group: Strings  {
 
 Group: Video  {
 
+   File: Colours  (video/colours.h)
    File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
    File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
    File: cpct_fw2hw  (video/cpct_fw2hw.asm)
@@ -137,61 +227,13 @@ Group: Video  {
    File: cpct_setPalette  (video/cpct_setPalette.asm)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
-   File: cpct_setVideoMode  (video/cpct_setVideoMode.s)
+   File: cpct_setVideoMode  (video/cpct_setVideoMode.asm)
    File: cpct_waitVSYNC  (video/cpct_waitVSYNC.s)
-   File: Video Macros&amp;Constants  (video/videomode.h)
+   File: Useful Macros  (video/video_macros.h)
    }  # Group: Video
 
-Group: Memutils  {
-
-   File: cpct_memcpy  (memutils/cpct_memcpy.asm)
-   File: cpct_memset  (memutils/cpct_memset.asm)
-   File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
-   File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
-   File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
-   }  # Group: Memutils
-
-Group: Command Line Tools  {
-
-   File: cpct_bin2c  (no auto-title, commandline/cpct_bin2c)
-   File: cpct_img2tileset  (commandline/cpct_img2tileset)
-   File: cpct_mkproject  (no auto-title, commandline/cpct_mkproject)
-   File: cpct_rgas2c  (no auto-title, commandline/cpct_rgas2c)
-   File: cpct_sp2tiles  (no auto-title, commandline/cpct_sp2tiles)
-   File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
-   File: cpct_winape  (commandline/cpct_winape)
-   }  # Group: Command Line Tools
-
-Group: Easytilemaps  {
-
-   File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
-   File: cpct_etm_drawTilemap2x4_f  (easytilemaps/cpct_etm_drawTilemap2x4_f.asm)
-   File: cpct_etm_drawTileRow2x4  (easytilemaps/cpct_etm_drawTileRow2x4.s)
-   File: cpct_etm_setTileset2x4  (easytilemaps/cpct_etm_setTileset2x4.s)
-   File: EasyTilemaps  (easytilemaps/easytilemaps.h)
-   }  # Group: Easytilemaps
-
-Group: Random  {
-
-   File: cpct_getRandom_mxor_u16  (random/cpct_getRandom_mxor_u16.s)
-   File: cpct_getRandom_mxor_u32  (random/cpct_getRandom_mxor_u32.s)
-   File: cpct_getRandom_mxor_u8  (random/cpct_getRandom_mxor_u8.s)
-   File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
-   File: cpct_getRandomu8_glfsr16  (random/cpct_getRandom_flfsr.s)
-   File: cpct_getRandomUniform_u8_f  (random/cpct_getRandomUniform_u8_f.s)
-   File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
-   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
-   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
-   File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
-   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
-   File: cpct_setRandomSeedUniform_u8  (random/cpct_setRandomSeedUniform_u8.s)
-   File: cpct_setSeed_glfsr16  (random/cpct_setSeed_flfsr.s)
-   File: cpct_setSeed_mxor  (random/cpct_setSeed_mxor.s)
-   File: cpct_setSeed_xsp40_u8  (random/cpct_setSeed_xsp40_u8.asm)
-   File: cpct_setTaps_glfsr16  (random/cpct_setTaps_flfsr.s)
-   File: GLFSR16_TAPSET_YYYY  (random/glfsr16taps.h)
-   File: Random  (random/random.h)
-   }  # Group: Random
+Text: ______________________________________________________________________
+File: License  (gpl-license.txt)
 
 Group: Index  {
 

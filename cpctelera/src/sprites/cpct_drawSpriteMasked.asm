@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
@@ -30,8 +30,8 @@
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel and mask data)
 ;;  (2B DE) memory - Destination video memory pointer
-;;  (1B B ) width  - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
-;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B C ) width  - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
+;;  (1B B ) height - Sprite Height in bytes (>0)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteMasked_asm
@@ -138,18 +138,6 @@
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Convenient macros to clarify the use of 
-;;   * LD IXL, C 
-;;   * LD C, IXL
-;;
-.macro ld__ixl_c
-   .DW  #0x69DD   ;; ld ixl, c 
-.endm
-
-.macro ld__c_ixl
-   .DW  #0x4DDD   ;; ld c, ixl
-.endm
 
    push ix         ;; [5] Save IX regiter before using it as temporal var
    ld__ixl_c       ;; [3] Save Sprite Width into IXL for later use

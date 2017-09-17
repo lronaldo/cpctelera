@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>&#181;Csim: Code Analyzer</title>
+  </head>
+  <body bgcolor="white">
+    <h1>Code analyser</h1>
+    Code
+    analyser analyses the code of the simulated program and tries to
+    figure out which address contains valid instruction. <br>
+    <br>
+    Analyser starts
+    analysing of the code with address 0 which always must contain an
+    instruction because reset of the device sets zero into program
+    counter. So, analyser marks address 0 that it contains an
+    instruction. Then it marks the address of the next instruction and so
+    on. If the analyser finds a <i>jump</i> instruction it continues with
+    destination address of the <i>jump</i> instruction. If it finds a
+    <i>call</i> instruction, it recursively analyses destination address
+    as well as next instruction follows the <i>call</i> one.<br>
+    <br>
+    Analysator
+    stops if it finds an address which is already marked or if it finds a
+    <i>return</i> instruction or an indirect <i>jump</i> which is
+    impossible to follow. All these mean that it is impossible to discover
+    all instructions of the program.
+    <p>This problem is solved in very simple way. If the
+      execution reaches an unmarked address, the analyser is called to
+      analyse the code starting at actual address pointed by the PC.</p>
+    <hr>
+  </body>
+</html>

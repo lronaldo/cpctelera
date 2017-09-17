@@ -1,0 +1,17 @@
+USAGE:
+  * You can copy the gstring.{cpp, h} files into your application's
+	src directory, and use it directly in your application.
+
+  * Make and install the library.  Then, in your application's Makefile
+	add the works '-lgstring' in order to link the gstring library
+	to your application.
+
+INSTALL:
+  * Verify the variables in the Makefile are correct and to
+	your liking.
+
+  * Type 'make' then 'make install' 
+
+AUTHOR:
+  PC Drew <drewpc@users.sourceforge.net>
+  http://gstring.sourceforge.net

@@ -3,16 +3,16 @@
 ##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ CPCT_PATH      := $(patsubst %cfg/,%,$(THIS_FILE_PATH))
 
 # PATHs FOR BUILDING TOOLS BINARIES
 #  Absolute paths for SDCC, Hex2bin, iDSK and 2CDT 
-SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.5.5/bin/
+SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.6.8-r9946/bin/
 HEX2BIN_PATH := $(CPCT_PATH)tools/hex2bin-2.0/bin/
 IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.13/bin/
 2CDT_PATH    := $(CPCT_PATH)tools/2cdt/bin/

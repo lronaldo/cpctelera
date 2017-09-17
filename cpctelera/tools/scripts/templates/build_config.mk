@@ -3,16 +3,16 @@
 ##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@
 ##   If you change folder structure, CPCT_PATH should reflect this change.
 ##   This variable should always have the absolute path value.
 ##
-CPCT_PATH := #%%%CPCTELERA_PATH%%%
+CPCT_PATH := %%%CPCTELERA_PATH%%%
 
 ####
 ## SECTION 1: Project configuration 
@@ -123,7 +123,7 @@ include $(CPCT_PATH)/cfg/global_paths.mk
 #####
 Z80CCFLAGS    :=
 Z80ASMFLAGS   := -l -o -s
-Z80CCINCLUDE  := -I$(CPCT_SRC)
+Z80CCINCLUDE  := -I$(CPCT_SRC) -I$(SRCDIR)
 Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
                  --code-loc $(Z80CODELOC) \
                  --data-loc 0 -l$(CPCT_LIB)
@@ -137,6 +137,11 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
 
+# Convert images and tilemaps
+include cfg/image_conversion.mk
+include cfg/tilemap_conversion.mk
+include cfg/music_conversion.mk
+
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
 OBJDSKINCSDIR := $(OBJDIR)/$(DSKFILESDIR)
@@ -144,14 +149,19 @@ OBJSUBDIRS    := $(OBJDSKINCSDIR) $(foreach DIR, $(SUBDIRS), $(patsubst $(SRCDIR
 
 # Calculate all source files
 CFILES         := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(C_EXT)))
+CFILES         := $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
+ASMFILES       := $(filter-out $(IMGASMFILES), $(ASMFILES))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
 
 # Calculate all object files
 BIN_OBJFILES   := $(patsubst %.$(BIN_EXT), %.$(C_EXT), $(BIN2CFILES))
 CFILES         := $(filter-out $(BIN_OBJFILES), $(CFILES))
+GENC_OBJFILES  := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(IMGCFILES)))
+GENASM_OBJFILES:= $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(IMGASMFILES)))
 C_OBJFILES     := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(C_EXT), %.$(OBJ_EXT), $(BIN_OBJFILES) $(CFILES)))
 ASM_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.$(OBJ_EXT), $(ASMFILES)))
 DSKINCOBJFILES := $(foreach FILE, $(DSKINCSRCFILES), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(FILE)).$(DSKINC_EXT))
 OBJFILES       := $(C_OBJFILES) $(ASM_OBJFILES)
+GENOBJFILES    := $(GENC_OBJFILES) $(GENASM_OBJFILES)

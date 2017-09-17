@@ -3,23 +3,21 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
 
-// Pointer to the start of video memory
-#define VIDEO_MEM (u8*)0xC000
 // Offset from the start of a character row to the next in video memory
 #define ROW_OFFSET 0x50
 
@@ -43,7 +41,7 @@ void myInterruptHandler() {
 // Print some messages on the screen about this example
 //
 void printMessages() {
-   u8* pvm = VIDEO_MEM;
+   u8* pvm = CPCT_VMEM_START;
    cpct_drawStringM1_f("Interrupt Handler Example", pvm, 0, 3);
 
    pvm += 3 * ROW_OFFSET;

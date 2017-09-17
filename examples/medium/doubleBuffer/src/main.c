@@ -5,16 +5,16 @@
 //  Copyright (C) 2015 Maximo / Cheesetea / ByteRealms (@rgallego87)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -29,9 +29,8 @@
 #define BR_W   62
 #define BR_H   90
 
-// Pointers to the start of default video memory and hardware backbuffer
-// placed in bank 1 of the memory (0x4000-0x7FFF)
-#define SCR_VMEM  (u8*)0xC000
+// Pointers to the hardware backbuffer, placed in bank 1 
+// of the memory (0x4000-0x7FFF)
 #define SCR_BUFF  (u8*)0x4000
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -80,8 +79,8 @@ void main(void) {
    cpct_setVideoMode(0);               // Change to Mode 0 (160x200, 16 colours)
 
    // Clean up Screen and BackBuffer filling them up with 0's
-   cpct_memset(SCR_VMEM, 0x00, 0x4000);
-   cpct_memset(SCR_BUFF, 0x00, 0x4000);
+   cpct_memset(CPCT_VMEM_START, 0x00, 0x4000);
+   cpct_memset(       SCR_BUFF, 0x00, 0x4000);
 
    // Lets Draw CPCtelera's Squared Logo on the BackBuffer. We draw it at 
    // byte coordinates (0, 52) with respect to the start of the Backbuffer.
@@ -99,7 +98,7 @@ void main(void) {
       // Draw the ByteRealms logo at its current Y location on the screen. Moving
       // the logo does not leave a trail because we move it pixel to pixel and the
       // sprite has a 0x00 frame around it in its pixel definition.
-      pvmem = cpct_getScreenPtr(SCR_VMEM, 10, br_y);  // Locate sprite at (10,br_y) in Default Video Memory
+      pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 10, br_y);  // Locate sprite at (10,br_y) in Default Video Memory
       cpct_drawSprite(G_BR, pvmem, BR_W, BR_H);       // Draw the sprite
 
       // Change video memory page (from Screen Memory to Back Buffer and vice-versa)

@@ -1,0 +1,43 @@
+ARCH  ?= @ARCH@
+EARCH ?= @EARCH@
+
+AM_CPPFLAGS =
+AM_CPPFLAGS += -I.
+AM_CPPFLAGS += -I$(top_srcdir)/../../include/pic14 -I$(top_srcdir)/../../non-free/include/pic14
+
+AM_CFLAGS =
+AM_CFLAGS += -mpic14 -p$(ARCH)
+AM_CFLAGS += --no-warn-non-free
+AM_CFLAGS += --std-c99
+#AM_CFLAGS += --asm="$(CCAS)"
+##AM_CFLAGS += -Wa,-q
+
+#AM_CFLAGS += --debug-ralloc
+#AM_CFLAGS += --debug-xtra
+#AM_CFLAGS += --pcode-verbose
+AM_CFLAGS += --i-code-in-asm
+
+#AM_CFLAGS += --no-pcode-opt
+
+#AM_CFLAGS += --nooverlay
+#AM_CFLAGS += --nogcse
+#AM_CFLAGS += --nolabelopt
+#AM_CFLAGS += --noinvariant
+#AM_CFLAGS += --noinduction
+#AM_CFLAGS += --nojtbound
+#AM_CFLAGS += --noloopreverse
+
+AM_CCASFLAGS =
+AM_CCASFLAGS += -p$(ARCH)
+AM_CCASFLAGS += -I$(top_srcdir)/../../include/pic14 -I$(top_srcdir)/../../non-free/include/pic14
+AM_CCASFLAGS += -I$(srcdir)
+
+clean-local:
+	$(RM) *.asm;
+	$(RM) *.lst;
+
+clean-intermediate: clean-local
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $@ in $$subdir"; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
+	done

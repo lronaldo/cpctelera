@@ -1,0 +1,13 @@
+CREDITS
+
+src/spirits.png image included in this example is based on Little Candele Monsters by C-TOY. Thanks to C-TOY for sharing the image.
+
+URLs
+------------------------------------------------------------
+Little Candele Monsters 
+   - http://opengameart.org/content/little-candle-monsters
+C-TOY 
+   - http://opengameart.org/users/c-toy
+   - http://c-toy.blogspot.com.es/
+
+ License: CC-BY 3.0 (http://creativecommons.org/licenses/by/3.0/)

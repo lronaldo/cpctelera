@@ -1,4 +1,3 @@
-
 #include "img2cpc.hpp"
 
 int initializeParser(ezOptionParser &parser) {
@@ -10,8 +9,10 @@ int initializeParser(ezOptionParser &parser) {
 	parser.add("", 0, 1, 0, "Tile width. If not set, the image width is used.", "-w", "--tileWidth");
 	parser.add("", 0, 1, 0, "Tile height. If not set, the image height is used.", "-h", "--tileHeight");
 	parser.add("", 0, 1, 0, "Tile base name. If not set, the filename will be used.", "-bn", "--baseName");
+	parser.add("", 0, 0, 0, "Absolute base name. Use the tile base name as the variable identifier, no composition.", "-abn", "--absoluteBaseName");
 
 	parser.add("asm", 0, 1, 0, "Output format. If not set, data will be generated in assembly format.", "-of", "--outputFormat");
+	parser.add("", 0, 0, 0, "Output tile size as constants.", "-osz", "--outputSize");
 	parser.add("", 0, 0, 0, "Create a flipped values look-up table for the current palette and mode.", "-f");
 
 	parser.add("0", 0, 1, 0, "Specifies the CPC Mode to generate data for. Valid values are 0 (default), 1 or 2.", "-m", "--mode");
@@ -26,6 +27,7 @@ int initializeParser(ezOptionParser &parser) {
 	parser.add("", 0, 1, 0, "Specifies input palette file.", "-p", "--palette");
 	parser.add("", 0, 1, 0, "Specifies transparent color (as index in palette).", "-t", "--transparentColor");
 	parser.add("", 0, 0, 0, "Interlaced masks. Mask values will be interlaced with pixel values.", "-im", "--interlacedMasks");
+	parser.add("", 0, 0, 0, "No mask data. And/Or tables will be used.", "-nm", "--noMasks");
 
 	parser.add("", 0, 0, 0, "Don't create tileset. Use this if you are creating sprites and do not need a table with all the tile pointers.", "-nt", "--noTileset");
 
@@ -34,6 +36,8 @@ int initializeParser(ezOptionParser &parser) {
 
 	parser.add("", 0, 0, 0, "Generates PNG images to check tile output.", "-g", "--generatePNG");
 	parser.add("", 0, 0, 0, "Generate one output file per processed file. Files will be named using the base name (if specified) and the source file name .", "--oneFile");
+
+	parser.add("", 0, 1, ',', "Additional includes to add to header file when generating C data files.", "--includes");
 
 	parser.add("", 0, 0, 0, "Help. Show usage.", "--help");
 
@@ -97,19 +101,19 @@ int dumpTiles(vector<Tile>& tiles, ConversionOptions &convOptions) {
 			}
 
 			switch (convOptions.Format) {
-			case ConversionOptions::ASSEMBLER:
-				generator.GenerateASM(currentTiles, convOptions);
-				break;
-			case ConversionOptions::ASSEMBLER_ASXXXX:
-				generator.GenerateASXXXX(currentTiles, convOptions);
-				break;
-			case ConversionOptions::BINARY:
-				generator.GenerateBIN(currentTiles, convOptions);
-				break;
-			case ConversionOptions::PURE_C:
-				generator.GenerateC(currentTiles, convOptions);
-				generator.GenerateH(currentTiles, convOptions);
-				break;
+				case ConversionOptions::ASSEMBLER:
+					generator.GenerateASM(currentTiles, convOptions);
+					break;
+				case ConversionOptions::ASSEMBLER_ASXXXX:
+					generator.GenerateASXXXX(currentTiles, convOptions);
+					break;
+				case ConversionOptions::BINARY:
+					generator.GenerateBIN(currentTiles, convOptions);
+					break;
+				case ConversionOptions::PURE_C:
+					generator.GenerateC(currentTiles, convOptions);
+					generator.GenerateH(currentTiles, convOptions);
+					break;
 			}		
 		} while(it != tiles.end());
 	}
@@ -183,6 +187,13 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
 		if (options.isSet("-bn")) {
 			options.get("-bn")->getString(convOptions.BaseName);
 		}
+		convOptions.AbsoluteBaseName = options.isSet("-abn");
+	
+		if(convOptions.AbsoluteBaseName && options.lastArgs.size() > 1) {
+			cout << "ERROR: Cannot specify more than one file with the --absoluteBaseName or -abn switch." << endl;
+			return -1;
+		}
+		convOptions.OutputSize = options.isSet("-osz");
 
 		string outputFmt;
 		options.get("-of")->getString(outputFmt);
@@ -209,13 +220,181 @@ int extractConversionOptions(ezOptionParser &options, ConversionOptions &convOpt
 			cout << endl;
 		}
 
-		if (options.isSet("-z")) {
-			convOptions.ZigZag = true;
+		convOptions.ZigZag = options.isSet("-z");
+		convOptions.CreateFlipLut = options.isSet("-f");
+		convOptions.NoMaskData = options.isSet("-nm");
+
+		if(options.isSet("--includes")) {
+			if(convOptions.Format == ConversionOptions::PURE_C) {
+				options.get("--includes")->getStrings(convOptions.AdditionalIncludes);
+			} else {
+				cout << "Warning: Additional includes for output format different than C files. Ignored." << endl;
+			}
 		}
 
 		convOptions.InterlaceMasks = convOptions.Palette.TransparentIndex >= 0 && options.isSet("-im");
 	}
 	return result;
+}
+
+void createFlipLut(ConversionOptions &convOptions) {
+	unsigned char flipLut[0x100];
+    for (int i = 0; i < 0x100; i++) {
+        flipLut[i] = ColorCombinator::FlipByteNum(convOptions.Mode, i);
+    }
+
+    OutputGenerator generator;
+	switch (convOptions.Format) {
+		case ConversionOptions::ASSEMBLER:
+			generator.DumpTableASM(flipLut, 0x100, "flipLut");
+			break;
+		case ConversionOptions::ASSEMBLER_ASXXXX:
+			generator.DumpTableASXXXX(flipLut, 0x100, "flipLut");
+			break;
+		case ConversionOptions::BINARY:
+			generator.DumpTableBIN(flipLut, 0x100, "flipLut");
+			break;
+		case ConversionOptions::PURE_C:
+			generator.DumpTableC(flipLut, 0x100, "flipLut");
+			break;
+	}
+}
+
+void createAndOrTables(ConversionOptions &convOptions) {
+	unsigned char andMaskLut[0x100], orMaskLut[0x100], flippedAndMaskLut[0x100], flippedOrMaskLut[0x100];
+	unsigned char col1, col2, col3, col4, col5, col6, col7, col8;
+	unsigned char maskCol1, maskCol2, maskCol3, maskCol4, maskCol5, maskCol6, maskCol7, maskCol8;
+	unsigned char colorIndex;
+
+	switch(convOptions.Mode) {
+		case 0: 
+		    for (col1 = 0; col1 < 0x10; ++col1) {
+			    for (col2 = 0; col2 < 0x10; ++col2) {
+		        	vector<unsigned char> colors = {col1, col2};
+		            colorIndex = ColorCombinator::CombineColData(colors);
+		            maskCol1 = (col1 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+		            maskCol2 = (col2 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+		        	vector<unsigned char> maskColors = {maskCol1, maskCol2};
+		            andMaskLut[colorIndex] = ColorCombinator::CombineColData(maskColors);
+		            flippedAndMaskLut[colorIndex] = ColorCombinator::FlipByteNum(convOptions.Mode, andMaskLut[colorIndex]);
+
+		            maskCol1 = (col1 == convOptions.Palette.TransparentIndex) ? 0 : col1;
+		            maskCol2 = (col2 == convOptions.Palette.TransparentIndex) ? 0 : col2;
+		            maskColors = {maskCol1, maskCol2};
+		            orMaskLut[colorIndex] = ColorCombinator::CombineColData(maskColors);
+		            flippedOrMaskLut[colorIndex] = ColorCombinator::FlipByteNum(convOptions.Mode, orMaskLut[colorIndex]);
+		        }
+		    }
+			break;			
+		case 1:
+			for (col1 = 0; col1 < 0x4; ++col1) {
+			    for (col2 = 0; col2 < 0x4; ++col2) {
+			    	for (col3 = 0; col3 < 0x4; ++col3) {
+						for (col4 = 0; col4 < 0x4; ++col4) {
+				        	vector<unsigned char> colors = {col1, col2, col3, col4};
+				            colorIndex = ColorCombinator::CombineColData(colors);
+				            maskCol1 = (col1 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+				            maskCol2 = (col2 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+				            maskCol3 = (col3 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+				            maskCol4 = (col4 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+				        	vector<unsigned char> maskColors = {maskCol1, maskCol2, maskCol3, maskCol4};
+				            andMaskLut[colorIndex] = ColorCombinator::CombineColData(maskColors);
+				            flippedAndMaskLut[colorIndex] = ColorCombinator::FlipByteNum(convOptions.Mode, andMaskLut[colorIndex]);
+
+				            maskCol1 = (col1 == convOptions.Palette.TransparentIndex) ? 0 : col1;
+				            maskCol2 = (col2 == convOptions.Palette.TransparentIndex) ? 0 : col2;
+				            maskCol3 = (col3 == convOptions.Palette.TransparentIndex) ? 0 : col3;
+				            maskCol4 = (col4 == convOptions.Palette.TransparentIndex) ? 0 : col4;
+				            maskColors = {maskCol1, maskCol2, maskCol3, maskCol4};
+				            orMaskLut[colorIndex] = ColorCombinator::CombineColData(maskColors);
+				            flippedOrMaskLut[colorIndex] = ColorCombinator::FlipByteNum(convOptions.Mode, orMaskLut[colorIndex]);
+				        }
+				    }
+				}
+			}
+
+		    break;
+		case 2:
+			for (col1 = 0; col1 < 0x2; ++col1) {
+			    for (col2 = 0; col2 < 0x2; ++col2) {
+			    	for (col3 = 0; col3 < 0x2; ++col3) {
+						for (col4 = 0; col4 < 0x2; ++col4) {
+							for (col5 = 0; col5 < 0x2; ++col5) {
+								for (col6 = 0; col6 < 0x2; ++col6) {
+									for (col7 = 0; col7 < 0x2; ++col7) {
+										for (col8 = 0; col8 < 0x2; ++col8) {
+								        	vector<unsigned char> colors = {col1, col2, col3, col4, col5, col6, col7, col8};
+								            colorIndex = ColorCombinator::CombineColData(colors);
+								            maskCol1 = (col1 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								            maskCol2 = (col2 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								            maskCol3 = (col3 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								            maskCol4 = (col4 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								            maskCol5 = (col5 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								            maskCol6 = (col6 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								            maskCol7 = (col7 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								            maskCol8 = (col8 == convOptions.Palette.TransparentIndex) ? ColorCombinator::MaxValueByMode(convOptions.Mode) : 0;
+								        	vector<unsigned char> maskColors = {maskCol1, maskCol2, maskCol3, maskCol4, maskCol5, maskCol6, maskCol7, maskCol8};
+								            andMaskLut[colorIndex] = ColorCombinator::CombineColData(maskColors);
+								            flippedAndMaskLut[colorIndex] = ColorCombinator::FlipByteNum(convOptions.Mode, andMaskLut[colorIndex]);
+
+								            maskCol1 = (col1 == convOptions.Palette.TransparentIndex) ? 0 : col1;
+								            maskCol2 = (col2 == convOptions.Palette.TransparentIndex) ? 0 : col2;
+								            maskCol3 = (col3 == convOptions.Palette.TransparentIndex) ? 0 : col3;
+								            maskCol4 = (col4 == convOptions.Palette.TransparentIndex) ? 0 : col4;
+								            maskCol5 = (col5 == convOptions.Palette.TransparentIndex) ? 0 : col5;
+								            maskCol6 = (col6 == convOptions.Palette.TransparentIndex) ? 0 : col6;
+								            maskCol7 = (col7 == convOptions.Palette.TransparentIndex) ? 0 : col7;
+								            maskCol8 = (col8 == convOptions.Palette.TransparentIndex) ? 0 : col8;
+								            maskColors = {maskCol1, maskCol2, maskCol3, maskCol4, maskCol5, maskCol6, maskCol7, maskCol8};
+								            orMaskLut[colorIndex] = ColorCombinator::CombineColData(maskColors);
+								            flippedOrMaskLut[colorIndex] = ColorCombinator::FlipByteNum(convOptions.Mode, orMaskLut[colorIndex]);
+								        }
+								    }
+								}
+							}
+				        }
+				    }
+				}
+			}
+
+			break;
+	}
+
+    OutputGenerator generator;
+	switch (convOptions.Format) {
+		case ConversionOptions::ASSEMBLER:
+			generator.DumpTableASM(andMaskLut, 0x100, "andMasks");
+			generator.DumpTableASM(orMaskLut, 0x100, "orMasks");
+		    if(convOptions.CreateFlipLut) {
+				generator.DumpTableASM(flippedAndMaskLut, 0x100, "flippedAndMasks");
+				generator.DumpTableASM(flippedOrMaskLut, 0x100, "flippedOrMasks");
+		    }
+			break;
+		case ConversionOptions::ASSEMBLER_ASXXXX:
+			generator.DumpTableASXXXX(andMaskLut, 0x100, "andMasks");
+			generator.DumpTableASXXXX(orMaskLut, 0x100, "orMasks");
+		    if(convOptions.CreateFlipLut) {
+				generator.DumpTableASXXXX(flippedAndMaskLut, 0x100, "flippedAndMasks");
+				generator.DumpTableASXXXX(flippedOrMaskLut, 0x100, "flippedOrMasks");
+		    }
+			break;
+		case ConversionOptions::BINARY:
+			generator.DumpTableBIN(andMaskLut, 0x100, "andMasks");
+			generator.DumpTableBIN(orMaskLut, 0x100, "orMasks");
+		    if(convOptions.CreateFlipLut) {
+				generator.DumpTableBIN(flippedAndMaskLut, 0x100, "flippedAndMasks");
+				generator.DumpTableBIN(flippedOrMaskLut, 0x100, "flippedOrMasks");
+		    }
+			break;
+		case ConversionOptions::PURE_C:
+			generator.DumpTableC(andMaskLut, 0x100, "andMasks");
+			generator.DumpTableC(andMaskLut, 0x100, "andMasks");
+		    if(convOptions.CreateFlipLut) {
+				generator.DumpTableC(flippedAndMaskLut, 0x100, "flippedAndMasks");
+				generator.DumpTableC(flippedOrMaskLut, 0x100, "flippedOrMasks");
+		    }
+			break;
+	}
 }
 
 int main(int argc, const char** argv)
@@ -253,6 +432,13 @@ int main(int argc, const char** argv)
 			cout << "Error processing image: " << filename << endl;
 			return result;
 		}
+	}
+
+	if(convOptions.CreateFlipLut) {
+		createFlipLut(convOptions);
+	}
+	if(convOptions.NoMaskData) {
+		createAndOrTables(convOptions);		
 	}
 
 	dumpTiles(tiles, convOptions);

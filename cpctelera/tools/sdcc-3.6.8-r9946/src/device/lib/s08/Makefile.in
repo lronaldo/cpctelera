@@ -1,0 +1,93 @@
+# libc/s08 Makefile
+
+VPATH  = @srcdir@
+srcdir = @srcdir@
+top_builddir = @top_builddir@
+
+LIB_TYPE     = @LIB_TYPE@
+
+SCC = $(top_builddir)/bin/sdcc -ms08
+SAS = $(top_builddir)/bin/sdas6808
+
+# override PORTDIR defined by super (parent) makefile
+override PORTDIR = ../build/s08
+
+include $(srcdir)/../incl.mk
+
+HC08_FLOAT = $(COMMON_FLOAT)
+
+HC08_INT = $(COMMON_INT) \
+  _divsint.c \
+  _modsint.c \
+  _moduint.c
+
+HC08_LONG = $(COMMON_LONG)
+
+HC08_LONGLONG = $(COMMON_LONGLONG) \
+  _rrulonglong.c \
+  _rrslonglong.c \
+  _rlulonglong.c \
+  _rlslonglong.c \
+  _mullonglong.c \
+  _divslonglong.c \
+  _divulonglong.c \
+  _modslonglong.c \
+  _modulonglong.c
+
+HC08_SDCC = $(COMMON_SDCC) \
+  _itoa.c \
+  _ltoa.c \
+  _spx.c \
+  _startup.c \
+  _strlen.c \
+  _strcmp.c \
+  _strcpy.c \
+  _memcpy.c \
+  _memmove.c \
+  _heap.c \
+  sprintf.c \
+  vprintf.c
+
+HC08SOURCES = $(addprefix ../,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08_LONGLONG) $(HC08_SDCC))
+HC08OBJECTS = $(patsubst %.c,%.rel,$(HC08_FLOAT) $(HC08_INT) $(HC08_LONG) $(HC08_LONGLONG) $(HC08_SDCC))
+
+OBJ = _ret.rel _divuint.rel _divulong.rel _mulint.rel _mullong.rel _setjmp.rel
+
+LIB = s08.lib
+CC = $(SCC)
+AS = $(SAS)
+ASFLAGS = -plosgff
+
+CFLAGS = -I$(srcdir)/../../include -I. --std-c99
+
+all: $(PORTDIR)/$(LIB)
+
+$(PORTDIR)/$(LIB): $(OBJ) $(HC08OBJECTS) Makefile
+ifeq ($(LIB_TYPE), SDCCLIB)
+	rm -f $@; \
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(HC08OBJECTS)
+else
+  ifeq ($(LIB_TYPE), AR)
+	$(top_builddir)/bin/sdar -rcSD $@ $(OBJ) $(HC08OBJECTS)
+  else
+    ifeq ($(LIB_TYPE), RANLIB)
+	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(HC08OBJECTS)
+    else
+	rm -f $@
+	for i in $(basename $(OBJ) $(HC08OBJECTS)); do echo $$i >>$@; done
+	cp $(OBJ) $(HC08OBJECTS) $(PORTDIR)
+    endif
+  endif
+endif
+
+%.rel: %.c
+	$(CC) $(CFLAGS) -c $<
+
+%.rel: ../%.c
+	$(CC) $(CFLAGS) -c $<
+
+clean:
+	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib
+
+distclean: clean
+	rm -f Makefile

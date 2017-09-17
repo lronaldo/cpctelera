@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{d62eee26-dbd0-4367-9726-8be6e7a7de74}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{542d6692-b312-430e-b08c-25d50a679c72}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Regression Test">
+      <UniqueIdentifier>{294f3d1a-92d6-4c47-884a-62ffa390e878}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Custom Build">
+      <UniqueIdentifier>{ffdab0d0-444f-4892-8854-39c4adee434b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cdbFile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\support\util\dbuf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\support\util\dbuf_string.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\support\util\NewAlloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCasm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCast.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCBBlock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCbitv.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCcflow.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCcse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCdebug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCdflow.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCdwarf2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCerr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCglue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCChasht.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCicode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCClabel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCloop.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCClrange.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCmacro.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCmain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCmem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCpeeph.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCptropt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCset.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCsymt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCsystem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCutil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCval.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\add.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\arrays.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\b.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\bool1.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\call1.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\compare.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\compare2.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\for.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\pointer1.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\struct1.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\sub.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="regression\while.c">
+      <Filter>Regression Test</Filter>
+    </ClCompile>
+    <ClCompile Include="sdcclex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCnaddr.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCgen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCClospre.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCCbtree.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\support\scripts\resource.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\support\scripts\sdcc.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\support\util\dbuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\support\util\dbuf_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\support\util\newalloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="port.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdcc_vc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCasm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCBBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCbitv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCcflow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCcse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCdflow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCdwarf2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCerr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCglobl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCglue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCChasht.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCClabel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCloop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCClrange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCmem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCpeeph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCptropt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCsymt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCsystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdccy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="spawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCnaddr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCralloc.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCtree_dec.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCargs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCmacro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCdebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCgen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCClospre.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCbtree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
