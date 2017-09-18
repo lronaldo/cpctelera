@@ -217,38 +217,36 @@ void TZX_WriteBlocks(TZX_FILE *pTZXFile, FILE *fh)
 }
 
 
-void	TZX_AppendFile(TZX_FILE *pTZXFile, unsigned char *pFilename)
+BOOL	TZX_AppendFile(TZX_FILE *pTZXFile, const char *pFilename)
 {
 	FILE *fh;
 
 	/* open TZX file */
-	fh = fopen((const char *)pFilename,"r+b");
+	fh = fopen(pFilename,"r+b");
 
 	if (fh!=NULL)
 	{
-		TZX_BLOCK *pBlock;
-
         fseek(fh, 0, SEEK_END);
 
         TZX_WriteBlocks(pTZXFile, fh);
 
 		/* close TZX file */
 		fclose(fh);
+		return TRUE;
 	}
+	return FALSE;
 }
 
 
-void	TZX_WriteFile(TZX_FILE *pTZXFile, unsigned char *pFilename)
+BOOL TZX_WriteFile(TZX_FILE *pTZXFile, const char *pFilename)
 {
 	FILE *fh;
 
 	/* open TZX file */
-	fh = fopen((const char *)pFilename,"wb");
+	fh = fopen(pFilename,"wb");
 
 	if (fh!=NULL)
 	{
-		TZX_BLOCK *pBlock;
-
 		/* write header */
 		fwrite(TZX_FileHeader, 8, sizeof(unsigned char), fh);
 		/* write version numbers */
@@ -259,7 +257,9 @@ void	TZX_WriteFile(TZX_FILE *pTZXFile, unsigned char *pFilename)
 
 		/* close TZX file */
 		fclose(fh);
+		return TRUE;
 	}
+	return FALSE;
 }
 
 void	TZX_SetupPauseBlock(TZX_BLOCK *pBlock,unsigned long PauseInMilliseconds)

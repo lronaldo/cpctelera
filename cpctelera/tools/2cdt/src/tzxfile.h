@@ -62,9 +62,10 @@ typedef struct TZX_FILE
 	TZX_BLOCK *pFirstBlock;
 } TZX_FILE;
 
-void	TZX_WriteFile(TZX_FILE *pTZXFile, unsigned char *pFilename);
+BOOL	TZX_WriteFile(TZX_FILE *pTZXFile, const char *pFilename);
 unsigned char *TZX_GetBlockDataPtr(TZX_BLOCK *);
 unsigned char *TZX_GetBlockHeaderPtr(TZX_BLOCK *);
+BOOL	TZX_AppendFile(TZX_FILE *pTZXFile, const char *pFilename);
 
 TZX_FILE *TZX_CreateFile(unsigned char VersionMajor, unsigned char VersionMinor);
 void	TZX_FreeFile(TZX_FILE *pFile);
