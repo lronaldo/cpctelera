@@ -169,7 +169,18 @@ endef
 # $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
 #
 define ADDBASICFILETOCDT
-	@$(2CDT) -F 0 $(2) -r $(3) $(1) > /dev/null
+	@$(2CDT) $(2) -r $(3) $(1) > /dev/null
+endef
+
+#################
+# ADDAMSDOSFILETOCDT: Adds a file with AMSDOS header to a CDT file
+#
+# $(1): CDT file where the AMSDOS file will be added
+# $(2): AMSDOS file to be added (path to it in the filesystem)
+# $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
+#
+define ADDAMSDOSFILETOCDT
+	@$(2CDT) $(2) -r $(3) $(1) > /dev/null
 endef
 
 #################
