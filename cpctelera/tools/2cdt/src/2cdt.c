@@ -16,6 +16,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+// SOMETIMES generates read error B!
 
 /* The following program is designed to create a .tzx/.cdt from a tape-file stored
 on the PC */
@@ -23,9 +24,15 @@ on the PC */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef UNIX
+#include <sys/io.h>
+#else
+#include <io.h>
+#endif
 #include "defs.h"
 #include "tzxfile.h"
-#include "getopt.h"
+#include "opth.h"
+#include <ctype.h>
 
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 typedef unsigned __int64 ulong64;
@@ -40,8 +47,13 @@ enum
     CPC_METHOD_BLOCKS = 0,
     CPC_METHOD_HEADERLESS,
     CPC_METHOD_SPECTRUM,
+	CPC_METHOD_2BLOCKS,
 };
 
+static int NumFiles = 0;
+static const char *Filenames[2];
+static char TapeFilename[17]; /* 16 + NULL */
+static int HeaderlessSyncByte = 0x016;
 static int ExecutionAddress;
 static BOOL ExecutionAddressOverride;
 static int LoadAddress;
@@ -139,7 +151,6 @@ BOOL	Host_LoadFile(const char *Filename, unsigned char **pLocation, unsigned lon
 							fclose(fh);
 							return TRUE;
 						}
-
 						free(pData);
 					}
 				}
@@ -178,16 +189,23 @@ unsigned int AMSDOS_CalculateChecksum(unsigned char *pHeader)
 #define kCRCpoly  4129  /* used for binary long division in CRC */
 
 /* CRC polynomial: X^16+X^12+X^5+1 */
-unsigned int CRCupdate(unsigned int CRC, unsigned char new)
+unsigned int CRCupdate(unsigned int CRC, unsigned char newByte)
 {
- unsigned int aux = CRC ^ (new << 8);
+ unsigned int aux = CRC ^ (newByte << 8);
  int i;
 
  for(i=0; i<8; i++)
-   if (aux & 0x8000)
-       aux = (aux <<= 1) ^ kCRCpoly;
-     else
-       aux <<= 1;
+	{
+	   if (aux & 0x8000)
+	   {
+		   aux = aux<<1;
+		   aux = aux^kCRCpoly;
+	   }
+	   else
+	   {
+		   aux = aux<<1;
+	}
+}
 
  return(aux);
 }
@@ -259,10 +277,10 @@ void	CPC_InitialiseTurboLoadingDataBlock(TZX_BLOCK *pBlock, int BaudRate,int Pau
 		/* check it is a turbo-loading data block */
 		if (pHeader[0] == TZX_TURBO_LOADING_DATA_BLOCK)
 		{
-			int ZeroPulseLengthInMicroseconds;
+			long64 ZeroPulseLengthInMicroseconds;
 			long64 ZeroPulseLengthInCPCTStates;
-			int OnePulseLength;
-			int ZeroPulseLength;
+			long64 OnePulseLength;
+			long64 ZeroPulseLength;
 
 			pHeader++;
 			/* equation from CPC firmware guide:
@@ -278,9 +296,22 @@ void	CPC_InitialiseTurboLoadingDataBlock(TZX_BLOCK *pBlock, int BaudRate,int Pau
 			/* one pulse is twice the size of a zero pulse */
 			OnePulseLength = ZeroPulseLength<<1;
 
+			if (OnePulseLength >= 65536)
+			{
+				printf("1 Pulse length is greater than 65536! Can't write TZX file.");
+				exit(1);
+			}
+
 			/* PILOT pulse on CPC is a one bit */
 			pHeader[0x00] = (unsigned char)OnePulseLength;
 			pHeader[0x01] = (unsigned char)(OnePulseLength>>8);
+
+			if (ZeroPulseLength >= 65536)
+			{
+				printf("0 Pulse length is greater than 65536! Can't write TZX file.");
+				exit(1);
+			}
+
 
 			/* SYNC on CPC is a zero bit, both sync pulses will be the same */
 			pHeader[0x02] = pHeader[0x04] = (unsigned char)ZeroPulseLength;
@@ -361,7 +392,7 @@ void WriteStandardSpeedDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, uns
 #define CPC_DATA_BLOCK_SIZE 2048
 
 /* write a block of data to a file */
-void	CPC_WriteTurboLoadingDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, unsigned char *pData, int DataSize, int Pause)
+void	CPC_WriteTurboLoadingDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, const unsigned char *pData, int DataSize, int Pause)
 {
 	TZX_BLOCK *pBlock;
 	unsigned char *pBlockData;
@@ -381,7 +412,7 @@ void	CPC_WriteTurboLoadingDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, 
 		/* size of CRC's for all chunks */
 		(NumChunks<<1) +
 		/* size of trailer in bytes */
-		4 +
+		8 +
 		/* size of sync pattern */
 		1;
 
@@ -404,7 +435,7 @@ void	CPC_WriteTurboLoadingDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, 
 		if (pBlockData!=NULL)
 		{
 			int i,j;
-			unsigned char *pDataPtr;
+			const unsigned char *pDataPtr;
 			int DataSizeRemaining;
 			unsigned char *pBlockPtr;
 			unsigned short CRC;
@@ -460,15 +491,15 @@ void	CPC_WriteTurboLoadingDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, 
 				}
 
 				/* store CRC inverted */
-				pBlockPtr[0] = (CRC>>8)^0x0ff;
+				pBlockPtr[0] = ((CRC>>8)^0x0ff)&0x0ff;
 				pBlockPtr++;
-				pBlockPtr[0] = CRC^0x0ff;
+				pBlockPtr[0] = (CRC^0x0ff)&0x0ff;
 				pBlockPtr++;
 			}
 
 
 			/* write trailer */
-			memset(pBlockPtr, 0x0ff, 4);
+			memset(pBlockPtr, 0x0ff, 8);
 		}
 	}
 }
@@ -496,10 +527,10 @@ void	CPC_InitialisePureDataBlock(TZX_BLOCK *pBlock, int BaudRate, int Pause)
 		/* check it is a turbo-loading data block */
 		if (pHeader[0] == TZX_PURE_DATA_BLOCK)
 		{
-			int ZeroPulseLengthInMicroseconds;
+			long64 ZeroPulseLengthInMicroseconds;
 			long64 ZeroPulseLengthInCPCTStates;
-			int OnePulseLength;
-			int ZeroPulseLength;
+		 	long64 OnePulseLength;
+			long64 ZeroPulseLength;
 
 			pHeader++;
 			/* equation from CPC firmware guide:
@@ -511,16 +542,29 @@ void	CPC_InitialisePureDataBlock(TZX_BLOCK *pBlock, int BaudRate, int Pause)
 
 			ZeroPulseLength = (ZeroPulseLengthInCPCTStates*
 							(T_STATE_CONVERSION_FACTOR>>8))>>8;
+			/* one pulse is twice the size of a zero pulse */
+			OnePulseLength = ZeroPulseLength << 1;
+			if (OnePulseLength >= 65536)
+			{
+				printf("1 Pulse length is greater than 65536! Can't write TZX file.");
+				exit(1);
+			}
+			if (ZeroPulseLength >= 65536)
+			{
+				printf("0 Pulse length is greater than 65536! Can't write TZX file.");
+				exit(1);
+			}
+
 
 			/* one pulse is twice the size of a zero pulse */
 			OnePulseLength = ZeroPulseLength<<1;
 			/* write zero pulse length */
-			pHeader[0x00] = ZeroPulseLength;
-			pHeader[0x01] = ZeroPulseLength>>8;
+			pHeader[0x00] = (ZeroPulseLength&0x0ff);
+			pHeader[0x01] = (ZeroPulseLength >> 8) & 0x0ff;
 
 			/* write one pulse length */
-			pHeader[0x02] = OnePulseLength;
-			pHeader[0x03] = OnePulseLength>>8;
+			pHeader[0x02] = (OnePulseLength&0x0ff);
+			pHeader[0x03] = (OnePulseLength>>8)&0x0ff;
 
 			/* the end of the block will be the trailer bytes. Say all bits are
 			used, although, because it doesn't contain useful data it doesn't matter */
@@ -537,14 +581,14 @@ void	CPC_InitialisePureDataBlock(TZX_BLOCK *pBlock, int BaudRate, int Pause)
 
 
 /* the following is for a bitstream */
-unsigned char *pData;
+unsigned char *pBitStreamData;
 unsigned long ByteCount;
 unsigned long BitCount;
 
 /* initialise bit stream with buffer to write data to */
 void	BitStream_Initialise(unsigned char *pBuffer)
 {
-	pData = pBuffer;
+	pBitStreamData = pBuffer;
 	ByteCount = 0;
 	BitCount = 0;
 }
@@ -555,10 +599,10 @@ void	BitStream_WriteBit(int Bit)
 	unsigned char Data;
 
 	/* get current data written */
-	Data = pData[ByteCount];
+	Data = pBitStreamData[ByteCount];
 	Data &= ~(1<<(7-BitCount));
 	Data |= (Bit<<(7-BitCount));
-	pData[ByteCount] = Data;
+	pBitStreamData[ByteCount] = Data;
 
 	/* increment bit count */
 	BitCount++;
@@ -589,7 +633,7 @@ void	BitStream_WriteByte(unsigned char Byte)
 
 
 /* write a block of data to a file */
-void	CPC_WritePureDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, unsigned char *pData, int DataSize, int Pause)
+void	CPC_WritePureDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, const unsigned char *pData, int DataSize, int Pause)
 {
 	TZX_BLOCK *pBlock;
 	unsigned char *pBlockData;
@@ -609,7 +653,7 @@ void	CPC_WritePureDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, unsigned
 		/* size of CRC's for all chunks */
 		(NumChunks<<1) +
 		/* size of trailer in bytes */
-		4 +
+		8 +
 		/* size of sync pattern */
 		1;
 
@@ -634,7 +678,7 @@ void	CPC_WritePureDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, unsigned
 		if (pBlockData!=NULL)
 		{
 			int i,j;
-			unsigned char *pDataPtr;
+			const unsigned char *pDataPtr;
 			int DataSizeRemaining;
 			unsigned char *pBlockPtr;
 			unsigned short CRC;
@@ -705,8 +749,8 @@ void	CPC_WritePureDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, unsigned
 
 				CRC = CRC^0x0ffff;
 
-				BitStream_WriteByte((CRC>>8));
-				BitStream_WriteByte(CRC);
+				BitStream_WriteByte((CRC>>8)&0x0ff);
+				BitStream_WriteByte((CRC&0x0ff));
 			}
 
 			/* write trailer */
@@ -719,7 +763,7 @@ void	CPC_WritePureDataBlock(TZX_FILE *pFile, unsigned char SyncPattern, unsigned
 }
 
 /* write a data block in format specified */
-void	CPC_WriteDataBlock(TZX_FILE *pFile, unsigned char SyncByte, unsigned char *pData, unsigned long DataSize, int Pause)
+void	CPC_WriteDataBlock(TZX_FILE *pFile, unsigned char SyncByte, const unsigned char *pData, unsigned long DataSize, int Pause)
 {
 	switch (TZXWriteMethod)
 	{
@@ -756,7 +800,8 @@ void	DisplayInfo()
         printf("                  1 = headerless (Firmware function: CAS READ - &BCA1) \n");
         printf("                  2 = spectrum \n");
         printf("                  3 = Two blocks. First block of 2K, second block has remainder\n");
-        printf("                  4 = Two blocks. First block of 1 byte, second block has remainder\n");
+  //      printf("                  4 = Two blocks. First block of 1 byte, second block has remainder\n");
+		printf("-H <number> 	= Headerless sync byte (default &16)\n");
 		printf("-X <number> 	= Define or override execution address (default is &1000 if no header)\r\n");
 		printf("-L <number> 	= Define or override load address (default is &1000 if no header)\r\n");
  		printf("-F <number> 	= Define or override file type (0=BASIC, 2=Binary (default if no header)) etc. Applies to Data method 0\r\n");
@@ -766,11 +811,9 @@ void	DisplayInfo()
         printf("                - Add <input filename> as <tape filename> to CDT (rename file)\n");
 }
 
-extern char *optarg;
-
-int ReadNumberParameter(char *param)
+int ReadNumberParameter(const char *param)
 {
-    int Length = strlen(param);
+    size_t Length = strlen(param);
     BOOL bIsHex = FALSE;
     int Offset = 0;
     unsigned long Value = 0;
@@ -819,195 +862,283 @@ int ReadNumberParameter(char *param)
     return Value;
 }
 
-int		main(int argc, char *argv[])
-{
-    unsigned char *pTapeFilename = NULL;
 
-	if (argc==1)
+int OutputDetailsOption(ARGUMENT_DATA *pData)
+{
+	DisplayInfo();
+	return OPTION_OK;
+}
+int	NonOptionHandler(const char *pOption)
+{
+	if (NumFiles<2)
 	{
-		DisplayInfo();
+		Filenames[NumFiles] = pOption;
+		NumFiles++;
+	}
+
+	return OPTION_OK;
+}
+
+int SetSpecifyBaudRateOptionHandler(ARGUMENT_DATA *pData)
+{
+	int Baud;
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	Baud = atoi(opt);
+	if ((Baud>0) && (Baud<6000))
+		BaudRate = Baud;
+
+	printf("Baud rate set to: %d\n", BaudRate);
+
+	return OPTION_OK;
+}
+
+int SpecifySpeedWriteOptionHandler(ARGUMENT_DATA *pData)
+{
+	int SpeedWrite;
+	
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	SpeedWrite = atoi(opt);
+	if (SpeedWrite==1)
+	{
+		BaudRate = 2000;
 	}
 	else
 	{
-		TZX_FILE *pTZXFile;
-		unsigned char *pSourceFilename;
-		unsigned char *pDestFilename;
-		unsigned char *pData;
-		unsigned long DataLength;
-        char c;
+		BaudRate = 1000;
+	}
+	printf("Baud rate set to: %d\n", BaudRate);
 
-		/* initialise defaults */
-		BaudRate = 2000;
-		Pause = 3000;
-		Type = 2;
-		TypeOverride = FALSE;
-		LoadAddressOverride = FALSE;
+	return OPTION_OK;
+}
+
+
+int SpecifyHeaderlessSyncOptionHandler(ARGUMENT_DATA *pData)
+{
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	HeaderlessSyncByte = ReadNumberParameter(opt) & 0x0ff;
+	printf("Headerless sync set to: %d (&%02x)\n", HeaderlessSyncByte, HeaderlessSyncByte);
+
+	return OPTION_OK;
+}
+
+
+int SetTZXBlockWriteMethodOptionHandler(ARGUMENT_DATA *pData)
+{
+	int nMethod;
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	nMethod = atoi(opt);
+	if (nMethod==0)
+	{
+		TZXWriteMethod = TZX_PURE_DATA_BLOCK;
+	}
+	else if (nMethod==1)
+	{
 		TZXWriteMethod = TZX_TURBO_LOADING_DATA_BLOCK;
-        BlankBeforeUse = FALSE;
-        ExecutionAddress = LoadAddress = 0x01000;
-		ExecutionAddressOverride = FALSE;
-		LoadAddressOverride = FALSE;
+	}
+	else if (nMethod==2)
+	{
+		TZXWriteMethod = TZX_STANDARD_SPEED_DATA_BLOCK;
+	}
 
-		printf("-n              - Blank CDT file before use\n");
-        printf("-b <number>	    - Specify Baud rate (default 2000)\n");
-		printf("-s <0 or 1>     - Specify 'Speed Write'.\n");
-		printf("                  0 = 1000 baud, 1 = 2000 baud (default)\n");
-		printf("-t <method>     - TZX Block Write Method.\n");
-		printf("                  0 = Pure Data, 1 = Turbo Loading (default)\n");
-		printf("-m <method>     - Data method\n");
-        printf("                  0 = blocks (default)\n");
-        printf("                  1 = headerless (Firmware function: CAS READ - &BCA1) \n");
-        printf("                  2 = spectrum \n");
-        printf("                  3 = Two blocks. First block of 2K, second block has remainder\n");
-        printf("                  4 = Two blocks. First block of 1 byte, second block has remainder\n");
-		printf("-X <number> 	= Define or override execution address (default is &1000 if no header)\r\n");
-		printf("-L <number> 	= Define or override load address (default is &1000 if no header)\r\n");
- 		printf("-F <number> 	= Define or override file type (0=BASIC, 2=Binary (default if no header)) etc. Applies to Data method 0\r\n");
- 		printf("-p <number> 	= Set initial pause in milliseconds (default 3000ms)\r\n");
- 		printf("-P 				= Add a 1ms pause for buggy emulators that ignore first block\r\n");
-		printf("-r <tape filename>\n");
-        printf("                - Add <input filename> as <tape filename> to CDT (rename file)\n");
+	printf("TZX Data block type: %d\n", nMethod);
+
+	return OPTION_OK;
+}
+
+int SetInitialPauseOptionHandler(ARGUMENT_DATA *pData)
+{
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	Pause = atoi(opt);
+	if (Pause<0)
+	{
+		Pause = 0;
+	}
+
+	printf("Initial Pause (ms): %d\n", Pause);
+	return OPTION_OK;
+}
+
+int SetDataMethodOptionHandler(ARGUMENT_DATA *pData)
+{
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	CPCMethod = atoi(opt);
+
+	printf("Data method set to: %d\n", CPCMethod);
+
+	return OPTION_OK;
+}
+
+int SetFileTypeOptionHandler(ARGUMENT_DATA *pData)
+{
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	Type = atoi(opt) & 0x0ff;
+	TypeOverride = TRUE;
+
+	printf("Type set to: %d\n", Type);
+
+	return OPTION_OK;
+}
+
+int SetLoadAddressOptionHandler(ARGUMENT_DATA *pData)
+{
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	LoadAddress = ReadNumberParameter(opt) & 0x0ffff;
+	LoadAddressOverride = TRUE;
+	printf("Load address set to: &%04x\n", LoadAddress);
+
+	return OPTION_OK;
+}
+
+int SetExecutionAddressOptionHandler(ARGUMENT_DATA *pData)
+{
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	ExecutionAddress = ReadNumberParameter(opt) & 0x0ffff;
+	ExecutionAddressOverride = TRUE;
+	printf("Execution address set to: &%04x\n", ExecutionAddress);
+	return OPTION_OK;
+}
+
+int SetFilenameOptionHandler(ARGUMENT_DATA *pData)
+{
+	size_t i;
+	size_t nLength;
+
+	const char *opt = ArgumentList_GetNext(pData);
+
+	if (opt == NULL)
+		return OPTION_MISSING_PARAMETER;
+
+	memset(TapeFilename, 0, sizeof(TapeFilename));
+	nLength = strlen(opt);
+	if (nLength>16)
+		nLength = 16;
+	for (i = 0; i<nLength; i++)
+	{
+		TapeFilename[i] = toupper(opt[i]);
+	}
+	printf("Filename: %s\n", TapeFilename);
+
+	return OPTION_OK;
+}
 
 
-        do
+int SetAdd1MsPauseOptionHandler(ARGUMENT_DATA *pData)
+{
+	BuggyEmuExtraPause = TRUE;
+	
+	return OPTION_OK;
+}
+
+int SetBlankCDTOptionHandler(ARGUMENT_DATA *pData)
+{
+	BlankBeforeUse = TRUE;
+	
+	return OPTION_OK;
+}
+
+
+OPTION OptionTable[]=
+{
+	{"n",SetBlankCDTOptionHandler},
+	{ "b", SetSpecifyBaudRateOptionHandler},
+	{ "s", SpecifySpeedWriteOptionHandler },
+	{ "t", SetTZXBlockWriteMethodOptionHandler },
+	{ "m", SetDataMethodOptionHandler},
+	{ "X", SetExecutionAddressOptionHandler},
+	{ "L", SetLoadAddressOptionHandler},
+	{ "F", SetFileTypeOptionHandler},
+	{ "p", SetInitialPauseOptionHandler},
+	{ "P", SetAdd1MsPauseOptionHandler},
+	{ "r", SetFilenameOptionHandler},
+	{ "?", OutputDetailsOption  },
+	{NULL, NULL},
+};
+
+
+int		main(int argc, char *argv[])
+{
+	// TODO: BUG IN PURE DATA! OVERWRITES MEMORY - FIX
+
+	/* initialise defaults */
+	BaudRate = 2000;
+	Pause = 3000;
+	Type = 2;
+	TypeOverride = FALSE;
+	LoadAddressOverride = FALSE;
+	TZXWriteMethod = TZX_TURBO_LOADING_DATA_BLOCK;	
+	BlankBeforeUse = FALSE;
+	ExecutionAddress = LoadAddress = 0x01000;
+	ExecutionAddressOverride = FALSE;
+	LoadAddressOverride = FALSE;
+	CPCMethod = CPC_METHOD_BLOCKS;
+	memset(TapeFilename, 0, sizeof(TapeFilename));
+	
+	if (ArgumentList_Execute(argc, (const char**)argv, OptionTable, printf, NonOptionHandler)==OPTION_OK)
+	{
+		TZX_FILE *pTZXFile;
+		const char *pSourceFilename;
+		const char *pDestFilename;
+		unsigned char *pFileData = NULL;
+		unsigned long FileDataLength = 0;
+
+        if (NumFiles==0)
         {
-            c = getopt(argc, argv,"r:nb:p:m:t:F:L:s:X:p:P");
-
-            switch (c)
-            {
-                case 'm':
-                {
-                    int nMethod = atoi(optarg);
-                    CPCMethod = nMethod;
-
-                }
-                break;
-
-                case 'p':
-                {
-	                Pause = atoi(optarg);
-	                if (Pause<0)
-	                {
-	                    Pause = 0;
-	                }
-               }
-               break;
-
-                case 'r':
-                {
-                    pTapeFilename = optarg;
-                }
-                break;
-
-                case 'n':
-                {
-                    BlankBeforeUse = TRUE;
-                }
-                break;
-
-                case 'b':
-                {
-                    int Baud = atoi(optarg);
-                    if ((Baud>0) && (Baud<6000))
-                        BaudRate = Baud;
-                }
-                break;
-
-                case 'X':
-                {
-	                ExecutionAddress = ReadNumberParameter(optarg) & 0x0ffff;
-	                ExecutionAddressOverride = TRUE;
-                }
-                break;
-
-                case 'L':
-                {
-	                LoadAddress = ReadNumberParameter(optarg) & 0x0ffff;
-	                LoadAddressOverride = TRUE;
-                }
-                break;
-
-                case 's':
-                {
-                    int SpeedWrite = atoi(optarg);
-                    if (SpeedWrite==1)
-                    {
-                        BaudRate = 2000;
-                    }
-                    else
-                    {
-                        BaudRate = 1000;
-                    }
-                }
-                break;
-
-                case 'F':
-                {
-	                Type = atoi(optarg) & 0x0ff;
-	                TypeOverride = TRUE;
-
-
-                }
-                break;
-
-
-                case 'P':
-                {
-	                BuggyEmuExtraPause = TRUE;
-
-                }
-                break;
-
-                case 't':
-                {
-                    int nMethod = atoi(optarg);
-                    if (nMethod==0)
-                    {
-                        TZXWriteMethod = TZX_PURE_DATA_BLOCK;
-                    }
-                    else if (nMethod==1)
-                    {
-                        TZXWriteMethod = TZX_TURBO_LOADING_DATA_BLOCK;
-                    }
-                    else if (nMethod==2)
-                    {
-                        TZXWriteMethod = TZX_STANDARD_SPEED_DATA_BLOCK;
-                    }
-                }
-                break;
-
-                default:
-                {
-                }
-                break;
-            }
-
-        }
-        while (c!=-1);
-
-        if ((argc-optind)==0)
-        {
-            printf("No source file or destination file have been specified!\n");
+			DisplayInfo();
             exit(1);
         }
 
-        if ((argc-optind)==1)
+        if (NumFiles==1)
         {
             printf("No destination file has been specified\n");
             exit(1);
         }
 
-        pSourceFilename = argv[optind];
-        pDestFilename = argv[optind+1];
+        pSourceFilename = Filenames[0];
+		pDestFilename = Filenames[1];
 
+		printf("Will write file %s to %s\n", pSourceFilename, pDestFilename);
+		
 		/* create TZX file */
 		pTZXFile = TZX_CreateFile(TZX_VERSION_MAJOR,TZX_VERSION_MINOR);
 
 		if (pTZXFile!=NULL)
 		{
-			int nFile;
-
-
 			if (BlankBeforeUse)
 			{
 				TZX_BLOCK *pBlock;
@@ -1037,226 +1168,240 @@ int		main(int argc, char *argv[])
 			}
 
 
-            if (Host_LoadFile(pSourceFilename, &pData, &DataLength))
-            {
-                int FileOffset;
-                int FileLengthRemaining;
-                int TapeBlockSize;
-                BOOL FirstBlock,LastBlock;
-                int BlockIndex;
-                unsigned short BlockLocation;
+			if (Host_LoadFile(pSourceFilename, &pFileData, &FileDataLength))
+			{
+				int FileOffset;
+				int FileLengthRemaining;
+				int TapeBlockSize = 0;
+				BOOL FirstBlock = FALSE, LastBlock = FALSE;
+				int BlockIndex;
+				unsigned short BlockLocation;
+				
+				/* header for tape file */
+				unsigned char TapeHeader[CPC_TAPE_HEADER_SIZE+1];
 
-                /* header for tape file */
-                unsigned char TapeHeader[CPC_TAPE_HEADER_SIZE];
+				/* calculate checksum from loaded file */
+				unsigned short CalculatedChecksum = 0;
+				
+				/* get stored checksum */
+				unsigned short StoredChecksum = 0;
+				
+				printf("File length: %d\n",(int)FileDataLength);
+				
+				if (FileDataLength>=128)
+				{
+					printf("File potentially has a header\n");
+					CalculatedChecksum = (unsigned short)AMSDOS_CalculateChecksum(pFileData);
+					StoredChecksum = (pFileData[67] & 0x0ff) | (pFileData[68] & 0x0ff) << 8;
+				}
+				else
+				{
+					printf("File is to short to have a header\n");
+				}
+				
+				FileOffset = 0;
+				FileLengthRemaining = FileDataLength;
+				BlockIndex = 1;
+				FirstBlock = TRUE;
 
-                /* calculate checksum from loaded file */
-                unsigned short CalculatedChecksum = (unsigned short)AMSDOS_CalculateChecksum(pData);
+				/* insert a pause block - 1 second, this is added onto the end of the previous block */
+	/*            if (BlankBeforeUse == FALSE)
+				{
+					TZX_BLOCK *pBlock;
 
-                /* get stored checksum */
-                unsigned short StoredChecksum =
-                                    (pData[67] & 0x0ff) |
-                                     (pData[68] & 0x0ff)<<8;
+					pBlock = TZX_CreateBlock(TZX_PAUSE_BLOCK);
 
-                FileOffset = 0;
-                FileLengthRemaining = DataLength;
-                BlockIndex = 1;
-                FirstBlock =TRUE;
-
-                /* insert a pause block - 1 second, this is added onto the end of the previous block */
-    /*            if (BlankBeforeUse == FALSE)
-                {
-                    TZX_BLOCK *pBlock;
-
-                    pBlock = TZX_CreateBlock(TZX_PAUSE_BLOCK);
-
-                    if (pBlock!=NULL)
-                    {
-                        TZX_SetupPauseBlock(pBlock, 2000);
-                        TZX_AddBlockToEndOfFile(pTZXFile,pBlock);
-                    }
-                }
+					if (pBlock!=NULL)
+					{
+						TZX_SetupPauseBlock(pBlock, 2000);
+						TZX_AddBlockToEndOfFile(pTZXFile,pBlock);
+					}
+				}
 */
 
 
-                /* clear tape header */
-                memset(TapeHeader, 0, CPC_TAPE_HEADER_SIZE);
+/* clear tape header */
+				memset(TapeHeader, 0, CPC_TAPE_HEADER_SIZE);
 
-                /* checksum's match? */
-                if (CalculatedChecksum==StoredChecksum)
-                {
-                    /* copy file type */
-                    TapeHeader[CPC_TAPE_HEADER_FILE_TYPE] = pData[CPC_TAPE_HEADER_FILE_TYPE];
-                    /* copy execution address */
-                    TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW] = pData[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW];
-                    TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH] = pData[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH];
-                    /* copy data location */
-                    TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = pData[CPC_TAPE_HEADER_DATA_LOCATION_LOW];
-                    TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = pData[CPC_TAPE_HEADER_DATA_LOCATION_HIGH];
+				/* checksum's match? */
+				if (FileDataLength>=128 && CalculatedChecksum == StoredChecksum)
+				{
+					/* copy file type */
+					TapeHeader[CPC_TAPE_HEADER_FILE_TYPE] = pFileData[CPC_TAPE_HEADER_FILE_TYPE];
+					/* copy execution address */
+					TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW] = pFileData[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW];
+					TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH] = pFileData[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH];
+					/* copy data location */
+					TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = pFileData[CPC_TAPE_HEADER_DATA_LOCATION_LOW];
+					TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = pFileData[CPC_TAPE_HEADER_DATA_LOCATION_HIGH];
 
-                    FileOffset+=128;
-                    FileLengthRemaining-=128;
+					FileOffset += 128;
+					FileLengthRemaining -= 128;
 
-                    /* override execution address? */
-                    if (ExecutionAddressOverride)
-                    {
-						TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW] = ExecutionAddress&0xFF;
-						TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH] = (ExecutionAddress>>8)&0xFF;
-                    }
-
-                    /* override type? */
-                    if (TypeOverride)
-                    {
-						TapeHeader[CPC_TAPE_HEADER_FILE_TYPE] = Type;
-                    }
-
-                    /* override load address? */
-                    if (LoadAddressOverride)
-                    {
-						TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = LoadAddress&0xFF;
-						TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = (LoadAddress>>8)&0xFF;
+					/* override execution address? */
+					if (ExecutionAddressOverride)
+					{
+						TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW] = ExecutionAddress & 0xFF;
+						TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH] = (ExecutionAddress >> 8) & 0xFF;
 					}
 
-                }
-                else
-                {
+					/* override type? */
+					if (TypeOverride)
+					{
+						TapeHeader[CPC_TAPE_HEADER_FILE_TYPE] = Type;
+					}
+
+					/* override load address? */
+					if (LoadAddressOverride)
+					{
+						TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = LoadAddress & 0xFF;
+						TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = (LoadAddress >> 8) & 0xFF;
+					}
+
+				}
+				else
+				{
 					/* set type */
 					TapeHeader[CPC_TAPE_HEADER_FILE_TYPE] = Type;
 
 					/* set execution address */
-					TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW] = ExecutionAddress&0xFF;
-					TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH] = (ExecutionAddress>>8)&0xFF;
+					TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_LOW] = ExecutionAddress & 0xFF;
+					TapeHeader[CPC_TAPE_HEADER_DATA_EXECUTION_ADDRESS_HIGH] = (ExecutionAddress >> 8) & 0xFF;
 
 					/* set load address */
-					TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = LoadAddress&0xFF;
-					TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = (LoadAddress>>8)&0xFF;
-                }
+					TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = LoadAddress & 0xFF;
+					TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = (LoadAddress >> 8) & 0xFF;
+				}
 
-                if (pTapeFilename!=NULL)
-                {
-                    int i;
-                    int nLength = strlen(pTapeFilename);
-                    if (nLength>16)
-                        nLength = 16;
-                    for (i=0; i<nLength; i++)
-                    {
-                        TapeHeader[i] = toupper(pTapeFilename[i]);
-                    }
-                }
-                TapeHeader[CPC_TAPE_HEADER_DATA_LOGICAL_LENGTH_LOW] = (FileLengthRemaining & 0x0ff);
-                TapeHeader[CPC_TAPE_HEADER_DATA_LOGICAL_LENGTH_HIGH] = (FileLengthRemaining>>8) & 0x0ff;
+				if (strlen(TapeFilename) != 0)
+				{
+					strcpy(TapeHeader, TapeFilename);
+				}
+				TapeHeader[CPC_TAPE_HEADER_DATA_LOGICAL_LENGTH_LOW] = (FileLengthRemaining & 0x0ff);
+				TapeHeader[CPC_TAPE_HEADER_DATA_LOGICAL_LENGTH_HIGH] = (FileLengthRemaining >> 8) & 0x0ff;
 
 
-                BlockLocation = TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] |
-                                (TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH]<<8);
+				BlockLocation = TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] |
+					(TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] << 8);
 
-                if (CPCMethod == CPC_METHOD_SPECTRUM)
-                {
-                    /* write data into block */
-                    WriteStandardSpeedDataBlock(pTZXFile, 0x0ff, &pData[FileOffset], FileLengthRemaining, 1000);
-                }
-                else
-                {
-                    do
-                    {
-                        unsigned char Flag;
-    /*
-                        CPC can't handle this one
-                        if (CPCMethod == CPC_METHOD_2BLOCKS)
-                        {
-                              if (FirstBlock)
-                              {
-                                    TapeBlockSize=CPC_DATA_BLOCK_SIZE;
-                                    LastBlock = FALSE;
-                              }
-                              else
-                              {
-                                    TapeBlockSize = FileLengthRemaining;
-                                    LastBlock = TRUE;
-                              }
-                        }
-                        else
-    */
-                        if (CPCMethod == CPC_METHOD_BLOCKS)
-                        {
-                            /* calc size of tape data block */
-                            if (FileLengthRemaining>CPC_DATA_BLOCK_SIZE)
-                            {
-                                TapeBlockSize = CPC_DATA_BLOCK_SIZE;
-                                LastBlock = FALSE;
-                            }
-                            else
-                            {
-                                TapeBlockSize = FileLengthRemaining;
-                                LastBlock = TRUE;
-                            }
-                        }
-                        else
-                        if (CPCMethod == CPC_METHOD_HEADERLESS)
-                        {
-                            TapeBlockSize = FileLengthRemaining;
-                        }
+				if (CPCMethod == CPC_METHOD_SPECTRUM)
+				{
+
+					/* write data into block */
+					WriteStandardSpeedDataBlock(pTZXFile, 0x0ff, &pFileData[FileOffset], FileLengthRemaining, 1000);
+				}
+				else
+				{
+					do
+					{
+						unsigned char Flag;
+						// CPC can't handle this one
+						if (CPCMethod == CPC_METHOD_2BLOCKS)
+						{
+							  if (FirstBlock)
+							  {
+									if (FileLengthRemaining<=CPC_DATA_BLOCK_SIZE)
+									{
+										TapeBlockSize = FileLengthRemaining;
+										LastBlock = TRUE;
+									}
+									else
+									{
+										TapeBlockSize=CPC_DATA_BLOCK_SIZE;
+										LastBlock = FALSE;
+									}
+							  }
+							  else
+							  {
+									TapeBlockSize = FileLengthRemaining;
+									LastBlock = TRUE;
+								
+							  }
+						}
+						else
+						if (CPCMethod == CPC_METHOD_BLOCKS)
+						{
+							/* calc size of tape data block */
+							if (FileLengthRemaining > CPC_DATA_BLOCK_SIZE)
+							{
+								TapeBlockSize = CPC_DATA_BLOCK_SIZE;
+								LastBlock = FALSE;
+							}
+							else
+							{
+								TapeBlockSize = FileLengthRemaining;
+								LastBlock = TRUE;
+							}
+						}
+						else
+							if (CPCMethod == CPC_METHOD_HEADERLESS)
+							{
+								TapeBlockSize = FileLengthRemaining;
+							}
 
 
 
-                        /**** HEADER ****/
-                        /* SETUP TAPE RELATED DATA */
-                        /* block index */
-                        TapeHeader[CPC_TAPE_HEADER_BLOCK_NUMBER] = BlockIndex;
+						/**** HEADER ****/
+						/* SETUP TAPE RELATED DATA */
+						/* block index */
+						TapeHeader[CPC_TAPE_HEADER_BLOCK_NUMBER] = BlockIndex;
 
-                        /* first block? */
-                        if (FirstBlock)
-                        {
-                            FirstBlock = FALSE;
+						/* first block? */
+						if (FirstBlock)
+						{
+							FirstBlock = FALSE;
 
-                            Flag = 0x0ff;
-                        }
-                        else
-                        {
-                            Flag = 0;
-                        }
+							Flag = 0x0ff;
+						}
+						else
+						{
+							Flag = 0;
+						}
 
-                        TapeHeader[CPC_TAPE_HEADER_FIRST_BLOCK_FLAG] = Flag;
+						TapeHeader[CPC_TAPE_HEADER_FIRST_BLOCK_FLAG] = Flag;
 
-                        /* last block? */
-                        if (LastBlock)
-                        {
-                            Flag = 0x0ff;
-                        }
-                        else
-                        {
-                            Flag = 0;
-                        }
+						/* last block? */
+						if (LastBlock)
+						{
+							Flag = 0x0ff;
+						}
+						else
+						{
+							Flag = 0;
+						}
 
-                        TapeHeader[CPC_TAPE_HEADER_LAST_BLOCK_FLAG] = Flag;
+						TapeHeader[CPC_TAPE_HEADER_LAST_BLOCK_FLAG] = Flag;
 
-                        /* size of data following */
-                        TapeHeader[CPC_TAPE_HEADER_DATA_LENGTH_LOW] = (unsigned char)TapeBlockSize;
-                        TapeHeader[CPC_TAPE_HEADER_DATA_LENGTH_HIGH] = (unsigned char)(TapeBlockSize>>8);
+						/* size of data following */
+						TapeHeader[CPC_TAPE_HEADER_DATA_LENGTH_LOW] = (unsigned char)TapeBlockSize;
+						TapeHeader[CPC_TAPE_HEADER_DATA_LENGTH_HIGH] = (unsigned char)(TapeBlockSize >> 8);
 
-                        /* location of block */
-                        TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = (unsigned char)BlockLocation;
-                        TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = (unsigned char)(BlockLocation>>8);
+						/* location of block */
+						TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_LOW] = (unsigned char)BlockLocation;
+						TapeHeader[CPC_TAPE_HEADER_DATA_LOCATION_HIGH] = (unsigned char)(BlockLocation >> 8);
 
-                        /* don't write a header if headerless */
-                        if (CPCMethod!=CPC_METHOD_HEADERLESS)
-                        {
-                            /* write header */
-                            CPC_WriteDataBlock(pTZXFile, 0x02c, TapeHeader, CPC_TAPE_HEADER_SIZE,10);
-                        }
+						/* don't write a header if headerless */
+						if (CPCMethod != CPC_METHOD_HEADERLESS)
+						{
+							/* write header */
+							CPC_WriteDataBlock(pTZXFile, 0x02c, TapeHeader, CPC_TAPE_HEADER_SIZE, 10);
+						}
 
-                        /* write data into block */
-                        CPC_WriteDataBlock(pTZXFile, 0x016, &pData[FileOffset], TapeBlockSize,CPC_PAUSE_AFTER_BLOCK_IN_MS);
+						/* write data into block */
+						CPC_WriteDataBlock(pTZXFile, HeaderlessSyncByte, &pFileData[FileOffset], TapeBlockSize, CPC_PAUSE_AFTER_BLOCK_IN_MS);
 
-                        BlockLocation+=TapeBlockSize;
-                        BlockIndex++;
-                        FileOffset+=TapeBlockSize;
-                        FileLengthRemaining -= TapeBlockSize;
-                    }
-                    while (FileLengthRemaining!=0);
-                }
-
-                free(pData);
-            }
+						BlockLocation += TapeBlockSize;
+						BlockIndex++;
+						FileOffset += TapeBlockSize;
+						FileLengthRemaining -= TapeBlockSize;
+					} while (FileLengthRemaining != 0);
+				}
+				free(pFileData);
+			}
+			else
+			{
+				printf("Failed to open input file\n");
+			}
 
 			/* write file */
 			if (BlankBeforeUse)
@@ -1265,7 +1410,7 @@ int		main(int argc, char *argv[])
 			}
 			else
 			{
-			    TZX_AppendFile(pTZXFile, pDestFilename);
+				TZX_AppendFile(pTZXFile, pDestFilename);
 			}
 
 			/* free it */
