@@ -51,6 +51,13 @@ extern void cpct_drawSpriteBlended   (void *memory, u8 height, u8 width, void *s
 extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height);
 extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideomem, 
                                               u8 width, u8 height, const void* pmasktable) __z88dk_callee;
+// Clipped sprite draw functions 
+extern void cpct_drawSpriteClipped(u8 width_sprite_to_draw, void *sprite, 
+                                         void* memory, u8 width, u8 height) __z88dk_callee;
+extern void cpct_drawSpriteClippedMasked(u8 width_sprite_to_draw, void *sprite, 
+                                         void* memory, u8 width, u8 height) __z88dk_callee;
+extern void cpct_drawSpriteClippedMaskedAlignedTable(u8 width_sprite_to_draw, void *sprite, 
+                                         void* memory, u8 width, u8 height, void *mask_table) __z88dk_callee;
 
 // Sprite flipping functions
 extern void cpct_hflipSpriteM0   (u8 width, u8 height, void* sprite) __z88dk_callee;
