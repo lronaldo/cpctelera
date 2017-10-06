@@ -22,8 +22,9 @@
 ;;
 ;; Function: cpct_drawToSpriteBufferMasked
 ;;
-;;    Draws an sprite to back buffer, using mask as transparency information to prevent erasing the background. 
-;; This lets using the destination sprite as a temporary screen back buffer.
+;;    Draws an sprite inside another sprite's buffer, using mask as transparency 
+;; information to prevent erasing the background. This permits using the destination 
+;; sprite as a temporary screen back buffer.
 ;; 
 ;; C Definition:
 ;;    void <cpct_drawToSpriteBufferMasked> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
@@ -65,6 +66,7 @@
 ;; along with mask data, take a look at <cpct_drawSpriteMasked>.
 ;; 
 ;; Known limitations:
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;     * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of the buffer or the sprite it might 
 ;; potentially overwrite memory locations beyond boundaries. In particular, pay 
@@ -81,9 +83,26 @@
 ;;
 ;; Details:
 ;;    This function copies a generic WxH bytes sprite from memory to a 
-;; buffer-memory or another sprite.  The original sprite must be stored as an array (i.e. with 
-;; all of its pixels stored as consecutive bytes in memory). It works in
-;; a similar way to <cpct_drawSpriteMasked>.
+;; buffer-memory or another sprite. Both origin and destination sprites must be 
+;; stored as arrays (i.e. with all of their pixels stored as consecutive bytes 
+;; in memory). It works in a similar way to <cpct_drawSpriteMasked>.
+;;
+;;    The function copies bytes one by one from the origin sprite to the 
+;; place within the destination sprite marked by *inbuffer_ptr*. The process
+;; does a "blending" instead of a raw copy. The blending depends on the mask
+;; that must be included within the origin sprite, interlaced with its colour
+;; pixel data (in the same format as for <cpct_drawSpriteMasked>). The blending
+;; consist in applying the mask to the bytes from the origin sprite (AND 
+;; operation), then mixing the result with the bytes from the destination
+;; sprite (OR operation). This is designed mainly to be used for simulating
+;; transparency on the origin sprite.
+;;
+;;    This code shows a great example of what can be done with this function:
+;; (start code)
+;;  ----------------- REVIEW STILL PENDING  ------------------------------
+;;	backBufferPtr = cpctm_spriteBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X, POS_SHIP_Y);
+;;	cpct_drawToSpriteBufferMasked(VIEW_CX, backBufferPtr, G_SHIP_W, G_SHIP_H, g_ship);
+;; (end code)
 ;;
 ;; Destroyed Register values:
 ;;       AF, BC, DE, HL

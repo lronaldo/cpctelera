@@ -22,8 +22,8 @@
 ;;
 ;; Function: cpct_drawToSpriteBuffer
 ;;
-;;    Draws an sprite inside another sprite. This lets using the destination sprite
-;; as a temporary screen back buffer.
+;;    Draws an sprite inside another sprite's buffer. This permits using the 
+;; destination sprite as a temporary screen back buffer.
 ;;
 ;; C Definition:
 ;;    void <cpct_drawToSpriteBuffer> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
@@ -70,6 +70,7 @@
 ;;  must be greater than 0 and greater or equal than *width*.
 ;; 
 ;; Known limitations:
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;     * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of the buffer or the sprite it might 
 ;; potentially overwrite memory locations beyond boundaries. In particular, pay 
