@@ -22,7 +22,7 @@
 ;; (end code)
 ;;
 
-.include "src/macros/cpct_reverseBits.s"
+.include "macros/cpct_reverseBits.s"
 
 ;; Parameter retrieval
    pop  hl     ;; [3] HL = return address
