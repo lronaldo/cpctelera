@@ -40,8 +40,8 @@ include $(THIS_DIR)/global_paths.mk
 ##  Setting assembler flags for compilation of CPCTelera library
 ##
 #####
-
-Z80ASMFLAGS=-l -o -s
+INCLUDE_DIRS := -I$(CPCT_PATH)src/
+Z80ASMFLAGS=$(INCLUDE_DIRS) -l -o -s 
 
 ####
 ## SECTION 2: LIBRARY CONFIG
