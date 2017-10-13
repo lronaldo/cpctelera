@@ -20,13 +20,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: drawBackBufferMaskedAlignedTable
+;; Function: cpct_drawToSpriteBufferMaskedAlignedTable
 ;;
 ;; Draws an sprite to back buffer, making use of a 
 ;; given 256-bytes aligned mask table to create transparencies. 
 ;;
 ;; C Definition:
-;;    void <cpct_drawBackBufferMaskedAlignedTable> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
+;;    void <cpct_drawToSpriteBufferMaskedAlignedTable> (<u16> *buffer_width*, void* *inbuffer_ptr*, 
 ;;                                           <u8> *width*, <u8> *height*, void* *sprite*, 
 ;;                                           <u8>* *mask_table*) __z88dk_callee;
 ;;

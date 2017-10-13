@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -16,9 +16,22 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCT_SPRITE_TYPES_H
-#define CPCT_SPRITE_TYPES_H
+//#####################################################################
+//### MODULE: Sprites
+//### SUBMODULE: blending
+//#####################################################################
+//### This module contains routines to draw sprites in special ways to
+//### blend them with backgrounds in screen video memory
+//#####################################################################
+//
 
-#include "blending/sprite_types.h"
+#ifndef CPCT_BLENDSPRITES_H
+#define CPCT_BLENDSPRITES_H
+
+// Blended Draw Functions
+extern void cpct_drawSpriteBlended   (void *memory, u8 height, u8 width, void *sprite) __z88dk_callee;
+
+// Functions to modify behaviour of other functions
+extern void cpct_setBlendMode (CPCT_BlendMode mode) __z88dk_fastcall;
 
 #endif
