@@ -67,7 +67,7 @@
 
 ;; We need to change the value of the index counter to set it to its initial value
 .globl cpct_seedJump_mxor_u16
-.include "src/macros/cpct_opcodes.s"
+.include "macros/cpct_opcodeConstants.h.s"
 
 _cpct_restoreState_mxor_u16::
 cpct_restoreState_mxor_u16_asm::

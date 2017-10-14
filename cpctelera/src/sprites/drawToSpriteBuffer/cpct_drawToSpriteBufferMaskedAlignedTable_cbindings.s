@@ -18,11 +18,8 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.s"	
-.include "macros/cpct_maths.s" 
-
-;;( u16 buffer_width, void* buffer, u8 width, u8 height
-;;  void* sprite, u8* mask_table) __z88dk_callee;
+.include "macros/cpct_undocumentedOpcodes.h.s"	
+.include "macros/cpct_maths.h.s" 
 
 ;;
 ;; C bindings for <cpct_drawToSpriteBufferMaskedAlignedTable>
