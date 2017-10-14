@@ -25,7 +25,7 @@
 
 ;; Constant: opc_JR
 ;;    Opcode for "JR xx" instruction. Requires 1-byte parameter (xx)
-opc_JR = 0x18
+opc_JR   = 0x18
 
 ;; Constant: opc_LD_D
 ;;    Opcode for "LD d, xx" instruction. Requires 1-byte parameter (xx)
