@@ -16,7 +16,7 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.include "cpct_maths.h.s"
-.include "cpct_opcodeConstants.h.s"
-.include "cpct_reverseBits.h.s"
-.include "cpct_undocumentedOpcodes.h.s"
+.include "macros/cpct_maths.h.s"
+.include "macros/cpct_opcodeConstants.h.s"
+.include "macros/cpct_reverseBits.h.s"
+.include "macros/cpct_undocumentedOpcodes.h.s"
