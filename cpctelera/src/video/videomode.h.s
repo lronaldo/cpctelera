@@ -15,8 +15,19 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module cpct_video
+   
+;;
+;; Includes
+;;
+.include "video/video_macros.h.s"
+.include "video/colours.h.s"
 
-;; All CPCtelera include files
-.include "macros/allmacros.h.s"
-.include "keyboard/keyboard.h.s"
-.include "video/videomode.h.s"
+;;
+;; Constant values
+;;
+.equ GA_port,      0x7F00  ;; 16-bit Port of the Gate Array (for the use with BC register)
+.equ GA_port_byte, 0x7F    ;; 8-bit Port of the Gate Array
+.equ PAL_PENR,     0x00    ;; Command to select a PEN register in the PAL chip
+.equ PAL_INKR,     0x40    ;; Command to set the INK of a previously selected PEN register in the PAL chip
+.equ PPI_PORT_B,   0xF5    ;; Port B of the PPI, used to read Vsync/Jumpers/PrinterBusy/CasIn/Exp information
