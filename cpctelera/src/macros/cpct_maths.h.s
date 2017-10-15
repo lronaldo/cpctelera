@@ -27,6 +27,9 @@
 ;;
 ;;    Performs the operation REGPAIR = REGPAIR + A. REGPAIR is any given pair of 8-bit registers.
 ;;
+;; ASM Definition:
+;;    .macro <add_REGPAIR_a> RH, RL
+;;
 ;; Parameters:
 ;;    RH    - Register 1 of the REGPAIR. Holds higher-byte value
 ;;    RL    - Register 2 of the REGPAIR. Holds lower-byte value
@@ -72,6 +75,9 @@
 ;;
 ;;    Performs the operation DE = DE + A
 ;;
+;; ASM Definition:
+;;    .macro <add_de_a>
+;;
 ;; Parameters:
 ;;    None
 ;; 
@@ -110,6 +116,9 @@
 ;;
 ;;    Performs the operation HL = HL + A
 ;;
+;; ASM Definition:
+;;    .macro <add_hl_a>
+;;
 ;; Parameters:
 ;;    None
 ;; 
@@ -147,6 +156,9 @@
 ;; Macro: add_bc_a
 ;;
 ;;    Performs the operation BC = BC + A
+;;
+;; ASM Definition:
+;;    .macro <add_bc_a>
 ;;
 ;; Parameters:
 ;;    None
