@@ -22,8 +22,9 @@ Project owner:
  
 Awesome collaborators:
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
+ * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
    * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
-   * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
+   * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
    * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
    * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
@@ -48,6 +49,7 @@ Random number generation:
 Graphical assets:
    * <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
    * <C-TOY at http://c-toy.blogspot.com.es/>
+   * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
    * <hassekf at http://opengameart.org/users/hassekf>
    * <SpinachChicken at http://opengameart.org/users/spinachchicken>
 
@@ -117,7 +119,7 @@ Section: Testers & Bug Reporters
 
 Section: Assets 
 
- * SpritesEMR, Persea, Fremos Logo, Frame Tile Sprite, Death with an oil lamp, Background and others by Emilio Molina Reig (<Dardalorth at https://twitter.com/dardalorth> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
+ * SpritesEMR, Persea, Fremos Logo, Frame Tile Sprite, Death with an oil lamp, Background and others by Emilio Molina Reig (<Dardalorth at https://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
  * Goku, No13, Vegeta by <SunWay at mailto:oferrer@carlio.es> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
  * GNG Like tiles by <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
 * <Hand Painted Texture at http://opengameart.org/content/hand-painted-texture-sandstone> by <The Chayed - KIIRA at http://opengameart.org/users/the-chayed-kiira>
