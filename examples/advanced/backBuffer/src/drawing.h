@@ -19,30 +19,34 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
-// SPRITE BACK BUFFER
+// SCENE DRAWING FUNCTIONS
 //
-// This file groups all functions and data used to perform drawing by using an sprite as
-// back buffer. All drawing operations are performed from sprite to sprite (to the sprite 
-// that is used as back buffer). When all drawings are finished, and after waiting to 
-// VSYNC signal, the Sprite Back Buffer is then drawn as one big sprite to screen. This
-// final unique operation is fast enough to avoid being caught by raster, then avoiding 
-// flickering.
+// This module groups functions and data structures used to draw the main demonstrative
+// scene in this demo. It can draw the same scene using 3 different functions:
+//    - DrawDirectlyToScreen: draws everything directly to the displayed video memory
+//    - DrawUsingHardwareBackBuffer: draws to a hardware back buffer, switching buffers
+//          when drawing is finished.
+//    - DrawUsingSpriteBackBuffer: draws to a Sprite used as back buffer first. Then, 
+//          it draws the sprite back buffer directly to displayed video memory in 1 single step.
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <declarations.h>
+#ifndef _DRAWING_H_
+#define _DRAWING_H_
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// COPY TO SCREEN
+// PUBLIC DEFINED TYPES
 //
-//    Waits for VSYNC and then copies the Sprite Back Buffer to its final location at the
-// screen (actually, it draws it)
-//
-void CopyToScreen() {
-   // Calculate screen location where Sprite Back Buffer will be drawn
-   u8*   pVideoMemLocation = GetScreenPtr(VIEW_X, VIEW_Y);
 
-   // Wait for VSYNC and perform the actual drawing of the Sprite
-   cpct_waitVSYNC();
-   cpct_drawSprite(gBackBuffer, pVideoMemLocation, VIEW_W_BYTES, VIEW_H_BYTES);
-}
+// Draw functions pointer (Points to any of the drawing functions)
+typedef void (*TDrawFunc)(void);
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTION DECLARATIONS
+//
+void  InitializeDrawing();
+void  SelectDrawFunction(u8 drawFuncNb);
+void  ScrollAndDrawSpace();
+
+#endif

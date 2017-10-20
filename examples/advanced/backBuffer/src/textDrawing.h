@@ -19,7 +19,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
-// MANAGE VIDEO MEMORY
+// TEXT DRAWING FUNCTIONS
 //
 // This module groups functions and data structures used to draw textual information 
 // on the screen.
@@ -50,6 +50,6 @@ typedef struct {
 // PUBLIC FUNCTION DECLARATIONS
 //
 void DrawInfoText();
-void DrawSelection(u8 sel);
+void DrawTextSelectionSign(u8 sel);
 
 #endif

@@ -92,12 +92,12 @@ void DrawSelectionToBuffer(u8* bufferPtr, u8 pos) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// DRAW SELECTION
+// DRAW TEXT SELECTION SIGN
 //
 //    Draws a sign near the currently selected option in both screen buffers (screen 
 // video memory and hardware back buffer)
 // 
-void DrawSelection(u8 sel) {
+void DrawTextSelectionSign(u8 sel) {
    // On-screen Y locations of the 3 selections the
    // user can pick up
    static const u8 locations[3] = { 

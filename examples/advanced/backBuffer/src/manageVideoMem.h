@@ -17,6 +17,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+// MANAGE VIDEO MEMORY
+//
+// This module groups functions and variables that control video memory. These functions
+// take care of which memory is being used as screen video memory and which as hardware 
+// back buffer. They also switch both buffers on demand.
+// This module also controls the function tu perform drawing from a sprite back buffer
+// to video memory. When all drawings are finished, and after waiting to VSYNC signal, 
+// the Sprite Back Buffer is then drawn as one big sprite to screen. This final unique 
+// operation is fast enough to avoid being caught by raster, then avoiding flickering.
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef _MANAGEVIDEOMEM_H_
 #define _MANAGEVIDEOMEM_H_
 
@@ -25,9 +39,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTION DECLARATIONS
 //
-void  FlipBuffer        ();
-u8*   GetScreenPtr      (u8 xPos, u8 yPos);
-u8*   GetBackBufferPtr  (u8 xPos, u8 yPos);
-void  initVideoMemoryBuffers();
+void  InitializeVideoMemoryBuffers  ();
+u8*   GetScreenPtr                  (u8 xPos, u8 yPos);
+u8*   GetBackBufferPtr              (u8 xPos, u8 yPos);
+u8*   GetSpriteBackBufferPtr        (u8 xPos, u8 yPos);
+void  FlipBuffers                   ();
+void  DrawSpriteBackBufferToScreen  ();
 
 #endif

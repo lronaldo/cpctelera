@@ -32,8 +32,8 @@
 
 // Other modules
 #include <manageVideoMem.h>
-#include <spriteBackBuffer.h>
 #include <textDrawing.h>
+#include <drawing.h>
 
 /////////////////////////////////////////////////////////////////////////////////
 // USEFUL MACROS AND CONSTANTS
@@ -66,10 +66,5 @@
 
 // Declare Mask Table for Mode 1
 cpctm_declareMaskTable(gMaskTable);
-
-/////////////////////////////////////////////////////////////////////////////////
-// GLOBAL VARIABLES DEFINED IN OTHER MODULES
-//
-extern u8 gBackBuffer[VIEW_W_BYTES*VIEW_H_BYTES]; // Software Back buffer
 
 #endif
