@@ -33,6 +33,7 @@
 // Other modules
 #include <manageVideoMem.h>
 #include <spriteBackBuffer.h>
+#include <textDrawing.h>
 
 /////////////////////////////////////////////////////////////////////////////////
 // USEFUL MACROS AND CONSTANTS

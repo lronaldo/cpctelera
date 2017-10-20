@@ -150,87 +150,21 @@ void DrawSWDoubleBuffer()
 
 /*****************************************************/
 /*                                      */
-/* Draw current selection                     */
-/*                                       */
-/*****************************************************/
-void DrawSelection(u8 sel)
-{
-   u8 pos;
-   switch(sel)
-   {
-      case 1 : pos = POS_TEXT + 15; break;
-      case 2 : pos = POS_TEXT + 40; break;
-      case 3 : pos = POS_TEXT + 75; break;
-      default : return;
-   }
-   
-   /** Draw text in both video buffer */
-   cpct_drawSolidBox(cpct_getScreenPtr((u8*)CPCT_VMEM_START, 0, POS_TEXT + 15), 0, 2, 80);
-   cpct_drawSolidBox(cpct_getScreenPtr((u8*)SCREEN_BUFF, 0, POS_TEXT + 15), 0, 2, 80);
-   
-   cpct_drawStringM1(">", cpct_getScreenPtr((u8*)CPCT_VMEM_START, 0, pos), 3, 0);  
-   cpct_drawStringM1(">", cpct_getScreenPtr((u8*)SCREEN_BUFF, 0, pos), 3, 0);  
-}
-
-/*****************************************************/
-/*                                      */
 /* Check input keys to change draw function      */
 /*                                       */
 /*****************************************************/
-void CheckUserInput() 
-{
-   u8 sel = 0;
+void CheckUserInput() {
    cpct_scanKeyboard_f();
    
-   if (cpct_isKeyPressed(Key_1))
-   {
-      sel = 1;
+   if (cpct_isKeyPressed(Key_1)) {
       gDrawFunc = DrawSprite;
-   }
-   else  
-   if (cpct_isKeyPressed(Key_2))
-   {
-      sel = 2;
+      DrawSelection(1);
+   } else if (cpct_isKeyPressed(Key_2)) {
       gDrawFunc = DrawHWDoubleBuffer;
-   }
-   else  
-   if (cpct_isKeyPressed(Key_3))
-   {
-      sel = 3;
+      DrawSelection(2);
+   } else if (cpct_isKeyPressed(Key_3)) {
       gDrawFunc = DrawSWDoubleBuffer;
-   }
-   
-   DrawSelection(sel);
-}
-
-/*****************************************************/
-/*                                      */
-/* Draw text in both buffer                   */
-/*                                       */
-/*****************************************************/
-void DrawInfoText()
-{
-   u8 i;
-   for (i = 0; i < NB_BUFFERS; i++)
-   {
-      u8* mem = (i == 0) ? (u8*)CPCT_VMEM_START : (u8*)SCREEN_BUFF;
-
-      cpct_drawStringM1("Press:", cpct_getScreenPtr(mem, 0, POS_TEXT - 5), 3, 0);  
-      
-      cpct_drawStringM1("1", cpct_getScreenPtr(mem, 4, POS_TEXT + 15), 1, 0);  
-      cpct_drawStringM1(": No double buffer", cpct_getScreenPtr(mem, 8, POS_TEXT + 15), 2, 0);  
-      
-      cpct_drawStringM1("Directly draw in video mem", cpct_getScreenPtr(mem, 8, POS_TEXT + 25), 1, 0);  
-      
-      cpct_drawStringM1("2", cpct_getScreenPtr(mem, 4, POS_TEXT + 40), 1, 0);  
-      cpct_drawStringM1(": Hardware double buffer", cpct_getScreenPtr(mem, 8,  POS_TEXT + 40), 2, 0);  
-      
-      cpct_drawStringM1("Draw alternatively in two video mem  (2*16384 bytes) and flip between them", cpct_getScreenPtr(mem, 8, POS_TEXT + 50), 1, 0);  
-      
-      cpct_drawStringM1("3", cpct_getScreenPtr(mem, 4, POS_TEXT + 75), 1, 0);  
-      cpct_drawStringM1(": Software double buffer", cpct_getScreenPtr(mem, 8, POS_TEXT + 75), 2, 0);  
-      
-      cpct_drawStringM1("Draw in buffer (50*60 bytes) of size view and copy whole buffer to video mem (16384 bytes)", cpct_getScreenPtr(mem, 8, POS_TEXT + 85), 1, 0);  
+      DrawSelection(3);
    }
 }
 
