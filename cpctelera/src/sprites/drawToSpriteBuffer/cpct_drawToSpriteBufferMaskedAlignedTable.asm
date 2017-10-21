@@ -97,8 +97,87 @@
 ;; colours (origin sprite) with background colours (destination sprite buffer), 
 ;; after removing background pixels from the origin sprite.
 ;;
+;;    Next code example shows how to use this function to draw a sprite into
+;; a sprite back buffer,
+;; (start code)
+;;  // Constants defining sizes and locations
+;;  #define  SPRBUFFER_W    60 // Width of the sprite buffer IN BYTES
+;;  #define  SPRBUFFER_H   100 // Height of the sprite buffer in pixels (same as in bytes)
+;;  #define  G_TITLE_W      50 // Width of the sprite of the title IN BYTES
+;;  #define  G_TITLE_H      12 // Height of the sprite of the title in pixels (same as in bytes)
+;;  
+;;  /////////////////////////////////////////////////////////////////////////////////
+;;  // Mask Table Definition for Mode 1
+;;  //    This creates a 256-bytes transparency mask table that spans from 
+;;  // 0x0100 to 0x01FF, making it 256-bytes aligned (high-order byte 0x01 does 
+;;  // never change). This table considers any Mode1 0-coloured pixel as transparent
+;;  //
+;;  cpctm_createTransparentMaskTable(gMaskTable, 0x0100, M1, 0);
+;;  
+;;  // Sprite declarations
+;;  extern u8* g_title;  // g_title sprite is defined in an external file
+;;  
+;;  // .... More code goes here ....
+;;  
+;;  // Array used as sprite back buffer. Drawing is performed inside here first.
+;;  // After all drawings are performed, this sprite can be drawn in 1 single step 
+;;  // to the actual screen video memory
+;;  u8 gSpBackBuffer[SPRBUFFER_W * SPRBUFFER_H];
+;;  
+;;  /////////////////////////////////////////////////////////////////////////////////
+;;  // DRAW TITLE
+;;  //    Draws the title sprite over a background at the given (tx,ty) location inside
+;;  // the sprite back buffer that simulates the viewport. The title sprite has its
+;;  // transparent zone coloured as palette index 0. Therefore, we use a transparent
+;;  // mask table to make all 0-coloured pixels transparent when drawing.
+;;  //
+;;  void drawTitle(u8 tx, u8 ty) {
+;;     // Get a pointer to the byte inside the Sprite back buffer that is located
+;;     // at coordinates (tx, ty) (with respect to the origin of the sprite back buffer)
+;;     u8* drawPtr = cpctm_spriteBufferPtr(gSpBackBuffer, SPRBUFFER_W, tx, ty);
+;;  
+;;     // Draw the title sprite at (tx, ty) coordinates inside the Sprite back buffer
+;;     cpct_drawToSpriteBufferMaskedAlignedTable(SPRBUFFER_W, drawPtr, G_TITLE_W, G_TITLE_H, g_title, gMaskTable);
+;;  }
+;;  
+;;  // .... More code goes here ....
+;;  
+;;  ////////////////////////////////////////////////////////////////////////////////////////////
+;;  // DRAW SPRITE BACK BUFFER TO SCREEN
+;;  //
+;;  //    Waits for VSYNC and then copies the Sprite Back Buffer at the start of the screen
+;;  // video memory (actually, it draws it there)
+;;  //
+;;  void DrawSpriteBackBufferToScreen() {
+;;     // Wait for VSYNC and perform the actual drawing of the Sprite
+;;     cpct_waitVSYNC();
+;;     cpct_drawSprite(gSpBackBuffer, CPCT_VMEM_START, SPRBUFFER_W, SPRBUFFER_H);
+;;  }
+;;  
+;;  // .... More code goes here ....
+;;  
+;; (end code)
+;;     
+;;     Drawing to sprites instead of the screen lets us do as many draw 
+;; operations as required without worrying about the raster and flickering
+;; or tearing effects. As nothing is being changed in video memory, no 
+;; problematic effects are produced. Once the image is composed in one or 
+;; a few sprites, these can be drawn to the screen. This minimizes the 
+;; total cycles required to copy data from memory to video memory.
+;;
+;;         Also, as destination sprite is a normal sprite with its data 
+;; distributed linear in memory, calculating a position inside the sprite 
+;; is easier than in video memory. It only requires multiplying the 
+;; y-coordinate by the width of the sprite-buffer (to jump from its start 
+;; point to the y-th line), then adding the x-coordinate. Everything is 
+;; also added to the starting point of the sprite buffer. Moreover, this 
+;; calculations can be easily sped up by carefully selecting the width 
+;; of the sprite-buffer. If it is a power of 2, then multiplications will 
+;; become simple shifts, speeding up the proccess.
+;;
 ;; Destroyed Register values:
-;;       AF, BC, DE, HL
+;;    C-call   - AF, BC, DE, HL
+;;    ASM-call - AF, BC, DE, HL, IX
 ;;
 ;; Required memory:
 ;;    C-bindings   -  53 bytes
