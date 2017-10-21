@@ -98,7 +98,7 @@
 ;; about how sprite copying works,  and how video memory is formatted, 
 ;; take a look at <cpct_drawSprite>.
 ;;
-;;    This code shows a great example of what can be done with this function:
+;;    This code shows a great example of what can be done with this function,
 ;; (start code)
 ;;  // Size of the Background 
 ;;  #define BACK_W  60
@@ -128,14 +128,15 @@
 ;; a few sprites, these can be drawn to the screen. This minimizes the 
 ;; total cycles required to copy data from memory to video memory.
 ;;
-;;     Also, as destination sprite is a normal sprite with its data distributed
-;; linear in memory, calculating a position inside the sprite is easier than in
-;; video memory. It only requires multiplying the y coordinate by the Width of
-;; the sprite-buffer (to jump from its start point to the y-th line), then adding
-;; the x coordinate. Everything is also added to the starting point of the sprite
-;; buffer. Moreover, this calculations can be easily sped up by carefully selecting
-;; the width of the sprite-buffer. If it is a power of 2, then multiplications
-;; will become simple shifts, speeding up the proccess.
+;;         Also, as destination sprite is a normal sprite with its data 
+;; distributed linear in memory, calculating a position inside the sprite 
+;; is easier than in video memory. It only requires multiplying the 
+;; y-coordinate by the width of the sprite-buffer (to jump from its start 
+;; point to the y-th line), then adding the x-coordinate. Everything is 
+;; also added to the starting point of the sprite buffer. Moreover, this 
+;; calculations can be easily sped up by carefully selecting the width 
+;; of the sprite-buffer. If it is a power of 2, then multiplications will 
+;; become simple shifts, speeding up the proccess.
 ;;
 ;; Destroyed Register values:
 ;;       AF, BC, DE, HL

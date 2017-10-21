@@ -85,7 +85,9 @@
 ;;    This function copies a generic WxH bytes sprite from memory to a 
 ;; buffer-memory or another sprite. Both origin and destination sprites must be 
 ;; stored as arrays (i.e. with all of their pixels stored as consecutive bytes 
-;; in memory). It works in a similar way to <cpct_drawSpriteMasked>.
+;; in memory). It works in a similar way to <cpct_drawSpriteMasked>, but drawing 
+;; to a linearly-disposed memory (as in the case of a sprite array), instead 
+;; of a screen video memory formatted one.
 ;;
 ;;    The function copies bytes one by one from the origin sprite to the 
 ;; place within the destination sprite marked by *inbuffer_ptr*. The process
@@ -97,12 +99,69 @@
 ;; sprite (OR operation). This is designed mainly to be used for simulating
 ;; transparency on the origin sprite.
 ;;
-;;    This code shows a great example of what can be done with this function:
+;;    This code shows a great example of what can be done with this function,
 ;; (start code)
-;;  ----------------- REVIEW STILL PENDING  ------------------------------
-;;	backBufferPtr = cpctm_spriteBufferPtr(gBackBuffer, VIEW_CX, POS_SHIP_X, POS_SHIP_Y);
-;;	cpct_drawToSpriteBufferMasked(VIEW_CX, backBufferPtr, G_SHIP_W, G_SHIP_H, g_ship);
+;; // Constants defining sizes and locations
+;; // "Viewport" is the sprite buffer drawn in the screen video memory
+;; #define  SPRBUFFER_W    60 // Width of the sprite buffer IN BYTES
+;; #define  SPRBUFFER_H    80 // Height of the sprite buffer in pixels (same as in bytes)
+;; #define  VIEW_X         10 // X Coordinate of the Viewport (location where sprite buffer is drawn in screen video memory)
+;; #define  VIEW_Y         30 // Y Coordinate of the Viewport (location where sprite buffer is drawn in screen video memory)
+;; #define  G_SHIP_W       28 // Width of the sprite of the ship IN BYTES
+;; #define  G_SHIP_H       20 // Height of the sprite of the ship in pixels (same as in bytes)
+;; #define  SHIP_X         12 // X coordinate of the ship inside the sprite buffer (IN BYTES)
+;; #define  SHIP_Y         15 // Y coordinate of the ship inside the sprite buffer (in pixels, same as in bytes)
+;; // As Viewport location is fixed, we can define it as a pre-calculated constant
+;; // We use the calculation macro for this purpose, as it will be compiled to the result.
+;; #define  VIEW_PTR       cpctm_screenPtr(CPCT_VMEM_START, VIEW_X, VIEW_Y)
+;; 
+;; // Array used as sprite back buffer. Drawing is performed inside here first.
+;; // After all drawings are performed, this sprite can be drawn in 1 single step 
+;; // to the actual screen video memory
+;; u8 gSpBackBuffer[SPRBUFFER_W * SPRBUFFER_H];
+;; 
+;; // .... Other functions go here ....
+;; 
+;; // This function draws all elements to the sprite back buffer. Afterwards, it
+;; // waits for VSYNC and then it draws the sprite back buffer to the screen video memory
+;; void  drawEverything() {
+;;    u8* drawPtr;
+;;    
+;;    // .... Other drawings here (tiles, background, sprites...)
+;; 
+;;    // Calculate exact byte location inside the sprite buffer where our ship
+;;    // has to be drawn, according to its coordinates (X, Y). (Coordinates are 
+;;    // local to the sprite buffer space, being (0,0) the first byte, up-left corner)
+;;    drawPtr = cpctm_spriteBufferPtr(gSpBackBuffer, SPRBUFFER_W, SHIP_X, SHIP_Y);
+;;    // Now that we have the exact byte location, draw the
+;;    // sprite of the ship to the sprite back buffer
+;;    cpct_drawToSpriteBufferMasked(SPRBUFFER_W, drawPtr, G_SHIP_W, G_SHIP_H, g_ship);
+;; 
+;;    // .... Other drawings here (tiles, background, sprites...)
+;; 
+;;    // All drawings are finished, wait for VSYNC and then copy 
+;;    // the sprite buffer to screen video memory
+;;    cpct_waitVSYNC();
+;;    cpct_drawSprite(gSpBackBuffer, VIEW_PTR, SPRBUFFER_W, SPRBUFFER_H);   
+;; }
 ;; (end code)
+;;
+;;     Drawing to sprites instead of the screen lets us do as many draw 
+;; operations as required without worrying about the raster and flickering
+;; or tearing effects. As nothing is being changed in video memory, no 
+;; problematic effects are produced. Once the image is composed in one or 
+;; a few sprites, these can be drawn to the screen. This minimizes the 
+;; total cycles required to copy data from memory to video memory.
+;;
+;;         Also, as destination sprite is a normal sprite with its data 
+;; distributed linear in memory, calculating a position inside the sprite 
+;; is easier than in video memory. It only requires multiplying the 
+;; y-coordinate by the width of the sprite-buffer (to jump from its start 
+;; point to the y-th line), then adding the x-coordinate. Everything is 
+;; also added to the starting point of the sprite buffer. Moreover, this 
+;; calculations can be easily sped up by carefully selecting the width 
+;; of the sprite-buffer. If it is a power of 2, then multiplications will 
+;; become simple shifts, speeding up the proccess.
 ;;
 ;; Destroyed Register values:
 ;;       AF, BC, DE, HL

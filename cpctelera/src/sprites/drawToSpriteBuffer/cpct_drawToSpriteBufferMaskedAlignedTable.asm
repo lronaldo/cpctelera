@@ -64,6 +64,7 @@
 ;; example table you might want to use.
 ;; 
 ;; Known limitations:
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;     * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of the buffer or the sprite
 ;; if might potentially overwrite memory locations beyond boundaries. This 
@@ -77,25 +78,24 @@
 ;;
 ;; Details:
 ;;    This function copies a generic WxH bytes sprite from memory to a 
-;; buffer-memory or another sprite. The original sprite must be stored as an array (i.e. with 
-;; all of its pixels stored as consecutive bytes in memory).
+;; buffer-memory or another sprite. Both origin and destination sprites must be 
+;; stored as arrays (i.e. with all of their pixels stored as consecutive bytes 
+;; in memory). It works in a similar way to <cpct_drawSpriteMaskedAlignedTable>, 
+;; but drawing to a linearly-disposed memory (as in the case of a sprite array), 
+;; instead of a screen video memory formatted one. For detailed information about 
+;; how sprite copying works, and how video memory is formatted, take a look at 
+;; <cpct_drawSprite> and <cpct_drawSpriteMasked> also.
 ;;
-;;    The original sprite must be stored as an array (i.e. with 
-;; all of its pixels stored as consecutive bytes in memory). It works in
-;; a similar way to <cpct_drawSpriteMasked>, but taking care about transparency
-;; information. For detailed information about how sprite copying works, 
-;; and how video memory is formatted, take a look at <cpct_drawSprite> and
-;; <cpct_drawSpriteMasked>.
-;;
-;;    The way if works is by getting sprite bytes one by one, operating
-;; with them, and copying them to video memory (or backbuffer). Each 
-;; byte got is used as index to retrieve the associated mask value from
-;; the mask table. Then, an AND operation between the byte and the mask
-;; is done to remove (set to 0) background pixels. After that, an OR
-;; operation between the new byte information and the background (the
-;; present byte at video memory location where we want to write) is
-;; performed. That effectively mixes sprite colours with background
-;; colours, after removing background pixels from the sprite.
+;;    The way it works is by copying bytes one by one from the origin sprite to
+;; the exact destination location inside the sprite-buffer, marked by the pointer
+;; *inbuffer_ptr*. The operation performed is not a raw copy, but a copy with 
+;; transparency modification. An aligned in-memory transparency table is used
+;; to perform and AND operation with bytes from the origin sprite, to remove
+;; background pixels from them (palette colour index 0). Afterwards, an OR
+;; operation between now transparent bytes and the destination sprite buffer 
+;; is performed to mix both of them. Both operations effectively mix sprite 
+;; colours (origin sprite) with background colours (destination sprite buffer), 
+;; after removing background pixels from the origin sprite.
 ;;
 ;; Destroyed Register values:
 ;;       AF, BC, DE, HL
