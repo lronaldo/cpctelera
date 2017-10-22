@@ -125,6 +125,8 @@ Group: Keyboard  {
 
 Group: Macros  {
 
+   File: allmacros.h  (macros/allmacros.h)
+   File: allmacros.h.s  (macros/allmacros.h.s)
    File: Math Macros  (macros/cpct_maths.h.s)
    File: Opcodes  (macros/cpct_opcodeConstants.h.s)
    File: Reverse Bits  (macros/cpct_reverseBits.h.s)
@@ -139,6 +141,7 @@ Group: Memutils  {
    File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
    File: cpct_pageMemory  (memutils/cpct_pageMemory.asm)
    File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
+   File: cpct_waitHalts  (memutils/cpct_waitHalts.asm)
    File: Memory Pagination Macros  (memutils/banks.h)
    File: Memory Relocation Utilities  (memutils/relocation.h)
    }  # Group: Memutils
@@ -245,6 +248,7 @@ Group: Video  {
    File: cpct_fw2hw  (video/cpct_fw2hw.asm)
    File: cpct_getHWColour  (video/cpct_getHWColour.s)
    File: cpct_getScreenPtr  (video/cpct_getScreenPtr.asm)
+   File: cpct_setCRTCReg  (video/cpct_setCRTCReg.asm)
    File: cpct_setPALColour  (video/cpct_setPALColour.asm)
    File: cpct_setPalette  (video/cpct_setPalette.asm)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
