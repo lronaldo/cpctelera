@@ -40,11 +40,6 @@
 ;;    * Warning: if interrupts are disabled when this function gets called, it 
 ;; will effectively hang your CPU forever, requiring a reset.
 ;;
-;; Details:
-;;    Executes a wait loop with a *halt* instruction inside. This effectively 
-;; waits for *n* interrupt signals to be produced. Each *halt* instruction
-;; hangs the CPU until the next interrupt signal is received. 
-;;
 ;; Destroyed Register values: 
 ;;    F, B
 ;;
@@ -56,6 +51,11 @@
 ;;    Time taken by the function greatly depends on the moment it is called. The
 ;; function will effectively wait for *n* interrupts to be produced + 7 additional
 ;; microseconds for final DJNZ and RET instructions.
+;;
+;; Details:
+;;    Executes a wait loop with a *halt* instruction inside. This effectively 
+;; waits for *n* interrupt signals to be produced. Each *halt* instruction
+;; hangs the CPU until the next interrupt signal is received. 
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
