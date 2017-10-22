@@ -42,6 +42,9 @@ extern void cpct_setStackLocation(void *memory) __z88dk_fastcall;
 // Memory pagination
 extern void cpct_pageMemory(u8 configAndBankValue) __z88dk_fastcall;
 
+// Wait for N Halts to be executed
+extern void cpct_waitHalts(u8 n) __z88dk_fastcall;
+
 // Macro to check conditions at compile time and issue errors
 #define BUILD_BUG_ON(condition) ((void)sizeof(char[2 - 2*!!(condition)]))
 
