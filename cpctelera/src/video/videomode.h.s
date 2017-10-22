@@ -26,8 +26,10 @@
 ;;
 ;; Constant values
 ;;
-.equ GA_port,      0x7F00  ;; 16-bit Port of the Gate Array (for the use with BC register)
-.equ GA_port_byte, 0x7F    ;; 8-bit Port of the Gate Array
-.equ PAL_PENR,     0x00    ;; Command to select a PEN register in the PAL chip
-.equ PAL_INKR,     0x40    ;; Command to set the INK of a previously selected PEN register in the PAL chip
-.equ PPI_PORT_B,   0xF5    ;; Port B of the PPI, used to read Vsync/Jumpers/PrinterBusy/CasIn/Exp information
+GA_port        = 0x7F00  ;; 16-bit Port of the Gate Array (for the use with BC register)
+GA_port_byte   = 0x7F    ;; 8-bit Port of the Gate Array
+PAL_PENR       = 0x00    ;; Command to select a PEN register in the PAL chip
+PAL_INKR       = 0x40    ;; Command to set the INK of a previously selected PEN register in the PAL chip
+PPI_PORT_B     = 0xF5    ;; Port B of the PPI, used to read Vsync/Jumpers/PrinterBusy/CasIn/Exp information
+CRTC_SELECTREG = 0xBC    ;; CRTC Port and command "Select Register"
+CRTC_SETVAL    = 0xBD    ;; CRTC Port and command "Set Value"

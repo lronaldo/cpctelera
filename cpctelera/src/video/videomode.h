@@ -44,4 +44,7 @@ extern void cpct_setVideoMemoryOffset (u8 offset) __z88dk_fastcall;
 // Using screen coordinates to get byte pointers
 extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y) __z88dk_callee;
 
+// Change Screen Resolutions setting CRTC register values
+extern void cpct_setCRTCReg   (u8 regnum, u8 newval) __z88dk_callee;
+
 #endif

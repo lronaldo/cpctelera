@@ -55,7 +55,7 @@ cpct_page40_asm = 0x10
 cpct_page00_asm = 0x00
 
 ;;
-;; Macro: cpct_memPage6_asm
+;; Macro: cpctm_memPage6_asm
 ;;
 ;;    Macro that encodes a video memory page in the 6 Least Significant bits (LSb)
 ;; of a byte, required as parameter for <cpct_setVideoMemoryPage>. It loads resulting
@@ -90,8 +90,8 @@ cpct_page00_asm = 0x00
 ;; with just 6 significant bits. For more information, check functions
 ;; <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
 ;;
-.macro cpct_memPage6_asm REG8, PAGE 
-   ld REG8, #PAGE / 4
+.macro cpctm_memPage6_asm REG8, PAGE 
+   ld REG8, #PAGE / 4      ;; [2] REG8 = PAGE/4
 .endm
 
 ;;
@@ -155,7 +155,59 @@ cpct_page00_asm = 0x00
 ;;    Any variable value  - Use the function <cpct_getScreenPtr>
 ;;
 .macro cpctm_screenPtr_asm REG16, VMEM, X, Y 
-   ld REG16, #VMEM + 80 * (Y / 8) + 2048 * (Y & 7) + X
+   ld REG16, #VMEM + 80 * (Y / 8) + 2048 * (Y & 7) + X   ;; [3] REG16 = screenPtr
+.endm
+
+;;
+;; Macro: cpctm_setCRTCReg
+;;
+;;    Macro that sets a new value for a given CRTC register.
+;;
+;; ASM Definition:
+;;    .macro <cpctm_setCRTCReg> *HEXVAL*, *HEXREG*
+;;
+;; Parameters:
+;;    (1B) HEXVAL - New value to be set for the register (in hexadecimal)
+;;    (1B) HEXREG - Number of the register to be set (in hexadecimal)
+;;
+;; Parameter Restrictions:
+;;    * *HEXREG* has to be an hexadecimal value from 00 to 1F
+;;    * *HEXVAL* has to be an hexadecimal value. Its valid range will depend
+;;          upon the selected register that will be modified. 
+;;
+;; Known issues:
+;;   * This macro can *only* be used from assembler code. It is not accessible from 
+;; C scope. 
+;;   * This macro can only be used with *constant values*. As given values are 
+;; concatenated with a number, they must also be hexadecimal numbers. If a 
+;; register or other value is given, this macro will not work.
+;;   * Using values out of range have unpredicted behaviour and can even 
+;; potentially cause damage to real Amstrad CPC monitors. Please, use with care.
+;;
+;; Destroyed Registers:
+;;    BC
+;;
+;; Size of generated code:
+;;    10 bytes 
+;;
+;; Time Measures:
+;;    * 14 microseconds
+;;    * 56 CPU Cycles
+;;
+;; Details:
+;;    This macro expands to two CRTC commands: Register selection and Register setting.
+;; It selects the register given as first parameter, then sets its new value to 
+;; that given as second parameter. Both given parameters must be of exactly 1 byte
+;; in size and the have to be provided in hexadecimal. This is due to the way
+;; that macro expansion and concatenation works. Given values will be concatenated
+;; with another 8-bit hexadecimal value to form a unique 16-bits hexadecimal value.
+;; Therefore, any parameter given will always be considered hexadecimal.
+;;
+.macro cpctm_setCRTCReg_asm HEXVAL, HEXREG
+   ld    bc, #0xBC'HEXREG  ;; [3] B=0xBC CRTC Select Register, C=register number to be selected
+   out  (c), c             ;; [4] Select register
+   ld    bc, #0xBD'HEXVAL  ;; [3] B=0xBD CRTC Set Register, C=Value to be set
+   out  (c), c             ;; [4] Set the value
 .endm
 
 ;;//////////////////////////////////////////////////////////////////////
@@ -163,7 +215,7 @@ cpct_page00_asm = 0x00
 ;;//////////////////////////////////////////////////////////////////////
 
 ;;
-;; Macro: cpct_setBorder_asm
+;; Macro: cpctm_setBorder_asm
 ;;
 ;;   Changes the colour of the screen border.
 ;;
@@ -202,7 +254,8 @@ cpct_page00_asm = 0x00
 ;; is called when using <cpct_setBorder_asm> (It is called using 16 as *pen*
 ;; argument, which identifies the border).
 ;;
-.macro cpct_setBorder_asm HWC
+.macro cpctm_setBorder_asm HWC
+   .globl cpct_setPALColour_asm
    ld   hl, #0x'HWC'10         ;; [3]  H=Hardware value of desired colour, L=Border INK (16)
    call cpct_setPALColour_asm  ;; [25] Set Palette colour of the border
 .endm
@@ -212,7 +265,7 @@ cpct_page00_asm = 0x00
 ;;//////////////////////////////////////////////////////////////////////
 
 ;;
-;; Macro: cpct_clearScreen_asm
+;; Macro: cpctm_clearScreen_asm
 ;;
 ;;    Macro to simplify clearing the screen.
 ;;
@@ -245,10 +298,10 @@ cpct_page00_asm = 0x00
 ;;    98309 microseconds (*4.924 VSYNCs* on a 50Hz display).
 ;;    393236 CPU Cycles 
 ;;
-.macro cpct_clearScreen_asm COL
-   ld    hl, #0xC000    ;; [3]
-   ld    de, #0xC001    ;; [3]
-   ld    bc, #0x4000    ;; [3]
-   ld   (hl), #COL      ;; [3]
-   ldir                 ;; [x]
+.macro cpctm_clearScreen_asm COL
+   ld    hl, #0xC000    ;; [3] HL Points to Start of Video Memory
+   ld    de, #0xC001    ;; [3] DE Points to the next byte
+   ld    bc, #0x4000    ;; [3] BC = 16384 bytes to be copied
+   ld   (hl), #COL      ;; [3] First Byte = given Colour
+   ldir                 ;; [98297] Perform the copy
 .endm
