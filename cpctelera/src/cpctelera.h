@@ -19,16 +19,17 @@
 #ifndef CPCTELERA_ALL_H
 #define CPCTELERA_ALL_H
 
-#include "types.h"
-#include "firmware/firmware.h"
-#include "memutils/memutils.h"
-#include "keyboard/keyboard.h"
-#include "bitarray/bitarray.h"
-#include "sprites/sprites.h"
-#include "strings/strings.h"
-#include "video/videomode.h"
-#include "audio/audio.h"
-#include "random/random.h"
-#include "easytilemaps/easytilemaps.h"
+#include <types.h>
+#include <firmware/firmware.h>
+#include <memutils/memutils.h>
+#include <keyboard/keyboard.h>
+#include <bitarray/bitarray.h>
+#include <sprites/sprites.h>
+#include <strings/strings.h>
+#include <video/videomode.h>
+#include <audio/audio.h>
+#include <random/random.h>
+#include <macros/allmacros.h>
+#include <easytilemaps/easytilemaps.h>
 
 #endif
