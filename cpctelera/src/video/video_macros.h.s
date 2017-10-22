@@ -164,11 +164,11 @@ cpct_page00_asm = 0x00
 ;;    Macro that sets a new value for a given CRTC register.
 ;;
 ;; ASM Definition:
-;;    .macro <cpctm_setCRTCReg> *HEXVAL*, *HEXREG*
+;;    .macro <cpctm_setCRTCReg> *HEXREG*, *HEXVAL*
 ;;
 ;; Parameters:
-;;    (1B) HEXVAL - New value to be set for the register (in hexadecimal)
-;;    (1B) HEXREG - Number of the register to be set (in hexadecimal)
+;;    (1B) HEXREG - New value to be set for the register (in hexadecimal)
+;;    (1B) HEXVAL - Number of the register to be set (in hexadecimal)
 ;;
 ;; Parameter Restrictions:
 ;;    * *HEXREG* has to be an hexadecimal value from 00 to 1F
@@ -203,7 +203,7 @@ cpct_page00_asm = 0x00
 ;; with another 8-bit hexadecimal value to form a unique 16-bits hexadecimal value.
 ;; Therefore, any parameter given will always be considered hexadecimal.
 ;;
-.macro cpctm_setCRTCReg_asm HEXVAL, HEXREG
+.macro cpctm_setCRTCReg_asm HEXREG, HEXVAL
    ld    bc, #0xBC'HEXREG  ;; [3] B=0xBC CRTC Select Register, C=register number to be selected
    out  (c), c             ;; [4] Select register
    ld    bc, #0xBD'HEXVAL  ;; [3] B=0xBD CRTC Set Register, C=Value to be set
