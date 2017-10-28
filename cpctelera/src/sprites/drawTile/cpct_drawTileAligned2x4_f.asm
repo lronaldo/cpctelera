@@ -103,7 +103,7 @@
 ;; (start code)
 ;;    Case    | microSecs (us) | CPU Cycles 
 ;; -----------------------------------------
-;;    Any     |       72       |   288
+;;    Any     |       71       |   284
 ;; -----------------------------------------
 ;; Asm saving |      -13       |   -52 
 ;; -----------------------------------------
@@ -137,7 +137,8 @@
 
    ;; Fourth line of pixels   
    ldi                      ;; [5] Copy 2 bytes for (HL) to (DE) and decrement BC 
-   ldi                      ;; [5]
+   ld    a, (hl)            ;; [2]
+   ld (de), a               ;; [2]
 
    ;; Return
    ret                      ;; [3]
