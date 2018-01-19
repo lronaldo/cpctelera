@@ -1,0 +1,12 @@
+#include "square.h"
+// Data created with Img2CPC - (c) Retroworks - 2007-2015
+// Tile g_square: 4x6 pixels, 2x6 bytes.
+const u8 g_square[2 * 6] = {
+	0xff, 0xaa,
+	0xff, 0xaa,
+	0xff, 0xaa,
+	0xff, 0xaa,
+	0xff, 0xaa,
+	0xff, 0xaa
+};
+
