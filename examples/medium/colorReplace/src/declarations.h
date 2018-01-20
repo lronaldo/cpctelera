@@ -43,44 +43,44 @@
 // Memory location definition
 enum
 {
-	VIDEO_MEM,
-	BUFFER_MEM,
-	NB_BUFFERS
+    VIDEO_MEM,
+    BUFFER_MEM,
+    NB_BUFFERS
 };
 
 // Boolean definition
-#define BOOL				u8
-#define TRUE				1
-#define FALSE				0
+#define BOOL                u8
+#define TRUE                1
+#define FALSE                0
 
 // Double buffer location
-#define SCREEN_BUFF			0x8000
-#define VMEM_SIZE			0x4000
+#define SCREEN_BUFF            0x8000
+#define VMEM_SIZE            0x4000
 
 // Mask table location
-#define MASK_TABLE_LOC		(SCREEN_BUFF - 0x100) // 0x100	= Size of Mask Table
+#define MASK_TABLE_LOC        (SCREEN_BUFF - 0x100) // 0x100    = Size of Mask Table
 
 // New stack location
-#define NEW_STACK_LOC		(MASK_TABLE_LOC - 0x100) // 0x100	= Size of Stack
+#define NEW_STACK_LOC        (MASK_TABLE_LOC - 0x100) // 0x100    = Size of Stack
 
 // Screen size
-#define SCREEN_CY			200
-#define SCREEN_CX			80
+#define SCREEN_CY            200
+#define SCREEN_CX            80
 
-#define VIEW_TOP			0
-#define VIEW_DOWN			SCREEN_CY - 20
+#define VIEW_TOP            0
+#define VIEW_DOWN            SCREEN_CY - 20
 
-#define POS_CLOUD_X			0
-#define POS_CLOUD_Y			20
+#define POS_CLOUD_X            0
+#define POS_CLOUD_Y            20
 
-#define NB_BALOONS			8
-#define BALOON_TRAIL		8
+#define NB_BALOONS            8
+#define BALOON_TRAIL        8
 
-#define BALOON_ACTIVE		1
-#define BALOON_INACTIVE		0
+#define BALOON_ACTIVE        1
+#define BALOON_INACTIVE        0
 
-#define NB_STARS			10
-#define NB_COLORS_STAR		7
+#define NB_STARS            10
+#define NB_COLORS_STAR        7
 
 /////////////////////////////////////////////////////////////////////////////////
 // Mask Table Definition for Mode 0

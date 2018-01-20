@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2017 Arnaud BOUCHE
+//  Copyright (C) 2017 Arnaud BOUCHE (@Arnaud6128)
 //  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -31,15 +31,15 @@ cpctm_createTransparentMaskTable(gMaskTable, MASK_TABLE_LOC, M0, 0);
 //
 void Initialization()
 {
-	// We need to disable firmware in order to set the palette and
-	// to be able to use a second screen between 0x8000 and 0xBFFF
-	cpct_disableFirmware();
-	cpct_setVideoMode(0);			// Set mode 0
-	cpct_setPalette(g_palette, 16);	// Set the palette
-	cpct_setBorder(0x57);			// Set the border color with Hardware color (Sky Blue)
-	
-	InitializeVideoMemoryBuffers();	// Initialize video buffers	
-	InitializeDrawing();			// Initialize drawing elements
+    // We need to disable firmware in order to set the palette and
+    // to be able to use a second screen between 0x8000 and 0xBFFF
+    cpct_disableFirmware();
+    cpct_setVideoMode(0);            // Set mode 0
+    cpct_setPalette(g_palette, 16);  // Set the palette
+    cpct_setBorder(HW_SKY_BLUE);     // Set the border color with Hardware color
+    
+    InitializeVideoMemoryBuffers();  // Initialize video buffers    
+    InitializeDrawing();             // Initialize drawing elements
 }
 
 ///////////////////////////////////////////////////////
@@ -47,23 +47,23 @@ void Initialization()
 /// 
 void main(void) 
 {
-	// Change stack location before any call. We will be using
-	// memory from 0x8000 to 0xBFFF as secondary buffer, so
-	// the stack must not be there or it will get overwritten
-	cpct_setStackLocation((u8*)NEW_STACK_LOC);
-	
-	// Initialize everything
-	Initialization();
-	
-	// Main Loop
-	while (TRUE)
-	{
-		UpdateBaloons();
-		DrawSceneBaloons();
-		DrawStars();
-		
-		// Flip buffers to display the present back buffer
-		// and stop displaying the current video memory
-		FlipBuffers();		
-	}
+    // Change stack location before any call. We will be using
+    // memory from 0x8000 to 0xBFFF as secondary buffer, so
+    // the stack must not be there or it will get overwritten
+    cpct_setStackLocation((u8*)NEW_STACK_LOC);
+    
+    // Initialize everything
+    Initialization();
+    
+    // Main Loop
+    while (TRUE)
+    {
+        UpdateBaloons();
+        DrawSceneBaloons();
+        DrawStars();
+        
+        // Flip buffers to display the present back buffer
+        // and stop displaying the current video memory
+        FlipBuffers();        
+    }
 }
