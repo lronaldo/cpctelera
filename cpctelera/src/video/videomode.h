@@ -47,4 +47,7 @@ extern  u8* cpct_getScreenPtr (void* screen_start, u8 x, u8 y) __z88dk_callee;
 // Change Screen Resolutions setting CRTC register values
 extern void cpct_setCRTCReg   (u8 regnum, u8 newval) __z88dk_callee;
 
+// Capture Video Memory area to buffer
+extern void cpct_getScreenToSprite(u8* memory, u8* sprite, u8 width, u8 height) __z88dk_callee;
+
 #endif
