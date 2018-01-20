@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2018 Arnaud BOUCHE
+//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -19,9 +20,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_drawSpriteMasked
+;; Function: cpct_getScreenToSprite
 ;;
-;;    Copies and convert part of the screen to sprite
+;;    Copies and convert screen area to sprite
 ;;
 ;; C Definition:
 ;;    void <cpct_getScreenToSprite> (void* *memory*, void* *sprite*, <u8> *width*, <u8> *height*) __z88dk_callee;
