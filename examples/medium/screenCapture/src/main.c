@@ -1,7 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2017 Arnaud Bouche
-//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2018 Arnaud Bouche
+//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -23,10 +23,10 @@
 
 /////////////////////////////////////////////////////////////////////////////////
 // SPRITES
-#include "sprites\ufo.h"
-#include "sprites\building_1.h"
-#include "sprites\building_2.h"
-#include "sprites\building_3.h"
+#include "sprites/ufo.h"
+#include "sprites/building_1.h"
+#include "sprites/building_2.h"
+#include "sprites/building_3.h"
 
 /////////////////////////////////////////////////////////////////////////////////
 // USEFUL MACROS AND CONSTANTS
@@ -45,17 +45,20 @@
 
 /////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
-u8 gScreenCapture[G_UFO_0_H*G_UFO_0_W];	// Array of background capture of size of UFO
+
+// This array will contain a copy of the background in the video memory region that
+// we will be overwritting with the UFO sprite. This copy will let us erase the 
+// UFO sprite restoring the previous background.
+u8 gScreenCapture[ G_UFO_0_H * G_UFO_0_W ];	
 
 /////////////////////////////////////////////////////////////////////////////////
 // INITIALIZATION
 // 
-void Initialization()
-{
-	cpct_disableFirmware();
-	cpct_setVideoMode(0);				// Set mode 0
-	cpct_setPalette (g_palette, 16);	// Set the palette
-	cpct_setBorder(0x14);				// Set the border color with Hardware color (Black)
+void Initialization() {
+	cpct_disableFirmware();            // Disable firmware to take full control of the CPC
+	cpct_setVideoMode(0);              // Set mode 0
+	cpct_setPalette (g_palette, 16);   // Set the palette
+	cpct_setBorder(HW_BLACK);          // Set the border color with Hardware color
 	
 	// Fill screen with color index 4 (Red)
 	cpct_memset(CPCT_VMEM_START, cpct_px2byteM0(4, 4), VMEM_SIZE);
@@ -64,51 +67,49 @@ void Initialization()
 /////////////////////////////////////////////////////////////////////////////////
 // GET UFO CURRENT ANIMATION SPRITE
 //
-u8* GetUfoSprite()
-{
-	// Current animation state
-	static u8 anim = 0;	
-	
-	// Array of all four sprites of UFO
-	static u8* const ufoSprite[] = { g_ufo_0, g_ufo_1, g_ufo_2, g_ufo_3 }; 
-	
-	// Get next animation sprite and return it
+u8* GetUfoSprite() {
+	// Private UFO Animation-Status Data
+    static u8 anim = 0;     // Currently selected animation sprite
+	static u8* const ufoSprite[] = { 
+        g_ufo_0, g_ufo_1, g_ufo_2, g_ufo_3  // Array of all four animation sprites
+    };
+    
+	// Just get next animation sprite and return it
 	return ufoSprite[anim++ % 4];
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 // DRAW UFO
 //
-void DrawUFO()
-{
+void DrawUFO() {
+    // Private data to control UFO location and status
 	static BOOL moveRight;	// Keep move direction
 	static u8 posX;			// Keep position X 
 	
-	u8* pvmem;
+    // Get a pointer to the start of the UFO sprite in video memory
+    // previous to moving. Background will need to be restored at this 
+    // precise location to erase UFO before drawing it in its next location
+	u8* pvmem_ufoBg = cpct_getScreenPtr(CPCT_VMEM_START, posX, UFO_Y);
 	
-	// Get VMem pointer of current UFO position for background replacement
-	u8* backPmem = cpct_getScreenPtr(CPCT_VMEM_START, posX, UFO_Y);
-	
-	// Move to right or to left
-	// If border is reached go to opposite direction
-	if (moveRight == FALSE)
-	{
+    // Temporal pointer to videomemory for drawing sprites (will be used later)
+    u8* pvmem;
+
+	// UFO Moves towards right or left
+	// When border is reached, movement direction changes
+	if (moveRight) {
+        // If right border reached go to left border
+        if (posX == SCREEN_CX - G_UFO_0_W - 1)  
+            moveRight = FALSE;	// Change direction
+		else 
+            posX++; 			// Move to right
+	} else {
 		// If left border reached go to right border
-		if (posX == 0)
-			moveRight = TRUE;	// Change direction
-		else
-			posX--;				// Move to left
-	}
-	else 
-	{
-		// If right border reached go to left border
-		if (posX == SCREEN_CX - G_UFO_0_W - 1)
-			moveRight = FALSE;	// Change direction
-		else
-			posX++; 			// Move to right
+		if (posX == 0)  moveRight = TRUE;	// Change direction
+		else            posX--;				// Move to left
 	}
 	
-	// Get VMem pointer of new UFO position
+	// Get a pointer to the Screen Video Memory location where 
+    // UFO will be drawn next (in its new location after movement)
 	pvmem = cpct_getScreenPtr(CPCT_VMEM_START, posX, UFO_Y);
 	
 	// Wait for VSync and draw background and UFO
@@ -116,51 +117,48 @@ void DrawUFO()
 	// any flickering. In other case you have to use double-buffer to prevent this.
 	cpct_waitVSYNC();
 	
-	// Replace background with previous position
+    //--- UFO REDRAWING
+    
+	// Erase UFO at its previous location by drawing background over it
 	cpct_drawSprite(gScreenCapture, backPmem, G_UFO_0_W, G_UFO_0_H);
 	
-	// Memorize current background for next move
+	// Before drawing UFO at its new location, copy the background there
+    // to gScreenCapture buffer. This will let us restore it next time
+    // the UFO moves.
 	cpct_getScreenToSprite(pvmem, gScreenCapture, G_UFO_0_W, G_UFO_0_H);
 	
-	// Draw UFO over background redrawn
+	// Draw UFO at its new location
 	cpct_drawSpriteMasked(GetUfoSprite(), pvmem, G_UFO_0_W, G_UFO_0_H);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 // FILL LINE OF COLOR
 //
-void FillLine(u8 pixColor, u8 lineY)
-{
-	// Get line start at line Y position
+void FillLine(u8 pixColor, u8 lineY) {
+	// Get a pointer to the start of line Y of screen video memory
+    // and fill it with given colour 
 	u8* pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 0, lineY);
-	
-	// Fill screen line width with color 
 	cpct_memset(pvmem, pixColor, SCREEN_CX);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-// DRAW SKY PART FILLED WITH GRADIANT
+// DRAW SKY PART FILLED WITH GRADIENT
 //
-u8 DrawSkyGradiant(u8 cy, u8 posY, u8 colorFront, u8 colorBack)
-{
+u8 DrawSkyGradient(u8 cy, u8 posY, u8 colorFront, u8 colorBack) {
 	u8 i, j;
 	
-	// Get byte color M0 for front color
+    // Get Mode 0 screen pixel colour representations for front and back colours
 	u8 pixFront = cpct_px2byteM0(colorFront, colorFront);
-	
-	// Get byte color M0 for back color
 	u8 pixBack  = cpct_px2byteM0(colorBack, colorBack);
 
-	// Draw gradiant zone
-	for (j = 0; j < cy; j++)
-	{
+	// Draw gradient zone
+	for (j = 0; j < cy; j++) {
 		// If end of screen reached stop drawing
 		if (posY == SCREEN_CY - 2)
 			break;
 
 		// Draw lines of color
-		for (i = 0; i < cy - j; i++)
-		{
+		for (i = 0; i < cy - j; i++) {
 			FillLine(pixFront, posY++);		
 		}	
 		FillLine(pixBack, posY++);	
@@ -173,10 +171,9 @@ u8 DrawSkyGradiant(u8 cy, u8 posY, u8 colorFront, u8 colorBack)
 /////////////////////////////////////////////////////////////////////////////////
 // DRAW SKY WITH GRADIENT ZONES FOR BACKGROUND
 //
-void DrawSky()
-{
+void DrawSky() {
 	// Define color of gradient sky parts
-	const u8 colors[] = { 2, 15, 2, 7, 10, 13, 8, 4 };
+	static const u8 colors[] = { 2, 15, 2, 7, 10, 13, 8, 4 };
 	
 	// Current line filled with color
 	u8 startLine = 0;
@@ -184,47 +181,48 @@ void DrawSky()
 	// Screen is divided into gradient zone
 	u8 i;
 	for (i = 1; i < sizeof(colors); i++)
-		startLine = DrawSkyGradiant(GRADIENT_CY - i, startLine, colors[i], colors[i - 1]);
+		startLine = DrawSkyGradient(GRADIENT_CY - i, startLine, colors[i], colors[i - 1]);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 // DRAW CITY WITH ALL BUILDING FOR BACKGROUND
 //
-void DrawCity()
-{
-	u8* pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 10, SCREEN_CY - G_BUILDING_1_H);
+void DrawCity() {
+    // As all locations of buildings are constant, we use cpctm_screenPtr that 
+    // will calculate screen video memory pointers during compile time (as it
+    // is a macro). Resulting assembly code will be shorter and faster, as 
+    // it will only contain exact video memory values for pointers, instead of
+    // code for calculating them.
+	u8* pvmem = cpctm_screenPtr(CPCT_VMEM_START, 10, SCREEN_CY - G_BUILDING_1_H);
 	cpct_drawSprite(g_building_1, pvmem, G_BUILDING_1_W, G_BUILDING_1_H);
 	
-	pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 30, SCREEN_CY - G_BUILDING_2_H);
+	pvmem = cpctm_screenPtr(CPCT_VMEM_START, 30, SCREEN_CY - G_BUILDING_2_H);
 	cpct_drawSprite(g_building_2, pvmem, G_BUILDING_2_W, G_BUILDING_2_H);
 	
-	pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 40, SCREEN_CY - G_BUILDING_1_H);
+	pvmem = cpctm_screenPtr(CPCT_VMEM_START, 40, SCREEN_CY - G_BUILDING_1_H);
 	cpct_drawSprite(g_building_1, pvmem, G_BUILDING_1_W, G_BUILDING_1_H);
 	
-	pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 67, SCREEN_CY - G_BUILDING_2_H);
+	pvmem = cpctm_screenPtr(CPCT_VMEM_START, 67, SCREEN_CY - G_BUILDING_2_H);
 	cpct_drawSprite(g_building_2, pvmem, G_BUILDING_2_W, G_BUILDING_2_H);
 	
-	pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 60, SCREEN_CY - G_BUILDING_3_H);
+	pvmem = cpctm_screenPtr(CPCT_VMEM_START, 60, SCREEN_CY - G_BUILDING_3_H);
 	cpct_drawSprite(g_building_3, pvmem, G_BUILDING_3_W, G_BUILDING_3_H);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 // INITIALIZE FIRST BACKGROUND CAPTURE		
 // 
-void InitCapture()
-{
-	// Get VMem pointer of default UFO position
-	u8* pvmem = cpct_getScreenPtr(CPCT_VMEM_START, UFO_INIT_X, UFO_Y);
-	
-	// Capture first UFO background
+void InitCapture() {
+	// Get Screen Video Memory pointer of default UFO location 
+    // and make a copy of the background pixel data there to gScreenCapture buffer
+	u8* pvmem = cpctm_screenPtr(CPCT_VMEM_START, UFO_INIT_X, UFO_Y);
 	cpct_getScreenToSprite(pvmem, gScreenCapture, G_UFO_0_W, G_UFO_0_H);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 // DRAW BACKGROUND WITH GRADIENT SKY AND BUILDING		
 // 
-void DrawBackground()
-{
+void DrawBackground() {
 	DrawSky();
 	DrawCity();
 	
@@ -234,17 +232,12 @@ void DrawBackground()
 ///////////////////////////////////////////////////////
 /// MAIN PROGRAM
 /// 
-void main(void) 
-{
-	// Initialize everything
-	Initialization();
+void main(void)  {
+	Initialization();   // Initialize everything
+	DrawBackground();   // Draw background with sky and buildings
 	
-	// Draw background with sky and buildings
-	DrawBackground();
-	
-	// Main Loop
-	while(1)
-	{
+	// Main Loop: Permanently move and draw the UFO
+	while(1) {
 		DrawUFO();
 	}
 }
