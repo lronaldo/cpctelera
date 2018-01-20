@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2017 Arnaud Bouche (Arnaud6128)
+;;  Copyright (C) 2017 Arnaud Bouche (@Arnaud6128)
 ;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ _cpct_drawSpriteColorizeM0::
    ex   (sp), hl                ;; [6] HL = (H = newColor, L = oldColor)
                                 ;; ... and leave Return Address at (SP) as we don't need to restore
                                 ;; ... stack status because callin convention is __z88dk_callee
-								
+                                
 .include /cpct_drawSpriteColorizeM0.asm/
 
 dms_restore_ix:

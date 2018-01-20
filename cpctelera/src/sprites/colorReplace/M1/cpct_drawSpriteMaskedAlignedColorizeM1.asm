@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2017 Arnaud Bouche (Arnaud6128)
-;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -105,121 +105,121 @@
 .globl dc_mode1_ct
 
 ;; Macro to convert color to pixel Mode1 : Axxx Axxx
-.macro convertPixel        ;; From cpct_px2byteM1               	
-	ld   bc, #dc_mode1_ct  ;; [3] BC points to conversion table (dc_mode1_ct)
-	
-	;; Compute BC += A
-	add  c                 ;; [1] | C += A
-	ld   c, a              ;; [1] |
-	sub  a                 ;; [1] A = 0 (preserving Carry Flag)
-	adc  b                 ;; [1] | B += Carry
-	ld   b, a              ;; [1] |
+.macro convertPixel        ;; From cpct_px2byteM1                   
+    ld   bc, #dc_mode1_ct  ;; [3] BC points to conversion table (dc_mode1_ct)
+    
+    ;; Compute BC += A
+    add  c                 ;; [1] | C += A
+    ld   c, a              ;; [1] |
+    sub  a                 ;; [1] A = 0 (preserving Carry Flag)
+    adc  b                 ;; [1] | B += Carry
+    ld   b, a              ;; [1] |
 
     ;; A = *(BC + A)
     ld   a, (bc)           ;; [2] A = Value stored at the table pointed by HL 
 .endm
        
-	;; Convert newColor to pixel format (E)
-	ld a, h                ;; [1]  A = H new color index
-	convertPixel	       ;; [10] | Convert into A
-	ld e, a                ;; [1]  | E = A new color : Axxx Axxx
+    ;; Convert newColor to pixel format (E)
+    ld a, h                ;; [1]  A = H new color index
+    convertPixel           ;; [10] | Convert into A
+    ld e, a                ;; [1]  | E = A new color : Axxx Axxx
 
-	;; Convert oldColor to pixel format (D)
-	ld a, l                ;; [1]  A = L old color index
-	convertPixel	       ;; [10] | Convert into A
-	ld d, a                ;; [1]  | D = A old color : Axxx Axxx
-	
-	ld c, #0x88            ;; [2] C = Mask to get pixel A : Axxx Axxx
-	exx                    ;; [1] Switch to Alternate registers
-	
-	ld__ixl_c              ;; [1] IXL = C (Width)
-	ld c, b                ;; [1] C = B (Height)
-	
-convertLoop:	
-	push de                ;; [4] Store DE start line (DestMem)
-	ld__b_ixl              ;; [2] B = IXL (Sprite Width)
-		
+    ;; Convert oldColor to pixel format (D)
+    ld a, l                ;; [1]  A = L old color index
+    convertPixel           ;; [10] | Convert into A
+    ld d, a                ;; [1]  | D = A old color : Axxx Axxx
+    
+    ld c, #0x88            ;; [2] C = Mask to get pixel A : Axxx Axxx
+    exx                    ;; [1] Switch to Alternate registers
+    
+    ld__ixl_c              ;; [1] IXL = C (Width)
+    ld c, b                ;; [1] C = B (Height)
+    
+convertLoop:    
+    push de                ;; [4] Store DE start line (DestMem)
+    ld__b_ixl              ;; [2] B = IXL (Sprite Width)
+        
 lineLoop:
-	ld	a, (hl)            ;; [2] A = (HL) current Byte of sprite Mask
+    ld  a, (hl)            ;; [2] A = (HL) current Byte of sprite Mask
     exx                    ;; [1] Switch to Default registers
-	
-	ld  l, a               ;; [1] L = A current Byte of sprite : ABCD ABCD
-	and c                  ;; [2] A |= C (C = 0x88)   : Axxx Axxx
-	
-	cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-	jr 	nz, readPixelA     ;; [2/3] If not equal go to next pixel 
+    
+    ld  l, a               ;; [1] L = A current Byte of sprite : ABCD ABCD
+    and c                  ;; [2] A |= C (C = 0x88)   : Axxx Axxx
+    
+    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
+    jr  nz, readPixelA     ;; [2/3] If not equal go to next pixel 
         ld  a, e           ;; [1] else A = new colour to set (E)
-	
+    
 readPixelA:
-	ld  h, a               ;; [1] H = A (current colorized sprite) : Axxx Axxx
-	
-	sla l                  ;; [2] L (current byte of sprite) << 1 : ABCD ABCD -> BCDx BCDx
-	ld 	a, l               ;; [1] A = L  : BCDx BCDx
-	and c                  ;; [2] A |= Mask (0x88) : Bxxx Bxxx
-	
-	cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-	jr 	nz, readPixelB     ;; [2/3] If not equal go to next pixel 
+    ld  h, a               ;; [1] H = A (current colorized sprite) : Axxx Axxx
+    
+    sla l                  ;; [2] L (current byte of sprite) << 1 : ABCD ABCD -> BCDx BCDx
+    ld  a, l               ;; [1] A = L  : BCDx BCDx
+    and c                  ;; [2] A |= Mask (0x88) : Bxxx Bxxx
+    
+    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
+    jr  nz, readPixelB     ;; [2/3] If not equal go to next pixel 
         ld  a, e           ;; [1] else A = new colour to set (E)
-		
+        
 readPixelB:
     rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
-	or h                   ;; [1] A |= H (color byte) : Axxx Axxx
-	ld  h, a               ;; [1] H = A               : ABxx ABxx
-	
-	sla l                  ;; [2] L ( BCDx BCDx) << 1 : CDxx CDxx  
-	ld 	a, l               ;; [1] A = L               : CDxx CDxx  
-	and	c                  ;; [1] A |= C (C = 0x88)   : Cxxx Cxxx
-	
-	cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-	jr 	nz, readPixelC     ;; [2/3] If not equal go to next pixel 
+    or h                   ;; [1] A |= H (color byte) : Axxx Axxx
+    ld  h, a               ;; [1] H = A               : ABxx ABxx
+    
+    sla l                  ;; [2] L ( BCDx BCDx) << 1 : CDxx CDxx  
+    ld  a, l               ;; [1] A = L               : CDxx CDxx  
+    and c                  ;; [1] A |= C (C = 0x88)   : Cxxx Cxxx
+    
+    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
+    jr  nz, readPixelC     ;; [2/3] If not equal go to next pixel 
         ld  a, e           ;; [1] else A = new colour to set (E)
-	
+    
 readPixelC:
-	rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
-	rrca                   ;; [1] A = xxCx xxCx << 1  : xxCx xxCx
-	or 	h                  ;; [1] A |= H (ABxx ABxx)  : ABCx ABCx
-	ld	h, a               ;; [1] H = A               : ABCx ABCx
+    rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
+    rrca                   ;; [1] A = xxCx xxCx << 1  : xxCx xxCx
+    or  h                  ;; [1] A |= H (ABxx ABxx)  : ABCx ABCx
+    ld  h, a               ;; [1] H = A               : ABCx ABCx
 
-	sla l                  ;; [2] L (BCDx BCDx) << 1  : Dxxx Dxxx  
-	ld  a, l               ;; [1] A = L               : Dxxx Dxxx   
-	and	c                  ;; [1] A |= C (C = 0x88)   : Dxxx Dxxx
-	
-	cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-	jr 	nz, readPixelD     ;; [2/3] If not equal go to next pixel 
+    sla l                  ;; [2] L (BCDx BCDx) << 1  : Dxxx Dxxx  
+    ld  a, l               ;; [1] A = L               : Dxxx Dxxx   
+    and c                  ;; [1] A |= C (C = 0x88)   : Dxxx Dxxx
+    
+    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
+    jr  nz, readPixelD     ;; [2/3] If not equal go to next pixel 
         ld  a, e           ;; [1] else A = new colour to set (E)
-	
+    
 readPixelD:    
-	rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
-	rrca                   ;; [1] A = xBxx xBxx >> 1  : xxCx xxCx
-	rrca                   ;; [1] A = xxCx xxxx >> 1  : xxxD xxxD
-	or  h                  ;; [1] A |= H (ABCx ABCx)  : ABCD ABCD  
+    rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
+    rrca                   ;; [1] A = xBxx xBxx >> 1  : xxCx xxCx
+    rrca                   ;; [1] A = xxCx xxxx >> 1  : xxxD xxxD
+    or  h                  ;; [1] A |= H (ABCx ABCx)  : ABCD ABCD  
   
-	exx                    ;; [1] Switch to Alternate registers
+    exx                    ;; [1] Switch to Alternate registers
 
 drawByte:
     push hl                ;; [4] Store HL (current byte sprite source)
     ld   h, b              ;; [1] H = B (Masked table adress High Byte)
-	ld   l, a              ;; [1] Access mask table element (table must be 256-byte aligned)
-	ld   a, (de)           ;; [2] Get the value of the byte of the screen where we are going to draw
-	and  (hl)              ;; [2] Erase background part that is to be overwritten (Mask step 1)
-	or   l                 ;; [1] Add up background and sprite information in one byte (Mask step 2)
-	ld   (de), a           ;; [2] Save modified background + sprite data information into memory	
-	pop  hl                ;; [3] Recover HL (current byte sprite source)
-		
-	inc  hl                ;; [2] Next byte sprite source
-	inc  de                ;; [2] Next byte sprite colorized
-	djnz lineLoop          ;; [3] Decrement B (Width) if B != 0 goto lineLoop
-	
-	dec	c                  ;; [1] Decrement C (Height) 
-	jr 	z, end             ;; [2/3] If C == O goto end
+    ld   l, a              ;; [1] Access mask table element (table must be 256-byte aligned)
+    ld   a, (de)           ;; [2] Get the value of the byte of the screen where we are going to draw
+    and  (hl)              ;; [2] Erase background part that is to be overwritten (Mask step 1)
+    or   l                 ;; [1] Add up background and sprite information in one byte (Mask step 2)
+    ld   (de), a           ;; [2] Save modified background + sprite data information into memory    
+    pop  hl                ;; [3] Recover HL (current byte sprite source)
+        
+    inc  hl                ;; [2] Next byte sprite source
+    inc  de                ;; [2] Next byte sprite colorized
+    djnz lineLoop          ;; [3] Decrement B (Width) if B != 0 goto lineLoop
+    
+    dec c                  ;; [1] Decrement C (Height) 
+    jr  z, end             ;; [2/3] If C == O goto end
 
-	pop de                 ;; [3] Restore DE start line (DestMem
+    pop de                 ;; [3] Restore DE start line (DestMem
 
     ld   a, d              ;; [1] Start of next pixel line normally is 0x0800 bytes away.
     add  #0x08             ;; [2]    so we add it to DE (just by adding 0x08 to D)
     ld   d, a              ;; [1]
-    and  #0x38             ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)..	
-	
+    and  #0x38             ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)..    
+    
     jr   nz, convertLoop   ;; [2/3]  .. by checking the 4 bits that identify present memory line. 
                            ;; ....  If 0, we have crossed boundaries
 
@@ -230,10 +230,10 @@ dms_sprite_8bit_boundary_crossed:
     ld   a, d              ;; [1] -- which effectively is the same as moving it 1 bank backwards and then
     adc  #0xC0             ;; [2] -- 50 bytes forwards (which is what we want to move it to the next pixel line)
     ld   d, a              ;; [1] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
-	
-    jr   convertLoop       ;; [3] Jump to continue with next pixel line	
+    
+    jr   convertLoop       ;; [3] Jump to continue with next pixel line    
 
 end:
     pop de                 ;; [3] Empty stack by getting last element (DestMem)
-	;; Return is included in bindings
-	
+    ;; Return is included in bindings
+    

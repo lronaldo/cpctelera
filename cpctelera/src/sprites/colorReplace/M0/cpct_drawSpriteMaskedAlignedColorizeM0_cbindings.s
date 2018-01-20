@@ -42,7 +42,7 @@ _cpct_drawSpriteMaskedAlignedColorizeM0::
    ex   (sp), hl                ;; [6] HL = Table Mask address
                                 ;; ... and leave Return Address at (SP) as we don't need to restore
                                 ;; ... stack status because callin convention is __z88dk_callee
-								
+                                
    ex de, hl                    ;; [1] HL <-> DE
 
 .include /cpct_drawSpriteMaskedAlignedColorizeM0.asm/
