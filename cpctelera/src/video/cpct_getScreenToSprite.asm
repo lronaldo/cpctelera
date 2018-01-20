@@ -22,14 +22,14 @@
 ;;
 ;; Function: cpct_getScreenToSprite
 ;;
-;;    Copies and convert screen area to sprite
+;;    Copies sprite data from screen video memory to a linear array (a sprite)
 ;;
 ;; C Definition:
 ;;    void <cpct_getScreenToSprite> (void* *memory*, void* *sprite*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (2B DE) memory - Source Screen Address (Video memory location)
-;;  (2B HL) sprite - Destination Sprite Address (Sprite data array)
+;;  (2B HL) memory - Source Screen Address (Video memory location)
+;;  (2B DE) sprite - Destination Sprite Address (Sprite data array)
 ;;  (1B C ) width  - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
 ;;  (1B B ) height - Sprite Height in bytes (>0)
 ;;
@@ -41,92 +41,147 @@
 ;; will be equally treated as video memory (taking into account CPC's video memory 
 ;; disposition). This lets you copy software or hardware backbuffers, and
 ;; not only video memory.
-;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
+;;  * *sprite* must be a pointer to the start of a linear array that will be filled
+;; up with sprite pixel data got from *memory*.
 ;;  * *width* must be the width of the screen to capture *in bytes*, and 
-;; must be 1 or more. Using 0 as *width* parameter for this function could potentially 
-;; make the program hang or crash. Always remember that the *width* must be 
-;; expressed in bytes and *not* in pixels. The correspondence is:
-;;    mode 0      - 1 byte = 2 pixels
-;;    modes 1 / 3 - 1 byte = 4 pixels
-;;    mode 2      - 1 byte = 8 pixels
+;; must be greater than 0. A 0 as *width* parameter will be considered as 65536,  
+;; making this function overwrite the whole memory, making your program crash.
 ;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
-;; There is no practical upper limit to this value. Height of a sprite in
-;; bytes and pixels is the same value, as bytes only group consecutive pixels in
-;; the horizontal space.
+;; A 0 as *height* parameter will be considered as 256 (the maximum value). 
+;; Height of a sprite in bytes and pixels is the same value, as bytes only group 
+;; consecutive pixels in the horizontal space.
 ;;
 ;; Known limitations:
 ;;    * This function does not do any kind of boundary check or clipping. If you 
 ;; get data beyond your video memory or screen buffer the sprite will also contains 
 ;; not video data.
+;;    * This function uses self-modifying code, so it cannot be used from ROM.
 ;;
 ;; Details:
-;;    This function copies a video-memory location (either present video-memory or software / hardware  
-;; backbuffer) to a generic WxH bytes sprite from memory to . The destination sprite must be stored as an array (i.e. with 
-;; all of its pixels stored as consecutive bytes in memory). 
+;;    Reads screen video memory data at *memory* and copies it to a linear array (a *sprite*). 
+;; The copy takes into account CPC's video memory disposition, which is comprised of character
+;; lines made by 8-pixel lines each. The copy converts this disposition to linear, putting
+;; each sprite line contiguous to the previous one in the resulting *sprite* array. After 
+;; this copy, *sprite* can be used as any other normal sprite through sprite drawing functions
+;; like <cpct_drawSprite>.
+;;
+;;    Next example shows how to use this function,
+;; (start code)
+;;    // All enemies will be of the same size
+;;    #define  ENEMY_WIDTH     6
+;;    #define  ENEMY_HEIGHT   10
+;;
+;;    // Struct Enemy
+;;    //    Contains all enemy information: position, velocity, sprite and background data buffer.
+;;    //    The background data buffer will contain the background screen pixel data behind the 
+;;    // enemy sprite. This will be used to erase the enemy sprite restoring the background.
+;;    typedef struct Enemy {
+;;       u8    x, y;       // Enemy location
+;;       u8    vx, vy;     // Enemy velocity
+;;       u8*   sprite;     // Enemy sprite
+;;       u8    background[ ENEMY_WIDTH * ENEMY_HEIGHT ]; // Background pixel data
+;;    } Enemy;
+;;
+;;    //////////////////////////////////////////////////////////////////////////////////////////
+;;    // Moves an Enemy and redraws it afterwards
+;;    //
+;;    void MoveAndRedrawEnemy(Enemy* enemy) {
+;;       u8* pvmem; // Temporal pointer to video memory for drawing sprites (will be used later)
+;; 
+;;       // --- Calculations previous to moving the enemy ---
+;;
+;;       // Get a pointer to the start of the Enemy sprite in video memory
+;;       // previous to moving. Background will need to be restored at this 
+;;       // precise location to erase the Enemy before drawing it in its next location
+;;       u8* pvmem_enemyBg = cpct_getScreenPtr(CPCT_VMEM_START, enemy->x, enemy->y);
+;;    
+;;       // Move the enemy adding velocity to position
+;;       enemy->x += enemy->vx;
+;;       enemy->y += enemy->vy;
+;;       
+;;       // Get a pointer to the Screen Video Memory location where 
+;;       // Enemy will be drawn next (in its new location after movement)
+;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, enemy->x, enemy->y);
+;;       
+;;       // Wait for VSync and draw background and Enemy
+;;       cpct_waitVSYNC();
+;;       
+;;       //--- ENEMY REDRAWING ---
+;;        
+;;       // Erase ENEMY at its previous location by drawing background over it
+;;       cpct_drawSprite(enemy->background, pvmem_enemyBg, ENEMY_WIDTH, ENEMY_HEIGHT);
+;;       
+;;       // Before drawing ENEMY at its new location, copy the background there
+;;       // to enemy->background buffer. This will let us restore it next time the ENEMY moves.
+;;       cpct_getScreenToSprite(pvmem, enemy->background, ENEMY_WIDTH, ENEMY_HEIGHT);
+;;       
+;;       // Draw ENEMY at its new location
+;;       cpct_drawSpriteMasked(enemy->sprite, pvmem, ENEMY_WIDTH, ENEMY_HEIGHT);
+;;    }
+;; (end code)
+;; 
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 50 bytes
-;;  ASM-bindints - 44 bytes
+;;    C-bindings - 39 bytes
+;;  ASM-bindings - 34 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |    microSecs (us)        |    CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      |     16 + (27 + 12W)H     |   84 + (88 + 72W)H 
+;;  Best      |  30 + 8HH + (19 + 6W)H   | 120 + 32HH + (76 + 24W)H
+;;  Worst     |  38 + 8HH + (19 + 6W)H   | 152 + 32HH + (76 + 24W)H
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |          832             |      3328
-;;  W=4,H=32  |         2416             |      9964
+;;  W=2,H=16  |        534 /  542        |      2136 / 2168
+;;  W=4,H=32  |       1430 / 1438        |      5720 / 5752
 ;; ----------------------------------------------------------------
-;; Asm saving |          -16             |       -64
+;; Asm saving |          -16             |         -64
 ;; ----------------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes
+;;    W = *width* in bytes, H = *height* in bytes, HH = integer((*H*-1)/8)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   push ix         ;; [5] Save IX regiter before using it as temporal var
-   ld__ixl_c       ;; [3] Save Sprite Width into IXL for later use
+   ld    a, c                 ;; [1] A = sprite width
+   ld    (restore_width), a   ;; [4] Modify sprite with in the code for the loop
 
-dms_sprite_height_loop:
-   push de         ;; [4] Save DE for later use (jump to next screen line)
+   sub   c                    ;; [1] | A = c - c - c = -c 
+   sub   c                    ;; [1] |   A contains negative width
+   ld    (neg_width), a       ;; [4] Modify negative sprite width in the calculation code
 
-dms_sprite_width_loop:
-   ld    a, (de)   ;; [2] Get Screen byte into A
-   ld   (hl), a    ;; [2] Put A (Screen) byte into Sprite Memory
-   inc  de         ;; [2] Next Screen Memory byte
-   inc  hl         ;; [2] Next Sprite byte
+   ld    a, b                 ;; [1] A = sprite height
 
-   dec   c         ;; [1] C holds sprite width, we decrease it to count pixels in this line.
-   jr   nz,dms_sprite_width_loop;; [2/3] While not 0, we are still painting this sprite line 
-                                ;;      - When 0, we have to jump to next pixel line
+next_line:
+restore_width=.+1
+   ld   bc, #0x0000  ;; [3] 0000 is a placeholder for the width of a sprite line
+   ldir              ;; [6*W-1] Copy one complete sprite line
 
-   pop  de         ;; [3] Recover DE from stack. We use it to calculate start of next pixel line on screen
+   dec   a           ;; [1]   1 less sprite line to end
+   ret   z           ;; [2/4] If no lines left, return
 
-   dec   b         ;; [1] B holds sprite height. We decrease it to count another pixel line finished
-   jr    z,dms_sprite_copy_ended;; [2/3] If 0, we have finished the last sprite line.
-                                ;;      - If not 0, we have to move pointers to the next pixel line
+   ;; Make HL Point to next line start
+neg_width=.+1
+   ld    bc, #0x0700 ;; [3] 0700 will be modified to be 07xx, with xx being negative width of the sprite
+   add   hl, bc      ;; [3] HL += 0x800 - sprite width
 
-   ld__c_ixl       ;; [3] Restore Sprite Width into C
+   ;; Check for memory boundaries
+   ld     b, a          ;; [1] Save the value of A into B (we need it for next loop iteration)
+   ld     a, h          ;; [1] A=H (to test bits 12,13 and 14 of the new video memory address)
+   and   #0x38          ;; [2] We get the 3 bits (12,13 and 14) to test if we have crossed 8-line character boundary
+   ld     a, b          ;; [1] Restore A value (previously saved into B)
+   jr    nz, next_line  ;; [2/3]  If bits 12,13 and 14 are 0, we are at the first line of a character 
+                        ;; ....  which means we have crossed character boundaries and memory address will
+                        ;; ....  be incorrect. Else, we have not, so we can safely proceed to next_line
 
-   ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
-   add   #0x08     ;; [2]    so we add it to DE (just by adding 0x08 to D)
-   ld    d, a      ;; [1]
-   and   #0x38     ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)
-   jr   nz, dms_sprite_height_loop ;; [2/3]  by checking the 4 bits that identify present memory line. 
-                                   ;; ....  If 0, we have crossed boundaries
+_8line_character_boundary_crossed:
+   ;; Our address has moved out of the 16K memory bank of video memory. As memory addresses
+   ;; are 16-bits long (4 16K banks), in order to make it cycle to the start of the 16K bank 
+   ;; we were located, we need to "jump" over the other 3 banks, which means adding 48K (0xC000).
+   ;; As we also want to jump to the next character line, which is 0x50 bytes away, we need
+   ;; to add 0xC050 in total.
+   ld    bc, #0xC050 ;; [3] Value to be added to make HL point to next pixel line in video memory
+   add   hl, bc      ;; [3] HL += 0xC050
+   jr  next_line     ;; [3] Continue with next pixel line
 
-dms_sprite_8bit_boundary_crossed:
-   ld    a, e      ;; [1] DE = DE + 0xC050h
-   add   #0x50     ;; [2] -- Relocate DE pointer to the start of the next pixel line:
-   ld    e, a      ;; [1] -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
-   ld    a, d      ;; [1] -- which effectively is the same as moving it 1 bank backwards and then
-   adc   #0xC0     ;; [2] -- 50 bytes forwards (which is what we want to move it to the next pixel line)
-   ld    d, a      ;; [1] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
-
-   jr  dms_sprite_height_loop ;; [3] Jump to continue with next pixel line
-
-dms_sprite_copy_ended:
-   pop  ix         ;; [5] Restore IX before returning
-   ret             ;; [3] Return to caller
