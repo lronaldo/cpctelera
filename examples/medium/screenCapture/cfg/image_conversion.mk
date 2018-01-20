@@ -54,18 +54,10 @@
 ##     $(eval $(call IMG2SPRITES,imgs/1.png,0,g,4,8,$(PAL),,src/))        ##
 ############################################################################
 
-## Example firmware palette definition as variable in cpct_img2tileset format
-
+## Firmware palette definition as variable in cpct_img2tileset format
 PALETTE={13 1 2 3 6 9 10 11 15 19 20 21 24 25 26 0}
 
-## Example image conversion
-##    This example would convert img/example.png into src/example.{c|h} files.
-##    A C-array called pre_example[24*12*2] would be generated with the definition
-##    of the image example.png in mode 0 screen pixel format, with interlaced mask.
-##    The palette used for conversion is given through the PALETTE variable and
-##    a pre_palette[16] array will be generated with the 16 palette colours as 
-##	  hardware colour values.
-
+## Automatic conversion for UFO and Buildings sprites for Mode0 pixel format
 $(eval $(call IMG2SPRITES,img/ufo.png,0,g,32,0,$(PALETTE),mask,src/sprites,hwpalette))
 $(eval $(call IMG2SPRITES,img/building_1.png,0,g,0,0,$(PALETTE),,src/sprites,))
 $(eval $(call IMG2SPRITES,img/building_2.png,0,g,0,0,$(PALETTE),,src/sprites,))
