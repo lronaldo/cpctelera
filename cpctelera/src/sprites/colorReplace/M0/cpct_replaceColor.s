@@ -18,18 +18,27 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "../macros/cpct_undocumentedOpcodes.s"
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; ASM bindings for <cpct_drawSpriteColorizeM0>
+;; Variables: cpct_color_old, cpct_color_new
 ;;
-cpct_drawSpriteColorizeM0_asm:: ;; Assembly entry point
+;;    Contains the colors to be used by theses functions:
+;;     * cpct_setReplaceColors
+;;     * cpct_spriteColorizeM0
+;;     * cpct_spriteColorizeM1
+;;     * cpct_drawSpriteColorizeM0
+;;     * cpct_drawSpriteColorizeM1
+;;
+;; C Definition:
+;;    <u8> <cpct_color_old>;
+;;    <u8> <cpct_color_new>;
+;;
+;; Known limitations:
+;;    * These color are used for Mode0 (0 to 15) and Mode1 (0 to 3)
+;;    * You may assing a value to this seed direcly from C or ASM. If directly accessed 
+;; from ASM, do not forget to put an underscore in front (_cpct_color_old and _cpct_color_new).
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;; GET Parameters from the stack 
-   ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-
-;;.include /cpct_drawSpriteColorizeM0.asm/
-
-dms_restore_ix:
-   ld   ix, #0000               ;; [4] Restore IX before returning
-   ret                          ;; [3] Return to caller
+_cpct_color_old:: .db #00
+_cpct_color_new:: .db #00

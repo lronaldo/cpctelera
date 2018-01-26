@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2017 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -18,18 +18,18 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "../../../macros/cpct_undocumentedOpcodes.h.s"
+.include "../macros/cpct_undocumentedOpcodes.s"
 
 ;;
 ;; C bindings for <cpct_drawSpriteColorizeM0>
 ;;
-;;   33 us, 10 bytes
+;;   33 us, 8 bytes
 ;;
 _cpct_drawSpriteColorizeM0::
 
   ;; GET Parameters from the stack 
    ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
+   pop   de                     ;; [3] DE = Return Address
    
    exx 
    pop   hl                     ;; [3] HL' = Source address (Sprite)
@@ -37,9 +37,8 @@ _cpct_drawSpriteColorizeM0::
    pop   bc                     ;; [5] BC' = (B = Sprite Height, C = Width)
    exx
    
-   ex   (sp), hl                ;; [6] HL = (H = newColor, L = oldColor)
-                                ;; ... and leave Return Address at (SP) as we don't need to restore
-                                ;; ... stack status because callin convention is __z88dk_callee
+  push   de                     ;; [4] Put returning address in the stack again
+                                ;;      as this function uses __z88dk_callee convention
                                 
 .include /cpct_drawSpriteColorizeM0.asm/
 
