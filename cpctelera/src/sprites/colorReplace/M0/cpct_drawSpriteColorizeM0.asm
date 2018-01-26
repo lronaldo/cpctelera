@@ -25,15 +25,13 @@
 ;;    Directly replace a color and draw a sprite to video memory.
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteColorizeM0> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*, <u8> *oldColor*, <u8> *newColor*) __z88dk_callee;
+;;    void <cpct_drawSpriteColorizeM0> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (8 bytes):
 ;;  (2B HL') sprite      - Source Sprite Pointer (array of pixel data)
 ;;  (2B DE') memory      - Destination video memory pointer
 ;;  (1B C' ) height      - Sprite Height in bytes (>0)
 ;;  (1B B' ) width       - Sprite Width in *bytes* (Beware, *not* in pixels!)
-;;  (1B L )  oldColor    - Color to replace
-;;  (1B H )  newColor    - New color
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteColorizeM0_asm
@@ -54,8 +52,6 @@
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
-;;  * *oldColor* must be the index of color (0 to 15) to replace
-;;  * *newColor* must be the index of the new color (0 to 15)
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of boundary check or clipping. If you 
@@ -76,8 +72,8 @@
 ;;    AF, BC, DE, HL, BC', DE', HL', IX
 ;;
 ;; Required memory:
-;;     C-bindings - 118 bytes
-;;   ASM-bindings - 108 bytes
+;;     C-bindings - 165 bytes
+;;   ASM-bindings - 160 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -100,32 +96,15 @@
 ;; Thanks to all of them for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.globl dc_mode0_ct
+.globl _cpct_color_old
+.globl _cpct_color_new
 
-;; Macro to convert Pixel to xAxC xBxD format
-.macro convertPixel              
-    ;; From cpct_px2byteM0
-    ld   bc, #dc_mode0_ct  ;; [3] BC points to conversion table (dc_mode0_ct)
-    
-    ;; Compute BC += A
-    add  c                 ;; [1] | C += A
-    ld   c, a              ;; [1] |
-    sub  a                 ;; [1] A = 0 (preserving Carry Flag)
-    adc  b                 ;; [1] | B += Carry
-    ld   b, a              ;; [1] |
-
-    ;; A = *(BC + A)
-    ld   a, (bc)           ;; [2] A = Value stored at the table pointed by BC 
-.endm
-
-    ;; Convert newColor to pixel format (E)
-    ld a, h                ;; [1]  A = H new color index
-    convertPixel           ;; [10] | Convert into A
+    ;; newColor to pixel format (E)
+    ld a, (_cpct_color_new);; [4]  A = mem new color index
     ld e, a                ;; [1]  | E = A new color      : xAxC xBxD
 
-    ;; Convert oldColor to pixel format (D)
-    ld a, l                ;; [1]  A = L old color index
-    convertPixel           ;; [10] | Convert into A
+    ;; oldColor to pixel format (D)
+    ld a, (_cpct_color_old);; [4]  A = mem old color index
     ld d, a                ;; [1]  | D = A old color      : xAxC xBxD
     
     ld c, #0x55            ;; [2] C = Mask to get pixel A : xAxC xBxD
@@ -147,7 +126,7 @@ lineLoop:
     and c                  ;; [2] A |= C (C = 0x55)            : xBxB xBxB
     
     cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-    jr     nz, readPixelA     ;; [2/3] If not equal go to next pixel 
+    jr  nz, readPixelA     ;; [2/3] If not equal go to next pixel 
         ld  a, e           ;; [1] else A = new colour to set (E)
 
 ;; Pixel Mode 0 = ABAB ABAB

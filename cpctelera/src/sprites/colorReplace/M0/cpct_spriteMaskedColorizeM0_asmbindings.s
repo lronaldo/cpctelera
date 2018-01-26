@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2018 Arnaud Bouche (Arnaud6128)
 ;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
+.include "../macros/cpct_undocumentedOpcodes.s"
 
 ;;
 ;; ASM bindings for <cpct_spriteMaskedColorizeM0>
@@ -27,7 +27,6 @@ cpct_spriteMaskedColorizeM0_asm:: ;; Assembly entry point
 
    ;; GET Parameters from the stack 
    ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
 
 .include /cpct_spriteMaskedColorizeM0.asm/
 

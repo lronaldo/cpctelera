@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2017 Arnaud Bouche (Arnaud6128)
-;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -18,12 +18,12 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
+.include "../macros/cpct_undocumentedOpcodes.s"
 
 ;;
 ;; C bindings for <cpct_drawSpriteMaskedAlignedColorizeM0>
 ;;
-;;   39 us, 16 bytes
+;;   39 us, 8 bytes
 ;;
 _cpct_drawSpriteMaskedAlignedColorizeM0::
 
@@ -37,13 +37,10 @@ _cpct_drawSpriteMaskedAlignedColorizeM0::
    pop   bc                     ;; [5] BC' = (B = Sprite Height, C = Width)
    
    exx                          ;; [1] Switch to Default registers
-   pop   de                     ;; [3] DE = (D = newColor, E = oldColor)
+   pop   de                     ;; [3] DE = Table Mask address
    
-   ex   (sp), hl                ;; [6] HL = Table Mask address
-                                ;; ... and leave Return Address at (SP) as we don't need to restore
-                                ;; ... stack status because callin convention is __z88dk_callee
-                                
-   ex de, hl                    ;; [1] HL <-> DE
+   push   hl                    ;; [4] Put returning address in the stack again
+                                ;;      as this function uses __z88dk_callee convention
 
 .include /cpct_drawSpriteMaskedAlignedColorizeM0.asm/
 
