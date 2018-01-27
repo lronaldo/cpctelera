@@ -20,7 +20,7 @@
 .include "macros/cpct_opcodeConstants.h.s"
 .include "macros/cpct_reverseBits.h.s"
 .include "macros/cpct_undocumentedOpcodes.h.s"
-.include "macros/cpct_tableConversions.h.s"
+.include "macros/cpct_luts.h.s"
 
 ;;//////////////////////////////////////////////////////////////////////
 ;; Group: General Useful Macros
