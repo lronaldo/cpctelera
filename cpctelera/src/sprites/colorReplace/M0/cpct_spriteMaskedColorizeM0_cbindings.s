@@ -18,7 +18,7 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "../macros/cpct_undocumentedOpcodes.s"
+.include "../../../macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
 ;; C bindings for <cpct_spriteMaskedColorizeM0>
@@ -29,7 +29,7 @@ _cpct_spriteMaskedColorizeM0::
 
    ;; GET Parameters from the stack 
    ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   de                     ;; [3] DE = Return Address
+   pop   hl                     ;; [3] HL = Return Address
    
    exx 
    pop   hl                     ;; [3] HL' = Source address (Sprite)
@@ -37,8 +37,9 @@ _cpct_spriteMaskedColorizeM0::
    pop   bc                     ;; [5] BC' = (B = Sprite Height, C = Width)
    exx
    
-   push de                      ;; [4] Put returning address in the stack again
-                                ;;      as this function uses __z88dk_callee convention
+   ex   (sp), hl                ;; [6] HL = (H = newColor, L = oldColor)
+                                ;; ... and leave Return Address at (SP) as we don't need to restore
+                                ;; ... stack status because callin convention is __z88dk_callee
 
 .include /cpct_spriteMaskedColorizeM0.asm/
 
