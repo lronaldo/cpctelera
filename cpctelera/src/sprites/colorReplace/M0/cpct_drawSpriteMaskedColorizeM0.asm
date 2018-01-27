@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2017 Arnaud Bouche
+;;  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -18,6 +18,8 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
+.globl dc_mode0_ct
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_drawSpriteMaskedColorizeM0
@@ -25,13 +27,15 @@
 ;;    Directly replace a color and draw a sprite Masked to video memory.
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteMaskedColorizeM0> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
+;;    void <cpct_drawSpriteMaskedColorizeM0> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*, <u8> *oldColor*, <u8> *newColor*) __z88dk_callee;
 ;;
-;; Input Parameters (6 bytes):
+;; Input Parameters (8 bytes):
 ;;  (2B HL') sprite      - Source Sprite Pointer (array of pixel data)
 ;;  (2B DE') memory      - Destination video memory pointer
 ;;  (1B C' ) height      - Sprite Height in bytes (>0)
 ;;  (1B B' ) width       - Sprite Width in *bytes* (Beware, *not* in pixels!)
+;;  (1B L )  oldColor    - Color to replace
+;;  (1B H )  newColor    - New color
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteMaskedColorizeM0_asm
@@ -57,6 +61,8 @@
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
+;;  * *oldColor* must be the index of color (0 to 15) to replace
+;;  * *newColor* must be the index of the new color (0 to 15)
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of boundary check or clipping. If you 
@@ -74,21 +80,20 @@
 ;;     * This function requires the CPC firmware to be DISABLED. Otherwise, random crashes might happen due to side effects.
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, BC', DE', HL', IX
+;;    AF, BC, DE, HL, BC', DE', HL', IX
 ;;
 ;; Required memory:
-;;     C-bindings - 165 bytes
-;;   ASM-bindings - 160 bytes
+;;     C-bindings - 115 bytes
+;;   ASM-bindings - 102 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |   microSecs (us)       |        CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      |                        |  
-;;  Worst     |                        |       
+;;  Best      |    29 + (50 + 36W)H    |    116 + (200 + 144W)H 
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |                        |    
-;;  W=4,H=32  |                        |    
+;;  W=2,H=16  |        1981            |       7924
+;;  W=4,H=32  |        6237            |      24948 
 ;; ----------------------------------------------------------------
 ;; Asm saving |         -16            |        -64
 ;; ----------------------------------------------------------------
@@ -102,18 +107,31 @@
 ;; Thanks to all of them for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.globl _cpct_color_old
-.globl _cpct_color_new
+;; Macro to convert Pixel to xAxC xBxD format
+.macro convertPixel              
+    ;; From cpct_px2byteM0
+    ld   bc, #dc_mode0_ct  ;; [3] BC points to conversion table (dc_mode0_ct)
+    
+    ;; Compute BC += A
+    add  c                 ;; [1] | C += A
+    ld   c, a              ;; [1] |
+    sub  a                 ;; [1] A = 0 (preserving Carry Flag)
+    adc  b                 ;; [1] | B += Carry
+    ld   b, a              ;; [1] |
 
-    ;; newColor to pixel format (E)
-    ld a, (_cpct_color_new);; [4]  A = mem new color index
+    ;; A = *(BC + A)
+    ld   a, (bc)           ;; [2] A = Value stored at the table pointed by BC 
+.endm
+
+    ;; Convert newColor to pixel format (E)
+    ld a, h                ;; [1]  A = H new color index
+    convertPixel           ;; [10] | Convert into A
     ld e, a                ;; [1]  | E = A new color      : xAxC xBxD
 
-    ;; oldColor to pixel format (D)
-    ld a, (_cpct_color_old);; [4]  A = mem old color index
+    ;; Convert oldColor to pixel format (D)
+    ld a, l                ;; [1]  A = L old color index
+    convertPixel           ;; [10] | Convert into A
     ld d, a                ;; [1]  | D = A old color      : xAxC xBxD
-    
-    ld c, #0x55            ;; [2] C = Mask to get pixel A : xAxC xBxD
     
     ld c, #0x55            ;; [2] C = Mask to get pixel A : xAxC xBxD
     
