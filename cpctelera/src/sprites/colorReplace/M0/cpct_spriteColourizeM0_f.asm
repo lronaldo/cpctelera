@@ -20,13 +20,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_spriteColourizeM0_f
+;; Function: cpct_spriteColourizeM0
 ;;
 ;;    Replace one concrete colour of a sprite by a different one. This function
-;; does the replacement, use <cpct_setSpriteColourizeM0_f> to pick up colours.
+;; does the replacement, use <cpct_setSpriteColourizeM0> to pick up colours.
 ;;
 ;; C Definition:
-;;    void <cpct_spriteColourizeM0_f> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
+;;    void <cpct_spriteColourizeM0> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array of pixel data)
@@ -34,7 +34,7 @@
 ;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_spriteColourizeM0_f_asm
+;;    > call cpct_spriteColourizeM0_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be a pointer to the start of an array containing sprite's pixels data 
@@ -49,10 +49,23 @@
 ;; the horizontal space.
 ;;
 ;; Details:
-;;  <TODO>
+;;    This function modifies a *sprite* replacing pixels of a given colour by 
+;; other colour. Both searched colour and replacement colour are previously 
+;; selected using <cpct_setSpriteColourizeM0>. Therefore, this function only
+;; does the replacement of the previously selected colours.
+;;    Selected colours are inserted directly as immediate values into the code
+;; of this function. After a call to <cpct_setSpriteColourizeM0>, machine code
+;; that does the replacement gets modified permanently unless <cpct_setSpriteColourizeM0>
+;; is called again. Therefore, you may perform one single call <cpct_setSpriteColourizeM0>
+;; to configure this function for many uses, resulting in a great performance gain.
+;;    If no call is performed to <cpct_setSpriteColourizeM0> before calling
+;; this function, no color replacement will be done at all. Effectively, it will
+;; replaced color 0 with color 0, to no effect at all.
 ;;
 ;; Known limitations:
 ;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;     * <cpct_setSpriteColourizeM0> must be called at least once before properly
+;; using this function. Otherwise, this function will have no effect.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
