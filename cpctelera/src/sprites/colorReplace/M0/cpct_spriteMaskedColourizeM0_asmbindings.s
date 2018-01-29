@@ -23,4 +23,4 @@
 ;;
 cpct_spriteMaskedColourizeM0_asm:: ;; Assembly entry point
 
-.include /cpct_spriteMaskedColorizeM0.asm/
+.include /cpct_spriteMaskedColourizeM0.asm/

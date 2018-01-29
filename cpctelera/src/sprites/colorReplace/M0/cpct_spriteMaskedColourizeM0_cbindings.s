@@ -31,4 +31,4 @@ _cpct_spriteMaskedColourizeM0::
                                 ;; ... and leave Return Address at (SP) as we don't need to restore
                                 ;; ... stack status because callin convention is __z88dk_callee
 
-.include /cpct_spriteMaskedColorizeM0.asm/
+.include /cpct_spriteMaskedColourizeM0.asm/
