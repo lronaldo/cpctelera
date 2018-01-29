@@ -23,6 +23,6 @@
 ;;
 ;; ASM bindings for <cpct_spriteColourizeM0>
 ;;
-cpct_setSpriteColourizeM0_f_asm:: ;; Assembly entry point
+cpct_setSpriteColourizeM0_asm:: ;; Assembly entry point
 
-.include /cpct_setSpriteColourizeM0_f.asm/
+.include /cpct_setSpriteColourizeM0.asm/

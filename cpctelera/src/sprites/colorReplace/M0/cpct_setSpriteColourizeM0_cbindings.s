@@ -25,11 +25,11 @@
 ;;
 ;;   9 us, 2 bytes
 ;;
-_cpct_setSpriteColourizeM0_f::
+_cpct_setSpriteColourizeM0::
    ;; GET Parameters from the stack 
    pop   hl                     ;; [3] HL = Return Address  
    ex   (sp), hl                ;; [6] H = newColour, L = oldColour
                                 ;; ... and leave Return Address at (SP) as we don't need to restore
                                 ;; ... stack status because callin convention is __z88dk_callee
 
-.include /cpct_setSpriteColourizeM0_f.asm/
+.include /cpct_setSpriteColourizeM0.asm/
