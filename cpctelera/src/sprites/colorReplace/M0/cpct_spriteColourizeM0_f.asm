@@ -61,6 +61,24 @@
 ;;    If no call is performed to <cpct_setSpriteColourizeM0> before calling
 ;; this function, no color replacement will be done at all. Effectively, it will
 ;; replaced color 0 with color 0, to no effect at all.
+;; Example,
+;; (start code)
+;; void SetEnemyTShirtsNewColour(u8 colour) {
+;;    static u8 oldcolour;
+;;    u8 i;
+;;
+;;    // Enemy t-shirts oldcolour will be replaced with new colour
+;;    cpct_setSpriteColourizeM0(oldcolour, colour);
+;;
+;;    // Replace t-shirts colours from all enemy sprites. All enemy sprites
+;;    // will be modified replacing oldcolour with colour.
+;;    for(i=0; i < ENEMIES; ++i)
+;;       cpct_spriteColourizeM0(G_ENEMY_W, G_ENEMY_H, gEnemy[i]->sprite);
+;;
+;;    // After replacement, colour becomes oldcolour
+;;    oldcolour = colour;
+;;  }
+;; (end code)
 ;;
 ;; Known limitations:
 ;;     * This function *will not work from ROM*, as it uses self-modifying code.

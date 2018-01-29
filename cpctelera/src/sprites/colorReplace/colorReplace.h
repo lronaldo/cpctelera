@@ -29,7 +29,11 @@
 #define CPCT_COLORREPLACE_H
 
 // Functions to replace a color in sprite M0
-extern void cpct_spriteColorizeM0(u8* sprite, u8* spriteColor, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;
+extern void cpct_setSpriteColourizeM0_f(u8 oldColor, u8 newColor) __z88dk_callee;
+extern void cpct_spriteColourizeM0_f(u8 width, u8 height, void* sprite) __z88dk_callee;
+
+extern void cpct_spriteColourizeM0(u8* sprite, u8* spriteColor, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;
+extern void cpct_setpriteColourizeM0(u8* sprite, u8* spriteColor, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;
 extern void cpct_spriteMaskedColorizeM0(u8* sprite, u8* spriteColor, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;
 
 // Functions to draw a sprite M0 with a color replaced 
