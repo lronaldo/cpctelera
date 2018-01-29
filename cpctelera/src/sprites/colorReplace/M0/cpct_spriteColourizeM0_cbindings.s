@@ -18,8 +18,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
-
 ;;
 ;; C bindings for <cpct_spriteColourizeM0_f>
 ;;
