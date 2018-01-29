@@ -25,4 +25,4 @@
 ;;
 cpct_spriteColourizeM0_asm:: ;; Assembly entry point
 
-.include /cpct_spriteColourizeM0_f.asm/
+.include /cpct_spriteColourizeM0.asm/
