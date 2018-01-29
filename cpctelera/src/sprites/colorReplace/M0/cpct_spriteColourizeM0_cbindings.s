@@ -25,7 +25,7 @@
 ;;
 ;;   12 us, 3 bytes
 ;;
-_cpct_spriteColourizeM0_f::
+_cpct_spriteColourizeM0::
    ;; GET Parameters from the stack 
    pop   hl                     ;; [3] HL = Return Address  
    pop   bc                     ;; [3] B = Width, C = Height 
