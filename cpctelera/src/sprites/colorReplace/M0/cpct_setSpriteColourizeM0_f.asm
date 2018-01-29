@@ -20,29 +20,42 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_setSpriteColourizeM0_f
+;; Function: cpct_setSpriteColourizeM0
 ;;
-;;    Sets the concrete colour that will be replaced by <cpct_spriteColourizeM0_f> when called.
+;;    Sets colours to be used when <cpct_spriteColourizeM0> gets called. It sets
+;; both colour to be replaced (*oldColour*) and replacement colour (*newColour*).
 ;;
 ;; C Definition:
-;;    void <cpct_setSpriteColourizeM0_f> (<u8> *oldColor*, <u8> *newColor*) __z88dk_callee;
+;;    void <cpct_setSpriteColourizeM0> (<u8> *oldColour*, <u8> *newColour*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (1B L )  oldColor     - Colour to be replaced (Palette Index, 0-15)
-;;  (1B H )  newColor     - New colour (Palette Index, 0-15)
+;;  (1B L )  oldColour    - Colour to be replaced (Palette Index, 0-15)
+;;  (1B H )  newColour    - New colour (Palette Index, 0-15)
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_setSpriteColourizeM0_f_asm
+;;    > call cpct_setSpriteColourizeM0_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *oldColor* must be the palette index of the colour to be replaced (0 to 15).
-;;  * *newColor* must be the palette index of the new colour (0 to 15).
+;;  * *oldColour* must be the palette index of the colour to be replaced (0 to 15).
+;;  * *newColour* must be the palette index of the new colour (0 to 15).
 ;;
 ;; Known limitations:
-;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;     * This function works from ROM, but <cpct_spriteColourizeM0> must 
+;; be in RAM, as it gets modified by this function.
 ;;
 ;; Details:
-;;    <TODO>
+;;    This function sets the colours that <cpct_spriteColourizeM0> will use 
+;; internally when called. Concretely, it has to set two colours: and *oldColour*
+;; that will be searched and replaced, and a *newColour* that will be inserted
+;; where *oldColours* are found. The function has to be called at least once 
+;; before using <cpct_spriteColourizeM0> in order for it to actually perform 
+;; any colour replacement. 
+;; 	It works by modifying <cpct_spriteColourizeM0>'s machine code, changing
+;; values of *oldColour* and *newColour*. Therefore, the change is permanent
+;; until a new change is performed. So you may call this function once and 
+;; then perform many sprite colour changes by calling many times to
+;; <cpct_spriteColourizeM0>. You may see an use example by consulting 
+;; <cpct_spriteColourizeM0>'s documentation.
 ;;
 ;; Destroyed Register values: 
 ;;    A, BC, HL
