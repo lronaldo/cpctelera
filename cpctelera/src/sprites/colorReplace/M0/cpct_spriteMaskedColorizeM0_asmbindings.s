@@ -18,19 +18,9 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "../../../macros/cpct_undocumentedOpcodes.h.s"
-
 ;;
-;; ASM bindings for <cpct_spriteMaskedColorizeM0>
+;; ASM bindings for <cpct_spriteMaskedColourizeM0>
 ;;
-cpct_spriteMaskedColorizeM0_asm:: ;; Assembly entry point
-
-   ;; GET Parameters from the stack 
-   ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
+cpct_spriteMaskedColourizeM0_asm:: ;; Assembly entry point
 
 .include /cpct_spriteMaskedColorizeM0.asm/
-
-dms_restore_ix:
-   ld   ix, #0000  ;; [4] Restore IX before returning
-   ret             ;; [3] Return to caller

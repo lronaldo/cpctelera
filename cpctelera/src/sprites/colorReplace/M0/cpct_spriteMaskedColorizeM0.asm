@@ -20,70 +20,94 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_spriteMaskedColorizeM0
+;; Function: cpct_spriteMaskedColourizeM0
 ;;
-;;    Replace a color in a Masked sprite and copy to another or the same sprite.
+;;    Replace one concrete colour of a masked sprite by a different one. This function
+;; does the replacement, use <cpct_setSpriteMaskedColourizeM0> to pick up colours.
 ;;
 ;; C Definition:
-;;    void <cpct_spriteMaskedColorizeM0> (void* *sprite*, void* *spriteColor*, <u8> *width*, <u8> *height*, <u8> *oldColor*, <u8> *newColor*) __z88dk_callee;
+;;    void <cpct_spriteMaskedColourizeM0> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (2B HL') sprite      - Source Sprite Pointer (array of pixel data)
-;;  (2B DE') spriteColor - Destination Sprite Pointer (can be also the Source Sprite) (array of pixel data)
-;;  (1B C')  height      - Sprite Height in bytes (>0)
-;;  (1B B')  width       - Sprite Width in *bytes* (Beware, *not* in pixels!)
-;;  (1B L)   oldColor    - Color to replace
-;;  (1B H)   newColor    - New color
+;;  (2B HL) sprite - Source Sprite Pointer (array of pixel data)
+;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_spriteMaskedColorizeM0_asm
+;;    > call cpct_spriteMaskedColourizeM0_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; along with mask data. Each mask byte will contain enabled bits as those that should
-;; be picked from the background (transparent) and disabled bits for those that will
-;; be printed from sprite colour data. Each mask data byte must precede its associated
-;; colour data byte.
-;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
-;; starting from top-left corner and going left-to-right, top-to-bottom down to the
-;; bottom-right corner. Total amount of bytes in pixel array should be 
-;; 2 x *width* x *height* (mask data doubles array size).
-;;  * *spriteColor*  must be an array containing the new sprite's pixels data with the new color.
-;; Total amount of bytes in pixel array should be 2 x *width* x *height* (mask data doubles array size).
-;;  * *width* must be the width of the sprite *in bytes*. Always remember that the width must be 
-;; expressed in bytes and *not* in pixels.
-;;  The correspondence is mode 0 : 1 byte = 2 pixels
+;;  * *sprite* must be a pointer to the start of an array containing sprite's pixels data 
+;; in screen pixel format. Sprite must be rectangular and all bytes in the array must be 
+;; consecutive pixels, starting from top-left corner and going left-to-right, top-to-bottom 
+;; down to the bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*.
+;;  * *width* must be the width of the sprite *in bytes*, without taking into account mask bytes. 
+;; Always remember that the width must be expressed in bytes and *not* in pixels.
 ;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
-;;  * *oldColor* must be the index of color (0 to 15) to replace
-;;  * *newColor* must be the index of the new color (0 to 15)
+;;
+;; Details:
+;;    This function modifies a masked *sprite* replacing pixels of a given colour by 
+;; other colour. Both searched colour and replacement colour are previously 
+;; selected using <cpct_setSpriteMaskedColourizeM0>. Therefore, this function only
+;; does the replacement of the previously selected colours. The *sprite* must contain
+;; an interlaced transparency mask (check <cpct_drawMaskedSprite> for reference). 
+;; Transparency mask is not affected by color replacement.
+;;    Selected colours are inserted directly as immediate values into the code
+;; of this function. After a call to <cpct_setSpriteMaskedColourizeM0>, machine code
+;; that does the replacement gets modified permanently unless <cpct_setSpriteMaskedColourizeM0>
+;; is called again. Therefore, you may perform one single call <cpct_setSpriteMaskedColourizeM0>
+;; to configure this function for many uses, resulting in a great performance gain.
+;;    If no call is performed to <cpct_setSpriteMaskedColourizeM0> before calling
+;; this function, no color replacement will be done at all. Effectively, it will
+;; replaced color 0 with color 0, to no effect at all.
+;; Example,
+;; (start code)
+;; void SetEnemyTShirtsNewColour(u8 colour) {
+;;    static u8 oldcolour;
+;;    u8 i;
+;;
+;;    // Enemy t-shirts oldcolour will be replaced with new colour
+;;    cpct_setSpriteMaskedColourizeM0(oldcolour, colour);
+;;
+;;    // Replace t-shirts colours from all enemy sprites. All enemy sprites
+;;    // will be modified replacing oldcolour with colour.
+;;    for(i=0; i < ENEMIES; ++i)
+;;       cpct_spriteMaskedColourizeM0(G_ENEMY_W, G_ENEMY_H, gEnemy[i]->sprite);
+;;
+;;    // After replacement, colour becomes oldcolour
+;;    oldcolour = colour;
+;;  }
+;; (end code)
 ;;
 ;; Known limitations:
 ;;     * This function *will not work from ROM*, as it uses self-modifying code.
-;;     * This function requires the CPC firmware to be DISABLED. Otherwise, random crashes might happen due to side effects.
+;;     * <cpct_setSpriteMaskedColourizeM0> must be called at least once before properly
+;; using this function. Otherwise, this function will have no effect.
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL, BC', DE', HL', IX
+;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;     C-bindings - 87 bytes
-;;   ASM-bindings - 73 bytes
+;;     C-bindings - 39 bytes
+;;   ASM-bindings - 36 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |   microSecs (us)       |        CPU Cycles
 ;; ----------------------------------------------------------------
-;;            |   29 + (41 + 6W)H      |  116 + (164 + 24W)H
+;; Best  Case |   21 + (5 + 29W)H      |   84 + (20 + 116W)H
+;; Worst Case |   21 + (5 + 31W)H      |   84 + (20 + 124W)H
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |         2109           |        8436
-;;  W=4,H=32  |          877           |        3508
+;;  W=2,H=16  |     1029 / 1093        |       4116 /  4372
+;;  W=4,H=32  |     3893 / 4149        |      15572 / 16596
 ;; ----------------------------------------------------------------
-;; Asm saving |         -16            |        -64
+;; Asm saving |         -12            |          -48
 ;; ----------------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
+;;    W = *width* in bytes, H = *height* in bytes
 ;;
 ;; Credits:
 ;;    Original routine optimized by @Docent and discussed in CPCWiki :
@@ -92,84 +116,56 @@
 ;; Thanks to all of them for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.globl dc_mode0_ct
+;; Save width value to restore it after each line 
+ld     a, b          ;; [1] A = width
+ld    (w_restore), a ;; [4] Save width into its restore place
 
-;; Macro to convert Pixel to xAxC xBxD format
-.macro convertPixel              
-    ;; From cpct_px2byteM0
-    ld   bc, #dc_mode0_ct  ;; [3] BC points to conversion table (dc_mode0_ct)
-    
-    ;; Compute BC += A
-    add  c                 ;; [1] | C += A
-    ld   c, a              ;; [1] |
-    sub  a                 ;; [1] A = 0 (preserving Carry Flag)
-    adc  b                 ;; [1] | B += Carry
-    ld   b, a              ;; [1] |
+;; As E register is free, use it as a cache for Pixel 1 Pattern of the colour to be replaced
+px1_oldval = .+1
+ld     e, #00        ;; [2] E = Pixel 1 4-bit Pattern of the colour to be replaced (x0x2x1x3)
 
-    ;; A = *(BC + A)
-    ld   a, (bc)           ;; [2] A = Value stored at the table pointed by BC 
-.endm
+;; Loop through all the bytes of the sprite, replacing colours that have the same
+;; 4-bit pattern of the colour we want to replace. 
+loop:
+   ;; Check and replace Pixel 1
+   ld     a, (hl)    ;; [2] A = Byte with 2 Mode 0 Pixels to be replaced
+   and   #0b01010101 ;; [2] A ^= 0x55. Left out only the 4 bits of the Pixel 1 (x0x2x1x3)
+   ld     d, a       ;; [1] D = holds a copy of Pixel 1 bits, just in case we don't have to replace it
+   cp     e          ;; [1] A == E? Check if A is equal to the Pixel 1 Pattern of the colour we want to replace
+   jr    nz, notpx1  ;; [2/3] If it is not equal, just continue to check pixel 0
+      px1_newval = .+1
+      ld     d, #00  ;; [2] Perform replacement of Pixel 1. D holds the 4 bits of the new colour. #00 is a placeholder
+   notpx1:
 
-    ;; Convert newColor to pixel format (E)
-    ld a, h                ;; [1]  A = H new color index
-    convertPixel           ;; [10] | Convert into A
-    ld e, a                ;; [1]  | E = A new color      : xAxC xBxD
+   ;; Check and replace Pixel 0
+   ld     a, (hl)    ;; [2] A = Restore the value of the byte with the 2 Mode 0 pixels to be replaced
+   and   #0b10101010 ;; [2] A ^= 0xAA. Left out only the 4 bits of the Pixel 0 (0x2x1x3x)
+   px0_oldval = .+1
+   cp    #00         ;; [2] Check if A is equal to the Pixel 0 Pattern of the colour we want to replace. #00 is a placeholder
+   jr    nz, notpx0  ;; [2/3] If it is not equal, just continue to mix both output values
+      px0_newval = .+1
+      ld     a, #00  ;; [2] Perform replacement of Pixel 0. A holds the 4 bits of the new colour. #00 is a placeholder
+   notpx0:
 
-    ;; Convert oldColor to pixel format (D)
-    ld a, l                ;; [1]  A = L old color index
-    convertPixel           ;; [10] | Convert into A
-    ld d, a                ;; [1]  | D = A old color      : xAxC xBxD
-    
-    ld c, #0x55            ;; [2] C = Mask to get pixel A : xAxC xBxD
-    exx                    ;; [1] Switch to Alternate registers
-    
-    ld__ixl_c              ;; [1] IXL = C (Width)
-    ld c, b                ;; [1] C = B (Height)
-    
-convertLoop:    
-    ld__b_ixl              ;; [2] B = IXL (Sprite Width)
+   ;; Mix both replacements and save
+   or     d          ;; [1] A |= C. A and C hold replacements for pixels 0 and 1. This mixes them into A.
+   ld   (hl), a      ;; [2] Write byte with colours replaced
+   inc   hl          ;; [2] HL++ Jump to the next byte (mask byte)
+   inc   hl          ;; [2] HL++ Move to next byte of the sprite
 
-lineLoop:
-    ld  a, (hl)            ;; [2] A = (HL) current Byte of sprite Mask
-    ld (de), a             ;; [2] (DE) = A Copy of sprite Mask
-    inc hl                 ;; [2] Next byte sprite Color source 
-    inc de                 ;; [2] Next byte sprite Color destination 
-    ld  a, (hl)            ;; [2] A = (HL) current Byte of sprite Color
-    
-    exx                    ;; [1] Switch to Default registers
-    
-    ld  l, a               ;; [1] L = A current Byte of sprite : ABAB ABAB
-    and c                  ;; [2] A |= C (C = 0x55)            : xBxB xBxB
-    
-    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-    jr  nz, readPixelA     ;; [2/3] If not equal go to next pixel 
-        ld  a, e           ;; [1] else A = new colour to set (E)
+ djnz  loop          ;; [3/4] B--. Continue looping if there are more bytes left in this sprite line (B!=0)
 
-;; Pixel Mode 0 = ABAB ABAB
-readPixelA:
-    ld  h, a               ;; [1] H = A (current colorized sprite) : xBxB xBxB
-    ld  a, l               ;; [1] L = A current Byte of sprite     : ABAB ABAB
-    rrca                   ;; [1] A (current byte of sprite) >> 1  : ABAB ABAB -> xABA BABA
-    and c                  ;; [2] A |= Mask (0x55)                 : xAxA xAxA
-    
-    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-    jr  nz, readPixelB     ;; [2/3] If not equal go to next pixel 
-        ld  a, e           ;; [1] else A = new colour to set (E)
-    
-readPixelB:
-    rlca                   ;; [1] A = xAxA xAxA << 1  : AxAx AxAx
-    or  h                  ;; [1] A |= H (xBxB xBxB)  : ABAB ABAB
+   w_restore=.+1
+   ld    b, #00      ;; [2] B = width (restore value). #00 is a placeholder
+   dec   c           ;; [1] C-- (One less line of the sprite to process)
+ jr    nz, loop      ;; [2/3] Continue looping if there are more lines left
 
-setByte:  
-    exx                    ;; [1] Switch to Alternate registers
-    
-    ld  (de), a            ;; [2] Update current sprite byte with pixels
-    inc  hl                ;; [2] Next byte sprite source
-    inc  de                ;; [2] Next byte sprite colorized
-    djnz lineLoop          ;; [3] Decrement B (Width) if != 0 goto lineLoop
-    
-    dec    c                  ;; [1] Decrement C (Height) 
-    jr     nz, convertLoop    ;; [2/3] If C == O goto end
+ ret                 ;; [3] Return to caller
 
-end:
-    ;; Return is included in bindings
+;;
+;; Global symbols to be used by external functions to set placeholders
+;;
+cpct_spriteMaskedColourizeM0_px0_oldval == px0_oldval
+cpct_spriteMaskedColourizeM0_px1_oldval == px1_oldval
+cpct_spriteMaskedColourizeM0_px0_newval == px0_newval
+cpct_spriteMaskedColourizeM0_px1_newval == px1_newval
