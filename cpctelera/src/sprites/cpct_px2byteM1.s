@@ -94,6 +94,9 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Include required macro files
+.include "macros/cpct_maths.h.s"
+
 ;; Pixel colour table defined in cpct_drawCharM1
 .globl dc_mode1_ct
 
@@ -112,17 +115,12 @@ px1_repeat:
    ld   de, #dc_mode1_ct ;; [3] DE points to the start of the colour table
    ld    a, (hl)         ;; [2] A = Firmware colour for next pixel (to be added to DE, 
                          ;; .... as it is the index of the colour value to retrieve)
-   ;; Compute DE += Pixel 0 (A)
-   add   e               ;; [1] | E += A
-   ld    e, a            ;; [1] |
-   sub   a               ;; [1] A = 0 (preserving Carry Flag)
-   adc   d               ;; [1] | D += Carry
-   ld    d, a            ;; [1] |
-
+   add_de_a              ;; [5] DE += A (A contains next color translation to Pixel 0 bitpattern)
+   
    ld    a, (de)         ;; [2] A = Screen format for Firmware colour for Pixel
    or    c               ;; [1] Mix (OR) pixel format with accumulated previous pixel format conversions
    rlca                  ;; [1] Rotate A left, to left space for next pixel at the same 2 bits (7 and 3)
-   ld    c, a            ;; [1] B = Acumulated screen pixels format
+   ld    c, a            ;; [1] C = Acumulated screen pixels format
    inc  hl               ;; [2] HL points to next pixel in firmware colour (next parameter)
    djnz px1_repeat       ;; [3/4] Repeat until B=0 (until 4 pixels have been converted)
 
