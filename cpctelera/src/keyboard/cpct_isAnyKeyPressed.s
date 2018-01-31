@@ -35,6 +35,9 @@
 ;; is pressed). Take into account that *true* is not 1, but any non-0 number. Return 
 ;; value is placed in registers A and L (same value for both)
 ;;
+;; Flag Output Status:
+;;    - *Z* = 1 (NO Key Pressed) / 0 (Some Key Pressed)
+;;
 ;; Details:
 ;;    Checks if at least one key from the keyboard is pressed. It does it looking   
 ;; at the <cpct_keyboardStatusBuffer>, which is an 80-bit array holding the pressed / not pressed 

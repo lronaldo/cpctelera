@@ -90,7 +90,7 @@ _cpct_akp_songLoopTimes:: .db 0
 ;; sound results.
 ;;
 ;; Destroyed Register values: 
-;;    AF, AF', BC, DE, HL, IX, IY
+;;    AF, AF', BC, BC', DE, DE', HL, HL'
 ;;
 ;; Required memory:
 ;;    1794 bytes 

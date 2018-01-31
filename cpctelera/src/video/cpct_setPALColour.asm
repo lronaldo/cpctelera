@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2014-2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -64,7 +64,7 @@
 ;; command).
 ;;
 ;; Destroyed Register values:
-;;    F, BC, HL
+;;    AF, B
 ;;
 ;; Required memory:
 ;;     C-bindings - 12 bytes
@@ -89,11 +89,11 @@
 
   ;or  #PAL_PENR           ;; [2] (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). 
                            ;; .... As PENR command is 000, nothing to be done here.
-   ld     b, #GA_port_byte ;; [2] B = Gate Array Port (0x7F). C has the command that GA will execute.
-   out  (c), l             ;; [4] GA command: Select PENR. C = Command + Parameter (PENR + PEN number to select)
+   ld     b, #GA_port_byte ;; [2] B = Gate Array Port (0x7F). L has the command that GA will execute.
+   out  (c), l             ;; [4] GA command: Select PENR. L = Command + Parameter (PENR + PEN number to select)
 
-   ld     a, #PAL_INKR     ;; [2] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for INKR number (n). 
-   or     h                ;; [1]
+   ld     a, #PAL_INKR     ;; [2] | (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for INKR number (n). 
+   or     h                ;; [1] \
    out  (c), a             ;; [4] GA command: Set INKR. A = Command + Parameter 
                            ;; .... (INKR + INK to be set for selected PEN number)
    ret                     ;; [3] Return

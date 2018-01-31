@@ -19,7 +19,7 @@
 #ifndef CPCT_COLOURS_H
 #define CPCT_COLOURS_H
 
-// File: Colours
+// File: Colours (C)
 //
 //    Constants and utilities to manage the 27 colours from
 // the CPC Palette comfortably.

@@ -44,6 +44,11 @@
 ;;    <u8> - *false* (0, if not pressed) or *true* (>0, if pressed). Take into
 ;; account that *true* is not 1, but any non-0 number. 
 ;;
+;; Flag Output Status:
+;;    - *Z* = 1 (Key NOT pressed) / 0 (Key pressed)
+;;    - *C*,*N* = 0
+;;    - *H* = 1
+;;
 ;; Details:
 ;;    Checks if a concrete key is pressed or not. It does it looking   
 ;; at the <cpct_keyboardStatusBuffer>, which is an 80-bit array holding
@@ -66,7 +71,7 @@
 ;; (start code)
 ;;   Case      | microSecs (us) | CPU Cycles 
 ;; -------------------------------------------
-;; Any         |      14        |    56 
+;; Any         |      17        |    68 
 ;; -------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

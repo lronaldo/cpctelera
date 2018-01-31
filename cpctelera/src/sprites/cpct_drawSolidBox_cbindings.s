@@ -18,7 +18,7 @@
 .module cpct_sprites
 
 ;; Macros for easy use of undocumented opcodes
-.include "src/macros/cpct_undocumentedOpcodes.s"
+.include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
 ;; C bindings for <cpct_drawSolidBox>

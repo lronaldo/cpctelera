@@ -118,15 +118,19 @@ Group: Keyboard  {
    File: cpct_scanKeyboard_f  (keyboard/cpct_scanKeyboard_f.s)
    File: cpct_scanKeyboard_i  (keyboard/cpct_scanKeyboard_i.s)
    File: cpct_scanKeyboard_if  (keyboard/cpct_scanKeyboard_if.s)
+   File: Key Definitions &lparen;asm&rparen;  (keyboard/keyboard.h.s)
    File: Keyboard Mappings&amp;Constants  (keyboard/keyboard.h)
    File: Keyboard Technicals  (keyboard/keyboard.txt)
    }  # Group: Keyboard
 
 Group: Macros  {
 
-   File: cpct_reverseBits.s  (no auto-title, macros/cpct_reverseBits.s)
-   File: cpct_undocumentedOpcodes.s  (no auto-title, macros/cpct_undocumentedOpcodes.s)
-   File: Opcodes  (macros/cpct_opcodes.s)
+   File: allmacros.h  (macros/allmacros.h)
+   File: allmacros.h.s  (macros/allmacros.h.s)
+   File: Math Macros  (macros/cpct_maths.h.s)
+   File: Opcodes  (macros/cpct_opcodeConstants.h.s)
+   File: Reverse Bits  (macros/cpct_reverseBits.h.s)
+   File: Undocumented Opcodes  (macros/cpct_undocumentedOpcodes.h.s)
    }  # Group: Macros
 
 Group: Memutils  {
@@ -137,6 +141,7 @@ Group: Memutils  {
    File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
    File: cpct_pageMemory  (memutils/cpct_pageMemory.asm)
    File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
+   File: cpct_waitHalts  (memutils/cpct_waitHalts.asm)
    File: Memory Pagination Macros  (memutils/banks.h)
    File: Memory Relocation Utilities  (memutils/relocation.h)
    }  # Group: Memutils
@@ -168,31 +173,52 @@ Group: Random  {
 
 Group: Sprites  {
 
+   Group: Blending  {
+
+      File: Blended-Sprites Structs  (sprites/blending/sprite_types.h)
+      File: cpct_drawSpriteBlended  (sprites/blending/cpct_drawSpriteBlended.asm)
+      File: cpct_setBlendMode  (sprites/blending/cpct_setBlendMode.s)
+      }  # Group: Blending
+
+   Group: DrawTile  {
+
+      File: cpct_drawTileAligned2x4_f  (sprites/drawTile/cpct_drawTileAligned2x4_f.asm)
+      File: cpct_drawTileAligned2x8  (sprites/drawTile/cpct_drawTileAligned2x8.asm)
+      File: cpct_drawTileAligned2x8_f  (sprites/drawTile/cpct_drawTileAligned2x8_f.asm)
+      File: cpct_drawTileAligned4x4_f  (sprites/drawTile/cpct_drawTileAligned4x4_f.asm)
+      File: cpct_drawTileAligned4x8  (sprites/drawTile/cpct_drawTileAligned4x8.asm)
+      File: cpct_drawTileAligned4x8_f  (sprites/drawTile/cpct_drawTileAligned4x8_f.asm)
+      File: cpct_drawTileGrayCode2x8_af  (sprites/drawTile/cpct_drawTileGrayCode2x8_af.asm)
+      }  # Group: DrawTile
+
+   Group: DrawToSpriteBuffer  {
+
+      File: cpct_drawToSpriteBuffer  (sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer.asm)
+      File: cpct_drawToSpriteBufferMasked  (sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked.asm)
+      File: cpct_drawToSpriteBufferMaskedAlignedTable  (sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable.asm)
+      File: Macros &lparen;asm&rparen;  (sprites/drawToSpriteBuffer/drawToSpriteBuffer.h.s)
+      File: Macros &lparen;C&rparen;  (sprites/drawToSpriteBuffer/drawToSpriteBuffer.h)
+      }  # Group: DrawToSpriteBuffer
+
+   Group: Flipping  {
+
+      File: cpct_hflipSpriteM0  (sprites/flipping/cpct_hflipSpriteM0.asm)
+      File: cpct_hflipSpriteM0_r  (sprites/flipping/cpct_hflipSpriteM0_r.asm)
+      File: cpct_hflipSpriteM1  (sprites/flipping/cpct_hflipSpriteM1.asm)
+      File: cpct_hflipSpriteM1_r  (sprites/flipping/cpct_hflipSpriteM1_r.asm)
+      File: cpct_hflipSpriteM2  (sprites/flipping/cpct_hflipSpriteM2.asm)
+      File: cpct_hflipSpriteM2_r  (sprites/flipping/cpct_hflipSpriteM2_r.asm)
+      File: cpct_hflipSpriteMaskedM0  (sprites/flipping/cpct_hflipSpriteMaskedM0.asm)
+      File: cpct_hflipSpriteMaskedM1  (sprites/flipping/cpct_hflipSpriteMaskedM1.asm)
+      File: cpct_hflipSpriteMaskedM2  (sprites/flipping/cpct_hflipSpriteMaskedM2.asm)
+      }  # Group: Flipping
+
    File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.asm)
    File: cpct_drawSprite  (sprites/cpct_drawSprite.asm)
-   File: cpct_drawSpriteBlended  (sprites/cpct_drawSpriteBlended.asm)
    File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.asm)
    File: cpct_drawSpriteMaskedAlignedTable  (sprites/cpct_drawSpriteMaskedAlignedTable.asm)
-   File: cpct_drawTileAligned2x4_f  (sprites/cpct_drawTileAligned2x4_f.asm)
-   File: cpct_drawTileAligned2x8  (sprites/cpct_drawTileAligned2x8.asm)
-   File: cpct_drawTileAligned2x8_f  (sprites/cpct_drawTileAligned2x8_f.asm)
-   File: cpct_drawTileAligned4x4_f  (sprites/cpct_drawTileAligned4x4_f.asm)
-   File: cpct_drawTileAligned4x8  (sprites/cpct_drawTileAligned4x8.asm)
-   File: cpct_drawTileAligned4x8_f  (sprites/cpct_drawTileAligned4x8_f.asm)
-   File: cpct_drawTileGrayCode2x8_af  (sprites/cpct_drawTileGrayCode2x8_af.asm)
-   File: cpct_hflipSpriteM0  (sprites/cpct_hflipSpriteM0.asm)
-   File: cpct_hflipSpriteM0_r  (sprites/cpct_hflipSpriteM0_r.asm)
-   File: cpct_hflipSpriteM1  (sprites/cpct_hflipSpriteM1.asm)
-   File: cpct_hflipSpriteM1_r  (sprites/cpct_hflipSpriteM1_r.asm)
-   File: cpct_hflipSpriteM2  (sprites/cpct_hflipSpriteM2.asm)
-   File: cpct_hflipSpriteM2_r  (sprites/cpct_hflipSpriteM2_r.asm)
-   File: cpct_hflipSpriteMaskedM0  (sprites/cpct_hflipSpriteMaskedM0.asm)
-   File: cpct_hflipSpriteMaskedM1  (sprites/cpct_hflipSpriteMaskedM1.asm)
-   File: cpct_hflipSpriteMaskedM2  (sprites/cpct_hflipSpriteMaskedM2.asm)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0.asm)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
-   File: cpct_setBlendMode  (sprites/cpct_setBlendMode.s)
-   File: Sprite Types  (sprites/sprite_types.h)
    File: Transparency Macros  (sprites/transparency_table_macros.h)
    File: Transparency Tables for Mode 0  (sprites/transparency_tables_m0.h)
    File: Transparency Tables for Mode 1  (sprites/transparency_tables_m1.h)
@@ -215,19 +241,22 @@ Group: Strings  {
 
 Group: Video  {
 
-   File: Colours  (video/colours.h)
+   File: Colours &lparen;asm&rparen;  (video/colours.h.s)
+   File: Colours &lparen;C&rparen;  (video/colours.h)
    File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
    File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
    File: cpct_fw2hw  (video/cpct_fw2hw.asm)
    File: cpct_getHWColour  (video/cpct_getHWColour.s)
    File: cpct_getScreenPtr  (video/cpct_getScreenPtr.asm)
+   File: cpct_setCRTCReg  (video/cpct_setCRTCReg.asm)
    File: cpct_setPALColour  (video/cpct_setPALColour.asm)
    File: cpct_setPalette  (video/cpct_setPalette.asm)
    File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
    File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
    File: cpct_setVideoMode  (video/cpct_setVideoMode.asm)
    File: cpct_waitVSYNC  (video/cpct_waitVSYNC.s)
-   File: Useful Macros  (video/video_macros.h)
+   File: Macros &lparen;asm&rparen;  (video/video_macros.h.s)
+   File: Macros &lparen;C&rparen;  (video/video_macros.h)
    }  # Group: Video
 
 Text: ______________________________________________________________________
