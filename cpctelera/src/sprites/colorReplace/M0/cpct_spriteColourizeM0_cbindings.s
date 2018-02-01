@@ -18,11 +18,17 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
-
 ;;
-;; ASM bindings for <cpct_spriteColourizeM0>
+;; C bindings for <cpct_spriteColourizeM0_f>
 ;;
-cpct_spriteColourizeM0_f_asm:: ;; Assembly entry point
+;;   12 us, 3 bytes
+;;
+_cpct_spriteColourizeM0::
+   ;; GET Parameters from the stack 
+   pop   hl                     ;; [3] HL = Return Address  
+   pop   bc                     ;; [3] B = Width, C = Height 
+   ex   (sp), hl                ;; [6] HL = Pointer to the sprite
+                                ;; ... and leave Return Address at (SP) as we don't need to restore
+                                ;; ... stack status because callin convention is __z88dk_callee
 
-.include /cpct_spriteColourizeM0_f.asm/
+.include /cpct_spriteColourizeM0.asm/

@@ -79,9 +79,14 @@ u8 GetRand(u8 max)
 ///
 void ColorSprite(u8 color)
 {
+    // Create a copy of the original g_baloon sprite before changing it
+    cpct_memcpy(gSpriteColorized, g_baloon, G_BALOON_W*G_BALOON_H);
+
     // Replace the two colors 1 and 2 of sprite baloon
-    cpct_spriteColorizeM0(g_baloon, gSpriteColorized, G_BALOON_W, G_BALOON_H, 1, color); // Colors are consecutives        
-    cpct_spriteColorizeM0(gSpriteColorized, gSpriteColorized, G_BALOON_W, G_BALOON_H, 2, color + 1);
+    cpct_setSpriteColourizeM0(1, color);
+    cpct_spriteColourizeM0(G_BALOON_W, G_BALOON_H, gSpriteColorized); // Colors are consecutives
+    cpct_setSpriteColourizeM0(2, color + 1);
+    cpct_spriteColourizeM0(G_BALOON_W, G_BALOON_H, gSpriteColorized);
 }
 
 ///////////////////////////////////////////////////////
