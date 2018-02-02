@@ -29,7 +29,7 @@
 ;;    void <cpct_spriteMaskedColourizeM1> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (2B HL) sprite - Source Sprite Pointer (array of pixel data)
+;;  (2B HL) sprite - Source Sprite Pointer (array with pixel and mask data)
 ;;  (1B C ) height - Sprite Height in bytes (>0)
 ;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;
@@ -37,10 +37,16 @@
 ;;    > call cpct_spriteMaskedColourizeM1_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *sprite* must be a pointer to the start of an array containing sprite's pixels data 
-;; in screen pixel format. Sprite must be rectangular and all bytes in the array must be 
-;; consecutive pixels, starting from top-left corner and going left-to-right, top-to-bottom 
-;; down to the bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*.
+;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
+;; along with mask data. Each mask byte will contain enabled bits as those that should
+;; be picked from the background (transparent) and disabled bits for those that will
+;; be printed from sprite colour data. Each mask data byte must precede its associated
+;; colour data byte.
+;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
+;; starting from top-left corner and going left-to-right, top-to-bottom down to the
+;; bottom-right corner. Total amount of bytes in pixel array should be 
+;; 2 x *width* x *height* (mask data doubles array size). You may check screen 
+;; pixel format for mode 1 (<cpct_px2byteM1>).
 ;;  * *width* must be the width of the sprite *in bytes*. Always remember that the width must be 
 ;; expressed in bytes and *not* in pixels.
 ;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
