@@ -97,7 +97,7 @@ rrca                                            ;; [1]  Convert replacement to P
 ld (cpct_spriteMaskedColourizeM1_px1_newval), a ;; [4]  Set replacement for Pixel-0 in cpct_setSpriteMaskedColourizeM1
 
 ;; Convert oldColour to pixel format 
-ld a, h                                         ;; [1]  A = H new colour index
+ld a, l                                         ;; [1]  A = H new colour index
 cpctm_lutget8 dc_mode1_ct, b, c                 ;; [10] A = dc_mode0_ct[BC + A]. Get Pixel-3 searched colour from Look-Up-Table
 ld (cpct_spriteMaskedColourizeM1_px3_oldval), a ;; [4]  Set searched for Pixel-3 in cpct_setSpriteMaskedColourizeM1
 
