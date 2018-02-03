@@ -64,18 +64,18 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;     C-bindings - 60 bytes
-;;   ASM-bindings - 57 bytes
+;;     C-bindings - 61 bytes
+;;   ASM-bindings - 58 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |   microSecs (us)       |        CPU Cycles
 ;; ----------------------------------------------------------------
-;; Best  Case |   21 + (5 + 50W)H      |   84 + (20 + 200W)H
-;; Worst Case |   21 + (5 + 53W)H      |   84 + (20 + 212W)H
+;; Best  Case |   19 + (5 + 50W)H      |   76 + (20 + 200W)H
+;; Worst Case |   19 + (5 + 53W)H      |   76 + (20 + 212W)H
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |     1701 / 1797        |       6804 /  7188
-;;  W=4,H=32  |     6581 / 6965        |      26324 / 27860
+;;  W=2,H=16  |     1699 / 1795        |       6796 /  7180
+;;  W=4,H=32  |     6579 / 6963        |      26316 / 27852
 ;; ----------------------------------------------------------------
 ;; Asm saving |         -12            |          -48
 ;; ----------------------------------------------------------------
@@ -92,11 +92,12 @@
 ;; Save width value to restore it after each line 
 ld    a, b               ;; [1] A = width
 ld    (w_restore), a     ;; [4] Save width into its restore place
-inc   hl                 ;; [2] HL++ Jump to the first colour byte (Pixel = Mask+Colour)
 
 ;; Loop through all the bytes of the sprite, replacing colours that have the same
 ;; 2-bit pattern of the colour we want to replace. 
 loop:
+   inc    hl             ;; [2] HL++ Jump to the next byte (jump over mask byte)
+
    ;; Check and replace Pixel-3
    ld     e, (hl)        ;; [2] E = Byte with 4 Mode-1 Pixels to be replaced
    ld     a, #0b10001000 ;; [2] A = 0x88. Mask for the 2 bits of Pixel-3
@@ -152,7 +153,6 @@ loop:
    or     d          ;; [1] A |= D. D hold mixed replacements for pixels 3, 2 and 1.
                      ;; ....A holds replacement for Pixel-0. Both 4 replacements get mixed into A.
    ld    (hl), a     ;; [2] Write byte with colours all 4 colours replaced
-   inc    hl         ;; [2] HL++ Jump to the next byte (mask byte)
    inc    hl         ;; [2] HL++ Move to next byte of the sprite
 
 djnz  loop           ;; [3/4] B--. Continue looping if there are more bytes left in this sprite line (B!=0)
