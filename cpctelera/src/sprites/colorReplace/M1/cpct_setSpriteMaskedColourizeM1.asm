@@ -78,47 +78,36 @@
 .globl cpct_spriteMaskedColourizeM1_px1_oldval
 .globl cpct_spriteMaskedColourizeM1_px0_oldval
 
-;; Local symbols that act as aliases for the global symbols.
-;; This helps making code shorter and clearer
-px3_newval = cpct_spriteMaskedColourizeM1_px3_newval
-px2_newval = cpct_spriteMaskedColourizeM1_px2_newval
-px1_newval = cpct_spriteMaskedColourizeM1_px1_newval
-px0_newval = cpct_spriteMaskedColourizeM1_px0_newval
-px3_oldval = cpct_spriteMaskedColourizeM1_px3_oldval
-px2_oldval = cpct_spriteMaskedColourizeM1_px2_oldval
-px1_oldval = cpct_spriteMaskedColourizeM1_px1_oldval
-px0_oldval = cpct_spriteMaskedColourizeM1_px0_oldval
-
 ;; Use Look-Up-Table to convert palette index colour to screen pixel format
 ;; This conversion is for the first Pixel into the four pixels each byte 
 ;; has in mode 1 [3,2,1,0]. Therefore, only bits 0xxx1xxx will be produced.
 
 ;; Convert newColour to pixel format 
-ld a, h                          ;; [1]  A = H new colour index
-cpctm_lutget8 dc_mode1_ct, b, c  ;; [10] A = dc_mode0_ct[BC + A]. Get Pixel-3 replacement colour from Look-Up-Table
-ld (px3_newval), a               ;; [4]  Set replacement for Pixel-3 in cpct_setSpriteMaskedColourizeM1
+ld a, h                                         ;; [1]  A = H new colour index
+cpctm_lutget8 dc_mode1_ct, b, c                 ;; [10] A = dc_mode0_ct[BC + A]. Get Pixel-3 replacement colour from Look-Up-Table
+ld (cpct_spriteMaskedColourizeM1_px3_newval), a ;; [4]  Set replacement for Pixel-3 in cpct_setSpriteMaskedColourizeM1
 
-rrca                             ;; [1]  Convert replacement to Pixel-2 format (x0xx x1xx)
-ld (px2_newval), a               ;; [4]  Set replacement for Pixel-2 in cpct_setSpriteMaskedColourizeM1
+rrca                                            ;; [1]  Convert replacement to Pixel-2 format (x0xx x1xx)
+ld (cpct_spriteMaskedColourizeM1_px2_newval), a ;; [4]  Set replacement for Pixel-2 in cpct_setSpriteMaskedColourizeM1
 
-rrca                             ;; [1]  Convert replacement to Pixel-1 format (xx0x xx1x)
-ld (px1_newval), a               ;; [4]  Set replacement for Pixel-1 in cpct_setSpriteMaskedColourizeM1
+rrca                                            ;; [1]  Convert replacement to Pixel-1 format (xx0x xx1x)
+ld (cpct_spriteMaskedColourizeM1_px1_newval), a ;; [4]  Set replacement for Pixel-1 in cpct_setSpriteMaskedColourizeM1
 
-rrca                             ;; [1]  Convert replacement to Pixel-0 format (xxx0 xxx1)
-ld (px1_newval), a               ;; [4]  Set replacement for Pixel-0 in cpct_setSpriteMaskedColourizeM1
+rrca                                            ;; [1]  Convert replacement to Pixel-0 format (xxx0 xxx1)
+ld (cpct_spriteMaskedColourizeM1_px1_newval), a ;; [4]  Set replacement for Pixel-0 in cpct_setSpriteMaskedColourizeM1
 
 ;; Convert oldColour to pixel format 
-ld a, h                          ;; [1]  A = H new colour index
-cpctm_lutget8 dc_mode1_ct, b, c  ;; [10] A = dc_mode0_ct[BC + A]. Get Pixel-3 searched colour from Look-Up-Table
-ld (px3_oldval), a               ;; [4]  Set searched for Pixel-3 in cpct_setSpriteMaskedColourizeM1
+ld a, h                                         ;; [1]  A = H new colour index
+cpctm_lutget8 dc_mode1_ct, b, c                 ;; [10] A = dc_mode0_ct[BC + A]. Get Pixel-3 searched colour from Look-Up-Table
+ld (cpct_spriteMaskedColourizeM1_px3_oldval), a ;; [4]  Set searched for Pixel-3 in cpct_setSpriteMaskedColourizeM1
 
-rrca                             ;; [1]  Convert searched to Pixel-2 format (x0xx x1xx)
-ld (px2_oldval), a               ;; [4]  Set searched for Pixel-2 in cpct_setSpriteMaskedColourizeM1
+rrca                                            ;; [1]  Convert searched to Pixel-2 format (x0xx x1xx)
+ld (cpct_spriteMaskedColourizeM1_px2_oldval), a ;; [4]  Set searched for Pixel-2 in cpct_setSpriteMaskedColourizeM1
 
-rrca                             ;; [1]  Convert searched to Pixel-1 format (xx0x xx1x)
-ld (px1_oldval), a               ;; [4]  Set searched for Pixel-1 in cpct_setSpriteMaskedColourizeM1
+rrca                                            ;; [1]  Convert searched to Pixel-1 format (xx0x xx1x)
+ld (cpct_spriteMaskedColourizeM1_px1_oldval), a ;; [4]  Set searched for Pixel-1 in cpct_setSpriteMaskedColourizeM1
 
-rrca                             ;; [1]  Convert searched to Pixel-0 format (xxx0 xxx1)
-ld (px1_oldval), a               ;; [4]  Set searched for Pixel-0 in cpct_setSpriteMaskedColourizeM1
+rrca                                            ;; [1]  Convert searched to Pixel-0 format (xxx0 xxx1)
+ld (cpct_spriteMaskedColourizeM1_px1_oldval), a ;; [4]  Set searched for Pixel-0 in cpct_setSpriteMaskedColourizeM1
 
 ret         ;; [3] Return to the caller
