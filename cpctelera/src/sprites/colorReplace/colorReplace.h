@@ -29,19 +29,21 @@
 #define CPCT_COLORREPLACE_H
 
 // Functions to replace a color in sprite M0
-extern void cpct_setSpriteColourizeM0(u8 oldColor, u8 newColor) __z88dk_callee;
-extern void cpct_spriteColourizeM0(u8 width, u8 height, void* sprite) __z88dk_callee;
-extern void cpct_spriteMaskedColourizeM0(u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_setSpriteColourizeM0      (u8 oldColor, u8 newColor)          __z88dk_callee;
+extern void cpct_spriteColourizeM0         (u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_setSpriteMaskedColourizeM0(u8 oldColor, u8 newColor)          __z88dk_callee;
+extern void cpct_spriteMaskedColourizeM0   (u8 width, u8 height, void* sprite) __z88dk_callee;
+
+// Functions to replace a color in sprite M1
+extern void cpct_setSpriteColourizeM1      (u8 oldColor, u8 newColor)            __z88dk_callee;
+extern void cpct_spriteColourizeM1         (u8 width, u8 height, void* sprite)   __z88dk_callee;
+extern void cpct_setSpriteMaskedColourizeM1(u8 oldColor, u8 newColor)            __z88dk_callee;
+extern void cpct_spriteMaskedColorizeM1    (u8 width, u8 height, void* sprite)   __z88dk_callee; 
 
 // Functions to draw a sprite M0 with a color replaced 
 extern void cpct_drawSpriteColorizeM0(u8* sprite, u8* destMem, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;
 extern void cpct_drawSpriteMaskedColorizeM0(u8* sprite, u8* destMem, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;
 extern void cpct_drawSpriteMaskedAlignedColorizeM0(u8* sprite, u8* destMem, u8 width, u8 height, u8 oldColor, u8 newColor, const u8* maskTable) __z88dk_callee;
-
-// Functions to replace a color in sprite M1
-extern void cpct_setSpriteColourizeM1(u8 oldColor, u8 newColor) __z88dk_callee;
-extern void cpct_spriteColourizeM1(u8 width, u8 height, void* sprite) __z88dk_callee;
-extern void cpct_spriteMaskedColorizeM1(u8 width, u8 height, void* sprite) __z88dk_callee; 
 
 // Functions to draw a sprite M1 with a color replaced 
 extern void cpct_drawSpriteColorizeM1(u8* sprite, u8* destMem, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;
