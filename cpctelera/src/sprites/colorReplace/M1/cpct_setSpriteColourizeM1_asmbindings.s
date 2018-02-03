@@ -18,8 +18,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
-
 ;;
 ;; ASM bindings for <setSpriteColourizeM1>
 ;;
