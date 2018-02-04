@@ -80,9 +80,10 @@
 ;;     g_alienSkinColour = colour;
 ;;  }
 ;; (end code)
-
 ;;
 ;; Known limitations:
+;;    * <cpct_setSpriteColourizeM1> should have been called at least once before
+;; properly using this function. Otherwise, this function will produce no effect.
 ;;    * This function *will not work from ROM*, as it uses self-modifying code.
 ;;    * This function does not check for parameters being valid. Incorrect values
 ;; will probably produce changes in memory places outside your sprite, leading
