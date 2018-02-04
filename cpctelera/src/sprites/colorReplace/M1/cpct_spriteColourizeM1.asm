@@ -34,7 +34,7 @@
 ;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_spriteColourizeM1_f_asm
+;;    > call cpct_spriteColourizeM1_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be a pointer to the start of an array containing sprite's pixels data 
@@ -42,9 +42,9 @@
 ;; consecutive pixels, starting from top-left corner and going left-to-right, top-to-bottom 
 ;; down to the bottom-right corner. Total amount of bytes in pixel array should be 
 ;; *width* x *height*.
-;;  * *width* must be the width of the sprite *in bytes* (1-256). Always remember that 
+;;  * *width* (1-256) must be the width of the sprite *in bytes*. Always remember that 
 ;; the width must be expressed in bytes and *not* in pixels.
-;;  * *height* must be the height of the sprite in bytes (1-256). Height of a sprite in
+;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
 ;; bytes and pixels is the same value.
 ;;  * *Beware!* A 0 value either for *width* or *height* will be treated as 256, and 
 ;; will probably lead this function to overwrite memory values outside your sprite array.
@@ -115,7 +115,7 @@
 ;;    Original routine optimized by @Docent and discussed in CPCWiki :
 ;; http://www.cpcwiki.eu/forum/programming/cpctelera-colorize-sprite/
 ;;
-;; Thanks to all of them for their help and support.
+;; Thanks to all who participated in the discussion for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Save width value to restore it after each line 
