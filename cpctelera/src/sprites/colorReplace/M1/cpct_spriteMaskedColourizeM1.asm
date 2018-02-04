@@ -22,15 +22,16 @@
 ;;
 ;; Function: cpct_spriteMaskedColourizeM1
 ;;
-;;    Replace one concrete colour of a sprite by a different one. This function
-;; does the replacement, use <cpct_setSpriteColourizeM1> to pick up colours.
+;;    Replace one concrete colour of a masked sprite by a different one, ignoring 
+;; interlaced mask bytes. This function does the replacement, use 
+;; <cpct_setSpriteMaskedColourizeM1> to pick up colours.
 ;;
 ;; C Definition:
 ;;    void <cpct_spriteMaskedColourizeM1> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
-;; Input Parameters (6 bytes):
+;; Input Parameters (4 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel and mask data)
-;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B C ) height - Sprite Height in bytes
 ;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
@@ -38,27 +39,70 @@
 ;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; along with mask data. Each mask byte will contain enabled bits as those that should
-;; be picked from the background (transparent) and disabled bits for those that will
-;; be printed from sprite colour data. Each mask data byte must precede its associated
-;; colour data byte.
+;; along with mask data. Each mask data byte must precede its associated colour data byte.
 ;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
 ;; starting from top-left corner and going left-to-right, top-to-bottom down to the
 ;; bottom-right corner. Total amount of bytes in pixel array should be 
-;; 2 x *width* x *height* (mask data doubles array size). You may check screen 
-;; pixel format for mode 1 (<cpct_px2byteM1>).
-;;  * *width* must be the width of the sprite *in bytes*. Always remember that the width must be 
-;; expressed in bytes and *not* in pixels.
-;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
-;; There is no practical upper limit to this value. Height of a sprite in
-;; bytes and pixels is the same value, as bytes only group consecutive pixels in
-;; the horizontal space.
+;; 2 x *width* x *height* (mask data doubles array size). 
+;;  * *width* (1-256) must be the width of the sprite *in bytes* (not taking into account
+;; mask bytes). Always remember that the width must be expressed in bytes and *not* in pixels.
+;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
+;; bytes and pixels is the same value.
+;;  * *Beware!* A 0 value either for *width* or *height* will be treated as 256, and 
+;; will probably lead this function to overwrite memory values outside your sprite array.
 ;;
 ;; Details:
-;;  <TODO>
+;;    This function takes a masked *sprite* and replaces all pixels of a given colour value 
+;; (*oldColour*) for a different one (*newColour*). Replacement ignores mask values: 
+;; transparent pixels will continue to be invisible. Both colours had to be previously
+;; selected by calling the function <cpct_setSpriteMaskedColourizeM1>. This function only
+;; performs the replacement.
+;;    Selected colours are inserted directly as immediate values into the code
+;; of this function. After a call to <cpct_setSpriteMaskedColourizeM1>, machine code
+;; that does the replacement gets modified permanently unless <cpct_setSpriteMaskedColourizeM1>
+;; is called again. Therefore, you may perform one single call to <cpct_setSpriteMaskedColourizeM1>
+;; to configure this function for many uses, resulting in a great performance gain.
+;;    By default, this function would replace colour 0 by colour 0, producing no
+;; effect at all. So, at least one call to <cpct_setSpriteMaskedColourizeM1> is required
+;; before properly using this function.
+;;
+;; Example,
+;; (start code)
+;;  // Simple soccer ball Mode 1 8x8-pixels masked sprite
+;;  const u8 g_ball[2*2*8] = {
+;;       0xEE, 0x01, 0x77, 0x08,    0xCC, 0x30, 0x33, 0x0C
+;;    ,  0x88, 0x43, 0x11, 0xC2,    0x00, 0xC3, 0x00, 0xC3
+;;    ,  0x00, 0x3C, 0x00, 0x3C,    0x88, 0x34, 0x11, 0x2C
+;;    ,  0xCC, 0x03, 0x33, 0xC0,    0xEE, 0x01, 0x77, 0x08
+;;  }
+;;  u8 g_ball_colours[2];
+;;
+;;  //
+;;  // Soccer ball is made of patches of two colours. This
+;;  // function changes colours of both patches.
+;;  //
+;;  void changeSocerBallColours(u8 newColour1, u8 newColour2) {
+;;     // Change colour of the first patch of the ball
+;;     cpct_setSpriteMaskedColourizeM1(g_ball_colours[0], newColour1);
+;;     cpct_spriteMaskedColourizeM1(2, 8, g_ball);
+;;     
+;;     // Change colour of the second patch of the ball
+;;     cpct_setSpriteMaskedColourizeM1(g_ball_colours[1], newColour2);
+;;     cpct_spriteMaskedColourizeM1(2, 8, g_ball);
+;;  
+;;     // Save new ball colours for future changes
+;;     g_ball_colours[0] = newColour1;
+;;     g_ball_colours[1] = newColour2;
+;;  }
+;; (end code)
 ;;
 ;; Known limitations:
-;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;    * <cpct_setSpriteMaskedColourizeM1> should have been called at least once before
+;; properly using this function. Otherwise, this function will produce no effect.
+;;    * This function *will not work from ROM*, as it uses self-modifying code.
+;;    * This function does not check for parameters being valid. Incorrect values
+;; will probably produce changes in memory places outside your sprite, leading
+;; to undefined behaviour.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
