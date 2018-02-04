@@ -50,13 +50,13 @@
 ;;
 ;; Details:
 ;;    This function modifies a *sprite* replacing pixels of a given colour by 
-;; other colour. Both searched colour and replacement colour are previously 
+;; another colour. Both searched colour and replacement colour are previously 
 ;; selected using <cpct_setSpriteColourizeM0>. Therefore, this function only
 ;; does the replacement of the previously selected colours.
 ;;    Selected colours are inserted directly as immediate values into the code
 ;; of this function. After a call to <cpct_setSpriteColourizeM0>, machine code
 ;; that does the replacement gets modified permanently unless <cpct_setSpriteColourizeM0>
-;; is called again. Therefore, you may perform one single call <cpct_setSpriteColourizeM0>
+;; is called again. Therefore, you may perform one single call to <cpct_setSpriteColourizeM0>
 ;; to configure this function for many uses, resulting in a great performance gain.
 ;;    If no call is performed to <cpct_setSpriteColourizeM0> before calling
 ;; this function, no color replacement will be done at all. Effectively, it will
