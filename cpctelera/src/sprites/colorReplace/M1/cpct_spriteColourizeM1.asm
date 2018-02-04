@@ -28,9 +28,9 @@
 ;; C Definition:
 ;;    void <cpct_spriteColourizeM1> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
-;; Input Parameters (6 bytes):
+;; Input Parameters (4 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array of pixel data)
-;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B C ) height - Sprite Height in bytes.
 ;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
@@ -40,19 +40,53 @@
 ;;  * *sprite* must be a pointer to the start of an array containing sprite's pixels data 
 ;; in screen pixel format. Sprite must be rectangular and all bytes in the array must be 
 ;; consecutive pixels, starting from top-left corner and going left-to-right, top-to-bottom 
-;; down to the bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*.
-;;  * *width* must be the width of the sprite *in bytes*. Always remember that the width must be 
-;; expressed in bytes and *not* in pixels.
-;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
-;; There is no practical upper limit to this value. Height of a sprite in
-;; bytes and pixels is the same value, as bytes only group consecutive pixels in
-;; the horizontal space.
+;; down to the bottom-right corner. Total amount of bytes in pixel array should be 
+;; *width* x *height*.
+;;  * *width* must be the width of the sprite *in bytes* (1-256). Always remember that 
+;; the width must be expressed in bytes and *not* in pixels.
+;;  * *height* must be the height of the sprite in bytes (1-256). Height of a sprite in
+;; bytes and pixels is the same value.
+;;  * *Beware!* A 0 value either for *width* or *height* will be treated as 256, and 
+;; will probably lead this function to overwrite memory values outside your sprite array.
 ;;
 ;; Details:
-;;  <TODO>
+;;    This function takes an *sprite* and replaces all pixels of a given colour value 
+;; (*oldcolour*) for a different one (*newcolour*). Both colours had to be previously
+;; selected by calling the function <cpct_setSpriteColourizeM1>. This function only
+;; performs the replacement.
+;;    Selected colours are inserted directly as immediate values into the code
+;; of this function. After a call to <cpct_setSpriteColourizeM1>, machine code
+;; that does the replacement gets modified permanently unless <cpct_setSpriteColourizeM1>
+;; is called again. Therefore, you may perform one single call to <cpct_setSpriteColourizeM1>
+;; to configure this function for many uses, resulting in a great performance gain.
+;;    By default, this function would replace colour 0 by colour 0, producing no
+;; effect at all. So, at least one call to <cpct_setSpriteColourizeM1> is required
+;; before properly using this function.
+;;
+;; Example,
+;; (start code)
+;;  u8 g_alienSkinColour;
+;;  
+;;  void setAliensSkinColour(u8 colour) {
+;;     // Set old skin colour to be replaced with new one
+;;     cpct_setSpriteColourizeM1(g_alienSkinColour, colour);
+;;     
+;;     // Replace all skin colour with new one on all alien sprites
+;;     cpct_spriteColourizeM1(G_ALIEN_A_W, G_ALIEN_A_H, g_alien_a_sprite);
+;;     cpct_spriteColourizeM1(G_ALIEN_B_W, G_ALIEN_B_H, g_alien_b_sprite);
+;;     cpct_spriteColourizeM1(G_ALIEN_M_W, G_ALIEN_M_H, g_alien_m_sprite);
+;;  
+;;     // Save new skin colour for later changes
+;;     g_alienSkinColour = colour;
+;;  }
+;; (end code)
+
 ;;
 ;; Known limitations:
-;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;    * This function *will not work from ROM*, as it uses self-modifying code.
+;;    * This function does not check for parameters being valid. Incorrect values
+;; will probably produce changes in memory places outside your sprite, leading
+;; to undefined behaviour.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
