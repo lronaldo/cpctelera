@@ -50,8 +50,9 @@
 ;; will probably lead this function to overwrite memory values outside your sprite array.
 ;;
 ;; Details:
-;;    This function takes an *sprite* and replaces all pixels of a given colour value 
-;; (*oldcolour*) for a different one (*newcolour*). Both colours had to be previously
+;;    This function takes a *sprite* and replaces all pixels of a given colour value 
+;; (*oldColour*) for a different one (*newColour*). Replacement ignores mask values: 
+;; transparent pixels will continue to be invisible. Both colours had to be previously
 ;; selected by calling the function <cpct_setSpriteColourizeM1>. This function only
 ;; performs the replacement.
 ;;    Selected colours are inserted directly as immediate values into the code
