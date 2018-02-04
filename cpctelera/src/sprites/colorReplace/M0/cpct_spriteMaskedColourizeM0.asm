@@ -28,33 +28,36 @@
 ;; C Definition:
 ;;    void <cpct_spriteMaskedColourizeM0> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
-;; Input Parameters (6 bytes):
+;; Input Parameters (4 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array of pixel data)
-;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B C ) height - Sprite Height in bytes 
 ;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_spriteMaskedColourizeM0_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *sprite* must be a pointer to the start of an array containing sprite's pixels data 
-;; in screen pixel format. Sprite must be rectangular and all bytes in the array must be 
-;; consecutive pixels, starting from top-left corner and going left-to-right, top-to-bottom 
-;; down to the bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*.
-;;  * *width* must be the width of the sprite *in bytes*, without taking into account mask bytes. 
-;; Always remember that the width must be expressed in bytes and *not* in pixels.
-;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
-;; There is no practical upper limit to this value. Height of a sprite in
-;; bytes and pixels is the same value, as bytes only group consecutive pixels in
-;; the horizontal space.
+;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
+;; along with mask data. Each mask data byte must precede its associated colour data byte.
+;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
+;; starting from top-left corner and going left-to-right, top-to-bottom down to the
+;; bottom-right corner. Total amount of bytes in pixel array should be 
+;; 2 x *width* x *height* (mask data doubles array size). 
+;;  * *width* (1-256) must be the width of the sprite *in bytes* (not taking into account
+;; mask bytes). Always remember that the width must be expressed in bytes and *not* in pixels.
+;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
+;; bytes and pixels is the same value.
+;;  * *Beware!* A 0 value either for *width* or *height* will be treated as 256, and 
+;; will probably lead this function to overwrite memory values outside your sprite array.
 ;;
 ;; Details:
 ;;    This function modifies a masked *sprite* replacing pixels of a given colour by 
-;; other colour. Both searched colour and replacement colour are previously 
-;; selected using <cpct_setSpriteMaskedColourizeM0>. Therefore, this function only
-;; does the replacement of the previously selected colours. The *sprite* must contain
-;; an interlaced transparency mask (check <cpct_drawMaskedSprite> for reference). 
-;; Transparency mask is not affected by color replacement.
+;; other colour. The *sprite* must contain an interlaced transparency mask (check 
+;; <cpct_drawMaskedSprite> for reference). Replacement ignores mask values: transparent 
+;; pixels will continue to be invisible. Both searched colour and replacement colour 
+;; are previously selected using <cpct_setSpriteMaskedColourizeM0>. This function only
+;; does the replacement of the previously selected colours. Transparency mask is not 
+;; affected by color replacement.
 ;;    Selected colours are inserted directly as immediate values into the code
 ;; of this function. After a call to <cpct_setSpriteMaskedColourizeM0>, machine code
 ;; that does the replacement gets modified permanently unless <cpct_setSpriteMaskedColourizeM0>
@@ -83,9 +86,12 @@
 ;; (end code)
 ;;
 ;; Known limitations:
-;;     * This function *will not work from ROM*, as it uses self-modifying code.
-;;     * <cpct_setSpriteMaskedColourizeM0> must be called at least once before properly
-;; using this function. Otherwise, this function will have no effect.
+;;    * <cpct_setSpriteMaskedColourizeM0> should have been called at least once before
+;; properly using this function. Otherwise, this function will produce no effect.
+;;    * This function *will not work from ROM*, as it uses self-modifying code.
+;;    * This function does not check for parameters being valid. Incorrect values
+;; will probably produce changes in memory places outside your sprite, leading
+;; to undefined behaviour.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
