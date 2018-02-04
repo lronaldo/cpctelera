@@ -19,7 +19,7 @@
 .module cpct_sprites
 
 ;;
-;; C bindings for <cpct_setSpriteColourizeM0_f>
+;; C bindings for <cpct_setSpriteColourizeM0>
 ;;
 ;;   9 us, 2 bytes
 ;;
