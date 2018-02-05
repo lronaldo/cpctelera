@@ -28,85 +28,49 @@
 ;;    void <cpct_drawSpriteVFlip> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (2B HL) sprite - Source Sprite Pointer (array with pixel data)
-;;  (2B DE) memory - Destination video memory pointer
-;;  (1B C ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
-;;  (1B B ) height - Sprite Height in bytes (>0)
+;;  (2B HL) sprite - Source Sprite Pointer
+;;  (2B DE) memory - Destination video memory pointer (*Bottom-left corner*)
+;;  (1B C ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
+;;  (1B B ) height - Sprite Height in bytes 
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteVFlip_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format.
-;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
-;; starting from top-left corner and going left-to-right, top-to-bottom down to the
-;; bottom-right corner. Total amount of bytes in pixel array should be *width* x *height*.
-;; You may check screen pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 
-;; (<cpct_px2byteM1>) as for mode 2 is linear (1 bit = 1 pixel).
-;;  * *memory* could be any place in memory, inside or outside current video memory. It
-;; will be equally treated as video memory (taking into account CPC's video memory 
-;; disposition). This lets you copy sprites to software or hardware backbuffers, and
-;; not only video memory.
-;;  * *width* must be the width of the sprite *in bytes*, and must be in the range [1-63].
-;; A sprite width outside the range [1-63] will probably make the program hang or crash, 
-;; due to the optimization technique used. Always remember that the width must be 
-;; expressed in bytes and *not* in pixels. The correspondence is:
-;;    mode 0      - 1 byte = 2 pixels
-;;    modes 1 / 3 - 1 byte = 4 pixels
-;;    mode 2      - 1 byte = 8 pixels
-;;  * *height* must be the height of the sprite in bytes, and must be greater than 0. 
-;; There is no practical upper limit to this value. Height of a sprite in
-;; bytes and pixels is the same value, as bytes only group consecutive pixels in
-;; the horizontal space.
+;;  * *sprite* must be a pointer to the sprite array containing pixel data to
+;; be drawn. Sprite must be rectangular and all bytes in the array must be 
+;; consecutive pixels, starting from top-left corner and going left-to-right, 
+;; top-to-bottom down to the bottom-right corner. Total amount of bytes in pixel 
+;; array should be *width* x *height*.
+;;  * *memory* must be a pointer to bottom-left corner of the place where the sprite 
+;; is to be drawn. The sprite will then be drawn bottom-to-top, starting at the 
+;; video memory byte *memory* is pointing at. It could be any place in memory, 
+;; inside or outside current video memory. It will be equally treated as video 
+;; memory (taking into account CPC's video memory disposition). This lets you 
+;; copy sprites to software or hardware backbuffers, and not only video memory.
+;;  * *width* (1-63) must be the width of the sprite *in bytes*. Always remember 
+;; that the width must be  expressed in bytes and *not* in pixels. 
+;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
+;; bytes and pixels is the same value.
 ;;
 ;; Known limitations:
-;;     * This function does not do any kind of boundary check or clipping. If you 
+;;    * A sprite *width* outside the range (1-63) will probably make the program 
+;; hang or crash, due to the optimization technique used.
+;;    * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
 ;; could cause your program to behave erratically, hang or crash. Always 
 ;; take the necessary steps to guarantee that you are drawing inside screen
 ;; or buffer boundaries.
-;;     * As this function receives a byte-pointer to memory, it can only 
+;;    * As this function receives a byte-pointer to memory, it can only 
 ;; draw byte-sized and byte-aligned sprites. This means that the box cannot
 ;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
-;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;    * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
-;;    This function copies a generic WxH bytes sprite from memory to a 
-;; video-memory location (either present video-memory or software / hardware  
-;; backbuffer). The original sprite must be stored as an array (i.e. with 
-;; all of its pixels stored as consecutive bytes in memory). It only works 
-;; for solid, rectangular sprites, with 1-63 bytes width
-;;
-;;    This function will just copy bytes, not taking care of colours or 
-;; transparencies. If you wanted to copy a sprite without erasing the background
-;; just check for masked sprites and <cpct_drawMaskedSprite>.
-;;
-;;    Copying a sprite to video memory is a complex operation due to the 
-;; particular distribution of screen pixels in CPC's video memory. At power on,
-;; video memory starts at address 0xC000 (it can be changed by BASIC's scroll,
-;; or using functions <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>).
-;; This means that the byte at 0xC000 contains first pixels colour values, the ones
-;; at the top-left corner of the screen (2 first pixels in mode 0, 4 in mode 1 and 
-;; 8 in mode 2). Byte at 0xC001 contains next pixel values to the right, etc. 
-;; However, this configuration is not always linear. First 80 bytes encode the 
-;; first screen pixel line (line 0), next 80 bytes encode pixel line 8, next 
-;; 80 encode pixel line 16, and so on. Pixel line 1 start right next to pixel
-;; line 200 (the last one on screen), then goes pixel line 9, and so on. 
-;; 
-;; This particular distribution was thought to be used in 'characters' when it 
-;; was conceived. As a character has 8x8 pixels, pixel lines have a distribution
-;; in jumps of 8. This means that the screen has 25 character lines, each one
-;; with 8 pixel lines. This distribution is shown at table 1, depicting memory 
-;; locations where every pixel line starts, related to their character lines. 
-;;    *Note on how to interpret Table 1*: Table 1 contains starting video memory locations 
-;; for all 200 pixel lines on the screen (with default configuration). To know where does 
-;; a particular pixel line start, please read Table 1 left-to-right, top-to-bottom. So, 
-;; ROW 1 at Table 1 contains the memory start locations for the first 8 pixel lines on 
-;; screen (0 to 7), ROW 2 refers to pixel lines 8 to 15, ROW 3 has pixel lines 16 to 23, 
-;; and so on.
+;;    <TODO>
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
@@ -134,9 +98,6 @@
 ;;    This routine was inspired in the original *cpc_PutSprite* from
 ;; CPCRSLib by Raul Simarro.
 ;;
-;;    Thanks to *Mochilote* / <CPCMania at http://cpcmania.com> for creating the original
-;; <video memory locations table at 
-;; http://www.cpcmania.com/Docs/Programming/Painting_pixels_introduction_to_video_memory.htm>.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;; Modify code using width to jump in drawSpriteWidth
