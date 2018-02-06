@@ -28,8 +28,11 @@
 #ifndef CPCT_SPRITEFLIPPING_H
 #define CPCT_SPRITEFLIPPING_H
 
+// Get Bottom Left Pointer to a Sprite in Video Memory
+extern void *cpct_getBottomLeftPtr (u16 height, void *sprite) __z88dk_callee;
+
 // Draw Sprite Flipped Functions
-extern void cpct_drawSpriteVFlip (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
+extern void  cpct_drawSpriteVFlip (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 
 // Sprite flipping functions
 extern void cpct_hflipSpriteM0   (u8 width, u8 height, void* sprite) __z88dk_callee;

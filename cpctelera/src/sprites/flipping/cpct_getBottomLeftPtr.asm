@@ -23,7 +23,7 @@ ld     d, a       ;; [1] | DE += 0x100 * 8 (He1 % 8)
 ld     a, #0xF8   ;; [2]
 and    c          ;; [1] A = 8 * int(He1 / 8)
 ld     h, #0x00   ;; [2]
-ld     l, c       ;; [1] HL =  8 * int(He1 / 8)
+ld     l, a       ;; [1] HL =  8 * int(He1 / 8)
 add   hl, hl      ;; [3] HL = 16 * int(He1 / 8)
 ld     b, h       ;; [1]
 ld     c, l       ;; [1] BC = 16 * int(He1 / 8)
