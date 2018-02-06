@@ -37,7 +37,7 @@
 #define LOOK_RIGHT   1
 
 //
-// MAIN: Using keyboard to move a sprite example
+// INITIALIZE: Initialize CPC, Draw Floor and Instructions
 //
 void initialize() {
    u8* pvideomem;               // Pointer to video memory

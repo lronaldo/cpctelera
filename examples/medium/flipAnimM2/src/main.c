@@ -47,7 +47,7 @@ u8* const g_animation[6] = {
 };
 
 //
-// MAIN: Using keyboard to move a sprite example
+// INITIALIZE: Initialize CPC, Draw demo banner and instructions
 //
 void initialize() {
    u8* pvideomem;               // Pointer to video memory
