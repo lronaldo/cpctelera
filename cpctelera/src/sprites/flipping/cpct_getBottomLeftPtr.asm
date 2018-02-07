@@ -1,6 +1,77 @@
-;; DE => Pointer
-;; BC => Height (C)
+;;-----------------------------LICENSE NOTICE------------------------------------
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;
+;;  This program is free software: you can redistribute it and/or modify
+;;  it under the terms of the GNU Lesser General Public License as published by
+;;  the Free Software Foundation, either version 3 of the License, or
+;;  (at your option) any later version.
+;;
+;;  This program is distributed in the hope that it will be useful,
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;  GNU Lesser General Public License for more details.
+;;
+;;  You should have received a copy of the GNU Lesser General Public License
+;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;-------------------------------------------------------------------------------
+.module cpct_sprites
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_getBottomLeftPtr
+;;
+;;    Gets a pointer to the bottom-left byte of a sprite in video memory, knowing
+;; its top-left byte and height.
+;;
+;; C Definition:
+;;    void <cpct_getBottomLeftPtr> (void* *memory*, <u16> *height*) __z88dk_callee;
+;;
+;; Input Parameters (3 bytes):
+;;  (2B DE) memory - Video memory pointer to the top-left corner of a sprite
+;;  (1B C ) height - Sprite Height
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_getBottomLeftPtr
+;;
+;; Parameter Restrictions:
+;;  * *memory* must be a pointer to top-left corner of a sprite in video memory.
+;; It could be any place in memory, inside or outside current video memory. 
+;; It will be equally treated as video  memory (taking into account CPC's video 
+;; memory disposition). 
+;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
+;; bytes and pixels is the same value.
+;;
+;; Known limitations:
+;;	<TODO>
+;;
+;; Details:
+;;    <TODO>
+;;
+;; Destroyed Register values: 
+;;    AF', AF, BC, DE, HL
+;;
+;; Required memory:
+;;     C-bindings - 40 bytes
+;;   ASM-bindings - 36 bytes
+;;
+;; Time Measures:
+;; (start code)
+;;  Case      |   microSecs (us)       |        CPU Cycles
+;; ----------------------------------------------------------------
+;;  Best      |          57            | 		228
+;;  Worst     |          64            |      	256
+;; ----------------------------------------------------------------
+;; Asm saving |         -13            |        -52
+;; ----------------------------------------------------------------
+;; (end code)
+;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
+;;
+;; Credits:
+;;    This routine was inspired in the original *cpc_PutSprite* from
+;; CPCRSLib by Raul Simarro.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Save Memory Bank
 ld     a, #0xC0   ;; [2]
 and    d          ;; [1] A = Bits 14-15 of DE (Memory 16K Bank 00-11)

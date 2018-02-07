@@ -25,8 +25,8 @@
 _cpct_getBottomLeftPtr::
    ;; Parameter retrieval from stack
    pop   af       ;; [3] AF = return address
-   pop   bc       ;; [3] B = Ignored, C = height of the sprite
    pop   de       ;; [3] DE = Sprite start address pointer
+   pop   bc       ;; [3] B = Ignored, C = height of the sprite
    push  af       ;; [4] Leave only return address in the stack,
                   ;; ... as this function uses __z88dk_callee convention
 
