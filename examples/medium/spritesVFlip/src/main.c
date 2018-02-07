@@ -49,7 +49,7 @@ void drawRockets(u8 x, u8 y) {
    // Assuming pvmem points to upper-left byte of the rocket sprite in
    // video memory, calculate a pointer to the bottom-left byte.
    // Equivalent to: cpct_getScreenPtr(CPCT_VMEM_START, x, (y + G_ROCKET_H - 1) )
-   pvmem = cpct_getBottomLeftPtr(G_ROCKET_H, pvmem);
+   pvmem = cpct_getBottomLeftPtr(pvmem, G_ROCKET_H);
    // As we don't want to overwrite the left rocket, this right rocket will
    // be drawn 1 byte to its right. That means moving to the right (adding) 
    // a number of bytes equal to the width of the rocket + 1. 
