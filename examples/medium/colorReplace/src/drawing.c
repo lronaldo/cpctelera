@@ -272,10 +272,11 @@ void DrawStars()
         {
             // Color and copy masked sprite in temporary array
             u8 circleColor[G_CIRCLE_TRANS_W * G_CIRCLE_TRANS_H * 2];
-            cpct_spriteMaskedColorizeM0(g_circle_trans, circleColor, G_CIRCLE_TRANS_W, G_CIRCLE_TRANS_H, 15, sColorStar[color]);
             
             // Draw masked Sprite from temporary array
-            cpct_drawSpriteMasked(circleColor, pvmem, G_CIRCLE_TRANS_W, G_CIRCLE_TRANS_H);
+            cpct_memcpy(circleColor, g_circle_trans, G_CIRCLE_TRANS_W * G_CIRCLE_TRANS_H * 2);
+            cpct_setSpriteColourizeM0      (15, sColorStar[color]);
+            cpct_spriteMaskedColourizeM0   (G_CIRCLE_TRANS_W, G_CIRCLE_TRANS_H, circleColor);
         }
         
         // If all colors palette used restart from 0
