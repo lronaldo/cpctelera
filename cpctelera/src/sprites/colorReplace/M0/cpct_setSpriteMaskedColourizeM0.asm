@@ -83,10 +83,10 @@
 .globl dc_mode0_ct                ;; Look-Up-Table to convert Palette Indexes to 4-bits pixel 1 screen format patterns
 .include "macros/cpct_luts.h.s"   ;; Macros to easily access the Look-Up-Table
 ;; Symbols for placeholders inside the Colourize function
-.globl cpct_setSpriteMaskedColourizeM0_px1_newval
-.globl cpct_setSpriteMaskedColourizeM0_px0_newval
-.globl cpct_setSpriteMaskedColourizeM0_px1_oldval
-.globl cpct_setSpriteMaskedColourizeM0_px0_oldval
+.globl cpct_spriteMaskedColourizeM0_px1_newval
+.globl cpct_spriteMaskedColourizeM0_px0_newval
+.globl cpct_spriteMaskedColourizeM0_px1_oldval
+.globl cpct_spriteMaskedColourizeM0_px0_oldval
 
  ;; Use Look-Up-Table to convert palette index colour to screen pixel format
  ;; This conversion is for the Pixel 1 into the two pixels each byte has in mode 0 [0,1]
@@ -95,15 +95,15 @@
  ;; Convert newColour to pixel format 
  ld a, h                                            ;; [1]  A = H new colour index
  cpctm_lutget8 dc_mode0_ct, b, c                    ;; [10] Get from Look-Up-Table dc_mode0_ct[BC + A]
- ld (cpct_setSpriteMaskedColourizeM0_px1_newval), a ;; [4]  Write Pixel 1 format (x0x2x1x3) into Colourize function code
+ ld (cpct_spriteMaskedColourizeM0_px1_newval), a    ;; [4]  Write Pixel 1 format (x0x2x1x3) into Colourize function code
  rlca                                               ;; [1]  Convert Pixel 1 format to Pixel 0, shifting bits to the left
- ld (cpct_setSpriteMaskedColourizeM0_px0_newval), a ;; [4]  Write Pixel 0 format (0x2x1x3x) into Colourize function code
+ ld (cpct_spriteMaskedColourizeM0_px0_newval), a    ;; [4]  Write Pixel 0 format (0x2x1x3x) into Colourize function code
 
  ;; Convert oldColour to pixel format 
  ld a, l                                            ;; [1]  A = L old colour index
  cpctm_lutget8 dc_mode0_ct, b, c                    ;; [10] Get from Look-Up-Table dc_mode0_ct[BC + A]
- ld (cpct_setSpriteMaskedColourizeM0_px1_oldval), a ;; [4]  Write Pixel 1 format (x0x2x1x3) into Colourize function code
+ ld (cpct_spriteMaskedColourizeM0_px1_oldval), a    ;; [4]  Write Pixel 1 format (x0x2x1x3) into Colourize function code
  rlca                                               ;; [1]  Convert Pixel 1 format to Pixel 0, shifting bits to the left
- ld (cpct_setSpriteMaskedColourizeM0_px0_oldval), a ;; [4]  Write Pixel 0 format (0x2x1x3x) into Colourize function code
+ ld (cpct_spriteMaskedColourizeM0_px0_oldval), a    ;; [4]  Write Pixel 0 format (0x2x1x3x) into Colourize function code
 
 ret                                                 ;; [3] Return to the caller
