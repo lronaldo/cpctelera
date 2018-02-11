@@ -255,7 +255,7 @@ void DrawStars()
     {
         // Get video pointer of each star to be drawn
         u8* pvmem = GetBackBufferPtr(gStars.stars[i].posX, gStars.stars[i].posY);
-        u8 color = gStars.stars[i].color++;
+		u8 color = gStars.stars[i].color++;
         
         // Use different drawing color methods
         if (i < NB_STARS/3)
@@ -275,7 +275,7 @@ void DrawStars()
             
             // Draw masked Sprite from temporary array
             cpct_memcpy(circleColor, g_circle_trans, G_CIRCLE_TRANS_W * G_CIRCLE_TRANS_H * 2);
-            cpct_setSpriteColourizeM0      (15, sColorStar[color]);
+            cpct_setSpriteMaskedColourizeM0(15, sColorStar[color]);
             cpct_spriteMaskedColourizeM0   (G_CIRCLE_TRANS_W, G_CIRCLE_TRANS_H, circleColor);
         }
         
