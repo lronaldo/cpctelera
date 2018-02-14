@@ -72,8 +72,8 @@
 ;; We save this information into A' to check it later against the final
 ;; calculated address and know if we have gone outside our memory bank.
 ld     a, #0b11000000   ;; [2] Bits to save
-and    d             ;; [1] A = D & 0xC0 = Bits 14-15 of DE (Memory 16K Bank 00-11)
-ex    af, af'        ;; [1] Save A into A'
+and    d                ;; [1] A = D & 0xC0 = Bits 14-15 of DE (Memory 16K Bank 00-11)
+ex    af, af'           ;; [1] Save A into A'
 
 ;; We need height-1 (We will call it He1) because we 
 ;; want to point to the bottom-left of the sprite (last line)
@@ -87,7 +87,7 @@ dec    c          ;; [1] C-- (C = Height-1 = He1)
 ;; So we perform the operation DE += 0x800 * (He1 % 8)
 ;;
 ld     a, #0b00000111   ;; [2] 3 latest bits to perform modulo 8 operation
-and    c             ;; [1] A = C % 8 = He1 % 8
+and    c                ;; [1] A = C % 8 = He1 % 8
 ;; Multiplying it by 0x800 is multiplying it by 8, and then by 0x100,
 ;; what is just adding result to d, as if it has 8 trailing zeros
 rlca              ;; [1] / 
