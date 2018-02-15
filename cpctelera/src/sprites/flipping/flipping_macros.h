@@ -74,5 +74,31 @@
 //
 #define cpctm_spriteBottomLeftPtr(SP, X, Y)		(SP) + ((X) * (Y-1))
 
+//
+// Macro: cpctm_vflipSpriteMasked
+//
+//    Vertically flips a masked sprite
+//
+// C Definition:
+//    #define <cpctm_vflipSpriteMasked> (W, H, SPBL, SP)
+//
+// Parameters:
+//    (1B) W    - Width of the sprite in *bytes* (Without counting on the mask bytes)
+//    (1B) H    - Height of the sprite in pixels
+//    (2B) SPBL - Pointer to the bottom-left row of the sprite
+//    (2B) SP   - Pointer to the sprite (top-left corner, first byte)
+//
+// Details:
+//    This is a convenience macro that calls <cpct_vflipSprite> with same 
+// parameters given, except for the width (*W*) that will be multiplied
+// by two, to take into account mask bytes. 
+//    Therefore, it is a mere front-end to call <cpct_vflipSprite>. For more
+// details on parameter restrictions, issues and working details, please
+// refer to <cpct_vflipSprite> documentation.
+//
+// Known issues:
+//    * This is a C-language macro. It cannot be called or used from assembly code.
+//
+#define cpctm_vflipSpriteMasked(W, H, SPBL, SP)  cpct_vflipSprite(2*(W), (H), (SPBL), (SP))
 
 #endif

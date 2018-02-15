@@ -36,18 +36,21 @@ extern void *cpct_getBottomLeftPtr (void *sprite, u16 height) __z88dk_callee;
 // Draw Sprite Flipped Functions
 extern void  cpct_drawSpriteVFlip (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 
-// Sprite flipping functions
+// Vertically flipping functions
 extern void cpct_vflipSprite     (u8 width, u8 height, void* spbl, void* sprite) __z88dk_callee;
+// cpctm_vflipSpriteMasked (u8 width, u8 height, void* spbl, void* sprite); << DEFINED AS MACRO
+
+// Horizontally flipping functions
 extern void cpct_hflipSpriteM0   (u8 width, u8 height, void* sprite) __z88dk_callee;
 extern void cpct_hflipSpriteM1   (u8 width, u8 height, void* sprite) __z88dk_callee;
 extern void cpct_hflipSpriteM2   (u8 width, u8 height, void* sprite) __z88dk_callee;
 
-// Sprite flipping functions (ROM-friendly versions)
+// Horizontally flipping functions (ROM-friendly versions)
 extern void cpct_hflipSpriteM0_r (void* sprite, u8 width, u8 height) __z88dk_callee;
 extern void cpct_hflipSpriteM1_r (void* sprite, u8 width, u8 height) __z88dk_callee;
 extern void cpct_hflipSpriteM2_r (void* sprite, u8 width, u8 height) __z88dk_callee;
 
-// Masked Sprite flipping functions
+// Horizontally flipping functions for Masked Sprites
 extern void cpct_hflipSpriteMaskedM0(u8 width, u8 height, void* sprite) __z88dk_callee;
 extern void cpct_hflipSpriteMaskedM1(u8 width, u8 height, void* sprite) __z88dk_callee;
 extern void cpct_hflipSpriteMaskedM2(u8 width, u8 height, void* sprite) __z88dk_callee;
