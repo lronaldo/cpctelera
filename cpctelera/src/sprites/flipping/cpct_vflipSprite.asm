@@ -19,12 +19,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_vflipSpriteM0
+;; Function: cpct_vflipSprite
 ;;
 ;;   Vertically flips a sprite, encoded in screen pixel format, *mode 0*.
 ;;
 ;; C definition:
-;;   void <cpct_vflipSpriteM0> (<u8> width, <u8> height, void* spbl, void* sprite) __z88dk_callee;
+;;   void <cpct_vflipSprite> (<u8> width, <u8> height, void* spbl, void* sprite) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
 ;;  (1B  A) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
@@ -33,7 +33,7 @@
 ;;  (2B DE) sprite - Pointer to the sprite array (top-left byte)
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_vflipSpriteM0_asm
+;;    > call cpct_vflipSprite_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *width*  must be the width of the sprite *in bytes* (Not! in pixels).

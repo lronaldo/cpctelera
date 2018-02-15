@@ -18,10 +18,10 @@
 .module cpct_sprites
 
 ;;
-;; ASM bindings for <cpct_vflipSpriteM0_asm>
+;; ASM bindings for <cpct_vflipSprite_asm>
 ;;
 ;;   0 us, 0 bytes
 ;;
-_cpct_vflipSpriteM0_asm::
+_cpct_vflipSprite_asm::
 
-.include /cpct_vflipSpriteM0.asm/
+.include /cpct_vflipSprite.asm/

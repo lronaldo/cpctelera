@@ -18,11 +18,11 @@
 .module cpct_sprites
 
 ;;
-;; C bindings for <cpct_vflipSpriteM0>
+;; C bindings for <cpct_vflipSprite>
 ;;
 ;;   17 us, 6 bytes
 ;;
-_cpct_vflipSpriteM0::
+_cpct_vflipSprite::
    ;; Parameter retrieval from stack
    pop  hl     	;; [3] HL = return address
    pop  bc     	;; [3] BC = height / width of the sprite
@@ -34,4 +34,4 @@ _cpct_vflipSpriteM0::
    ld     a, c    ;; [1] A = Width 
    ld     c, b    ;; [1] C = Height
 
-.include /cpct_vflipSpriteM0.asm/
+.include /cpct_vflipSprite.asm/
