@@ -20,7 +20,7 @@
 ;;
 ;; C bindings for <cpct_vflipSprite>
 ;;
-;;   17 us, 6 bytes
+;;   15 us, 4 bytes
 ;;
 _cpct_vflipSprite::
    ;; Parameter retrieval from stack
@@ -29,9 +29,5 @@ _cpct_vflipSprite::
    pop  de     	;; [3] DE = sprite bottom-left pointer
    ex (sp), hl 	;; [6] HL = Sprite start address pointer, while leaving return address 
                	;; ... in the stack, as this function uses __z88dk_callee convention
-
-   ;; Reorder registers, as required by the function
-   ld     a, c    ;; [1] A = Width 
-   ld     c, b    ;; [1] C = Height
 
 .include /cpct_vflipSprite.asm/

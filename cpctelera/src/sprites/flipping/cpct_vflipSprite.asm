@@ -27,8 +27,8 @@
 ;;   void <cpct_vflipSprite> (<u8> width, <u8> height, void* spbl, void* sprite) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
-;;  (1B  A) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
-;;  (1B  C) height - Height of the sprite in pixels / bytes (both are the same). Must be >= 1.
+;;  (1B  C) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
+;;  (1B  B) height - Height of the sprite in pixels / bytes (both are the same). Must be >= 1.
 ;;  (2B HL) spbl   - Pointer to the bottom-left byte of the sprite
 ;;  (2B DE) sprite - Pointer to the sprite array (top-left byte)
 ;;
@@ -95,11 +95,20 @@
 
 .include "macros/cpct_maths.h.s"
 
+   ld     a, c       ;; [1]
    ld (wrestore), a  ;; [5]
-   ld     b, a       ;; [1]
-   srl    c          ;; [2]
+   srl    b          ;; [2]
+   jr    byte_loop   ;; [3]
 
-loop:
+row_loop:
+   ;; Next line
+wrestore=.+1
+   ld    a, #00         ;; [2] width
+   ld    c, a           ;; [1]
+   add   a              ;; [1]
+   sub_de_a             ;; [7]
+
+byte_loop:
       ld     a, (hl)    ;; [2]
       ex    af, af'     ;; [1]
       ld     a, (de)    ;; [2]
@@ -109,17 +118,9 @@ loop:
       inc   hl          ;; [2]
       inc   de          ;; [2]
 
-   djnz loop           ;; [3/4]
-
    dec   c              ;; [1]
-   ret   z              ;; [2/4]
+   jr   nz, byte_loop   ;; [2/3]
 
-   ;; Next line
-wrestore=.+1
-   ld    a, #00         ;; [2] width
-   ld    b, a           ;; [1]
-   add   a              ;; [1]
-   sub_de_a             ;; [7]
+   djnz row_loop        ;; [3/4]
 
-   jr loop              ;; [3]
-
+ret                     ;; [3]
