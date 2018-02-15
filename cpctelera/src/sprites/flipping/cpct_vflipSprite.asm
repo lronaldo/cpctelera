@@ -21,7 +21,7 @@
 ;;
 ;; Function: cpct_vflipSprite
 ;;
-;;   Vertically flips a sprite, encoded in screen pixel format, *mode 0*.
+;;   Flips a sprite vertically in-place, modifying it.
 ;;
 ;; C definition:
 ;;   void <cpct_vflipSprite> (<u8> width, <u8> height, void* spbl, void* sprite) __z88dk_callee;
@@ -36,91 +36,107 @@
 ;;    > call cpct_vflipSprite_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *width*  must be the width of the sprite *in bytes* (Not! in pixels).
-;;  * *height* must be the height of the sprite in pixels.
+;;  * *width*  [1-255] must be the width of the sprite *in bytes* (Not! in pixels).
+;;  * *height* [2-255] must be the height of the sprite in pixels.
 ;;  * *spbl*   must be a pointer to the bottom-left byte of the *sprite*.
 ;;  * *sprite* must be a pointer to an array containing sprite's pixels data.
 ;;
 ;; Known limitations:
 ;;  * This function will not work from ROM, as it uses self-modifying code.
 ;;  * This function does not do any kind of boundary check. If you give it 
-;; incorrect values for *width*, *height* or *sprite* pointer it might 
+;; incorrect values for *width*, *height*, *spbl* or *sprite* it might 
 ;; potentially alter the contents of memory locations beyond *sprite* boundaries. 
 ;; This could cause your program to behave erratically, hang or crash. Always 
 ;; take the necessary steps to guarantee that your values are correct.
+;;  * This function assumes that *sprite* data is stored consecutive into
+;; memory. Optimized or special ways to store *sprite* should not use this
+;; function, as results may be unpredictable.
 ;;
 ;; Details:
-;;    <TODO>
+;;    This function flips a *sprite* vertically in-place, modifying *sprite*
+;; memory. It does it by interchanging top and bottom rows one by one. As this 
+;; function does only interchange sprite rows, it is valid for any video 
+;; mode: pixel data will stay the same. It is also valid for sprites with
+;; interlaced mask. Such sprites will have 2x*width* bytes per row. Therefore,
+;; if you call this function with 2x*width* as *width* parameter, it will
+;; perform a valid vertical flipping for sprites with interlaced mask.
 ;;
+;;    Next example shows how to flip an sprite vertically,
 ;; (start code)
-;;    // Example call. Sprite has 8x4 pixels (4x4 bytes)
-;;    cpct_hflipSpriteM0(4, 4, sprite);
+;;    //
+;;    // Flip the sprite of an entity vertically
+;;    //
+;;    void verticallyFlipEntity(TEntity* e) {
+;;       // Calculate a pointer to bottom-left row of entity's sprite 
+;;       // The flipping function requires this pointer
+;;       u8* sblp = cpctm_spriteBottomLeftPtr(e->sprite, e->width, e->height);
 ;;
-;;    // Operation performed by the call and results
-;;    //
-;;    // --------------------------------------------------------------
-;;    //  |  Received as parameter     | Result after flipping       |
-;;    // --------------------------------------------------------------
-;;    //  | sprite => [05][21][73][40] |  sprite => [04][37][12][05] |
-;;    //  |           [52][23][37][74] |            [47][73][32][25] |
-;;    //  |           [05][11][31][04] |            [04][13][11][50] |
-;;    //  |           [00][55][44][00] |            [00][44][55][00] |
-;;    // --------------------------------------------------------------
-;;    //  Sprite takes 16 consecutive bytes in memory (4 rows with 4 bytes)
-;;    //
+;;       // Flip the sprite vertically
+;;       cpct_vflipSprite(e->width, e->height, sblp, e->sprite);
+;;    }
 ;; (end code)
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, AF', BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - xx bytes
-;;  ASM-bindings - xx bytes
+;;    C-bindings - 37 bytes
+;;  ASM-bindings - 33 bytes
 ;;
-;; Time Measures: <TODO>
-;; (start code)
+;; Time Measures:
+;; (start code) 
 ;;  Case       |      microSecs (us)       |         CPU Cycles          |
 ;; -----------------------------------------------------------------------
-;;  Even-width |     (32WW + 16)H + 32     |     (128WW +  64)H + 128    |
-;;  Oven-width |     (32WW + 36)H + 37     |     (128WW + 144)H + 148    |
+;;  Any        |     19 + (12 + 18W)HH     |     76 + (48 + 72W)HH       |
 ;; -----------------------------------------------------------------------
-;;  W=2,H=16   |           800             |           3200              |
-;;  W=5,H=32   |          3237             |          12948              |
+;;  W=2,H=16   |           403             |           1612              |
+;;  W=5,H=32   |          1651             |           6604              |
 ;; -----------------------------------------------------------------------
-;;  Asm saving |          -12              |            -48              |
+;;  Asm saving |           -15             |            -60              |
 ;; -----------------------------------------------------------------------
 ;; (end code)
-;;   *W* = *width* % 2, *WW* = *width*/2, *H* = *height*
+;;   *W* = *width*, *H* = *height*, *HH* = int(*height*/2)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .include "macros/cpct_maths.h.s"
 
-   ld     a, c       ;; [1]
-   ld (wrestore), a  ;; [5]
-   srl    b          ;; [2]
-   jr    byte_loop   ;; [3]
+   ;; Store width in its placeholder. This will enable it
+   ;; to be restored at every row iteration
+   ld     a, c       ;; [1] A = sprite width
+   ld (wrestore), a  ;; [5] Store sprite width in its restore-placeholder
+   
+   ;; Calculate the number of rows that need to be interchanged (B)
+   srl    b          ;; [2] B /= 2. Half the height of the sprite is the number of rows to interchange
+
+   jr    byte_loop   ;; [3] Jump over next-row-loop for the first iteration
 
 row_loop:
-   ;; Next line
+   ;; Set up everything for next row to be processed
+   ;; HL already points to next row
+   ;; DE must be moved to previous row, and width must be restored
 wrestore=.+1
-   ld    a, #00         ;; [2] width
-   ld    c, a           ;; [1]
-   add   a              ;; [1]
-   sub_de_a             ;; [7]
+   ld    a, #00         ;; [2] A = sprite width (#00 is a placeholder that gets modified)
+   ld    c, a           ;; [1] C = sprite width 
+   add   a              ;; [1] A = 2*A (We need to take 2 times the width from DE to make it point to previous row)
+   sub_de_a             ;; [7] DE -= 2*width (Make DE point to previous row)
 
+   ;; Interchange rows pointed by HL and DE. 
+   ;; HL Points to the upper part of the sprite, whereas DE starts from the bottom
 byte_loop:
-      ld     a, (hl)    ;; [2]
-      ex    af, af'     ;; [1]
-      ld     a, (de)    ;; [2]
-      ld  (hl), a       ;; [2]
-      ex    af, af'     ;; [1]
-      ld  (de), a       ;; [2]
-      inc   hl          ;; [2]
-      inc   de          ;; [2]
+      ld     a, (hl)    ;; [2] / 
+      ex    af, af'     ;; [1] \ A' = top-row byte
+      ld     a, (de)    ;; [2] A = bottom-row byte
+      ld  (hl), a       ;; [2] Store bottom-row byte into the top-row
+      ex    af, af'     ;; [1] /
+      ld  (de), a       ;; [2] \ Store top-row byte into the bottom-row
+      inc   hl          ;; [2]  / Increment Both row pointers 
+      inc   de          ;; [2]  \ to point to the next bytes
 
-   dec   c              ;; [1]
-   jr   nz, byte_loop   ;; [2/3]
+   dec   c              ;; [1]   --C (1 less byte into the width of this row)
+   jr   nz, byte_loop   ;; [2/3] If C!=0, continue with next byte of this row
 
-   djnz row_loop        ;; [3/4]
+   ;; Finished processing present row. Decrement B (height counter) and
+   ;; continue with next row, in case
+   djnz row_loop        ;; [3/4] --B. If B!=0, continue with next row
 
-ret                     ;; [3]
+ret                     ;; [3]  Return to the caller
