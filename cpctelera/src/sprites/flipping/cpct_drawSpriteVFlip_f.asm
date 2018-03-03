@@ -55,7 +55,7 @@
 ;;
 ;; Known limitations:
 ;;    * A sprite *width* outside the range (1-63) will probably make the program 
-;; hang or crash, due to the optimization technique used.
+;; hang or crash, due to the optimization technique used (unfolded LDI loop).
 ;;    * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
@@ -70,14 +70,42 @@
 ;;    * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
-;;    <TODO>
+;;    Draws given *sprite* to *memory* taking into account CPC's standard video
+;; memory disposition. Therefore, *memory* can be pointing to actual video memory
+;; or to a hardware backbuffer. 
+;;
+;;    The drawing happens bottom-to-top. *memory* will be considered to be pointing
+;; to the bottom-left byte of the sprite in video memory. This is the way in which
+;; the sprite will be drawn in reverse,
+;;
+;; (start code)
+;; -------------------||-------------------||
+;;    MEMORY          ||  VIDEO MEMORY     ||
+;; -------------------||-------------------|| 
+;;       /->###  ###  ||          # #  # # || ^
+;;  sprite  ##    ##  ||          ##    ## || |
+;;          #      #  ||          ###  ### || | Sprite is 
+;;          ###  ###  ||          ##   ### || | drawn in 
+;;          ##   ###  ||          ###  ### || | this order
+;;          ###  ###  ||          #      # || |
+;;          ##    ##  ||          ##    ## || |
+;;          # #  # #  || memory-->###  ### || -  
+;; -------------------||-------------------||
+;; (end code)
+;;
+;;    In order to get a pointer to the bottom-left of the memory location where you
+;; want to draw your sprite, you may use <cpct_getBottomLeftPtr>.
+;;
+;;    As the function uses an unrolled LDI loop containing 63 LDI's, the maximum 
+;; with of any *sprite* to be drawn is 63. If you try to draw a wider sprite,
+;; the function behaviour will be undefined.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;     C-bindings - 165 bytes
-;;   ASM-bindings - 160 bytes
+;;     C-bindings - 167 bytes
+;;   ASM-bindings - 162 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
