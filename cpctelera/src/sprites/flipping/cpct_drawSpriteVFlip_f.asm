@@ -25,7 +25,7 @@
 ;; flipping it vertically (top to bottom)
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteVFlip> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
+;;    void <cpct_drawSpriteVFlip_f> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer
@@ -34,7 +34,7 @@
 ;;  (1B B ) height - Sprite Height in bytes 
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_drawSpriteVFlip_asm
+;;    > call cpct_drawSpriteVFlip_f_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *sprite* must be a pointer to the sprite array containing pixel data to

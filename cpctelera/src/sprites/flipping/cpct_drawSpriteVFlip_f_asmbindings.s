@@ -21,18 +21,8 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; C bindings for <cpct_drawSpriteVFlip>
+;; ASM bindings for <cpct_drawSpriteVFlip_f_asm>
 ;;
-;;   16 us, 5 bytes
-;;
-_cpct_drawSpriteVFlip::
-   ;; GET Parameters from the stack 
-   pop  af   ;; [3] AF = Return Address
-   pop  hl   ;; [3] HL = Source Address (Sprite data array)
-   pop  de   ;; [3] DE = Destination address (Video memory location)
-   pop  bc   ;; [3] BC = Height/Width (B = Height, C = Width)
- 
-   push af   ;; [4] Put returning address in the stack again
-             ;;      as this function uses __z88dk_callee convention
+cpct_drawSpriteVFlip_f_asm::         ;; Assembly entry point
 
-.include /cpct_drawSpriteVFlip.asm/
+.include /cpct_drawSpriteVFlip_f.asm/
