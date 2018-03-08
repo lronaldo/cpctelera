@@ -75,68 +75,14 @@
 ;; memory disposition. Therefore, *memory* can be pointing to actual video memory
 ;; or to a hardware backbuffer. 
 ;;
-;;    The drawing happens bottom-to-top. *memory* will be considered to be pointing
-;; to the bottom-left byte of the sprite in video memory. This is the way in which
-;; the sprite will be drawn in reverse,
-;;
-;; (start code)
-;; ||-----------------------||----------------------||
-;; ||   MEMORY              ||  VIDEO MEMORY        ||
-;; ||-----------------------||----------------------|| 
-;; ||           width       ||          width       ||
-;; ||         (------)      ||        (------)      ||
-;; ||                       ||                      ||
-;; ||      /->###  ###  ^   ||        # #  # #  ^   || ^
-;; || sprite  ##    ##  | h ||        ##    ##  | h || |
-;; ||         #      #  | e ||        ###  ###  | e || | Sprite is 
-;; ||         ###  ###  | i ||        ##   ###  | i || | drawn in 
-;; ||         ##   ###  | g ||        ###  ###  | g || | this order
-;; ||         ###  ###  | h ||        #      #  | h || | (bottom to
-;; ||         ##    ##  | t || memory ##    ##  | t || |  top)
-;; ||         # #  # #  v   ||     \->###  ###  v   || -  
-;; ||-----------------------||----------------------||
-;; (end code)
-;;
-;;    In order to get a pointer to the bottom-left of the memory location where you
-;; want to draw your sprite, you may use <cpct_getBottomLeftPtr>.
+;;    It works exactly similar to <cpct_drawSpriteVFlip>, but 3% to 10% faster
+;; depending on the size of the sprite to be drawn. Please refer to 
+;; <cpct_drawSpriteVFlip> for more details and use example (both functions
+;; are used exactly the same way, just changing the name on the call).
 ;;
 ;;    As the function uses an unrolled LDI loop containing 63 LDI's, the maximum 
 ;; with of any *sprite* to be drawn is 63. If you try to draw a wider sprite,
 ;; the function behaviour will be undefined.
-;;
-;;    Use example,
-;; (start code)
-;;    ///////////////////////////////////////////////////////////////////
-;;    // DRAW OBJECT IN FRONT OF INVERTING MIRROR
-;;    //    Draws an object in its coordinates and a vertically inverted
-;;    // version of the same object right next to the original one.
-;;    //
-;;    void drawObjectInFrontOfMirror(Object* o) {
-;;       u8* pvmem;  // Pointer to video memory
-;;    
-;;       //-----Draw original object
-;;       //
-;;       // Get a pointer to video memory byte for object location
-;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, o->x, o->y);
-;;       // Draw the object
-;;       cpct_drawSprite(o->sprite, pvmem, o->width, o->height);
-;;    
-;;       //-----Draw Inverted object right next to original one
-;;       //
-;;       // Assuming pvmem points to upper-left byte of the original sprite in
-;;       // video memory, calculate a pointer to the bottom-left byte (in video memory).
-;;       // Equivalent to: cpct_getScreenPtr(CPCT_VMEM_START, o->x, (o->y + o->height - 1) )
-;;       pvmem = cpct_getBottomLeftPtr(pvmem, o->height);
-;;       // As we don't want to overwrite the original object, this inverted version will
-;;       // be drawn 1 byte to its right (in front of the original). That means moving to 
-;;       // the right (adding) a number of bytes equal to the width of the object + 1. 
-;;       pvmem += o->width + 1;
-;;       // Finally, draw the vertically flipped object. This draw function
-;;       // does the drawing bottom-to-top in the video memory. That's the reason
-;;       // to have a pointer to the bottom-left.
-;;       cpct_drawSpriteVFlip_f(o->sprite, pvmem, o->width, o->height);
-;;    }
-;; (end code)
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
