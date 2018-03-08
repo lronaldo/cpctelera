@@ -19,7 +19,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_drawSpriteVFlip
+;; Function: cpct_drawSpriteVFlip_f
 ;;
 ;;    Copies a sprite from an array to video memory or Hardware Back Buffer 
 ;; flipping it vertically (top to bottom)
@@ -79,18 +79,21 @@
 ;; the sprite will be drawn in reverse,
 ;;
 ;; (start code)
-;; -------------------||-------------------||
-;;    MEMORY          ||  VIDEO MEMORY     ||
-;; -------------------||-------------------|| 
-;;       /->###  ###  ||          # #  # # || ^
-;;  sprite  ##    ##  ||          ##    ## || |
-;;          #      #  ||          ###  ### || | Sprite is 
-;;          ###  ###  ||          ##   ### || | drawn in 
-;;          ##   ###  ||          ###  ### || | this order
-;;          ###  ###  ||          #      # || |
-;;          ##    ##  ||          ##    ## || |
-;;          # #  # #  || memory-->###  ### || -  
-;; -------------------||-------------------||
+;; ||-----------------------||----------------------||
+;; ||   MEMORY              ||  VIDEO MEMORY        ||
+;; ||-----------------------||----------------------|| 
+;; ||           width       ||          width       ||
+;; ||         (------)      ||        (------)      ||
+;; ||                       ||                      ||
+;; ||      /->###  ###  ^   ||        # #  # #  ^   || ^
+;; || sprite  ##    ##  | h ||        ##    ##  | h || |
+;; ||         #      #  | e ||        ###  ###  | e || | Sprite is 
+;; ||         ###  ###  | i ||        ##   ###  | i || | drawn in 
+;; ||         ##   ###  | g ||        ###  ###  | g || | this order
+;; ||         ###  ###  | h ||        #      #  | h || | (bottom to
+;; ||         ##    ##  | t || memory ##    ##  | t || |  top)
+;; ||         # #  # #  v   ||     \->###  ###  v   || -  
+;; ||-----------------------||----------------------||
 ;; (end code)
 ;;
 ;;    In order to get a pointer to the bottom-left of the memory location where you
@@ -99,6 +102,40 @@
 ;;    As the function uses an unrolled LDI loop containing 63 LDI's, the maximum 
 ;; with of any *sprite* to be drawn is 63. If you try to draw a wider sprite,
 ;; the function behaviour will be undefined.
+;;
+;;    Use example,
+;; (start code)
+;;    ///////////////////////////////////////////////////////////////////
+;;    // DRAW OBJECT IN FRONT OF INVERTING MIRROR
+;;    //    Draws an object in its coordinates and a vertically inverted
+;;    // version of the same object right next to the original one.
+;;    //
+;;    void drawObjectInFrontOfMirror(Object* o) {
+;;       u8* pvmem;  // Pointer to video memory
+;;    
+;;       //-----Draw original object
+;;       //
+;;       // Get a pointer to video memory byte for object location
+;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, o->x, o->y);
+;;       // Draw the object
+;;       cpct_drawSprite(o->sprite, pvmem, o->width, o->height);
+;;    
+;;       //-----Draw Inverted object right next to original one
+;;       //
+;;       // Assuming pvmem points to upper-left byte of the original sprite in
+;;       // video memory, calculate a pointer to the bottom-left byte (in video memory).
+;;       // Equivalent to: cpct_getScreenPtr(CPCT_VMEM_START, o->x, (o->y + o->height - 1) )
+;;       pvmem = cpct_getBottomLeftPtr(pvmem, o->height);
+;;       // As we don't want to overwrite the original object, this inverted version will
+;;       // be drawn 1 byte to its right (in front of the original). That means moving to 
+;;       // the right (adding) a number of bytes equal to the width of the object + 1. 
+;;       pvmem += o->width + 1;
+;;       // Finally, draw the vertically flipped object. This draw function
+;;       // does the drawing bottom-to-top in the video memory. That's the reason
+;;       // to have a pointer to the bottom-left.
+;;       cpct_drawSpriteVFlip_f(o->sprite, pvmem, o->width, o->height);
+;;    }
+;; (end code)
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
@@ -111,16 +148,16 @@
 ;; (start code)
 ;;  Case      |   microSecs (us)       |        CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      | 20 + (21 + 5W)H + 9HH  | 80 + (84 + 20W)H + 36HH
+;;  Best      | 14 + (24 + 5W)H + 9HH  | 56 + (96 + 20W)H + 36HH
 ;;  Worst     |       Best + 9         |      Best + 36
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |        525 /  534      |   2100 / 2136
-;;  W=4,H=32  |       1359 / 1368      |   5436 / 5472
+;;  W=2,H=16  |        558 /  567      |   2232 / 2268
+;;  W=4,H=32  |       1422 / 1431      |   5688 / 5724
 ;; ----------------------------------------------------------------
 ;; Asm saving |         -16            |        -64
 ;; ----------------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
+;;    W = *width* in bytes, H = *height* in bytes, HH = int((H-1)/8)
 ;;
 ;; Credits:
 ;;    This routine was inspired in the original *cpc_PutSprite* from
@@ -132,7 +169,7 @@
    ld    a, #126           ;; [2] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite * 2 (2B)
    sub   c                 ;; [1]    to do as much LDIs as bytes the Sprite is wide
    sub   c                 ;; [1]
-   ld (ds_drawSpriteWidth+#4), a ;; [4] Modify JR data to create the jump we need
+   ld  (ds_jrOffset), a    ;; [4] Modify JR offset to create the jump we need
 
    ld    a, b              ;; [1] A = Height (used as counter for the number of lines we have to copy)
    ex   de, hl             ;; [1] Instead of jumping over the next line, we do the inverse operation because 
@@ -146,6 +183,7 @@ ds_drawSpriteWidth:
    ;; Draw a sprite-line of n bytes
    ld   bc, #-0x800 ;; [3] 0x800 bytes is the distance in memory from one pixel line to the next within every 8 pixel lines
                     ;; ... Each LDI performed will decrease this by 1, as we progress through memory copying the present line
+ds_jrOffset = .+1   ;;
    jr__0            ;; [3] Self modifying instruction: the '00' will be substituted by the required jump forward. 
                     ;; ... (Note: Writting JR 0 compiles but later it gives odd linking errors)
    ldi              ;; [5] <| 63 LDIs, which are able to copy up to 63 bytes each time.
