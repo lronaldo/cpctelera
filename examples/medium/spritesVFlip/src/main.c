@@ -57,7 +57,10 @@ void drawRockets(u8 x, u8 y) {
    // Finally, draw the right rocket vertically flipped. This draw function
    // does the drawing bottom-to-top in the video memory. That's the reason
    // to have a pointer to the bottom-left.
-   cpct_drawSpriteVFlip_f(g_rocket, pvmem, G_ROCKET_W, G_ROCKET_H);  
+   cpct_drawSpriteVFlip(g_rocket, pvmem, G_ROCKET_W, G_ROCKET_H);  
+
+   // cpct_drawSpriteVFlip_f could be used instead for faster drawing, 
+   // at the cost of more memory consumption (+125 bytes, as it uses an unrolled loop)
 }
 
 ///////////////////////////////////////////////////////////////////
