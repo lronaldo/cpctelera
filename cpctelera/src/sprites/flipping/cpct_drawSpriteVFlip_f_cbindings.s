@@ -28,8 +28,8 @@
 _cpct_drawSpriteVFlip_f::
    ;; GET Parameters from the stack 
    pop  af   ;; [3] AF = Return Address
-   pop  hl   ;; [3] HL = Source Address (Sprite data array)
-   pop  de   ;; [3] DE = Destination address (Video memory location)
+   pop  de   ;; [3] DE = Source Address (Sprite data array)
+   pop  hl   ;; [3] HL = Destination address (Video memory location)
    pop  bc   ;; [3] BC = Height/Width (B = Height, C = Width)
  
    push af   ;; [4] Put returning address in the stack again

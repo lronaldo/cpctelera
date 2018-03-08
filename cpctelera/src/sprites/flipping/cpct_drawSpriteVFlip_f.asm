@@ -22,14 +22,15 @@
 ;; Function: cpct_drawSpriteVFlip_f
 ;;
 ;;    Copies a sprite from an array to video memory or Hardware Back Buffer 
-;; flipping it vertically (top to bottom)
+;; flipping it vertically (top to bottom). It does same function as <cpct_drawSpriteVFlip>
+;; but 3%-10% faster depending on sprite size (bigger sprites, more gain).
 ;;
 ;; C Definition:
 ;;    void <cpct_drawSpriteVFlip_f> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (2B HL) sprite - Source Sprite Pointer
-;;  (2B DE) memory - Destination video memory pointer (*Bottom-left corner*)
+;;  (2B DE) sprite - Source Sprite Pointer
+;;  (2B HL) memory - Destination video memory pointer (*Bottom-left corner*)
 ;;  (1B C ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;  (1B B ) height - Sprite Height in bytes 
 ;;
@@ -141,14 +142,14 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;     C-bindings - 167 bytes
-;;   ASM-bindings - 162 bytes
+;;     C-bindings - 166 bytes
+;;   ASM-bindings - 161 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |   microSecs (us)       |        CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      | 14 + (24 + 5W)H + 9HH  | 56 + (96 + 20W)H + 36HH
+;;  Best      | 13 + (24 + 5W)H + 9HH  | 52 + (96 + 20W)H + 36HH
 ;;  Worst     |       Best + 9         |      Best + 36
 ;; ----------------------------------------------------------------
 ;;  W=2,H=16  |        558 /  567      |   2232 / 2268
@@ -172,8 +173,6 @@
    ld  (ds_jrOffset), a    ;; [4] Modify JR offset to create the jump we need
 
    ld    a, b              ;; [1] A = Height (used as counter for the number of lines we have to copy)
-   ex   de, hl             ;; [1] Instead of jumping over the next line, we do the inverse operation because 
-                           ;; .... it is only 4 cycles and not 10, as a JP would be)
 
 ds_drawSpriteWidth_next:
    ;; NEXT LINE
