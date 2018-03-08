@@ -34,7 +34,8 @@
 extern void *cpct_getBottomLeftPtr (void *sprite, u16 height) __z88dk_callee;
 
 // Draw Sprite Flipped Functions
-extern void  cpct_drawSpriteVFlip_f(void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
+extern void cpct_drawSpriteVFlip  (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
+extern void cpct_drawSpriteVFlip_f(void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 
 // Vertically flipping functions
 extern void cpct_vflipSprite     (u8 width, u8 height, void* spbl, void* sprite) __z88dk_callee;
