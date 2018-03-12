@@ -72,13 +72,6 @@
    .dw #0x6FDD  ;; Opcode for ld ixl, a
 .endm
 
-;; Macro: dec__ixh
-;;    Opcode for "DEC IXH" instruction
-;; 
-.macro dec__ixh
-   .dw #0x25DD  ;; Opcode for dec ixh
-.endm
-
 ;; Macro: dec__ixl
 ;;    Opcode for "DEC IXL" instruction
 ;; 
@@ -93,13 +86,6 @@
    .dw #0x95DD  ;; Opcode for sub ixl
 .endm
 
-;; Macro: sub__ixh
-;;    Opcode for "SUB IXH" instruction
-;; 
-.macro sub__ixh
-   .dw #0x94DD  ;; Opcode for sub ixh
-.endm
-
 ;; Macro: ld__ixl    Value
 ;;    Opcode for "LD IXL, Value" instruction
 ;;  
@@ -110,6 +96,12 @@
    .db #0xDD, #0x2E, Value  ;; Opcode for ld ixl, Value
 .endm
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+;; IXH Related Macros
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+
 ;; Macro: ld__ixh    Value
 ;;    Opcode for "LD IXH, Value" instruction
 ;;  
@@ -118,4 +110,158 @@
 ;; 
 .macro ld__ixh    Value 
    .db #0xDD, #0x26, Value  ;; Opcode for ld ixh, Value
+.endm
+
+;; Macro: ld__ixh_a
+;;    Opcode for "LD IXH, a" instruction
+;; 
+.macro ld__ixh_a
+   .dw #0x67DD  ;; Opcode for ld ixh, a
+.endm
+
+;; Macro: ld__ixh_b
+;;    Opcode for "LD IXH, B" instruction
+;; 
+.macro ld__ixh_b
+   .dw #0x60DD  ;; Opcode for ld ixh, b
+.endm
+
+;; Macro: ld__ixh_c
+;;    Opcode for "LD IXH, C" instruction
+;; 
+.macro ld__ixh_c
+   .dw #0x61DD  ;; Opcode for ld ixh, c
+.endm
+
+;; Macro: ld__ixh_d
+;;    Opcode for "LD IXH, D" instruction
+;; 
+.macro ld__ixh_d
+   .dw #0x62DD  ;; Opcode for ld ixh, d
+.endm
+
+;; Macro: ld__ixh_e
+;;    Opcode for "LD IXH, E" instruction
+;; 
+.macro ld__ixh_e
+   .dw #0x63DD  ;; Opcode for ld ixh, e
+.endm
+
+;; Macro: ld__ixh_ixl
+;;    Opcode for "LD IXH, IXL" instruction
+;; 
+.macro ld__ixh_ixl
+   .dw #0x65DD  ;; Opcode for ld ixh, ixl
+.endm
+
+;; Macro: ld__a_ixh
+;;    Opcode for "LD A, IXH" instruction
+;; 
+.macro ld__a_ixh
+   .dw #0x7CDD  ;; Opcode for ld a, ixh
+.endm
+
+;; Macro: ld__b_ixh
+;;    Opcode for "LD B, IXH" instruction
+;; 
+.macro ld__b_ixh
+   .dw #0x44DD  ;; Opcode for ld b, ixh
+.endm
+
+;; Macro: ld__c_ixh
+;;    Opcode for "LD c, IXH" instruction
+;; 
+.macro ld__c_ixh
+   .dw #0x4CDD  ;; Opcode for ld c, ixh
+.endm
+
+;; Macro: ld__d_ixh
+;;    Opcode for "LD D, IXH" instruction
+;; 
+.macro ld__d_ixh
+   .dw #0x54DD  ;; Opcode for ld d, ixh
+.endm
+
+;; Macro: ld__e_ixh
+;;    Opcode for "LD e, IXH" instruction
+;; 
+.macro ld__e_ixh
+   .dw #0x5CDD  ;; Opcode for ld e, ixh
+.endm
+
+;; Macro: ld__ixl_ixh
+;;    Opcode for "LD ixl, IXH" instruction
+;; 
+.macro ld__ixl_ixh
+   .dw #0x6CDD  ;; Opcode for ld ixl, ixh
+.endm
+
+;; Macro: add__ixh
+;;    Opcode for "ADD IXH" instruction
+;; 
+.macro add__ixh
+   .dw #0x84DD  ;; Opcode for add ixh
+.endm
+
+;; Macro: sub__ixh
+;;    Opcode for "SUB IXH" instruction
+;; 
+.macro sub__ixh
+   .dw #0x94DD  ;; Opcode for sub ixh
+.endm
+
+;; Macro: adc__ixh
+;;    Opcode for "ADC IXH" instruction
+;; 
+.macro adc__ixh
+   .dw #0x8CDD  ;; Opcode for adc ixh
+.endm
+
+;; Macro: sbc__ixh
+;;    Opcode for "SBC IXH" instruction
+;; 
+.macro sbc__ixh
+   .dw #0x9CDD  ;; Opcode for sbc ixh
+.endm
+
+;; Macro: and__ixh
+;;    Opcode for "AND IXH" instruction
+;; 
+.macro and__ixh
+   .dw #0xA4DD  ;; Opcode for and ixh
+.endm
+
+;; Macro: or__ixh
+;;    Opcode for "OR IXH" instruction
+;; 
+.macro or__ixh
+   .dw #0xB4DD  ;; Opcode for or ixh
+.endm
+
+;; Macro: xor__ixh
+;;    Opcode for "XOR IXH" instruction
+;; 
+.macro xor__ixh
+   .dw #0xACDD  ;; Opcode for xor ixh
+.endm
+
+;; Macro: cp__ixh
+;;    Opcode for "CP IXH" instruction
+;; 
+.macro cp__ixh
+   .dw #0xBCDD  ;; Opcode for cp ixh
+.endm
+
+;; Macro: dec__ixh
+;;    Opcode for "DEC IXH" instruction
+;; 
+.macro dec__ixh
+   .dw #0x25DD  ;; Opcode for dec ixh
+.endm
+
+;; Macro: inc__ixh
+;;    Opcode for "INC IXH" instruction
+;; 
+.macro inc__ixh
+   .dw #0x24DD  ;; Opcode for inc ixh
 .endm
