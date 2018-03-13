@@ -27,14 +27,14 @@
 ;; C Definition:
 ;;    void <cpct_drawSpriteMaskedAlignedTable> (const void* *psprite*, void* *pvideomem*, 
 ;;                                       <u8> *width*, <u8> *height*, 
-;;                                       const void* *pmasktable*) __z88dk_callee;
+;;                                       const void* *pmasktable0*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
-;;  (2B  BC) psprite    - Source Sprite Pointer
-;;  (2B  DE) pvideomem  - Destination video memory pointer
-;;  (1B IXL) width      - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
-;;  (1B IXH) height     - Sprite Height in bytes (>0)
-;;  (2B  HL) pmasktable - Pointer to the aligned mask table used to create transparency
+;;  (2B  BC) psprite     - Source Sprite Pointer
+;;  (2B  DE) pvideomem   - Destination video memory pointer
+;;  (1B IXL) width       - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
+;;  (1B IXH) height      - Sprite Height in bytes (>0)
+;;  (2B  HL) pmasktable0 - Pointer to an Aligned Mask Table for transparencies with palette index 0
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteMaskedAlignedTable_asm
@@ -61,14 +61,16 @@
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
-;;  * *pmasktable* must be a pointer to the mask table that will be used for calculating
-;; transparency. A mask table is expected to be 256-sized containing all the possible
-;; masks for each possible byte colour value. Also, the mask is required to be
-;; 256-byte aligned, which means it has to start at a 0x??00 address in memory to
-;; fit in a complete 256-byte memory page. <cpct_transparentMaskTable00M0> is an 
-;; example table you might want to use.
+;;  * *pmasktable0* must be a pointer to the start of a mask table that will be used 
+;; for calculating transparency. This table *must* consider palette index 0 as transparent.
+;; The mask table is expected to be 256-sized containing all the possible masks for each 
+;; possible byte-sized colour value. Also, the mask is required to be 256-byte aligned, 
+;; which means it has to start at a 0x??00 address in memory to fit in a complete 256-byte 
+;; memory page. <cpct_transparentMaskTable00M0> is an example table you might want to use.
 ;;
 ;; Known limitations:
+;;    * *width*s or *height*s of 0 will be considered as 256 and will potentially 
+;; make your program behave erratically or crash.
 ;;    * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
@@ -83,9 +85,10 @@
 ;;    * This function *cannot be run from ROM* as it uses self-modifying code.
 ;;    * If mask table is not aligned within a memory page (256-bytes
 ;; aligned), rubbish may appear on the screen.
-;;    * Under hardware scroll conditions, sprite drawing will fail if asked to draw
-;; near 0x?7FF or 0x?FFF addresses (at the end of each one of the 8 pixel lines), as 
-;; next screen byte at that locations is -0x7FF and not +1 bytes away.
+;;    * Although this function can be used under hardware-scrolling conditions,
+;; it does not take into account video memory wrap-around (0x?7FF or 0x?FFF 
+;; addresses, the end of character pixel lines).It  will produce a "step" 
+;; in the middle of sprites when drawing near wrap-around.
 ;;
 ;; Details:
 ;;    This function draws a generic *width* x *height* bytes sprite either to

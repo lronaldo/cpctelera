@@ -72,6 +72,10 @@
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
 ;;    * This function *will not work from ROM*, as it uses self-modifying code.
+;;    * Although this function can be used under hardware-scrolling conditions,
+;; it does not take into account video memory wrap-around (0x?7FF or 0x?FFF 
+;; addresses, the end of character pixel lines).It  will produce a "step" 
+;; in the middle of sprites when drawing near wrap-around.
 ;;
 ;; Details:
 ;;    This function draws a solid colour-patterned box (a rectangle full

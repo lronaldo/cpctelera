@@ -63,6 +63,10 @@
 ;; start on non-byte aligned pixels (like odd-pixels, for instance) and 
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
+;;    * Although this function can be used under hardware-scrolling conditions,
+;; it does not take into account video memory wrap-around (0x?7FF or 0x?FFF 
+;; addresses, the end of character pixel lines).It will produce a "step" 
+;; in the middle of tiles when drawing near wrap-around.
 ;;
 ;; Details:
 ;;    Copies a 2x8-byte sprite from an array with 16 screen pixel format 
