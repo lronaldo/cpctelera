@@ -144,11 +144,11 @@
 ;; (start code)
 ;;  Case      |   microSecs (us)       |        CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      | 15 + (23 + 6W)H + 8HH  | 60 + (92 + 24W)H + 32HH
+;;  Best      | 13 + (23 + 6W)H + 8HH  | 52 + (92 + 24W)H + 32HH
 ;;  Worst     |       Best + 8         |      Best + 32
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |        575 /  583      |   2300 / 2332
-;;  W=4,H=32  |       1551 / 1559      |   6204 / 6236
+;;  W=2,H=16  |        573 /  581      |   2292 / 2324
+;;  W=4,H=32  |       1549 / 1557      |   6196 / 6228
 ;; ----------------------------------------------------------------
 ;; Asm saving |         -17            |        -68
 ;; ----------------------------------------------------------------
@@ -158,9 +158,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;; Modify code using width to jump in drawSpriteWidth
-   ld (widthRestore), a ;; [5] Save sprite width into its restoration placeholder for row loop
+   ld (widthRestore), a ;; [4] Save sprite width into its restoration placeholder for row loop
    neg                  ;; [2] A = -A (0 - Sprite Width)
-   ld (minusWidthOp), a ;; [5] Save negative sprite width into placeholder for next row calculation
+   ld (minusWidthOp), a ;; [4] Save negative sprite width into placeholder for next row calculation
    ld     a, b          ;; [1] A = height
 
    ;; Draw the sprite row by row

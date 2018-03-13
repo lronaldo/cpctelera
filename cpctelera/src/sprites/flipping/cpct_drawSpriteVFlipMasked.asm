@@ -134,11 +134,11 @@
 ;; (start code)
 ;;  Case      |   microSecs (us)       |        CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      | 29 + (21 + 18W)H + 8HH | 116 + (84 + 72W)H + 32HH
+;;  Best      | 27 + (21 + 18W)H + 8HH | 108 + (84 + 72W)H + 32HH
 ;;  Worst     |       Best + 8         |      Best + 32
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |        949 /  957      |    3796 /  3828
-;;  W=4,H=32  |       3029 / 3037      |   12116 / 12148
+;;  W=2,H=16  |        947 /  955      |    3788 /  3820
+;;  W=4,H=32  |       3027 / 3035      |   12108 / 12140
 ;; ----------------------------------------------------------------
 ;; Asm saving |         -28            |        -112
 ;; ----------------------------------------------------------------
@@ -148,9 +148,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ;; Modify code using width inside drawing loops
-   ld (widthRestore), a ;; [5] Save sprite width into its restoration placeholder for row loop
+   ld (widthRestore), a ;; [4] Save sprite width into its restoration placeholder for row loop
    neg                  ;; [2] A = -A (0 - Sprite Width)
-   ld (minusWidthOp), a ;; [5] Save negative sprite width into placeholder for next row calculation
+   ld (minusWidthOp), a ;; [4] Save negative sprite width into placeholder for next row calculation
 
 nextSpriteRow:
    ex   de, hl       ;; [1] Switch DE <=> HL to have HL pointing to the sprite and DE to video memory
