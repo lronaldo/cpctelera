@@ -71,6 +71,8 @@
 ;; Known limitations:
 ;;    * *width*s or *height*s of 0 will be considered as 256 and will potentially 
 ;; make your program behave erratically or crash.
+;;    * Transparent drawing will only work if *pmasktable0* uses *palette index 0*
+;; as transparent colour. 
 ;;    * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
@@ -112,6 +114,9 @@
 ;; present byte at video memory location where we want to write) is
 ;; performed. That effectively mixes sprite colours with background
 ;; colours, after removing background pixels from the sprite.
+;;
+;;    *Important*; this process for mixing background with sprite colours works
+;; only for *palette index 0* as transparent colour. 
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
