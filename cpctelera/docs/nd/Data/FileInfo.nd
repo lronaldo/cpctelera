@@ -1,273 +1,299 @@
 1.52
 Assembly
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_cbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_cbinding.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_mxor_u16.s	1508614170	1	cpct_getRandom_mxor_u16
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_undocumentedOpcodes.h.s	1508614170	1	Undocumented Opcodes
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_lcg_u8.s	1476054529	1	cpct_getRandom_lcg_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_f.s	1476054529	1	cpct_scanKeyboard_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f.asm	1508614170	1	cpct_drawTileAligned4x4_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_asmbindings.s	1500312309	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits.asm	1476054529	1	cpct_set6Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1_f.s	1476054529	1	cpct_drawStringM1_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h	1508686876	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite.asm	1476054529	1	cpct_drawSprite
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_lookupgenerator.cpp	1438757101	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_lookupgenerator.cpp
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/colours.h.s	1508614170	1	Colours (asm)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_asmbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_asmbinding.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_setInterruptHandler.s	1500312309	1	cpct_setInterruptHandler
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_glfsr_define_generator.cpp	1445188181	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_glfsr_define_generator.cpp
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_dc_mode0_ct.s	1476054529	1	dc_mode0_ct
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy.asm	1476054529	1	cpct_memcpy
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/banks.h	1500315574	1	Memory Pagination Macros
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_sp2tiles	1476054529	1	cpct_sp2tile
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/transparency_tables_m0.h	1476054529	1	Transparency Tables for Mode 0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprite_types.h	1508614170	0	Sprite Types
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/tilemap_conversion.mk	1500312309	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/tilemap_conversion.mk
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/buildsys/vscode_integration.txt	1500312309	1	Visual Studio Code
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM1_f.s	1476054529	1	cpct_drawCharM1_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM0.s	1476054529	1	cpct_drawStringM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/random.h	1476054529	1	Random
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/build_config.mk	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/build_config.mk
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_mxor_u32.s	1517870681	1	cpct_getRandom_mxor_u32
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryPage.s	1517870681	1	cpct_setVideoMemoryPage
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_asmbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_asmbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_cbindings.s
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.txt	1430760928	1	Keyboard Technicals
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r.asm	1508614170	1	cpct_hflipSpriteM0_r
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/sprite_types.h	1508614170	1	Blended-Sprites Structs
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr.asm	1476054529	1	cpct_getScreenPtr
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxor532_u8.s	1476054529	1	cpct_nextRandom_mxor532_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_opcodeConstants.h.s	1508614170	1	Opcodes
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1.asm	1508614170	1	cpct_hflipSpriteMaskedM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/music_conversion.mk	1500312309	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/music_conversion.mk
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r.asm	1508614170	1	cpct_hflipSpriteM1_r
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer.asm	1508614170	1	cpct_drawToSpriteBuffer
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM0.s	1476054529	1	cpct_drawCharM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_enableDisableROMs.s	1476054529	1	Enabling / disabling ROMs
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_firmware2hw_colour_table.s	1476054529	1	cpct_firmware2hw_colour
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f.asm	1508614170	1	cpct_drawTileAligned2x8_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/buildsys/asset_conversion.txt	1500312309	1	Asset Conversion Utilities
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_mxor_u8.s	1508614159	1	cpct_getRandom_mxor_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.s	1476054529	1	Firmware&ROM constants
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_if.s	1476054529	1	cpct_scanKeyboard_if
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkosplayer.txt	1430940109	1	Arkos Player Manual
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_cbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_cbinding.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended.asm	1508614170	1	cpct_drawSpriteBlended
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.h	1476054529	1	Keyboard Mappings&Constants
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_mxor.s	1476054529	1	cpct_setSeed_mxor
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/main.c	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/main.c
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset.asm	1476054529	1	cpct_memset
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits.asm	1476054529	1	cpct_get6Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isAnyKeyPressed.s	1508614170	1	cpct_isAnyKeyPressed
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_mxor32_seed.s	1476054529	1	cpct_mxor32_seed
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_aks2c	1500312309	1	cpct_aks2c
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/video_macros.h.s	1508685088	1	Macros (asm)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_bin2c	1476054529	1	cpct_bin2c
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit.asm	1476054529	1	cpct_setBit
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_count2VSYNC.s	1476054529	1	cpct_count2VSYNC
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_waitVSYNC.s	1476054529	1	cpct_waitVSYNC
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h	1508690211	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1.s	1476054529	1	cpct_drawStringM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit.asm	1476054529	1	cpct_getBit
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2.asm	1508614170	1	cpct_hflipSpriteM2
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0.asm	1508614170	1	cpct_hflipSpriteM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_rgas2c	1476054529	1	cpct_rgas2c
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker.s	1508614170	1	Arkos Player Functions
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM2.s	1476054529	1	cpct_drawStringM2
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_putChar.s	1476054529	1	putchar
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h.s	1508690216	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8.asm	1476054529	1	cpct_memset_f8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg.asm	1508686859	1	cpct_setCRTCReg
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable.asm	1476054529	1	cpct_drawSpriteMaskedAlignedTable
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_cbindings.s	1508686851	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h.s	1508683469	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileRow2x4.s	1476054529	1	cpct_etm_drawTileRow2x4
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_asmbindings.s	1508691071	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_restoreState_mxor_u16.s	1508614170	1	cpct_restoreState_mxor_u16
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_maths.h.s	1508614170	1	Math Macros
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/colours.h	1508614170	1	Colours (C)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_reenableFirmware.s	1476054529	1	cpct_reenableFirmware
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_pageMemory.asm	1500315574	1	cpct_pageMemory
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1.asm	1508614170	1	cpct_hflipSpriteM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_setBank_consts.asm	1500315574	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_setBank_consts.asm
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/audio.h	1476054529	1	Audio Constants&Variables
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/video_macros.h	1508614170	1	Macros (C)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette.asm	1476054529	1	cpct_setPalette
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_cbindings.s	1508691032	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r.asm	1508614170	1	cpct_hflipSpriteM2_r
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard.s	1476054529	1	cpct_scanKeyboard
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setTaps_glfsr.s	1476054529	1	cpct_setTaps_glfsr16
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af.asm	1508614170	1	cpct_drawTileGrayCode2x8_af
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxor_u8.s	1476054529	1	cpct_nextRandom_mxor_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/authors.txt	1508614170	1	Authors
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_lcg_u8.s	1476054529	1	cpct_setSeed_lcg_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_xsp40_u8.s	1476054529	1	cpct_getRandom_xsp40_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_setBlendMode.s	1508614170	1	cpct_setBlendMode
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_asmbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_asmbinding.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/build_config.mk	1503705015	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/build_config.mk
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_i.s	1476054529	1	cpct_scanKeyboard_i
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0.asm	1508614170	1	cpct_hflipSpriteMaskedM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h	1508689618	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits.asm	1476054529	1	cpct_set4Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked.asm	1476054529	1	cpct_drawSpriteMasked
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getHWColour.s	1476054529	1	cpct_getHWColour
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_installrslib	1476054529	1	cpct_installrslib
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_asmbindings.s	1508685294	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_tmx2csv	1500312309	1	cpct_tmx2csv
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_winape	1508275557	1	cpct_winape
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4.asm	1500312309	1	cpct_etm_drawTileBox2x4
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits.asm	1476054529	1	cpct_set2Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/random_types.h	1476054529	1	Defined Types
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8.asm	1508614170	1	cpct_drawTileAligned4x8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f.asm	1508614170	1	cpct_drawTileAligned2x4_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/relocation.h	1476054529	1	Memory Relocation Utilities
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM1.s	1508614170	1	cpct_px2byteM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_pageMemory_cbindings.s	1500315574	0	cpct_pageMemory
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts.asm	1508692789	1	cpct_waitHalts
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_cbindings.s	1508685289	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/drawToSpriteBuffer.h.s	1508614170	1	Macros (asm)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/main.c	1499895372	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/main.c
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpc_mode_rom_status.s	1476054529	1	cpct_mode_rom_status
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_reverseBits.h.s	1508614170	1	Reverse Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/transparency_table_macros.h	1476054529	1	Transparency Macros
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_bitWeightsVector.s	1476054529	1	cpct_bitWeights
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour.asm	1508614170	1	cpct_setPALColour
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_asmbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_asmbinding.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64.asm	1476054529	1	cpct_memset_f64
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f.asm	1508614170	1	cpct_drawTileAligned4x8_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM1.s	1476054529	1	cpct_drawCharM1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray_macros.h	1476054529	1	Useful macros
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_cbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_cbinding.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits.asm	1476054529	1	cpct_get4Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxor_u32.s	1476054529	1	cpct_nextRandom_mxor_u32
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8.asm	1508614170	1	cpct_drawTileAligned2x8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_img2tileset	1500312309	1	cpct_img2tileset
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode.asm	1476054529	1	cpct_setVideoMode
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2.asm	1508614170	1	cpct_hflipSpriteMaskedM2
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_pageMemory_asmbinding.s	1500315574	0	cpct_pageMemory
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits.asm	1476054529	1	cpct_get2Bits
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f.asm	1476054529	1	cpct_etm_drawTilemap2x4_f
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0.asm	1476054529	1	cpct_px2byteM0
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_cbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8.asm	1476054529	1	cpct_setSeed_xsp40_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_removeInterruptHandler.s	1500798707	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_removeInterruptHandler.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/gpl-license.txt	1476054529	1	License
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_asmbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_asmbinding.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_cbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_cbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/transparency_tables_m1.h	1503705015	1	Transparency Tables for Mode 1
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_mxor_u32.s	1508614159	1	cpct_getRandom_mxor_u32
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/easytilemaps.h	1476054529	1	EasyTilemaps
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/flipping.h	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/flipping.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h	1500798783	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryOffset.s	1476054529	1	cpct_setVideoMemoryOffset
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/drawToSpriteBuffer.h	1508614170	1	Macros (C)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_glfsr.s	1476054529	1	cpct_getRandom_glfsr16
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_glfsr.s	1476054529	1	cpct_setSeed_glfsr16
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_setStackLocation.s	1476054529	1	cpct_setStackLocation
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_restoreState_mxor_u8.s	1476054529	1	cpct_restoreState_mxor_u8
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.h.s	1508614170	1	Key Definitions (asm)
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/image_conversion.mk	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/image_conversion.mk
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/memutils.h	1508691361	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/memutils.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/blending.h	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/blending.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable.asm	1508614170	1	cpct_drawToSpriteBufferMaskedAlignedTable
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_cbinding.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_cbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_at.asm	1520984948	1	cpct_drawSpriteVFlipMasked_at
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_dc_mode0_ct.s	1517870681	1	dc_mode0_ct
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox.asm	1520984948	1	cpct_drawSolidBox
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8.asm	1517870681	1	cpct_memset_f8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_f.asm	1520984948	1	cpct_drawSpriteVFlip_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_cbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_i.s	1517870681	1	cpct_scanKeyboard_i
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1.asm	1517870681	1	cpct_hflipSpriteM1
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxor_u32.s	1517870681	1	cpct_nextRandom_mxor_u32
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/transparency_tables_m0.h	1517870681	1	Transparency Tables for Mode 0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_f_cbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_f_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0.asm	1517870681	1	cpct_hflipSpriteMaskedM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_removeInterruptHandler.s	1517870681	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_removeInterruptHandler.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprite_types.h	1517870681	0	Sprite Types
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_cbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8_cbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_firmware2hw_colour_table.s	1517870681	1	cpct_firmware2hw_colour
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/license.txt	1517870681	1	License
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_setBank_consts.asm	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_setBank_consts.asm
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_cbindings.s
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxorplus_u64.s	1461175273	1	cpct_nextRandom_mxorplus_u32
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/types.h	1476054529	1	Aliases for builtin types
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/drawTile.h	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/drawTile.h
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/readme.txt	1500312309	1	CPCtelera Reference Manual
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryPage.s	1476054529	1	cpct_setVideoMemoryPage
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isKeyPressed.s	1508614170	1	cpct_isKeyPressed
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/license.txt	1476054529	1	License
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteHFlipM0.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteHFlipM0.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_setTileset2x4.s	1476054529	1	cpct_etm_setTileset2x4
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_asmbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_asmbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr.asm	1517870681	1	cpct_getScreenPtr
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable.asm	1520984948	1	cpct_drawSpriteMaskedAlignedTable
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2.asm	1517870681	1	cpct_hflipSpriteMaskedM2
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/drawTile.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/drawTile.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_cbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h.s	1518559279	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1.s	1517870681	1	cpct_drawStringM1
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_glfsr_define_generator.cpp	1445188181	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_glfsr_define_generator.cpp
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_getBottomLeftPtr.asm	1520984948	1	cpct_getBottomLeftPtr
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxor_u8.s	1517870681	1	cpct_nextRandom_mxor_u8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts.asm	1517870681	1	cpct_waitHalts
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/relocation.h	1517870681	1	Memory Relocation Utilities
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_mxor32_seed.s	1517870681	1	cpct_mxor32_seed
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite.asm	1520984948	1	cpct_drawSprite
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits.asm	1517870681	1	cpct_set6Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMemoryOffset.s	1517870681	1	cpct_setVideoMemoryOffset
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_pageMemory.asm	1517870681	1	cpct_pageMemory
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_vflipSprite.asm	1520984949	1	cpct_vflipSprite
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.h.s	1517870681	1	Key Definitions (asm)
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/types.h	1517870681	1	Aliases for builtin types
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_mxor.s	1517870681	1	cpct_setSeed_mxor
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy.asm	1517870681	1	cpct_memcpy
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_winape	1517870682	1	cpct_winape
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_sp2tiles	1517870682	1	cpct_sp2tile
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits.asm	1517870681	1	cpct_get2Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_reenableFirmware.s	1517870681	1	cpct_reenableFirmware
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/main.c	1517870682	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/main.c
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/drawToSpriteBuffer.h	1517870681	1	Macros (C)
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_pageMemory_cbindings.s	1517870681	0	cpct_pageMemory
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_lookupgenerator.cpp	1438757101	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/c_scripts/cpct_lookupgenerator.cpp
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/screenToSprite/screenToSprite.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/screenToSprite/screenToSprite.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/tilemap_conversion.mk	1517870682	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/tilemap_conversion.mk
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_asmbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/buildsys/asset_conversion.txt	1517870681	1	Asset Conversion Utilities
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/random_types.h	1517870681	1	Defined Types
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/authors.txt	1517870681	1	Authors
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_rgas2c	1517870682	1	cpct_rgas2c
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_asmbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_f_asmbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_f_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get2Bits_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_vflipSprite_asmbindings.s	1520984949	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_vflipSprite_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit.asm	1517870681	1	cpct_setBit
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f.asm	1520984948	1	cpct_drawTileAligned2x8_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits.asm	1517870681	1	cpct_get4Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/video_macros.h.s	1517870681	1	Macros (asm)
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_dc_mode1_ct.s	1517870681	1	dc_mode1_ct
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1.asm	1517870681	1	cpct_hflipSpriteMaskedM1
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get4Bits_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked.asm	1517870681	1	cpct_drawToSpriteBufferMasked
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM1_f.s	1517870681	1	cpct_drawStringM1_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/bitarray_macros.h	1517870681	1	Useful macros
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_img2tileset	1517870682	1	cpct_img2tileset
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/screenToSprite/cpct_getScreenToSprite_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/screenToSprite/cpct_getScreenToSprite_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset.asm	1517870681	1	cpct_memset
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h.s	1520984949	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/easytilemaps.h	1517870681	1	EasyTilemaps
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_lcg_u8.s	1517870681	1	cpct_setSeed_lcg_u8
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxor_u16.s	1461175275	1	cpct_nextRandom_mxor_u32
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSolidBox.asm	1476054529	1	cpct_drawSolidBox
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM2.s	1476054529	1	cpct_drawCharM2
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw.asm	1476054529	1	cpct_fw2hw
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_asmbindings.s	1476054529	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked.asm	1508614170	1	cpct_drawToSpriteBufferMasked
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isAnyKeyPressed_f.s	1476054529	1	cpct_isAnyKeyPressed_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM2_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker_interrupts.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isKeyPressed.s	1517870681	1	cpct_isKeyPressed
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked.asm	1520984948	1	cpct_drawSpriteMasked
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM2.s	1517870681	1	cpct_drawCharM2
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0.asm	1517870681	1	cpct_px2byteM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM0_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/flipping_macros.h	1520984949	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/flipping_macros.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit.asm	1517870681	1	cpct_getBit
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isAnyKeyPressed_f.s	1517870681	1	cpct_isAnyKeyPressed_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/gpl-license.txt	1517870681	1	License
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_cbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_cbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/music_conversion.mk	1517870682	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/music_conversion.mk
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_pageMemory_asmbinding.s	1517870681	0	cpct_pageMemory
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked.asm	1520984948	1	cpct_drawSpriteVFlipMasked
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM0.s	1517870681	1	cpct_drawStringM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h	1517870681	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/allmacros.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setTaps_glfsr.s	1517870681	1	cpct_setTaps_glfsr16
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_at_cbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_at_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h	1518559279	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/sprites.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8.asm	1520984948	1	cpct_drawTileAligned2x8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_waitVSYNC.s	1517870681	1	cpct_waitVSYNC
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM0.s	1517870681	1	cpct_drawCharM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_reverseBits.h.s	1517870681	1	Reverse Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_getBottomLeftPtr_cbindings.s	1520984949	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_getBottomLeftPtr_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0.asm	1517870681	1	cpct_hflipSpriteM0
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_glfsr.s	1517870681	1	cpct_getRandom_glfsr16
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits.asm	1517870681	1	cpct_get6Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r.asm	1517870681	1	cpct_hflipSpriteM2_r
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_cbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_cbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/transparency_table_macros.h	1517870681	1	Transparency Macros
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8_f.asm	1520984948	1	cpct_drawTileAligned4x8_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/audio.h	1517870681	1	Audio Constants&Variables
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_maths.h.s	1520984948	1	Math Macros
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_if.s	1517870681	1	cpct_scanKeyboard_if
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended.asm	1520984948	1	cpct_drawSpriteBlended
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpc_mode_rom_status.s	1517870681	1	cpct_mode_rom_status
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f.asm	1520984948	1	cpct_drawTileAligned2x4_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_isAnyKeyPressed.s	1517870681	1	cpct_isAnyKeyPressed
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw.asm	1517870681	1	cpct_fw2hw
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/banks.h	1517870681	1	Memory Pagination Macros
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/transparency_tables_m1.h	1517870681	1	Transparency Tables for Mode 1
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_enableDisableROMs.s	1517870681	1	Enabling / disabling ROMs
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/colours.h	1517870681	1	Colours (C)
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMasked_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_get6Bits_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_restoreState_mxor_u8.s	1517870681	1	cpct_restoreState_mxor_u8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard.s	1517870681	1	cpct_scanKeyboard
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.h	1517870681	1	Keyboard Mappings&Constants
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f.asm	1517870681	1	cpct_etm_drawTilemap2x4_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM1.s	1518559279	1	cpct_px2byteM1
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_f_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set6Bits_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/video_macros.h	1517870681	1	Macros (C)
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawStringM2.s	1517870681	1	cpct_drawStringM2
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/keyboard.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_waitHalts_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_putChar.s	1517870681	1	putchar
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_bitWeightsVector.s	1517870681	1	cpct_bitWeights
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_setStackLocation.s	1517870681	1	cpct_setStackLocation
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/strings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_drawSpriteBlended_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/blending.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/blending.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer.asm	1517870681	1	cpct_drawToSpriteBuffer
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/colours.h.s	1517870681	1	Colours (asm)
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_glfsr.s	1517870681	1	cpct_setSeed_glfsr16
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/sprite_types.h	1517870681	1	Blended-Sprites Structs
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/cpctelera.h.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkosplayer.txt	1430940109	1	Arkos Player Manual
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_asmbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64_asmbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2.asm	1517870681	1	cpct_hflipSpriteM2
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/screenToSprite/cpct_getScreenToSprite_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/screenToSprite/cpct_getScreenToSprite_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setVideoMode.asm	1517870681	1	cpct_setVideoMode
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_at_asmbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlipMasked_at_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/videomode.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f64.asm	1517870681	1	cpct_memset_f64
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/memutils.h	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/memutils.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/readme.txt	1517870681	1	CPCtelera Reference Manual
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPalette.asm	1517870681	1	cpct_setPalette
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getScreenPtr_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/blending/cpct_setBlendMode.s	1517870681	1	cpct_setBlendMode
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_getBit_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_nextRandom_mxor532_u8.s	1517870681	1	cpct_nextRandom_mxor532_u8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_vflipSprite_cbindings.s	1520984949	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_vflipSprite_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_aks2c	1517870682	1	cpct_aks2c
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x8.asm	1520984948	1	cpct_drawTileAligned4x8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM2_r_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits.asm	1517870681	1	cpct_set4Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour.asm	1517870681	1	cpct_setPALColour
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r.asm	1517870681	1	cpct_hflipSpriteM0_r
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/audio/arkostracker.s	1517870681	1	Arkos Player Functions
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_mxor_u8.s	1517870681	1	cpct_getRandom_mxor_u8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/main.c	1517870682	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/main.c
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSpriteMaskedAlignedTable_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setPALColour_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/screenToSprite/cpct_getScreenToSprite.asm	1517870681	1	cpct_getScreenToSprite
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_getHWColour.s	1517870681	1	cpct_getHWColour
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_bin2c	1517870682	1	cpct_bin2c
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_installrslib	1517870682	1	cpct_installrslib
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_drawSprite_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_count2VSYNC.s	1517870681	1	cpct_count2VSYNC
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_lcg_u8.s	1517870681	1	cpct_getRandom_lcg_u8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/build_config.mk	1517870682	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/cpcrslib/build_config.mk
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileBox2x4.asm	1520217935	1	cpct_etm_drawTileBox2x4
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM1_f.s	1517870681	1	cpct_drawCharM1_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/image_conversion.mk	1517870682	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/image_conversion.mk
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_setBit_cbindings.s
 /home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_cmwc.s	1461175287	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_cmwc.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_mkproject	1500312309	1	cpct_mkproject
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_asmbindings.s	1508614170	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_asmbindings.s
-/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_dc_mode1_ct.s	1476054529	1	dc_mode1_ct
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memcpy_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x4_f_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/random.h	1517870681	1	Random
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable.asm	1517870681	1	cpct_drawToSpriteBufferMaskedAlignedTable
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip.asm	1520984948	1	cpct_drawSpriteVFlip
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_asmbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_asmbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTileRow2x4.s	1517870681	1	cpct_etm_drawTileRow2x4
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_fw2hw_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_asmbindings.s	1520984948	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteVFlip_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned2x8_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteMaskedM1_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileAligned4x4_f.asm	1520984948	1	cpct_drawTileAligned4x4_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/flipping.h	1520984949	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/flipping.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r.asm	1517870681	1	cpct_hflipSpriteM1_r
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set2Bits.asm	1517870681	1	cpct_set2Bits
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_mkproject	1517870682	1	cpct_mkproject
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/cpct_px2byteM0_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM1_r_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_setTileset2x4.s	1517870681	1	cpct_etm_setTileset2x4
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/flipping_macros.h.s	1520984949	1	cpctm_spbloff
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/firmware.s	1517870681	1	Firmware&ROM constants
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/cpct_tmx2csv	1517870682	1	cpct_tmx2csv
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/keyboard/cpct_scanKeyboard_f.s	1517870681	1	cpct_scanKeyboard_f
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_hflipSpriteM0_r_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/strings/cpct_drawCharM1.s	1517870681	1	cpct_drawCharM1
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/pixel_macros.h	1518559279	1	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/pixel_macros.h
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteHFlipM0.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_drawSpriteHFlipM0.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawTile/cpct_drawTileGrayCode2x8_af.asm	1520984948	1	cpct_drawTileGrayCode2x8_af
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/buildsys/vscode_integration.txt	1517870681	1	Visual Studio Code
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_opcodeConstants.h.s	1517870681	1	Opcodes
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/drawToSpriteBuffer/drawToSpriteBuffer.h.s	1517870681	1	Macros (asm)
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_xsp40_u8.s	1517870681	1	cpct_getRandom_xsp40_u8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_getBottomLeftPtr_asmbindings.s	1520984949	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/sprites/flipping/cpct_getBottomLeftPtr_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/build_config.mk	1517870682	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/commandline/templates/build_config.mk
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/macros/cpct_undocumentedOpcodes.h.s	1520984948	1	Undocumented Opcodes
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/firmware/cpct_setInterruptHandler.s	1517870681	1	cpct_setInterruptHandler
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_getRandom_mxor_u16.s	1517870681	1	cpct_getRandom_mxor_u16
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_cbinding.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/memutils/cpct_memset_f8_cbinding.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/video/cpct_setCRTCReg.asm	1517870681	1	cpct_setCRTCReg
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_asmbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/easytilemaps/cpct_etm_drawTilemap2x4_f_asmbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_setSeed_xsp40_u8.asm	1517870681	1	cpct_setSeed_xsp40_u8
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_cbindings.s	1517870681	0	/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/bitarray/cpct_set4Bits_cbindings.s
+/home/ronaldo/trabajo/git/cpctelera/cpctelera/src/random/cpct_restoreState_mxor_u16.s	1517870681	1	cpct_restoreState_mxor_u16
