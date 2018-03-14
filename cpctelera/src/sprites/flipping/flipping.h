@@ -38,6 +38,7 @@ extern void cpct_drawSpriteVFlip          (const void *sprite, void* memory, u8 
 extern void cpct_drawSpriteVFlip_f        (const void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSpriteVFlipMasked    (const void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSpriteVFlipMasked_at (const void *sprite, void* memory, u8 width, u8 height, const void* pmasktable) __z88dk_callee;
+extern void cpct_drawSpriteHFlipM0        (const void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 
 //==== Vertically flipping functions
 extern void cpct_vflipSprite     (u8 width, u8 height, void* spbl, void* sprite) __z88dk_callee;
