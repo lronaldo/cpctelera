@@ -187,7 +187,7 @@ nextbyte:
    inc   hl             ;; [2] HL++ (Next sprite byte)
 firstbyte:
    ld     c, (hl)       ;; [2] A = Next sprite byte
-   ld     a, (bc)       ;; [2] B = A (For temporary calculations)
+   ld     a, (bc)       ;; [2] A = Byte with pixels horizontally flipped (got from precalculated table)
    ld  (de), a          ;; [2] Save Sprite byte with both pixels reversed
 
    dec__ixl             ;; [2] IXL-- (One less byte in this row to go)
