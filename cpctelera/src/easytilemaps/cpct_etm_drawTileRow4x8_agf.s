@@ -17,8 +17,16 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
 .include "macros/cpct_undocumentedOpcodes.h.s"
+.include "macros/cpct_opcodeConstants.h.s"
+.include "macros/cpct_maths.h.s"
 
-;; MOV = ( inc | dec )
+;; LOCAL MACRO: drawSpriteRow
+;;    Copies 4 bytes from the Stack to (HL) using pop DE.
+;; It can copy the sprite left-to-right or right-to-left. For left-to-right
+;; use 'inc' as parameter (MOV=inc), and for right-to-left use 'dec' (MOV=dec).
+;; The copy assumes that destination is 4-byte aligned (L + 2 < 0xFF)
+;; Parameters:
+;;    MOV = ( inc | dec )
 ;;
 .macro drawSpriteRow MOV
    pop   de             ;; [3] Get next 2 sprite bytes
@@ -33,35 +41,80 @@
 .endm
 
 ;;
-;; C bindings for <cpct_etm_drawTileRow2x8_agf>
+;; C bindings for <cpct_etm_setDrawTileMap4x8_agf>
 ;;
 ;;  xx microSecs, xx bytes
-;; cpct_etm_drawTileRow2x8_agf(u16 width, void* tilemap, void* memory, void* tileset)
-;; BC  = Tilemap
-;; DE  = videomem
-;; HL  = Tileset
-;; IYL = Width
+;; cpct_etm_setDrawTileMap4x8_agf(u8 width, u8 height, u16 tilemapWidth, void* tileset)
+;; BC  = B:Height, C:Width
+;; DE  = TileMapWidth
+;; HL  = ptileset
 ;; 
-_cpct_etm_drawTileRow2x8_agf::
-   ;; Parameters
-   ld (restoreIY), iy ;; [6] Save IY
-   pop   hl       ;; [3] HL = Return address
-   pop   iy       ;; [4] IY = Width
-   pop   bc       ;; [3] BC = Tilemap Ptr
-   pop   de       ;; [3] DE = Videomem Ptr
-   ex  (sp), hl   ;; [6] HL = Tileset Ptr
-   push  ix       ;; [5] Save IX
+_cpct_etm_setDrawTileMap4x8_agf::
+   pop   hl       ;; [3] HL = Return Address
+   pop   bc       ;; [3] BC = B:Height, C:Width
+   pop   de       ;; [3] DE = TilemapWidth
+   ex  (sp), hl   ;; [6] HL = ptileset
 
-   ;; Setup (Should be performed outside)
-   ld (videoMemPtr), de    ;; [6]
    ld (tilesetPtr), hl     ;; [5]
+   ;; Setup Width Update for every row
+   ld     a, b             ;; [1] A = height
+   ld (heightSet), a       ;; [4] Set Height
+   ld     a, c             ;; [1] A = Width
+   ld (widthSet), a        ;; [4]
+   ld (restoreWidth), a    ;; [4]
+   dec    a                ;; [1] A = Width - 1
+   sub_de_a                ;; [7] FullWidth - DrawnWidth + 1
+   ld (updateWidthLow), a  ;; [4] (as A == E right now)
+   ld     a, d             ;; [1]
+   ld (updateWidthHigh), a ;; [4]
 
+   ;; Setup Increment HL for each row
+   ld     a, c          ;; [1] A = Width
+   add    a             ;; [1] A = 2*Width
+   add    a             ;; [1] A = 4*Width
+   cpl                  ;; [1] A = - 4*Width - 1
+   add #0x50 + 1        ;; [2] 0x50 - 4*Width (( ==> Maximum showable width = 64))
+   ld (incrementHL), a  ;; [4] 
+
+   ;; Setup restoring of previous interrupt status
+   ld     a, i          ;; [3] P/V flag set to current interrupt status (IFF2 flip-flop)
+   ld     a, #opc_EI    ;; [2] A = Opcode for Enable Interrupts instruction (EI = 0xFB)
+   jp    pe, int_enabled;; [3] If interrupts are enabled, EI is the appropriate instruction
+     ld   a, #opc_DI    ;; [2] Otherwise, it is DI, so A = Opcode for Disable Interrupts instruction (DI = 0xF3)
+int_enabled:
+   ld (restoreI), a     ;; [4] Restore Interrupt status at the end with corresponding DI or EI
+
+   ret
+
+;;
+;; C bindings for <cpct_etm_drawTileMap4x8_agf>
+;;
+;;  xx microSecs, xx bytes
+;; cpct_etm_drawTileMap4x8_agf(void* tilemap, void* memory)
+;; BC  = Tilemap
+;; HL  = VideoMem
+;; 
+_cpct_etm_drawTileMap4x8_agf::
+   ;; Parameters
+   pop   hl       ;; [3] HL = Return address
+   pop   bc       ;; [3] BC = Tilemap Ptr
+   ex  (sp), hl   ;; [6] HL = Videomem Ptr
+   push  ix       ;; [5] Save IX
+   push  iy       ;; [5] Save IY
+
+widthSet  = .+2
+heightSet = .+3
+   ld iy, #0000            ;; [4] IYL=Width, IYH=Height
+
+nextRow:
    ;; Disable interrupts and save SP
    di                      ;; [1] Disable interrupts before starting (we are using SP to read values)
    ld (restoreSP), sp      ;; [6] Save actual SP to restore it in the end
 
    ;; Get tile ID
 nexttile:
+   ;; Setup VideoMemPtr Restore
+   ld (videoMemPtr), hl    ;; [5]
    ld     a, (bc)          ;; [2] Next tile
 
    ;; HL = 32*A (Only calculate L component)
@@ -143,7 +196,7 @@ drawTile:
    res    5, h          ;; [ 2] --100---=>--000--- (Next sprite line: 0)
 
 ;;;   dec__iyl             ;; [2]
-;;;   jr     z, return     ;; [2/3]
+;;;   jr     z, rowEnd     ;; [2/3]
 
    ;; Advance HL to next tile location in video memory
    inc    l  ;; [1]
@@ -155,18 +208,42 @@ drawTile:
    dec    a             ;; [1]
    jr    nz, drawTile   ;; [2/3]
 
-;;;  inc   bc             ;; [2]
-   ld (videoMemPtr), hl ;; [5]
+;;;  inc   bc           ;; [2]
    cp__iyl              ;; [2] IYL == 0? (A is 0)
    jp    nz, nexttile   ;; [3]
 
 ;;;  jp    nexttile       ;; [3]
 
-return:
+rowEnd:
 restoreSP = .+1
    ld    sp, #0000      ;; [3] Restore SP (#0000 is a placeholder)
+restoreI = .
    ei                   ;; [1] Reenable interrupts before returning
+
+   dec__iyh             ;; [3] --IYH (--Height)
+   jr     z, return     ;; [2/3] Height==0? Then return
+
+incrementHL = .+1
+   ld    de, #0000      ;; [3] 0x50 - 4*width (#0000 placeholder)
+   add   hl, de         ;; [3] HL + 0x50 - 4*width
+
+restoreWidth = .+2
+   ld__iyl  #00         ;; [2] IYL = Width (#00 placeholder)
+
+;; Update Width adding difference FullWidth - DrawnWidth
+   ld     a, c          ;; [1]
+updateWidthLow = .+1
+   add   #00            ;; [2] << LowWidthAddition (#00 Placeholder)
+   ld     c, a          ;; [1]
+   ld     a, b          ;; [1]
+updateWidthHigh = .+1
+   adc   #00            ;; [2] << HighWidthAddition (#00 Placeholder)
+   ld     b, a          ;; [1]
+
+   jp    nextRow        ;; [3] Next Row
+
+return:
 restoreIY = .+2
-   ld    iy, #0000      ;; [4] Restore IX, IY
+   pop   iy             ;; [4] Restore IX, IY
    pop   ix             ;; [4]
    ret                  ;; [3] Return
