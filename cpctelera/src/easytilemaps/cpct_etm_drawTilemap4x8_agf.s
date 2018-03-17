@@ -50,10 +50,10 @@
 ;; HL  = ptileset
 ;; 
 _cpct_etm_setDrawTileMap4x8_agf::
-   pop   hl       ;; [3] HL = Return Address
-   pop   bc       ;; [3] BC = B:Height, C:Width
-   pop   de       ;; [3] DE = TilemapWidth
-   ex  (sp), hl   ;; [6] HL = ptileset
+   pop   hl                ;; [3] HL = Return Address
+   pop   bc                ;; [3] BC = B:Height, C:Width
+   pop   de                ;; [3] DE = TilemapWidth
+   ex  (sp), hl            ;; [6] HL = ptileset
 
    ld (tilesetPtr), hl     ;; [5]
    ;; Setup Width Update for every row
@@ -63,26 +63,26 @@ _cpct_etm_setDrawTileMap4x8_agf::
    ld (widthSet), a        ;; [4]
    ld (restoreWidth), a    ;; [4]
    dec    a                ;; [1] A = Width - 1
-   sub_de_a                ;; [7] FullWidth - DrawnWidth + 1
+   sub_de_a                ;; [7] tilemapWidth - (Width - 1)
    ld (updateWidthLow), a  ;; [4] (as A == E right now)
    ld     a, d             ;; [1]
    ld (updateWidthHigh), a ;; [4]
 
    ;; Setup Increment HL for each row
-   ld     a, c          ;; [1] A = Width
-   add    a             ;; [1] A = 2*Width
-   add    a             ;; [1] A = 4*Width
-   cpl                  ;; [1] A = - 4*Width - 1
-   add #0x50 + 1        ;; [2] 0x50 - 4*Width (( ==> Maximum showable width = 64))
-   ld (incrementHL), a  ;; [4] 
+   ld     a, c             ;; [1] A = Width
+   add    a                ;; [1] A = 2*Width
+   add    a                ;; [1] A = 4*Width
+   cpl                     ;; [1] A = - 4*Width - 1
+   add #0x50 + 1           ;; [2] 0x50 - 4*Width (( ==> Maximum showable width = 64))
+   ld (incrementHL), a     ;; [4] 
 
    ;; Setup restoring of previous interrupt status
-   ld     a, i          ;; [3] P/V flag set to current interrupt status (IFF2 flip-flop)
-   ld     a, #opc_EI    ;; [2] A = Opcode for Enable Interrupts instruction (EI = 0xFB)
-   jp    pe, int_enabled;; [3] If interrupts are enabled, EI is the appropriate instruction
-     ld   a, #opc_DI    ;; [2] Otherwise, it is DI, so A = Opcode for Disable Interrupts instruction (DI = 0xF3)
+   ld     a, i             ;; [3] P/V flag set to current interrupt status (IFF2 flip-flop)
+   ld     a, #opc_EI       ;; [2] A = Opcode for Enable Interrupts instruction (EI = 0xFB)
+   jp    pe, int_enabled   ;; [3] If interrupts are enabled, EI is the appropriate instruction
+     ld   a, #opc_DI       ;; [2] Otherwise, it is DI, so A = Opcode for Disable Interrupts instruction (DI = 0xF3)
 int_enabled:
-   ld (restoreI), a     ;; [4] Restore Interrupt status at the end with corresponding DI or EI
+   ld (restoreI), a        ;; [4] Restore Interrupt status at the end with corresponding DI or EI
 
    ret
 
