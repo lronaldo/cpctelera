@@ -18,28 +18,18 @@
 .module cpct_easytilemaps
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
-.macro drawLine_Left2Right
-   pop   de             ;; [3] Get 2 sprite bytes
-   ld  (hl), e          ;; [2] 1st byte is the left byte
-   inc    l             ;; [1] HL++ -> next video mem location
-   ld  (hl), d          ;; [2] 2nd byte is the right byte
-   inc    l             ;; [1] HL++ -> next video mem location
-   pop   de             ;; [3] Get 2 sprite bytes
-   ld  (hl), e          ;; [2] 3rd byte is the left byte
-   inc    l             ;; [1] HL++ -> next video mem location
-   ld  (hl), d          ;; [2] 4th byte is the right byte
-.endm
-
-.macro drawLine_Right2Left
-   pop   de             ;; [3] Get 2 sprite bytes
-   ld  (hl), e          ;; [2] 1st byte is the right byte
-   dec    l             ;; [1] HL-- -> next video mem location
-   ld  (hl), d          ;; [2] 2nd byte is the left byte
-   dec    l             ;; [1] HL-- -> next video mem location
-   pop   de             ;; [3] Get 2 sprite bytes
-   ld  (hl), e          ;; [2] 3rd byte is the right byte
-   dec    l             ;; [1] HL-- -> next video mem location
-   ld  (hl), d          ;; [2] 4th byte is the left byte  
+;; MOV = ( inc | dec )
+;;
+.macro drawSpriteRow MOV
+   pop   de             ;; [3] Get next 2 sprite bytes
+   ld  (hl), e          ;; [2] Copy byte 1
+   MOV    l             ;; [1] HL++ / HL-- (4-byte aligned) -> next video mem location
+   ld  (hl), d          ;; [2] Copy byte 2
+   MOV    l             ;; [1] HL++ / HL-- (4-byte aligned) -> next video mem location
+   pop   de             ;; [3] Get next 2 sprite bytes
+   ld  (hl), e          ;; [2] Copy byte 3
+   MOV    l             ;; [1] HL++ / HL-- (4-byte aligned) -> next video mem location
+   ld  (hl), d          ;; [2] Copy byte 4
 .endm
 
 ;;
@@ -121,35 +111,35 @@ drawTile:
    ld    sp, ix          ;; [3]
 
    ;; Sprite Line 0. Drawing order [>>]
-   drawLine_Left2Right  ;; [17] Copy tile line Left-to-Right
+   drawSpriteRow inc    ;; [17] Copy tile line Left-to-Right
    set    3, h          ;; [ 2] --000---=>--001--- (Next sprite line: 1)
 
    ;; Sprite Line 1. Drawing order [<<]
-   drawLine_Right2Left  ;; [17] Copy tile line Right-to-Left 
+   drawSpriteRow dec    ;; [17] Copy tile line Right-to-Left 
    set    4, h          ;; [ 2] --001---=>--011--- (Next sprite line: 3)
 
    ;; Sprite Line 3. Drawing order [>>]
-   drawLine_Left2Right  ;; [17] Copy tile line Left-to-Right
+   drawSpriteRow inc    ;; [17] Copy tile line Left-to-Right
    res    3, h          ;; [ 2] --011---=>--010--- (Next sprite line: 2)
 
    ;; Sprite Line 2. Drawing order [<<]
-   drawLine_Right2Left  ;; [17] Copy tile line Right-to-Left
+   drawSpriteRow dec     ;; [17] Copy tile line Right-to-Left
    set    5, h          ;; [ 2] --010---=>--110--- (Next sprite line: 6)
 
    ;; Sprite Line 6. Drawing order [>>]
-   drawLine_Left2Right  ;; [17] Copy tile line Left-to-Right
+   drawSpriteRow inc    ;; [17] Copy tile line Left-to-Right
    set    3, h          ;; [ 2] --110---=>--111--- (Next sprite line: 7)
 
    ;; Sprite Line 7. Drawing order [<<]
-   drawLine_Right2Left  ;; [17] Copy tile line Right-to-Left 
+   drawSpriteRow dec    ;; [17] Copy tile line Right-to-Left 
    res    4, h          ;; [ 2] --111---=>--101--- (Next sprite line: 5)
 
    ;; Sprite Line 5. Drawing order [>>]
-   drawLine_Left2Right  ;; [17] Copy tile line Left-to-Right
+   drawSpriteRow inc    ;; [17] Copy tile line Left-to-Right
    res    3, h          ;; [ 2] --101---=>--100--- (Next sprite line: 4)
 
    ;; Sprite Line 4. Drawing order [<<]
-   drawLine_Right2Left  ;; [17] Copy tile line Right-to-Left
+   drawSpriteRow dec    ;; [17] Copy tile line Right-to-Left
    res    5, h          ;; [ 2] --100---=>--000--- (Next sprite line: 0)
 
 ;;;   dec__iyl             ;; [2]
@@ -180,6 +170,3 @@ restoreIY = .+2
    ld    iy, #0000      ;; [4] Restore IX, IY
    pop   ix             ;; [4]
    ret                  ;; [3] Return
-
-;; 40649
-;; 37433
