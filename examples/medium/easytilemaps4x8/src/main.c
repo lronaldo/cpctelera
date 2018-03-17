@@ -23,15 +23,12 @@
 u8* buffer_ptr;
 u8  buffer;
 
-void drawTilemap(u8 x) {
-   u8 y;
-   u8* pvmem = buffer_ptr + 0xA0;
-   u8* ptilem = g_tilemap + x;
-   for(y=0; y < 10; y++) {
-      cpct_etm_drawTileRow2x8_agf(20, ptilem, pvmem, g_tileset_0);
-      pvmem += 0x50;
-      ptilem += g_tilemap_W;
-   }
+#define  VIEW_X 16
+#define  VIEW_Y  7
+#define  OFF_X  (0xA0 + (20 - VIEW_X) * 2)
+
+void drawTilemap(u16 offset) {
+   cpct_etm_drawTileMap4x8_agf(g_tilemap + offset, buffer_ptr + OFF_X);
    cpct_waitVSYNC();
    cpct_setVideoMemoryPage(buffer);
    buffer     ^= 0x10;
@@ -43,22 +40,26 @@ void initialize() {
    cpct_memset((void*)0x8000, 0, 0x4000);
    cpct_setVideoMode(0);
    cpct_setPalette(g_palette, 16);
-   cpct_setBorder(HW_BLACK);
+   cpct_setBorder(HW_WHITE);
+   cpct_etm_setDrawTileMap4x8_agf(VIEW_X, VIEW_Y, g_tilemap_W, g_tileset_0);
    buffer = 0x20;
    buffer_ptr = (u8*)(0x8000);
 }
 
 void main(void) {
-   u8 x;
+   u16 offset;
+   u8  x, y;
    cpct_setStackLocation((void*)0x8000);
    initialize();
 
    // Loop forever
-   x = 0;
+   offset = 0; x = y = 0;
    while (1) {
-      drawTilemap(x);
+      drawTilemap(offset);
       cpct_scanKeyboard_f();
-      if (cpct_isKeyPressed(Key_O) && x) --x;
-      if (cpct_isKeyPressed(Key_P) && x < g_tilemap_W - 20) ++x;
+      if (cpct_isKeyPressed(Key_O) && x)                          { --x; --offset; }
+      if (cpct_isKeyPressed(Key_P) && x < g_tilemap_W - VIEW_X)   { ++x; ++offset; }
+      if (cpct_isKeyPressed(Key_Q) && y)                          { --y; offset -= g_tilemap_W; }
+      if (cpct_isKeyPressed(Key_A) && y < g_tilemap_H - VIEW_Y)   { ++y; offset += g_tilemap_W; }
    }
 }
