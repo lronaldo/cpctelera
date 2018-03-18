@@ -19,14 +19,24 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; ASM bindings for <cpct_etm_drawTileMap4x8_agf_asm>
+;; C bindings for <cpct_etm_drawTileMap4x8_ag>
 ;;
-;; 3 microseconds, 1 byte
+;; 34 microseconds, 13 bytes
 ;;
-cpct_etm_drawTileMap4x8_agf_asm::
+_cpct_etm_drawTileMap4x8_ag::
+   ;; Parameters
+   pop   af          ;; [3] AF = Return address
+   pop   hl          ;; [3] HL = Video Memory Pointer
+   pop   de          ;; [3] DE = Tilemap Pointer
+   push  af          ;; [4] Leave previous AF value (return address)
+                     ;; ... at the top of the stack (following __z88dk_callee convention)
+   push  ix          ;; [5] Save IX and IY to let this function...
+   push  iy          ;; [5] ...use and restore them before returning
 
-.include /cpct_etm_drawTilemap4x8_agf.asm/
+.include /cpct_etm_drawTilemap4x8_ag.asm/
 
-   drawTileMap4x8_agf_gen cpct_etm_dtm4x8_asm_
+   drawTileMap4x8_ag_gen cpct_etm_dtm4x8_ag_c_
 
+   pop   iy          ;; [4] | Restore IX, IY
+   pop   ix          ;; [4] |
    ret               ;; [3] Return

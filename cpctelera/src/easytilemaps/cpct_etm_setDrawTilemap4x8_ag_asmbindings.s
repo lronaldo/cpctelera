@@ -16,17 +16,16 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
-.include "macros/cpct_undocumentedOpcodes.h.s"
+.include "macros/cpct_opcodeConstants.h.s"
+.include "macros/cpct_maths.h.s"
 
 ;;
-;; ASM bindings for <cpct_etm_drawTileMap4x8_agf_asm>
+;; ASM bindings for <cpct_etm_setDrawTileMap4x8_ag_asm>
 ;;
-;; 3 microseconds, 1 byte
+;; 0 microseconds, 0 bytes
 ;;
-cpct_etm_drawTileMap4x8_agf_asm::
+cpct_etm_setDrawTileMap4x8_ag_asm::
 
-.include /cpct_etm_drawTilemap4x8_agf.asm/
+.include /cpct_etm_setDrawTilemap4x8_ag.asm/
 
-   drawTileMap4x8_agf_gen cpct_etm_dtm4x8_asm_
-
-   ret               ;; [3] Return
+   setDrawTileMap4x8_ag_gen cpct_etm_dtm4x8_ag_asm_
