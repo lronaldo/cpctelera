@@ -23,12 +23,12 @@
 u8* buffer_ptr;
 u8  buffer;
 
-#define  VIEW_X 16
-#define  VIEW_Y  7
+#define  VIEW_X 20
+#define  VIEW_Y 10
 #define  OFF_X  (0xA0 + (20 - VIEW_X) * 2)
 
 void drawTilemap(u16 offset) {
-   cpct_etm_drawTileMap4x8_agf(g_tilemap + offset, buffer_ptr + OFF_X);
+   cpct_etm_drawTileMap4x8_agf(buffer_ptr + OFF_X, g_tilemap + offset);
    cpct_waitVSYNC();
    cpct_setVideoMemoryPage(buffer);
    buffer     ^= 0x10;
