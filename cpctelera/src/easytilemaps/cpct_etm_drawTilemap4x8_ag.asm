@@ -120,10 +120,10 @@ tilesetPtr = .+2
 
    ;; We now test if we have finished drawing present row of tiles. If that is
    ;; the case, the Width counter will be 0 (IYL=0). 
-   inc   de           ;; [2]
-   dec__iyl           ;; [2]   --IYL (--Width)
-   jp    nz, nexttile ;; [3]
-
+   inc   de           ;; [2] ++DE (Make tilemapPtr point to next tile to be drawn)
+   dec__iyl           ;; [2] --IYL (--Width, One less tile to be drawn in this row)
+   jp    nz, nexttile ;; [3] if (IYL!=0), then more tiles are left to be drawn in this row,
+                      ;; ... so continue with next tile.
 rowEnd:
    ;; We have finished drawing present row of tiles. We restore SP original value
    ;; and previous interrupt status. This will enable interrupts to occur in a
@@ -139,8 +139,10 @@ restoreI = .
    ;; If the counter is 0, then we have finished drawing the whole tilemap.
    dec__iyh             ;; [3]   --IYH (--Height)
    jr     z, return     ;; [2/3] if (Height==0) then return
+
    ;;
-   ;; As Height counter is not 0 (IYH > 0), set up pointers for drawing next row
+   ;; As Height counter is not 0 (IYH > 0), there are more rows to draw.
+   ;; Set up pointers before drawing next tile row.
    ;;
 
    ;; Video Memory Pointer (Currently HL) has to point to next row in the screen.
