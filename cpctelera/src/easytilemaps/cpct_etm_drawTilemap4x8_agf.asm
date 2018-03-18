@@ -16,9 +16,6 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
-.include "macros/cpct_undocumentedOpcodes.h.s"
-.include "macros/cpct_opcodeConstants.h.s"
-.include "macros/cpct_maths.h.s"
 
 ;; LOCAL MACRO: drawSpriteRow
 ;;    Copies 4 bytes from the Stack to (HL) using pop BC.
@@ -40,104 +37,8 @@
    ld  (hl), b          ;; [2] Copy byte 4
 .endm
 
-;;
-;; C bindings for <cpct_etm_setDrawTileMap4x8_agf>
-;;
-;; BC  = B:Height, C:Width
-;; DE  = Tileset Pointer
-;; HL  = tilemapWidth
-;;
-;; Destroyed Register values: 
-;;      AF, DE
-;;
-;; Required memory:
-;;      xx bytes (+ xx bytes from <cpct_etm_drawTileMap4x8_agf> which is included)
-;;
-;; Time Measures:
-;; (start code)
-;;    Case     | microSecs (us) | CPU Cycles  
-;; ------------------------------------------
-;;    Any      |      72        |    288
-;; ------------------------------------------
-;; ASM Saving  |     -15        |    -60
-;; ------------------------------------------
-;; (end code)
-;;    W - Map width (number of horizontal tiles)
-;; 
-_cpct_etm_setDrawTileMap4x8_agf::
-   pop   hl                ;; [3] HL = Return Address
-   pop   bc                ;; [3] BC = B:Height, C:Width
-   pop   de                ;; [3] DE = Tileset Pointer
-   ex  (sp), hl            ;; [6] HL = TilemapWidth, leaving previous HL value (return address)
-                           ;; ... at the top of the stack (following __z88dk_callee convention)
 
-   ;; Set (tilesetPtr) placeholder
-   ld (tilesetPtr), hl     ;; [5] Save HL into tilesetPtr placeholder
-
-   ;; Set all Width values required by drawTileMap4x8_agf. First two values
-   ;; (heightSet, widthSet) are values used at the start of the function for
-   ;; initialization. The other one (restoreWidth) restores the value of the
-   ;; width after each loop, as it is used as counter and decremented to 0.
-   ld (widthHeightSet), bc ;; [6]
-   ld     a, c             ;; [1]
-   ld (restoreWidth), a    ;; [4] Set restore width after each loop placeholder
-   
-   ;; In order to properly show a view of (Width x Height) tiles from within the
-   ;; tilemap, every time a row has been drawn, we need to move tilemap pointer
-   ;; to the start of the next row. As the complete tilemap is (tilemapWidth) bytes
-   ;; wide and we are showing a view only (Width) tiles wide, to complete (tilemapWidth)
-   ;; bytes at each loop, we need to add (tilemapWidth - Width + 1) bytes.
-   dec    a                ;; [1] A = Width - 1
-   sub_de_a                ;; [7] tilemapWidth - (Width - 1)
-   ld (updateWidth), de    ;; [6] set the difference in updateWidth placeholder
-
-   ;; Calculate HL update that has to be performed for each new row loop.
-   ;; HL advances through video memory as tiles are being drawn. When a row
-   ;; is completely drawn, HL is at the right-most place of the screen.
-   ;; As each screen row has a width of 0x50 bytes (in standard modes), 
-   ;; if the Row that has been drawn has less than 0x50 bytes, this difference
-   ;; has to be added to HL to make it point to the start of next screen row.
-   ;; As each tile is 4-bytes wide, this amount is (0x50 - 4*Width). Also,
-   ;; taking into account that 4*Width cannot exceed 255 (1-byte), a maximum
-   ;; of 63 tiles can be considered as Width.
-   ld     a, c             ;; [1] A = Width
-   add    a                ;; [1] A = 2*Width
-   add    a                ;; [1] A = 4*Width
-   cpl                     ;; [1] A = -4*Width - 1
-   add #0x50 + 1           ;; [2] A = -4*Width-1 + 0x50+1 = 0x50 - 4*Width
-   ld (incrementHL), a     ;; [4] Set HL increment in its placeholder
-
-   ;; Set the restoring of Interrupt Status. drawTileMap4x8_agf disables interrupts before
-   ;; drawing each tile row, and then it restores previous interrupt status after the row
-   ;; has been drawn. To do this, present interrupt status is considered. This code detects
-   ;; present interrupt status and sets a EI/DI instruction at the end of tile row drawing
-   ;; to either reactivate interrupts or preserve interrupts disabled.
-   ld     a, i             ;; [3] P/V flag set to current interrupt status (IFF2 flip-flop)
-   ld     a, #opc_EI       ;; [2] A = Opcode for Enable Interrupts instruction (EI = 0xFB)
-   jp    pe, int_enabled   ;; [3] If interrupts are enabled, EI is the appropriate instruction
-     ld   a, #opc_DI       ;; [2] Otherwise, it is DI, so A = Opcode for Disable Interrupts instruction (DI = 0xF3)
-int_enabled:
-   ld (restoreI), a        ;; [4] Set the Restore Interrupt status at the end with corresponding DI or EI
-
-   ret                     ;; [3] Return to caller
-
-;;
-;; C bindings for <cpct_etm_drawTileMap4x8_agf>
-;;
-;;  xx microSecs, xx bytes
-;; cpct_etm_drawTileMap4x8_agf(void* memory, void* tilemap)
-;; DE  = Tilemap Pointer
-;; HL  = Video Memory Pointer
-;; 
-_cpct_etm_drawTileMap4x8_agf::
-   ;; Parameters
-   pop   hl          ;; [3] HL = Return address
-   pop   de          ;; [3] DE = Tilemap Pointer
-   ex  (sp), hl      ;; [6] HL = Video Memory Pointer, leaving previous HL value (return address)
-                     ;; ... at the top of the stack (following __z88dk_callee convention)
-   push  ix          ;; [5] Save IX and IY to let this function...
-   push  iy          ;; [5] ...use and restore them before returning
-
+.macro drawTileMap4x8_agf_gen lblPrf
    ;; Set Height and Width of the View Window of the current 
    ;; tilemap to be drawn (This is set by setDrawTilemap4x8_agf)
 widthHeightSet = .+2
@@ -316,6 +217,13 @@ saveSPfirst:
    ;; When everything is finished, we safely return
    ;; 
 return:
-   pop   iy             ;; [4] | Restore IX, IY
-   pop   ix             ;; [4] |
-   ret                  ;; [3] Return
+
+;; Set up association of global symbols with locals
+lblPrf'tilesetPtr     == tilesetPtr
+lblPrf'widthHeightSet == widthHeightSet
+lblPrf'restoreWidth   == restoreWidth
+lblPrf'updateWidth    == updateWidth
+lblPrf'incrementHL    == incrementHL
+lblPrf'restoreI       == restoreI
+
+.endm
