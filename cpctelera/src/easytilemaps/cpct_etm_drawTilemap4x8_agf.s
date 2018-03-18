@@ -43,48 +43,88 @@
 ;;
 ;; C bindings for <cpct_etm_setDrawTileMap4x8_agf>
 ;;
-;;  xx microSecs, xx bytes
 ;; cpct_etm_setDrawTileMap4x8_agf(u8 width, u8 height, u16 tilemapWidth, void* tileset)
 ;; BC  = B:Height, C:Width
 ;; DE  = TileMapWidth
 ;; HL  = ptileset
+;;
+;; Destroyed Register values: 
+;;      AF, DE
+;;
+;; Required memory:
+;;      xx bytes (+ xx bytes from <cpct_etm_drawTileMap4x8_agf> which is included)
+;;
+;; Time Measures:
+;; (start code)
+;;    Case     | microSecs (us) | CPU Cycles  
+;; ------------------------------------------
+;;    Any      |      84        |    336
+;; ------------------------------------------
+;; ASM Saving  |     -15        |    -60
+;; ------------------------------------------
+;; (end code)
+;;    W - Map width (number of horizontal tiles)
 ;; 
 _cpct_etm_setDrawTileMap4x8_agf::
    pop   hl                ;; [3] HL = Return Address
    pop   bc                ;; [3] BC = B:Height, C:Width
    pop   de                ;; [3] DE = TilemapWidth
-   ex  (sp), hl            ;; [6] HL = ptileset
+   ex  (sp), hl            ;; [6] HL = ptileset, leaving previous HL value (return address)
+                           ;; ... at the top of the stack (following __z88dk_callee convention)
 
-   ld (tilesetPtr), hl     ;; [5]
-   ;; Setup Width Update for every row
+   ;; Set (tilesetPtr) placeholder
+   ld (tilesetPtr), hl     ;; [5] Save HL into tilesetPtr placeholder
+
+   ;; Set all Width values required by drawTileMap4x8_agf. First two values
+   ;; (heightSet, widthSet) are values used at the start of the function for
+   ;; initialization. The other one (restoreWidth) restores the value of the
+   ;; width after each loop, as it is used as counter and decremented to 0.
    ld     a, b             ;; [1] A = height
-   ld (heightSet), a       ;; [4] Set Height
+   ld (heightSet), a       ;; [4] Set initial height loading placeholder
    ld     a, c             ;; [1] A = Width
-   ld (widthSet), a        ;; [4]
-   ld (restoreWidth), a    ;; [4]
+   ld (widthSet), a        ;; [4] Set initial width loading placeholder
+   ld (restoreWidth), a    ;; [4] Set restore width after each loop placeholder
+   
+   ;; In order to properly show a view of (Width x Height) tiles from within the
+   ;; tilemap, every time a row has been drawn, we need to move tilemap pointer
+   ;; to the start of the next row. As the complete tilemap is (tilemapWidth) bytes
+   ;; wide and we are showing a view only (Width) tiles wide, to complete (tilemapWidth)
+   ;; bytes at each loop, we need to add (tilemapWidth - Width + 1) bytes.
    dec    a                ;; [1] A = Width - 1
    sub_de_a                ;; [7] tilemapWidth - (Width - 1)
    ld (updateWidthLow), a  ;; [4] (as A == E right now)
    ld     a, d             ;; [1]
    ld (updateWidthHigh), a ;; [4]
 
-   ;; Setup Increment HL for each row
+   ;; Calculate HL update that has to be performed for each new row loop.
+   ;; HL advances through video memory as tiles are being drawn. When a row
+   ;; is completely drawn, HL is at the right-most place of the screen.
+   ;; As each screen row has a width of 0x50 bytes (in standard modes), 
+   ;; if the Row that has been drawn has less than 0x50 bytes, this difference
+   ;; has to be added to HL to make it point to the start of next screen row.
+   ;; As each tile is 4-bytes wide, this amount is (0x50 - 4*Width). Also,
+   ;; taking into account that 4*Width cannot exceed 255 (1-byte), a maximum
+   ;; of 63 tiles can be considered as Width.
    ld     a, c             ;; [1] A = Width
    add    a                ;; [1] A = 2*Width
    add    a                ;; [1] A = 4*Width
-   cpl                     ;; [1] A = - 4*Width - 1
-   add #0x50 + 1           ;; [2] 0x50 - 4*Width (( ==> Maximum showable width = 64))
-   ld (incrementHL), a     ;; [4] 
+   cpl                     ;; [1] A = -4*Width - 1
+   add #0x50 + 1           ;; [2] A = -4*Width-1 + 0x50+1 = 0x50 - 4*Width
+   ld (incrementHL), a     ;; [4] Set HL increment in its placeholder
 
-   ;; Setup restoring of previous interrupt status
+   ;; Set the restoring of Interrupt Status. drawTileMap4x8_agf disables interrupts before
+   ;; drawing each tile row, and then it restores previous interrupt status after the row
+   ;; has been drawn. To do this, present interrupt status is considered. This code detects
+   ;; present interrupt status and sets a EI/DI instruction at the end of tile row drawing
+   ;; to either reactivate interrupts or preserve interrupts disabled.
    ld     a, i             ;; [3] P/V flag set to current interrupt status (IFF2 flip-flop)
    ld     a, #opc_EI       ;; [2] A = Opcode for Enable Interrupts instruction (EI = 0xFB)
    jp    pe, int_enabled   ;; [3] If interrupts are enabled, EI is the appropriate instruction
      ld   a, #opc_DI       ;; [2] Otherwise, it is DI, so A = Opcode for Disable Interrupts instruction (DI = 0xF3)
 int_enabled:
-   ld (restoreI), a        ;; [4] Restore Interrupt status at the end with corresponding DI or EI
+   ld (restoreI), a        ;; [4] Set the Restore Interrupt status at the end with corresponding DI or EI
 
-   ret
+   ret                     ;; [3] Return to caller
 
 ;;
 ;; C bindings for <cpct_etm_drawTileMap4x8_agf>
@@ -96,61 +136,88 @@ int_enabled:
 ;; 
 _cpct_etm_drawTileMap4x8_agf::
    ;; Parameters
-   pop   hl       ;; [3] HL = Return address
-   pop   bc       ;; [3] BC = Tilemap Ptr
-   ex  (sp), hl   ;; [6] HL = Videomem Ptr
-   push  ix       ;; [5] Save IX
-   push  iy       ;; [5] Save IY
+   pop   hl          ;; [3] HL = Return address
+   pop   bc          ;; [3] BC = Tilemap Ptr
+   ex  (sp), hl      ;; [6] HL = Video Memory Pointer, leaving previous HL value (return address)
+                           ;; ... at the top of the stack (following __z88dk_callee convention)
+   push  ix          ;; [5] Save IX and IY to let this function...
+   push  iy          ;; [5] ...use and restore them before returning
 
+   ;; Set Height and Width of the View Window of 
+   ;; the current tilemap to be drawn (This is set by setDrawTilemap4x8_agf)
 widthSet  = .+2
 heightSet = .+3
-   ld iy, #0000            ;; [4] IYL=Width, IYH=Height
+   ld iy, #0000      ;; [4] IYL=View Window Width, IYH=View Window Height
 
+   ;; Start of the code that Draws a complete tilemap row
+   ;;
 nextRow:
-   ;; Disable interrupts and save SP
+   ;; Disable interrupts and save SP before starting
    di                      ;; [1] Disable interrupts before starting (we are using SP to read values)
    ld (restoreSP), sp      ;; [6] Save actual SP to restore it in the end
 
-   ;; Get tile ID
+   ;; Start of the code that draws the next tile of the present row being drawn
+   ;;
 nexttile:
-   ;; Setup VideoMemPtr Restore
-   ld (videoMemPtr), hl    ;; [5]
-   ld     a, (bc)          ;; [2] Next tile
+   ;; Get next tile to be drawn from the tilemap, which is pointed by BC
+   ld     a, (bc)          ;; [2] A = present tile-ID of the tile to be drawn
+   ld     d, a             ;; [1] D = A (copy of present tile-ID to draw)
 
-   ;; HL = 32*A (Only calculate L component)
-   ld     h, a             ;; [1] 
-   and   #0x07             ;; [2]
-   rrca                    ;; [1]
-   rrca                    ;; [1]
-   rrca                    ;; [1] 
-   ld     l, a             ;; [1] 
+   ;; We are going to use HL for calculations. As HL points to the place in
+   ;; video memory were we want to draw present tile, we save this value in
+   ;; a placeholder location to restore it before starting the drawing code.
+   ;; We cannot use the stack because SP is pointing to the tileset, as we
+   ;; are using it for reading tiles. So we use self-modifying code instead.
+;;   ld (videoMemPtr), hl    ;; [5] Save Current VideoMemPtr (HL) to be able to restore it 
 
-   ;; A = Count how many consecutive tiles there are
-   ld__e_iyl               ;; [2] IYL = row width
+   ;; Optimization: Count how many consecutive tiles have same ID. Knowing this
+   ;; we can repeat the drawing part many times for same tile, without recalculating
+   ;; At the end of this loop, A=Number of times to repeat drawing of present tile-ID
+   ld__e_iyl               ;; [2] E = remaining tiles to be drawn in this row (width - drawn tiles)
 rep:
-   dec    e                ;; [1]
-   jr     z, endwidth      ;; [2/3]
-   inc   bc                ;; [2]
-   ld     a, (bc)          ;; [2]
-   cp     h                ;; [1]
-   jr     z, rep           ;; [2/3]
+   dec    e                ;; [1]   --Width (1 less tile to be drawn)
+   jr     z, endwidth      ;; [2/3] If (Width==0) jump to endwidth (as no more tiles to be drawn in this row)
+   inc   bc                ;; [2]   ++BC (Point to next tile in this tilemap)
+   ld     a, (bc)          ;; [2]   A = next tile ID of the tilemap to be drawn
+   cp     d                ;; [1]   Check A==D (D: present tile to be drawn)
+   jr     z, rep           ;; [2/3] if (A==D), next tile is equal to present to be drawn, so
+                           ;; ..... add 1 to the counter of times to draw this tile and check next one
 endwidth:
-   ld__a_iyl               ;; [2]
-   ld__iyl_e               ;; [2]         
-   sub    e                ;; [1] A = IYL - E
+   ;; Update the Width counter at IYL with its new value (hold at E). We need to know
+   ;; how many times we have decremented this counter (with DEC E) as this is then number of
+   ;; copies of the present tile that we have to draw now. This can be calculated as IYL - E
+   ;; (IYL:previous value of Width counter, E: Updated value of Width counter, after decrementing)
+   ld__a_iyl      ;; [2]   A = total tiles pending to be drawn in this row
+   ld__iyl_e      ;; [2] IYL = tiles that will be pending to be drawn in this row after drawing present tile
+   sub    e       ;; [1] A = IYL - E (Number of copies of present tile to be drawn now)
 
-   ;; HL = 32*A (H Component. Offset of the tile in the tileset)
-   srl    h                ;; [2] 
-   srl    h                ;; [2]
-   srl    h                ;; [2]
+   ;; From the tile-ID we hold in A, we need to calculate the Offset of the 
+   ;; tile definition (its 32-bytes of screen pixel data). As each tile takes 32-bytes,
+   ;; offsets are tile_0: 0-bytes, tile_1: 32-bytes, tile_2: 64-bytes... tile_N: N*32-bytes.
+   ;; Therefore, to calculate offset of tile-ID in A, we need to multiply 32*A. As this
+   ;; multiplication may result in a 16-bits value, we will perform DE = 32*A. 
+   ;; If A=[abcdefgh], result has to be DE = [000abcde][fgh00000] (5 shifts left = 32*tile-ID).
+   ;; This multiplication will be performed in 2 parts for performance reasons. Next
+   ;; code performs the computation for the final value of E=[fgh00000], and leaves D=[abcdefgh] 
+   ;; to be calculated afterwards with 3 shifts right.
+   ;; Calculate second part of the Offset for present tile-ID (HL = 32*tile-ID).
+   ;; Starting from tile-ID=[abcdefgh], previous code left calculus as 
+   ;; HL = [abcdefgh][fgh00000]. To achieve final value of 32*tile-ID=[000abcde][fgh00000]
+   ;; we need to shift H right 3 times
+   ld     e, #0   ;; [2] E = [00000000]
+   srl    d       ;; [2] D = [0abcdefg] (Right shift)
+   rr     e       ;; [2] E = [h0000000] (Rotate Right + Carry Insertion in bit 7)
+   srl    d       ;; [2] D = [00abcdef] (Right shift)
+   rr     e       ;; [2] E = [gh000000] (Rotate Right + Carry Insertion in bit 7)
+   srl    d       ;; [2] D = [000abcde] (Right shift). 
+   rr     e       ;; [2] E = [fgh00000] (Rotate Right + Carry Insertion in bit 7). DE = 32*tile-ID complete.
 
-   ;; IX Points to the tile
-tilesetPtr = .+1
-   ld    de, #0000         ;; [3] <= Placeholder for #tileset
-   add   hl, de            ;; [3] HL = tileset + 32*A
-   ex    de, hl            ;; [1]
-   ld__ixh_d               ;; [2]
-   ld__ixl_e               ;; [2] IX = HL
+   ;; Make IX point to the 32-byte screen pixel definition of the selecte tile.
+   ;; For that, we need to add previous calculated tile Offset and the start location
+   ;; of the tileset. So operation is IX = tilesetPtr + Offset. 
+tilesetPtr = .+2
+   ld    ix, #0000   ;; [4] < tileet
+   add   ix, de      ;; [4] < IX = tileset + 32*a
 
    ;;
    ;; Draw Tile
@@ -158,8 +225,8 @@ tilesetPtr = .+1
    ;; HL = Video Memory (top-left-corner)
    ;; Uses DE
    ;;
-videoMemPtr = .+1
-   ld    hl, #0000       ;; [3] <= Placeholder for Video Mem
+;;videoMemPtr = .+1
+;;   ld    hl, #0000       ;; [3] <= Placeholder for Video Mem
 drawTile:
    ld    sp, ix          ;; [3]
 
