@@ -94,6 +94,7 @@ Group: Easytilemaps  {
 
    File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
    File: cpct_etm_drawTilemap2x4_f  (easytilemaps/cpct_etm_drawTilemap2x4_f.asm)
+   File: cpct_etm_drawTilemap4x8_ag  (easytilemaps/cpct_etm_drawTilemap4x8_ag.asm)
    File: cpct_etm_drawTileRow2x4  (easytilemaps/cpct_etm_drawTileRow2x4.s)
    File: cpct_etm_setTileset2x4  (easytilemaps/cpct_etm_setTileset2x4.s)
    File: EasyTilemaps  (easytilemaps/easytilemaps.h)
@@ -202,6 +203,16 @@ Group: Sprites  {
 
    Group: Flipping  {
 
+      File: cpct_drawSpriteHFlip_at  (sprites/flipping/cpct_drawSpriteHFlip_at.asm)
+      File: cpct_drawSpriteHFlipM0  (sprites/flipping/cpct_drawSpriteHFlipM0.asm)
+      File: cpct_drawSpriteHFlipM1  (sprites/flipping/cpct_drawSpriteHFlipM1.asm)
+      File: cpct_drawSpriteHFlipM2  (sprites/flipping/cpct_drawSpriteHFlipM2.asm)
+      File: cpct_drawSpriteHFlipMasked_at  (sprites/flipping/cpct_drawSpriteHFlipMasked_at.asm)
+      File: cpct_drawSpriteVFlip  (sprites/flipping/cpct_drawSpriteVFlip.asm)
+      File: cpct_drawSpriteVFlip_f  (sprites/flipping/cpct_drawSpriteVFlip_f.asm)
+      File: cpct_drawSpriteVFlipMasked  (sprites/flipping/cpct_drawSpriteVFlipMasked.asm)
+      File: cpct_drawSpriteVFlipMasked_at  (sprites/flipping/cpct_drawSpriteVFlipMasked_at.asm)
+      File: cpct_getBottomLeftPtr  (sprites/flipping/cpct_getBottomLeftPtr.asm)
       File: cpct_hflipSpriteM0  (sprites/flipping/cpct_hflipSpriteM0.asm)
       File: cpct_hflipSpriteM0_r  (sprites/flipping/cpct_hflipSpriteM0_r.asm)
       File: cpct_hflipSpriteM1  (sprites/flipping/cpct_hflipSpriteM1.asm)
@@ -211,14 +222,21 @@ Group: Sprites  {
       File: cpct_hflipSpriteMaskedM0  (sprites/flipping/cpct_hflipSpriteMaskedM0.asm)
       File: cpct_hflipSpriteMaskedM1  (sprites/flipping/cpct_hflipSpriteMaskedM1.asm)
       File: cpct_hflipSpriteMaskedM2  (sprites/flipping/cpct_hflipSpriteMaskedM2.asm)
+      File: cpct_vflipSprite  (sprites/flipping/cpct_vflipSprite.asm)
+      File: cpctm_spbloff  (sprites/flipping/flipping_macros.h.s)
+      File: flipping_macros.h  (sprites/flipping/flipping_macros.h)
+      File: Pixel Horizontally Flipping Macros  (sprites/flipping/flipping_table_macros.h)
+      File: Pixel Horizontally Flipping Tables  (sprites/flipping/flipping_tables.h)
       }  # Group: Flipping
 
    File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.asm)
    File: cpct_drawSprite  (sprites/cpct_drawSprite.asm)
    File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.asm)
    File: cpct_drawSpriteMaskedAlignedTable  (sprites/cpct_drawSpriteMaskedAlignedTable.asm)
+   File: cpct_getScreenToSprite  (sprites/screenToSprite/cpct_getScreenToSprite.asm)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0.asm)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
+   File: pixel_macros.h  (sprites/pixel_macros.h)
    File: Transparency Macros  (sprites/transparency_table_macros.h)
    File: Transparency Tables for Mode 0  (sprites/transparency_tables_m0.h)
    File: Transparency Tables for Mode 1  (sprites/transparency_tables_m1.h)

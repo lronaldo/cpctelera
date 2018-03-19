@@ -128,7 +128,7 @@
 ;; *by 4* to be 4-bytes aligned (0xC000, 0xC004, 0xC008...). Be always sure that
 ;; you meet these requirements when drawing.
 ;;
-;;    Following Figure 1, the 1st example view of (6x5) can be drawn as follows,
+;;    Following Figure 1, the Tilemap View 1 of (6x5) can be drawn as follows,
 ;; (start code)
 ;;    // We assume tileset and tilemap are defined as in previous example
 ;; 
@@ -155,62 +155,6 @@
 ;; (start code)
 ;; *************** FIGURE 2 ********************
 ;;
-;; |----------------------------------------|---------|
-;; |               MEMORY                   | TILEMAP |
-;; |    addresses & contents in hexadecimal | VIEW 2  |
-;; |----------------------------------------| <4019>  |
-;; |ADDRESS|          CONTENTS              |  5 x 4  |
-;; |-------|--------------------------------|---------|         
-;; |  4000 |[01] 01  01  01  01  01  01  01 |         |
-;; |  4008 | 01  00  00  00  00  09  09  01 |         | 
-;; |  4010 | 01| 00  06  00  00  09  09  01 |         |
-;; |       |   /-------------------\        |         | << Width = 5 \
-;; |  4018 | 01|<05> 05  05  00  08| 00  01 | /// 8   | ^            | View
-;; |  4020 | 01| 02  02  02  08  08| 08  01 | ===88   | | Height = 4 | Window
-;; |  4028 | 01| 02  03  02  00  06| 00  01 | =o= |   | |            |
-;; |  4030 | 01| 02  04  02  07  06| 07  01 | =^=_|   | v            |
-;; |       |   \-------------------/        |         |              /
-;; |  4038 | 01  01  01  01  01  01  01  01 |         |
-;; |-------|--------------------------------|---------|
-;;           <------------------------------> Complete tilemapWidth = 8 tiles = 8 bytes
-;;           ^   ^
-;;           /   \---- First tile to draw at location (4019) in memory: tile (1,3).
-;;  tilemap at         Offset = 3 rows of 8 bytes plus 1 byte = 25 bytes = 0x19 bytes
-;;  location [4000]
-;; (end code)
-;;
-;;    Figure 2 shows how view windows are drawn. Once *width*, *height* and *tilemapWidth* have
-;; been configured using <cpct_etm_setDrawTilemap4x8_ag>, any view inside the tilemap can be
-;; drawn just by selecting the first tile to be drawn. In Figure 2, tile (2,2) is selected and
-;; that selects the complete 6x5 view window to be drawn. This could easily be used to 
-;; perform software scrolling effects by moving this first tile and redrawing the view.
-;; The only thing to take into account is that the tile is selected by its memory location. 
-;; Therefore, we start from the address of the *tilemap* array (0x4000 in the example) and 
-;; add an offset to select the concrete tile we want. Adding/Subtracting 1 byte is equivalent
-;; to moving one tile to the right/left, while adding/subtracting *tilemapWidth* bytes is 
-;; similar to moving one tile up/down in the *tilemap* space.
-;;
-;;    Similarly to previous example, the Tilemap view 2 from Figure 1 can be drawn using the
-;; following code,
-;; (start code)
-;;    // We assume tileset and tilemap are defined as in previous examples
-;; 
-;;    // Set up drawTilemap for drawing a view of 5x4 tiles. Full tilemap
-;;    // width is always 8, and we will be using same tileset as before
-;;    cpct_etm_setDrawTilemap4x8_ag (5, 4, 8, tileset);
-;;    
-;;    //....
-;;
-;;    // We draw the view of the tilemap at the start of video memory. First tile we want
-;;    // to draw is (1,3) (3 rows of 8 tiles + 1 tile = 8*3 + 1 = 24 + 1) = 0x19 bytes away
-;;    // from tilemap start.
-;;    cpct_etm_drawTilemap4x8_ag (CPCT_VMEM_START, tilemap + 0x19);
-;; (end code)
-;;
-;;    As explained before, previous code will produce a view explained in next figure,
-;; (start code)
-;; *************** FIGURE 3 ********************
-;;
 ;; |------------------------------------------|---------|
 ;; |               MEMORY                     | TILEMAP |
 ;; |    addresses & contents in hexadecimal   | VIEW 1  |
@@ -232,6 +176,65 @@
 ;;           ^        ^
 ;;           /        \- First tile to draw at location (4012) in memory: tile (2,2).
 ;;  tilemap at           Offset = 2 rows of 8 bytes plus 2 bytes = 14 bytes = 0x12 bytes
+;;  location [4000]
+;; (end code)
+;;
+;;    Figure 2 shows how view windows are drawn. Once *width*, *height* and *tilemapWidth* have
+;; been configured using <cpct_etm_setDrawTilemap4x8_ag>, any view inside the tilemap can be
+;; drawn just by selecting the first tile to be drawn. In Figure 2, tile (2,2) is selected and
+;; that selects the complete 6x5 view window to be drawn. This could easily be used to 
+;; perform software scrolling effects by moving this first tile and redrawing the view.
+;; The only thing to take into account is that the tile is selected by its memory location. 
+;; Therefore, we start from the address of the *tilemap* array (0x4000 in the example) and 
+;; add an offset to select the concrete tile we want. Adding/Subtracting 1 byte is equivalent
+;; to moving one tile to the right/left, while adding/subtracting *tilemapWidth* bytes is 
+;; similar to moving one tile up/down in the *tilemap* space.
+;;
+;;    Similarly to previous example, the Tilemap View 2 from Figure 1 can be drawn using the
+;; following code,
+;; (start code)
+;;    // We assume tileset and tilemap are defined as in previous examples
+;; 
+;;    // Set up drawTilemap for drawing a view of 5x4 tiles. Full tilemap
+;;    // width is always 8, and we will be using same tileset as before
+;;    cpct_etm_setDrawTilemap4x8_ag (5, 4, 8, tileset);
+;;    
+;;    //....
+;;
+;;    // We draw the view of the tilemap at the start of video memory. First tile we want
+;;    // to draw is (1,3) (3 rows of 8 tiles + 1 tile = 8*3 + 1 = 24 + 1) = 0x19 bytes away
+;;    // from tilemap start.
+;;    cpct_etm_drawTilemap4x8_ag (CPCT_VMEM_START, tilemap + 0x19);
+;; (end code)
+;;
+;;    Following explanations, previous code will produce a view of 5x4 tiles from the *tilemap*,
+;; as detailed in next figure,
+;;
+;; (start code)
+;; *************** FIGURE 3 ********************
+;;
+;;
+;; |----------------------------------------|---------|
+;; |               MEMORY                   | TILEMAP |
+;; |    addresses & contents in hexadecimal | VIEW 2  |
+;; |----------------------------------------| <4019>  |
+;; |ADDRESS|          CONTENTS              |  5 x 4  |
+;; |-------|--------------------------------|---------|         
+;; |  4000 |[01] 01  01  01  01  01  01  01 |         |
+;; |  4008 | 01  00  00  00  00  09  09  01 |         | 
+;; |  4010 | 01| 00  06  00  00  09  09  01 |         |
+;; |       |   /-------------------\        |         | << Width = 5 \
+;; |  4018 | 01|<05> 05  05  00  08| 00  01 | /// 8   | ^            | View
+;; |  4020 | 01| 02  02  02  08  08| 08  01 | ===88   | | Height = 4 | Window
+;; |  4028 | 01| 02  03  02  00  06| 00  01 | =o= |   | |            |
+;; |  4030 | 01| 02  04  02  07  06| 07  01 | =^=_|   | v            |
+;; |       |   \-------------------/        |         |              /
+;; |  4038 | 01  01  01  01  01  01  01  01 |         |
+;; |-------|--------------------------------|---------|
+;;           <------------------------------> Complete tilemapWidth = 8 tiles = 8 bytes
+;;           ^   ^
+;;           /   \---- First tile to draw at location (4019) in memory: tile (1,3).
+;;  tilemap at         Offset = 3 rows of 8 bytes plus 1 byte = 25 bytes = 0x19 bytes
 ;;  location [4000]
 ;; (end code)
 ;;
