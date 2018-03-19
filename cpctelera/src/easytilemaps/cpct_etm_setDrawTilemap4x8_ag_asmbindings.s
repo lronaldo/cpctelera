@@ -20,12 +20,12 @@
 .include "macros/cpct_maths.h.s"
 
 ;;
-;; ASM bindings for <cpct_etm_setDrawTileMap4x8_ag_asm>
+;; ASM bindings for <cpct_etm_setDrawTilemap4x8_ag_asm>
 ;;
 ;; 0 microseconds, 0 bytes
 ;;
-cpct_etm_setDrawTileMap4x8_ag_asm::
+cpct_etm_setDrawTilemap4x8_ag_asm::
 
 .include /cpct_etm_setDrawTilemap4x8_ag.asm/
 
-   setDrawTileMap4x8_ag_gen cpct_etm_dtm4x8_ag_asm_
+   setDrawTilemap4x8_ag_gen cpct_etm_dtm4x8_ag_asm_

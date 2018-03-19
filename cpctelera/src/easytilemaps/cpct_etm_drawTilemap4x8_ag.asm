@@ -139,36 +139,127 @@
 ;;    //....
 ;;
 ;;    // We draw the view of the tilemap at the start of video memory. As the first
-;;    // tile we want to draw is 0x19 (25) bytes beyond the start of the tilemap
+;;    // tile we want to draw is 0x12 (18) bytes beyond the start of the tilemap
 ;;    // array, we only need to add this offset to the address where tilemap starts
 ;;    // to pass the address of that tile to the function, as the first tile that will be drawn
-;;    cpct_etm_drawTilemap4x8_ag (CPCT_VMEM_START, tilemap + 0x19);
+;;    cpct_etm_drawTilemap4x8_ag (CPCT_VMEM_START, tilemap + 0x12);
 ;; (end code)
 ;;    
+;;    This second example sets up a view window of 6x5 tiles from the 8-tiles-wide *tilemap*. 
+;; using the same *tileset* as on previous example. Then, starting tile address is changed 
+;; on the call to <cpct_etm_drawTilemap4x8_ag>. That makes the function draw a window of 
+;; 6x5 tiles that effectively starts at the tile *tilemap + 0x12* which is marked in Figure 1
+;; with parentheses *()*. Using tilemap coordinates, that tile is (2,2) (2 rows = 8*2 = 16 (0x10)
+;; plus 2 tiles, 0x10 + 2 = 0x12). Therefore, drawing starts at tile (2,2), and spans a view
+;; window of 6x5 tiles, which expands view up to tile (8,7). Next figure clarifies this window,
+;; (start code)
+;; *************** FIGURE 2 ********************
+;;
+;; |----------------------------------------|---------|
+;; |               MEMORY                   | TILEMAP |
+;; |    addresses & contents in hexadecimal | VIEW 2  |
+;; |----------------------------------------| <4019>  |
+;; |ADDRESS|          CONTENTS              |  5 x 4  |
+;; |-------|--------------------------------|---------|         
+;; |  4000 |[01] 01  01  01  01  01  01  01 |         |
+;; |  4008 | 01  00  00  00  00  09  09  01 |         | 
+;; |  4010 | 01| 00  06  00  00  09  09  01 |         |
+;; |       |   /-------------------\        |         | << Width = 5 \
+;; |  4018 | 01|<05> 05  05  00  08| 00  01 | /// 8   | ^            | View
+;; |  4020 | 01| 02  02  02  08  08| 08  01 | ===88   | | Height = 4 | Window
+;; |  4028 | 01| 02  03  02  00  06| 00  01 | =o= |   | |            |
+;; |  4030 | 01| 02  04  02  07  06| 07  01 | =^=_|   | v            |
+;; |       |   \-------------------/        |         |              /
+;; |  4038 | 01  01  01  01  01  01  01  01 |         |
+;; |-------|--------------------------------|---------|
+;;           <------------------------------> Complete tilemapWidth = 8 tiles = 8 bytes
+;;           ^   ^
+;;           /   \---- First tile to draw at location (4019) in memory: tile (1,3).
+;;  tilemap at         Offset = 3 rows of 8 bytes plus 1 byte = 25 bytes = 0x19 bytes
+;;  location [4000]
+;; (end code)
+;;
+;;    Figure 2 shows how view windows are drawn. Once *width*, *height* and *tilemapWidth* have
+;; been configured using <cpct_etm_setDrawTilemap4x8_ag>, any view inside the tilemap can be
+;; drawn just by selecting the first tile to be drawn. In Figure 2, tile (2,2) is selected and
+;; that selects the complete 6x5 view window to be drawn. This could easily be used to 
+;; perform software scrolling effects by moving this first tile and redrawing the view.
+;; The only thing to take into account is that the tile is selected by its memory location. 
+;; Therefore, we start from the address of the *tilemap* array (0x4000 in the example) and 
+;; add an offset to select the concrete tile we want. Adding/Subtracting 1 byte is equivalent
+;; to moving one tile to the right/left, while adding/subtracting *tilemapWidth* bytes is 
+;; similar to moving one tile up/down in the *tilemap* space.
+;;
+;;    Similarly to previous example, the Tilemap view 2 from Figure 1 can be drawn using the
+;; following code,
+;; (start code)
+;;    // We assume tileset and tilemap are defined as in previous examples
+;; 
+;;    // Set up drawTilemap for drawing a view of 5x4 tiles. Full tilemap
+;;    // width is always 8, and we will be using same tileset as before
+;;    cpct_etm_setDrawTilemap4x8_ag (5, 4, 8, tileset);
+;;    
+;;    //....
+;;
+;;    // We draw the view of the tilemap at the start of video memory. First tile we want
+;;    // to draw is (1,3) (3 rows of 8 tiles + 1 tile = 8*3 + 1 = 24 + 1) = 0x19 bytes away
+;;    // from tilemap start.
+;;    cpct_etm_drawTilemap4x8_ag (CPCT_VMEM_START, tilemap + 0x19);
+;; (end code)
+;;
+;;    As explained before, previous code will produce a view explained in next figure,
+;; (start code)
+;; *************** FIGURE 3 ********************
+;;
+;; |------------------------------------------|---------|
+;; |               MEMORY                     | TILEMAP |
+;; |    addresses & contents in hexadecimal   | VIEW 1  |
+;; |------------------------------------------| (4012)  |
+;; |ADDRESS|          CONTENTS                |  6 x 5  |
+;; |-------|----------------------------------|---------|         
+;; |  4000 |[01] 01   01  01  01  01  01  01  |         |
+;; |  4008 | 01  00   00  00  00  09  09  01  |         |
+;; |       |        /-----------------------\ |         | << Width = 6 \
+;; |  4010 | 01  00 |(06) 00  00  09  09  01| | |  **#  | ^            | View
+;; |  4018 | 01  05 | 05  05  00  08  00  01| | // 8 #  | |            | Window
+;; |  4020 | 01  02 | 02  02  08  08  08  01| | ==888#  | | Height = 5 |
+;; |  4028 | 01  02 | 03  02  00  06  00  01| | o= | #  | |            |
+;; |  4030 | 01  02 | 04  02  07  06  07  01| | ^=_|_#  | v            |
+;; |       |        \-----------------------/ |         |              /
+;; |  4038 | 01  01   01  01  01  01  01  01  |         |
+;; |-------|----------------------------------|---------|
+;;           <------------------------------> Complete tilemapWidth = 8 tiles = 8 bytes
+;;           ^        ^
+;;           /        \- First tile to draw at location (4012) in memory: tile (2,2).
+;;  tilemap at           Offset = 2 rows of 8 bytes plus 2 bytes = 14 bytes = 0x12 bytes
+;;  location [4000]
+;; (end code)
 ;;
 ;; Destroyed Register values: 
 ;;      C-bindings - AF, BC, DE, HL
 ;;    ASM-bindings - AF, BC, DE, HL, IX, IY
 ;;
 ;; Required memory:
-;;      C-bindings - xx bytes
-;;    ASM-bindings - xx bytes
+;;      C-bindings - 165 bytes (+48 bytes from <cpct_etm_setDrawTileMap4x8_ag> which is required)
+;;    ASM-bindings - 153 bytes (+44 bytes from <cpct_etm_setDrawTileMap4x8_ag_asm> which is required)
 ;;
 ;; Time Measures: 
 ;; (start code)
-;;    Case     |      microSecs (us)            |          CPU Cycles              |
-;; ---------------------------------------------------------------------------------
-;;    Any      | 
-;; ---------------------------------------------------------------------------------
-;;  ASM saving | 
-;; ---------------------------------------------------------------------------------
-;;  H=30, W=30 | 
-;; ---------------------------------------------------------------------------------
-;;  H=40, W=40 |
-;; ---------------------------------------------------------------------------------
+;;    Case     |  microSecs (us)   |    CPU Cycles      |
+;; ------------------------------------------------------
+;;    Any      | 19 + (35 + 189W)H | 76 + (140 + 756W)H |
+;; ------------------------------------------------------
+;;  ASM saving |       -33         |      -132          |
+;; ------------------------------------------------------
+;;  W=20, H=10 |      38.169       |     152.676        | (1,91 VSync)
+;; ------------------------------------------------------
+;;  W=16, H=16 |      48.963       |     195.852        | (2,45 VSync)
+;; ------------------------------------------------------
+;;    ^
+;;    \--- 16x16 Screen is used in most games like AMC or Target Renegade, for instance.
 ;; (end code)
-;;    W  - Map width (number of horizontal tiles)
-;;    H  - Map height (number of vertical tiles)
+;;    W - View Width in tiles
+;;    H - View Height in tiles
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -197,7 +288,7 @@
    ;; Set Height and Width of the View Window of the current 
    ;; tilemap to be drawn (This is set by setDrawTilemap4x8_agf)
 widthHeightSet = .+2
-   ld iy, #0000      ;; [4] IYL=View Window Width, IYH=View Window Height
+   ld iy, #0000         ;; [4] IYL=View Window Width, IYH=View Window Height
 
 nextRow:
    ;; Disable interrupts and save SP before starting

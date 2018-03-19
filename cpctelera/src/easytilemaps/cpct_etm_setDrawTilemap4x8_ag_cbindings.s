@@ -24,7 +24,7 @@
 ;;
 ;; 15 microseconds, 4 bytes
 ;;
-_cpct_etm_setDrawTileMap4x8_ag::
+_cpct_etm_setDrawTilemap4x8_ag::
    pop   hl                ;; [3] HL = Return Address
    pop   bc                ;; [3] BC = B:Height, C:Width
    pop   de                ;; [3] DE = Tileset Pointer
@@ -33,4 +33,4 @@ _cpct_etm_setDrawTileMap4x8_ag::
 
 .include /cpct_etm_setDrawTilemap4x8_ag.asm/
 
-   setDrawTileMap4x8_ag_gen cpct_etm_dtm4x8_ag_c_
+   setDrawTilemap4x8_ag_gen cpct_etm_dtm4x8_ag_c_
