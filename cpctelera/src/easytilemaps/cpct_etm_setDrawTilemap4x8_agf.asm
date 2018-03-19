@@ -17,7 +17,7 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
 ;;-------------------------------------------------------------------------------
-;; C bindings for <cpct_etm_setDrawTileMap4x8_agf>
+;; C bindings for <cpct_etm_setDrawTilemap4x8_agf>
 ;;
 ;; BC  = B:Height, C:Width
 ;; DE  = Tileset Pointer
@@ -27,7 +27,7 @@
 ;;      AF, DE
 ;;
 ;; Required memory:
-;;      xx bytes (+ xx bytes from <cpct_etm_drawTileMap4x8_agf> which is included)
+;;      xx bytes (+ xx bytes from <cpct_etm_drawTilemap4x8_agf> which is included)
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -42,11 +42,11 @@
 ;;-------------------------------------------------------------------------------
 
 ;;
-;; Macro that generates the code for setDrawTileMap4x8_agf and couples it to the labels
+;; Macro that generates the code for setDrawTilemap4x8_agf and couples it to the labels
 ;; that it has to modify. A label prefix is passed to generate different kinds of labels
 ;; for different bindings
 ;;
-.macro setDrawTileMap4x8_agf_gen lblPrf
+.macro setDrawTilemap4x8_agf_gen lblPrf
 
 ;; Declare global symbols used here
 .globl lblPrf'tilesetPtr
@@ -59,7 +59,7 @@
    ;; Set (tilesetPtr) placeholder
    ld (lblPrf'tilesetPtr), hl     ;; [5] Save HL into tilesetPtr placeholder
 
-   ;; Set all Width values required by drawTileMap4x8_agf. First two values
+   ;; Set all Width values required by drawTilemap4x8_agf. First two values
    ;; (heightSet, widthSet) are values used at the start of the function for
    ;; initialization. The other one (restoreWidth) restores the value of the
    ;; width after each loop, as it is used as counter and decremented to 0.
@@ -92,7 +92,7 @@
    add #0x50 + 1              ;; [2] A = -4*Width-1 + 0x50+1 = 0x50 - 4*Width
    ld (lblPrf'incrementHL), a ;; [4] Set HL increment in its placeholder
 
-   ;; Set the restoring of Interrupt Status. drawTileMap4x8_agf disables interrupts before
+   ;; Set the restoring of Interrupt Status. drawTilemap4x8_agf disables interrupts before
    ;; drawing each tile row, and then it restores previous interrupt status after the row
    ;; has been drawn. To do this, present interrupt status is considered. This code detects
    ;; present interrupt status and sets a EI/DI instruction at the end of tile row drawing

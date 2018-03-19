@@ -38,7 +38,7 @@
 .endm
 
 
-.macro drawTileMap4x8_agf_gen lblPrf
+.macro drawTilemap4x8_agf_gen lblPrf
    ;; Set Height and Width of the View Window of the current 
    ;; tilemap to be drawn (This is set by setDrawTilemap4x8_agf)
 widthHeightSet = .+2

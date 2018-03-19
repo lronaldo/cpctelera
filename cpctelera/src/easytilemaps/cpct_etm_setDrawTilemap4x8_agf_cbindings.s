@@ -20,11 +20,11 @@
 .include "macros/cpct_maths.h.s"
 
 ;;
-;; C bindings for <cpct_etm_setDrawTileMap4x8_agf>
+;; C bindings for <cpct_etm_setDrawTilemap4x8_agf>
 ;;
 ;; 15 microseconds, 4 bytes
 ;;
-_cpct_etm_setDrawTileMap4x8_agf::
+_cpct_etm_setDrawTilemap4x8_agf::
    pop   hl                ;; [3] HL = Return Address
    pop   bc                ;; [3] BC = B:Height, C:Width
    pop   de                ;; [3] DE = Tileset Pointer
@@ -33,4 +33,4 @@ _cpct_etm_setDrawTileMap4x8_agf::
 
 .include /cpct_etm_setDrawTilemap4x8_agf.asm/
 
-   setDrawTileMap4x8_agf_gen cpct_etm_dtm4x8_c_
+   setDrawTilemap4x8_agf_gen cpct_etm_dtm4x8_c_

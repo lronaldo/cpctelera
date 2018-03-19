@@ -19,11 +19,11 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; C bindings for <cpct_etm_drawTileMap4x8_ag>
+;; C bindings for <cpct_etm_drawTilemap4x8_ag>
 ;;
 ;; 34 microseconds, 13 bytes
 ;;
-_cpct_etm_drawTileMap4x8_ag::
+_cpct_etm_drawTilemap4x8_ag::
    ;; Parameters
    pop   af          ;; [3] AF = Return address
    pop   hl          ;; [3] HL = Video Memory Pointer
@@ -35,7 +35,7 @@ _cpct_etm_drawTileMap4x8_ag::
 
 .include /cpct_etm_drawTilemap4x8_ag.asm/
 
-   drawTileMap4x8_ag_gen cpct_etm_dtm4x8_ag_c_
+   drawTilemap4x8_ag_gen cpct_etm_dtm4x8_ag_c_
 
    pop   iy          ;; [4] | Restore IX, IY
    pop   ix          ;; [4] |

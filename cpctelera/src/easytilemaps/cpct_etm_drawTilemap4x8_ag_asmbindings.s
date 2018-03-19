@@ -19,14 +19,14 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; ASM bindings for <cpct_etm_drawTileMap4x8_ag_asm>
+;; ASM bindings for <cpct_etm_drawTilemap4x8_ag_asm>
 ;;
 ;; 3 microseconds, 1 byte
 ;;
-cpct_etm_drawTileMap4x8_ag_asm::
+cpct_etm_drawTilemap4x8_ag_asm::
 
 .include /cpct_etm_drawTilemap4x8_ag.asm/
 
-   drawTileMap4x8_ag_gen cpct_etm_dtm4x8_ag_asm_
+   drawTilemap4x8_ag_gen cpct_etm_dtm4x8_ag_asm_
 
    ret               ;; [3] Return
