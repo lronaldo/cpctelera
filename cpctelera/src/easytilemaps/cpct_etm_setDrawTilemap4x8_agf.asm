@@ -46,7 +46,7 @@
 ;; that it has to modify. A label prefix is passed to generate different kinds of labels
 ;; for different bindings
 ;;
-.macro setDrawTileMap4x8_agf_gen lblPrf, ?int_enabled
+.macro setDrawTileMap4x8_agf_gen lblPrf
 
 ;; Declare global symbols used here
 .globl lblPrf'tilesetPtr
