@@ -286,7 +286,14 @@
    ld  (hl), b          ;; [2] Copy byte 4
 .endm
 
-
+;; LOCAL MACRO: drawTilemap4x8_ag_gen
+;;    All code function is defined as a macro to prevent code duplication on reuse
+;; between ASM/C bindings. As setDrawtilemap4x8_ag ASM/C bindings have to couple
+;; each one with its correct version, different global labels can be generated
+;; from the same source using different lblPrf parameters. 
+;;    Therefore, ASM/C bindings include this file and use this macro to generate
+;; specific source code that will be compiled, with the appropriate labels.
+;;
 .macro drawTilemap4x8_ag_gen lblPrf
    ;; Set Height and Width of the View Window of the current 
    ;; tilemap to be drawn (This is set by setDrawTilemap4x8_agf)
