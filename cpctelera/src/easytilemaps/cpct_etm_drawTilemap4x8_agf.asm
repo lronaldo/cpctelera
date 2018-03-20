@@ -17,6 +17,150 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Function: cpct_etm_drawTilemap4x8_agf
+;;
+;;    Draws an aligned view of a tilemap made of 4x8-bytes tiles. Tiles must be
+;; Gray-coded, with scanline order 0,1,3,2,6,7,5,4. It works identical to 
+;; <cpct_etm_drawTilemap4x8_ag> but faster depending on horizontal repetitions of tiles.
+;;
+;; C Definition:
+;;    void <cpct_etm_drawTilemap4x8_agf> (void* *memory*, const void* *tilemap*) __z88dk_callee;
+;;
+;; Input Parameters (4 bytes):
+;;    (2B HL) memory  - Video memory location where to draw the tilemap (character & 4-byte aligned)
+;;    (2B DE) tilemap - Pointer to the upper-left tile of the view to be drawn of the tilemap
+;;
+;; Assembly call (Input parameters on registers):
+;;    > call cpct_etm_drawTilemap4x8_agf_asm
+;;
+;; Parameter Restrictions:
+;;    * *memory* must be the location in video memory or backbuffer where to draw
+;; the tilemap. This location *must be* a *4-byte-aligned* location at a 
+;; *character pixel line 0*. *4-byte-aligned* means this address must be divisible
+;; by 4. Details about character pixel line 0 are explained in <cpct_drawSprite> documentation.
+;;    * *tilemap* must be the memory address of the first tile to be drawn inside a Tilemap. 
+;; A Tilemap is a 2D tile-index matrix at 1-byte-per-tile. You may point to any tile inside
+;; a Tilemap and that one will be considered the upper-left corner of the view to be drawn.
+;; Please, consult details section for a deeper explanation.
+;;
+;; Known limitations:
+;;     * This function *SHALL NOT* be used without a previous call to 
+;; <cpct_etm_setDrawTilemap4x8_agf>. This call is required to configure view 
+;; sizes and the tileset to be used.
+;;     * This function does not do any kind of checking over the tilemap, its
+;; contents or size. If you give a wrong pointer, your tilemap has different
+;; dimensions than required or has less / more tiles than will be used later,
+;; undefined behaviour may happen.
+;;     * This function only draws 32-bytes tiles of size 4x8 (in bytes).
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;     * Under hardware scroll conditions, tile drawing might fail if asked to draw
+;; near 0x?7FF or 0x?FFF addresses (at the end of each one of the 8 pixel lines), as 
+;; next screen byte at that locations is -0x7FF and not +1 bytes away.
+;;
+;; Details:
+;;    Please, refer to documentation about <cpct_etm_drawTilemap4x8_ag> for usage details. 
+;; Both this function and <cpct_etm_drawTilemap4x8_ag> work identical. Just remember to 
+;; use <cpct_etm_setDrawTilemap4x8_agf> to configure *size* values and *tileset* for this 
+;; f-fast version of the function.
+;;
+;;    This fast version takes into account horizontal repetitions of tiles in the same
+;; row of the *tilemap* being drawn. Instead of drawing tiles one by one, it draws 
+;; each tile as many times as consecutive repetitions are found. Let us analyze figure 1
+;; for illustration,
+;;
+;; (start code)
+;; ***************** FIGURE 1 *******************
+;;
+;; |---------------------------------|----------|
+;; |            MEMORY               | COMPLETE |
+;; | address&contents in hexadecimal | TILEMAP  |
+;; |---------------------------------|  [4000]  |
+;; |ADDRESS|       CONTENTS          |  8 x 8   |
+;; |-------|-------------------------|----------|         
+;; |  4000 |[01]01 01 01 01 01 01 01 | ######## |
+;; |  4008 | 01 00 00 00 00 09 09 01 | #    **# |
+;; |  4010 | 01 00 06 00 00 09 09 01 | # |  **# |
+;; |  4018 | 01 05 05 05 00 08 00 01 | #/// 8 # |
+;; |  4020 | 01 02 02 02 08 08 08 01 | #===888# |
+;; |  4028 | 01 02 03 02 00 06 00 01 | #=o= | # |
+;; |  4030 | 01 02 04 02 07 06 07 01 | #=^=_|_# | 
+;; |  4038 | 01 01 01 01 01 01 01 01 | ######## |
+;; |-------|-------------------------|----------|
+;; (end code)
+;;
+;;    Figure 1 contains an 8x8-bytes *tilemap* starting at 0x4000. Calling 
+;; <cpct_etm_drawTilemap4x8_agf> to draw this complete *tilemap* will produce next
+;; logical sequence,
+;;
+;;    1 - First tile to draw is 01 (at address 0x4000)
+;;    2 - After counting, 8 consecutive 01 tiles are found on first row.
+;;    3 - 8 consecutive 01 tiles are drawn.
+;;    4 - Next tile is 01 (first from second row)
+;;    5 - After counting, only 1 consecutive 01 tile is found.
+;;    6 - A 01 tile is drawn.
+;;    7 - Next tile is 00 (second tile from second row)
+;;    8 - After counting, 4 consecutive 00 tiles are found.
+;;    9 - 4 consecutive 00 tiles are drawn.
+;;   10 - Next tile is 09 (sixth from second row)
+;;   11 - ......
+;;
+;;    This sequence reduce calculations for repeated tiles, and draws them consecutively. 
+;; When applied to tilemaps with a great number of horizontal repetitions, it results on
+;; faster drawing. As this is quite common, you may usually prefer this function for 
+;; *complete tilemap* drawing instead of <cpct_etm_drawTilemap4x8_ag>. However, it is advisable
+;; to test them first and measure gains, specially if you are unsure of the frequency of
+;; horizontal regularities in your tilemaps. If your tilemaps have no tile regularities in
+;; their horizontal rows, using this function may even be slower (Please, check time measures
+;; section for reference).
+;;
+;;    Last words of advice: it is recommended not to use both versions <cpct_etm_drawTilemap4x8_ag>
+;; and <cpct_etm_drawTilemap4x8_agf> simultaneously. They will take a lot of space and potential
+;; performance gains will usually be not worth it. Also, using <cpct_etm_drawTilemap4x8_agf> for
+;; small tilemap windows or to erase sprites by redrawing tiles over them is not advisable.
+;; For such small windows it will probably be much slower than <cpct_etm_drawTilemap4x8_ag>.
+;;
+;; Destroyed Register values: 
+;;      C-bindings - AF, BC, DE, HL
+;;    ASM-bindings - AF, BC, DE, HL, IX, IY
+;;
+;; Required memory:
+;;      C-bindings - 187 bytes (+49 bytes from <cpct_etm_setDrawTileMap4x8_agf> which is required)
+;;    ASM-bindings - 176 bytes (+45 bytes from <cpct_etm_setDrawTileMap4x8_agf_asm> which is required)
+;;
+;; Time Measures: 
+;;    Performance depends on frequency of repetitions of tiles inside tilemap rows. Because 
+;; of this, no useful formula for calculating performance can be given. Instead, some measures
+;; for general understanding are given for drawing complete tilemaps of 20x10 and 16x16 sizes.
+;; For each tilemap, Best Case means all tiles are repeated, Worst Case means no single tile
+;; is repeated, and Non-fast is the performance for <cpct_etm_drawTilemap4x8_ag> (Non-fast version)
+;;
+;; (start code)
+;;    Case     |  microSecs (us)   |    CPU Cycles      |
+;; ------------------------------------------------------
+;; ////    Measures for Tilemap of size (20 x 10)    ////
+;; ------------------------------------------------------
+;;  Best Case  |   35.475 ( -7,1%) |     141.900        | (1,78 VSync)   
+;;             ------------------------------------------
+;;  Non-fast   |   38.169          |     152.676        | (1,91 VSync) 
+;;             ------------------------------------------           
+;;  Worst Case |   42.505 (+11,3%) |     170.020        | (2,19 VSync)      
+;; ------------------------------------------------------
+;; ////    Measures for Tilemap of size (16 x 16)    ////
+;; ------------------------------------------------------
+;;  Best Case  |   45.609 ( -7,0%) |     182.436        | (2,28 VSync)   
+;;             ------------------------------------------
+;;  Non-fast   |   48.963          |     195.852        | (2,45 VSync) 
+;;             ------------------------------------------           
+;;  Worst Case |   54.489 (+11,3%) |     217.956        | (2,73 VSync)      
+;; ------------------------------------------------------  
+;;  ASM saving |       -33         |      -132          | 
+;; ------------------------------------------------------
+;; (end code)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 ;; LOCAL MACRO: drawSpriteRow
 ;;    Copies 4 bytes from the Stack to (HL) using pop BC.
 ;; It can copy the sprite left-to-right or right-to-left. For left-to-right
