@@ -16,6 +16,10 @@
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
+##
+## No Music in this example
+##
+
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
@@ -44,10 +48,3 @@
 ##  * Parameter  (5) (Aditional options) is  optional and  generally not  ##
 ##    required.                                                           ##
 ############################################################################
-
-## Convert music/song.aks to src/music/song.s and src/music/song.h
-##		This file contains a music created with Arkos Tracker. This macro 
-## will convert the music into a data array called g_mysong that will be
-## placed at the 0x42A0 memory address in an absolue way.
-##
-#$(eval $(call AKS2C,music/song.aks,g_mysong,src/music/,0x42A0))

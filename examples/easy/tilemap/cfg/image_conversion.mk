@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -19,6 +19,36 @@
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
+############################################################################
+
+# DEFINE PALETTE
+# 16-colours mode 0 palette used in this example. This values are 
+# firmware color values. You may consult this colour values at 
+# http://lronaldo.github.io/cpctelera/files/video/cpct_setPalette-asm.html
+#  0: Black           1: Blue              2: Bright Blue      3: Red
+#  5: Mauve           6: Bright Red        9: Green           11: Sky Blue
+# 15: Orange         18: Bright Green     19: Sea Green       20: Bright Cyan
+# 21: Lime           22: Pastel Green     24: Bright Yellow   26: Bright White
+PALETTE={0 1 2 3 5 6 9 11 15 18 19 20 21 22 24 26}
+
+# CONVERT TILES:
+#  Converts img/tiles.png into src/map/tiles.c & src/map/tiles.h
+#
+# It will split img/tiles.png into 8x8 pixel mode 0 tiles and generate an array 
+# of screen pixel format values for each tile. Each array will be named using 
+# prefix 'g_' followed by the name of the file 'tiles' and a suffix '_XX' with
+# the number of the tile. Conversion will use previously defined $(PALETTE) to 
+# generate pixel format values. Tiles do not need interlaced mask and no 
+# tileset pointer array is required in this example. A 'g_palette' array 
+# containing hardware numbers for all 16 colours will also be generated. 
+# Finally, '-z' option stands for generating tiles in Zig-Zag Gray-Code format.
+# This format is optimal for drawing to screen and required by '_g' functions
+# like cpct_etm_drawTilemap4x8_ag (aligned, Grey-code).
+$(eval $(call IMG2SPRITES,img/tiles.png,0,g,8,8,$(PALETTE),,src/map/,hwpalette,-z))
+
+
+############################################################################
+##       GENERAL INSTRUCTIONS TO UNDERSTAND HOW THIS FILE WORKS           ##
 ##------------------------------------------------------------------------##
 ## This file is intended for users to automate image conversion from JPG, ##
 ## PNG, GIF, etc. into C-arrays.                                          ##
@@ -53,6 +83,3 @@
 ##  have mask and/or tileset, you may omit parameter (7) leaving it empty ##
 ##     $(eval $(call IMG2SPRITES,imgs/1.png,0,g,4,8,$(PAL),,src/))        ##
 ############################################################################
-
-PALETTE={0 1 2 3 5 6 9 15 18 19 20 21 22 23 24 25}
-$(eval $(call IMG2SPRITES,img/tiles.png,0,g,8,8,$(PALETTE),,src/map/,hwpalette,-z))

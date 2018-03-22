@@ -17,8 +17,23 @@
 ##------------------------------------------------------------------------------
 
 ############################################################################
-##                        CPCTELERA ENGINE                                ##
-##                 Automatic image conversion file                        ##
+##                       CPCTELERA ENGINE                                 ##
+##               Automatic tilemap conversion file                        ##
+############################################################################
+
+## CONVERT COURT TILEMAP
+##	 Converts img/court.tmx into src/map/court.c & src/map/court.h
+##
+## Court.tmx defines a tilemap in Tiled/CSV format. This is just a 2D-array
+## of tile indexes. This conversion generates a C-array, named g_courtMap,
+## containing all these indexes. The generated array will use 1-byte per
+## index, so that 256 different tiles can be used. 
+##
+$(eval $(call TMX2C,img/court.tmx,g_courtMap,src/map/,))
+
+
+############################################################################
+##       GENERAL INSTRUCTIONS TO UNDERSTAND HOW THIS FILE WORKS           ##
 ##------------------------------------------------------------------------##
 ## This file is intended for users to automate tilemap conversion from    ##
 ## original files (like Tiled .tmx) into C-arrays.                        ##
@@ -42,5 +57,3 @@
 ##  * You can omit parameters by leaving them empty.                      ##
 ##  * Parameters (4) and (5) are optional and generally not required.     ##
 ############################################################################
-
-$(eval $(call TMX2C,img/court.tmx,g_courtTilemap,src/map/,))
