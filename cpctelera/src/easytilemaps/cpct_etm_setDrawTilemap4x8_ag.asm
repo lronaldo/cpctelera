@@ -30,8 +30,11 @@
 ;; Input Parameters (6 bytes):
 ;;    (1B  C) width        - Width in *tiles* of the view window to be drawn
 ;;    (1B  B) height       - Height in *tiles* of the view window to be drawn
-;;    (2B HL) tilemapWidth - Width in *tiles* of the complete tilemap
-;;    (2B DE) tileset      - Pointer to the start of the tileset definition (list of 32-byte tiles).
+;;    (2B DE) tilemapWidth - Width in *tiles* of the complete tilemap
+;;    (2B HL) tileset      - Pointer to the start of the tileset definition (list of 32-byte tiles).
+;;
+;;    *Note*: it also uses current interrupt status (register I) as a value. 
+;;            It should be considered as an additional parameter.
 ;;
 ;; Assembly call (Input parameters on Registers):
 ;;    > call cpct_etm_setDrawTilemap4x8_ag_asm
@@ -73,6 +76,14 @@
 ;; that <cpct_etm_setDrawTilemap4x8_ag> has to be called at least once before using
 ;; <cpct_etm_drawTilemap4x8_ag>, as default values for sizes and pointers are set to 0, 
 ;; and that will produce unexpected results.
+;;
+;;    Internal values set include: *width* and *height* of the view window, width of the
+;; complete tilemap (*tilemapWidth*), pointer to the *tileset* and interrupt status. 
+;; <cpct_etm_drawTilemap4x8_ag> disables interrupts when it starts drawing every row,
+;; and returns interrupts to their original status on finishing row drawing. If interrupts
+;; are enabled when calling this setting function, interrupts will be set to be reenabled 
+;; after every row drawn by <cpct_etm_drawTilemap4x8_ag>. Otherwise, interrupts will be 
+;; set as disabled for all the processing of <cpct_etm_drawTilemap4x8_ag>.
 ;;
 ;;    Values to be set are shown in the next figure about memory,
 ;; (start code)
@@ -185,8 +196,8 @@
 ;;      AF, DE
 ;;
 ;; Required memory:
-;;      C-bindings - 48 bytes (+165 bytes from <cpct_etm_drawTileMap4x8_ag> which is included)
-;;    ASM-bindings - 44 bytes (+153 bytes from <cpct_etm_drawTileMap4x8_ag_asm> which is included)
+;;      C-bindings - 48 bytes (+165 bytes from <cpct_etm_drawTilemap4x8_ag>-cbindings which is included)
+;;    ASM-bindings - 44 bytes (+153 bytes from <cpct_etm_drawTilemap4x8_ag>-asmbindings which is included)
 ;;
 ;; Time Measures:
 ;; (start code)

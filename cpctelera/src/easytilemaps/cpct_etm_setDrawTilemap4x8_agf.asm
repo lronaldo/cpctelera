@@ -16,18 +16,40 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
-;;-------------------------------------------------------------------------------
-;; C bindings for <cpct_etm_setDrawTilemap4x8_agf>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; BC  = B:Height, C:Width
-;; DE  = Tileset Pointer
-;; HL  = tilemapWidth
+;; Function: cpct_etm_setDrawTilemap4x8_agf
+;;
+;;    Sets internal configuration values for <cpct_etm_drawTilemap4x8_agf>.
+;;
+;; C Definition:
+;;    void <cpct_etm_setDrawTilemap4x8_agf> (<u8> *width*, <u8> *height*, 
+;; <u16> *tilemapWidth*, const void* *tileset*) __z88dk_callee;
+;;
+;; Input Parameters (6 bytes):
+;;    (1B  C) width        - Width in *tiles* of the view window to be drawn
+;;    (1B  B) height       - Height in *tiles* of the view window to be drawn
+;;    (2B DE) tilemapWidth - Width in *tiles* of the complete tilemap
+;;    (2B HL) tileset      - Pointer to the start of the tileset definition (list of 32-byte tiles).
+;;
+;;    *Note*: it also uses current interrupt status (register I) as a value. 
+;;            It should be considered as an additional parameter.
+;;
+;; Assembly call (Input parameters on Registers):
+;;    > call cpct_etm_setDrawTilemap4x8_agf_asm
+;;
+;; Details:
+;;    Please refer to <cpct_etm_setDrawTilemap4x8_ag> documentation for details. This function
+;; works identical to <cpct_etm_setDrawTilemap4x8_ag> except for the fact that it configures
+;; values for <cpct_etm_drawTilemap4x8_agf> (f - fast-version).
 ;;
 ;; Destroyed Register values: 
 ;;      AF, DE
 ;;
 ;; Required memory:
-;;      xx bytes (+ xx bytes from <cpct_etm_drawTilemap4x8_agf> which is included)
+;;      C-bindings - 49 bytes (+187 bytes from <cpct_etm_drawTilemap4x8_agf>-cbindings which is included)
+;;    ASM-bindings - 45 bytes (+176 bytes from <cpct_etm_drawTilemap4x8_agf>-asmbindings which is included)
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -38,13 +60,15 @@
 ;; ASM Saving  |     -15        |    -60
 ;; ------------------------------------------
 ;; (end code)
-;;    W - Map width (number of horizontal tiles)
-;;-------------------------------------------------------------------------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;
-;; Macro that generates the code for setDrawTilemap4x8_agf and couples it to the labels
-;; that it has to modify. A label prefix is passed to generate different kinds of labels
-;; for different bindings
+;; LOCAL MACRO: setDrawTileMap4x8_agf_gen
+;;    All code function is defined as a macro to prevent code duplication on reuse
+;; between ASM/C bindings. This macro generates the code for setDrawTileMap4x8_agf 
+;; and couples it to the appropriate labels that it has to modify. A label prefix 
+;; is passed to generate different kinds of labels for different bindings.
+;;    Therefore, ASM/C bindings include this file and use this macro to generate
+;; specific source code that will be compiled, with the appropriate labels.
 ;;
 .macro setDrawTilemap4x8_agf_gen lblPrf
 

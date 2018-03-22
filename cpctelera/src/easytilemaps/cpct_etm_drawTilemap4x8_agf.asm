@@ -126,8 +126,8 @@
 ;;    ASM-bindings - AF, BC, DE, HL, IX, IY
 ;;
 ;; Required memory:
-;;      C-bindings - 187 bytes (+49 bytes from <cpct_etm_setDrawTileMap4x8_agf> which is required)
-;;    ASM-bindings - 176 bytes (+45 bytes from <cpct_etm_setDrawTileMap4x8_agf_asm> which is required)
+;;      C-bindings - 187 bytes (+49 bytes from <cpct_etm_setDrawTilemap4x8_agf>-cbindings which is required)
+;;    ASM-bindings - 176 bytes (+45 bytes from <cpct_etm_setDrawTilemap4x8_agf>-asmbindings which is required)
 ;;
 ;; Time Measures: 
 ;;    Performance depends on frequency of repetitions of tiles inside tilemap rows. Because 

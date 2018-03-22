@@ -243,8 +243,8 @@
 ;;    ASM-bindings - AF, BC, DE, HL, IX, IY
 ;;
 ;; Required memory:
-;;      C-bindings - 165 bytes (+48 bytes from <cpct_etm_setDrawTileMap4x8_ag> which is required)
-;;    ASM-bindings - 153 bytes (+44 bytes from <cpct_etm_setDrawTileMap4x8_ag_asm> which is required)
+;;      C-bindings - 165 bytes (+48 bytes from <cpct_etm_setDrawTilemap4x8_ag>-cbindings which is required)
+;;    ASM-bindings - 153 bytes (+44 bytes from <cpct_etm_setDrawTilemap4x8_ag>-asmbindings which is required)
 ;;
 ;; Time Measures: 
 ;; (start code)
