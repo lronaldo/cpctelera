@@ -1,6 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
 //  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2018 Miguel Sánchez aka PixelArtM (@PixelArtM)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -40,6 +41,9 @@
 // to the tile that has to be drawn. This array is generated at src/map/court.c from
 // the original img/court.tmx. This generation is controlled in the file 
 // cfg/tilemap_conversion.mk.
+//
+// Court and Tiles are contributed by @PixelArtM (https://twitter.com/PixelArtM)
+// and distributed under Creative Commons CC-BY-SA-3.0 License
 //------------------------------------------------------------------------------
 
 // Required Include files
