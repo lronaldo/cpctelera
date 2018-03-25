@@ -84,12 +84,14 @@ DSKINC_EXT := dskinc
 ## BINFILE = Binary file that is finally included in DSK and CDT (produced by Hex2Bin)
 ## CDT     = CDT file produced
 ## DSK     = DSK file produced
+## SNA     = SNA file produced
 ## DSKINC  = Flag object file produced to signal DSK already has all include files in it
 ##
 IHXFILE := $(OBJDIR)/$(PROJNAME).ihx
 BINFILE := $(OBJDIR)/$(PROJNAME).bin
 CDT     := $(PROJNAME).cdt
 DSK     := $(PROJNAME).dsk
+SNA     := $(PROJNAME).sna
 DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 
 ##
@@ -97,9 +99,10 @@ DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 ##
 ##  $(CDT):    Generates the CDT file with main binary
 ##  $(DSK):    Generates the DSK file with main binary
+##  $(SNA):    Generates the SNA file with main binary
 ##  $(DSKINC): Includes all files from DSKFILESDIR into DSK as binaries 
 ##
-TARGET := $(CDT) $(DSK) $(DSKINC)
+TARGET := $(CDT) $(DSK) $(DSKINC) $(SNA)
 
 ##
 ## OBJS2CLEAN: Additional objects to be removed when running "make clean"
