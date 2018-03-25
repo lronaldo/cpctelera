@@ -5,7 +5,7 @@ COMP    = g++
 TARGET  = $(BINDIR)/iDSK
 SRCFILES= $(wildcard $(SRCDIR)/*.cpp)
 OBJFILES= $(foreach F, $(SRCFILES), $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(F:%.cpp=%.o)))
-CPFLAGS = -O3 -Wall -pedantic -fsigned-char
+CPFLAGS = -std=c++98 -O3 -Wall -pedantic -fsigned-char
 LDLIBS  = 
 
 .PHONY: clean cleanall

@@ -18,27 +18,31 @@
 
 ###########################################################################
 ##                          CPCTELERA ENGINE                             ##
-##                     Makefile for building tools                       ##
+##                     Makefile for building c_scripts                   ##
 ##-----------------------------------------------------------------------##
-## This makefile calls all the makefiles and build systems of the various##
-## tools required to use CPCTelera and its examples for the creation of  ##
-## CPC software and games.                                               ##
+## This makefile calls all the makefiles and build systems of the        ##
+## c_scripts required by CPCtelera to work.                              ##
 ## In general, there is no need to make changes to this file.            ##
 ###########################################################################
 # INCLUDES
-include ../cfg/global_functions.mk
+include ../../../cfg/global_functions.mk
 
-TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.6.8-r9946 img2cpc dskgen scripts/c_scripts
-TOOLSYSTEM=ToolMaker
+TOOLS      :=bin2sna
+TOOLSYSTEM :=ToolMaker::c_scripts
+SCRIPTS_DIR:=..
 
 # TOOLS CONFIG
-RM=rm -f
-MKDIR=mkdir
+RM   :=rm -f
+MKDIR:=mkdir
+MV   :=mv
 
 define MAKERULE
 $(1): $(1)/Makefile
 	$(call PRINT,$(TOOLSYSTEM),"Building $(1)...")
 	@$(MAKE) -C $(1)
+	$(call PRINT,$(TOOLSYSTEM),"Moving $(1) binaries to scripts...")
+	$(MV) $(1)/bin/* $(SCRIPTS_DIR)
+
 endef
 
 define MAKETOOL
