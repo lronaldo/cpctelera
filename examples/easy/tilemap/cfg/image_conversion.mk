@@ -37,14 +37,14 @@ PALETTE={0 1 2 3 5 6 9 11 15 18 19 20 21 22 24 26}
 # It will split img/tiles.png into 8x8 pixel mode 0 tiles and generate an array 
 # of screen pixel format values for each tile. Each array will be named using 
 # prefix 'g_' followed by the name of the file 'tiles' and a suffix '_XX' with
-# the number of the tile. Conversion will use previously defined $(PALETTE) to 
-# generate pixel format values. Tiles do not need interlaced mask and no 
-# tileset pointer array is required in this example. A 'g_palette' array 
+# the number of the tile (For instance, g_tiles_00, g_tiles_01...). Conversion 
+# will use previously defined $(PALETTE) to generate pixel format values. 
+# 'zgtiles' option generates tiles in Zig-Zag pixel order and Gray-Code row order.
+# This format is optimal for drawing to screen and required all functions with
+# the suffix '_g' in their names, like cpct_etm_drawTilemap4x8_ag (_a: aligned, 
+# _g: Zig-Zag pixel order, Gray-Code row order). Finally, a 'g_palette' array 
 # containing hardware numbers for all 16 colours will also be generated. 
-# Finally, '-z' option stands for generating tiles in Zig-Zag Gray-Code format.
-# This format is optimal for drawing to screen and required by '_g' functions
-# like cpct_etm_drawTilemap4x8_ag (aligned, Grey-code).
-$(eval $(call IMG2SPRITES,img/tiles.png,0,g,8,8,$(PALETTE),,src/map/,hwpalette,-z))
+$(eval $(call IMG2SPRITES,img/tiles.png,0,g,8,8,$(PALETTE),zgtiles,src/map/,hwpalette))
 
 
 ############################################################################
@@ -63,6 +63,8 @@ $(eval $(call IMG2SPRITES,img/tiles.png,0,g,8,8,$(PALETTE),,src/map/,hwpalette,-
 ##  (7): (mask / tileset /)                                               ##
 ##     - "mask":    generate interlaced mask for all sprites converted    ##
 ##     - "tileset": generate a tileset array with pointers to all sprites ##
+##     - "zgtiles": generate tiles/sprites in Zig-Zag pixel order and     ##
+##                  Gray Code row order                                   ##
 ##  (8): Output subfolder for generated .C/.H files (in project folder)   ##
 ##  (9): (hwpalette)                                                      ##
 ##     - "hwpalette": output palette array with hardware colour values    ##
