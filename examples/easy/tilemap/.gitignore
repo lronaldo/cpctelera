@@ -1,4 +1,1 @@
-src/tilemap.h
-src/tilemap.c
-src/tileset.c
-src/tileset.h
+src/map/

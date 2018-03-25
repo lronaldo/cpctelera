@@ -229,8 +229,10 @@ endef
 # $(4): Width in pixels of each sprite/tile/etc that will be generated
 # $(5): Height in pixels of each sprite/tile/etc that will be generated
 # $(6): Firmware palette used to convert the image file into C values
-# $(7): (mask,tileset,) "mask":    generate interlaced mask for all sprites converted
-#                       "tileset": generate a tileset array including pointers to all sprites
+# $(7): (mask,tileset,zgtiles) 
+#		"mask":    generate interlaced mask for all sprites converted
+#       "tileset": generate a tileset array including pointers to all sprites
+#		"zgtiles": generate tiles in Zig-Zag pixel order, Gray Code row order
 # $(8): Output subfolder for generated .C and .H files (inside project folder)
 # $(9): (hwpalette) "hwpalette":   output palette array as hardware values
 # $(10): Aditional options (you can use this to pass aditional modifiers to cpct_img2tileset)
@@ -243,7 +245,10 @@ $(eval I2S_NH := $(notdir $(I2S_H)))
 $(eval I2S_C2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NC)"; else echo "$(I2S_C)"; fi))
 $(eval I2S_H2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NH)"; else echo "$(I2S_H)"; fi))
 $(eval I2S_CH := $(I2S_C2) $(I2S_H2))
-$(eval I2S_P  := $(shell if [ "$(7)" = "mask" ]; then echo "-nt -im"; elif [ ! "$(7)" = "tileset" ]; then echo "-nt"; fi))
+$(eval I2S_P  := $(shell 	if   [ "$(7)" = "mask" ]; then echo "-nt -im"; \
+							elif [ "$(7)" = "zgtiles" ]; then echo "-z -g"; \
+							elif [ ! "$(7)" = "tileset" ]; then echo "-nt"; \
+							fi))
 $(eval I2S_P  := $(I2S_P) $(shell if [ "$(9)" = "hwpalette" ]; then echo "-oph"; fi))
 .SECONDARY: $(I2S_CH)
 $(I2S_CH): $(1)

@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -15,13 +15,35 @@
 ##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
-
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
 ##------------------------------------------------------------------------##
 ## This file is intended for users to automate image conversion from JPG, ##
 ## PNG, GIF, etc. into C-arrays.                                          ##
+############################################################################
+
+## Example firmware palette definition as variable in cpct_img2tileset format
+
+# PALETTE={0 1 3 4 7 9 10 12 13 16 19 20 21 24 25 26}
+
+## AUTOMATED IMAGE CONVERSION EXAMPLE (Uncomment EVAL line to use)
+##
+##    This example would convert img/example.png into src/example.{c|h} files.
+##    A C-array called pre_example[24*12*2] would be generated with the definition
+##    of the image example.png in mode 0 screen pixel format, with interlaced mask.
+##    The palette used for conversion is given through the PALETTE variable and
+##    a pre_palette[16] array will be generated with the 16 palette colours as 
+##	  hardware colour values.
+
+#$(eval $(call IMG2SPRITES,img/example.png,0,pre,24,12,$(PALETTE),mask,src/,hwpalette))
+
+
+
+
+############################################################################
+##              DETAILED INSTRUCTIONS AND PARAMETERS                      ##
+##------------------------------------------------------------------------##
 ##                                                                        ##
 ## Macro used for conversion is IMG2SPRITES, which has up to 9 parameters:##
 ##  (1): Image file to be converted into C sprite (PNG, JPG, GIF, etc)    ##
@@ -30,9 +52,11 @@
 ##  (4): Width in pixels of each sprite/tile/etc that will be generated   ##
 ##  (5): Height in pixels of each sprite/tile/etc that will be generated  ##
 ##  (6): Firmware palette used to convert the image file into C values    ##
-##  (7): (mask / tileset /)                                               ##
+##  (7): (mask / tileset / zgtiles)                                       ##
 ##     - "mask":    generate interlaced mask for all sprites converted    ##
 ##     - "tileset": generate a tileset array with pointers to all sprites ##
+##     - "zgtiles": generate tiles/sprites in Zig-Zag pixel order and     ##
+##                  Gray Code row order                                   ##
 ##  (8): Output subfolder for generated .C/.H files (in project folder)   ##
 ##  (9): (hwpalette)                                                      ##
 ##     - "hwpalette": output palette array with hardware colour values    ##
@@ -53,17 +77,3 @@
 ##  have mask and/or tileset, you may omit parameter (7) leaving it empty ##
 ##     $(eval $(call IMG2SPRITES,imgs/1.png,0,g,4,8,$(PAL),,src/))        ##
 ############################################################################
-
-## Example firmware palette definition as variable in cpct_img2tileset format
-
-# PALETTE={0 1 3 4 7 9 10 12 13 16 19 20 21 24 25 26}
-
-## Example image conversion
-##    This example would convert img/example.png into src/example.{c|h} files.
-##    A C-array called pre_example[24*12*2] would be generated with the definition
-##    of the image example.png in mode 0 screen pixel format, with interlaced mask.
-##    The palette used for conversion is given through the PALETTE variable and
-##    a pre_palette[16] array will be generated with the 16 palette colours as 
-##	  hardware colour values.
-
-#$(eval $(call IMG2SPRITES,img/example.png,0,pre,24,12,$(PALETTE),mask,src/,hwpalette))

@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -15,35 +15,15 @@
 ##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
-
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
 ##------------------------------------------------------------------------##
 ## This file is intended for users to automate tilemap conversion from    ##
 ## original files (like Tiled .tmx) into C-arrays.                        ##
-##                                                                        ##
-## Macro used for conversion is TMX2C, which has up to 4 parameters:      ##
-##  (1): TMX file to be converted to C array                              ##
-##  (2): C identifier for the generated C array                           ##
-##  (3): Output folder for C and H files generated (Default same folder)  ##
-##  (4): Bits per item (1,2,4 or 6 to codify tilemap into a bitarray).    ##
-##       Blanck for normal integer tilemap array (8 bits per item)        ##
-##  (5): Aditional options (aditional modifiers for cpct_tmx2csv)         ##
-##                                                                        ##
-## Macro is used in this way (one line for each image to be converted):   ##
-##  $(eval $(call TMX2C,(1),(2),(3),(4),(5)))                             ##
-##                                                                        ##
-## Important:                                                             ##
-##  * Do NOT separate macro parameters with spaces, blanks or other chars.##
-##    ANY character you put into a macro parameter will be passed to the  ##
-##    macro. Therefore ...,src/sprites,... will represent "src/sprites"   ##
-##    folder, whereas ...,  src/sprites,... means "  src/sprites" folder. ##
-##  * You can omit parameters by leaving them empty.                      ##
-##  * Parameters (4) and (5) are optional and generally not required.     ##
 ############################################################################
 
-## Conversion Examples
+## TILEMAP CONVERSION EXAMPLES (Uncomment EVAL lines to use)
 ##
 
 ## Convert img/tilemap.tmx to src/tilemap.c and src/tilemap.h
@@ -64,3 +44,30 @@
 ##
 
 #$(eval $(call TMX2C,img/level0b.tmx,g_level0_4bit,src/levels/,4))
+
+
+
+
+############################################################################
+##              DETAILED INSTRUCTIONS AND PARAMETERS                      ##
+##------------------------------------------------------------------------##
+##                                                                        ##
+## Macro used for conversion is TMX2C, which has up to 4 parameters:      ##
+##  (1): TMX file to be converted to C array                              ##
+##  (2): C identifier for the generated C array                           ##
+##  (3): Output folder for C and H files generated (Default same folder)  ##
+##  (4): Bits per item (1,2,4 or 6 to codify tilemap into a bitarray).    ##
+##       Blanck for normal integer tilemap array (8 bits per item)        ##
+##  (5): Aditional options (aditional modifiers for cpct_tmx2csv)         ##
+##                                                                        ##
+## Macro is used in this way (one line for each image to be converted):   ##
+##  $(eval $(call TMX2C,(1),(2),(3),(4),(5)))                             ##
+##                                                                        ##
+## Important:                                                             ##
+##  * Do NOT separate macro parameters with spaces, blanks or other chars.##
+##    ANY character you put into a macro parameter will be passed to the  ##
+##    macro. Therefore ...,src/sprites,... will represent "src/sprites"   ##
+##    folder, whereas ...,  src/sprites,... means "  src/sprites" folder. ##
+##  * You can omit parameters by leaving them empty.                      ##
+##  * Parameters (4) and (5) are optional and generally not required.     ##
+############################################################################

@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -15,13 +15,40 @@
 ##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
-
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
 ##------------------------------------------------------------------------##
 ## This file is intended for users to automate tilemap conversion from    ##
 ## original files (like Tiled .tmx) into C-arrays.                        ##
+############################################################################
+
+## AUTOMATED TILEMAP CONVERSIONS
+##
+## We automatically convert 3 tilemaps into arrays: 
+##	- img/frame_updown.tmx 		(Upper and Lower parts of the Fixed Frame)
+##	- img/frame_leftright.tmx   (Left and Right parts of the Fixed Frame)
+##	- img/building.tmx 			(Building tilemap that will be scrolled inside the frame)
+##
+
+## CONVERT: img/building.tmx to src/maps/building.c & src/maps/building.h
+##	Generates a g_building C-Array, with 1-byte tile indexes defining the building
+$(eval $(call TMX2C,img/building.tmx,g_building,src/maps/,))
+
+## CONVERT: img/frame_updown.tmx to src/maps/frame_updown.c & src/maps/frame_updown.h
+##	Generates a g_frame_ud C-Array, with 1-byte tile indexes defining Upper and Lower parts of the frame
+$(eval $(call TMX2C,img/frame_updown.tmx,g_frame_ud,src/maps/,))
+
+## CONVERT: img/frame_leftright.tmx to src/maps/frame_leftright.c & src/maps/frame_leftright.h
+##	Generates a g_frame_lr C-Array, with 1-byte tile indexes defining Left and Right parts of the frame
+$(eval $(call TMX2C,img/frame_leftright.tmx,g_frame_lr,src/maps/,))
+
+
+
+
+############################################################################
+##              DETAILED INSTRUCTIONS AND PARAMETERS                      ##
+##------------------------------------------------------------------------##
 ##                                                                        ##
 ## Macro used for conversion is TMX2C, which has up to 4 parameters:      ##
 ##  (1): TMX file to be converted to C array                              ##
@@ -42,17 +69,3 @@
 ##  * You can omit parameters by leaving them empty.                      ##
 ##  * Parameters (4) and (5) are optional and generally not required.     ##
 ############################################################################
-
-## Conversion Examples
-##
-
-## Convert img/tilemap.tmx to src/tilemap.c and src/tilemap.h
-##		This file contains a tilemap created with Tiled that uses tiles
-## in img/tiles.png. This macro will convert the tilemap into a C-array
-## named g_tilemap, containing all the IDs of the tiles that are located 
-## at each given location of the C-array. 
-##
-
-$(eval $(call TMX2C,img/building.tmx,g_building,src/maps/,))
-$(eval $(call TMX2C,img/frame_updown.tmx,g_frame_ud,src/maps/,))
-$(eval $(call TMX2C,img/frame_leftright.tmx,g_frame_lr,src/maps/,))

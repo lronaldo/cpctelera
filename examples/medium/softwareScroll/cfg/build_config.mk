@@ -55,7 +55,7 @@ Z80CODELOC := 0x4000
 ## OBJDIR      = Object files generated on compilation
 ##
 SRCDIR      := src
-DSKFILESDIR := dsk_files
+DSKFILESDIR := dsk
 OBJDIR      := obj
 
 ##

@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -15,10 +15,12 @@
 ##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
-
 ############################################################################
-##                       CPCTELERA ENGINE                                 ##
-##               Automatic tilemap conversion file                        ##
+##                        CPCTELERA ENGINE                                ##
+##                 Automatic image conversion file                        ##
+##------------------------------------------------------------------------##
+## This file is intended for users to automate tilemap conversion from    ##
+## original files (like Tiled .tmx) into C-arrays.                        ##
 ############################################################################
 
 ## CONVERT COURT TILEMAP
@@ -32,11 +34,11 @@
 $(eval $(call TMX2C,img/court.tmx,g_courtMap,src/map/,))
 
 
+
+
 ############################################################################
-##       GENERAL INSTRUCTIONS TO UNDERSTAND HOW THIS FILE WORKS           ##
+##              DETAILED INSTRUCTIONS AND PARAMETERS                      ##
 ##------------------------------------------------------------------------##
-## This file is intended for users to automate tilemap conversion from    ##
-## original files (like Tiled .tmx) into C-arrays.                        ##
 ##                                                                        ##
 ## Macro used for conversion is TMX2C, which has up to 4 parameters:      ##
 ##  (1): TMX file to be converted to C array                              ##
