@@ -153,6 +153,18 @@ define CREATECDT
 endef
 
 #################
+# CREATESNA: Create a SNA file with the BINARY added to it 
+#
+# $(1): Binary file to be inserted in the SNA
+# $(2): SNA file to be created
+# $(3): Memory address where binary will be loaded (LOAD ADDRESS)
+# $(4): Memory address where main program starts (RUN ADDRESS)
+#
+define CREATESNA
+  @$(BIN2SNA) -pc 0x$(4) -l 0x$(3) $(1) > $(2)
+endef
+
+#################
 # CREATEBLANKCDT: Create a Blank CDT file
 #
 # $(1): CDT file to be created

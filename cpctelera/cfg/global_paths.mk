@@ -74,6 +74,7 @@ HEX2BIN  := $(HEX2BIN_PATH)hex2bin
 IDSK     := $(IDSK_PATH)iDSK
 2CDT     := $(2CDT_PATH)2cdt
 BIN2C    := $(SCRIPTS_PATH)cpct_bin2c
+BIN2SNA  := $(SCRIPTS_PATH)cpct_bin2sna
 
 ## SHELL TOOLS ALIASES
 TOUCH := touch

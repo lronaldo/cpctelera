@@ -77,6 +77,13 @@ $(BINADDRLOG): $(BINFILE)
 	@$(call CREATECDT,$<,$(notdir $<),$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,$(PROJNAME),"Successfully created $@")
 
+# GENERATE A SNAPSHOP FILE (.SNA) AND INCLUDE BINARY FILE (.BIN) INTO IT
+%.sna: $(BINFILE) $(BINADDRLOG)
+	@$(call PRINT,$(PROJNAME),"Creating Snapshot File $@")
+	@$(call CREATESNA,$<,$@,$(LOADADDR),$(RUNADDR))
+	@$(call PRINT,$(PROJNAME),"Successfully created $@")
+
+
 ## Include files in DSKFILESDIR to DSK, print a message and generate a flag file DSKINC
 $(DSKINC): $(DSK) $(DSKINCOBJFILES)
 	@$(call PRINT,$(PROJNAME),"All files added to $(DSK). Disc ready.")

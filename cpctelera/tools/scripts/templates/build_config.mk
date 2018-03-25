@@ -90,6 +90,7 @@ IHXFILE := $(OBJDIR)/$(PROJNAME).ihx
 BINFILE := $(OBJDIR)/$(PROJNAME).bin
 CDT     := $(PROJNAME).cdt
 DSK     := $(PROJNAME).dsk
+SNA     := $(PROJNAME).sna
 DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 
 ##
@@ -97,9 +98,10 @@ DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 ##
 ##  $(CDT):    Generates the CDT file with main binary
 ##  $(DSK):    Generates the DSK file with main binary
+##  $(SNA):    Generates the SNA file with main binary
 ##  $(DSKINC): Includes all files from DSKFILESDIR into DSK as binaries 
 ##
-TARGET := $(CDT) $(DSK) $(DSKINC)
+TARGET := $(CDT) $(DSK) $(DSKINC) $(SNA)
 
 ##
 ## OBJS2CLEAN: Additional objects to be removed when running "make clean"
