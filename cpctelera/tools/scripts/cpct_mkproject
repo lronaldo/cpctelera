@@ -206,6 +206,7 @@ fi
 
 ## Objective directory structure
 SOURCE_DIR=${PROJECTDIR}/src
+DSKINC_DIR=${PROJECTDIR}/dsk
 CONFIG_DIR=${PROJECTDIR}/cfg
 NEW_MAIN=${SOURCE_DIR}/main.c
 NEW_BUILD=${CONFIG_DIR}/build_config.mk
@@ -228,6 +229,7 @@ fi
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Creating project folder structure..."
 mkdir -p ${SOURCE_DIR}
 mkdir -p ${CONFIG_DIR}
+mkdir -p ${DSKINC_DIR}
 drawOK
 
 ## Copy templates substituting tags
