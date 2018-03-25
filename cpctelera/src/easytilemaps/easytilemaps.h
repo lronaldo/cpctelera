@@ -31,6 +31,11 @@ extern void cpct_etm_drawTileBox2x4  (u8 x, u8 y, u8 w, u8 h, u8 map_width, void
 extern void cpct_etm_drawTileRow2x4  (u8 numtiles, void* video_memory, const void* ptilemap) __z88dk_callee;
 extern void cpct_etm_setTileset2x4   (const void* ptileset) __z88dk_fastcall;
 
+extern void cpct_etm_setDrawTilemap4x8_ag (u8 width, u8 height, u16 tilemapWidth, const void* tileset) __z88dk_callee;
+extern void cpct_etm_setDrawTilemap4x8_agf(u8 width, u8 height, u16 tilemapWidth, const void* tileset) __z88dk_callee;
+extern void cpct_etm_drawTilemap4x8_ag    (void* memory, const void* tilemap) __z88dk_callee;
+extern void cpct_etm_drawTilemap4x8_agf   (void* memory, const void* tilemap) __z88dk_callee;
+
 //
 // Macro: cpct_etm_drawTilemap2x4
 //

@@ -144,7 +144,7 @@ drawtiles_height:
 set_HLp_nextRow:
    ld    b, #00        ;; [2] B = map_width (it must be restored for each new row to be drawn, #00 is a placeholder)
 
-   ;; HL' = DE (HL' is the pointer to video memory which 
+   ;; DE' = DE (DE' is the pointer to video memory which 
    ;; ... we are changing, so put the result in there
    ld   a, e           ;; [1] A = E
    exx                 ;; [1] Change to alternate register set

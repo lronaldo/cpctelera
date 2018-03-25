@@ -30,3 +30,11 @@ opc_JR   = 0x18
 ;; Constant: opc_LD_D
 ;;    Opcode for "LD d, xx" instruction. Requires 1-byte parameter (xx)
 opc_LD_D = 0x16
+
+;; Constant: opc_EI
+;;    Opcode for "EI" instruction. 
+opc_EI = 0xFB
+
+;; Constant: opc_DI
+;;    Opcode for "DI" instruction. 
+opc_DI = 0xF3

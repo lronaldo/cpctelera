@@ -61,6 +61,8 @@
 ##
 ##                        > cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png
 ##
+##    -z   | --zig-zag                         - Generate pixel lines using zig-zag order (left-to-right
+##                                               for one line, and right-to-left for the next one)
 ##    -nt  | --no-tileset                      - Do not generate a tileset array containing pointers to
 ##                                              generated sprites/tiles.
 ##    -oph | --output-palette-hardware         - Generate output palette array containing hardware values
@@ -88,6 +90,10 @@ IMG2CPC=${CPCT_PATH}/tools/img2cpc/bin/img2cpc
 ## Configuration 
 PALETTE=( 1 24 20 6 26 0 2 8 10 12 14 16 18 22 24 16 )
 PALETTE_SIZE=16
+ROWORDER=""
+ROWORDER_MSG="Ascending Linear"
+ROWPATH=""
+ROWPATH_MSG="Left-to-right"
 GENTILESET_MSG="no"
 INTERLACED_MASKS=""
 INTERLACED_MASKS_MSG="no"
@@ -145,6 +151,8 @@ to convert the file tiles.png: "
    echo
    echo "          ${COLOR_WHITE}cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png"
    echo
+   echo "${COLOR_LIGHT_BLUE}  -z   | --zig-zag"                         
+   echo "${COLOR_CYAN}       Generate pixel lines using zig-zag order (left-to-right for one line, and right-to-left for the next one)"
    echo "${COLOR_LIGHT_BLUE}  -nt  | --no-tileset"
    echo "${COLOR_CYAN}       Do not generate a tileset array containing pointers to generated sprites/tiles."
    echo "${COLOR_LIGHT_BLUE}  -oph | --output-palette-hardware"
@@ -179,6 +187,13 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
+      ## Zig-Zag order
+      "-z" | "--zig-zag")
+         ROWPATH="-z"
+         ROWORDER="-s 0,1,3,2,6,7,5,4"
+         ROWORDER_MSG="Graycode (0,1,3,2,6,7,5,4)"
+         ROWPATH_MSG="Zig-Zag"
+      ;;
       ## Do not generate tilesets
       "-nt" | "--no-tileset")
          GENTILESET="-nt"
@@ -370,6 +385,7 @@ echo "${COLOR_GREEN}Interlaced Mask : ${COLOR_LIGHT_YELLOW}${INTERLACED_MASKS_MS
 echo "${COLOR_GREEN}Transparency    : ${COLOR_LIGHT_YELLOW}${TRANSPARENT_INDEX_MSG}"
 echo "${COLOR_GREEN}Generate Tileset: ${COLOR_LIGHT_YELLOW}${GENTILESET_MSG}"
 echo "${COLOR_GREEN}Basename        : ${COLOR_LIGHT_YELLOW}'${TILES_BASENAME}'"
+echo "${COLOR_GREEN}Pixel Row Order : ${COLOR_LIGHT_YELLOW}${ROWPATH_MSG} ${ROWORDER_MSG}"
 printf "${COLOR_GREEN}Palette         : ${COLOR_LIGHT_YELLOW}"
 for((i=0; i < ${MODECOLOURS[$MODE]}; i++)); do
    printf "%s " ${PALETTE[$i]}
@@ -383,7 +399,7 @@ to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${
 ## Run IMG2CPC and check exit status
 if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" --includes "<types.h>" -osz \
--o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE "${FILE}"; then
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $ROWPATH "${FILE}"; then
    ## Success message
    echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and \
 '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.h${COLOR_CYAN}' have been created with ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s \

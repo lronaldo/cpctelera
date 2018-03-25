@@ -81,6 +81,9 @@
 ;; kind of data, the result is undefined (most likely a crash or rubbish on the screen).
 ;;
 ;; Known limitations:
+;;     * This function cannot be called using tail-recursion optimization. It *must*
+;; be called using a CALL instruction. If you call it using JP, parameters passed on
+;; the stack will be used as return address making your program execute arbitrary code.
 ;;     * This function does not do any kind of checking over the tilemap, its
 ;; contents or size. If you give a wrong pointer, your tilemap has different
 ;; dimensions than required or has less / more tiles than will be used later,
