@@ -19,6 +19,6 @@
 //------------------------------------------------------------------------------
 // PUBLIC FUNCTIONS
 //------------------------------------------------------------------------------
-u8*   video_getBackBuffer();
+u8*   video_getBackBufferPtr();
 void  video_initBuffers();
 void  video_switchBuffers();
