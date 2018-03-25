@@ -4,7 +4,7 @@ Format: 1.52
 Title: . .
 SubTitle: 
 
-Footer: (C)opyright 2015 CPCtelera authors. Distributed under GNU GPL License.
+Footer: (C)opyright 2018 CPCtelera authors. Distributed under GNU GPL License.
 Timestamp: Last updated yyyy/mm/dd
 #   m     - One or two digit month.  January is "1"
 #   mm    - Always two digit month.  January is "01"
@@ -81,6 +81,7 @@ Group: Commandline  {
 
    File: cpct_aks2c  (commandline/cpct_aks2c)
    File: cpct_bin2c  (commandline/cpct_bin2c)
+   File: cpct_bin2sna  (commandline/c_scripts/bin2sna/src/main.h)
    File: cpct_img2tileset  (commandline/cpct_img2tileset)
    File: cpct_installrslib  (commandline/cpct_installrslib)
    File: cpct_mkproject  (commandline/cpct_mkproject)
