@@ -1,3 +1,21 @@
+//-----------------------------LICENSE NOTICE------------------------------------
+//  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//------------------------------------------------------------------------------
+
 #include <iostream>
 #include <fstream>
 #include <cstdint>
@@ -8,6 +26,49 @@
 #include <sstream>
 
 typedef std::vector<std::string> TArgs;
+
+// COLORS DEFINITION
+const std::string C_LIGHT_RED { "\033[1;31;49m" };
+const std::string C_LIGHT_GREEN { "\033[1;32;49m" };
+const std::string C_LIGHT_YELLOW { "\033[1;33;49m" };
+const std::string C_LIGHT_BLUE { "\033[1;34;49m" };
+const std::string C_LIGHT_MAGENTA { "\033[1;35;49m" };
+const std::string C_LIGHT_CYAN { "\033[1;36;49m" };
+const std::string C_LIGHT_WHITE { "\033[1;37;49m" };
+const std::string C_INVERTED_LIGHT_RED { "\033[1;39;41m" };
+const std::string C_INVERTED_LIGHT_GREEN { "\033[1;39;42m" };
+const std::string C_INVERTED_GREEN { "\033[0;39;42m" };
+const std::string C_INVERTED_CYAN { "\033[0;39;46m" };
+const std::string C_INVERTED_WHITE { "\033[0;39;47m" };
+const std::string C_RED { "\033[0;31;49m" };
+const std::string C_GREEN { "\033[0;32;49m" };
+const std::string C_MAGENTA { "\033[0;35;49m" };
+const std::string C_CYAN { "\033[0;36;49m" };
+const std::string C_YELLOW { "\033[0;33;49m" };
+const std::string C_WHITE { "\033[0;37;49m" };
+const std::string C_NORMAL { "\033[0;39;49m" };
+
+void usage(const std::string& prg) {
+   std::cerr 
+      << C_LIGHT_YELLOW << "USAGE" 
+      << C_LIGHT_BLUE   << "\n   " << prg << " <binfile> [OPTIONS]"
+      << C_LIGHT_YELLOW << "\n\nDescription"
+      << C_CYAN         << "\n   Creates a runnable 64K snapshot (SNA) file with <binfile>"
+      << " loaded in memory at the address given with option -l/--load-address. If no address"
+      << " is given, binfile is loaded at 0x0000 (memory start). The value of the PC is also"
+      << " set to 0x0000 by default and may be changed with -pc/--set-pc."
+      << C_LIGHT_YELLOW << "\n\nOPTIONS:"
+      << C_LIGHT_BLUE   << "\n\n   -l  | --load-address <ADDRESS> (Default 0x0000)"
+      << C_CYAN         << "\n          Sets the memory address where to load the binary file <binfile>. "
+      << C_LIGHT_BLUE   << "\n   -pc | --set-pc <ADDRESS> (Default 0x0000)"
+      << C_CYAN         << "\n          Sets the value of the PC register at execution start. This value should"
+      << " be set to the entry point of the application (its run address)."
+      << C_LIGHT_BLUE   << "\n   -h  | --help"
+      << C_CYAN         << "\n          Shows this help."
+      << "\n\n" << C_NORMAL;
+
+   exit(-1);
+}
 
 void error(const TArgs&& err) {
    std::stringstream s;
@@ -4252,7 +4313,7 @@ void parseArguments(const TArgs& args) {
       const std::string& a = args[i];
 
       // SET THE PC
-      if (a == "-pc") {
+      if (a == "-pc" || a == "--set-pc") {
          if (i + 1 >= args.size()) error( { "Modifier '-pc' needs to be followed by a 16-bits address, but nothing found."} );
 
          address = to16bitAddress(args[i+1]);
@@ -4260,12 +4321,16 @@ void parseArguments(const TArgs& args) {
          ++i;
 
       // LOAD ADDRESS
-      } else if (a == "-l") {
+      } else if (a == "-l" || a == "--load-address") {
          if (i + 1 >= args.size()) error( { "Modifier '-l' needs to be followed by a 16-bits address, but nothing found."} );
 
          address = to16bitAddress(args[i+1]);
          theSNA.setLoadAddress(address);
          ++i;
+
+      // SHOW HELP
+      } else if (a == "-h" || a == "--help") {
+         usage(args[0]);
 
       // BINARY FILE
       } else {
@@ -4275,6 +4340,7 @@ void parseArguments(const TArgs& args) {
    }
 
    // FINAL CHECKS AND PARSING
+   if (args.size()==1) usage(args[0]);
    if (theBinary.size() == 0) error ( {"Binary file required to create the SNA file."} );
    theSNA.loadBinary(theBinary);
 }
