@@ -65,4 +65,4 @@ PALETTE={1 0 2 3 6 9 11 13 15 18 19 20 21 22 23 24}
 ##    a pre_palette[16] array will be generated with the 16 palette colours as 
 ##	  hardware colour values.
 
-$(eval $(call IMG2SPRITES,img/tileset.png,0,g,8,8,$(PALETTE),,src/maps/,hwpalette,-z))
+$(eval $(call IMG2SPRITES,img/tileset.png,0,g,8,8,$(PALETTE),zgtiles,src/maps/,hwpalette,))

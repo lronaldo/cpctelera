@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -15,17 +15,24 @@
 ##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
-
-##
-## No Music in this example
-##
-
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
 ##------------------------------------------------------------------------##
 ## This file is intended for users to automate music conversion from      ##
 ## original files (like Arkos Tracker .aks) into data arrays.             ##
+############################################################################
+
+##
+## No Music in this example
+##
+
+
+
+
+############################################################################
+##              DETAILED INSTRUCTIONS AND PARAMETERS                      ##
+##------------------------------------------------------------------------##
 ##                                                                        ##
 ## Macro used for conversion is AKS2C, which has up to 5 parameters:      ##
 ##  (1): AKS file to be converted to data array                           ##
