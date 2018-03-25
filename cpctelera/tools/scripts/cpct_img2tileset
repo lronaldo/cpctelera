@@ -63,6 +63,7 @@
 ##
 ##    -z   | --zig-zag                         - Generate pixel lines using zig-zag order (left-to-right
 ##                                               for one line, and right-to-left for the next one)
+##    -g   | --gray-code                       - Generate rows of pixels ordered in Gray Code sequence.
 ##    -nt  | --no-tileset                      - Do not generate a tileset array containing pointers to
 ##                                              generated sprites/tiles.
 ##    -oph | --output-palette-hardware         - Generate output palette array containing hardware values
@@ -92,8 +93,8 @@ PALETTE=( 1 24 20 6 26 0 2 8 10 12 14 16 18 22 24 16 )
 PALETTE_SIZE=16
 ROWORDER=""
 ROWORDER_MSG="Ascending Linear"
-ROWPATH=""
-ROWPATH_MSG="Left-to-right"
+PIXELORDER=""
+PIXELORDER_MSG="Linear (Left-to-right)"
 GENTILESET_MSG="no"
 INTERLACED_MASKS=""
 INTERLACED_MASKS_MSG="no"
@@ -176,6 +177,33 @@ of the palette to be considered transparent."
    exit 1
 }
 
+## Converts an integer value into its equivalent in gray code order and echoes the result
+## $1: Integer number to convert
+##
+function int2gray() {
+   local n="$1"
+   printf "%i" $(( n ^ (n >> 1) ))
+}
+
+## Generates and echoes a GrayCode integer sequence
+##  $1: First integer number to show in gray code
+##  $2: Last integer number to show in gray code (Both recommended to be power of 2)
+##  $3: Separator between numbers
+##
+function graySeq() {
+   local i="$1"
+   local max="$2"
+   local sep="$3"
+   local gray
+   if (( i <= max )); then
+      int2gray i
+   fi
+   while (( ++i <= max )); do
+      echo -n "${sep}" 
+      int2gray i
+   done
+}
+
 ##############################################################
 ###############################################################
 ## Check command line parameters
@@ -187,12 +215,15 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
-      ## Zig-Zag order
+      ## Zig-Zag pixel order
       "-z" | "--zig-zag")
-         ROWPATH="-z"
-         ROWORDER="-s 0,1,3,2,6,7,5,4"
-         ROWORDER_MSG="Graycode (0,1,3,2,6,7,5,4)"
-         ROWPATH_MSG="Zig-Zag"
+         PIXELORDER="-z"
+         PIXELORDER_MSG="Zig-Zag (Left-to-right then Right-to-left)"
+      ;;
+      ## Gray Code Row order
+      "-g" | "--gray-code")
+         ROWORDER="graycode"
+         ROWORDER_MSG="Graycode"
       ;;
       ## Do not generate tilesets
       "-nt" | "--no-tileset")
@@ -371,6 +402,22 @@ manually and run this script again."
    fi
 fi
 
+##
+## Generate Gray Code sequence for Gray-Coded Row Orders
+##
+LIMIT=$(( TILES_HEIGHT - 1 ))
+case "$ROWORDER" in
+   "graycode")
+      SEQ="$(graySeq 0 ${LIMIT} ',')"
+      ROWORDER="-s ${SEQ}"
+      ROWORDER_MSG="Gray Code (${SEQ})"
+   ;;
+   *)
+      SEQ="$(seq -s ',' 0 ${LIMIT} )"
+      ROWORDER_MSG="Ascending linear (${SEQ})"
+   ;;
+esac
+
 ###############################################################
 ###############################################################
 ## Convert image to CPCtelera's C Array.
@@ -385,7 +432,8 @@ echo "${COLOR_GREEN}Interlaced Mask : ${COLOR_LIGHT_YELLOW}${INTERLACED_MASKS_MS
 echo "${COLOR_GREEN}Transparency    : ${COLOR_LIGHT_YELLOW}${TRANSPARENT_INDEX_MSG}"
 echo "${COLOR_GREEN}Generate Tileset: ${COLOR_LIGHT_YELLOW}${GENTILESET_MSG}"
 echo "${COLOR_GREEN}Basename        : ${COLOR_LIGHT_YELLOW}'${TILES_BASENAME}'"
-echo "${COLOR_GREEN}Pixel Row Order : ${COLOR_LIGHT_YELLOW}${ROWPATH_MSG} ${ROWORDER_MSG}"
+echo "${COLOR_GREEN}Pixel Order     : ${COLOR_LIGHT_YELLOW}${PIXELORDER_MSG}"
+echo "${COLOR_GREEN}Row Order       : ${COLOR_LIGHT_YELLOW}${ROWORDER_MSG}"
 printf "${COLOR_GREEN}Palette         : ${COLOR_LIGHT_YELLOW}"
 for((i=0; i < ${MODECOLOURS[$MODE]}; i++)); do
    printf "%s " ${PALETTE[$i]}
@@ -399,7 +447,7 @@ to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${
 ## Run IMG2CPC and check exit status
 if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" --includes "<types.h>" -osz \
--o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $ROWPATH "${FILE}"; then
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $PIXELORDER "${FILE}"; then
    ## Success message
    echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and \
 '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.h${COLOR_CYAN}' have been created with ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s \
