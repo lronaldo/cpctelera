@@ -13,6 +13,7 @@ Section: Donnors
    21/04/2016 - Oscar Martínez Gómez
    29/05/2016 - Oliver Lenz
    13/01/2018 - Rafael Castillo García
+   31/03/2018 - Augusto Ruíz García
 
 Section: Project authors
    
