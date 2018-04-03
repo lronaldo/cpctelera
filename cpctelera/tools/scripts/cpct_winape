@@ -86,19 +86,21 @@ source $(dirname $0)/lib/bash_library.sh
 ##
 function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK File]"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK/SNA File]"
    echo
    echo "${COLOR_CYAN}  Lets the user execute winape from command line and automatically \
 run a file from a DSK at will."
-
    echo
-   echo "${COLOR_CYAN}  This script automatically launches WinAPE either directly or using wine, \
-depending on the system where it is executed (OSX and Linux will use wine, Windows/Cygwin will \
-execute directly). The script also lets the user give a DSK file as parameter to be \
-automatically loaded into WinAPE's FD1. The main file from the DSK will be automatically \
-runned (with a RUN command) and the corresponding NoICE symbols file for debugging will \
-automatically be loaded. NoICE symbols are grabbed either from the same folder where DSK \
-lies, or from  obj/ subfolder, if they exist."
+   echo "${COLOR_CYAN}     This script automatically launches WinAPE either directly or using wine, \
+depending on the system where it is executed (OSX and Linux will use wine, \
+Windows/Cygwin will execute directly). The script also lets the user give a \
+DSK/SNA file as parameter to be automatically loaded into WinAPE. When loading \
+a DSK file, it will be loaded into WinAPE's FD1 and the main file from the DSK \
+will be automatically runned (with a RUN command). SNA files will be automatically \
+restored into memory and execution will continue from their PC location. \
+Corresponding NoICE symbols file for debugging will automatically be loaded in \
+both cases. NoICE symbols are grabbed either from the same folder where DSK/SNA \
+lies, or from obj/ subfolder, if they exist."
    echo
    echo "${COLOR_CYAN}  If WinAPE is not installed on the system or not propperly configured \
 to be used with this script, the script prompts the user and helps to configure and/or to \
