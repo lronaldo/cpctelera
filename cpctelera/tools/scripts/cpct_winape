@@ -110,6 +110,8 @@ the system)."
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -a | --any-dsk"
    echo "${COLOR_CYAN}       Lauches WinAPE and loads first DSK file to match *.dsk."
+   echo "${COLOR_LIGHT_BLUE}  -as| --any-sna"
+   echo "${COLOR_CYAN}       Lauches WinAPE and loads first SNA file to match *.sna."
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches WinAPE but does not automatically RUN any DSK program."
    echo "${COLOR_LIGHT_BLUE}  -s | --symbols <symbols_file>"
@@ -335,10 +337,10 @@ while (( $# > 0 )); do
          AUTOLOADSYMS=false
       ;;
       "-a" | "--any-dsk")
-         FILE="*.dsk"
+         FILE="*.[dD][sS][kK]"
       ;;
       "-as" | "--any-sna")
-         FILE="*.sna"
+         FILE="*.[sS][nN][aA]"
       ;;
       "-h" | "--help")
         usage
