@@ -1,0 +1,384 @@
+#!/bin/bash
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU Lesser General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU Lesser General Public License for more details.
+##
+##  You should have received a copy of the GNU Lesser General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_rvm
+##    This script lets the user execute RetroVirtualMachine from command line 
+## and automatically run a file from a DSK/SNA at will. 
+##
+## Usage:
+##    <cpct_rvm> [options] [DSKFile/SNAFile]
+##
+## Description:
+##    This script automatically launches RetroVirtualMachine emulator (RVM) 
+## and executes an Amstrad CPC. If required, it additionally passes a DSK/SNA file 
+## which gets automatically loaded and executed. When loading a DSK file, it will 
+## be into RVM's FD1 ('A' unit) and a file with the same name of the DSK file will
+## be executed with a 'RUN "FILE"' command. Please, refer to this script's options
+## if you wanted to configure this RUN command. SNA files are automatically
+## restored into memory and execution continues from their PC location (included 
+## in the SNA). 
+##
+##    By default, RVM is run with a CPC464 machine configuration. Refer to 
+## this script's options to select different machines or configurations.
+##    
+##    If RVM is not installed on the system or not propperly configured to
+## be used with this script, the script prompts the user and helps to configure
+## and/or to install RVM. Users can either give the script the path of their own
+## RVM installations or ask the script to automatically download and install
+## it inside CPCtelera's tool folder. For this last operation, wget and unzip 
+## commands are required (they should be installed in the system).
+##
+## Command line options:
+##    -a  | --any-dsk         - Lauches RVM and loads first DSK file to match *.dsk
+##    -as | --any-sna         - Lauches RVM and loads first SNA file to match *.sna
+##    -n  | --no-execute      - Lauches RVM but does not automatically RUN any DSK program.
+##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated
+##    -h  | --help            - Shows help information on the terminal.
+##
+
+##
+## Global configuration
+##
+
+# Script configuration
+CPCT_TOOLS_FOLDER=$(dirname $0)/..
+WWW_RVM=http://RVM.net/download/RVM20B2.zip
+RVM_EXE=RetroVirtualMachine
+RVM_INI=noinifile
+RVM_ZIP=${CPCT_TOOLS_FOLDER}/RVM.zip
+RVM_DIR=${CPCT_TOOLS_FOLDER}/rvm
+RVM=/path/to/RVM ## Should be read from config file
+CONFIG_FILE=$(dirname $0)/.cpct_rvm.config
+
+# Command line parameter variables
+FILE=""
+FILEMOD=""
+EXECUTE=true
+EXECUTEFILE=""
+MACHINE="cpc464"
+VALIDMACHINES=("cpc464" "cpc6128")
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK/SNA File]"
+   echo
+   echo "${COLOR_CYAN}  Lets the user execute RVM from command line and automatically \
+run a file from a DSK at will."
+   echo
+   echo "${COLOR_CYAN}     This script automatically launches RVM either directly or using wine, \
+depending on the system where it is executed (OSX and Linux will use wine, \
+Windows/Cygwin will execute directly). The script also lets the user give a \
+DSK/SNA file as parameter to be automatically loaded into RVM. When loading \
+a DSK file, it will be loaded into RVM's FD1 and the main file from the DSK \
+will be automatically runned (with a RUN command). SNA files will be automatically \
+restored into memory and execution will continue from their PC location. \
+Corresponding NoICE symbols file for debugging will automatically be loaded in \
+both cases. NoICE symbols are grabbed either from the same folder where DSK/SNA \
+lies, or from obj/ subfolder, if they exist."
+   echo
+   echo "${COLOR_CYAN}  If RVM is not installed on the system or not propperly configured \
+to be used with this script, the script prompts the user and helps to configure and/or to \
+install RVM. Users can either give the script the path of their own RVM installations \
+or ask the script to automatically download and install it inside CPCtelera's tool folder. \
+For this last operation, wget and unzip commands are required (they should be installed in \
+the system)."
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo "${COLOR_LIGHT_BLUE}  -a | --any-dsk"
+   echo "${COLOR_CYAN}       Lauches RVM and loads first DSK file to match *.dsk."
+   echo "${COLOR_LIGHT_BLUE}  -as| --any-sna"
+   echo "${COLOR_CYAN}       Lauches RVM and loads first SNA file to match *.sna."
+   echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
+   echo "${COLOR_CYAN}       Lauches RVM but does not automatically RUN any DSK program."
+   echo "${COLOR_LIGHT_BLUE}  -s | --symbols <symbols_file>"
+   echo "${COLOR_CYAN}       Loads a symbols file for debugging (NoICE format .noi)."
+   echo "${COLOR_LIGHT_BLUE}  -d | --disable-symbols-autoload"
+   echo "${COLOR_CYAN}       Prevents this script from trying to autoload a symbols file \
+for debugging, when no symbols file is provided"
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+## Ensures that cygpath is installed on Cygwin systems, as it will be 
+## required for execution.
+## If something is missing, it aborts the script with an error message
+##
+function ensureExecutionPrerequisitesAreInstalled {
+   if checkSystem cygwin; then
+      ## Do CYGWIN required stuff
+      EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
+running this script. Please, check cygwin installation and run this script again."
+   fi
+}
+
+## Transforms a Linux Path into a Cygwin/Wine path.
+##    Returns the transformed path through a given global variable
+##  $1: System path
+##
+function getMySystemPath {
+   if checkSystem cygwin; then
+      ## Do CYGWIN required stuff
+      echo "$(cygpath -a -w ${1} 2> /dev/null)" 
+   else
+      ## Linux / MacOSX use original System Path
+      echo "${1}" 
+   fi
+}
+
+## Insert new RVM path into this script
+##  $1: New path to RetroVirtualMachine.exe
+##
+function setRVMPath {
+   local RVMPATH="$1"
+
+   updateVarValueInConfigFile "RVM" "$RVMPATH" $CONFIG_FILE
+   RVM="${1}"
+}
+
+## Aborts the program showing a message to clarify that no configuration has been updated
+##
+function exitNoConfig {
+   echo
+   echo "${COLOR_LIGHT_YELLOW}No configuration has been modified."
+   echo "${COLOR_CYAN}You will have to configure RVM launch script later on if you wanted to use it."
+   echo "${COLOR_RED}Aborting installation. ${COLOR_NORMAL}"
+   exit -1
+}
+
+## Shows a colored error message on screen
+##  $1: Message to show
+##
+function showErrorMsg {
+   echo "${COLOR_RED}[Error]${COLOR_CYAN} ${1}${COLOR_NORMAL}"
+}
+
+## Configure personal RVM installation
+##
+function configurePersonalRVMInstallation {
+   local VALID=false
+
+   while ! $VALID; do
+      ## RVM is installed, ask for path
+      echo
+      echo   "${COLOR_CYAN}This script will help you configure your own RVM installation."
+      echo
+      echo   "Please, provide ${COLOR_LIGHT_CYAN}full path${COLOR_CYAN} for \
+${COLOR_LIGHT_CYAN}${RVM_EXE}${COLOR_CYAN}, or leave it blank if you prefer to exit now and  \
+configure this script later on."
+      printf "${COLOR_LIGHT_BLUE}Path to ${COLOR_LIGHT_CYAN}${RVM_EXE}${COLOR_LIGHT_BLUE}: ${COLOR_NORMAL}"
+      read -e -r RVM
+      if [[ "$RVM" == "" ]]; then
+         exitNoConfig
+      elif [ -f "$RVM" ]; then
+         setRVMPath "$RVM"
+         VALID=true
+      else 
+         showErrorMsg "'${COLOR_WHITE}$RVM${COLOR_CYAN}' does not refer to a valid, readable file."
+         echo
+      fi
+   done   
+}
+
+## Create a new installation of RVM inside CPCtelera tools folder
+##  Returns 0 on install success, errorCode otherwise
+##
+function installRVMInCPCtelera {
+   local ERRORMSG="is not installed on the system and is required to automatically download and install \
+RVM. Please, install it and run this script again or install RVM and provide the path manually. "
+   
+   ## Check required commands are installed
+   if ! isCommandAvailable "wget"; then
+      showErrorMsg "Command '${COLOR_WHITE}wget${COLOR_CYAN}' $ERRORMSG" 
+      return 1
+   elif ! isCommandAvailable "unzip"; then
+      showErrorMsg "Command '${COLOR_WHITE}unzip${COLOR_CYAN}' $ERRORMSG" 
+      return 2
+   fi
+
+   echo
+   echo "${COLOR_CYAN}This script can automatically ${COLOR_LIGHT_CYAN}download and install RVM\
+${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder for you."
+   echo
+   askSimpleQuestion y Y n N "${COLOR_LIGHT_BLUE}Do want RVM to be ${COLOR_LIGHT_CYAN}downloaded \
+& installed${COLOR_LIGHT_BLUE} (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?" ANS
+   echo ${COLOR_LIGHT_WHITE}$ANS
+   if [[ "$ANS" == "y" || "$ANS" == "Y" ]]; then
+      echo "${COLOR_RED} RVM2 is still unavailable for download."
+      #echo "${COLOR_CYAN} Downloading RVM from (${COLOR_WHITE}${WWW_RVM}${COLOR_CYAN})...${COLOR_NORMAL}"
+      #wget -nv --progress=bar -O "$RVM_ZIP" "$WWW_RVM"
+      #echo "${COLOR_CYAN}Unpacking RVM...${COLOR_NORMAL}"
+      #unzip -o -q "$RVM_ZIP" -d "$RVM_DIR" 
+      #rm "$RVM_ZIP"
+      #setRVMPath "${RVM_DIR}/${RVM_EXE}"
+
+      #echo "${COLOR_LIGHT_CYAN}RVM${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
+#${RVM_DIR}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
+      #echo
+      exitNoConfig
+   else 
+      exitNoConfig
+   fi
+
+   return 0
+}
+
+## Check RVM Installation
+##  $1: Path to RetroVirtualMachine.exe
+function checkRVMInstallation {
+   local RVMEMU="$1"
+      
+   ## Check if Retro Virtual Machine is installed
+   if [ ! -f "$RVMEMU" ]; then
+      ## RVM is not installed
+      echo
+      echo "${COLOR_GREEN}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+      echo "${COLOR_GREEN}%% ${COLOR_LIGHT_WHITE}RetroVirtualMachine laucher script"
+      echo "${COLOR_GREEN}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+      echo
+      echo "${COLOR_LIGHT_CYAN}[Warning]${COLOR_LIGHT_YELLOW} RVM is not configured for your system yet."
+      echo
+      echo "${COLOR_CYAN}Proceeding to install/configure RVM on your system."
+      echo
+      askSimpleQuestion y Y n N "${COLOR_LIGHT_BLUE}Do you ${COLOR_LIGHT_CYAN}already${COLOR_LIGHT_BLUE} \
+have RVM installed (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?${COLOR_NORMAL}" ANS
+      echo ${COLOR_LIGHT_WHITE}$ANS
+      if [[ "$ANS" == "y" || "$ANS" == "Y" ]]; then
+         configurePersonalRVMInstallation
+      elif ! installRVMInCPCtelera; then
+         echo "${COLOR_RED}Aborting installation. ${COLOR_NORMAL}"
+         exit -1
+      fi
+   ## Ensure that the file is executable
+   elif [ ! -e "$RVMEMU" ]; then
+      chmod +x "$RVMEMU"
+   fi
+}
+
+## Generate a blank config file
+##
+function generateNewConfigFile() {
+##-------------- HERE DOCUMENT FOR CONFIG FILE ------------#
+cat > $CONFIG_FILE <<CPCT_RVM_CONFIG_FILE
+# cpct_rvm config file
+#################################
+
+# RetroVirtualMachines's Full path
+RVM=/path/to/RVM
+CPCT_RVM_CONFIG_FILE
+##-------------- HERE DOCUMENT FOR CONFIG FILE ------------#
+}
+
+## Read config file or create it if it does not not exist
+##
+function readConfigFile {
+   ## Generate configfile whenever it does not exist
+   if ! isFileReadable $CONFIG_FILE; then
+      generateNewConfigFile
+   fi
+
+   ## Get value of RVM variable
+   RVM=$(extractVarValueFromConfigFile "RVM" $CONFIG_FILE)
+}
+
+# First of all, read the config file
+readConfigFile
+
+# Proccess command line parameters
+while (( $# > 0 )); do
+   case "$1" in
+      "-n" | "--no-execute")
+         EXECUTE=false
+      ;;
+      "-a" | "--any-dsk")
+         FILE="*.[dD][sS][kK]"
+      ;;
+      "-as" | "--any-sna")
+         FILE="*.[sS][nN][aA]"
+      ;;
+      "-m" | "--machine")
+         MACHINE="$2"
+         if ! contains ${VALIDMACHINES[*]} $MACHINE; then
+            paramError "'$MACHINE' is not a valid machine for RVM. Valid machines: (${VALIDMACHINES[*]})" 11
+         fi 
+         shift
+      ;;
+      "-h" | "--help")
+        usage
+      ;;
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         elif [[ "$FILE" == "" ]]; then
+            if [ ! -f "$1" ]; then
+               paramError "'$1' is not a valid readable file (a DSK/SNA file was expected)." 8
+            fi
+            FILE="${1}"
+         else
+            paramError "'${1}' unexpected parameter. Are you trying to provide more than one DSK/SNA file?" 9
+         fi
+      ;; 
+   esac
+   shift
+done
+
+# First, check RVM installation
+checkRVMInstallation "$RVM"
+
+# Check prerrequisites and calculated appropriate FILE Path depending on the system
+ensureExecutionPrerequisitesAreInstalled
+FILEPATH=$(getMySystemPath "$FILE")
+
+# Check file extension on launch
+EXT=$(echo ${FILEPATH:${#FILEPATH}-3:${#FILEPATH}} | tr /a-z/ /A-Z/)
+if [ "$EXT" = "SNA" ]; then
+   FILEMOD="-s"
+   #FILEPATH="${FILEPATH}"
+   EXECUTE=false
+elif [ "$EXT" = "DSK" ]; then
+   FILEMOD="-i="
+   #FILEPATH="${FILEPATH}"
+else
+   paramError "Invalid file extension '$EXT'. A DSK or SNA file is required." 10
+fi
+
+# If DSK has to be executed, construct its EXECUTEFILE from name
+if "$EXECUTE"; then
+   if [ "$EXECUTEFILE" = "" ]; then
+      ## Remove Path and extension from File to get just the name
+      EXECUTEFILE=${FILE##*/}
+      EXECUTEFILE=${EXECUTEFILE%%.*}
+      ## Then construct execution command
+      EXECUTEFILE="-c=RUN\"${EXECUTEFILE}\"\n"
+   fi
+fi
+
+# Launch RVM with appropriate path for DSK/SNA file
+"${RVM}" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$EXECUTEFILE" &> /dev/null &
