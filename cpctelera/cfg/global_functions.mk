@@ -62,11 +62,23 @@ endef
 # $(2): File.map that has been compiled (and has .bin.log and .map files associated)
 #
 define GETRUNADDRESS
-  $(eval $(1)   = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' < $(2);))
-  $(eval $(1)_1 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *init  *.*$$/\1/p'            < $(2);))
-  $(eval $(1)_2 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *_main  *.*$$/\1/p'           < $(2);))
-  $(eval $(1)   = $(shell if [ -z "$($(1))" ]; then echo "$($(1)_1)"; fi; ) )
-  $(eval $(1)   = $(shell if [ -z "$($(1))" ]; then echo "$($(1)_2)"; fi; ) )
+  $(eval $(1)   := $(shell sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' < $(2);))
+  $(eval $(1)_1 := $(shell sed -n 's/^ *0000\([0-9A-F]*\) *init  *.*$$/\1/p'            < $(2);))
+  $(eval $(1)_2 := $(shell sed -n 's/^ *0000\([0-9A-F]*\) *_main  *.*$$/\1/p'           < $(2);))
+  $(eval $(1)   := $(shell if [ -z "$($(1))" ]; then echo "$($(1)_1)"; fi; ) )
+  $(eval $(1)   := $(shell if [ -z "$($(1))" ]; then echo "$($(1)_2)"; fi; ) )
+endef
+
+#################
+# GETALLADDRESSES: Gets Load and Run Addresses and checks they are OK
+#
+# $(1): Binary file generated (from which to get addresses)
+#
+define GETALLADDRESSES 
+	@$(call GETLOADADDRESS,LOADADDR,$1.log)
+	@$(call GETRUNADDRESS,RUNADDR,$(1:.bin=.map))
+	@$(call CHECKVARIABLEISSET,LOADADDR)
+	@$(call CHECKVARIABLEISSET,RUNADDR)
 endef
 
 #################

@@ -26,7 +26,7 @@
 ##  * Project's build configuration is to be found in build_config.mk    ##
 ##  * Global paths and tool configuration is located at $(CPCT_PATH)/cfg/##
 ###########################################################################
-.PHONY: all clean cleanall
+.PHONY: all clean cleanall 
 
 # Logfile where load and run addresses for the generated binary will be logged
 BINADDRLOG=$(OBJDIR)/binaryAddresses.log
@@ -56,16 +56,14 @@ $(IHXFILE): $(GENOBJFILES) $(OBJFILES)
 
 # CREATE BINARY AND GET LOAD AND RUN ADDRESS FROM LOGFILE AND MAPFILE
 $(BINADDRLOG): $(BINFILE)
-	@$(call GETLOADADDRESS,LOADADDR,$(<).log)
-	@$(call GETRUNADDRESS,RUNADDR,$(<:.bin=.map))
-	@$(call CHECKVARIABLEISSET,LOADADDR)
-	@$(call CHECKVARIABLEISSET,RUNADDR)
+	@$(call GETALLADDRESSES,$<)
 	@echo "Generated Binary File $(BINFILE):" > $(BINADDRLOG)
 	@echo "Load Address = $(LOADADDR)"       >> $(BINADDRLOG)
 	@echo "Run  Address = $(RUNADDR)"        >> $(BINADDRLOG)
 
 # GENERATE A DISK FILE (.DSK) AND INCLUDE BINARY FILE (.BIN) INTO IT
 %.dsk: $(BINFILE) $(BINADDRLOG)
+	@$(call GETALLADDRESSES,$<)
 	@$(call PRINT,$(PROJNAME),"Creating Disk File $@")
 	@$(call CREATEEMPTYDSK,$@)
 	@$(call ADDCODEFILETODSK,$@,$<,$(LOADADDR),$(RUNADDR),$(<:%=%.$(DSKINC_EXT)))
@@ -73,16 +71,17 @@ $(BINADDRLOG): $(BINFILE)
 
 # GENERATE A CASSETTE FILE (.CDT) AND INCLUDE BINARY FILE (.BIN) INTO IT
 %.cdt: $(BINFILE) $(BINADDRLOG)
+	@$(call GETALLADDRESSES,$<)
 	@$(call PRINT,$(PROJNAME),"Creating Cassette File $@")
 	@$(call CREATECDT,$<,$(notdir $<),$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,$(PROJNAME),"Successfully created $@")
 
 # GENERATE A SNAPSHOP FILE (.SNA) AND INCLUDE BINARY FILE (.BIN) INTO IT
 %.sna: $(BINFILE) $(BINADDRLOG)
+	@$(call GETALLADDRESSES,$<)
 	@$(call PRINT,$(PROJNAME),"Creating Snapshot File $@")
 	@$(call CREATESNA,$<,$@,$(LOADADDR),$(RUNADDR))
 	@$(call PRINT,$(PROJNAME),"Successfully created $@")
-
 
 ## Include files in DSKFILESDIR to DSK, print a message and generate a flag file DSKINC
 $(DSKINC): $(DSK) $(DSKINCOBJFILES)
