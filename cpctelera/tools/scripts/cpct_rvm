@@ -52,8 +52,10 @@
 ##
 ## Command line options:
 ##    -a  | --any-dsk         - Lauches RVM and loads first DSK file to match *.dsk
+##    -ac | --any-cdt         - Lauches RVM and loads first CDT file to match *.cdt
 ##    -as | --any-sna         - Lauches RVM and loads first SNA file to match *.sna
 ##    -n  | --no-execute      - Lauches RVM but does not automatically RUN any DSK program.
+##    -nw | --no-warp         - Does not automatically enter Warp Mode on CDT load.
 ##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}
 ##    -r  | --run <FILENAME>  - Automatically runs FILENAME with the command RUN"FILENAME
 ##    -h  | --help            - Shows help information on the terminal.
@@ -76,10 +78,14 @@ CONFIG_FILE=$(dirname $0)/.cpct_rvm.config
 # Command line parameter variables
 FILE=""
 FILEMOD=""
+AUTOPLAY=""
 EXECUTE=true
 EXECUTEFILE=""
 COMMAND=""
+WARP=true
+WARPMODE=""
 MACHINE=""
+DEFAULTMACHINE_CDT="cpc464"
 DEFAULTMACHINE_SNA="cpc464"
 DEFAULTMACHINE_DSK="cpc664"
 VALIDMACHINES=("cpc464" "cpc664" "cpc6128")
@@ -119,10 +125,14 @@ commands are required (they should be installed in the system)."
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -a | --any-dsk"
    echo "${COLOR_CYAN}       Lauches RVM and loads first DSK file to match *.dsk."
+   echo "${COLOR_LIGHT_BLUE}  -ac| --any-cdt"
+   echo "${COLOR_CYAN}       Lauches RVM and loads first CDT file to match *.cdt."
    echo "${COLOR_LIGHT_BLUE}  -as| --any-sna"
    echo "${COLOR_CYAN}       Lauches RVM and loads first SNA file to match *.sna."
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches RVM but does not automatically RUN any DSK program."
+   echo "${COLOR_LIGHT_BLUE}  -nw| --no-warp"
+   echo "${COLOR_CYAN}       Does not automatically enter Warp Mode on CDT load."
    echo "${COLOR_LIGHT_BLUE}  -m | --machine <MACH>"
    echo "${COLOR_CYAN}       Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}"
    echo "${COLOR_LIGHT_BLUE}  -r | --run <FILENAME>"
@@ -323,8 +333,14 @@ while (( $# > 0 )); do
       "-n" | "--no-execute")
          EXECUTE=false
       ;;
+      "-nw"| "--no-warp")
+         WARP=false
+      ;;
       "-a" | "--any-dsk")
          FILE=$(echo *.[dD][sS][kK])
+      ;;
+      "-ac" | "--any-cdt")
+         FILE=$(echo *.[cC][dD][tT])
       ;;
       "-as" | "--any-sna")
          FILE=$(echo *.[sS][nN][aA])
@@ -378,18 +394,26 @@ if [[ "$FILE" != "" ]]; then
    if [ "$EXT" = "SNA" ]; then
       FILEMOD="-s"
       EXECUTE=false
-   elif [ "$EXT" = "DSK" ]; then
+   elif [ "$EXT" = "DSK" ] || [ "$EXT" = "CDT" ]; then
       FILEMOD="-i="
    else
-      paramError "Invalid file extension '$EXT'. A DSK or SNA file is required." 10
+      paramError "Invalid file extension '$EXT'. A DSK, SNA or CDT file is required." 10
    fi
 
-   # If DSK has to be executed, construct its EXECUTEFILE from name
+   # If CDT/DSK has to be executed, construct its EXECUTEFILE from name
    if "$EXECUTE"; then
-      if [ "$EXECUTEFILE" = "" ]; then
+      if [ "$EXT" = "CDT" ]; then
+         AUTOPLAY="-p"
+         COMMAND="RUN\"\n "
+         if $WARP; then
+            WARPMODE="-w"
+         fi
+      else
          ## Remove Path and extension from File to get just the name
          COMMAND=${FILE##*/}
          COMMAND="RUN\"${COMMAND%%.*}\""
+      fi
+      if [ "$EXECUTEFILE" = "" ]; then
          ## Then construct execution command
          EXECUTEFILE="-c=${COMMAND}\n"
       fi
@@ -400,6 +424,8 @@ fi
 if [ "$MACHINE" = "" ]; then
    if [ "$EXT" = "SNA" ]; then
       MACHINE="$DEFAULTMACHINE_SNA"
+   elif [ "$EXT" = "CDT" ]; then
+      MACHINE="$DEFAULTMACHINE_CDT"
    else
       MACHINE="$DEFAULTMACHINE_DSK"
    fi
@@ -407,14 +433,17 @@ fi
 
 # Show selected RVM Options before launching
 echo "${COLOR_LIGHT_YELLOW}Launching ${COLOR_LIGHT_CYAN}RetroVirtualMachine V2${COLOR_LIGHT_YELLOW}..."
-echo "${COLOR_LIGHT_BLUE}Machine:${COLOR_CYAN} $MACHINE"
+echo "${COLOR_LIGHT_BLUE}Machine:${COLOR_CYAN}  $MACHINE"
 if [ "$FILE" != "" ]; then
-   echo "${COLOR_LIGHT_BLUE}${EXT}:    ${COLOR_CYAN} $FILE"
+   echo "${COLOR_LIGHT_BLUE}${EXT}:     ${COLOR_CYAN} $FILE"
 fi
 if [ "$COMMAND" != "" ]; then
-   echo "${COLOR_LIGHT_BLUE}Command:${COLOR_CYAN} $COMMAND"
+   echo "${COLOR_LIGHT_BLUE}Command: ${COLOR_CYAN} $COMMAND"
+fi
+if [ "$WARPMODE" != "" ]; then
+   echo "${COLOR_LIGHT_BLUE}WarpMode:${COLOR_CYAN} ON"
 fi
 echo "${COLOR_NORMAL}"
 
 # Launch RVM with appropriate path for DSK/SNA file
-"${RVM}" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$EXECUTEFILE" &> /dev/null &
+"${RVM}" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$WARPMODE" "$AUTOPLAY" "$EXECUTEFILE" &> /dev/null &
