@@ -39,8 +39,9 @@
 ## restored into memory and execution continues from their PC location (included 
 ## in the SNA). 
 ##
-##    By default, RVM is run with a CPC464 machine configuration. Refer to 
-## this script's options to select different machines or configurations.
+##    By default, RVM is run with a CPC464 machine configuration for SNA files, 
+## and with a CPC664 for DSK files. Refer to this script's options to select 
+## different machines or configurations.
 ##    
 ##    If RVM is not installed on the system or not propperly configured to
 ## be used with this script, the script prompts the user and helps to configure
@@ -53,7 +54,8 @@
 ##    -a  | --any-dsk         - Lauches RVM and loads first DSK file to match *.dsk
 ##    -as | --any-sna         - Lauches RVM and loads first SNA file to match *.sna
 ##    -n  | --no-execute      - Lauches RVM but does not automatically RUN any DSK program.
-##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated
+##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}
+##    -r  | --run <FILENAME>  - Automatically runs FILENAME with the command RUN"FILENAME
 ##    -h  | --help            - Shows help information on the terminal.
 ##
 
@@ -76,8 +78,11 @@ FILE=""
 FILEMOD=""
 EXECUTE=true
 EXECUTEFILE=""
-MACHINE="cpc464"
-VALIDMACHINES=("cpc464" "cpc6128")
+COMMAND=""
+MACHINE=""
+DEFAULTMACHINE_SNA="cpc464"
+DEFAULTMACHINE_DSK="cpc664"
+VALIDMACHINES=("cpc464" "cpc664" "cpc6128")
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh
@@ -88,26 +93,28 @@ function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
    echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK/SNA File]"
    echo
-   echo "${COLOR_CYAN}  Lets the user execute RVM from command line and automatically \
+   echo "${COLOR_CYAN}  Lets the user execute RetroVirtualMachine from command line and automatically \
 run a file from a DSK at will."
    echo
-   echo "${COLOR_CYAN}     This script automatically launches RVM either directly or using wine, \
-depending on the system where it is executed (OSX and Linux will use wine, \
-Windows/Cygwin will execute directly). The script also lets the user give a \
-DSK/SNA file as parameter to be automatically loaded into RVM. When loading \
-a DSK file, it will be loaded into RVM's FD1 and the main file from the DSK \
-will be automatically runned (with a RUN command). SNA files will be automatically \
-restored into memory and execution will continue from their PC location. \
-Corresponding NoICE symbols file for debugging will automatically be loaded in \
-both cases. NoICE symbols are grabbed either from the same folder where DSK/SNA \
-lies, or from obj/ subfolder, if they exist."
+   echo "${COLOR_CYAN}     This script automatically launches RetroVirtualMachine emulator (RVM) \
+and executes an Amstrad CPC. If required, it additionally passes a DSK/SNA file \
+which gets automatically loaded and executed. When loading a DSK file, it will \
+be into RVM's FD1 ('A' unit) and a file with the same name of the DSK file will \
+be executed with a 'RUN "FILE"' command. Please, refer to this script's options \
+if you wanted to configure this RUN command. SNA files are automatically \
+restored into memory and execution continues from their PC location (included \
+in the SNA)."
    echo
-   echo "${COLOR_CYAN}  If RVM is not installed on the system or not propperly configured \
-to be used with this script, the script prompts the user and helps to configure and/or to \
-install RVM. Users can either give the script the path of their own RVM installations \
-or ask the script to automatically download and install it inside CPCtelera's tool folder. \
-For this last operation, wget and unzip commands are required (they should be installed in \
-the system)."
+   echo "${COLOR_CYAN}     By default, RVM is run with a CPC464 machine configuration for SNA files, \
+and with a CPC664 for DSK files. Refer to this script's options to select \
+different machines or configurations. "
+   echo
+   echo "${COLOR_CYAN}     If RVM is not installed on the system or not propperly configured to \
+be used with this script, the script prompts the user and helps to configure \
+and/or to install RVM. Users can either give the script the path of their own \
+RVM installations or ask the script to automatically download and install \
+it inside CPCtelera's tool folder. For this last operation, wget and unzip \
+commands are required (they should be installed in the system)."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -a | --any-dsk"
@@ -116,11 +123,10 @@ the system)."
    echo "${COLOR_CYAN}       Lauches RVM and loads first SNA file to match *.sna."
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches RVM but does not automatically RUN any DSK program."
-   echo "${COLOR_LIGHT_BLUE}  -s | --symbols <symbols_file>"
-   echo "${COLOR_CYAN}       Loads a symbols file for debugging (NoICE format .noi)."
-   echo "${COLOR_LIGHT_BLUE}  -d | --disable-symbols-autoload"
-   echo "${COLOR_CYAN}       Prevents this script from trying to autoload a symbols file \
-for debugging, when no symbols file is provided"
+   echo "${COLOR_LIGHT_BLUE}  -m | --machine <MACH>"
+   echo "${COLOR_CYAN}       Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}"
+   echo "${COLOR_LIGHT_BLUE}  -r | --run <FILENAME>"
+   echo "${COLOR_CYAN}       Automatically runs FILENAME with the command RUN\"FILENAME"
    echo "${COLOR_LIGHT_BLUE}  -h | --help"
    echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
@@ -318,10 +324,18 @@ while (( $# > 0 )); do
          EXECUTE=false
       ;;
       "-a" | "--any-dsk")
-         FILE="*.[dD][sS][kK]"
+         FILE=$(echo *.[dD][sS][kK])
       ;;
       "-as" | "--any-sna")
-         FILE="*.[sS][nN][aA]"
+         FILE=$(echo *.[sS][nN][aA])
+      ;;
+      "-r" | "--run")
+         if (( $# < 2 )); then
+            paramError "'-r/--run' requires a filename to be run as parameter" 12            
+         fi 
+         COMMAND="RUN\"${2}\""
+         EXECUTEFILE="-c=${COMMAND}\n"
+         shift
       ;;
       "-m" | "--machine")
          MACHINE="$2"
@@ -352,33 +366,55 @@ done
 # First, check RVM installation
 checkRVMInstallation "$RVM"
 
-# Check prerrequisites and calculated appropriate FILE Path depending on the system
+# Check prerrequisites
 ensureExecutionPrerequisitesAreInstalled
-FILEPATH=$(getMySystemPath "$FILE")
 
-# Check file extension on launch
-EXT=$(echo ${FILEPATH:${#FILEPATH}-3:${#FILEPATH}} | tr /a-z/ /A-Z/)
-if [ "$EXT" = "SNA" ]; then
-   FILEMOD="-s"
-   #FILEPATH="${FILEPATH}"
-   EXECUTE=false
-elif [ "$EXT" = "DSK" ]; then
-   FILEMOD="-i="
-   #FILEPATH="${FILEPATH}"
-else
-   paramError "Invalid file extension '$EXT'. A DSK or SNA file is required." 10
-fi
+# Calculate appropriate FILE Path depending on the system
+if [[ "$FILE" != "" ]]; then
+   FILEPATH=$(getMySystemPath "$FILE")
 
-# If DSK has to be executed, construct its EXECUTEFILE from name
-if "$EXECUTE"; then
-   if [ "$EXECUTEFILE" = "" ]; then
-      ## Remove Path and extension from File to get just the name
-      EXECUTEFILE=${FILE##*/}
-      EXECUTEFILE=${EXECUTEFILE%%.*}
-      ## Then construct execution command
-      EXECUTEFILE="-c=RUN\"${EXECUTEFILE}\"\n"
+   # Check file extension on launch
+   EXT=$(echo ${FILEPATH:${#FILEPATH}-3:${#FILEPATH}} | tr /a-z/ /A-Z/)
+   if [ "$EXT" = "SNA" ]; then
+      FILEMOD="-s"
+      EXECUTE=false
+   elif [ "$EXT" = "DSK" ]; then
+      FILEMOD="-i="
+   else
+      paramError "Invalid file extension '$EXT'. A DSK or SNA file is required." 10
+   fi
+
+   # If DSK has to be executed, construct its EXECUTEFILE from name
+   if "$EXECUTE"; then
+      if [ "$EXECUTEFILE" = "" ]; then
+         ## Remove Path and extension from File to get just the name
+         COMMAND=${FILE##*/}
+         COMMAND="RUN\"${COMMAND%%.*}\""
+         ## Then construct execution command
+         EXECUTEFILE="-c=${COMMAND}\n"
+      fi
    fi
 fi
+
+# Select MACHINE to be launched, depending on media and userprefs
+if [ "$MACHINE" = "" ]; then
+   if [ "$EXT" = "SNA" ]; then
+      MACHINE="$DEFAULTMACHINE_SNA"
+   else
+      MACHINE="$DEFAULTMACHINE_DSK"
+   fi
+fi
+
+# Show selected RVM Options before launching
+echo "${COLOR_LIGHT_YELLOW}Launching ${COLOR_LIGHT_CYAN}RetroVirtualMachine V2${COLOR_LIGHT_YELLOW}..."
+echo "${COLOR_LIGHT_BLUE}Machine:${COLOR_CYAN} $MACHINE"
+if [ "$FILE" != "" ]; then
+   echo "${COLOR_LIGHT_BLUE}${EXT}:    ${COLOR_CYAN} $FILE"
+fi
+if [ "$COMMAND" != "" ]; then
+   echo "${COLOR_LIGHT_BLUE}Command:${COLOR_CYAN} $COMMAND"
+fi
+echo "${COLOR_NORMAL}"
 
 # Launch RVM with appropriate path for DSK/SNA file
 "${RVM}" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$EXECUTEFILE" &> /dev/null &
