@@ -349,8 +349,7 @@ while (( $# > 0 )); do
          if (( $# < 2 )); then
             paramError "'-r/--run' requires a filename to be run as parameter" 12            
          fi 
-         COMMAND="RUN\"${2}\""
-         EXECUTEFILE="-c=${COMMAND}\n"
+         COMMAND="RUN\"${2}\"\n"
          shift
       ;;
       "-m" | "--machine")
@@ -402,21 +401,25 @@ if [[ "$FILE" != "" ]]; then
 
    # If CDT/DSK has to be executed, construct its EXECUTEFILE from name
    if "$EXECUTE"; then
+      ## Set default conditions for CDT autorun (autoplay + warp)
       if [ "$EXT" = "CDT" ]; then
          AUTOPLAY="-p"
-         COMMAND="RUN\"\n "
          if $WARP; then
             WARPMODE="-w"
          fi
-      else
-         ## Remove Path and extension from File to get just the name
-         COMMAND=${FILE##*/}
-         COMMAND="RUN\"${COMMAND%%.*}\""
       fi
-      if [ "$EXECUTEFILE" = "" ]; then
-         ## Then construct execution command
-         EXECUTEFILE="-c=${COMMAND}\n"
+      ## Set default RUN command if no command was set
+      if [ "$COMMAND" = "" ]; then
+         if [ "$EXT" = "CDT" ]; then
+            COMMAND="RUN\"\n "
+         else
+            ## Remove Path and extension from File to get just the name
+            COMMAND=${FILE##*/}
+            COMMAND="RUN\"${COMMAND%%.*}\""
+         fi
       fi
+      ## Construct EXECUTEFILE command to be given on launch
+      EXECUTEFILE="-c=${COMMAND}\n"
    fi
 fi
 
