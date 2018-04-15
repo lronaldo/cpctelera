@@ -41,3 +41,8 @@
 //   -h  | --help                                      - Shows this help.
 //       
 //
+
+extern const uint8_t gk_mem0000_004F[];
+extern const uint8_t gk_mem4000_4BEF[];
+extern const uint8_t gk_memA670_BFFF[];
+extern const uint8_t gk_sna3_header[];
