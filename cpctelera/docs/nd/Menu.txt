@@ -1,4 +1,4 @@
-Format: 1.52
+Format: 1.51
 
 
 Title: . .
@@ -86,6 +86,7 @@ Group: Commandline  {
    File: cpct_installrslib  (commandline/cpct_installrslib)
    File: cpct_mkproject  (commandline/cpct_mkproject)
    File: cpct_rgas2c  (commandline/cpct_rgas2c)
+   File: cpct_rvm  (commandline/cpct_rvm)
    File: cpct_sp2tile  (commandline/cpct_sp2tiles)
    File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
    File: cpct_winape  (commandline/cpct_winape)
@@ -161,10 +162,8 @@ Group: Random  {
    File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
    File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
    File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
-   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
    File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
    File: cpct_nextRandom_mxor532_u8  (random/cpct_nextRandom_mxor532_u8.s)
-   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
    File: cpct_restoreState_mxor_u16  (random/cpct_restoreState_mxor_u16.s)
    File: cpct_restoreState_mxor_u8  (random/cpct_restoreState_mxor_u8.s)
    File: cpct_setSeed_glfsr16  (random/cpct_setSeed_glfsr.s)
