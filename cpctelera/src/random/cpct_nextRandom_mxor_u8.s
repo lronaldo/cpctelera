@@ -51,8 +51,8 @@
 ;; points (88.01%).
 ;;    * The quality of the pseudo-random 8-bits sequence is somewhat worse than that produced
 ;; by other functions like <cpct_getRandom_mxor_u8> (which uses <cpct_nextRandom_mxor_u32>) and
-;; <cpct_getRandom_xsp40_u8>, but still has a very good quality with with a really low CPU
-;; cost. It is recommended with highest quality is not required, but CPU cost is a must. 
+;; <cpct_getRandom_xsp40_u8>, but still has a very good quality with a really low CPU
+;; cost. It is recommended when highest quality is not required, but CPU cost is a must. 
 ;; In fact, quality compared to <cpct_getRandom_glfsr16_u8> and <cpct_getRandom_lcg_u8> is
 ;; several orders of magnitude higher.
 ;;
