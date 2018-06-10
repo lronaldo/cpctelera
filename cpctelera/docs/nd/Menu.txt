@@ -1,4 +1,4 @@
-Format: 1.51
+Format: 1.52
 
 
 Title: . .
@@ -162,8 +162,10 @@ Group: Random  {
    File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
    File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
    File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
+   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
    File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
    File: cpct_nextRandom_mxor532_u8  (random/cpct_nextRandom_mxor532_u8.s)
+   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
    File: cpct_restoreState_mxor_u16  (random/cpct_restoreState_mxor_u16.s)
    File: cpct_restoreState_mxor_u8  (random/cpct_restoreState_mxor_u8.s)
    File: cpct_setSeed_glfsr16  (random/cpct_setSeed_glfsr.s)
@@ -247,14 +249,16 @@ Group: Sprites  {
 
 Group: Strings  {
 
-   File: cpct_drawCharM0  (strings/cpct_drawCharM0.s)
+   File: cpct_drawCharM0  (strings/cpct_drawCharM0.asm)
+   File: cpct_drawCharM0_inner_asm  (strings/cpct_drawCharM0_inner.s)
    File: cpct_drawCharM1  (strings/cpct_drawCharM1.s)
    File: cpct_drawCharM1_f  (strings/cpct_drawCharM1_f.s)
    File: cpct_drawCharM2  (strings/cpct_drawCharM2.s)
-   File: cpct_drawStringM0  (strings/cpct_drawStringM0.s)
+   File: cpct_drawStringM0  (strings/cpct_drawStringM0.asm)
    File: cpct_drawStringM1  (strings/cpct_drawStringM1.s)
    File: cpct_drawStringM1_f  (strings/cpct_drawStringM1_f.s)
    File: cpct_drawStringM2  (strings/cpct_drawStringM2.s)
+   File: cpct_setDrawCharM0  (strings/cpct_setDrawCharM0.asm)
    File: dc_mode0_ct  (strings/cpct_dc_mode0_ct.s)
    File: dc_mode1_ct  (strings/cpct_dc_mode1_ct.s)
    File: putchar  (strings/cpct_putChar.s)
