@@ -21,8 +21,8 @@
 ;;
 ;; Function: cpct_setDrawCharM0
 ;;
-;;    Sets foreground and background colours that will be used by <cpct_drawCharM0>
-;; when called.
+;;    Sets foreground and background colours that will be used by <cpct_drawCharM0_inner>
+;; when called. <cpct_drawCharM0_inner> is used by both <cpct_drawCharM0> and <cpct_drawStringM0>.
 ;;
 ;; C Definition:
 ;;    void <cpct_setDrawCharM0> (<u8> *fg_pen*, <u8> *bg_pen*) __z88dk_callee
@@ -44,13 +44,38 @@
 ;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
-;;    <TODO>
+;;    This function sets the internal values of <cpct_drawCharM0_inner>, so that next calls
+;; to <cpct_drawCharM0> or <cpct_drawStringM0> will use these new values. Concretely, these
+;; values are *fg_pen* (foreground colour) and *bg_pen* (background colour). This function
+;; receives 2 colour values in the range [0-15] and transforms them into the 4 possible 
+;; combinations of these 2 colours in groups of 2 pixels. Namely, 
+;; (start code)
+;;                       ___________________
+;;  2-bit combinations  | 00 | 01 | 10 | 11 |   * b = pixel coloured using bg_pen (background)
+;;  Displayed pixels    | bb | bF | Fb | FF |   * F = pixel coloured using fg_pen (foreground)
+;;                      \-------------------/
+;; (end code)
+;;    In mode 0, each of these 4 possible combinations corresponds to 1 byte in screen pixel 
+;; format that encodes the 2 selected colours.
+;;
+;;    These 4 combinations are stored into an internal array called *dc_2pxtableM0*, which is
+;; used by <cpct_drawCharM0_inner> to draw characters on the screen in mode 0, 2-pixels at a time.
+;; This array remains constant unless a new call to <cpct_setDrawCharM0> changes it. This lets
+;; the user change colours once and use them many times for subsequent calls to draw functions.
+;;
+;;    The appropriate use of this function is to call it each time a new pair of colours is
+;; required for following character drawings to be made either with <cpct_drawCharM0> or with
+;; <cpct_drawStringM0>. If the same colours are to be used for many drawings, a single call to 
+;; <cpct_setDrawCharM0> followed by many drawing calls would be the best practice. 
+;;
+;;    You may found use examples consulting documentation for <cpct_drawCharM0> and <cpct_drawStringM0>.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    xxx bytes (xxx)
+;;    ASM bindings  - 37 bytes (+100 cpct_drawCharM0_inner = 137 bytes)
+;;      C bindings  - 35 bytes (+100 cpct_drawCharM0_inner = 135 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
