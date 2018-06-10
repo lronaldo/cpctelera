@@ -98,6 +98,10 @@
 .globl cpct_drawCharM0_inner_asm
 .globl cpct_setDrawCharM0_asm
 
+   ;; Save IX and IY before using them
+   ld    (saveix), ix   ;; [6] Save IX
+   ld    (saveiy), iy   ;; [6] Save IY
+
    ;; Set foreground and background colours before drawing the string
    push  de                      ;; [4]   Save Pointer to Destination in Video Memory
    push  bc                      ;; [4]   Save Pointer to the null terminated string

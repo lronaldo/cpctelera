@@ -25,12 +25,9 @@
 ;;
 ;; C bindings for <cpct_drawStringM0>
 ;;
-;;   27 us, 12 bytes
+;;   15 us, 4 bytes
 ;;
 _cpct_drawStringM0::
-   ld    (saveix), ix   ;; [6] 
-   ld    (saveiy), iy   ;; [6] Save IX and IY before being used
-
    pop  hl        ;; [3] HL = Return Address
    pop  bc        ;; [3] BC = Pointer to the null terminated string
    pop  de        ;; [3] DE = Destination address (Video memory location where character will be printed)

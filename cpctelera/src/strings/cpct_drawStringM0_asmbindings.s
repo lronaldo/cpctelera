@@ -25,10 +25,8 @@
 ;;
 ;; ASM bindings for <cpct_drawStringM0>
 ;;
-;;   12 us, 8 bytes
+;;   0 us, 0 bytes
 ;;
 cpct_drawStringM0_asm::
-   ld    (saveix), ix   ;; [6] 
-   ld    (saveiy), iy   ;; [6] Save IX and IY before being used
 
 .include /cpct_drawStringM0.asm/
