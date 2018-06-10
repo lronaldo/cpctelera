@@ -48,11 +48,12 @@ void print256Chars(u8 **pvideomem, u8 mode, u8 fg_colour, u8 bg_colour) {
    increment = increments[mode];
 
    // Draw the complete set of 256 characters (excluding char 0)
+   cpct_setDrawCharM0(fg_colour, bg_colour);
    for(charnum=1; charnum != 0; charnum++) {
       switch (mode) {
          case 2: cpct_drawCharM2  (*pvideomem, fg_colour, charnum);            break;
          case 1: cpct_drawCharM1_f(*pvideomem, fg_colour, bg_colour, charnum); break;
-         case 0: cpct_drawCharM0  (*pvideomem, fg_colour, bg_colour, charnum); break;
+         case 0: cpct_drawCharM0  (*pvideomem, charnum);                       break;
       }
       // Point to next location on screen to draw (increment bytes required for this mode)
       *pvideomem = incrementedVideoPos(*pvideomem, increment);
@@ -95,7 +96,7 @@ void main(void) {
    // Disable firmware to prevent it from restoring our video memory changes 
    // ... and interfering with drawChar functions
    cpct_disableFirmware();
-
+   
    // Loop forever showing characters on different modes and colours
    //
    while(1) {
