@@ -69,7 +69,7 @@ bg_tile_offsets:
 .area _CODE
 
 ;; Include macros to easily manage undocumented opcodes
-.include "macros/cpct_undocumentedOpcodes.s"
+.include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;; Symbols with the names of the CPCtelera functions we want to use
 ;; must be declared globl to be recognized by the compiler. Later on,
