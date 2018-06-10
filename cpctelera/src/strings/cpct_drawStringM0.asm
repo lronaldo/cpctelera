@@ -17,12 +17,6 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_strings
 
-;;
-;; Include constants and general values
-;;
-.include /strings.s/
-.globl cpct_drawCharM0_asm
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; Function: cpct_drawStringM0
@@ -85,75 +79,66 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    189 bytes (36 bytes this function, 153 bytes <cpct_drawCharM0>)
+;;    C bindings  - 66 (+35 setDrawCharM0_asm + 100 cpct_drawCharM0_inner_asm = 201 bytes)
+;;  ASM bindings  - 62 (+35 setDrawCharM0_asm + 100 cpct_drawCharM0_inner_asm = 197 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
-;;   Case     |    Cycles    |   microSecs (us)
+;;   Case     | microSecs (us) | CPU Cycles
 ;; ----------------------------------------------
-;;   Best     | 185 + 3774*L | 46.25 +  956.00*L
-;;   Worst    | 185 + 4454*L | 46.25 + 1126.00*L
+;;   Best     |   143 + 854*L  |  572 + 3416*L  
+;;   Worst    |   143 + 862*L  |  572 + 3448*L
 ;; ----------------------------------------------
-;; Asm saving |        -84   |          -21.00
+;; Asm saving |      -15       |     -60
 ;; ----------------------------------------------
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
-;;
-;; These time measures take into account the time it takes to draw each individual
-;; character (call to <cpct_drawCharM0>, assembly entry point).
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_drawStringM0::
-   ;; Get parameters form stack
-.if let_disable_interrupts_for_function_parameters
-   ;; Way 1: Pop + Restoring SP. Faster, but consumes 5 bytes more, and requires disabling interrupts
-   ld (drsm0_restoreSP+1), sp          ;; [20] Save SP into placeholder of the instruction LD SP, 0, to restore it later.
-   di                                  ;; [ 4] Disable interrupts to ensure no one overwrites return address in the stack
-   pop  af                             ;; [10] AF = Return Address
-   pop  hl                             ;; [10] HL = Pointer to the null terminated string
-   pop  de                             ;; [10] DE = Destination address (Video memory location where character will be printed)
-   pop  bc                             ;; [10] BC = Colors (B=Background color, C=Foreground color) 
-drsm0_restoreSP:
-   ld sp, #0                           ;; [10] -- Restore Stack Pointer -- (0 is a placeholder which is filled up with 
-                                       ;; .... actual SP value previously)
-   ei                                  ;; [ 4] Enable interrupts again
-.else 
-   ;; Way 2: Pop + Push. Just 8 cycles more, but does not require disabling interrupts
-   pop  af                             ;; [10] AF = Return Address
-   pop  hl                             ;; [10] HL = Pointer to the null terminated string
-   pop  de                             ;; [10] DE = Destination address (Video memory location where character will be printed)
-   pop  bc                             ;; [10] BC = Colors (B=Background color, C=Foreground color) 
-   push bc                             ;; [11] Restore Stack status pushing values again
-   push de                             ;; [11] (Interrupt safe way, 8 cycles more)
-   push hl                             ;; [11]
-   push af                             ;; [11]
-.endif
+.globl cpct_drawCharM0_inner_asm
+.globl cpct_setDrawCharM0_asm
 
-cpct_drawStringM0_asm::                ;; Assembly entry point
+   ;; Set foreground and background colours before drawing the string
+   push  de                      ;; [4]   Save Pointer to Destination in Video Memory
+   push  bc                      ;; [4]   Save Pointer to the null terminated string
+   call  cpct_setDrawCharM0_asm  ;; [5+50] Set Colours
+   pop   iy                      ;; [5]   IY = Pointer to the null terminated string
+   pop   hl                      ;; [3]   HL = Pointer to Destination in Video Memory
 
-   ld (drsm0_values+1), bc             ;; [20] Save BC as LD direct value to be read later for saving colour values 
-                                       ;; .... (Foreground and Background)
-   jp drsm0_firstChar                  ;; [10] Jump to first char
+   ;; Enable Lower ROM during char copy operation, with interrupts disabled 
+   ;; to prevent firmware messing things up
+   ld     a,(_cpct_mode_rom_status) ;; [4] A = mode_rom_status (present value)
+   and    #0b11111011               ;; [2] bit 3 of A = 0 --> Lower ROM enabled (0 means enabled)
+   ld     b, #GA_port_byte          ;; [2] B = Gate Array Port (0x7F)
+   di                               ;; [1] Disable interrupts to prevent firmware from taking control while Lower ROM is enabled
+   out   (c), a                     ;; [3] GA Command: Set Video Mode and ROM status (100)
 
-drsm0_nextChar:
-   push hl                             ;; [11] Save HL and DE to the stack before calling draw char
-   push de                             ;; [11]
-   call cpct_drawCharM0_asm            ;; [17] Draw next char
-   pop  de                             ;; [10] Recover HL and DE from the stack
-   pop  hl                             ;; [10]
+   jr    firstChar                  ;; [3] Jump to first char (Saves 1 jr back every iteration)
 
-drsm0_values:
-   ld   bc, #00                        ;; [10] Restore BC value (Foreground and Background Colours)
-   inc  de                             ;; [ 6] DE += 4 (point to next position in video memory, 8 pixels to the right)
-   inc  de                             ;; [ 6]
-   inc  de                             ;; [ 6]
-   inc  de                             ;; [ 6]
-   inc  hl                             ;; [ 6] HL += 1 (point to next character in the string)
+nextChar:
+   push  hl                         ;; [4] Save HL
+   call  cpct_drawCharM0_inner_asm  ;; [5 + 824/832] Does the next character
+   pop   hl                         ;; [3] Recover HL 
 
-drsm0_firstChar:
-   ld  a, (hl)                         ;; [ 7] A = next character from the string
-   or  a                               ;; [ 4] Check if A = 0
-   jp  nz, drsm0_nextChar              ;; [10] if A != 0, A is next character, draw it, else end
+   ;; Increment Pointers
+   ld    de, #4                     ;; [3] /
+   add   hl, de                     ;; [3] | HL += 4 (point to next position in video memory, 8 pixels to the right)
+   inc   iy                         ;; [3] IY += 1 (point to next character in the string)
 
-drsm0_endString:
-   ret                                 ;; [10] Return
+firstChar:
+   ld     a, (iy)                   ;; [5] A = next character from the string
+   or     a                         ;; [1] Check if A = 0
+   jr    nz, nextChar               ;; [2/3] if A != 0, A is next character, draw it, else end
+
+endstring:
+   ;; After finishing character printing, restore previous ROM and Interrupts status
+   ld     a, (_cpct_mode_rom_status) ;; [4] A = mode_rom_status (present saved value)
+   ld     b, #GA_port_byte           ;; [2] B = Gate Array Port (0x7F)
+   out   (c), a                      ;; [3] GA Command: Set Video Mode and ROM status (100)
+   ei                                ;; [1] Enable interrupts
+
+saveix = .+2
+saveiy = .+6
+   ld    ix, #0000   ;; [6] Restore IX before returning (0000 is a placeholder)
+   ld    iy, #0000   ;; [6] Restore IY before returning (0000 is a placeholder)
+   ret               ;; [3] Return

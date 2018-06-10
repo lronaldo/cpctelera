@@ -47,7 +47,7 @@
 ;;    <TODO>
 ;;
 ;; Destroyed Register values: 
-;;    <TODO>
+;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
 ;;    xxx bytes (xxx)

@@ -28,8 +28,8 @@
 ;;    void <cpct_drawCharM0> (void* *video_memory*, <u8> *ascii*) __z88dk_callee
 ;;
 ;; Input Parameters (5 Bytes):
-;;  (2B DE) video_memory - Video memory location where the character will be drawn
-;;  (1B L ) ascii        - Character to be drawn (ASCII code)
+;;  (2B HL) video_memory - Video memory location where the character will be drawn
+;;  (1B E ) ascii        - Character to be drawn (ASCII code)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawCharM0_asm
@@ -91,17 +91,17 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C bindings   - 34 bytes (+111 from cpct_drawCharM0_inner_asm = 145 bytes)
-;;    ASM bindings - 27 bytes (+111 from cpct_drawCharM0_inner_asm = 138 bytes)
+;;    C bindings   - 35 bytes (+100 from cpct_drawCharM0_inner_asm = 135 bytes)
+;;    ASM bindings - 27 bytes (+100 from cpct_drawCharM0_inner_asm = 127 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case     | microSecs | CPU Cycles 
 ;; -------------------------------------
-;;   Best     |    878    |    3512
-;;   Worst    |    887    |    3548
+;;   Best     |    880    |    3520
+;;   Worst    |    888    |    3552
 ;; -------------------------------------
-;; Asm saving |    -18    |     -76
+;; Asm saving |    -19    |     -76
 ;; -------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -117,7 +117,7 @@
    out   (c), a                      ;; [3] GA Command: Set Video Mode and ROM status (100)
 
    ;; Draw the character
-   ld     a, l                       ;; [1] A = ASCII Value of the character
+   ld     a, e                       ;; [1] A = ASCII Value of the character
    call   cpct_drawCharM0_inner_asm  ;; [828/837] Does the actual drawing to screen
 
 endDraw:

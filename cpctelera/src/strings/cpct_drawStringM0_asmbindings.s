@@ -23,18 +23,12 @@
 .include "strings.s"
 
 ;;
-;; C bindings for <cpct_drawCharM0>
+;; ASM bindings for <cpct_drawStringM0>
 ;;
-;;   19 us, 8 bytes
+;;   12 us, 8 bytes
 ;;
-_cpct_drawCharM0::
-   ;; GET Parameters from the stack 
-   pop   hl          ;; [3] HL = Return Address
-   pop   de          ;; [3] DE = Pointer to Video Memory
-   ex    (sp), hl    ;; [6] L = ASCII Value of the character to be drawn, and
-                     ;; ...leaving Return Address on top of the stack at the same time
-                     ;; ...as this function uses __z88dk_callee convention
-   ex    de, hl      ;; [1] E = ASCII Value, HL = Pointer to video memory
-   ld   (saveix), ix ;; [6] Save IX value before using it
+cpct_drawStringM0_asm::
+   ld    (saveix), ix   ;; [6] 
+   ld    (saveiy), iy   ;; [6] Save IX and IY before being used
 
-.include /cpct_drawCharM0.asm/
+.include /cpct_drawStringM0.asm/

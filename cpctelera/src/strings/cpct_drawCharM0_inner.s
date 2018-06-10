@@ -31,7 +31,7 @@
 ;; exactly what it does.
 ;;
 ;; Input Parameters (3 Bytes):
-;;  (2B DE) video_memory - Video memory location where the character will be drawn
+;;  (2B HL) video_memory - Video memory location where the character will be drawn
 ;;  (1B A ) ascii        - Character to be drawn (ASCII code)
 ;;
 ;; Assembly call (Input parameters on registers):
@@ -73,13 +73,13 @@
 ;;    AF, BC, DE, HL, IX
 ;;
 ;; Required memory:
-;;    111 bytes
+;;    100 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case     | microSecs | CPU Cycles 
 ;; -------------------------------------
-;;   Best     |    823    |    3296
+;;   Best     |    824    |    3300
 ;;   Worst    |    832    |    3332
 ;; -------------------------------------
 ;; (end code)
@@ -88,14 +88,14 @@
 cpct_drawCharM0_inner_asm::
    ;; Calculate the memory address where the 8 bytes defining the character appearance 
    ;; ... start (IX = 0x3800 + 8*ASCII value). char0_ROM_address = 0x3800
-   rlca           ;; [1] | L = 8*ASCII. 3 RLCA leave A with this
+   rlca           ;; [1] | A = E = 8*ASCII. 3 RLCA leave A with this
    rlca           ;; [1] |   |hgfedcba| => 3*RLCA => |edcba|hgf|         IXH         IXL
    rlca           ;; [1] | Then we need to move it to IX like this => |00111hgf| |edcba000|
-   ld    l, a     ;; [1] \ That will be the final memory address where the definition starts
+   ld    e, a     ;; [1] \ That will be the final memory address where the definition starts
    and   #0x07    ;; [2] Isolate latest 3 bits of a |00000hgf|
    or    #0x38    ;; [2] Add the 3 ones in front, so that the address starts at 0x38xx => |00111hgf|
    ld__ixh_a      ;; [2] Save it to IXH = |00111hgf|
-   ld    a, l     ;; [1] Restore A status after 3*RLCA => |edcba|hgf|
+   ld    a, e     ;; [1] Restore A status after 3*RLCA => |edcba|hgf|
    and   #0xF8    ;; [2] Isolate first 5 bits => |edcba|000|
    ld__ixl_a      ;; [2] and save it to IXL = |edcba|000|
    ;; Now IX = |edcba|000||00111hgf| = 0x3800 + 8*ASCII
@@ -104,6 +104,7 @@ cpct_drawCharM0_inner_asm::
 
    ;; Draw next line from the character to the screen
 nextline:
+   ex    de, hl      ;; [1] Put Destination pointer into DE (it is in HL)
    ld     a, (ix)    ;; [5] A = Next Character pixel line definition 
                      ;; .... (8 bits defining 0 = background colour, 1 = foreground)
    ;; Copy the 4 bytes that compose the complete pixel line
@@ -132,18 +133,18 @@ endpixelline:
 
    ;; Prepare to copy next line 
    ;;  -- Move DE pointer to the next pixel line on the video memory
+   ;; (We save new calculations on HL, because it will be exchanged with DE at the start of nextline: loop)
    ld    hl, #0x800-4      ;; [3] | Next pixel line is 0x800 bytes away in standard video modes
    add   hl, de            ;; [3] | ..but DE has already being incremented 4 times. So add 0x800-4 to
-   ex    de, hl            ;; [1] \ ..DE to make it point to the start of the next pixel line in video memory
+                           ;;       ..DE to make it point to the start of the next pixel line in video memory
    ;; Check if new address has crossed character boundaries (every 8 pixel lines)
-   ld     a, d             ;; [1] A = D (top 8 bits of video memory address)
+   ld     a, h             ;; [1] A = H (top 8 bits of video memory address)
    and   #0x38             ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)
    jr    nz, nextline      ;; [2/3]  by checking the 4 bits that identify present memory line. 
                            ;; .... If 0, we have crossed boundaries
 boundary_crossed:
-   ld    hl, #0xC050       ;; [3] DE = DE + 0xC050
-   add   hl, de            ;; [3]   -- Relocate DE pointer to the start of the next pixel line 
-   ex    de, hl            ;; [1]   -- in video memory
+   ld    de, #0xC050       ;; [3] | HL = HL + 0xC050: Relocate DE pointer to the start of the next pixel line in video memory
+   add   hl, de            ;; [3] \ (Remember that HL and DE will be exchanged at the start of nextline:)
    jr    nextline          ;; [3] Jump to continue with next pixel line
 
 ;; Conversion table from 2 1-bit pixels to mode 0 2 4-bit pixels. Essentially, there are 4
