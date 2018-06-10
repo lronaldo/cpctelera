@@ -21,17 +21,18 @@
 ;;
 ;; Function: cpct_drawStringM0
 ;;
-;;    Prints a null-terminated string with ROM characters on a given byte-aligned 
-;; position on the screen in Mode 0 (160x200 px, 16 colours).
+;;    Draws a null-terminated string with ROM characters to video memory or 
+;; to a hardware backbuffer in Mode 0 (160x200, 16 colours).
 ;;
 ;; C Definition:
-;;    void <cpct_drawStringM0> (void* *string*, void* *video_memory*, <u8> *fg_pen*, <u8> *bg_pen*)
+;;    void <cpct_drawStringM0> ( void* *string*, void* *video_memory*
+;;                              , <u8> *fg_pen*, <u8> *bg_pen*) __z88dk_callee
 ;;
 ;; Input Parameters (5 Bytes):
-;;  (2B HL) string       - Pointer to the null terminated string being drawn
+;;  (2B BC) string       - Pointer to the null terminated string being drawn
 ;;  (2B DE) video_memory - Video memory location where the string will be drawn
-;;  (1B C ) fg_pen       - Foreground colour (PEN, 0-15)
-;;  (1B B ) bg_pen       - Background colour (PEN, 0-15)
+;;  (1B L ) fg_pen       - Foreground colour (PEN, 0-15)
+;;  (1B H ) bg_pen       - Background colour (PEN, 0-15)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawStringM0_asm
@@ -60,20 +61,44 @@
 ;;  * This routine does not check for boundaries. If you draw too long strings or out 
 ;; of the screen, unpredictable results will happen.
 ;;  * Screen must be configured in Mode 0 (160x200 px, 16 colours)
-;;  * This function requires the CPC *firmware* to be *DISABLED*. Otherwise, random
-;; crashes might happen due to side effects.
 ;;  * This function *disables interrupts* during main loop (character printing), and
 ;; re-enables them at the end.
 ;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Details:
 ;;    This function receives a null-terminated string and draws it to the screen in 
-;; Mode 0 (160x200, 16 colours). This function calls <cpct_drawCharM0> to draw every    
-;; character. *video_memory* parameter points to the byte where the string will be
+;; Mode 0 (160x200, 16 colours). This function calls <cpct_setDrawCharM0> (assembly
+;; bindings) once to set up colours before string drawing. Afterwards, it repeatedly
+;; calls <cpct_drawCharM0_inner_asm> for every character to be drawn.
+;;
+;;   *video_memory* parameter points to the byte where the string will be
 ;; drawn. The first pixel of that byte will be the upper-left corner of the string.
 ;; As this function uses a byte-pointer to refer to the upper-left corner of the 
 ;; string, it can only draw string on even-pixel columns (0, 2, 4, 6...), as 
 ;; every byte contains 2 pixels in Mode 0.
+;;
+;;    Usage of this function is quite straight-forward, as you can see in the 
+;; following example,
+;; (start code)
+;;    // Just print some strings for testing
+;;    void main () {
+;;       u8* pvmem;  // Pointer to video memory
+;;
+;;       // Set video mode 0
+;;       cpct_disableFirmware();
+;;       cpct_setVideoMode(0);
+;;
+;;       // Draw some testing strings with curious colours, more or less centered
+;;       pvmem = cpctm_screenPtr(CPCT_VMEM_START, 16, 88);
+;;       cpct_drawStringM0("Hello there!", pvmem, 3, 5); // Red over black
+;;
+;;       pvmem = cpctm_screenPtr(CPCT_VMEM_START, 20, 108);
+;;       cpct_drawStringM0("Great man!",   pvmem, 1, 9); // Bright yellow over yellow
+;;
+;;       // And loop forever
+;;       while(1);
+;;    }
+;; (end code)
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
@@ -120,8 +145,9 @@
    jr    firstChar                  ;; [3] Jump to first char (Saves 1 jr back every iteration)
 
 nextChar:
+   ;; Draw next character
    push  hl                         ;; [4] Save HL
-   call  cpct_drawCharM0_inner_asm  ;; [5 + 824/832] Does the next character
+   call  cpct_drawCharM0_inner_asm  ;; [5 + 824/832] Draws the next character
    pop   hl                         ;; [3] Recover HL 
 
    ;; Increment Pointers
@@ -135,7 +161,7 @@ firstChar:
    jr    nz, nextChar               ;; [2/3] if A != 0, A is next character, draw it, else end
 
 endstring:
-   ;; After finishing character printing, restore previous ROM and Interrupts status
+   ;; After finishing character drawing, restore previous ROM and Interrupts status
    ld     a, (_cpct_mode_rom_status) ;; [4] A = mode_rom_status (present saved value)
    ld     b, #GA_port_byte           ;; [2] B = Gate Array Port (0x7F)
    out   (c), a                      ;; [3] GA Command: Set Video Mode and ROM status (100)
