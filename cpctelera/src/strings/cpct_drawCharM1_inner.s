@@ -80,7 +80,7 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-cpct_drawCharM0_inner_asm::
+cpct_drawCharM1_inner_asm::
    ;; Calculate the memory address where the 8 bytes defining the character appearance 
    ;; ... start (BC = 0x3800 + 8*ASCII value). char0_ROM_address = 0x3800. 
    ;; ASCII value is in A=|hgfedcba|
