@@ -97,9 +97,6 @@
 ;; Include required macro files
 .include "macros/cpct_maths.h.s"
 
-;; Pixel colour table defined in cpct_drawCharM1
-.globl dc_mode1_ct
-
 cpct_px2byteM1_asm::
 _cpct_px2byteM1::
    ;; Point HL to the start of the first parameter in the stack
@@ -112,7 +109,7 @@ _cpct_px2byteM1::
    ;;
    ld    b, #4           ;; [2] We have 4 pixels to mix into 1 byte, so set loop counter to 4
 px1_repeat:
-   ld   de, #dc_mode1_ct ;; [3] DE points to the start of the colour table
+   ld   de, #pen2mode1px ;; [3] DE points to the start of the colour table
    ld    a, (hl)         ;; [2] A = Firmware colour for next pixel (to be added to DE, 
                          ;; .... as it is the index of the colour value to retrieve)
    add_de_a              ;; [5] DE += A (A contains next color translation to Pixel 0 bitpattern)
@@ -127,3 +124,12 @@ px1_repeat:
    ld    l, c            ;; [1] L = B, put return value into L
 
    ret                   ;; [3] return
+
+;;
+;;    Mode 1 Color conversion table (PEN to Screen pixel format)
+;;
+;;    This table converts PEN values (palette indexes from 0 to 4) into screen pixel format values in mode 1. 
+;; In mode 1, each byte has 4 pixels (P0, P1, P2, P3). This table converts to Pixel 0 (P0) format. Getting values for
+;; other pixels require shifting this byte to the right 1 to 3 times (depending on which pixel is required).
+;;
+pen2mode1px: .db 0x00, 0x08, 0x80, 0x88
