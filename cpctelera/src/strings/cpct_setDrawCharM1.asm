@@ -79,14 +79,14 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    ASM bindings  - 78 bytes ( +80 cpct_drawCharM1_inner +4 dc_mode1_ct table = 162 bytes)
-;;      C bindings  - 81 bytes ( +80 cpct_drawCharM1_inner +4 dc_mode1_ct table = 165 bytes)
+;;    ASM bindings  - 81 bytes ( +80 cpct_drawCharM1_inner +4 dc_mode1_ct table = 165 bytes)
+;;      C bindings  - 84 bytes ( +80 cpct_drawCharM1_inner +4 dc_mode1_ct table = 168 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case     | microSecs (us) | CPU Cycles
 ;; -------------------------------------------
-;;   Any      |      175       |     700
+;;   Any      |      185       |     740
 ;; -------------------------------------------
 ;; Asm saving |      -10       |     -40
 ;; -------------------------------------------
@@ -153,35 +153,31 @@ loop:
                   ;; A = [BG/FG]-BG-FG-BG
    xor    c       ;; [1] / Make 4th pixel FG (rightmost bit of each nibble)
    and    d       ;; [1] | 3 leftmost bits of each nibble remain the same (3 first pixels) 0xEE = [1110|1110]
-   or     c       ;; [1] \ D = 0xEE, C = 4 foreground pixel values
+   xor    c       ;; [1] \ D = 0xEE, C = 4 foreground pixel values
    ld  (hl), a    ;; [2] Store the [BG/FG]-BG-FG-FG combination at the byte [3 or 11] of the table
    inc   hl       ;; [2] HL points to the byte [4 or 12] of the table
 
    ;; Combination: [BG/FG]-FG-BG-BG
    ld     a, b    ;; [1] A = [BG/FG]-BG-BG-BG
    xor    c       ;; [1] / Make 2nd pixel FG (Insert FG colour here > [-F--|-F--])
-   and   #0xCC    ;; [2] | Insert FG Colour in the 2nd bit of each nibble: 0xCC = [1011|1011]
-   or     c       ;; [1] \ C = 4 foreground pixel values
+   and   #0xBB    ;; [2] | Insert FG Colour in the 2nd bit of each nibble: 0xCC = [1011|1011]
+   xor    c       ;; [1] \ C = 4 foreground pixel values
    ld  (hl), a    ;; [2] Store the [BG/FG]-FG-BG-BG combination at the byte [4 or 12] of the table
    inc   hl       ;; [2] HL points to the byte [5 or 13] of the table
-
-   ;; Modify B. This new combination will be useful to optimize 
-   ;; generation of new combinations later on
-   ld     b, a    ;; [1] B = [BG/FG]-FG-BG-BG
 
    ;; Combination: [BG/FG]-FG-BG-FG
                   ;; A = [BG/FG]-FG-BG-BG
    xor    c       ;; [1] / Make 4th pixel FG (rightmost bit of each nibble)
    and    d       ;; [1] | 3 leftmost bits of each nibble remain the same (3 first pixels) 0xEE = [1110|1110]
-   or     c       ;; [1] \ D = 0xEE, C = 4 foreground pixel values
+   xor    c       ;; [1] \ D = 0xEE, C = 4 foreground pixel values
    ld  (hl), a    ;; [2] Store the [BG/FG]-FG-BG-FG combination at the byte [5 or 13] of the table 
    inc   hl       ;; [2] HL points to the byte [6 or 14] of the table
 
    ;; Combination: [BG/FG]-FG-FG-BG
-   ld     a, b    ;; [1] A = [BG/FG]-FG-BG-BG
-   xor    c       ;; [1] / Make 3rd pixel FG (Insert FG colour here > [--F-|--F-])
-   and    e       ;; [1] | Insert FG Colour in the 3rd bit of each nibble: 0xDD = [1101|1101]
-   or     c       ;; [1] \ E = 0xDD, C = 4 foreground pixel values
+   ld     a, b    ;; [1] A = [BG/FG]-BG-BG-BG
+   xor    c       ;; [1] / Make 2nd and 3rd pixels FG (Insert FG colour here > [-FF-|-FF-])
+   and   #0x99    ;; [2] | Insert FG Colour in the 2nd and 3rd bits of each nibble: 0x99 = [1001|1001]
+   xor    c       ;; [1] \ C = 4 foreground pixel values
    ld  (hl), a    ;; [2] Store the [BG/FG]-FG-FG-BG combination at the byte [6 or 14] of the table  
    inc   hl       ;; [2] HL points to the byte [7 or 15] of the table
 
@@ -189,18 +185,9 @@ loop:
                   ;; A = [BG/FG]-FG-FG-BG
    xor    c       ;; [1] / Make 4th pixel FG (rightmost bit of each nibble)
    and    d       ;; [1] | 3 leftmost bits of each nibble remain the same (3 first pixels) 0xEE = [1110|1110]
-   or     c       ;; [1] \ D = 0xEE, C = 4 foreground pixel values
+   xor    c       ;; [1] \ D = 0xEE, C = 4 foreground pixel values
    ld  (hl), a    ;; [2] Store the [BG/FG]-FG-FG-FG combination at the byte [7 or 15] of the table 
 
-   ;; Return the second time
-nopret = .
-   nop            ;; [1/3] NOP / RET Placeholder
-
-   ;; If execution arrives here, means that previous instruction was a NOP,
-   ;; therefore this is the first iteration of the loop (on the second, previous instruction will be a RET)
-   ;; We only need to increment HL now (not in the second iteration), because we have filled half the table
-   inc   hl       ;; [2] HL points to the byte 8 of the table
-   
    ;; Update Return instruction: This instruction will be a NOP (0x00) the first
    ;; iteration of this loop, and a RET (0xC9) the second interaction. That will save
    ;; as a register, as no counter will be required. The only thing to do is to
@@ -210,9 +197,20 @@ nopret = .
    xor   #0xC9          ;; [2] XOR the NOP/RET instruction against 0xC9 to make it switch from NOP to RET and viceversa
    ld  (de), a          ;; [2] Store the switched version of the NOP/RET instruction
 
+   ;; Do nothing the first iteration, return on the second
+nopret = .
+   ret            ;; [1/3] NOP / RET Placeholder
+
+   ;; If execution arrives here, means that previous instruction was a NOP,
+   ;; therefore this is the first iteration of the loop (on the second, previous instruction will be a RET)
+   ;; We only need to increment HL now (not in the second iteration), because we have filled half the table
+   inc   hl       ;; [2] HL points to the byte 8 of the table
+   
    ;; Combination: FG-BG-BG-BG
-   ld     a, b    ;; [1] A = BG-FG-BG-BG
-   rlca           ;; [1] A' = A << 1 = FG-BG-BG-BG (Rotate pixels 1 to the left)
+   ld     a, b    ;; [1] A = BG-BG-BG-BG
+   xor    c       ;; [1] / Make 1st pixels FG (Insert FG colour here > [F---|F---])
+   and   #0x77    ;; [2] | Insert FG Colour in the 1st bits of each nibble: 0x77 = [0111|0111]
+   xor    c       ;; [1] \ C = 4 foreground pixel values
    ld  (hl), a    ;; [2] Store the FG-BG-BG-BG combination at the byte 8 of the table 
    inc   hl       ;; [2] HL points to the byte 9 of the table
    ld     b, a    ;; [1] B = FG-BG-BG-BG (New combination to be used on the second iteration of the loop)
