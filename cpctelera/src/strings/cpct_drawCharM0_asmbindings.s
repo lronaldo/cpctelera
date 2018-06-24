@@ -25,8 +25,10 @@
 ;;
 ;; ASM bindings for <cpct_drawCharM0>
 ;;
-;;   0 us, 0 bytes
+;;   1 us, 1 bytes
 ;;
 cpct_drawCharM0_asm::
 
 .include /cpct_drawCharM0.asm/
+
+   ret               ;; [3] Return

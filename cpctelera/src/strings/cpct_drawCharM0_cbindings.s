@@ -25,7 +25,7 @@
 ;;
 ;; C bindings for <cpct_drawCharM0>
 ;;
-;;   19 us, 8 bytes
+;;   28 us, 13 bytes
 ;;
 _cpct_drawCharM0::
    ;; GET Parameters from the stack 
@@ -38,3 +38,7 @@ _cpct_drawCharM0::
    ld   (saveix), ix ;; [6] Save IX value before using it
 
 .include /cpct_drawCharM0.asm/
+
+saveix = .+2
+   ld    ix, #0000   ;; [6] Restore IX before returning (0000 is a placeholder)
+   ret               ;; [3] Return

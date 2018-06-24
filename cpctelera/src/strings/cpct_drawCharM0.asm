@@ -88,11 +88,12 @@
 ;; (end code)
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    C bindings     - AF, BC, DE, HL
+;;    ASM bindings   - AF, BC, DE, HL, IX
 ;;
 ;; Required memory:
 ;;    C bindings   - 35 bytes (+100 from cpct_drawCharM0_inner_asm = 135 bytes)
-;;    ASM bindings - 27 bytes (+100 from cpct_drawCharM0_inner_asm = 127 bytes)
+;;    ASM bindings - 23 bytes (+100 from cpct_drawCharM0_inner_asm = 123 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -101,7 +102,7 @@
 ;;   Best     |    880    |    3520
 ;;   Worst    |    888    |    3552
 ;; -------------------------------------
-;; Asm saving |    -19    |     -76
+;; Asm saving |    -25    |    -100
 ;; -------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -127,6 +128,4 @@ endDraw:
    out   (c), a                      ;; [3] GA Command: Set Video Mode and ROM status (100)
    ei                                ;; [1] Enable interrupts
 
-saveix = .+2
-   ld    ix, #0000   ;; [6] Restore IX before returning (0000 is a placeholder)
-   ret               ;; [3] Return
+;; Restore IX and Return provided by bindings
