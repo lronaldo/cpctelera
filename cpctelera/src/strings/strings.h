@@ -27,7 +27,7 @@ extern void cpct_setDrawCharM1  (u8 fg_pen, u8 bg_pen) __z88dk_callee;
 
 // Functions for drawing ROM Characters on Graphics Screen
 extern void cpct_drawCharM0     (void* video_memory, u16 ascii) __z88dk_callee;
-extern void cpct_drawCharM1     (void* video_memory, u8 fg_pen, u8 bg_pen, u8 ascii);
+extern void cpct_drawCharM1     (void* video_memory, u16 ascii) __z88dk_callee;
 extern void cpct_drawCharM1_f   (void* video_memory, u8 fg_pen, u8 bg_pen, u8 ascii);
 extern void cpct_drawCharM2     (void* video_memory, u8 pen, u8 ascii);
 
