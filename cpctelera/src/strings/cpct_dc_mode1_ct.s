@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -21,9 +21,12 @@
 ;;
 ;;    Mode 1 Color conversion table (PEN to Screen pixel format)
 ;;
-;;    This table converts PEN values (palette indexes from 0 to 4) into screen pixel format values in mode 1. 
-;; In mode 1, each byte has 4 pixels (P0, P1, P2, P3). This table converts to Pixel 0 (P0) format. Getting values for
-;; other pixels require shifting this byte to the right 1 to 3 times (depending on which pixel is required).
+;;    This simple table converts PEN values (palette indexes from 0 to 3) into screen pixel format values in mode 1. 
+;; In mode 1, each byte has 4 pixels (P0, P1, P2, P3). This table converts the PEN value to a byte that has the 4
+;; pixels in the given PEN value colour. 
 ;;
-dc_mode1_ct:: .db 0x00, 0x0F, 0xF0, 0xFF
+dc_mode1_ct:: .db 0x00	;; PEN 0: All pixels are coloured 00
+		  .db 0x0F	;; PEN 1: All pixels are coloured 01 (left nibble, 4 zeros for the 4 pixels, right nibble 4 ones)
+		  .db 0xF0  ;; PEN 2: All 4-pixels are coloured 10 (similar to previous element, but inverted)
+		  .db 0xFF	;; PEN 3: All 4-pixels are coloured 11, so all bits are 1.
 
