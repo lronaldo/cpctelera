@@ -61,9 +61,10 @@ BINFILE := $(OBJDIR)/$(PROJNAME).bin
 IHXFILE := $(OBJDIR)/$(PROJNAME).ihx
 CDT     := $(PROJNAME).cdt
 DSK     := $(PROJNAME).dsk
+SNA     := $(PROJNAME).sna
 
 # TARGETs for compilation (if you only want one of them, remove the other)
-TARGET  := $(CDT) $(DSK)
+TARGET  := $(CDT) $(DSK) $(SNA)
 
 ####
 ## SECTION 2: TOOL PATH CONFIGURATION
