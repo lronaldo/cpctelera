@@ -67,12 +67,41 @@
 ;; It prints the character in 2 colours (PENs) one for foreground (*fg_pen*), and 
 ;; the other for background (*bg_pen*). 
 ;;
+;;    The character will be drawn using preconfigured foreground (FG) and 
+;; background (BG) colours (by default BG=0, FG=1). Both colours can be set
+;; calling <cpct_setDrawCharM1> before calling this function. Colours get set
+;; by modifying and internal 16-byte array called _cpct_char2pxM1_. This means
+;; that once colours are set they stay. You may set them once and call 
+;; this function as many times as you want to draw with the same set of colours.
+;;
+;;    Next code example shows how to use this function in conjunction with
+;; <cpct_setDrawCharM1>,
+;; (start code)
+;;    void drawSomeCharactersM1(u8* pscreen, u8 fgcolour, u8 bgcolour) {
+;;       cpct_setDrawCharM1(fgcolour, bgcolour);   // Set colours before drawing
+;;
+;;       // Draw A, B, C consecutive
+;;       cpct_drawCharM1(pscreen +  0, 'A');
+;;       cpct_drawCharM1(pscreen +  2, 'B');
+;;       cpct_drawCharM1(pscreen +  4, 'C');
+;;
+;;       // Set video inverse (inverted colours from before)
+;;       cpct_setDrawCharM1(bgcolour, fgcolour);   // Set inverse colours
+;;
+;;       // Draw D, E, F consecutive in inverse video
+;;       cpct_drawCharM1(pscreen +  6, 'D');
+;;       cpct_drawCharM1(pscreen +  8, 'E');
+;;       cpct_drawCharM1(pscreen + 10, 'F');
+;;    }
+;; (end code)
+;;
 ;; Destroyed Register values: 
 ;;    C bindings     - AF, BC, DE, HL
 ;;    ASM bindings   - AF, BC, DE, HL, IX
 ;;
 ;; Required memory:
-;;    139 bytes (4 bytes conversion table, 135 bytes code)
+;;    C bindings     - 35 bytes (+80 bytes cpct_drawCharM1_inner_asm = 115 bytes)
+;;    ASM bindings   - 23 bytes (+80 bytes cpct_drawCharM1_inner_asm = 103 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -80,9 +109,6 @@
 ;; ------------------------------------
 ;;    Best    |   514  |   2056
 ;;    Worst   |   522  |   2088
-;; ------------------------------------
-;;   Best     |  4378  |  1094.50   
-;;   Worst    |  5058  |  1264.50
 ;; ------------------------------------
 ;; Asm saving |   -28  |   -112
 ;; ------------------------------------
@@ -101,7 +127,7 @@
 
    ;; Draw the character
    ld     a, e                       ;; [1] A = ASCII Value of the character
-   call   cpct_drawCharM1_inner_asm  ;; [828/837] Does the actual drawing to screen
+   call   cpct_drawCharM1_inner_asm  ;; [5+458/466] Does the actual drawing to screen
 
 endDraw:
    ;; After finishing character printing, restore previous ROM and Interrupts status

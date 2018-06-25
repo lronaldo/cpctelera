@@ -99,16 +99,16 @@
 ;;    C bindings  - AF, BC, DE, HL
 ;;  ASM bindings  - AF, BC, DE, HL, IX, IY
 ;;
-;; Required memory:
-;;    C bindings  - 66 (+35 setDrawCharM0_asm + 100 cpct_drawCharM0_inner_asm = 201 bytes)
-;;  ASM bindings  - 62 (+35 setDrawCharM0_asm + 100 cpct_drawCharM0_inner_asm = 197 bytes)
+;; Required memory: 
+;;    C bindings  - 58 (+100 cpct_drawCharM0_inner_asm = 158 bytes)
+;;  ASM bindings  - 38 (+100 cpct_drawCharM0_inner_asm = 138 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case     | microSecs (us) | CPU Cycles
 ;; ----------------------------------------------
-;;   Best     |   143 + 854*L  |  572 + 3416*L  
-;;   Worst    |   143 + 862*L  |  572 + 3448*L
+;;   Best     |    74 + 854*L  |  296 + 3416*L  
+;;   Worst    |    74 + 862*L  |  296 + 3448*L
 ;; ----------------------------------------------
 ;; Asm saving |      -41       |     -164
 ;; ----------------------------------------------
