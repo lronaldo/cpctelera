@@ -25,8 +25,10 @@
 ;;
 ;; ASM bindings for <cpct_drawStringM0>
 ;;
-;;   0 us, 0 bytes
+;;   3 us, 1 bytes
 ;;
 cpct_drawStringM0_asm::
 
 .include /cpct_drawStringM0.asm/
+
+   ret      ;; [3] Return to caller

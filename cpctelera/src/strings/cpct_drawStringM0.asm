@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -25,14 +25,11 @@
 ;; to a hardware backbuffer in Mode 0 (160x200, 16 colours).
 ;;
 ;; C Definition:
-;;    void <cpct_drawStringM0> ( void* *string*, void* *video_memory*
-;;                              , <u8> *fg_pen*, <u8> *bg_pen*) __z88dk_callee
+;;    void <cpct_drawStringM0> ( void* *string*, void* *video_memory*) __z88dk_callee
 ;;
-;; Input Parameters (5 Bytes):
-;;  (2B BC) string       - Pointer to the null terminated string being drawn
-;;  (2B DE) video_memory - Video memory location where the string will be drawn
-;;  (1B L ) fg_pen       - Foreground colour (PEN, 0-15)
-;;  (1B H ) bg_pen       - Background colour (PEN, 0-15)
+;; Input Parameters (4 Bytes):
+;;  (2B IY) string       - Pointer to the null terminated string being drawn
+;;  (2B HL) video_memory - Video memory location where the string will be drawn
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawStringM0_asm
@@ -47,10 +44,6 @@
 ;; outside current screen memory boundaries, which is useful if you use any kind of
 ;; double buffer. However, be careful where you use it, as it does no kind of check
 ;; or clipping, and it could overwrite data if you select a wrong place to draw.
-;;  * *fg_pen* must be in the range [0-15]. It is used to access a colour mask table and,
-;; so, a value greater than 15 will return a random colour mask giving unpredictable 
-;; results (typically bad character rendering, with odd colour bars).
-;;  * *bg_pen* must be in the range [0-15], with identical reasons to *fg_pen*.
 ;;
 ;; Requirements and limitations:
 ;;  * *Do not put this function's code below 0x4000 in memory*. In order to read
@@ -67,9 +60,9 @@
 ;;
 ;; Details:
 ;;    This function receives a null-terminated string and draws it to the screen in 
-;; Mode 0 (160x200, 16 colours). This function calls <cpct_setDrawCharM0> (assembly
-;; bindings) once to set up colours before string drawing. Afterwards, it repeatedly
-;; calls <cpct_drawCharM0_inner_asm> for every character to be drawn.
+;; Mode 0 (160x200, 16 colours). To do so, it repeatedly calls <cpct_drawCharM0_inner_asm>,
+;; for every character to be drawn. As foreground and background colours it uses the
+;; ones previously set up by the latest call to <cpct_setDrawCharM0>.
 ;;
 ;;   *video_memory* parameter points to the byte where the string will be
 ;; drawn. The first pixel of that byte will be the upper-left corner of the string.
@@ -89,11 +82,13 @@
 ;;       cpct_setVideoMode(0);
 ;;
 ;;       // Draw some testing strings with curious colours, more or less centered
-;;       pvmem = cpctm_screenPtr(CPCT_VMEM_START, 16, 88);
-;;       cpct_drawStringM0("Hello there!", pvmem, 3, 5); // Red over black
+;;       pvmem = cpctm_screenPtr(CPCT_VMEM_START, 16, 88);  // Calculate video memory address
+;;       cpct_setDrawCharM0(3, 5);                          // Red over black
+;;       cpct_drawStringM0("Hello there!", pvmem);          // Draw the string
 ;;
-;;       pvmem = cpctm_screenPtr(CPCT_VMEM_START, 20, 108);
-;;       cpct_drawStringM0("Great man!",   pvmem, 1, 9); // Bright yellow over yellow
+;;       pvmem = cpctm_screenPtr(CPCT_VMEM_START, 20, 108); // Calculate new video memory address
+;;       cpct_setDrawCharM0(1, 9);                          // Bright yellow over yellow
+;;       cpct_drawStringM0("Great man!",   pvmem);          // Draw the string
 ;;
 ;;       // And loop forever
 ;;       while(1);
@@ -101,7 +96,8 @@
 ;; (end code)
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    C bindings  - AF, BC, DE, HL
+;;  ASM bindings  - AF, BC, DE, HL, IX, IY
 ;;
 ;; Required memory:
 ;;    C bindings  - 66 (+35 setDrawCharM0_asm + 100 cpct_drawCharM0_inner_asm = 201 bytes)
@@ -114,25 +110,13 @@
 ;;   Best     |   143 + 854*L  |  572 + 3416*L  
 ;;   Worst    |   143 + 862*L  |  572 + 3448*L
 ;; ----------------------------------------------
-;; Asm saving |      -15       |     -60
+;; Asm saving |      -41       |     -164
 ;; ----------------------------------------------
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .globl cpct_drawCharM0_inner_asm
-.globl cpct_setDrawCharM0_asm
-
-   ;; Save IX and IY before using them
-   ld    (saveix), ix   ;; [6] Save IX
-   ld    (saveiy), iy   ;; [6] Save IY
-
-   ;; Set foreground and background colours before drawing the string
-   push  de                      ;; [4]   Save Pointer to Destination in Video Memory
-   push  bc                      ;; [4]   Save Pointer to the null terminated string
-   call  cpct_setDrawCharM0_asm  ;; [5+50] Set Colours
-   pop   iy                      ;; [5]   IY = Pointer to the null terminated string
-   pop   hl                      ;; [3]   HL = Pointer to Destination in Video Memory
 
    ;; Enable Lower ROM during char copy operation, with interrupts disabled 
    ;; to prevent firmware messing things up
@@ -153,7 +137,7 @@ nextChar:
    ;; Increment Pointers
    ld    de, #4                     ;; [3] /
    add   hl, de                     ;; [3] | HL += 4 (point to next position in video memory, 8 pixels to the right)
-   inc   iy                         ;; [3] IY += 1 (point to next character in the string)
+   inc   iy                         ;; [3] IX += 1 (point to next character in the string)
 
 firstChar:
    ld     a, (iy)                   ;; [5] A = next character from the string
@@ -167,8 +151,4 @@ endstring:
    out   (c), a                      ;; [3] GA Command: Set Video Mode and ROM status (100)
    ei                                ;; [1] Enable interrupts
 
-saveix = .+2
-saveiy = .+6
-   ld    ix, #0000   ;; [6] Restore IX before returning (0000 is a placeholder)
-   ld    iy, #0000   ;; [6] Restore IY before returning (0000 is a placeholder)
-   ret               ;; [3] Return
+;; IX/IY Restore and Return provided by bindings
