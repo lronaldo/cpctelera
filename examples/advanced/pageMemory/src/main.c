@@ -68,31 +68,32 @@ void main(void) {
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 0, 0);
    cpct_drawSolidBox(pvmem, *firstByteInPage, 2, 8);
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 4, 0);
-   cpct_drawStringM1("RAMCFG_0", pvmem, 1, 0);
+   cpct_setDrawCharM1(1, 0);
+   cpct_drawStringM1("RAMCFG_0", pvmem);
 
    cpct_pageMemory(RAMCFG_4 | BANK_0); // Set the 4th page (64kb to 80kb) in 0x4000-0x7FFF
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 0, 16);
    cpct_drawSolidBox(pvmem, *firstByteInPage, 2, 8);
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 4, 16);
-   cpct_drawStringM1("RAMCFG_4", pvmem, 1, 0);
+   cpct_drawStringM1("RAMCFG_4", pvmem);
 
    cpct_pageMemory(RAMCFG_5 | BANK_0); // Set the 4th page (64kb to 80kb) in 0x4000-0x7FFF
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 0, 32);
    cpct_drawSolidBox(pvmem, *firstByteInPage, 2, 8);
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 4, 32);
-   cpct_drawStringM1("RAMCFG_5", pvmem, 1, 0);
+   cpct_drawStringM1("RAMCFG_5", pvmem);
 
    cpct_pageMemory(RAMCFG_6 | BANK_0); // Set the 4th page (64kb to 80kb) in 0x4000-0x7FFF
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 0, 48);
    cpct_drawSolidBox(pvmem, *firstByteInPage, 2, 8);
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 4, 48);
-   cpct_drawStringM1("RAMCFG_6", pvmem, 1, 0);
+   cpct_drawStringM1("RAMCFG_6", pvmem);
 
    cpct_pageMemory(RAMCFG_7 | BANK_0); // Set the 4th page (64kb to 80kb) in 0x4000-0x7FFF
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 0, 64);
    cpct_drawSolidBox(pvmem, *firstByteInPage, 2, 8);
    pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 4, 64);
-   cpct_drawStringM1("RAMCFG_7", pvmem, 1, 0);
+   cpct_drawStringM1("RAMCFG_7", pvmem);
 
    cpct_pageMemory(DEFAULT_MEM_CFG); // Equivalent to RAMCFG_0 | BANK_0 
 

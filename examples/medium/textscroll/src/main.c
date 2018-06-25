@@ -86,7 +86,9 @@ void main(void) {
    u8 penColour=1;                 // Pen colour for the characters
 
    // Infinite scrolling loop
-   cpct_drawStringM1("Hold any key to pause scroll", CPCT_VMEM_START, 1, 3);
+   cpct_setDrawCharM1(1, 3);
+   cpct_drawStringM1("Hold any key to pause scroll", CPCT_VMEM_START);
+   cpct_setDrawCharM1(penColour, 0);
    while (1) {
       // When holding a key, wait for release (Loop scanning the keyboard
       // until no single key is pressed)
@@ -94,7 +96,7 @@ void main(void) {
 
       // Draw next character at the rightmost character location of the
       // character line being scrolled
-      cpct_drawCharM1_f(pNextCharLocation, penColour, 0, text[nextChar]);
+      cpct_drawCharM1(pNextCharLocation, text[nextChar]);
 
       // nextChar will hold the index of the next Character, returning to
       // the first one when there are no more characters left, and changing
@@ -102,11 +104,12 @@ void main(void) {
       if (++nextChar == textlen) {
          nextChar = 0;
          if (++penColour > 3) penColour = 1;
+         cpct_setDrawCharM1(penColour, 0);
       }
 
       // Scroll character line 2 times, as each scroll call will move
       // the pixels 1 byte = 4 pixels. So, 2 times = 8 pixels = 1 Character
-      // Sinchronyze with VSYNC previous to each call to make it smooth
+      // Synchronize with VSYNC previous to each call to make it smooth
       wait_n_VSYNCs(2);
       scrollLine(pCharline_start, PIXEL_LINE_SIZE);
       wait_n_VSYNCs(2);

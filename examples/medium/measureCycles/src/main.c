@@ -41,8 +41,8 @@ void main(void) {
    cpct_fw2hw     (G_palette, 4);
    cpct_setPalette(G_palette, 4);
    cpct_setBorder (G_palette[1]);
-   // Ensure MODE 1 is set
-   cpct_setVideoMode(1);
+   cpct_setVideoMode(1);         // Ensure MODE 1 is set
+   cpct_setDrawCharM1(3, 0);     // Always draw characters using same colours (3 (Yellow) / 0 (Grey))
 
    // Main Loop
    while(1) {
@@ -74,7 +74,7 @@ void main(void) {
       #define LASTDIGIT_VMEM  0xC04E
       for(i=0; i<5; i++) {
          u8 digit = '0' + (ms % 10);
-         cpct_drawCharM1_f((void*)(LASTDIGIT_VMEM - 2*i), 3, 0, digit);
+         cpct_drawCharM1((void*)(LASTDIGIT_VMEM - 2*i), digit);
          ms /= 10;
       }
    }

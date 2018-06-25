@@ -42,18 +42,20 @@ void myInterruptHandler() {
 //
 void printMessages() {
    u8* pvm = CPCT_VMEM_START;
-   cpct_drawStringM1_f("Interrupt Handler Example", pvm, 0, 3);
+   cpct_setDrawCharM1(0, 3);
+   cpct_drawStringM1("Interrupt Handler Example", pvm);
 
    pvm += 3 * ROW_OFFSET;
-   cpct_drawStringM1_f("This example is running a void loop, but", pvm, 1, 0);
+   cpct_setDrawCharM1(1, 0);
+   cpct_drawStringM1("This example is running a void loop, but", pvm);
    pvm += ROW_OFFSET;
-   cpct_drawStringM1_f("border color is changed 6 times each", pvm, 1, 0);
+   cpct_drawStringM1("border color is changed 6 times each", pvm);
    pvm += ROW_OFFSET;
-   cpct_drawStringM1_f("frame. This change  is done by the inte-", pvm, 1, 0);
+   cpct_drawStringM1("frame. This change  is done by the inte-", pvm);
    pvm += ROW_OFFSET;
-   cpct_drawStringM1_f("rrupt handler. As z80 produces 300 inte-", pvm, 1, 0);
+   cpct_drawStringM1("rrupt handler. As z80 produces 300 inte-", pvm);
    pvm += ROW_OFFSET;
-   cpct_drawStringM1_f("rrupts per second, you have 6 per frame.", pvm, 1, 0);
+   cpct_drawStringM1("rrupts per second, you have 6 per frame.", pvm);
 }
 
 //

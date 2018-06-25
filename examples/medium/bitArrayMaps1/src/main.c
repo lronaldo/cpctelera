@@ -58,7 +58,8 @@ void drawMessages() {
       pmem = cpct_getScreenPtr(CPCT_VMEM_START, msg_prop[i][0], msg_prop[i][1]);
 
       // Draw the i-th message with colours from its properties 2 and 3 (fg, bg)
-      cpct_drawStringM1(strings[i], pmem, msg_prop[i][2], msg_prop[i][3]);
+      cpct_setDrawCharM1(msg_prop[i][2], msg_prop[i][3]);
+      cpct_drawStringM1(strings[i], pmem);
    }
 }
 // Remove macro constant that is not required anymore

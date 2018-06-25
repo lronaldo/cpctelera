@@ -105,15 +105,12 @@ void main(void) {
          // Rotate foreground colour using module 4 (AND 0x03)
          colours[1] = ++colours[1] & 3;
 
-         // Draw a string using normal drawString function for mode 1
+         // Draw a string using drawString function for mode 1
          cpct_setDrawCharM1(colours[1], colours[4]);
          cpct_drawStringM1("Mode 1 string :D", pvideomem);
-
          // Rotate foreground colour again
          colours[1] = ++colours[1] & 3;
-
-         // Draw a string using fast drawString function for mode 1 (in a column 38 bytes to the right)
-         cpct_drawStringM1_f("Mode 1 string :D", pvideomem + 38, colours[1], colours[4]);
+         cpct_drawStringM1("Mode 1 string :D", pvideomem + 38, colours[1], colours[4]);
 
          // Rotate foreground colour another time and wait for a few VSYNCs
          colours[1] = ++colours[1] & 3;

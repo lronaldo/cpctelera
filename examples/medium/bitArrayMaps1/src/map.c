@@ -173,7 +173,8 @@ void map_draw() {
    // Draw a message down the screen to inform the user
    // that the map is drawing
    pmem = cpct_getScreenPtr(CPCT_VMEM_START, 30, 160);
-   cpct_drawStringM1(string, pmem, C_BLACK, C_RED);
+   cpct_setDrawCharM1(C_BLACK, C_RED);
+   cpct_drawStringM1(string, pmem);
 
    // Draw the map tile by tile
    for(y=0; y < MAP_HEIGHT; y++) 
@@ -182,7 +183,8 @@ void map_draw() {
 
    // Remove the message that was informing the user
    // (Drawing the string with background colour)
-   cpct_drawStringM1(string, pmem, C_BLACK, C_BLACK);
+   cpct_setDrawCharM1(C_BLACK, C_BLACK);
+   cpct_drawStringM1(string, pmem);
 }
 
 /////////////////////////////////////////////////////////////////

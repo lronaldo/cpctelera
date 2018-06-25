@@ -56,8 +56,9 @@ void DrawInfoTextToBuffer(u8* bufferPtr) {
       
       // Calculate on-screen location where to draw the message 
       // and draw it with the selected colours
-      u8* pvmem = cpct_getScreenPtr(bufferPtr, t->x, t->y);     
-      cpct_drawStringM1(t->text, pvmem, t->pen, t->paper);
+      u8* pvmem = cpct_getScreenPtr(bufferPtr, t->x, t->y);
+      cpct_setDrawCharM1(t->pen, t->paper);
+      cpct_drawStringM1(t->text, pvmem);
    }
 }
 
@@ -88,7 +89,8 @@ void DrawSelectionToBuffer(u8* bufferPtr, u8 pos) {
 
    // Then draw the selection sign near the user selected item
    pvmem = cpct_getScreenPtr(bufferPtr, 0, pos);
-   cpct_drawStringM1(">", pvmem, 3, 0); 
+   cpct_setDrawCharM1(3, 0);
+   cpct_drawStringM1(">", pvmem);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
