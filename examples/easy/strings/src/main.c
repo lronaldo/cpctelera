@@ -110,7 +110,8 @@ void main(void) {
          cpct_drawStringM1("Mode 1 string :D", pvideomem);
          // Rotate foreground colour again
          colours[1] = ++colours[1] & 3;
-         cpct_drawStringM1("Mode 1 string :D", pvideomem + 38, colours[1], colours[4]);
+         cpct_setDrawCharM1(colours[1], colours[4]);
+         cpct_drawStringM1("Mode 1 string :D", pvideomem + 38);
 
          // Rotate foreground colour another time and wait for a few VSYNCs
          colours[1] = ++colours[1] & 3;
