@@ -78,7 +78,8 @@ void main(void) {
          colours[0] = ++colours[0] & 15;
          
          // Draw the string and wait for some VSYNCs
-         cpct_drawStringM0("$ Mode 0 string $", pvideomem, colours[0], colours[3]);
+         cpct_setDrawCharM0(colours[0], colours[3]);
+         cpct_drawStringM0("$ Mode 0 string $", pvideomem);
          wait_frames(WFRAMES);
 
          // Point to the start of the next character line on screen (80 bytes away)
@@ -105,13 +106,14 @@ void main(void) {
          colours[1] = ++colours[1] & 3;
 
          // Draw a string using normal drawString function for mode 1
-         cpct_drawStringM1("Mode 1 string :D", pvideomem, colours[1], colours[4]);
+         cpct_setDrawCharM1(colours[1], colours[4]);
+         cpct_drawStringM1("Mode 1 string :D", pvideomem);
 
          // Rotate foreground colour again
          colours[1] = ++colours[1] & 3;
 
          // Draw a string using fast drawString function for mode 1 (in a column 38 bytes to the right)
-         cpct_drawStringM1_f("Mode 1 string (Fast)", pvideomem + 38, colours[1], colours[4]);
+         cpct_drawStringM1_f("Mode 1 string :D", pvideomem + 38, colours[1], colours[4]);
 
          // Rotate foreground colour another time and wait for a few VSYNCs
          colours[1] = ++colours[1] & 3;
