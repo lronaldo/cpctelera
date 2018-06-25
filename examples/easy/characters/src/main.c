@@ -102,8 +102,8 @@ void main(void) {
    // Loop forever showing characters on different modes and colours
    //
    while(1) {
-//      drawCharacters(&pvideomem, 14, 2, (colours+0), (colours+1)); // Drawing on mode 2, 14 times
+      drawCharacters(&pvideomem, 14, 2, (colours+0), (colours+1)); // Drawing on mode 2, 14 times
       drawCharacters(&pvideomem, 17, 1, (colours+2), (colours+3)); // Drawing on mode 1, 17 times
-//      drawCharacters(&pvideomem, 21, 0, (colours+4), (colours+5)); // Drawing on mode 0, 21 times
+      drawCharacters(&pvideomem, 21, 0, (colours+4), (colours+5)); // Drawing on mode 0, 21 times
    }
 }
