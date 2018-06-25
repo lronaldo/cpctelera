@@ -46,12 +46,14 @@ void initializeGameScreen(u16 hiscore) {
 
    // Draw "HI" string 
    pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60,  16);   
-   cpct_drawStringM0("HI", pscr, 3, 8);
+   cpct_setDrawCharM0(3, 8);
+   cpct_drawStringM0("HI", pscr);
 
    // Draw HI-Score
    pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60,  24);
    sprintf(str, "%5u", hiscore);
-   cpct_drawStringM0(str, pscr, 15, 8);
+   cpct_setDrawCharM0(15, 8);
+   cpct_drawStringM0(str, pscr);
 
    // Draw Credits
    pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60, 172);
@@ -142,20 +144,24 @@ void showGameEnd(u16 score) {
 
    // Draw GAME OVER string
    pscr = cpct_getScreenPtr(CPCT_VMEM_START,  8, 24);
-   cpct_drawStringM0("GAME  OVER", pscr, 6, 0);
+   cpct_setDrawCharM0(6, 0);
+   cpct_drawStringM0("GAME  OVER", pscr);
 
    // Draw SCORE string
    pscr = cpct_getScreenPtr(CPCT_VMEM_START, 16, 48);
-   cpct_drawStringM0(  "SCORE", pscr, 9, 0);
+   cpct_setDrawCharM0(9, 0);
+   cpct_drawStringM0(  "SCORE", pscr);
 
    // Draw the score got in this game
    pscr = cpct_getScreenPtr(CPCT_VMEM_START, 16, 56);
    sprintf(str, "%5u", score);
-   cpct_drawStringM0(str, pscr, 14, 0);
+   cpct_setDrawCharM0(14, 0);
+   cpct_drawStringM0(str, pscr);
 
    // Draw PRESS SPACE string
    pscr = cpct_getScreenPtr(CPCT_VMEM_START, 6, 112);
-   cpct_drawStringM0("PRESS SPACE", pscr, 11, 0);
+   cpct_setDrawCharM0(11, 0);
+   cpct_drawStringM0("PRESS SPACE", pscr);
 
    // Wait for SPACE being pressed before continuing
    wait4Key(Key_Space);

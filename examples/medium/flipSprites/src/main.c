@@ -61,11 +61,14 @@ void initialize() {
 
    // Draw instructions
    pvideomem = cpct_getScreenPtr(CPCT_VMEM_START,  0, 20);
-   cpct_drawStringM0("  Sprite Flip Demo  ", pvideomem, 2, 0);   
+   cpct_setDrawCharM0(2, 0);
+   cpct_drawStringM0("  Sprite Flip Demo  ", pvideomem);
    pvideomem = cpct_getScreenPtr(CPCT_VMEM_START,  0, 34);
-   cpct_drawStringM0("[Cursor]",   pvideomem, 4, 0);
+   cpct_setDrawCharM0(4, 0);
+   cpct_drawStringM0("[Cursor]",   pvideomem);
    pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, 40, 34);
-   cpct_drawStringM0("Left/Right", pvideomem, 3, 0);
+   cpct_setDrawCharM0(3, 0);
+   cpct_drawStringM0("Left/Right", pvideomem);
 }
 
 //

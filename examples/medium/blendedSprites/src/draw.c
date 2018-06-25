@@ -86,14 +86,17 @@ void drawUserInterfaceStatus() {
    // the name and sprite of the item will be drawn
    u8 *p = cpct_getScreenPtr(CPCT_VMEM_START, 4, 60);
    
+   // Select foreground/background colours for drawStringM0 functions
+   cpct_setDrawCharM0(8, 0);
+
    // Draw the name of the item and its corresponding sprite
    // The sprite has to be drawn 7 characters to the right (7*4 = 28 bytes)
-   cpct_drawStringM0(g_items[g_selectedItem].name   , p      , 8, 0);
+   cpct_drawStringM0(g_items[g_selectedItem].name   , p       );
    cpct_drawSprite  (g_items[g_selectedItem].sprite , p + 28 , 4, 8);
    
    // Do the same as before to draw the name of the current blending mode
    p = cpct_getScreenPtr(CPCT_VMEM_START, 52, 60);
-   cpct_drawStringM0(g_blendModes[g_selectedBlendMode].name, p, 8, 0);
+   cpct_drawStringM0(g_blendModes[g_selectedBlendMode].name, p);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -105,22 +108,29 @@ void drawUserInterfaceMessages() {
 
    // Draw first two strings at the top-left corner of the screen
    // (exactly at CPCT_VMEM_START) and 8 characters to the right (8*4 = 32 bytes)
-   cpct_drawStringM0("[Space]"   , CPCT_VMEM_START    , 3, 0);
-   cpct_drawStringM0("Draw Item" , CPCT_VMEM_START+32 , 9, 0);
+   cpct_setDrawCharM0(3, 0);
+   cpct_drawStringM0("[Space]"   , CPCT_VMEM_START    );
+   cpct_setDrawCharM0(9, 0);
+   cpct_drawStringM0("Draw Item" , CPCT_VMEM_START+32 );
    
    // Get a pointer to the first pixel in the 15th line of the screen
    // And draw there next 2 strings, being the second 8 characters to the right also
    p = cpct_getScreenPtr(CPCT_VMEM_START, 0, 15);
-   cpct_drawStringM0("[1] [2]"   , p    , 3, 0);
-   cpct_drawStringM0("Select"    , p+32 , 9, 0);
+   cpct_setDrawCharM0(3, 0);
+   cpct_drawStringM0("[1] [2]"   , p    );
+   cpct_setDrawCharM0(9, 0);
+   cpct_drawStringM0("Select"    , p+32 );
 
    // Repeat same operation as before, but to draw at the start of the 30th line
    p = cpct_getScreenPtr(CPCT_VMEM_START, 0, 30);
-   cpct_drawStringM0("[Esc]"     , p    , 3, 0);
-   cpct_drawStringM0("Clear"     , p+32 , 9, 0);
+   cpct_setDrawCharM0(3, 0);
+   cpct_drawStringM0("[Esc]"     , p    );
+   cpct_setDrawCharM0(9, 0);
+   cpct_drawStringM0("Clear"     , p+32 );
 
    // And to same operation again, but to put messages for 
    // selected Item and Blend mode on the 50th line of the screen
    p = cpct_getScreenPtr(CPCT_VMEM_START, 0, 50);
-   cpct_drawStringM0("   Item     Blend   ", p, 1, 6);
+   cpct_setDrawCharM0(1, 6);
+   cpct_drawStringM0("   Item     Blend   ", p);
 }

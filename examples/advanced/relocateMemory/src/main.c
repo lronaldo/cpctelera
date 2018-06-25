@@ -56,7 +56,8 @@
 void setUpVideoBuffer(u8* vmem, u16 c_pattern, u8* string, u8 pen, u8 bpen) {
    cpct_memset_f64(vmem, c_pattern, VMEM_SIZE);
    vmem = cpct_getScreenPtr(vmem, 0, 80);
-   cpct_drawStringM0(string, vmem, pen, bpen);
+   cpct_setDrawCharM0(pen, bpen);
+   cpct_drawStringM0(string, vmem);
 }
 
 //=============================================================================

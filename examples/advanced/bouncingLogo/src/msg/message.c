@@ -27,11 +27,13 @@ void drawMessage() {
    // Draw message only if there is time to draw it
    if (g_message.time > 1) {
       // Draw the message
-      cpct_drawStringM0(g_message.str, g_message.videopos, 1, 0);
+      cpct_setDrawCharM0(1, 0);
+      cpct_drawStringM0(g_message.str, g_message.videopos);
       g_message.time--;
    } else if (g_message.time > 0) {
       // Clean the message
-      cpct_drawStringM0(g_message.str, g_message.videopos, 0, 0);
+      cpct_setDrawCharM0(0, 0);
+      cpct_drawStringM0(g_message.str, g_message.videopos);
       g_message.time=0;
    }
 }
