@@ -110,7 +110,7 @@
 ;;   Best     |    74 + 854*L  |  296 + 3416*L  
 ;;   Worst    |    74 + 862*L  |  296 + 3448*L
 ;; ----------------------------------------------
-;; Asm saving |      -41       |     -164
+;; Asm saving |      -38       |     -152
 ;; ----------------------------------------------
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
