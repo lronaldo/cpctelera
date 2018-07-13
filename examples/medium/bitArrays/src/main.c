@@ -62,7 +62,7 @@ void printArray(u8* pvideomem, void *array, u8 nItems, TFunc thefunction) {
 
       // Draw the character and point to the next byte in memory (next location
       // to draw a character, as 1 byte = 8 pixels in mode 2)
-      cpct_drawCharM2(pvideomem, 1, c);
+      cpct_drawCharM2(pvideomem, c);
       pvideomem++;
     }
 }
@@ -82,6 +82,7 @@ void main (void) {
 
   // Set mode 2 for visual clarity on arrays printed
   cpct_setVideoMode(2);
+  cpct_setDrawCharM2(1, 0); // Draw characters in Foreground colour
 
   // 
   // Main Loop: loop forever showing arrays
