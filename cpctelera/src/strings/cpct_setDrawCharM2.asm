@@ -94,9 +94,9 @@
 .globl cpct_charm2imc  ;; charM2 inner modifiable code section address
 
    ;; Calculate offset inside the MC table where the machine code to be copied starts
-   ld     a, h          ;; [1] | Make the 6th bit of A hold the bg_pen colour selected
+   ld     a, l          ;; [1] | Make the 6th bit of A hold the fg_pen colour selected
    rlca                 ;; [1] \
-   add    l             ;; [1] 7th bit of A = fg_pen colour selected
+   add    h             ;; [1] 7th bit of A = bg_pen colour selected
    rlca                 ;; [1] Multiply result by 2, because each option takes 2 bytes
    and   #0x07          ;; [2] Remove upper bits of A to ensure parameter errors do not make the program crash
 
