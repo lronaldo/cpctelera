@@ -25,7 +25,7 @@
 ;;
 ;; C bindings for <cpct_drawStringM2>
 ;;
-;;   29 us, 13 bytes
+;;   29 us, 12 bytes
 ;;
 _cpct_drawStringM2::
    ld (saveiy), iy   ;; [6] Save IY before modifying them

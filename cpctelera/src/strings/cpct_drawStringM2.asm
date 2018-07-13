@@ -105,17 +105,17 @@
 ;;    ASM bindings   - AF, BC, DE, HL, IY
 ;;
 ;; Required memory:
-;;    C bindings     - xx bytes (+xx bytes <cpct_drawCharM2_inner_asm> = xxx bytes)
-;;    ASM bindings   - xx bytes (+xx bytes <cpct_drawCharM2_inner_asm> = xxx bytes)
+;;    C bindings     - 47 bytes (+38 bytes <cpct_drawCharM2_inner_asm> = 85 bytes)
+;;    ASM bindings   - 35 bytes (+38 bytes <cpct_drawCharM2_inner_asm> = 73 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case     | microSecs (us) |  CPU Cycles
 ;; -------------------------------------------
-;;   Best     |   62 + 486*L   |  248 + 1944*L
-;;   Worst    |   62 + 494*L   |  248 + 1976*L
+;;   Best     |   63 + 162*L   |  252 + 648*L
+;;   Worst    |   63 + 180*L   |  252 + 720*L
 ;; ----------------------------------------------
-;; Asm saving |      -26       |      -104
+;; Asm saving |      -29       |      -116
 ;; ----------------------------------------------
 ;; (end code)
 ;;    L = Length of the string (excluding null-terminator character)
