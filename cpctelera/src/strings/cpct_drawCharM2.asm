@@ -66,8 +66,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings  - 65 bytes (27 bytes + 38 bytes from cpct_drawCharM2_inner_asm)
-;;  ASM-bindings  - 61 bytes (23 bytes + 38 bytes from cpct_drawCharM2_inner_asm)
+;;    C-bindings  - 27 bytes (+38 bytes from <cpct_drawCharM2_inner_asm> = 65 bytes)
+;;  ASM-bindings  - 23 bytes (+38 bytes from <cpct_drawCharM2_inner_asm> = 61 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)

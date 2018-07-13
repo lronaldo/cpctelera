@@ -75,16 +75,16 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    ASM bindings  - xx bytes ()
-;;      C bindings  - xx bytes ()
+;;    ASM bindings  - 30 bytes (+38 from <cpct_drawCharM2_inner_asm> = 68 bytes)
+;;      C bindings  - 32 bytes (+38 from <cpct_drawCharM2_inner_asm> = 70 bytes)
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case     | microSecs (us) | CPU Cycles
 ;; -------------------------------------------
-;;   Any      |      xx        |     xxx
+;;   Any      |      39        |     156
 ;; -------------------------------------------
-;; Asm saving |      xx        |     xxx
+;; Asm saving |      -9        |     -36
 ;; -------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

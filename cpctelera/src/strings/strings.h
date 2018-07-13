@@ -36,6 +36,6 @@ extern void cpct_drawCharM2     (void* video_memory, u16 ascii) __z88dk_callee;
 extern void cpct_drawStringM0   (void* string, void* video_memory) __z88dk_callee;
 extern void cpct_drawStringM1   (void* string, void* video_memory) __z88dk_callee;
 extern void cpct_drawStringM1_f (void* string, void* video_memory, u8 fg_pen, u8 bg_pen);
-extern void cpct_drawStringM2   (void* string, void* video_memory, u8 pen);
+extern void cpct_drawStringM2   (void* string, void* video_memory) __z88dk_callee;
 
 #endif
