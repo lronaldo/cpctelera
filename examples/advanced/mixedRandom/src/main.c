@@ -46,7 +46,7 @@ void drawPixelCount(u16 pixels) {
    if (! (pixels & 15) ) {
       char str[7];
       sprintf(str, "%6u", pixels);
-      cpct_drawStringM2(str, CPCT_VMEM_START+26, 1);
+      cpct_drawStringM2(str, CPCT_VMEM_START+26);
   }
 }
 
@@ -56,9 +56,10 @@ void main(void) {
    
    cpct_disableFirmware();
    cpct_setVideoMode(2);
+   cpct_setDrawCharM2(1, 0);
    initializeRandomGenerators();
 
-   cpct_drawStringM2("Random numbers generated:", CPCT_VMEM_START, 1);
+   cpct_drawStringM2("Random numbers generated:", CPCT_VMEM_START);
    while(1) {
       u8 y = mixedRandomGenerator();
       putpixel(last_y, y>>1, 1);
