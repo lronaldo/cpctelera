@@ -69,8 +69,9 @@ void main(void) {
    k_space = k_0 = k_1 = K_RELEASED;
 
    // Initialize CPC
-   cpct_disableFirmware(); // Disable firmware to prevent interaction
-   cpct_setVideoMode(2);   // Set Mode 2 (640x200, 2 colours)
+   cpct_disableFirmware();    // Disable firmware to prevent interaction
+   cpct_setVideoMode(2);      // Set Mode 2 (640x200, 2 colours)
+   cpct_setDrawCharM2(1, 0);  // Set Initial colours for drawCharM2 (Foreground/Background)
 
    // Initialize the song to be played
    cpct_akp_musicInit(molusk_song);    // Initialize the music
@@ -93,21 +94,22 @@ void main(void) {
          
          // Check if there is an instrument plaing on channel A
          if (cpct_akp_SFXGetInstrument(AY_CHANNEL_A))
-            cpct_drawCharM2(pvideomem, color, 'A'); // Write an 'A' because channel A is playing
+            cpct_drawCharM2(pvideomem, 'A'); // Write an 'A' because channel A is playing
          
          // Check if there is an instrument plaing on channel C
          else if (cpct_akp_SFXGetInstrument(AY_CHANNEL_C))
-            cpct_drawCharM2(pvideomem, color, 'C'); // Write an 'C' because channel A is playing 
+            cpct_drawCharM2(pvideomem, 'C'); // Write an 'C' because channel A is playing 
          
          // No SFX is playing on Channels A or C, write the number of times
          // this song has looped.
          else
-            cpct_drawCharM2(pvideomem, color, '0' + cpct_akp_songLoopTimes);
+            cpct_drawCharM2(pvideomem, '0' + cpct_akp_songLoopTimes);
 
          // Point to the start of the next character in video memory
          if (++pvideomem >= (u8*)0xC7D0) {
             pvideomem = CPCT_VMEM_START; // When we reach the end of the screen, we return..
             color ^= 1;                  // .. to the start, and change the colour
+            cpct_setDrawCharM2(color, color^1); // Set new colour pair for drawCharM2 (inverted from previous one)
          }
 
          // Check if music has already ended (when looptimes is > 0)
