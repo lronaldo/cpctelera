@@ -24,7 +24,8 @@
 ;; flipping it Horizontally (right to left)
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteHFlipM1> (const void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
+;;    void <cpct_drawSpriteHFlipM1> (const void* *sprite*, void* *memory*, 
+;;                                   <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B DE) sprite - Source Sprite Pointer
@@ -69,71 +70,80 @@
 ;; in the middle of sprites when drawing near wr1_paround.
 ;;
 ;; Details:
-
-
-;;;;;;;;;;;;; TODO: Rewrite Details a1_pExample
-
-
 ;;    Draws given *sprite* to *memory* taking into account CPC's standard video
-;; memory disposition. Therefore, *memory* can be pointing to actual video memory
-;; or to a hardware backbuffer. 
+;; memory disposition. Drawing is performed right-to-left instead of normal way
+;; (left-to-right). As so, it calculates a pointer to the top-right byte in video memory
+;; where the *sprite* will be drawn, by adding *width* - 1 to *memory*.
 ;;
-;;    The drawing happens bottom-to-top. *memory* will be considered to be pointing
-;; to the bottom-left byte of the sprite in video memory. This is the way in which
-;; the sprite will be drawn in reverse,
+;;    This function is identical to <cpct_drawSpriteHFlip_at>, but it does not
+;; use a 256-byte aligned table to do pixel flipping. Instead, it does the flipping
+;; by calculating the new value for each pixel byte. This calculation is a little
+;; bit slower than using a look-up table (14 microseconds extra per byte) but it
+;; uses much less memory as you can save the 256-byte table.
 ;;
-;1_pstart code)
-;; ||-----------------------||----------------------||
-;; ||   MEMORY              ||  VIDEO MEMORY        ||
-;; ||-----------------------||----------------------|| 
-;; ||           width       ||          width       ||
-;; ||         (------)      ||        (------)      ||
-;; ||                       ||                      ||
-;; ||      /->###  ###  ^   ||        # #  # #  ^   || ^
-;; || sprite  ##    ##  | h ||        ##    ##  | h || |
-;; ||         #      #  | e ||        ###  ###  | e || | Sprite is 
-;; ||         ###  ###  | i ||        ##   ###  | i || | drawn in 
-;; ||         ##   ###  | g ||        ###  ###  | g || | this order
-;; ||         ###  ###  | h ||        #      #  | h || | (bottom to
-;; ||         ##    ##  | t || memory ##    ##  | t || |  top)
-;; ||         # #  # #  v   ||     \->###  ###  v   || -  
-;; ||-----------------------||----------------------||
+;; See next figure for details,
+; (start code)
+;; ||-----------------------||-----------------------||
+;; ||   MEMORY              ||  VIDEO MEMORY         ||
+;; ||-----------------------||-----------------------|| 
+;; ||           width       ||           width       ||
+;; ||         (------)      ||         (------)      ||
+;; ||                       ||                       ||
+;; ||      /->########  ^   ||      /->########  ^   ||
+;; || sprite  # #    #  | h || memory  #    # #  | h ||
+;; ||         # #    #  | e ||         #    # #  | e ||
+;; ||         # ## # #  | i ||         # # ## #  | i ||
+;; ||         # #### #  | g ||         # #### #  | g ||
+;; ||         # # ## #  | h ||         # ## # #  | h ||
+;; ||         # #  # #  | t ||         # #  # #  | t ||
+;; ||         ########  v   ||         ########  v   ||
+;; ||-----------------------||-----------------------||
+;;                                    <--------  Sprite is drawn in this order
+;;                                    right-to-left and top-to-bottom
 ;; (end code)
 ;;
-;;    In order to get a pointer to the bottom-left of the memory location where you
-;; want to draw your sprite, you may use <cpct_getBottomLeftPtr>.
+;;    On the contrary to <cpct_drawSpriteHFlip_at>, this function is Mode 1-specific.
+;; If you needed to draw flipped sprites for different modes, you will need to use
+;; different versions of this function instead of different flipping tables.
 ;;
 ;;    Use example,
 ;; (start code)
 ;;    ///////////////////////////////////////////////////////////////////
-;;    // DRAW OBJECT IN FRONT OF INVERTING MIRROR
-;;    //    Draws an object in its coordinates and a vertically inverted
-;;    // version of the same object right next to the original one.
+;;    // DRAW ENTITY WITH FLIPPING ANIMATION
+;;    //    Draws an entity that horizontally flips each N frames to
+;;    // produce an animation.
 ;;    //
-;;    void drawObjectInFrontOfMirror(Object* o) {
+;;    void drawEntityFlipAnimated(Entity* e) {
 ;;       u8* pvmem;  // Pointer to video memory
-;;    
-;;       //-----Draw original object
-;;       //
-;;       // Get a pointer to video memory byte for object location
-;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, o->x, o->y);
-;;       // Draw the object
-;;       cpct_drawSprite(o->sprite, pvmem, o->width, o->height);
-;;    
-;;       //-----Draw Inverted object right next to original one
-;;       //
-;;       // Assuming pvmem points to upper-left byte of the original sprite in
-;;       // video memory, calculate a pointer to the bottom-left byte (in video memory).
-;;       // Equivalent to: cpct_getScreenPtr(CPCT_VMEM_START, o->x, (o->y + o->height - 1) )
-;;       pvmem = cpct_getBottomLeftPtr(pvmem, o->height);
-;;       // As we don't want to overwrite the original object, this inverted version will
-;;       // be drawn 1 byte to its right (in front of the original). That means moving to 
-;;       // the right (adding) a number of bytes equal to the width of the object + 1. 
-;;       pvmem += o->width + 1;
-;;       // Finally, draw the vertically flipped object. This draw function
-;;       // does the drawing bottom-to-top in the video memory. That's the reason
-;;       // to have a pointer to the bottom-left.
-;;       cpct_drawSpriteHFlipM1(o->sprite, pvmem, o->width, o->height);
+;;
+;;       // Count one less frame for animation
+;;       e->flipAnimTimer -= 1;
+;;
+;;       // If number of frames has passed, change animation status
+;;       // of the entity and restore the animation timer
+;;       if ( e->flipAnimTimer == 0 ) {
+;;          // Restore Animation timer to N frames
+;;          e->flipAnimTimer = e->nFramesForNextAnim;
+;;
+;;          // New flipstatus: entity changes the side towards it is looking at
+;;          if (e->flipStatus == LEFT)
+;;             e->flipStatus == RIGHT;
+;;          else
+;;             e->flipStatus == LEFT;
+;;       }
+;;
+;;       // Finally, draw the entity in its current flipping status
+;;       // First, calculate video memory location where to draw the entity
+;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, e->x, e->y);
+;;
+;;       // Then draw the entity according to its flipping status
+;;       if (e->flipStatus == LEFT) {
+;;          // Entity is looking left, so draw it using the original sprite
+;;          cpct_drawSprite(e->sprite, pvmem, e->width, e->height);
+;;       } else {
+;;          // Entity is looking right, we draw it horizontally flipped
+;;          cpct_drawSpriteHFlipM1(e->sprite, pvmem, e->width, e->height);
+;;       }
 ;;    }
 ;; (end code)
 ;;
