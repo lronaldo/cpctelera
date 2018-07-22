@@ -80,8 +80,8 @@
 ;; Details:
 ;;    Draws given *sprite* to *memory* taking into account CPC's standard video
 ;; memory disposition. Drawing is performed right-to-left instead of normal way
-;; (left-to-right). As so, it calculates a pointer to the top-right byte in video memory
-;; where the *sprite* will be drawn, by adding *width* - 1 to *memory*.     
+;; (left-to-right). This effectively produces an horizontally flipped version
+;; of the sprite in video memory.
 ;;
 ;; See next figure for details,
 ;; (start code)
