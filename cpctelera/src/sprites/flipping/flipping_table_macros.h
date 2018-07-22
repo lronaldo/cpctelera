@@ -112,7 +112,7 @@
 //          cpct_drawSprite(e->sprite, pmem, e->w, e->h);
 //       } else {
 //          // It is looking left, draw it horizontally flipped
-//          cpct_drawSpriteHFlipM1_at(e->sprite, pmem, e->w, e->h, g_flipTable);
+//          cpct_drawSpriteHFlip_at(e->sprite, pmem, e->w, e->h, g_flipTable);
 //       }
 //    }
 // (end code)
@@ -201,7 +201,7 @@ void dummy_cpct_PixelFlippingTable ## MODE ## _container() __naked
 //
 //    // Draw the sprite of the main character horizontally flipped
 //    pmem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
-//    cpct_drawSpriteHFlipM2_at(sprite, pmem, WIDTH, HEIGHT, gflipTable);
+//    cpct_drawSpriteHFlip_at(sprite, pmem, WIDTH, HEIGHT, gflipTable);
 //
 //    //.... code ....
 //

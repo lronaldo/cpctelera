@@ -24,14 +24,15 @@
 ;; flipping it Horizontally (right to left)
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteHFlip_at> (const void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
+;;    void <cpct_drawSpriteHFlip_at> (const void* *sprite*, void* *memory*, 
+;;                            <u8> *width*, <u8> *height*, const void* *pfliptable*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
 ;;  (2B  HL) sprite     - Source Sprite Pointer
-;;  (2B  DE) memory     - Destination video memory pointer
-;;  (1B  A ) pfliptable - Most Significant Byte of 256-byte flip table address (LSB should be 00)
+;;  (2B  DE) memory     - Destination video memory pointer (top-left byte)
 ;;  (1B IXL) width      - Sprite Width in *bytes* (Beware, *not* in pixels!)
 ;;  (1B IXH) height     - Sprite Height in bytes 
+;;  (1B  A ) pfliptable - Most Significant Byte of 256-byte flip table address (LSB should be 00)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteHFlip_at_asm
@@ -42,15 +43,22 @@
 ;; consecutive pixels, starting from top-left corner and going left-to-right, 
 ;; top-to-bottom down to the bottom-right corner. Total amount of bytes in pixel 
 ;; array should be *width* x *height*.
-;;  * *memory* must be a pointer to the place where the sprite is to be drawn. 
-;; It could be any place in memory, inside or outside current video memory. 
-;; It will be equally treated as video memory (taking into account CPC's video 
-;; memory disposition). This lets you copy sprites to software or hardware 
-;; backbuffers, and not only video memory.
+;;  * *memory* must be a pointer to the place where the sprite is to be drawn.
+;; It must be pointing to the top-left byte in video memory where the sprite is
+;; going to be drawn. From this pointer, the top-right byte will be calculated adding
+;; *width* - 1, as the drawing is performed right-to-left instead of left-to-right. 
+;; It could be any place in memory, inside or outside current video memory. It will 
+;; be equally treated as video memory (taking into account CPC's video memory 
+;; disposition). This lets you copy sprites to software or hardware backbuffers, 
+;; and not only video memory.
 ;;  * *width* (1-256) must be the width of the sprite *in bytes*. Always remember 
 ;; that the width must be expressed in bytes and *not* in pixels. 
 ;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
 ;; bytes and pixels is the same value.
+;;  * *pfliptable* must be a pointer to the address where the horizontally flipping
+;; table starts. This table must by *256-byte aligned* and only Most Significant Byte (MSB)
+;; of the address will be used. Least Significant Byte (LSB) will be set to 0, 
+;; no matter what address is passed.
 ;;
 ;; Known limitations:
 ;;    * *width*s or *height*s of 0 will be considered as 256, and could 
@@ -70,71 +78,62 @@
 ;; in the middle of sprites when drawing near wrap-around.
 ;;
 ;; Details:
-
-
-;;;;;;;;;;;;; TODO: Rewrite Details and Example
-
-
 ;;    Draws given *sprite* to *memory* taking into account CPC's standard video
-;; memory disposition. Therefore, *memory* can be pointing to actual video memory
-;; or to a hardware backbuffer. 
+;; memory disposition. Drawing is performed right-to-left instead of normal way
+;; (left-to-right). As so, it calculates a pointer to the top-right byte in video memory
+;; where the *sprite* will be drawn, by adding *width* - 1 to *memory*.     
 ;;
-;;    The drawing happens bottom-to-top. *memory* will be considered to be pointing
-;; to the bottom-left byte of the sprite in video memory. This is the way in which
-;; the sprite will be drawn in reverse,
-;;
+;; See next figure for details,
 ;; (start code)
-;; ||-----------------------||----------------------||
-;; ||   MEMORY              ||  VIDEO MEMORY        ||
-;; ||-----------------------||----------------------|| 
-;; ||           width       ||          width       ||
-;; ||         (------)      ||        (------)      ||
-;; ||                       ||                      ||
-;; ||      /->###  ###  ^   ||        # #  # #  ^   || ^
-;; || sprite  ##    ##  | h ||        ##    ##  | h || |
-;; ||         #      #  | e ||        ###  ###  | e || | Sprite is 
-;; ||         ###  ###  | i ||        ##   ###  | i || | drawn in 
-;; ||         ##   ###  | g ||        ###  ###  | g || | this order
-;; ||         ###  ###  | h ||        #      #  | h || | (bottom to
-;; ||         ##    ##  | t || memory ##    ##  | t || |  top)
-;; ||         # #  # #  v   ||     \->###  ###  v   || -  
-;; ||-----------------------||----------------------||
+;; ||-----------------------||-----------------------||
+;; ||   MEMORY              ||  VIDEO MEMORY         ||
+;; ||-----------------------||-----------------------|| 
+;; ||           width       ||           width       ||
+;; ||         (------)      ||         (------)      ||
+;; ||                       ||                       ||
+;; ||      /->########  ^   ||      /->########  ^   ||
+;; || sprite  #      #  | h || memory  #      #  | h ||
+;; ||         #  #####  | e ||         #####  #  | e ||
+;; ||         #     ##  | i ||         ##     #  | i ||
+;; ||         #    ###  | g ||         ###    #  | g ||
+;; ||         #  #####  | h ||         #####  #  | h ||
+;; ||         #      #  | t ||         #      #  | t ||
+;; ||         ########  v   ||         ########  v   ||
+;; ||-----------------------||-----------------------||
+;;                                    <--------  Sprite is drawn in this order
+;;                                    right-to-left and top-to-bottom
 ;; (end code)
 ;;
-;;    In order to get a pointer to the bottom-left of the memory location where you
-;; want to draw your sprite, you may use <cpct_getBottomLeftPtr>.
+;;    The function uses a 256-byte aligned table to flip pixels inside each byte.
+;; This table should have been defined previously (you may use <cpctm_createPixelFlippingTable>
+;; for that). This function works for all 3 videomodes (Mode 0, 1 or 2). However, 
+;; pixel flipping is mode-dependent and different mode require different flipping
+;; tables. So, depending on the flipping table you use, flipping will be performed
+;; for mode 0, 1 or 2.
 ;;
 ;;    Use example,
 ;; (start code)
+;;    // Declare a 256-byte aligned pixel flipping table, for Mode 0, 
+;;    // that has been defined in another translation file using 
+;;    // cpctm_createPixelFlippingTable(g_pflipTable, 0x0200, M0);
+;;    // This lets us use the table without redefinining it (we only need one)
+;;    cpctm_declarePixelFlippingTable(g_pflipTable);
+;;
 ;;    ///////////////////////////////////////////////////////////////////
-;;    // DRAW OBJECT IN FRONT OF INVERTING MIRROR
-;;    //    Draws an object in its coordinates and a vertically inverted
-;;    // version of the same object right next to the original one.
+;;    // DRAW ENTITY LOOKING LEFT OR RIGHT
+;;    //    Draws an entity looking to either side. The original sprite
+;;    // is assumed to be looking to the right, so we only need to draw 
+;;    // it horizontally flipped when we want it to look left. 
 ;;    //
-;;    void drawObjectInFrontOfMirror(Object* o) {
-;;       u8* pvmem;  // Pointer to video memory
-;;    
-;;       //-----Draw original object
-;;       //
-;;       // Get a pointer to video memory byte for object location
-;;       pvmem = cpct_getScreenPtr(CPCT_VMEM_START, o->x, o->y);
-;;       // Draw the object
-;;       cpct_drawSprite(o->sprite, pvmem, o->width, o->height);
-;;    
-;;       //-----Draw Inverted object right next to original one
-;;       //
-;;       // Assuming pvmem points to upper-left byte of the original sprite in
-;;       // video memory, calculate a pointer to the bottom-left byte (in video memory).
-;;       // Equivalent to: cpct_getScreenPtr(CPCT_VMEM_START, o->x, (o->y + o->height - 1) )
-;;       pvmem = cpct_getBottomLeftPtr(pvmem, o->height);
-;;       // As we don't want to overwrite the original object, this inverted version will
-;;       // be drawn 1 byte to its right (in front of the original). That means moving to 
-;;       // the right (adding) a number of bytes equal to the width of the object + 1. 
-;;       pvmem += o->width + 1;
-;;       // Finally, draw the vertically flipped object. This draw function
-;;       // does the drawing bottom-to-top in the video memory. That's the reason
-;;       // to have a pointer to the bottom-left.
-;;       cpct_drawSpriteHFlip_at(o->sprite, pvmem, o->width, o->height);
+;;    void drawEntityLookingAt(Entity* e, void* p_videomem, TSide look_at) {
+;;       // Check how to draw the entity depending on where it is looking at
+;;       if (look_at == RIGHT) {
+;;          // Entity is looking right, just draw it the normal way
+;;          cpct_drawSprite(e->sprite, p_videomem, o->width, o->height);
+;;       } else {
+;;          // Entity is looking left. We must draw it horizontally flipped
+;;          cpct_drawSpriteHFlip_at(o->sprite, p_videomem, o->width, o->height, g_pfliptable);
+;;       }
 ;;    }
 ;; (end code)
 ;;
