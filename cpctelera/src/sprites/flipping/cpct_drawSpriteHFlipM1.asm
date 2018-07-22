@@ -20,7 +20,7 @@
 ;;
 ;; Function: cpct_drawSpriteHFlipM1
 ;;
-;;    Draws a Mode 0 sprite from an array to video memory or Hardware Back Buffer 
+;;    Draws a Mode 1 sprite from an array to video memory or Hardware Back Buffer 
 ;; flipping it Horizontally (right to left)
 ;;
 ;; C Definition:
@@ -37,7 +37,7 @@
 ;;    > call cpct_drawSpriteHFlipM1_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *sprite* must be a pointer to the sprite array containing Mode 0 pixel data 
+;;  * *sprite* must be a pointer to the sprite array containing Mode 1 pixel data 
 ;; to be drawn. Sprite must be rectangular and all bytes in the array must be 
 ;; consecutive pixels, starting from top-left corner and going left-to-right, 
 ;; top-to-bottom down to the bottom-right corner. Total amount of bytes in pixel 
