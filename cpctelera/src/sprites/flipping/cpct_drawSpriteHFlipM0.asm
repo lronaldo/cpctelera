@@ -24,7 +24,8 @@
 ;; flipping it Horizontally (right to left)
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteHFlipM0> (const void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
+;;    void <cpct_drawSpriteHFlipM0> (const void* *sprite*, void* *memory*, 
+;;                                   <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
 ;;  (2B DE) sprite - Source Sprite Pointer
@@ -69,39 +70,41 @@
 ;; in the middle of sprites when drawing near wrap-around.
 ;;
 ;; Details:
-
-
-;;;;;;;;;;;;; TODO: Rewrite Details and Example
-
-
 ;;    Draws given *sprite* to *memory* taking into account CPC's standard video
-;; memory disposition. Therefore, *memory* can be pointing to actual video memory
-;; or to a hardware backbuffer. 
+;; memory disposition. Drawing is performed right-to-left instead of normal way
+;; (left-to-right). As so, it calculates a pointer to the top-right byte in video memory
+;; where the *sprite* will be drawn, by adding *width* - 1 to *memory*.
 ;;
-;;    The drawing happens bottom-to-top. *memory* will be considered to be pointing
-;; to the bottom-left byte of the sprite in video memory. This is the way in which
-;; the sprite will be drawn in reverse,
+;;    This function is identical to <cpct_drawSpriteHFlip_at>, but it does not
+;; use a 256-byte aligned table to do pixel flipping. Instead, it does the flipping
+;; by calculating the new value for each pixel byte. This calculation is a little
+;; bit slower than using a look-up table (5 microseconds extra per byte) but it
+;; uses much less memory as you can save the 256-byte table.
 ;;
-;; (start code)
-;; ||-----------------------||----------------------||
-;; ||   MEMORY              ||  VIDEO MEMORY        ||
-;; ||-----------------------||----------------------|| 
-;; ||           width       ||          width       ||
-;; ||         (------)      ||        (------)      ||
-;; ||                       ||                      ||
-;; ||      /->###  ###  ^   ||        # #  # #  ^   || ^
-;; || sprite  ##    ##  | h ||        ##    ##  | h || |
-;; ||         #      #  | e ||        ###  ###  | e || | Sprite is 
-;; ||         ###  ###  | i ||        ##   ###  | i || | drawn in 
-;; ||         ##   ###  | g ||        ###  ###  | g || | this order
-;; ||         ###  ###  | h ||        #      #  | h || | (bottom to
-;; ||         ##    ##  | t || memory ##    ##  | t || |  top)
-;; ||         # #  # #  v   ||     \->###  ###  v   || -  
-;; ||-----------------------||----------------------||
+;; See next figure for details,
+; (start code)
+;; ||-----------------------||-----------------------||
+;; ||   MEMORY              ||  VIDEO MEMORY         ||
+;; ||-----------------------||-----------------------|| 
+;; ||           width       ||           width       ||
+;; ||         (------)      ||         (------)      ||
+;; ||                       ||                       ||
+;; ||      /->########  ^   ||      /->########  ^   ||
+;; || sprite  #      #  | h || memory  #      #  | h ||
+;; ||         #     ##  | e ||         ##     #  | e ||
+;; ||         #    ###  | i ||         ###    #  | i ||
+;; ||         #   ####  | g ||         ####   #  | g ||
+;; ||         #  #####  | h ||         #####  #  | h ||
+;; ||         # ######  | t ||         ###### #  | t ||
+;; ||         ########  v   ||         ########  v   ||
+;; ||-----------------------||-----------------------||
+;;                                    <--------  Sprite is drawn in this order
+;;                                    right-to-left and top-to-bottom
 ;; (end code)
 ;;
-;;    In order to get a pointer to the bottom-left of the memory location where you
-;; want to draw your sprite, you may use <cpct_getBottomLeftPtr>.
+;;    On the contrary to <cpct_drawSpriteHFlip_at>, this function is Mode 0-specific.
+;; If you needed to draw flipped sprites for different modes, you will need to use
+;; different versions of this function instead of different flipping tables.
 ;;
 ;;    Use example,
 ;; (start code)
