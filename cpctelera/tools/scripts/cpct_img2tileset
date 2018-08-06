@@ -282,10 +282,12 @@ while (( $# >= 1 )); do
          ## Go through all palette values
          i=0
          RPAR_FOUND=0
+         PALETTE_SIZE=0
          while (( ! RPAR_FOUND )); do
             ## Check for parenthesis first
             if (( ${#NEXT} > 1 )) && [[ "${NEXT:(-1)}" == "$RPAR" ]]; then
                RPAR_FOUND=1
+               PALETTE_SIZE=1
                NLEN1=$(( ${#NEXT} - 1 ))
                NEXT=${NEXT:0:$NLEN1}
             fi
@@ -310,7 +312,7 @@ while (( $# >= 1 )); do
                fi
             fi
          done
-         PALETTE_SIZE=$((i+1))
+         PALETTE_SIZE=$(( PALETTE_SIZE + i ))
       ;;
       ## Get basename for tiles
       "-bn" | "--tiles-basename")
@@ -445,6 +447,10 @@ echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}PROCESSING${COLOR_LIGHT_RED}]${COL
 to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
 
 ## Run IMG2CPC and check exit status
+echo "Palette Size: $PALETTE_SIZE"
+echo ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
+-w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" --includes "<types.h>" -osz \
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $PIXELORDER "${FILE}"
 if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" --includes "<types.h>" -osz \
 -o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $PIXELORDER "${FILE}"; then
