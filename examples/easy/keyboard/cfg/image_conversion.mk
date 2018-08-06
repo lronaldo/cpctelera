@@ -23,20 +23,38 @@
 ## PNG, GIF, etc. into C-arrays.                                          ##
 ############################################################################
 
-## Example firmware palette definition as variable in cpct_img2tileset format
-
-# PALETTE={0 1 3 4 7 9 10 12 13 16 19 20 21 24 25 26}
-
-## AUTOMATED IMAGE CONVERSION EXAMPLE (Uncomment EVAL line to use)
+## DEFINITION OF THE FIRMWARE PALETTE TO BE USED IN THIS EXAMPLE
 ##
-##    This example would convert img/example.png into src/example.{c|h} files.
-##    A C-array called pre_example[24*12*2] would be generated with the definition
-##    of the image example.png in mode 0 screen pixel format, with interlaced mask.
-##    The palette used for conversion is given through the PALETTE variable and
-##    a pre_palette[16] array will be generated with the 16 palette colours as 
-##	  hardware colour values.
+## Using firmware palette values, we define the 4 colours that will
+## be used in this example, in ascending order, as
+## |=========|==========|================|
+## | Palette | Firmware |    Colour      |
+## |  Index  |  Colour  |     Name       |
+## |=========|==========|================|
+## |    0    |     0    |  Black         |
+## |    1    |    24    |  Bright Yellow |
+## |    2    |    26    |  Bright White  |
+## |    3    |    13    |  White         |
+## |=========|==========|================|
+##
+PALETTE={ 0 24 26 13 }
 
-#$(eval $(call IMG2SPRITES,img/example.png,0,pre,24,12,$(PALETTE),mask,src/,hwpalette))
+## AUTOMATED IMAGE CONVERSION 
+##
+##  This macro will proceed to convert img/ctlogo.png image into two files:
+## src/ctlogo.c and str/ctlogo.h. This conversion will be performed before
+## starting to compile project files. This conversion will use previously
+## defined PALETTE as Amstrad colours to be used. The original PNG will then
+## be transformed into an sprite array definition using only PALETTE colours.
+## Resulting sprite will be produced in slices of 48x62 pixels. As this is the
+## full size of ctlogo.png, only one slice will be produced (a single sprite
+## array). Produced sprite will be codified into MODE 1 colours, and the 
+## array will be named as ctlogo with G_ prefix, resulting in G_ctlogo name.
+## Also, a G_palette array will be produced with the converted values of 
+## PALETTE variable into Hardware values, which are the ones that the 
+## Amstrad CPC understands and CPCtelera uses.
+##
+$(eval $(call IMG2SPRITES,img/ctlogo.png,1,G,48,62,$(PALETTE),,src/,hwpalette))
 
 
 
