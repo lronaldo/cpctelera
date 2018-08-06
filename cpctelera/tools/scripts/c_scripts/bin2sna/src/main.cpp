@@ -50,15 +50,23 @@ const std::string C_YELLOW { "\033[0;33;49m" };
 const std::string C_WHITE { "\033[0;37;49m" };
 const std::string C_NORMAL { "\033[0;39;49m" };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// USAGE FUNCTION
+//
 void usage(const std::string& prg) {
    std::cerr 
       << C_LIGHT_YELLOW << "USAGE" 
       << C_LIGHT_BLUE   << "\n   " << prg << " <binfile> [OPTIONS]"
       << C_LIGHT_YELLOW << "\n\nDescription"
-      << C_CYAN         << "\n   Creates a runnable 64K snapshot (SNA) file with <binfile>"
-      << " loaded in memory at the address given with option -l/--load-address. If no address"
-      << " is given, binfile is loaded at 0x0000 (memory start). The value of the PC is also"
-      << " set to 0x0000 by default and may be changed with -pc/--set-pc."
+      << C_CYAN         << "\n   Creates a runnable 64K snapshot (SNA) file with <binfile> \
+loaded in memory at the address given with option -l/--load-address. If no address \
+is given, binfile is loaded at 0x0000 (memory start). The value of the PC is also  \
+set to 0x0000 by default and may be changed with -pc/--set-pc. Setting the PC lets \
+preparing the snapshot to start running from the entry point of the loaded binary. \
+\n\n   The rest of CPC's memory is filled up with standard values from a normal startup \
+of an Amstrad CPC 464. These values have been captured by stopping a running 464 and \
+copying memory values to this tool. \
+\n\n   Currently, this tool only supports 64K snapshots including 464 memory images."
       << C_LIGHT_YELLOW << "\n\nOPTIONS:"
       << C_LIGHT_BLUE   << "\n\n   -l  | --load-address <ADDRESS> (Default 0x0000)"
       << C_CYAN         << "\n          Sets the memory address where to load the binary file <binfile>. "
@@ -72,12 +80,18 @@ void usage(const std::string& prg) {
    exit(-1);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// FUNCTION TO THROW RUNTIME ERRORS
+//
 void error(const TArgs&& err) {
    std::stringstream s;
    for (auto&& e : err) s << e;
    throw std::runtime_error(s.str());
 }
 
+//
+// Register values according to SNA3 specification
+//
 enum class TRegister {
    AF  = 0x11,   F   = 0x11,   A   = 0x12,
    BC  = 0x13,   C   = 0x13,   B   = 0x14,
@@ -94,6 +108,11 @@ enum class TRegister {
    HLp = 0x2C,   Lp  = 0x2C,   Hp  = 0x2D
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SNAPSHOT CLASS
+//
+//    Contains a memory snapshot
+//
 struct SNA {
    SNA() {
       // Copy Memory Contents
@@ -150,6 +169,9 @@ private:
 
 SNA theSNA;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CHECKS IF A GIVEN STRING IS A VALID HEX NUMBER
+//
 bool isValidHex(const std::string& str) {
    for (auto&& c : str) {
       if ( !std::isdigit(c) ) {
@@ -161,6 +183,9 @@ bool isValidHex(const std::string& str) {
    return true;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CHECKS IF A GIVEN STRING IS A VALID DECIMAL NUMBER
+//
 bool isValidDec(const std::string& str) {
    for (auto&& c : str) {
       if ( !std::isdigit(c) )
@@ -169,6 +194,9 @@ bool isValidDec(const std::string& str) {
    return true;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CONVERT A 16-BIT ADDRESS (DEC OR HEX) AS STRING INTO ITS UINT16_T VALUE
+//
 uint16_t to16bitAddress(const std::string& str) {
    switch (str.size()) {
       case 0: error({"Received a 16-bits address of length 0."});
@@ -200,7 +228,8 @@ uint16_t to16bitAddress(const std::string& str) {
    }
 }
 
-//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PARSES ARGUMENTS GIVEN TO THIS SCRIPT
 //
 void parseArguments(const TArgs& args) {
    std::string theBinary {""};
@@ -243,6 +272,9 @@ void parseArguments(const TArgs& args) {
    theSNA.loadBinary(theBinary);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MAIN ENTRY POINT OF THE SCRIPT
+//
 int main(int argc, char **argv) {
    // Get and parse commandline arguments
    try {

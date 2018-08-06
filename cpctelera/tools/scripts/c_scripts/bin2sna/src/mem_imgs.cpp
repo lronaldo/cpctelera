@@ -1,5 +1,28 @@
+//-----------------------------LICENSE NOTICE------------------------------------
+//  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//------------------------------------------------------------------------------
 #include <cstdint>
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+// MEMORY IMAGES FROM AMSTRAD 464 MEMORY AT ITS STARTUP STATUS
+//
+// Next arrays contain values different from 0 that populate the memory of the Amstrad CPC 464
+// just after a normal startup. These are used to generate 64K snapshots.
+//
 extern const uint8_t gk_mem0000_004F[80] = {
    0x01, 0x89, 0x7f, 0xed, 0x49, 0xc3, 0x91, 0x05, 0xc3, 0x8a, 0xb9, 0xc3, 0x84, 0xb9, 0xc5, 0xc9,
    0xc3, 0x1d, 0xba, 0xc3, 0x17, 0xba, 0xd5, 0xc9, 0xc3, 0xc7, 0xb9, 0xc3, 0xb9, 0xb9, 0xe9, 0x00,
@@ -614,6 +637,11 @@ extern const uint8_t gk_memA670_BFFF[6544] = {
    0xc9, 0x16, 0x63, 0x25, 0x00, 0x02, 0xc9, 0x24, 0x10, 0x4a, 0xa2, 0xb9, 0x89, 0x7f, 0x98, 0x00,
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+// STANDARD SNA3 HEADER (464)
+//
+// This array contains values of a standard SNA3 header for an Amstrad 464 startup.
+//
 extern const uint8_t gk_sna3_header[256] = {
    0x4d, 0x56, 0x20, 0x2d, 0x20, 0x53, 0x4e, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x03, 0x0c, 0xff, 0xff, 0xb0, 0x40, 0x00, 0xff, 0xab, 0x26, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00,
