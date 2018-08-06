@@ -23,7 +23,7 @@
 //------------------------------------------------------------------------------
 //
 // This example draws a court that is defined as a map of tiles (a tilemap).
-// The map is defined using Tiled software, in the file img/court.tmx.
+// The map was created with Tiled (www.mapeditor.org): files img/court.tmx, img/court.tsx.
 // The tiles are defined in img/tiles.png and can be edited with any graphics editor.
 //
 // The court is a tilemap composed of 8x8-pixels tiles (4x8 bytes in mode 0). 
