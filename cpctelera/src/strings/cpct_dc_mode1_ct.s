@@ -26,7 +26,7 @@
 ;; pixels in the given PEN value colour. 
 ;;
 dc_mode1_ct:: .db 0x00	;; PEN 0: All pixels are coloured 00
-		  .db 0x0F	;; PEN 1: All pixels are coloured 01 (left nibble, 4 zeros for the 4 pixels, right nibble 4 ones)
-		  .db 0xF0  ;; PEN 2: All 4-pixels are coloured 10 (similar to previous element, but inverted)
+		  .db 0xF0	;; PEN 1: All pixels are coloured 01 (right nibble, 4 zeros for the 4 pixels, left nibble 4 ones)
+		  .db 0x0F  ;; PEN 2: All 4-pixels are coloured 10 (similar to previous element, but inverted)
 		  .db 0xFF	;; PEN 3: All 4-pixels are coloured 11, so all bits are 1.
 
