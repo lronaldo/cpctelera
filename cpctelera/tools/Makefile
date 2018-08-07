@@ -28,7 +28,7 @@
 # INCLUDES
 include ../cfg/global_functions.mk
 
-TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.6.8-r9946 img2cpc dskgen scripts/c_scripts
+TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.6.8-r9946 img2cpc dskgen zx7b scripts/c_scripts
 TOOLSYSTEM=ToolMaker
 
 # TOOLS CONFIG
