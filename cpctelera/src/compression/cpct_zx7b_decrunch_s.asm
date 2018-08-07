@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2012 Einar Saukas
-;;  Copyright (C) 2017 Antonio Villena
+;;  Copyright (C) 2012 Einar Saukas (https://www.ime.usp.br/~einar/)
+;;  Copyright (C) 2017 Antonio Villena (https://github.com/antoniovillena)
 ;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -133,7 +133,7 @@
 ;;  ---------------------------------------------------------------
 ;;      CPU Clock Cycles taken by different routine versions
 ;;  ---------------------------------------------------------------
-;;    file used    |  this   |(m)edium  (f)ast0  (f)ast1  (f)ast2
+;;    file used    |  this   | general  (f)ast0  (f)ast1  (f)ast2
 ;;  ---------------------------------------------------------------
 ;;    lena1k       |  136724 |  112287    83707    81511    81040
 ;;    lena16k      | 2578233 | 2091259  1518892  1468437  1462568
@@ -152,10 +152,11 @@
 ;; or NOPS that this routine will take.
 ;;
 ;;      Thanks to Antonio Villena for these benchmarks.
+;;
+;; Credits:
+;;    * <Original code at https://github.com/antoniovillena/zx7b/blob/master/dzx7b_slow.asm> 
+;;      from Antonio Villena, based on ZX7 algorithm by Einar Saukas.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Original code from Antonio Villena, based on ZX7 algorithm by Einar Saukas.
-;; Got from https://github.com/antoniovillena/zx7b/blob/master/dzx7b_slow.asm
 
         ld      bc, #0x8000
         ld      a, b
