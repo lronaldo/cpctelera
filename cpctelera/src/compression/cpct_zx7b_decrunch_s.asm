@@ -152,7 +152,6 @@
 ;; or NOPS that this routine will take.
 ;;
 ;;      Thanks to Antonio Villena for these benchmarks.
-;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Original code from Antonio Villena, based on ZX7 algorithm by Einar Saukas.
