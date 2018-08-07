@@ -77,7 +77,9 @@ Section: Donors
    24/11/2015 - Toni Ramirez
    21/04/2016 - Oscar Martínez Gómez
    26/05/2016 - Oliver Lenz
-
+   13/01/2018 - Rafael Castillo García
+   31/03/2018 - Augusto Ruíz García
+   
 Section: Supporting CPCtelera
    We, as authors of CPCtelera, have started this journey to create a usable, free, convenient and up-to-date game engine. There are lots of things to do and improve in order to achieve our goals. If you want to help us, we are more than happy. Any kind of help is always welcome, but we prefer any of these ways,
       * *Economic support*: make a donation using Bitcoin or Paypal (Links are at the top of this file). Big thanks for your support!
