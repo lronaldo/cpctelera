@@ -92,6 +92,7 @@ they are passed. "
 ##
 OUTFILE=
 INFILES=()
+OFFSETS=()
 ARRAYNAME=
 INCLUDE=
 COMPRESSOR=zx7b
@@ -139,11 +140,11 @@ while (( $# >= 1 )); do
          if isCommandLineOption "$1"; then
             paramError "Unrecognized command line option '$1'" 7
          else
-            EnsureExists file "$1"
             if isEmpty "$OUTFILE"; then
                OUTFILE="$1"
             else
-               INFILES+=('$1')
+               EnsureExists file "$1"
+               INFILES+=("$1")
             fi
          fi
       ;;
@@ -152,9 +153,10 @@ while (( $# >= 1 )); do
 done
 
 ## Check that there is at least one OUTFILE and INFILE
+NINFILES=${#INFILES[*]}
 if isEmpty "$OUTFILE"; then
    paramError "Parameter OUTFILE is required and has not been given."
-elif (( ${#INFILES[*]} < 1 )); then
+elif (( NINFILES < 1 )); then
    paramError "At least one file to be packed is required and none has been provided."
 fi
 
@@ -174,9 +176,11 @@ if (( ${#ARRAYNAME} < 1 )); then
 fi
 
 ## Concatenate all files in a single, temporary packfile
-echo "${COLOR_GREEN}[cpct_pack]${COLOR_YELLOW} Creating single pack file with all these files: ${COLOR_NORMAL}${INFILES[*]}" 
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Creating single pack file (${COLOR_CYAN}${OUTFILE}${COLOR_YELLOW}) \
+with all these files: ${COLOR_CYAN}${INFILES[*]}${COLOR_NORMAL}" 
 for F in ${INFILES[*]}; do
    cat "$F" >> "$TMPFILE"
+   OFFSETS+=( $(wc -c < "$F") )
 done
 
 ## Calculate the total amount of bytes to be converted (in the binary file)
@@ -185,8 +189,8 @@ UNCOMPRESSED_BYTES=$(wc -c < "$TMPFILE")
 ## Compress Pack file using selected compressor
 case $COMPRESSOR in
    'zx7b')
-      echo "${COLOR_GREEN}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}" 
-      ${ZX7B} "$TMPFILE" "$TMPPACK"
+      echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}" 
+      ${ZX7B} "$TMPFILE" "$TMPPACK" > /dev/null
    ;;
    *)
       paramError "Unknown compressor algorithm '$COMPRESSOR'." 8
@@ -194,6 +198,7 @@ case $COMPRESSOR in
 esac
 
 COMPRESSED_BYTES=$(wc -c < "$TMPPACK")
+SAVED_BYTES=$(( UNCOMPRESSED_BYTES - COMPRESSED_BYTES ))
 
 ###############################################################
 ###############################################################
@@ -201,10 +206,27 @@ COMPRESSED_BYTES=$(wc -c < "$TMPPACK")
 ##
 cat > ${OUTFILE}.h <<TheHFile
 // File ${OUTFILE}.h generated using cpct_pack
-// Compresor used: $COMPRESSOR
+// Compresor used:   $COMPRESSOR
+// Files compressed: [ ${INFILES[*]} ]
+// Uncompressed:     $UNCOMPRESSED_BYTES bytes
+// Compressed:       $COMPRESSED_BYTES bytes
+// Space saved:      $SAVED_BYTES bytes
 //
 extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
+#define ${ARRAYNAME}_END   ($ARRAYNAME + $COMPRESSED_BYTES - 1);
 TheHFile
+
+## Output file offset constants if there is more than one file compressed
+
+if (( NINFILES > 1 )); then
+   echo >> ${OUTFILE}.h
+   echo "// Define constants for starting offsets of files in the uncompressed array" >> ${OUTFILE}.h
+   OFF=0
+   for((I=0;I<NINFILES;I++)); do
+      printf "#define %s%03d   %6s   // Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> ${OUTFILE}.h
+      OFF=$(( OFF + ${OFFSETS[$I]} ))
+   done
+fi
 
 ###############################################################
 ###############################################################
@@ -213,19 +235,22 @@ TheHFile
 cat > ${OUTFILE}.c <<TheCFile
 // File ${OUTFILE}.c generated using cpct_pack
 // Compresor used: $COMPRESSOR
+// Files compressed: [ ${INFILES[*]} ]
+// Uncompressed:     $UNCOMPRESSED_BYTES bytes
+// Compressed:       $COMPRESSED_BYTES bytes
+// Space saved:      $SAVED_BYTES bytes
 //
-const unsigned char $ARRAYNAME[$COMPRESSED_BYTES] = {
 TheCFile
 
+## Output include file in case
+if (( ${#INCLUDE} > 0 )); then
+   echo
+   echo "#include <${INCLUDE}>"
+   echo
+fi >> ${OUTFILE}.c
 
-## Output the C Array declaration and the number of bytes to stdout
-#echo "// File $OUTFILE converted using cpct_pack"
-#if (( ${#INCLUDE} > 0 )); then
-#   echo
-#   echo "#include <${INCLUDE}>"
-#   echo
-#fi
-#echo "const unsigned char ${ARRAYNAME}[${BYTES}] = {"
+## Output the declaration line for the C Array
+echo "const unsigned char $ARRAYNAME[$COMPRESSED_BYTES] = {" >> ${OUTFILE}.c
 
 ## Convert binary file to bytes in hexadecimal and store in a temporary file
 od -An -t x1 -v "$TMPPACK" > $TMPFILE
@@ -249,4 +274,11 @@ while read LINE; do
 done < $TMPFILE >> ${OUTFILE}.c
 
 ## Output end bracket and semi-colon
-echo "\n};" >> ${OUTFILE}.c
+echo >> ${OUTFILE}.c
+echo "};" >> ${OUTFILE}.c
+
+## Success message
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_LIGHT_GREEN} Success! ${COLOR_YELLOW}Files compressed \
+from ${COLOR_CYAN}${UNCOMPRESSED_BYTES}${COLOR_YELLOW} to ${COLOR_CYAN}${COMPRESSED_BYTES}${COLOR_YELLOW} bytes \
+(Saved ${COLOR_CYAN}${SAVED_BYTES}${COLOR_YELLOW} bytes)${COLOR_NORMAL}" 
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Generated files: ${COLOR_CYAN}${OUTFILE}.h ${OUTFILE}.c${COLOR_NORMAL}"
