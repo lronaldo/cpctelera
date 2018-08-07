@@ -365,6 +365,7 @@ endef
 
 #################
 # PACKZX7B: Creates a compressed file out of all the files previously added with ADD2PACK.
+# Updates IMGCFILES and OBJS2CLEAN adding new C files that result from the pack generation.
 #
 # $(1): Compressed pack file name
 # $(2): Output folder for generated files
@@ -375,7 +376,13 @@ $(if $(1),,$(error <<ERROR>> PACKZX7B requires a PACK filename as first paramete
 # Now, check that $(1) is non-empty to ensure that some files have been previously added to variable
 $(if $(PACK_$(1)),,$(error <<ERROR>> PACK filename '$(1)' does not contain any file to be packed. Is the PACK filename correctly spelled?))
 # Now generate output filename depending on output folder
-$(eval PACK_$(1)_outfile := $(if $(2),$(2)/$(1),$(1)))
-
-$(info $(PACK_$(1)_outfile))
+$(eval PACK_$(1)_outfile := $(if $(2),$(2:/=)/$(1),$(1)))
+# Construct the build target
+$(eval PACK_$(1)_target := $(PACK_$(1)_outfile).c $(PACK_$(1)_outfile).h)
+.SECONDARY: $(PACK_$(1)_target)
+$(PACK_$(1)_target): $(PACK_$(1))
+	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
+	cpct_pack $(PACK_$(1)_outfile) $(PACK_$(1))
+IMGCFILES   := $(PACK_$(1)_outfile).c $(IMGCFILES)
+OBJS2CLEAN  := $(PACK_$(1)_target) $(OBJS2CLEAN)
 endef
