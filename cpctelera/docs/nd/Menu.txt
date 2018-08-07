@@ -92,6 +92,11 @@ Group: Commandline  {
    File: cpct_winape  (commandline/cpct_winape)
    }  # Group: Commandline
 
+Group: Compression  {
+
+   File: cpct_zx7b_decrunch_s  (compression/cpct_zx7b_decrunch_s.asm)
+   }  # Group: Compression
+
 Group: Easytilemaps  {
 
    File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
@@ -288,7 +293,6 @@ Group: Video  {
 
 Text: ______________________________________________________________________
 File: License  (gpl-license.txt)
-File: cpct_zx7b_decrunch_s  (compression/cpct_zx7b_decrunch_s.asm)
 
 Group: Index  {
 
