@@ -37,7 +37,7 @@
 ##    The converted output is outputted to the standard output.
 ##
 ## Command line options:
-##    -h  | --include-header [file]     - Include a header file at the top of
+##    -i  | --include-header [file]     - Include a header file at the top of
 ## the generated output
 ##    -an | --array-name [identifier]   - Sets the identifier that will be used
 ## for the array that will be generated. G_[file] is used by default.
@@ -61,7 +61,7 @@ all the bytes of the binary in hexadecimal format"
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo 
-   echo "${COLOR_LIGHT_BLUE}  -h | --include-header ${COLOR_NORMAL}<file>"
+   echo "${COLOR_LIGHT_BLUE}  -i | --include-header ${COLOR_NORMAL}<file>"
    echo "${COLOR_CYAN}       Include a header file at the top of the generated output."
    echo
    echo "${COLOR_LIGHT_BLUE} -an | --array-name ${COLOR_NORMAL}<identifier>"
@@ -92,9 +92,9 @@ fi
 while (( $# >= 1 )); do
    case $1 in
       ## Add an include header file in the output
-      "-h" | "--include-header")
+      "-i" | "--include-header")
          if (( $# < 2 )); then
-            paramError "Modifier -h (--include-header) requires filename as include file parameter."
+            paramError "Modifier -i (--include-header) requires filename as include file parameter."
          fi
          INCLUDE="$2"
          shift
