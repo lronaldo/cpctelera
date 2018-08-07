@@ -32,6 +32,68 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+;; SLL Instructions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+
+;; Macro: sll__b
+;;    Opcode for "SLL b" instruction
+;; 
+.macro sll__b
+   .db #0xCB, #0x30  ;; Opcode for sll b
+.endm
+
+;; Macro: sll__c
+;;    Opcode for "SLL c" instruction
+;; 
+.macro sll__c
+   .db #0xCB, #0x31  ;; Opcode for sll c
+.endm
+
+;; Macro: sll__d
+;;    Opcode for "SLL d" instruction
+;; 
+.macro sll__d
+   .db #0xCB, #0x32  ;; Opcode for sll d
+.endm
+
+;; Macro: sll__e
+;;    Opcode for "SLL e" instruction
+;; 
+.macro sll__e
+   .db #0xCB, #0x33  ;; Opcode for sll e
+.endm
+
+;; Macro: sll__h
+;;    Opcode for "SLL h" instruction
+;; 
+.macro sll__h
+   .db #0xCB, #0x34  ;; Opcode for sll h
+.endm
+
+;; Macro: sll__l
+;;    Opcode for "SLL l" instruction
+;; 
+.macro sll__l
+   .db #0xCB, #0x35  ;; Opcode for sll l
+.endm
+
+;; Macro: sll___hl_
+;;    Opcode for "SLL (hl)" instruction
+;; 
+.macro sll___hl_
+   .db #0xCB, #0x36  ;; Opcode for sll (hl)
+.endm
+
+;; Macro: sll__a
+;;    Opcode for "SLL a" instruction
+;; 
+.macro sll__a
+   .db #0xCB, #0x37  ;; Opcode for sll a
+.endm
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
 ;; IXL Related Macros
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,
