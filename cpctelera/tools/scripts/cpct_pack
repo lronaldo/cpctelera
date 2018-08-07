@@ -212,8 +212,16 @@ cat > ${OUTFILE}.h <<TheHFile
 // Compressed:       $COMPRESSED_BYTES bytes
 // Space saved:      $SAVED_BYTES bytes
 //
+#ifndef ${ARRAYNAME}_${COMPRESSED_BYTES}_H
+#define ${ARRAYNAME}_${COMPRESSED_BYTES}_H
+
+// Declaration of the compressed array
 extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
-#define ${ARRAYNAME}_END   ($ARRAYNAME + $COMPRESSED_BYTES - 1);
+
+// Constant with the address of the latest byte of the compressed array
+#define ${ARRAYNAME}_end   ($ARRAYNAME + $COMPRESSED_BYTES - 1)
+
+#endif
 TheHFile
 
 ## Output file offset constants if there is more than one file compressed
