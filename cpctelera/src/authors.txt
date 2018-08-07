@@ -94,8 +94,7 @@ Section: 3rdparty software authors
  <Retro Game Asset Studio (RGAS) at http://www.cpcwiki.eu/index.php/Retro_Game_Asset_Studio>:
    * <Lachlan Keown at http://www.twitter.com/lachlankeown> (lachlankeown@gmail.com)
 
- <Img2CPC at https://github.com/AugustoRuiz/Img2CPC>: 
- <DSKGen at https://github.com/AugustoRuiz/dskgen>: 
+ <Img2CPC at https://github.com/AugustoRuiz/Img2CPC>, <DSKGen at https://github.com/AugustoRuiz/dskgen>: 
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> (augusto.ruiz@gmail.com)
 
  <libfreeimage at http://freeimage.sourceforge.net/>:
