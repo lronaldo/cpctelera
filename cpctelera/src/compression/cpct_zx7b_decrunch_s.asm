@@ -49,11 +49,71 @@
 ;; memory parts.
 ;;
 ;; Known limitations:
-;;     * This function does not do any kind of checking over pointers passed. If any of the
-;; pointers is badly calculated or incorrect, undefined behaviour will follow.
+;;     * This function does not do any kind of checking over pointers or data passed. If any of the
+;; pointers is badly calculated or incorrect, or compressed data is corrupted, undefined behaviour 
+;; will follow.
 ;;
 ;; Details:
-;;    <TODO>
+;;      This function decompresses an array of data previously compressed using ZX7B algorithm
+;; by Einar Saukas and Antonio Villena. In order to perform this decompression, two in-memory
+;; arrays are required: a *source* array containing compressed data and a *destination* array
+;; where decompressed data will be written. *source* array is only read and never changed, so
+;; it might be placed either on RAM or on ROM memory. *destination* array is required to be 
+;; in RAM, as decompressed data will be written there.
+;;
+;;      Decompression is performed starting from the end of both arrays, and progressing 
+;; backwards until their beginning, as figure 1 shows,
+;; (start code)
+;;    ---------------------------------------------------------------------------
+;;                                  M E M O R Y 
+;;    ---------------------------------------------------------------------------
+;;     Address |                     Contents                                  |
+;;    ---------------------------------------------------------------------------
+;;     0x0100  |   |   [_9_|_8_|_7_|_6_|_5_|_4_|_3_|_2_|_1_|_0_]   |   |   |   | << [Destination Array]
+;;     0x0110  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+;;     0x0120  |   |   |   {·E·|·D·|·C·|·B·|·A·}   |   |   |   |   |   |   |   | << {Source Array}
+;;    ---------------------------------------------------------------------------
+;;                  0x0123 {^··Source Array···^} 0x0127
+;;              0x0102 [^__________Destination Array__________^] 0x010B
+;;
+;;    Figure 1. Example memory disposition of a source and a destination array
+;; (end code)
+;;    The example in figure 1 shows a *source* array that takes 5 bytes from 0x0123 to 0x0127 in 
+;; memory, and a 10-bytes destination array from 0x0102 to 0x010B in memory. In this example, 
+;; *source_end* equals 0x0127 whereas *dest_end* equals 0x010B. Decompression starts reading byte
+;; at *source_end* (0x0127 = A) and writing decompressed data from *dest_end* (0x010B = 0) backwards.
+;; Once first byte is decompressed, previous one at *source_end - 1* (0x0126) follows. Decompression
+;; continues reading *source* array backwards and writing at *destination* array backwards too, 
+;; until the end of compressed data (0x0123 = E) is reached.
+;;
+;;    Following you will found an use example,
+;; (start code)
+;;    // Amstrad CPC Video Memory starts at 0xC000 and ends at 0xFFFF
+;;    // Decrunching function requires a pointer to the end of this "array"
+;;    #define VIDEO_MEMORY_END   (void*)(0xFFFF)
+;;
+;;    //////////////////////////////////////////////////////////////////////////
+;;    // This function draws the background of the next screen of this game.
+;;    // It takes the compressed image of the background and directly 
+;;    // decompresses it to video memory
+;;    //
+;;    void decruch_background_to_screen(u8 screen_num) {
+;;       // Get a pointer to the end of the array that contains 
+;;       // crunched screen data. That is: beginning + size - 1
+;;       void *scr_crunched_data_end = game_screens[screen_num].crunched_data + game_screens[screen_num].size - 1;
+;;
+;;       // Directly decompress crunched screen data to video memory to 
+;;       // show the background there
+;;       cpct_zx7b_decrunch_s(VIDEO_MEMORY_END, scr_crunched_data_end);
+;;    }      
+;;  
+;; (end code)
+;;
+;;    There is no need to specify array sizes. Decompression routine ends when the end marker of 
+;; compressed data is found. That end marker is placed at the beginning of the *source* array 
+;; (0x0123 in the example). This means that corrupted compressed data or an error in the *source_end*
+;; pointer will potentially lead this routine to continue decompressing in an undefined-end loop, 
+;; probably overwriting other places in memory, previous to the beginning of *destination* array.
 ;;
 ;; Destroyed Register values: 
 ;;      AF,  BC,  DE,  HL
