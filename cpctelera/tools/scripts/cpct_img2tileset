@@ -109,10 +109,13 @@ TRANSPARENT_INDEX=""
 TRANSPARENT_INDEX_MSG="no"
 TILES_WIDTH=4
 TILES_HEIGHT=4
-TILES_BASENAME=g_tile
+TILES_BASENAME_DEFAULT=g_tile
 MODE=0
 MODEFACTOR=( 2 4 8 )
 MODECOLOURS=( 16 4 2 )
+VALIDFORMATS=( c bin )
+OUTPUT_FORMAT="c"
+OUTPUT_FORMAT_OPTION="-of c"
 
 ## Simbols used as 'parentheses' delimiters for passing arrays as parameters
 LPAR="{"
@@ -240,7 +243,7 @@ while (( $# >= 1 )); do
          fi
 
          TILES_BASENAME="${TILES_BASENAME_PREFIX}${2}"
-         ABSOLUTE_BASENAME="-abs"
+         ABSOLUTE_BASENAME="-abn"
          shift
       ;;
       ## Get basename prefix for tiles
@@ -306,16 +309,14 @@ while (( $# >= 1 )); do
       ;;
       ## Select output format 
       "-of" | "--output-format")
+         OUTPUT_FORMAT=$(toLower "$2")
          ## Output format must be from a list of valid output formats
-         #if isEmpty "$2"; then
-         #   paramError "Parameter -bnp (--tiles-basename-prefix) must be followed by a valid C identifier." 15
-         #elif ! isValidCIdentifier "$2"; then
-         #   paramError "'$2' is not a valid C-identifier for -bnp (--tiles-basename-prefix)." 16
-         #fi
+         if ! contains ${VALIDFORMATS[@]} "$OUTPUT_FORMAT"; then
+             paramError "'$2' is not a valid output format for -of (--output-format). Valid formats are: ${VALIDFORMATS[*]}" 16
+         fi
 
-         #TILES_BASENAME_PREFIX="$2"
-         #TILES_BASENAME="${2}${TILES_BASENAME}"
-         #shift
+         OUTPUT_FORMAT_OPTION="-of ${OUTPUT_FORMAT}"
+         shift
       ;;
       ## Get a palette as an array of firmware values
       "-pf" | "--palette-firmware")
@@ -457,6 +458,11 @@ manually and run this script again."
    fi
 fi
 
+## Fix TILES BASENAME
+if [ "$TILES_BASENAME" = "" ]; then
+   TILES_BASENAME="$TILES_BASENAME_DEFAULT"
+fi
+
 ##
 ## Generate Gray Code sequence for Gray-Coded Row Orders
 ##
@@ -487,6 +493,7 @@ echo "${COLOR_GREEN}Interlaced Mask : ${COLOR_LIGHT_YELLOW}${INTERLACED_MASKS_MS
 echo "${COLOR_GREEN}Transparency    : ${COLOR_LIGHT_YELLOW}${TRANSPARENT_INDEX_MSG}"
 echo "${COLOR_GREEN}Generate Tileset: ${COLOR_LIGHT_YELLOW}${GENTILESET_MSG}"
 echo "${COLOR_GREEN}Basename        : ${COLOR_LIGHT_YELLOW}'${TILES_BASENAME}'"
+echo "${COLOR_GREEN}Output Format   : ${COLOR_LIGHT_YELLOW}${OUTPUT_FORMAT}"
 echo "${COLOR_GREEN}Pixel Order     : ${COLOR_LIGHT_YELLOW}${PIXELORDER_MSG}"
 echo "${COLOR_GREEN}Row Order       : ${COLOR_LIGHT_YELLOW}${ROWORDER_MSG}"
 printf "${COLOR_GREEN}Palette         : ${COLOR_LIGHT_YELLOW}"
@@ -504,20 +511,41 @@ echo "${COLOR_LIGHT_RED}[${COLOR_LIGHT_YELLOW}PROCESSING${COLOR_LIGHT_RED}]${COL
 to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${COLOR_CYAN}..."
 
 ## Run IMG2CPC and check exit status
-if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
--w "$TILES_WIDTH" -h "$TILES_HEIGHT" $ABSOLUTE_BASENAME -bn "$TILES_BASENAME" --includes "<types.h>" -osz \
+echo ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" $OUTPUT_FORMAT_OPTION -m "$MODE" \
+-w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" $ABSOLUTE_BASENAME --includes "<types.h>" -osz \
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $PIXELORDER "${FILE}"
+if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" $OUTPUT_FORMAT_OPTION -m "$MODE" \
+-w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" $ABSOLUTE_BASENAME --includes "<types.h>" -osz \
 -o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $PIXELORDER "${FILE}"; then
-   ## Change generated palette names from ${TILES_BASENAME}_palette to selected name, in case
-   if [ "${OUTPUTPALETTE_ID}" != "" ]; then
-      replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.c"
-      replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.h"
-   fi
-
-   ## Success message
-   echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and \
+   ## Postprocess depending on output format
+   if [ "${OUTPUT_FORMAT}" = "c" ]; then
+      ## Change generated palette names from ${TILES_BASENAME}_palette to selected name, in case
+      if [ "${OUTPUTPALETTE_ID}" != "" ]; then
+         replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.c"
+         replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.h"
+      fi
+   
+      ## Success message
+      echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and \
 '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.h${COLOR_CYAN}' have been created with ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s \
 codification of tiles/sprites from '${COLOR_NORMAL}$FILE${COLOR_CYAN}'.${COLOR_NORMAL}"
-   echo
+      echo
+   elif [ "${OUTPUT_FORMAT}" = "bin" ]; then
+      ## Change generated palette names from ${TILES_BASENAME}_palette to selected name, in case
+      if [ "${OUTPUTPALETTE_ID}" != "" ]; then
+         TBNU=$(toUpper ${TILES_BASENAME})
+         OPIDU=$(toUpper ${OUTPUTPALETTE_ID})
+         replaceTag "${TBNU}_PALETTE_OFF"  "${OPIDU}_OFF"  "${IMG2CPC_OUTPUT}.h"
+         replaceTag "${TBNU}_PALETTE_SIZE" "${OPIDU}_SIZE" "${IMG2CPC_OUTPUT}.h"
+         replaceTag "${TBNU}_PALETTE_OFF"  "${OPIDU}_OFF"  "${IMG2CPC_OUTPUT}.h.s"
+         replaceTag "${TBNU}_PALETTE_SIZE" "${OPIDU}_SIZE" "${IMG2CPC_OUTPUT}.h.s"
+      fi
+
+      echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.bin${COLOR_CYAN}', \
+'${COLOR_NORMAL}${IMG2CPC_OUTPUT}.h${COLOR_CYAN}' and '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.h.s${COLOR_CYAN}' have been \
+created with ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s codification of tiles/sprites from \
+'${COLOR_NORMAL}$FILE${COLOR_CYAN}'.${COLOR_NORMAL}"
+   fi
 else
    ## Error message
    echo "${COLOR_LIGHT_RED}ERROR!${COLOR_WHITE} Some error happened while processing file with img2cpc. Please, "\
