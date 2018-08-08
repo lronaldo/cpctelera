@@ -54,21 +54,23 @@
 ##
 ## Command line options:
 ##    -bn  | --tiles-basename  <name>          - Sets the basename that will be used as C-identifier 
-##                                              for tiles or sprites. Default: g_tile
+##                                               for tiles or sprites. Default: g_tile
 ##    -bnp | --tiles-basename-prefix <prefix>  - Sets the prefix for the basename that will be used for the 
-##                                               C-identifier of tiles and sprites. C-identifier will be "<prefix>_filename"
+##                                               C-identifier of tiles and sprites. C-identifier will be "<prefix>_<image_file>"
 ##    -g   | --gray-code                       - Generate rows of pixels ordered in Gray Code sequence.
 ##                                               For example, for 8 rows the order would be { 0, 1, 3, 2, 6, 7, 5, 4 }
 ##    -h   | --help                            - Shows help information on the terminal.
 ##    -im  | --interlaced-masks                - Generates transparent sprites with interlaced masks
-##                                              using 0 as the default index of the palette colour to
-##                                              be considered transparent
+##                                               using 0 as the default index of the palette colour to
+##                                               be considered transparent
 ##    -m   | --mode <cpc_graphics_mode>        - Sets the CPC Graphics mode the output data will 
-##                                              be produced for (0, 1 or 2). Default: 0.
+##                                               be produced for (0, 1 or 2). Default: 0.
 ##    -nt  | --no-tileset                      - Do not generate a tileset array containing pointers to
-##                                              generated sprites/tiles.
-##    -oph | --output-palette-hardware <name>  - Generate output palette array containing hardware values.
-##                                              Resulting palette array will be named <name>
+##                                               generated sprites/tiles.
+##    -oph | --output-palette-hardware         - Generate output palette array containing hardware values.
+##                                               Resulting palette array will be named "<prefix>_palette"
+##    -opn | --output-palette-hard-named <name>- Generate output palette array containing hardware values.
+##                                               Resulting palette array will be named <name>
 ##    -of  | --output-format <format>          - Sets the output format. Valid formats: c, bin. Default: c
 ##    -pf  | --palette-firmware <palete_array> - Sets the Amstrad CPC palette 
 ##               to be used for the conversion as an array of firmware colour values (up to 16, 
@@ -166,7 +168,9 @@ of the palette to be considered transparent."
    echo "${COLOR_CYAN}       Do not generate a tileset array containing pointers to generated sprites/tiles."
    echo "${COLOR_LIGHT_BLUE}  -of  | --output-format <format>"
    echo "${COLOR_CYAN}       Sets the output format. Valid formats: c, bin. Default: c"
-   echo "${COLOR_LIGHT_BLUE}  -oph | --output-palette-hardware <name>"
+   echo "${COLOR_LIGHT_BLUE}  -oph | --output-palette-hardware"
+   echo "${COLOR_CYAN}       Generate output palette array containing hardware values. Resulting palette array will be named \"<prefix>_palette\""
+   echo "${COLOR_LIGHT_BLUE}  -opn | --output-palette-hard-named <name>"
    echo "${COLOR_CYAN}       Generate output palette array containing hardware values. Resulting palette array will be named <name>."
    echo "${COLOR_LIGHT_BLUE}  -pf  | --palette-firmware <palete_array> "
    echo "${COLOR_CYAN}       Sets the Amstrad CPC palette to be used for the conversion as an array \
@@ -285,15 +289,33 @@ while (( $# >= 1 )); do
       ;;
       ## Generate output palette as hardware values
       "-oph" | "--output-palette-hardware")
+         OUTPUTPALETTE="-ophw"
+         OUTPUTPALETTE_ID=""
+      ;;
+      ## Generate output palette as hardware values
+      "-opn" | "--output-palette-hard-named")
          ## Hardware palette requires a valid C-identifier
          if isEmpty "$2"; then
-            paramError "Parameter -oph (--output-palette-hardware) must be followed by the C-identifier for the palette." 13
+            paramError "Parameter -opn (--output-palette-hard-named) must be followed by the C-identifier for the palette." 13
          elif ! isValidCIdentifier "$2"; then
-            paramError "Palette name '$2' for option -oph (--output-palette-hardware) is not a valid C-identifier." 14
+            paramError "Palette name '$2' for option -opn (--output-palette-hard-named) is not a valid C-identifier." 14
          fi
          OUTPUTPALETTE="-ophw"
          OUTPUTPALETTE_ID="$2"
          shift
+      ;;
+      ## Select output format 
+      "-of" | "--output-format")
+         ## Output format must be from a list of valid output formats
+         #if isEmpty "$2"; then
+         #   paramError "Parameter -bnp (--tiles-basename-prefix) must be followed by a valid C identifier." 15
+         #elif ! isValidCIdentifier "$2"; then
+         #   paramError "'$2' is not a valid C-identifier for -bnp (--tiles-basename-prefix)." 16
+         #fi
+
+         #TILES_BASENAME_PREFIX="$2"
+         #TILES_BASENAME="${2}${TILES_BASENAME}"
+         #shift
       ;;
       ## Get a palette as an array of firmware values
       "-pf" | "--palette-firmware")
@@ -485,9 +507,11 @@ to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${
 if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" -of c -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" $ABSOLUTE_BASENAME -bn "$TILES_BASENAME" --includes "<types.h>" -osz \
 -o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $PIXELORDER "${FILE}"; then
-   ## Change generated palette names from ${TILES_BASENAME}_palette to selected name
-   replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.c"
-   replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.h"
+   ## Change generated palette names from ${TILES_BASENAME}_palette to selected name, in case
+   if [ "${OUTPUTPALETTE_ID}" != "" ]; then
+      replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.c"
+      replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.h"
+   fi
 
    ## Success message
    echo "${COLOR_LIGHT_GREEN} SUCCESS! ${COLOR_CYAN}Files '${COLOR_NORMAL}${IMG2CPC_OUTPUT}.c${COLOR_CYAN}' and \
