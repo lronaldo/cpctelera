@@ -258,7 +258,10 @@ endef
 #       "tileset": generate a tileset array including pointers to all sprites
 #		"zgtiles": generate tiles in Zig-Zag pixel order, Gray Code row order
 # $(8): Output subfolder for generated .C and .H files (inside project folder)
-# $(9): (hwpalette) "hwpalette":   output palette array as hardware values
+# $(9): (hwpalette, 'palettename') 
+#			""				: Do not generate a hardware palette array
+#			"hwpalette"		: Generate a palette array as hardware values named 'g_palette'
+#			"'palettename'" : Generate a palette array as hardware values with your own 'palettename' as C-identifier
 # $(10): Aditional options (you can use this to pass aditional modifiers to cpct_img2tileset)
 #
 define IMG2SPRITES
@@ -266,14 +269,20 @@ $(eval I2S_C  := $(basename $(1)).c)
 $(eval I2S_H  := $(basename $(1)).h)
 $(eval I2S_NC := $(notdir $(I2S_C)))
 $(eval I2S_NH := $(notdir $(I2S_H)))
-$(eval I2S_C2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NC)"; else echo "$(I2S_C)"; fi))
-$(eval I2S_H2 := $(shell if [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NH)"; else echo "$(I2S_H)"; fi))
+$(eval I2S_C2 := $(shell	if   [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NC)"; \
+							else echo "$(I2S_C)"; \
+							fi))
+$(eval I2S_H2 := $(shell 	if   [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NH)"; \
+							else echo "$(I2S_H)"; \
+							fi))
 $(eval I2S_CH := $(I2S_C2) $(I2S_H2))
 $(eval I2S_P  := $(shell 	if   [ "$(7)" = "mask" ]; then echo "-nt -im"; \
-							elif [ "$(7)" = "zgtiles" ]; then echo "-z -g"; \
-							elif [ ! "$(7)" = "tileset" ]; then echo "-nt"; \
+							elif [ "$(7)" = "zgtiles" ]; then echo "-z -g -nt"; \
+							elif [ "$(7)" != "tileset" ]; then echo "-nt"; \
 							fi))
-$(eval I2S_P  := $(I2S_P) $(shell if [ "$(9)" = "hwpalette" ]; then echo "-oph"; fi))
+$(eval I2S_P  := $(I2S_P) $(shell if   [ "$(9)"  = "hwpalette" ]; then echo "-oph"; \
+							      elif [ "$(9)" != ""          ]; then echo "-oph $(9)"; \
+							      fi))
 .SECONDARY: $(I2S_CH)
 $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
