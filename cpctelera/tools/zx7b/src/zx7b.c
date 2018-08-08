@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
   size_t output_size;
   size_t partial_counter;
   size_t total_counter;
-  char *output_name;
+//  char *output_name;
   int i, j;
 
   if( argc==1 )
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 
   /* write output file */
   if( fwrite(output_data, sizeof(char), output_size, ofp) != output_size )
-    fprintf(stderr, "Error: Cannot write output file %s\n", output_name),
+    fprintf(stderr, "Error: Cannot write output file %s\n", argv[2]),
     exit(1);
 
   /* close output file */
@@ -184,7 +184,7 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
   size_t input_prev;
   int offset1;
   int mask;
-  int i;
+//  int i;
 
   /* calculate and allocate output buffer */
   input_index= input_size-1;

@@ -6,7 +6,7 @@ OBJ  = obj
 SRC  = src
 BIN  = bin
 
-CFLAGS  = -O3 -fsigned-char -DUNIX
+CFLAGS  = -O3 -fsigned-char -Werror -Wall -DUNIX
 
 TARGET = $(BIN)/zx7b
 FILES  = zx7b
