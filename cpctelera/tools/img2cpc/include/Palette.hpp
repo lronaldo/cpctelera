@@ -13,6 +13,7 @@ using namespace std;
 
 class TPalette {
 public:
+	TPalette();
 	vector<Color> Current;
 	int TransparentIndex = -1;
 
@@ -31,10 +32,13 @@ public:
 	static vector<Color> Firmware;
 	static map <int, Color&> Hardware;
 
-
 	vector<int> GetPaletteAsFW();
 	vector<int> GetPaletteAsHW();
 
+	void UpdateMaxEntries(int mode, bool usesMasks);
+
+private:
+	int _maxEntries;
 };
 
 #endif

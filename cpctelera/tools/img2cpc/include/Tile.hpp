@@ -72,20 +72,25 @@ public:
 
 		for(unsigned char s : this->SourceValues) {
 			Color c = this->Palette.Current[s];
-			
-			pos[FI_RGBA_RED] = c.R;
-			pos[FI_RGBA_GREEN] = c.G;
-			pos[FI_RGBA_BLUE] = c.B;
-			
-			pos += 3;			
+			if (c.A) {
+				pos[FI_RGBA_RED] = c.R;
+				pos[FI_RGBA_GREEN] = c.G;
+				pos[FI_RGBA_BLUE] = c.B;
+			}
+			else {
+				pos[FI_RGBA_RED] = 255;
+				pos[FI_RGBA_GREEN] = 0;
+				pos[FI_RGBA_BLUE] = 255;
+			}
+			pos += 3;
 		}
 
 		stringstream ss;
-		ss << this->Name << ".png";
+		ss << this->Name << ".out.png";
 		string fileName = ss.str();
 		FileUtils::SaveImage(fileName, this->TileWidth, this->TileHeight, rgbValues);
 
-		delete rgbValues;
+		delete[] rgbValues;
 	}
 
 	void GenMaskImage() {
@@ -103,7 +108,7 @@ public:
 		string fileName = ss.str();
 		FileUtils::SaveImage(fileName, this->TileWidth, this->TileHeight, rgbValues);
 
-		delete rgbValues;
+		delete[] rgbValues;
 	}
 
 };
