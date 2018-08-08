@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <iomanip>
+#include <cstdint>
 #include "ConversionOptions.hpp"
 #include "Tile.hpp"
 #include "FileUtils.hpp"
@@ -554,9 +555,7 @@ public:
 		os << ASM_COMMENT_PREFIX << DATA_CREATED_WITH << '\n';
 		oh << C_COMMENT_PREFIX << DATA_CREATED_WITH << '\n';
 		
-		// Generate Palettes and Tileset
-		//DumpPaletteASXXXX(options, os);
-		//DumpPaletteC(options, oh);
+		// Generate Palettes 
 		unsigned int totalBytes = DumpPaletteBIN(options, ofs);
 		ss.str("");
 		ss << "Palete constants\n";
@@ -572,9 +571,16 @@ public:
 		oh << "#define " << palette_name << "_OFF    0\n";
 		oh << "#define " << palette_name << "_SIZE   " << totalBytes << "\n\n";
 
+		// Generate Tileset
 		if(options.CreateTileset) {
-			DumpTileMapASXXXX(tiles, options, os);
-			DumpTileMapC(tiles, options, oh);
+			ss.str("");
+			ss << " No tileset has been generated, because tilesets require absolute pointers and binary generation can only generate offsets.\n";
+			os << ";; " << ss.str();
+			oh << "// " << ss.str();
+			ss.str("");
+			ss << " However, you can calculate your own tileset by adding up offsets of tiles to the address where the first tile starts.\n\n";
+			os << ";; " << ss.str();
+			oh << "// " << ss.str();
 		}
 
 		unsigned int numTiles = tiles.size();
