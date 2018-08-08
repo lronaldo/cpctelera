@@ -133,6 +133,25 @@ public:
 		asmOfs.close();
 	}
 
+	void DumpPaletteC(ConversionOptions &options, ofstream &ofs) {
+		vector<int> palette = GetPaletteValues(options);
+		unsigned int numColors = palette.size();
+		if (numColors > 0) {
+			ofs << "// Palette uses " << ConversionOptions::ToString(options.PaletteFormat) << " values." << endl;
+			
+			ofs << "const unsigned char ";
+			if(!options.BaseName.empty()) {
+				ofs << options.BaseName << "_";
+			}
+			ofs << "palette["<< numColors <<"] = { 0x" << toHexString(palette[0]);
+			
+			for (unsigned int i = 1; i<numColors; ++i) {
+				ofs << ", 0x" << toHexString(palette[i]);
+			}
+			ofs << "}\n\n";
+		}
+	}
+
 	void DumpPaletteASM(ConversionOptions &options, ofstream &ofs) {
 		vector<int> palette = GetPaletteValues(options);
 		unsigned int numColors = palette.size();
@@ -172,6 +191,35 @@ public:
 				ofs << "#0x" << toHexString(palette[i]);
 			}
 			ofs << endl << endl;
+		}
+	}
+
+	unsigned int DumpPaletteBIN(ConversionOptions &options, ofstream &ofs) {
+		vector<int> palette = GetPaletteValues(options);
+		unsigned int numColors = palette.size();
+		for (unsigned int i = 0; i<numColors; ++i) {
+			ofs << (unsigned char)palette[i];
+		}
+		return numColors;
+	}
+
+	void DumpTileMapC(vector<Tile*> tiles, ConversionOptions &options, ofstream &ofs) {
+		unsigned int numTiles = tiles.size();
+		if (numTiles > 0) {
+			ofs << options.BaseName << "_tileset["<< numTiles <<"] = { " << tiles[0]->Name;
+			for (unsigned int i = 1; i < numTiles; ++i) {
+				ofs << ", " << tiles[i]->Name;
+			}
+			ofs << "}\n\n";
+			
+			if (options.Palette.TransparentIndex >= 0 && !(options.NoMaskData || options.InterlaceMasks)) {
+				ofs << options.BaseName <<"_masks_tileset["<< numTiles << "] = { " << tiles[0]->Name << "_mask";
+				
+				for (unsigned int i = 0; i < numTiles; ++i) {
+					ofs << ", " << tiles[i]->Name << "_mask";
+				}
+				ofs << "}\n\n";
+			}
 		}
 	}
 
@@ -421,7 +469,7 @@ public:
 
 	}
 	
-	void GenerateBIN(vector<Tile*> tiles, ConversionOptions &options) {
+	void GenerateMultipleBIN(vector<Tile*> tiles, ConversionOptions &options) {
 		stringstream ss;
 		ss << options.OutputFileName << ".asm";
 		string fileName = ss.str();
@@ -490,6 +538,108 @@ public:
 			}
 		}
 		os.close();
+	};
+
+
+	void GenerateBIN(vector<Tile*> tiles, ConversionOptions &options) {
+		// Setup .bin, .h and .h.s files
+		stringstream ss;
+		ss << options.OutputFileName << ".h.s"; ofstream os(ss.str()); ss.str("");
+		ss << options.OutputFileName << ".h";   ofstream oh(ss.str()); ss.str("");
+		ss << options.OutputFileName << ".bin"; ofstream ofs(ss.str(), ios::binary);
+
+		//string baseOutputFileName = FileUtils::RemoveExtension(options.OutputFileName);
+
+		// Initial comments
+		os << ASM_COMMENT_PREFIX << DATA_CREATED_WITH << '\n';
+		oh << C_COMMENT_PREFIX << DATA_CREATED_WITH << '\n';
+		
+		// Generate Palettes and Tileset
+		//DumpPaletteASXXXX(options, os);
+		//DumpPaletteC(options, oh);
+		unsigned int totalBytes = DumpPaletteBIN(options, ofs);
+		ss.str("");
+		ss << "Palete constants\n";
+		os << ";; " << ss.str();
+		oh << "// " << ss.str();
+		ss.str("");
+		if(!options.BaseName.empty()) ss << options.BaseName << "_";
+		ss << "palette";
+		string palette_name = ss.str();
+		transform(palette_name.begin(), palette_name.end(), palette_name.begin(), ::toupper);
+		os << palette_name << "_OFF  = 0\n";
+		os << palette_name << "_SIZE = " << totalBytes << "\n\n";
+		oh << "#define " << palette_name << "_OFF    0\n";
+		oh << "#define " << palette_name << "_SIZE   " << totalBytes << "\n\n";
+
+		if(options.CreateTileset) {
+			DumpTileMapASXXXX(tiles, options, os);
+			DumpTileMapC(tiles, options, oh);
+		}
+
+		unsigned int numTiles = tiles.size();
+		if (numTiles > 0) {
+			for (Tile* t : tiles) {
+				int numBytes = t->Data.size();
+				if (numBytes > 0) {
+					string defineBase = t->Name;
+					transform(defineBase.begin(), defineBase.end(), defineBase.begin(), ::toupper);
+
+					// Tile information in the comment
+					ss.str(""); 
+					ss << "Tile " << t->Name << " - " << t->TileWidth << "x" << t->TileHeight 
+						<< " pixels, " << t->TileWidthInBytes << "x" << t->TileHeight 
+						<< (options.InterlaceMasks && options.Palette.TransparentIndex >= 0 ? "x2" : "") 
+						<< " bytes." << '\n';
+					os << ";; " << ss.str();
+					oh << "// " << ss.str();
+
+					// Tile constants
+					if(options.OutputSize) {
+						os << defineBase << "_OFF      = " << totalBytes << '\n';
+						os << defineBase << "_SIZE     = " << numBytes << '\n';
+						os << defineBase << "_W        = " << t->TileWidthInBytes << '\n';
+						os << defineBase << "_H        = " << t->TileHeight << '\n';
+						oh << "#define " << defineBase << "_OFF        " << totalBytes << '\n';
+						oh << "#define " << defineBase << "_SIZE       " << numBytes << '\n';
+						oh << "#define " << defineBase << "_W          " << t->TileWidthInBytes << '\n';
+						oh << "#define " << defineBase << "_H          " << t->TileHeight << '\n';
+					}
+
+					// Mask Data
+					if (options.InterlaceMasks && options.Palette.TransparentIndex >= 0) {
+						ss.str("");
+						ss << "Mask data is interlaced (MASK BYTE, DATA BYTE)." << '\n';
+						os << ";; " << ss.str();
+						oh << "// " << ss.str();
+						for (int i = 0; i < numBytes; ++i) {
+							ofs << t->MaskData[i] << t->Data[i];
+						}
+					} else {
+						for (int i = 0; i < numBytes; ++i) {
+							ofs << t->Data[i];
+						}
+
+						// Non-interlaced Mask Data
+						if (options.Palette.TransparentIndex >= 0 && !(options.NoMaskData)) {
+							//os << t->Name << "_mask:" << '\n';
+							totalBytes += numBytes;
+							os << defineBase << "_MASK_OFF = " << totalBytes << '\n';
+							oh << "#define " << defineBase << "_MASK_OFF   " << totalBytes << '\n';
+
+							for (int i = 0; i < numBytes; ++i) {
+								ofs << t->MaskData[i];
+							}
+						}
+					}
+				}
+				// Update totalbytes
+				totalBytes += numBytes;
+			}
+		}
+		os.close();
+		oh.close();
+		ofs.close();
 	};
 
 	void GenerateH(vector<Tile*> tiles, ConversionOptions &options) {
