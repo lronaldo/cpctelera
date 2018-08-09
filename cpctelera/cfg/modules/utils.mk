@@ -67,7 +67,7 @@ define JOINFOLDER2BASENAME
 		if [ "$(J2B_2)" != "" ]; then \
 			A="$(J2B_2)"; A="$${A%%/}"; \
 			echo "$${A}/$(JF2BN_F)"; \
-		else \ 
+		else \
 			echo "$(J2B_3)"; \
 		fi))
 	$(eval undefine JF2BN_F)
