@@ -32,6 +32,7 @@
 I2S_PAL  := 
 I2S_MODE := -m 0
 I2S_MASK := 
+I2S_FMT  := 
 I2S_OUT  := -of c
 I2S_FOLD := src/
 I2S_EXTP := 
@@ -128,6 +129,24 @@ define IMG2SP_SET_FOLDER
 endef
 
 #################
+# IMG2SP_SET_FORMAT: Sets the pixel format to be used for following IMG2SP CONVERT commands
+#
+# $(1): Pixel Format { sprites, zgtiles, screen }
+#
+# Updates variable I2S_FOLD
+#
+define IMG2SP_SET_FORMAT
+	# Check that selected format is valid
+	$(eval I2S_FMT_VALS := sprites zgtiles screen)
+	$(if $(filter $(I2S_FMT_VALS),$(1)),,$(error <<ERROR>> '$(1)' is not valid for IMG2SP SET_FORMAT. Valid values are: {$(I2S_FMT_VALS)}))
+
+	# Convert selected format into options
+	$(eval I2S_FMT := $(if $(filter-out $(1),sprites),,))
+	$(eval I2S_FMT := $(if $(filter-out $(1),zgtiles),,-z -g))
+	$(eval I2S_FMT := $(if $(filter-out $(1),screen),,-scr))	
+endef
+
+#################
 # IMG2SP_SET_EXTRAPAR: Sets extra parameters to be used for following IMG2SP CONVERT commands
 #
 # $(1): Extra parameters
@@ -168,7 +187,7 @@ define IMG2SP_CONVERT_BIN
 .SECONDARY: $(I2S_CSB)
 $(I2S_CSB): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into binary data and .h + .h.s files for declarations...")
-	cpct_img2tileset $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) -nt -bn "$(4)" -tw "$(2)" -th "$(3)" $(I2S_EXTP) $(1);
+	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) -nt -bn "$(4)" -tw "$(2)" -th "$(3)" $(I2S_EXTP) $(1);
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_S)' > '$(I2S_S2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
@@ -215,7 +234,7 @@ define IMG2SP_CONVERT_C
 .SECONDARY: $(I2S_CH)
 $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
-	cpct_img2tileset $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_TILS) $(I2S_GPAL) -bn "$(4)" -tw "$(2)" -th "$(3)" $(I2S_EXTP) $(1);
+	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_TILS) $(I2S_GPAL) -bn "$(4)" -tw "$(2)" -th "$(3)" $(I2S_EXTP) $(1);
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
@@ -247,7 +266,7 @@ endef
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
 #
-# Valid Commands: SET_PALETTE_FW SET_MODE SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT
+# Valid Commands: SET_PALETTE_FW SET_MODE SET_FORMAT SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT
 # Info about each command can be found looking into its correspondent makefile macro IMG2SP_<COMMAND>
 #
 # When using CONVERT commands, IMGCFILES and OBJS2CLEAN are updated to add new C files that result from the pack generation.
@@ -258,7 +277,7 @@ define IMG2SP
 		,$(error <<ERROR>> '$(1)' is not a valid command for IMG2SP. Commands must be exactly one-word in lenght with no whitespaces)\
 		,)
 	# Set the list of valid commands
-	$(eval IMG2SP_F_FUNCTIONS = SET_PALETTE_FW SET_MODE SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT)
+	$(eval IMG2SP_F_FUNCTIONS = SET_PALETTE_FW SET_MODE SET_FORMAT SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT)
 	# Filter given command as $(1) to see if it is one of the valid commands
 	$(eval IMG2SP_F_SF = $(filter $(IMG2SP_F_FUNCTIONS),$(1)))
 	# If the given command is valid, it will be non-empty, then we proceed to call the command (up to 8 arguments). Otherwise, raise an error
