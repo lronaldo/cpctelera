@@ -155,6 +155,7 @@ CFILES         := $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
 ASMFILES       := $(filter-out $(IMGASMFILES), $(ASMFILES))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
+BIN2CFILES     := $(filter-out $(IMGBINFILES), $(BIN2CFILES))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
 
 # Calculate all object files
@@ -167,3 +168,4 @@ ASM_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.
 DSKINCOBJFILES := $(foreach FILE, $(DSKINCSRCFILES), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(FILE)).$(DSKINC_EXT))
 OBJFILES       := $(C_OBJFILES) $(ASM_OBJFILES)
 GENOBJFILES    := $(GENC_OBJFILES) $(GENASM_OBJFILES)
+NONLINKGENFILES:= $(IMGBINFILES)
