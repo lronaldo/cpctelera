@@ -392,7 +392,7 @@ while (( $# >= 1 )); do
       ## Zig-Zag pixel order
       "-scr" | "--screen-format")
          SCREEN_FORMAT="-scr"
-         SCREEN_FORMAT="Screen Distribution"
+         SCREEN_FORMAT_MSG="Screen Distribution"
       ;;
       ## Get transparent Index for generating Masks
       "-t" | "--transparent-index")
