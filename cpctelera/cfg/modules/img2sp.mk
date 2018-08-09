@@ -139,7 +139,53 @@ define IMG2SP_SET_EXTRAPAR
 endef
 
 #################
-# IMG2SP_CONVERT: Converts an image file into data ready to be used in the program
+# IMG2SP_CONVERT_BIN: Converts an image file into data ready to be used in the program.
+# 				      This version of the macro converts to binary.
+#
+# $(1): Image file
+# $(2): Horizontal resolution of each converted tile in pixels
+# $(3): Vertical resolution of each converted tile in pixels
+# $(4): C-identifier for the array containing pixel data
+# $(5): C-identifier for the array containing generated palette (if required)
+# $(6): C-identifier for the array containing generated tileset (ignored: no tileset produced on binary output)
+#
+# Updates IMGCFILES and OBJS2CLEAN adding new C files that result from the pack generation.
+#
+define IMG2SP_CONVERT_BIN
+	# Set up C and H files and paths
+	$(eval I2S_S := $(basename $(1)).h.s)
+	$(eval I2S_H := $(basename $(1)).h)
+	$(eval I2S_B := $(basename $(1)).bin)
+	$(eval $(call JOINFOLDER2BASENAME, I2S_S2, $(I2S_FOLD), $(I2S_S)))
+	$(eval $(call JOINFOLDER2BASENAME, I2S_H2, $(I2S_FOLD), $(I2S_H)))
+	$(eval $(call JOINFOLDER2BASENAME, I2S_B2, $(I2S_FOLD), $(I2S_B)))
+	$(eval I2S_CSB := $(I2S_S2) $(I2S_H2) $(I2S_B2))
+	
+	# Check if we have to generate a palette or not
+	$(eval I2S_GPAL := $(if $(5),-opn "$(5)",))
+
+# Generate target for image conversion
+.SECONDARY: $(I2S_CSB)
+$(I2S_CSB): $(1)
+	@$(call PRINT,$(PROJNAME),"Converting $(1) into binary data and .h + .h.s files for declarations...")
+	cpct_img2tileset $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) -nt -bn "$(4)" -tw "$(2)" -th "$(3)" $(I2S_EXTP) $(1);
+	@$(call PRINT,$(PROJNAME),"Moving generated files:")
+	@$(call PRINT,$(PROJNAME)," - '$(I2S_S)' > '$(I2S_S2)'")
+	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
+	@$(call PRINT,$(PROJNAME)," - '$(I2S_B)' > '$(I2S_B2)'")
+	@if [ "$(I2S_FOLD)" != "" ]; then \
+	   mv "$(I2S_S)" "$(I2S_S2)"; \
+	   mv "$(I2S_H)" "$(I2S_H2)"; \
+	   mv "$(I2S_B)" "$(I2S_B2)"; \
+	fi
+
+# Variables that need to be updated to ensure they are erased on clean
+IMGBINFILES := $(I2S_B2) $(IMGBINFILES)
+OBJS2CLEAN  := $(I2S_CSB) $(OBJS2CLEAN)
+endef
+
+#################
+# IMG2SP_CONVERT_C: Converts an image file into data ready to be used in the program
 #
 # $(1): Image file
 # $(2): Horizontal resolution of each converted tile in pixels
@@ -150,7 +196,8 @@ endef
 #
 # Updates IMGCFILES and OBJS2CLEAN adding new C files that result from the pack generation.
 #
-define IMG2SP_CONVERT
+define IMG2SP_CONVERT_C
+	$(info PERFORMING: c conversion)
 	# Set up C and H files and paths
 	$(eval I2S_C := $(basename $(1)).c)
 	$(eval I2S_H := $(basename $(1)).h)
@@ -180,6 +227,17 @@ $(I2S_CH): $(1)
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGCFILES  := $(I2S_C2) $(IMGCFILES)
 OBJS2CLEAN := $(I2S_CH) $(OBJS2CLEAN)
+endef
+
+
+#################
+# IMG2SP_CONVERT: Launches the proper version of CONVERT to perform image conversion into data
+#
+# $(1-6): Parameters
+#
+define IMG2SP_CONVERT
+	$(if $(filter-out $(I2S_OUT),-of c),,$(eval $(call IMG2SP_CONVERT_C,$(1),$(2),$(3),$(4),$(5),$(6))))
+	$(if $(filter-out $(I2S_OUT),-of bin),,$(eval $(call IMG2SP_CONVERT_BIN,$(1),$(2),$(3),$(4),$(5),$(6))))	
 endef
 
 #################
