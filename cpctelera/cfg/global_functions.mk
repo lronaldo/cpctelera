@@ -293,8 +293,6 @@ endef
 define ADD2PACK
 	# First, check that $(1) is non-empty to ensure that the variable to be generated is unique
 	$(if $(1),,$(error <<ERROR>> ADD2PACK Requires a non-empty pack name as first parameter))
-	# Second, ensure that $(2) file exists and is readable
-	$(if $(filter-out $(wildcard $(2)),$(2)),$(error <<ERROR>> File '$(2)' not found while trying to add it to '$(1)'))
 
 	# Finally, add the new file to the PACK variable
 	$(eval PACK_$(1) := $(PACK_$(1)) $(2))
