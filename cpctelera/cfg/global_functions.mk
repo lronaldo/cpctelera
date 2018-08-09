@@ -286,7 +286,7 @@ $(eval I2S_P  := $(I2S_P) $(shell if   [ "$(9)"  = "hwpalette" ]; then echo "-op
 .SECONDARY: $(I2S_CH)
 $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
-	cpct_img2tileset $(I2S_P) -m "$(2)" -bn "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(10) $(1);
+	cpct_img2tileset $(I2S_P) -m "$(2)" -bnp "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(10) $(1);
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
