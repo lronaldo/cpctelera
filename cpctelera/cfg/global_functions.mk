@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -17,7 +17,6 @@
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##     CPCTELERA ENGINE: Example of use of arkos tracker player routines ##
 ##              General Utility functions for the Makefile               ##
 ##-----------------------------------------------------------------------##
 ## This file contines general function definitions that are useful to    ##
@@ -26,24 +25,12 @@
 ## you should change the build_config.mk                                 ##
 ###########################################################################
 
-# ANSI Sequences for terminal colored printing
-COLOR_RED=\033[1;31;49m
-COLOR_YELLOW=\033[1;33;49m
-COLOR_NORMAL=\033[0;39;49m
+# Get directory path of this file at the moment of including it
+THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
-#################
-# PRINT: Print a nice and colorful message
-#
-# $(1): Subsystem that shows the message
-# $(2): Message to print
-#
-define PRINT
-	@printf "$(COLOR_RED)["
-	@printf $(1)
-	@printf "]$(COLOR_YELLOW) "
-	@printf $(2)
-	@printf "$(COLOR_NORMAL)\n"
-endef
+# Get the other makefiles
+include $(THIS_DIR)/modules/utils.mk
+include $(THIS_DIR)/modules/img2sp.mk
 
 #################
 # GETLOADADDRESS: Get load address from a created binary file (parsing hex2bin's log)
@@ -79,18 +66,6 @@ define GETALLADDRESSES
 	@$(call GETRUNADDRESS,RUNADDR,$(1:.bin=.map))
 	@$(call CHECKVARIABLEISSET,LOADADDR)
 	@$(call CHECKVARIABLEISSET,RUNADDR)
-endef
-
-#################
-# CHECKVARIABLEISSET: Checks if a given variable is set. If not, it prints out an error message and aborts generation
-#
-# $(1): Variable to check 
-#
-define CHECKVARIABLEISSET
-  if [ "$($(1))" = "" ]; then \
-    echo "**!!ERROR!!**: $(1) is not set. Aborting."; \
-    exit 1; \
-  fi
 endef
 
 #################
@@ -243,63 +218,6 @@ $(1): $(2)
 endef
 
 #################
-# IMG2SPRITES: General rule to convert images into C arrays representing
-# sprites. Updates IMGCFILES and OBJS2CLEAN adding new C files
-# that result from image conversions
-#
-# $(1): Image file to be converted into C sprite
-# $(2): Graphics mode (0,1,2) for the generated values
-# $(3): Prefix to add to all C-identifiers generated
-# $(4): Width in pixels of each sprite/tile/etc that will be generated
-# $(5): Height in pixels of each sprite/tile/etc that will be generated
-# $(6): Firmware palette used to convert the image file into C values
-# $(7): (mask,tileset,zgtiles) 
-#		"mask":    generate interlaced mask for all sprites converted
-#       "tileset": generate a tileset array including pointers to all sprites
-#		"zgtiles": generate tiles in Zig-Zag pixel order, Gray Code row order
-# $(8): Output subfolder for generated .C and .H files (inside project folder)
-# $(9): (hwpalette, 'palettename') 
-#			""				: Do not generate a hardware palette array
-#			"hwpalette"		: Generate a palette array as hardware values named 'g_palette'
-#			"'palettename'" : Generate a palette array as hardware values with your own 'palettename' as C-identifier
-# $(10): Aditional options (you can use this to pass aditional modifiers to cpct_img2tileset)
-#
-define IMG2SPRITES
-$(eval I2S_C  := $(basename $(1)).c)
-$(eval I2S_H  := $(basename $(1)).h)
-$(eval I2S_NC := $(notdir $(I2S_C)))
-$(eval I2S_NH := $(notdir $(I2S_H)))
-$(eval I2S_C2 := $(shell	if   [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NC)"; \
-							else echo "$(I2S_C)"; \
-							fi))
-$(eval I2S_H2 := $(shell 	if   [ ! "$(8)" = "" ]; then A="$(8)"; A="$${A%%/}"; echo "$${A}/$(I2S_NH)"; \
-							else echo "$(I2S_H)"; \
-							fi))
-$(eval I2S_CH := $(I2S_C2) $(I2S_H2))
-$(eval I2S_P  := $(shell 	if   [ "$(7)" = "mask" ]; then echo "-nt -im"; \
-							elif [ "$(7)" = "zgtiles" ]; then echo "-z -g -nt"; \
-							elif [ "$(7)" != "tileset" ]; then echo "-nt"; \
-							fi))
-$(eval I2S_P  := $(I2S_P) $(shell if   [ "$(9)"  = "hwpalette" ]; then echo "-oph"; \
-							      elif [ "$(9)" != ""          ]; then echo "-oph $(9)"; \
-							      fi))
-.SECONDARY: $(I2S_CH)
-$(I2S_CH): $(1)
-	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
-	cpct_img2tileset $(I2S_P) -m "$(2)" -bnp "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(10) $(1);
-	@$(call PRINT,$(PROJNAME),"Moving generated files:")
-	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
-	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
-	@if [ ! "$(8)" = "" ]; then \
-	   mv "$(I2S_C)" "$(I2S_C2)"; \
-	   mv "$(I2S_H)" "$(I2S_H2)"; \
-	fi
-IMGCFILES  := $(I2S_C2) $(IMGCFILES)
-OBJS2CLEAN := $(I2S_CH) $(OBJS2CLEAN)
-endef
-
-
-#################
 # TMX2C: General rule to convert TMX tilemaps into C arrays.
 # Updates IMGCFILES and OBJS2CLEAN adding new C files that result from 
 # tmx conversions
@@ -311,19 +229,24 @@ endef
 # $(5): Aditional options (you can use this to pass aditional modifiers to cpct_tmx2csv)
 #
 define TMX2C
-$(eval T2C_C  := $(basename $(1)).c)
-$(eval T2C_H  := $(basename $(1)).h)
-$(eval T2C_NC := $(notdir $(T2C_C)))
-$(eval T2C_NH := $(notdir $(T2C_H)))
-$(eval T2C_OF := $(shell if [ ! "$(3)" = "" ]; then echo "-of $(3)"; else echo ""; fi))
-$(eval T2C_C2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(T2C_NC)"; else echo "$(T2C_C)"; fi))
-$(eval T2C_H2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(T2C_NH)"; else echo "$(T2C_H)"; fi))
-$(eval T2C_BA := $(shell if [ ! "$(4)" = "" ]; then echo "-ba $(4)"; else echo ""; fi))
-$(eval T2C_CH := $(T2C_C2) $(T2C_H2))
+	# Set up C and H files for output
+	$(eval T2C_C := $(basename $(1)).c)
+	$(eval T2C_H := $(basename $(1)).h)
+	$(eval $(call JOINFOLDER2BASENAME, T2C_C2, $(3), $(T2C_C)))
+	$(eval $(call JOINFOLDER2BASENAME, T2C_H2, $(3), $(T2C_H)))
+	$(eval T2C_CH := $(T2C_C2) $(T2C_H2))
+
+	# Configure options for output folder $(3) and bits per item $(4)
+	$(eval T2C_OF := $(shell if [ "$(3)" != "" ]; then echo "-of $(3)"; else echo ""; fi))
+	$(eval T2C_BA := $(shell if [ "$(4)" != "" ]; then echo "-ba $(4)"; else echo ""; fi))
+
+# Generate target for tilemap conversion
 .SECONDARY: $(T2C_CH)
 $(T2C_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into C-arrays...")
 	cpct_tmx2csv -gh -ci $(2) $(T2C_OF) $(T2C_BA) $(5) $(1)
+
+# Variables that need to be updated to keep up with generated files and erase them on clean
 IMGCFILES  := $(T2C_C2) $(IMGCFILES)
 OBJS2CLEAN := $(T2C_CH) $(OBJS2CLEAN)
 endef
@@ -339,18 +262,23 @@ endef
 # $(5): Aditional options (you can use this to pass aditional modifiers to cpct_aks2c)
 #
 define AKS2C
-$(eval A2C_S  := $(basename $(1)).s)
-$(eval A2C_H  := $(basename $(1)).h)
-$(eval A2C_NS := $(notdir $(A2C_S)))
-$(eval A2C_NH := $(notdir $(A2C_H)))
-$(eval A2C_OF := $(shell if [ ! "$(3)" = "" ]; then echo "-od $(3)"; else echo ""; fi))
-$(eval A2C_S2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(A2C_NS)"; else echo "$(A2C_S)"; fi))
-$(eval A2C_H2 := $(shell if [ ! "$(3)" = "" ]; then A="$(3)"; A="$${A%%/}"; echo "$${A}/$(A2C_NH)"; else echo "$(A2C_H)"; fi))
-$(eval A2C_SH := $(A2C_S2) $(A2C_H2))
+	# Set up C and H files for output
+	$(eval A2C_S := $(basename $(1)).s)
+	$(eval A2C_H := $(basename $(1)).h)
+	$(eval $(call JOINFOLDER2BASENAME, A2C_S2, $(3), $(A2C_S)))
+	$(eval $(call JOINFOLDER2BASENAME, A2C_H2, $(3), $(A2C_H)))
+	$(eval A2C_SH := $(A2C_S2) $(A2C_H2))
+
+	# Configure options for output folder $(3)
+	$(eval A2C_OF := $(shell if [ ! "$(3)" = "" ]; then echo "-od $(3)"; else echo ""; fi))
+
+# Generate target for music converstion
 .SECONDARY: $(A2C_SH)
 $(A2C_SH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting music in $(1) into data arrays...")
 	cpct_aks2c -m "$(4)" $(A2C_OF) -id $(2) $(1)
+
+# Variables that need to be updated to keep up with generated files and erase them on clean
 IMGASMFILES := $(A2C_S2) $(IMGASMFILES)
 OBJS2CLEAN  := $(A2C_SH) $(OBJS2CLEAN)
 endef
@@ -363,13 +291,13 @@ endef
 # $(2): File to be added to the compressed pack file
 #
 define ADD2PACK
-# First, check that $(1) is non-empty to ensure that the variable to be generated is unique
-$(if $(1),,$(error <<ERROR>> ADD2PACK Requires a non-empty pack name as first parameter))
-# Second, ensure that $(2) file exists and is readable
-$(if $(filter-out $(wildcard $(2)),$(2)),$(error <<ERROR>> File '$(2)' not found while trying to add it to '$(1)'))
+	# First, check that $(1) is non-empty to ensure that the variable to be generated is unique
+	$(if $(1),,$(error <<ERROR>> ADD2PACK Requires a non-empty pack name as first parameter))
+	# Second, ensure that $(2) file exists and is readable
+	$(if $(filter-out $(wildcard $(2)),$(2)),$(error <<ERROR>> File '$(2)' not found while trying to add it to '$(1)'))
 
-# Finally, add the new file to the PACK variable
-$(eval PACK_$(1) := $(PACK_$(1)) $(2))
+	# Finally, add the new file to the PACK variable
+	$(eval PACK_$(1) := $(PACK_$(1)) $(2))
 endef
 
 #################
@@ -380,18 +308,22 @@ endef
 # $(2): Output folder for generated files
 #
 define PACKZX7B
-# First, check that a PACK name has been passed
-$(if $(1),,$(error <<ERROR>> PACKZX7B requires a PACK filename as first parameter))
-# Now, check that $(1) is non-empty to ensure that some files have been previously added to variable
-$(if $(PACK_$(1)),,$(error <<ERROR>> PACK filename '$(1)' does not contain any file to be packed. Is the PACK filename correctly spelled?))
-# Now generate output filename depending on output folder
-$(eval PACK_$(1)_outfile := $(if $(2),$(2:/=)/$(1),$(1)))
-# Construct the build target
-$(eval PACK_$(1)_target := $(PACK_$(1)_outfile).c $(PACK_$(1)_outfile).h)
+	# First, check that a PACK name has been passed
+	$(if $(1),,$(error <<ERROR>> PACKZX7B requires a PACK filename as first parameter))
+	# Now, check that $(1) is non-empty to ensure that some files have been previously added to variable
+	$(if $(PACK_$(1)),,$(error <<ERROR>> PACK filename '$(1)' does not contain any file to be packed. Is the PACK filename correctly spelled?))
+	# Now generate output filename depending on output folder
+	$(eval PACK_$(1)_outfile := $(if $(2),$(2:/=)/$(1),$(1)))
+	# Construct the build target
+	$(eval PACK_$(1)_target := $(PACK_$(1)_outfile).c $(PACK_$(1)_outfile).h)
+
+# Generate target for file compression
 .SECONDARY: $(PACK_$(1)_target)
 $(PACK_$(1)_target): $(PACK_$(1))
 	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
 	cpct_pack $(PACK_$(1)_outfile) $(PACK_$(1))
+
+# Variables that need to be updated to keep up with generated files and erase them on clean
 IMGCFILES   := $(PACK_$(1)_outfile).c $(IMGCFILES)
 OBJS2CLEAN  := $(PACK_$(1)_target) $(OBJS2CLEAN)
 endef
