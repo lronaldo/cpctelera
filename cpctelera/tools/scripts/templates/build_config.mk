@@ -143,6 +143,7 @@ include $(CPCT_PATH)/cfg/global_functions.mk
 include cfg/image_conversion.mk
 include cfg/tilemap_conversion.mk
 include cfg/music_conversion.mk
+include cfg/compression.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
