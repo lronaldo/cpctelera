@@ -66,7 +66,7 @@
 ##    -m   | --mode <cpc_graphics_mode>        - Sets the CPC Graphics mode the output data will 
 ##                                               be produced for (0, 1 or 2). Default: 0.
 ##    -nt  | --no-tileset                      - Do not generate a tileset array containing pointers to
-##                                               generated sprites/tiles.
+##                                               generated sprites/tiles
 ##    -oph | --output-palette-hardware         - Generate output palette array containing hardware values.
 ##                                               Resulting palette array will be named "<prefix>_palette"
 ##    -opn | --output-palette-hard-named <name>- Generate output palette array containing hardware values.
@@ -83,6 +83,8 @@
 ##    -t   | --transparent-index <index>       - Changes the colour index to be considered transparent
 ##                                              and is used to generate masks.
 ##    -th  | --tile-height  <pixels>           - Sets the height of a tile in pixels. Default: 4.
+##    -ts  | --tileset <name>                  - Generate output tileset as an array of pointers to tiles 
+##                                               with the C-identifier <name> (Default: <basename>_tileset)
 ##    -tw  | --tile-width   <pixels>           - Sets the width of a tile in pixels. Default: 4.
 ##    -z   | --zig-zag                         - Generate pixel lines using zig-zag order (left-to-right
 ##                                               for one line, and right-to-left for the next one)
@@ -102,7 +104,9 @@ ROWORDER=""
 ROWORDER_MSG="Ascending Linear"
 PIXELORDER=""
 PIXELORDER_MSG="Linear (Left-to-right)"
-GENTILESET_MSG="no"
+GENTILESET=""
+GENTILESET_ID=""
+GENTILESET_MSG="yes"
 INTERLACED_MASKS=""
 INTERLACED_MASKS_MSG="no"
 TRANSPARENT_INDEX=""
@@ -187,6 +191,8 @@ to convert the file tiles.png: "
    echo "${COLOR_CYAN}       Changes the colour index to be considered transparent and is used to generate masks"
    echo "${COLOR_LIGHT_BLUE}  -th  | --tile-height  <pixels>"
    echo "${COLOR_CYAN}       Sets the height of a tile in pixels. Default: 4."
+   echo "${COLOR_LIGHT_BLUE}  -ts  | --tileset  <name>"
+   echo "${COLOR_CYAN}       Generate output tileset as an array of pointers to tiles with the C-identifier <name>"
    echo "${COLOR_LIGHT_BLUE}  -tw  | --tile-width   <pixels>"
    echo "${COLOR_CYAN}       Sets the width of a tile in pixels. Default: 4."
    echo "${COLOR_LIGHT_BLUE}  -z   | --zig-zag"                         
@@ -288,7 +294,7 @@ while (( $# >= 1 )); do
       ## Do not generate tilesets
       "-nt" | "--no-tileset")
          GENTILESET="-nt"
-         GENTILESET_MSG="yes"
+         GENTILESET_MSG="no"
       ;;
       ## Generate output palette as hardware values
       "-oph" | "--output-palette-hardware")
@@ -399,6 +405,19 @@ while (( $# >= 1 )); do
             paramError "Parameter -th (--tile-height) must be followed by an integer representing the hieght of a tile in bytes." 9
          fi
          TILES_HEIGHT=$2
+         shift
+      ;;
+      ## Generate tileset
+      "-ts" | "--tileset")
+         ## Basename prefix for the tileset must be a valid C identifier
+         if isEmpty "$2"; then
+            paramError "Parameter -ts (--tileset) must be followed by a valid C identifier." 17
+         elif ! isValidCIdentifier "$2"; then
+            paramError "'$2' is not a valid C-identifier for -ts (--tileset)." 18
+         fi
+         GENTILESET=""
+         GENTILESET_ID="$2"
+         GENTILESET_MSG="yes"
          shift
       ;;
       ## Get tile width
@@ -520,6 +539,11 @@ if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" $OUTPUT_
       if [ "${OUTPUTPALETTE_ID}" != "" ]; then
          replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.c"
          replaceTag "${TILES_BASENAME}_palette" "${OUTPUTPALETTE_ID}" "${IMG2CPC_OUTPUT}.h"
+      fi
+      ## Change generated tileset names from ${TILES_BASENAME}_tileset to selected name, in case
+      if [ "${GENTILESET}" = "" -a "${GENTILESET_ID}" != "" ]; then
+         replaceTag "${TILES_BASENAME}_tileset" "${GENTILESET_ID}" "${IMG2CPC_OUTPUT}.c"
+         replaceTag "${TILES_BASENAME}_tileset" "${GENTILESET_ID}" "${IMG2CPC_OUTPUT}.h"
       fi
    
       ## Success message
