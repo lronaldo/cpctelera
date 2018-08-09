@@ -26,6 +26,15 @@
 ## IMG2SPRITES old macro is also maintained for backwards compatibility  ##
 ###########################################################################
 
+#
+# Default values for all IMG2SP functions
+#
+I2S_PAL  := 
+I2S_MODE := -m 0
+I2S_MASK := 
+I2S_OUT  := -of c
+I2S_FOLD := src/
+I2S_EXTP := 
 
 #################
 # IMG2SP_SET_PALETTE_FW: Sets the firmware palette to be used in following IMG2SP CONVERT commands
