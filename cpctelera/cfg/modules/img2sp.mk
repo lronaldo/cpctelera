@@ -158,6 +158,30 @@ define IMG2SP_SET_EXTRAPAR
 endef
 
 #################
+# IMG2SP_CONVERT_TARGET: Generates the common target line for all CONVERT macros
+# Waring: $(1) is a variable name, and not its contents
+#
+# $(1): Variable that contains the targets 
+# $(2): Image file on which targets depend
+# $(3): Tile Width
+# $(4): Tile Height
+# $(5): C-identifier for the array containing pixel data
+# $(6): Message string to output
+#
+# Updates IMGCFILES and OBJS2CLEAN adding new C files that result from the pack generation.
+#
+define IMG2SP_CONVERT_TARGET
+	# Target files are the contents of $(1)
+	$(eval I2S_TGT := $($(1)))
+
+# Generate target for image conversion
+.SECONDARY: $(I2S_TGT)
+$(I2S_TGT): $(2)
+	@$(call PRINT,$(PROJNAME),$(6))
+	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) -nt -bn "$(5)" -tw "$(3)" -th "$(4)" $(I2S_EXTP) $(2);
+endef
+
+#################
 # IMG2SP_CONVERT_BIN: Converts an image file into data ready to be used in the program.
 # 				      This version of the macro converts to binary.
 #
@@ -183,11 +207,11 @@ define IMG2SP_CONVERT_BIN
 	# Check if we have to generate a palette or not
 	$(eval I2S_GPAL := $(if $(5),-opn "$(5)",))
 
-# Generate target for image conversion
-.SECONDARY: $(I2S_CSB)
-$(I2S_CSB): $(1)
-	@$(call PRINT,$(PROJNAME),"Converting $(1) into binary data and .h + .h.s files for declarations...")
-	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) -nt -bn "$(4)" -tw "$(2)" -th "$(3)" $(I2S_EXTP) $(1);
+	# No tileset to be generated on binary output
+	$(eval I2S_TILS := -nt)
+
+	# Generate Target for image conversion
+	$(call IMG2SP_CONVERT_TARGET,I2S_CSB,$(1),$(2),$(3),$(4),"Converting $(1) into binary data and .h + .h.s files for declarations...")
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_S)' > '$(I2S_S2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
@@ -216,7 +240,6 @@ endef
 # Updates IMGCFILES and OBJS2CLEAN adding new C files that result from the pack generation.
 #
 define IMG2SP_CONVERT_C
-	$(info PERFORMING: c conversion)
 	# Set up C and H files and paths
 	$(eval I2S_C := $(basename $(1)).c)
 	$(eval I2S_H := $(basename $(1)).h)
@@ -230,11 +253,8 @@ define IMG2SP_CONVERT_C
 	# Check if we have to generate a tileset or not
 	$(eval I2S_TILS := $(if $(6),-ts "$(6)",-nt))
 
-# Generate target for image conversion
-.SECONDARY: $(I2S_CH)
-$(I2S_CH): $(1)
-	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
-	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_TILS) $(I2S_GPAL) -bn "$(4)" -tw "$(2)" -th "$(3)" $(I2S_EXTP) $(1);
+	# Generate target for image conversion
+	$(call IMG2SP_CONVERT_TARGET,I2S_CH,$(1),$(2),$(3),$(4),"Converting $(1) into C-arrays...")
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")
