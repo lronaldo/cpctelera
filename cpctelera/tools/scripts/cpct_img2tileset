@@ -80,8 +80,10 @@
 ##
 ##                        > cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png
 ##
+##    -scr | --screen-format                   - Outputs data following Amstrad CPC's screen distribution. Rows
+##                                               are interlaced: 0, 8, 16, 32... 192, 200, 1, 9, 17... 193, 2, 18...
 ##    -t   | --transparent-index <index>       - Changes the colour index to be considered transparent
-##                                              and is used to generate masks.
+##                                               and is used to generate masks.
 ##    -th  | --tile-height  <pixels>           - Sets the height of a tile in pixels. Default: 4.
 ##    -ts  | --tileset <name>                  - Generate output tileset as an array of pointers to tiles 
 ##                                               with the C-identifier <name> (Default: <basename>_tileset)
@@ -107,6 +109,8 @@ PIXELORDER_MSG="Linear (Left-to-right)"
 GENTILESET=""
 GENTILESET_ID=""
 GENTILESET_MSG="yes"
+SCREEN_FORMAT=""
+SCREEN_FORMAT_MSG="Tiles/Sprites"
 INTERLACED_MASKS=""
 INTERLACED_MASKS_MSG="no"
 TRANSPARENT_INDEX=""
@@ -187,6 +191,8 @@ to convert the file tiles.png: "
    echo
    echo "          ${COLOR_WHITE}cpct_img2tileset -m 1 -pf { 0 26 6 18 } tiles.png"
    echo
+   echo "${COLOR_LIGHT_BLUE}  -scr | --screen-format"
+   echo "${COLOR_CYAN}       Outputs data following Amstrad CPC's screen distribution. Rows are interlaced: 0, 8, 16, 32... 192, 200, 1, 9, 17... 193, 2, 18..."
    echo "${COLOR_LIGHT_BLUE}  -t   | --transparent-index <colour_index>"
    echo "${COLOR_CYAN}       Changes the colour index to be considered transparent and is used to generate masks"
    echo "${COLOR_LIGHT_BLUE}  -th  | --tile-height  <pixels>"
@@ -383,6 +389,11 @@ while (( $# >= 1 )); do
          done
          PALETTE_SIZE=$(( PALETTE_SIZE + i ))
       ;;
+      ## Zig-Zag pixel order
+      "-scr" | "--screen-format")
+         SCREEN_FORMAT="-scr"
+         SCREEN_FORMAT="Screen Distribution"
+      ;;
       ## Get transparent Index for generating Masks
       "-t" | "--transparent-index")
          ## Transparent index must be between 0 and 15
@@ -507,14 +518,17 @@ esac
 echo
 echo "${COLOR_LIGHT_YELLOW}PROCESSING FILE '${COLOR_NORMAL}$FILE${COLOR_CYAN}'"
 echo "${COLOR_GREEN}CPC Mode        : ${COLOR_LIGHT_YELLOW}${MODE}${COLOR_CYAN}"
-echo "${COLOR_GREEN}Tile Size       : ${COLOR_LIGHT_YELLOW}${TILES_WIDTH}x${TILES_HEIGHT}${COLOR_CYAN} pixels"
+echo "${COLOR_GREEN}Tile/Sprite Size: ${COLOR_LIGHT_YELLOW}${TILES_WIDTH}x${TILES_HEIGHT}${COLOR_CYAN} pixels"
+echo "${COLOR_GREEN}Format          : ${COLOR_LIGHT_YELLOW}${SCREEN_FORMAT_MSG}"
 echo "${COLOR_GREEN}Interlaced Mask : ${COLOR_LIGHT_YELLOW}${INTERLACED_MASKS_MSG}"
 echo "${COLOR_GREEN}Transparency    : ${COLOR_LIGHT_YELLOW}${TRANSPARENT_INDEX_MSG}"
 echo "${COLOR_GREEN}Generate Tileset: ${COLOR_LIGHT_YELLOW}${GENTILESET_MSG}"
 echo "${COLOR_GREEN}Basename        : ${COLOR_LIGHT_YELLOW}'${TILES_BASENAME}'"
 echo "${COLOR_GREEN}Output Format   : ${COLOR_LIGHT_YELLOW}${OUTPUT_FORMAT}"
 echo "${COLOR_GREEN}Pixel Order     : ${COLOR_LIGHT_YELLOW}${PIXELORDER_MSG}"
-echo "${COLOR_GREEN}Row Order       : ${COLOR_LIGHT_YELLOW}${ROWORDER_MSG}"
+if [ "$SCREEN_FORMAT" = "" ]; then
+   echo "${COLOR_GREEN}Row Order       : ${COLOR_LIGHT_YELLOW}${ROWORDER_MSG}"
+fi
 printf "${COLOR_GREEN}Palette         : ${COLOR_LIGHT_YELLOW}"
 for((i=0; i < ${MODECOLOURS[$MODE]}; i++)); do
    printf "%s " ${PALETTE[$i]}
@@ -532,7 +546,8 @@ to ${COLOR_NORMAL}CPCtelera${COLOR_CYAN}'s C code using ${COLOR_NORMAL}Img2CPC${
 ## Run IMG2CPC and check exit status
 if ${IMG2CPC} -fwp "$(valuesToCommaList ${PALETTE[@]:0:$PALETTE_SIZE})" $OUTPUT_FORMAT_OPTION -m "$MODE" \
 -w "$TILES_WIDTH" -h "$TILES_HEIGHT" -bn "$TILES_BASENAME" $ABSOLUTE_BASENAME --includes "<types.h>" -osz \
--o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $PIXELORDER "${FILE}"; then
+-o "$IMG2CPC_OUTPUT" $INTERLACED_MASKS $TRANSPARENT_INDEX $GENTILESET $OUTPUTPALETTE $ROWORDER $SCREEN_FORMAT \
+$PIXELORDER "${FILE}"; then
    ## Postprocess depending on output format
    if [ "${OUTPUT_FORMAT}" = "c" ]; then
       ## Change generated palette names from ${TILES_BASENAME}_palette to selected name, in case
