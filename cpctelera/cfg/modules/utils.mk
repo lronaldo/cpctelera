@@ -134,3 +134,50 @@ endef
 define INTINRANGE
 	$(eval $(1) := $(shell if (( $($(1)) >= $(2) && $($(1)) <= $(3) )); then echo "$($(1))"; else echo ""; fi))
 endef
+
+#################
+# ADD2INTS: Adds two integer values and places result in a given variable.
+# Integers received are not checked. If a non-integer is passed, it will fail.
+# Warning: $(3) must be a variable name, not its contents
+#
+# $(1): First int to be added
+# $(2): Second int to be added
+# $(3): Variable to store the result of addition
+#
+define ADD2INTS
+	$(eval $(3) := $(shell echo $$(( $(1) + $(2) ))))
+endef
+
+#################
+# ENSURE_VALID_C_ID: Checks if a given value is a valid C-identifier, if not, raises an error
+#
+# $(1): identifier to verify
+# $(2): Error Message if it does not exist
+#
+define ENSURE_VALID_C_ID
+	# Remove trailing whitespaces
+	$(eval EICID := $(strip $(1)))
+	
+	# Ensure that given identifier is exactly 1 word in size
+	$(eval $(if $(filter-out $(words $(EICID)),1)\
+				,$(error $(strip $(2)))\
+				,))
+
+	# Check that the word matches C-identifier rules 
+	$(eval $(if $(shell REX='^[a-zA-Z_][a-zA-Z0-9_]*$$'; if [[ $(EICID) =~ $$REX ]]; then echo "true"; fi)\
+				,\
+				,$(error $(strip $(2)))))
+endef
+
+#################
+# ENSUREFILEEXISTS: Checks if a given file exists and, if not, raises an error
+#
+# $(1): file
+# $(2): Error Message if it does not exist
+#
+define ENSUREFILEEXISTS
+	$(eval EFE_THEFILE := $(strip $(1)))
+	$(if $(filter-out $(wildcard $(EFE_THEFILE)),$(EFE_THEFILE))\
+		,$(error $(strip $(2)))\
+		,)
+endef
