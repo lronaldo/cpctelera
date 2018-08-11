@@ -1,10 +1,10 @@
 APPNAME :=cpct_tmx2data
 SHELL   :=/bin/bash
-INCDIR  :=src
 SRCDIR  :=src
 OBJDIR  :=obj
 BINDIR  :=bin
-LIBDIR  :=lib
+LIBDIR  :=libs
+INCDIRS :=src $(LIBDIR)/tmxlite/include
 MKDIR   :=mkdir -p
 RM      :=rm -rf
 
@@ -15,16 +15,17 @@ LDLIBS  :=
 
 .PHONY: showVars clean cleanall all
 
-vpath %.hpp $(INCDIR)
-vpath %.h   $(INCDIR)
+vpath %.hpp $(INCDIRS)
+vpath %.h   $(INCDIRS)
 vpath %.cpp $(SRCDIR)
 vpath %.cc $(SRCDIR)
 vpath %.o $(OBJDIR)
 
-HEADERS := $(wildcard $(INCDIR)/*)
+HEADERS := $(foreach D,$(INCDIRS),$(shell find $(D)/ -type f -name '*.h') $(shell find $(D)/ -type f -name '*.hpp'))
 SRCS    := $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/*.cpp)
 OBJS    := $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cc,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
 APP     := $(BINDIR)/${APPNAME}
+INCMODS := $(foreach D,$(INCDIRS),-I$(D))
 
 all: cygwinstaticbuild $(APP)
 
@@ -32,10 +33,10 @@ $(APP): $(BINDIR) $(OBJDIR) $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
 
 $(OBJDIR)/%.o: %.cc
-	$(CXX) $(CXXFLAGS) -o $@ -c -I$(INCDIR) $<
+	$(CXX) $(CXXFLAGS) -o $@ -c $(INCMODS) $<
 
 $(OBJDIR)/%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -o $@ -c -I$(INCDIR) $<
+	$(CXX) $(CXXFLAGS) -o $@ -c $(INCMODS) $<
 
 cygwinstaticbuild:
 	$(eval LDLIBS+=$(shell if [[ "$$(uname)" =~ "CYGWIN" ]]; then echo '-static-libstdc++'; fi))
