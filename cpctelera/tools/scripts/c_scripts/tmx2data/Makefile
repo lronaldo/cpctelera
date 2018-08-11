@@ -12,6 +12,7 @@ CC      :=gcc
 CXX     :=g++
 CXXFLAGS:=-std=c++11 -O3 -Werror -Wall -fsigned-char
 LDLIBS  :=
+SUBLIBS :=tmxlite
 
 .PHONY: showVars clean cleanall all
 
@@ -26,17 +27,28 @@ SRCS    := $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/*.cpp)
 OBJS    := $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cc,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
 APP     := $(BINDIR)/${APPNAME}
 INCMODS := $(foreach D,$(INCDIRS),-I$(D))
+SUBLIBOBJS := $(foreach L,$(SUBLIBS),$(LIBDIR)/$(L)/bin/$(L).a)
 
 all: cygwinstaticbuild $(APP)
 
-$(APP): $(BINDIR) $(OBJDIR) $(OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
+$(APP): $(SUBLIBOBJS) $(BINDIR) $(OBJDIR) $(OBJS)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) $(SUBLIBOBJS)
 
 $(OBJDIR)/%.o: %.cc
 	$(CXX) $(CXXFLAGS) -o $@ -c $(INCMODS) $<
 
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -o $@ -c $(INCMODS) $<
+
+%.a:
+	@echo "*****************************************************************"
+	@echo "*** COMPILANDO LIBRERIA: $(basename $(notdir $@))"
+	@echo
+	$(MAKE) -C $(LIBDIR)/$(basename $(notdir $@))/
+	@echo 
+	@echo "*** $(basename $(notdir $@)) COMPILADA CON ÉXITO"
+	@echo "*****************************************************************"
+	@echo
 
 cygwinstaticbuild:
 	$(eval LDLIBS+=$(shell if [[ "$$(uname)" =~ "CYGWIN" ]]; then echo '-static-libstdc++'; fi))
@@ -58,3 +70,4 @@ clean:
 
 cleanall: clean
 	$(RM) $(APP)
+	$(foreach L,$(SUBLIBS),$(MAKE) cleanall -C $(LIBDIR)/$(L)/)
