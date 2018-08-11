@@ -16,13 +16,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#ifndef __HELPERS_H__
-#define __HELPERS_H__
+#pragma once
 
 // INCLUDES
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <set>
+#include <sstream>
 
 // TYPES
 typedef std::vector<std::string> TArgs;
@@ -50,10 +51,17 @@ const std::string C_WHITE { "\033[0;37;49m" };
 const std::string C_NORMAL { "\033[0;39;49m" };
 
 // FUNCTION PROTOTYPES
-void     error          (const TArgs&& err);
-bool     isValidHex     (const std::string& str);
-bool     isValidDec     (const std::string& str);
-uint16_t to16bitAddress (const std::string& str);
+void        error          (const TArgs&& err);
+bool        isValidHex     (const std::string& str);
+bool        isValidDec     (const std::string& str);
+uint16_t    to16bitAddress (const std::string& str);
 
-
-#endif
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// CONVERT A SET OF STREAMEABLE TYPES INTO A STRING
+//
+template <class T>
+std::string setToString (const std::set<T>& aSet, const char* sep) {
+   std::stringstream ss;
+   for (const auto& item: aSet) ss << item << sep;
+   return ss.str();
+}

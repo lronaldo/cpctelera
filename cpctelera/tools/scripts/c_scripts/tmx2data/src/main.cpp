@@ -17,12 +17,19 @@
 //------------------------------------------------------------------------------
 
 #include "helpers.h"
+#include "tmxtilemap.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <cctype>
 #include <sstream>
 #include <main.h>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GLOBAL VARIABLES
+//
+CPCT_TMX_Tilemap  g_theTilemap;  // Tilemap information obtained from the TMX file
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // USAGE FUNCTION
@@ -71,9 +78,10 @@ void parseArguments(const TArgs& args) {
       const auto& a = args[i];
 
       // SET THE PC
-      if (a == "-pc" || a == "--set-pc") {
-         if (i + 1 >= args.size()) error( { "Modifier '-pc' needs to be followed by a 16-bits address, but nothing found."} );
-
+      if (a == "-ba" || a == "--bitarray") {
+         if (i + 1 >= args.size()) error( { "Modifier '-ba | --bitarray' needs to be followed by the amount of bits (1, 2, 4 or 6), but nothing found."} );
+         std::cerr << "-ba option";
+         
          ++i;
 
       // LOAD ADDRESS

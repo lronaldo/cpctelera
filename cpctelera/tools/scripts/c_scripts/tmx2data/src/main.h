@@ -44,3 +44,5 @@
 //    -ci | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
 //    -ba | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
 //
+
+#pragma once
