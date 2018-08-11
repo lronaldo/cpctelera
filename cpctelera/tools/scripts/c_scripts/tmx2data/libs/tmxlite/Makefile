@@ -1,4 +1,4 @@
-LIBNAME :=libtmxlite.a
+LIBNAME :=tmxlite.a
 SHELL   :=/bin/bash
 INCDIRS :=-Isrc -Iinclude
 SRCDIR  :=src
