@@ -24,13 +24,20 @@
 
 class CPCT_TMX_Tilemap {
 public:
+   enum class NumberFormat {
+         decimal
+      ,  hexadecimal
+      ,  binary
+   };
+
 	CPCT_TMX_Tilemap();
    CPCT_TMX_Tilemap(char* tmxfilename);
    ~CPCT_TMX_Tilemap();
 
    void  loadMap(const char* tmxfilename);
    void  setBitsPerItem(uint8_t bits);
-   void  setInitialTileID(uint8_t id) { m_initialTileID = id; }
+   void  setOutputNumberFormat(NumberFormat f)  { m_numFormat = f;      }
+   void  setInitialTileID(uint8_t id)           { m_initialTileID = id; }
 
    void  printSomeInfo() const;
 
@@ -40,19 +47,22 @@ public:
    void  output_basic_C(std::ostream& out) const;
 private:
    // Attributes
-   std::string m_filename;
-   std::string m_cid = "g_map";
-   tmx::Map    m_map;
-   uint8_t     m_bitsPerItem = 8;
-   uint8_t     m_maxTileID;         // Highest ID amongst tiles
-   uint8_t     m_maxTileDecDigits;  // Number of decimal digits of the Highest tile ID
-   uint8_t     m_initialTileID = 0; // This will be considered the ID of the first tile
-   uint32_t    m_visibleLayers;     // Number of visible layers in the TMX
-   uint32_t    m_tw, m_th;          // Tile Width and Height
-   uint32_t    m_total_bytes;       // Total bytes for a given output array
-   std::string m_theTime;           // Current time string
+   std::string    m_filename;             // Name of the TMX input file
+   std::string    m_cid = "g_map";        // C-identifier for output
+   tmx::Map       m_map;                  // TMX interpreter
+   uint8_t        m_bitsPerItem = 8;      // Number of bits per tile
+   uint8_t        m_maxTileID;            // Highest ID amongst tiles
+   uint8_t        m_maxTileDecDigits;     // Number of decimal digits of the Highest tile ID
+   uint8_t        m_initialTileID = 0;    // This will be considered the ID of the first tile
+   uint32_t       m_visibleLayers;        // Number of visible layers in the TMX
+   uint32_t       m_tw, m_th;             // Tile Width and Height
+   uint32_t       m_total_bytes;          // Total bytes for a given output array
+   std::string    m_theTime;              // Current time string
+   NumberFormat   m_numFormat = NumberFormat::decimal;  // Output number format selected
+
 
    // Useful methods
+   void           output_formatted_tile(std::ostream& out, uint8_t tile) const;
    inline uint8_t adjustedTileValue(uint8_t tile) const { 
       if (tile) return tile - 1 + m_initialTileID;
       else      return tile + m_initialTileID;

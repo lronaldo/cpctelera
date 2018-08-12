@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <cstdint>
 #include <set>
+#include <bitset>
 #include <cmath>
 #include <ctime>
 
@@ -158,6 +159,19 @@ CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Outputs one tile ID formatted depending on current base and maxTileDecDigits
+//
+void
+CPCT_TMX_Tilemap::output_formatted_tile(std::ostream& out, uint8_t tile) const {
+   uint16_t t = (uint16_t)adjustedTileValue(tile);
+   switch(m_numFormat) {
+      case NumberFormat::decimal:     out << std::setw(m_maxTileDecDigits) << std::setbase(std::ios_base::dec) << t;   break;
+      case NumberFormat::hexadecimal: out << "0x" << std::setw(2) << std::setfill('0') << std::setbase(std::ios_base::hex) << t;   break;
+      case NumberFormat::binary:      std::bitset<8> bs(t); out << "0b" << std::setw(8) << bs;                         break;
+   }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate output C-file for basic C conversion (1 layer)
 //
 void
@@ -195,7 +209,8 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
          char c_sep = ' ';
          uint32_t w = m_tw;
          for( const auto& t : l->getTiles() ) {
-            out << c_sep << std::setw(m_maxTileDecDigits) << (uint16_t)adjustedTileValue(t.ID);
+            out << c_sep;
+            output_formatted_tile(out, t.ID);
             c_sep = ',';
             if (--w == 0) { w = m_tw; out << '\n' << std::string(4,c_margin); }
          }
