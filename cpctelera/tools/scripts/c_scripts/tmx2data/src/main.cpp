@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
       TArgs args(argv, argv + argc);
       parseArguments(args);
       g_theTilemap.printSomeInfo();
-      g_theTilemap.output_basic_H(std::cout);
+      g_theTilemap.output_basic_C(std::cout);
    } catch (std::exception& e) {
       std::cerr << "ERROR: " << e.what() << "\n";
       return -1;

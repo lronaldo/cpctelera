@@ -17,10 +17,12 @@
 //------------------------------------------------------------------------------
    
 #include "tmxtilemap.h"
+#include <tmxlite/TileLayer.hpp>
 #include <helpers.h>
+#include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <set>
-#include <iostream>
 #include <cmath>
 #include <ctime>
 
@@ -41,9 +43,31 @@ CPCT_TMX_Tilemap::loadMap(const char* tmxfilename) {
    if (m_map.getOrientation() != tmx::Orientation::Orthogonal)
       error( { "'", tmxfilename, "' has a map orientation different than Orthogonal. Only Orthogonal orientation is supported."} );
 
-   // Check map for at least having 1 visible Layer
+   // Check map for at least having 1 visible Layer, and all layers being of type Tile
+   // Also count for maxTileID
    m_visibleLayers = 0;
-   for(const auto& l : m_map.getLayers()) { if ( l->getVisible() ) ++m_visibleLayers; } 
+   m_maxTileID = 0;
+   m_maxTileDecDigits = 1;
+   for(const auto& l : m_map.getLayers()) { 
+      if ( l->getVisible() ) { 
+         ++m_visibleLayers;
+         if ( l->getType() != tmx::Layer::Type::Tile )
+            error ( { "'", tmxfilename, "' contains visible non-tiled layers. Only 'Tile' type layers are supported. " } );
+
+         // Get the Tile layer and the Highest Tile ID (if we are already at 3 digits, there is no need to continue counting)
+         if (m_maxTileDecDigits < 3) {
+            const auto lt = dynamic_cast<tmx::TileLayer*>(l.get());           
+            for( const auto& t : lt->getTiles() ) { 
+               uint8_t v = adjustedTileValue(t.ID); 
+               if ( v > m_maxTileID ) {
+                  m_maxTileID = v;
+                  if      ( v >= 100 ) { m_maxTileDecDigits = 3; continue; }
+                  else if ( v >=  10 ) { m_maxTileDecDigits = 2;           }
+               }
+            }
+         }
+      }
+   } 
    if (! m_visibleLayers)
       error( { "'", tmxfilename, "' has 0 *visible* tilemap layers. At least 1 visible tilemap layer is required. (Remember: only *visible* layers are converted)"} );
 
@@ -103,7 +127,6 @@ CPCT_TMX_Tilemap::output_C_code_header(std::ostream& out) const {
 //
 void
 CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
-   const auto& layers = m_map.getLayers();
    output_C_code_header(out);
    
    // Output declarations
@@ -112,9 +135,9 @@ CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
    out << "\n#define "<< m_cid <<"_H  " << m_th;
    out << "\n";
    out << "\n//#### Converted layer tilemaps ####";
-   out << "\n//   Visible layers: " << layers.size();
+   out << "\n//   Visible layers: " << m_visibleLayers;
    out << "\n//";
-   if (layers.size() == 1) {
+   if (m_visibleLayers == 1) {
       out << "\nextern const u8 "<< m_cid <<"["<< m_total_bytes <<"];";
    } else {
       out << "\n";
@@ -124,7 +147,7 @@ CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
       uint16_t nvisl = 0;
       out << "\n";
       out << "\n// Constant pointers for immediate access";
-      for (const auto& l : layers) {
+      for (const auto& l : m_map.getLayers()) {
          if ( l->getVisible() ) {
             out << "\n#define "<< m_cid <<"_layer_" << nvisl <<"   (u8*)(&layers["<< nvisl <<"][0])";
             ++nvisl;
@@ -142,10 +165,45 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
    output_C_code_header(out);
 
    // Output tilemap definition
-   out << "\n// Generated CSV tilemap from " << m_filename;
-   out << "\nconst u8 "<< m_cid <<"["<< m_total_bytes <<"] = {\n";
+   out << "\n//#### Converted layer tilemaps ####";
+   out << "\n//   Visible layers: " << m_visibleLayers;
+   out << "\n//";
 
+   // Variable output depending on visible layers
+   std::stringstream ss;
+   std::string str_layers = "";
+   char c_margin  = ' ';
+   char c_prev    = '\0';
+   char c_post    = '\0';
+   char c_comma   = ' ';
+   if (m_visibleLayers > 1) {
+      ss << "[" << m_visibleLayers << "]"; str_layers = ss.str(); ss.str("");
+      c_prev = '{'; c_post = '}';
+   }
 
+   // Output declaration header
+   out << "\nconst u8 "<< m_cid << str_layers << "["<< m_total_bytes <<"] = {\n";
 
-   out << "\n}\n";
+   // Output visible layers
+   for( const auto& layer : m_map.getLayers() ) {
+      // Check if layer is visible (it will be of type Tile if it is visible)
+      if ( layer->getVisible() ) {
+         const auto l = dynamic_cast<tmx::TileLayer*>(layer.get());
+         out << std::string(3,c_margin) << c_comma << c_prev << '\n' << std::string(4, c_margin);
+
+         // Output all tiles in this layer
+         char c_sep = ' ';
+         uint32_t w = m_tw;
+         for( const auto& t : l->getTiles() ) {
+            out << c_sep << std::setw(m_maxTileDecDigits) << (uint16_t)adjustedTileValue(t.ID);
+            c_sep = ',';
+            if (--w == 0) { w = m_tw; out << '\n' << std::string(4,c_margin); }
+         }
+         out << c_post << '\n';
+         c_comma = ',';
+      }
+   }
+
+   // Output declaration end
+   out << "};\n";
 }
