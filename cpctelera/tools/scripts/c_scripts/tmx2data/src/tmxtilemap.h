@@ -20,8 +20,6 @@
 
 #include <tmxlite/Map.hpp>
 #include <string>
-#include <chrono>
-#include <ctime>
 #include <iostream>
 
 class CPCT_TMX_Tilemap {
@@ -35,12 +33,20 @@ public:
 
    void  printSomeInfo() const;
 
+   // Check and setup for output
+   void  checkAndSetUpForOutput();
+
    // Output operators
+   void  output_C_code_header(std::ostream& out) const;
    void  output_basic_H(std::ostream& out) const;
+   void  output_basic_C(std::ostream& out) const;
 private:
    std::string m_filename;
    std::string m_cid = "g_map";
    tmx::Map    m_map;
    uint8_t     m_bitsPerItem = 8;
-   std::time_t m_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+   uint16_t    m_visibleLayers;  // Number of visible layers in the TMX
+   uint32_t    m_tw, m_th;       // Tile Width and Height
+   uint32_t    m_total_bytes;    // Total bytes for a given output array
+   std::string m_theTime;        // Current time string
 };
