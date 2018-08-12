@@ -94,7 +94,15 @@ void parseArguments(const TArgs& args) {
          else { error( { "'", bits,"' is not a valid value for '-ba | --bitarray'. Valid values are: 1, 2, 4, 6, 8."  } ); }
          
          ++i;
-      //------------------------ SHOW HELP
+      //------------------------ SELECT C IDENTIFIER
+      } else if (a == "-ci" || a == "--c-identifier") {
+         if (i + 1 >= args.size()) error( { "Modifier '-ci | --c-identifier' needs to be followed by a desired c-identifier, but nothing found."} );
+         std::string cid = args[i + 1];
+         if ( !isValidCIdentifier(cid.c_str()) ) error( { "'", cid, "' is not a valid C-identifier for -ci | --c-identifier."} );
+         g_theTilemap.setCID(cid);
+
+         ++i;
+      //------------------------ SELECT NUMBER BASE
       } else if (a == "-nb" || a == "--number-base") {
          if (i + 1 >= args.size()) error( { "Modifier '-nb | --number-base' needs to be followed by selected numerical base (dec, bin or hex), but nothing found."} );
          std::string base = args[i+1];

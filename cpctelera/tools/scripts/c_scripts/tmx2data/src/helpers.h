@@ -74,3 +74,27 @@ std::string setToString (const std::set<T>& aSet, const char* sep) {
 constexpr unsigned int str2int(const char* str, int h = 0) {
     return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks a given character for being alphabetic
+//
+constexpr bool isAlphabetic(char c) {
+   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks a given character for being numeric
+//
+constexpr bool isNumeric(char c) {
+   return c >= '0' && c <= '9';
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks for a given const char* to contain a valid C-identifier
+//
+constexpr bool isValidCIdentifier(const char* cid) {
+   if (cid == nullptr || (!isAlphabetic(cid[0]) && cid[0] != '_') ) return false;
+   ++cid;
+   while(*cid) { if (!isAlphabetic(*cid) && !isNumeric(*cid) && *cid != '_') { return false; } ++cid; }
+   return true;
+}
