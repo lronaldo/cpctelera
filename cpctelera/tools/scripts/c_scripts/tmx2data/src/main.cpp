@@ -23,6 +23,7 @@
 #include <cstring>
 #include <cctype>
 #include <sstream>
+#include <algorithm>
 #include <main.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +60,8 @@ selected as CSV in tilemap properties."
       << C_CYAN         << "\n          Generates a H file with the declaration of the array for C file (implies -gc)"
       << C_LIGHT_BLUE   << "\n   -h  | --help"
       << C_CYAN         << "\n          Shows this help information."
+      << C_LIGHT_BLUE   << "\n   -nb | --number-base <base>"
+      << C_CYAN         << "\n          Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)"
       << C_LIGHT_BLUE   << "\n   -of | --output-folder <folder>"
       << C_CYAN         << "\n          Changes the output folder for generated C/H files (Default: .)"
       << "\n\n" << C_NORMAL;
@@ -84,6 +87,19 @@ void parseArguments(const TArgs& args) {
          
          ++i;
 
+      //------------------------ SHOW HELP
+      } else if (a == "-nb" || a == "--number-base") {
+         if (i + 1 >= args.size()) error( { "Modifier '-nb | --number-base' needs to be followed by selected numerical base (dec, bin or hex), but nothing found."} );
+         std::string base = args[i+1];
+         std::transform(base.begin(), base.end(), base.begin(), ::tolower);
+         switch (str2int(base.c_str())) {
+            case str2int("dec"): g_theTilemap.setOutputNumberFormat(CPCT_TMX_Tilemap::NumberFormat::decimal);     break;
+            case str2int("hex"): g_theTilemap.setOutputNumberFormat(CPCT_TMX_Tilemap::NumberFormat::hexadecimal); break;
+            case str2int("bin"): g_theTilemap.setOutputNumberFormat(CPCT_TMX_Tilemap::NumberFormat::binary);      break;
+            default: error( { "'", base, "' is not a valid numerical base for '-nb | --number-base'. Valid bases are: dec, bin, hex."} ); 
+         }
+
+         ++i;
       //------------------------ SHOW HELP
       } else if (a == "-h" || a == "--help") {
          usage(args[0]);

@@ -65,3 +65,12 @@ std::string setToString (const std::set<T>& aSet, const char* sep) {
    for (const auto& item: aSet) ss << item << sep;
    return ss.str();
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Convert a string (const char*) into a in int value in compilation time using a hashing const expression 
+// Original author: Jerry Coffin (https://stackoverflow.com/users/179910/jerry-coffin)
+// Original implementation: https://stackoverflow.com/questions/2111667/compile-time-string-hashing
+//
+constexpr unsigned int str2int(const char* str, int h = 0) {
+    return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
+}

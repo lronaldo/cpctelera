@@ -37,12 +37,12 @@
 //    Conversion is output to stdout unless otherwise requested by options.
 //
 // Command line options:
-//    -h  | --help                   - Shows help information on the terminal.
+//    -ba | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
+//    -ci | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
 //    -gc | --generate-c             - Generates a C file with an array containing converted values
 //    -gh | --generate-h             - Generates a H file with the declaration of the array for C file (implies -gc)
+//    -h  | --help                   - Shows help information on the terminal.
+//    -nb | --number-base <base>     - Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)
 //    -of | --output-folder <folder> - Changes the output folder for generated C/H files (Default: .)
-//    -ci | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
-//    -ba | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
-//
 
 #pragma once
