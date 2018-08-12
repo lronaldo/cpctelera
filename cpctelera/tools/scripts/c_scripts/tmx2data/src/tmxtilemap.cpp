@@ -122,6 +122,17 @@ CPCT_TMX_Tilemap::output_C_code_header(std::ostream& out) const {
    out << "\n";
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Change default C-identifier for output
+//
+void
+CPCT_TMX_Tilemap::setCID(std::string cid) { 
+   // Check that passed identifier is valid before assigning
+   if ( !isValidCIdentifier(cid.c_str()) ) error( { "'", cid, "' is not a valid C-identifier."} ); 
+   m_cid = std::move(cid);
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate output header file for basic C conversion

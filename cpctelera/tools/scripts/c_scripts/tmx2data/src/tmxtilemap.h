@@ -36,7 +36,7 @@ public:
 
    void  loadMap(const char* tmxfilename);
    void  setBitsPerItem(uint8_t bits);
-   void  setCID(std::string cid)                { m_cid = std::move(cid);  }
+   void  setCID(std::string cid);
    void  setOutputNumberFormat(NumberFormat f)  { m_numFormat = f;         }
    void  setInitialTileID(uint8_t id)           { m_initialTileID = id;    }
 

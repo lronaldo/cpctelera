@@ -97,9 +97,7 @@ void parseArguments(const TArgs& args) {
       //------------------------ SELECT C IDENTIFIER
       } else if (a == "-ci" || a == "--c-identifier") {
          if (i + 1 >= args.size()) error( { "Modifier '-ci | --c-identifier' needs to be followed by a desired c-identifier, but nothing found."} );
-         std::string cid = args[i + 1];
-         if ( !isValidCIdentifier(cid.c_str()) ) error( { "'", cid, "' is not a valid C-identifier for -ci | --c-identifier."} );
-         g_theTilemap.setCID(cid);
+         g_theTilemap.setCID(args[i + 1]);
 
          ++i;
       //------------------------ SELECT NUMBER BASE
