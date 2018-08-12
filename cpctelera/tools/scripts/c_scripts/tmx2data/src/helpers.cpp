@@ -22,6 +22,8 @@
 #include <stdexcept>
 #include <cctype>
 #include <sstream>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "helpers.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,4 +92,45 @@ uint16_t to16bitAddress(const std::string& str) {
 
          return address;
    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks if a folder exists, is a folder and is readable by the user
+//
+bool isFolder(const char* folder) {
+   struct stat sb;
+   return stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Checks if a folder exists, is a folder and the user has write permission
+//
+bool isFolderWritable(const char* folder) {
+   struct stat sb;
+   return stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode) && access(folder, W_OK) == 0;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Removes all character repetitions from a given string
+//
+std::string removeRepetitions(const std::string& str, char c) {
+   std::string outstr;
+   if (str.size() > 0) {
+      outstr.reserve(str.size());
+      outstr += str[0];
+      for(std::size_t i=1; i < str.size(); ++i ) {
+         if (str[i] != c || str[i-1] != c)
+            outstr += str[i];
+      }
+   }
+   return outstr;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ensures that a given string ends up with one repetition of a given character at the end
+//
+void ensureOnly1CharBack(std::string& str, char endc) {
+   char c = endc;
+   while(str.size() > 0 && (c = str.back()) == endc) str.pop_back();
+   str += endc;
 }

@@ -113,6 +113,14 @@ void parseArguments(const TArgs& args) {
          }
 
          ++i;
+      //------------------------ SELECT OUTPUT FOLDER
+      } else if (a == "-of" || a == "--output-folder") {
+         if (i + 1 >= args.size()) error( { "Modifier '-of | --output-folder' needs to be followed by a folder, but nothing found."} );
+         std::string folder = std::move(removeRepetitions(args[i + 1], '/'));
+         ensureOnly1CharBack(folder, '/');
+         if ( !isFolderWritable(folder.c_str()) ) error ({ "Folder '", folder, "' does not exist, is not a folder or is not writable." });
+
+         ++i;
       //------------------------ SHOW HELP
       } else if (a == "-h" || a == "--help") {
          usage(args[0]);
@@ -140,8 +148,7 @@ int main(int argc, char **argv) {
    try {
       TArgs args(argv, argv + argc);
       parseArguments(args);
-      g_theTilemap.printSomeInfo();
-      g_theTilemap.output_basic_C(std::cout);
+      g_theTilemap.output_basic_H(std::cout);
    } catch (std::exception& e) {
       std::cerr << "ERROR: " << e.what() << "\n";
       return -1;

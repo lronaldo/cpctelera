@@ -40,8 +40,6 @@ public:
    void  setOutputNumberFormat(NumberFormat f)  { m_numFormat = f;         }
    void  setInitialTileID(uint8_t id)           { m_initialTileID = id;    }
 
-   void  printSomeInfo() const;
-
    // Output operators
    void  output_C_code_header(std::ostream& out) const;
    void  output_basic_H(std::ostream& out) const;

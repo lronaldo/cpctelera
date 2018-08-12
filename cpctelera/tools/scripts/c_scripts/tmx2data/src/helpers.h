@@ -51,10 +51,14 @@ const std::string C_WHITE { "\033[0;37;49m" };
 const std::string C_NORMAL { "\033[0;39;49m" };
 
 // FUNCTION PROTOTYPES
-void        error          (const TArgs&& err);
-bool        isValidHex     (const std::string& str);
-bool        isValidDec     (const std::string& str);
-uint16_t    to16bitAddress (const std::string& str);
+void        error                (const TArgs&& err);
+bool        isValidHex           (const std::string& str);
+bool        isValidDec           (const std::string& str);
+uint16_t    to16bitAddress       (const std::string& str);
+bool        isFolder             (const char* folder);
+bool        isFolderWritable     (const char* folder);
+std::string removeRepetitions    (const std::string& str, char c);
+void        ensureOnly1CharBack  (std::string& str, char endc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CONVERT A SET OF STREAMEABLE TYPES INTO A STRING

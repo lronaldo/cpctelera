@@ -97,13 +97,6 @@ CPCT_TMX_Tilemap::setBitsPerItem(uint8_t bits) {
    m_total_bytes = std::ceil(m_tw * m_th * m_bitsPerItem / 8.0);
 }
 
-void
-CPCT_TMX_Tilemap::printSomeInfo() const {
-   //m_map.getTileCount()
-   //m_map.getTilesets()
-   //m_map.getLayers()
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Generates an output code header for either C or H files
 //
