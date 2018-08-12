@@ -71,31 +71,30 @@ selected as CSV in tilemap properties."
 //
 void parseArguments(const TArgs& args) {
    // Check that the number of arguments is valid
-   if (args.size()==1) usage(args[0]);
+   if (args.size() < 2) usage(args[0]);
 
    // PARSE ARGUMENTS ONE BY ONE
    for(std::size_t i=1; i < args.size(); ++i) {
       const auto& a = args[i];
 
-      // SET THE PC
+      //------------------------ BITARRAY MODIFIER
       if (a == "-ba" || a == "--bitarray") {
          if (i + 1 >= args.size()) error( { "Modifier '-ba | --bitarray' needs to be followed by the amount of bits (1, 2, 4 or 6), but nothing found."} );
          std::cerr << "-ba option";
          
          ++i;
 
-      // LOAD ADDRESS
-      } else if (a == "-l" || a == "--load-address") {
-         if (i + 1 >= args.size()) error( { "Modifier '-l' needs to be followed by a 16-bits address, but nothing found."} );
-
-         ++i;
-
-      // SHOW HELP
+      //------------------------ SHOW HELP
       } else if (a == "-h" || a == "--help") {
          usage(args[0]);
 
-      // BINARY FILE
+      //------------------------ UNKNOWN MODIFIER
+      } else if (a[0] == '-') {
+         error( { "Unknown modifier '", a, "'" } );
+      
+      //------------------------ TMX FILE
       } else {
+         g_theTilemap.loadMap(args[i].c_str());
       }
    }
 }
@@ -108,7 +107,8 @@ int main(int argc, char **argv) {
    try {
       TArgs args(argv, argv + argc);
       parseArguments(args);
-
+      g_theTilemap.printSomeInfo();
+      g_theTilemap.output_basic_H(std::cout);
    } catch (std::exception& e) {
       std::cerr << "ERROR: " << e.what() << "\n";
       return -1;

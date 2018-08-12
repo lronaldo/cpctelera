@@ -19,6 +19,10 @@
 #pragma once
 
 #include <tmxlite/Map.hpp>
+#include <string>
+#include <chrono>
+#include <ctime>
+#include <iostream>
 
 class CPCT_TMX_Tilemap {
 public:
@@ -26,9 +30,17 @@ public:
    CPCT_TMX_Tilemap(char* tmxfilename);
    ~CPCT_TMX_Tilemap();
 
-   void loadMap(char* tmxfilename);
-   void setBitsPerItem(uint8_t bits);
+   void  loadMap(const char* tmxfilename);
+   void  setBitsPerItem(uint8_t bits);
+
+   void  printSomeInfo() const;
+
+   // Output operators
+   void  output_basic_H(std::ostream& out) const;
 private:
+   std::string m_filename;
+   std::string m_cid = "g_map";
    tmx::Map    m_map;
    uint8_t     m_bitsPerItem = 8;
+   std::time_t m_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 };
