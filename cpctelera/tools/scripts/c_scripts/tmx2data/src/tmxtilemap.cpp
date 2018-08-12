@@ -38,7 +38,7 @@ void
 CPCT_TMX_Tilemap::loadMap(const char* tmxfilename) {
    // Load map and check it to be a correct TMX
    if ( ! m_map.load(tmxfilename)) 
-      error( { "File ", tmxfilename, " is not a TMX, is corrupted or could not be loaded." } );
+      error( { "File ", tmxfilename, " does not exist, is not a TMX, is corrupted or could not be loaded." } );
 
    // Check for required Orientation
    if (m_map.getOrientation() != tmx::Orientation::Orthogonal)

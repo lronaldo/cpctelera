@@ -73,6 +73,8 @@ selected as CSV in tilemap properties."
 // PARSES ARGUMENTS GIVEN TO THIS SCRIPT
 //
 void parseArguments(const TArgs& args) {
+   std::string filename = "";
+
    // Check that the number of arguments is valid
    if (args.size() < 2) usage(args[0]);
 
@@ -82,11 +84,16 @@ void parseArguments(const TArgs& args) {
 
       //------------------------ BITARRAY MODIFIER
       if (a == "-ba" || a == "--bitarray") {
-         if (i + 1 >= args.size()) error( { "Modifier '-ba | --bitarray' needs to be followed by the amount of bits (1, 2, 4 or 6), but nothing found."} );
-         std::cerr << "-ba option";
+         if ( i + 1 >= args.size() ) error( { "Modifier '-ba | --bitarray' needs to be followed by the amount of bits (1, 2, 4, 6 or 8), but nothing found."} );
+         std::string bits = args[i+1];
+         if       ( bits == "1" ) { g_theTilemap.setBitsPerItem(1); }
+         else if  ( bits == "2" ) { g_theTilemap.setBitsPerItem(2); }
+         else if  ( bits == "4" ) { g_theTilemap.setBitsPerItem(4); }
+         else if  ( bits == "6" ) { g_theTilemap.setBitsPerItem(6); }
+         else if  ( bits == "8" ) { g_theTilemap.setBitsPerItem(8); }
+         else { error( { "'", bits,"' is not a valid value for '-ba | --bitarray'. Valid values are: 1, 2, 4, 6, 8."  } ); }
          
          ++i;
-
       //------------------------ SHOW HELP
       } else if (a == "-nb" || a == "--number-base") {
          if (i + 1 >= args.size()) error( { "Modifier '-nb | --number-base' needs to be followed by selected numerical base (dec, bin or hex), but nothing found."} );
@@ -110,9 +117,13 @@ void parseArguments(const TArgs& args) {
       
       //------------------------ TMX FILE
       } else {
-         g_theTilemap.loadMap(args[i].c_str());
+         filename = args[i];
       }
    }
+
+   // Load the TMX with selected options
+   if (filename == "") error( { "No TMX file given. A TMX file is required to parse its contents." } );
+   g_theTilemap.loadMap(filename.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
