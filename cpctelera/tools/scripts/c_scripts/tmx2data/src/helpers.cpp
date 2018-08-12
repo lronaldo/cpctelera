@@ -107,7 +107,7 @@ bool isFolder(const char* folder) {
 //
 bool isFolderWritable(const char* folder) {
    struct stat sb;
-   return stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode) && access(folder, W_OK) == 0;
+   return stat(folder, &sb) == 0 && S_ISDIR(sb.st_mode) && access(folder, W_OK | X_OK) == 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,4 +133,24 @@ void ensureOnly1CharBack(std::string& str, char endc) {
    char c = endc;
    while(str.size() > 0 && (c = str.back()) == endc) str.pop_back();
    str += endc;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Remove extensions from a filename
+//
+std::string basename(const std::string& str) {
+   auto i = str.find('.');
+   if (i != std::string::npos)
+      return str.substr(0, i);
+   return str;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Remove all directory information and leave only the name of the file
+//
+std::string notdir(const std::string& str, char sep) {
+   auto i = str.rfind(sep);
+   if (i != std::string::npos)
+      return str.substr(i+1, str.length() - i);
+   return str;
 }

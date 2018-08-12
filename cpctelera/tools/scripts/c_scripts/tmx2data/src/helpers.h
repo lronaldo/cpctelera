@@ -59,6 +59,8 @@ bool        isFolder             (const char* folder);
 bool        isFolderWritable     (const char* folder);
 std::string removeRepetitions    (const std::string& str, char c);
 void        ensureOnly1CharBack  (std::string& str, char endc);
+std::string basename             (const std::string& str);
+std::string notdir               (const std::string& str, char sep);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CONVERT A SET OF STREAMEABLE TYPES INTO A STRING

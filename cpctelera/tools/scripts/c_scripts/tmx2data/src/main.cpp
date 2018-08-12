@@ -20,6 +20,7 @@
 #include "tmxtilemap.h"
 #include <iostream>
 #include <fstream>
+#include <fstream>
 #include <cstring>
 #include <cctype>
 #include <sstream>
@@ -29,7 +30,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 //
-CPCT_TMX_Tilemap  g_theTilemap;  // Tilemap information obtained from the TMX file
+CPCT_TMX_Tilemap  g_theTilemap;     // Tilemap information obtained from the TMX file
+std::string       g_outputFolder;   // Output folder for output files
+std::string       g_fileBasename;   // Basename for output files without folder or extension (only the name)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,9 +119,9 @@ void parseArguments(const TArgs& args) {
       //------------------------ SELECT OUTPUT FOLDER
       } else if (a == "-of" || a == "--output-folder") {
          if (i + 1 >= args.size()) error( { "Modifier '-of | --output-folder' needs to be followed by a folder, but nothing found."} );
-         std::string folder = std::move(removeRepetitions(args[i + 1], '/'));
-         ensureOnly1CharBack(folder, '/');
-         if ( !isFolderWritable(folder.c_str()) ) error ({ "Folder '", folder, "' does not exist, is not a folder or is not writable." });
+         g_outputFolder = std::move(removeRepetitions(args[i + 1], '/'));
+         ensureOnly1CharBack(g_outputFolder, '/');
+         if ( !isFolderWritable(g_outputFolder.c_str()) ) error ({ "Folder '", g_outputFolder, "' does not exist, is not a folder or is not writable." });
 
          ++i;
       //------------------------ SHOW HELP
@@ -132,6 +135,7 @@ void parseArguments(const TArgs& args) {
       //------------------------ TMX FILE
       } else {
          filename = args[i];
+         g_fileBasename = notdir(basename(filename), '/');
       }
    }
 
@@ -148,7 +152,18 @@ int main(int argc, char **argv) {
    try {
       TArgs args(argv, argv + argc);
       parseArguments(args);
-      g_theTilemap.output_basic_H(std::cout);
+
+      // Open output files and write them
+      std::string cfilename = g_outputFolder + g_fileBasename + ".c";
+      std::string hfilename = g_outputFolder + g_fileBasename + ".h";
+      std::ofstream cfile(cfilename);
+      std::ofstream hfile(hfilename);
+      if ( !cfile ) error ( { "There was an unknown problem opening '", cfilename, "' for writing output data." } );
+      if ( !hfile ) error ( { "There was an unknown problem opening '", hfilename, "' for writing output data." } );    
+      g_theTilemap.output_basic_C(cfile);
+      g_theTilemap.output_basic_H(hfile);
+      cfile.close();
+      hfile.close();
    } catch (std::exception& e) {
       std::cerr << "ERROR: " << e.what() << "\n";
       return -1;
