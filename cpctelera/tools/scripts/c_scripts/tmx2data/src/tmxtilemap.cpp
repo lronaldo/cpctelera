@@ -217,7 +217,7 @@ CPCT_TMX_Tilemap::output_basic_HS(std::ostream& out) const {
       out << "\n;; Offsets of the different layers with respect to the start of the data";
       for (const auto& l : m_map.getLayers()) {
          if ( l->getVisible() ) {
-            out << '\n' << m_cid << "_layer_" << nvisl << " = " << nvisl * m_total_bytes;
+            out << '\n' << m_cid << "_layer_" << nvisl << "_OFF = " << nvisl * m_total_bytes;
             ++nvisl;
          }
       }
@@ -326,7 +326,7 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Generate output C-file for basic C conversion
+// Generate output ASM-file for basic conversion
 //
 void
 CPCT_TMX_Tilemap::output_basic_S(std::ostream& out) const {
@@ -354,7 +354,7 @@ CPCT_TMX_Tilemap::output_basic_S(std::ostream& out) const {
 
          // Output layer header
          if (m_visibleLayers > 1) {
-            out << "\n;;   Layer '"<< nlayer <<"' array offset: "<< nlayer * m_total_bytes <<" size: " << m_total_bytes;
+            out << "\n;;   Layer '"<< std::setbase(10) << nlayer <<"' array offset: "<< nlayer * m_total_bytes <<" size: " << m_total_bytes;
             out << "\n" << m_cid << "_l" << nlayer << ":";
             out << '\n';
          }
