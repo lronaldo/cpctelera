@@ -43,6 +43,7 @@
 //    -gh | --generate-h             - Generates a H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag.
 //    -ghs| --generate-h-s           - Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag.
 //    -gb | --generate-bin           - Generates a BIN file with a raw string containing the converted values (same values as C array) (Default: no). Defaults are set to false on using this flag.
+//    -gs | --generate-asm           - Generates a .S (ASM) file with converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
 //    -h  | --help                   - Shows help information on the terminal.
 //    -nb | --number-base <base>     - Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)
 //    -nm | --do-not-use-cpct-macros - Does not use CPCtelera macros when producing array values. Default: macros used

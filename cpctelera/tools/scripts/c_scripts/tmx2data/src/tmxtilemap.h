@@ -49,10 +49,10 @@ public:
    void  setUseCPCTMacros(bool use)             { m_bitarray.setUseCPCTMacros(use); }
 
    // Output operators
-   void  output_basic_H(std::ostream& out) const;
-   void  output_basic_HS(std::ostream& out) const;
-
-   void  output_basic_C(std::ostream& out) const;
+   void  output_basic_H  (std::ostream& out) const;
+   void  output_basic_HS (std::ostream& out) const;
+   void  output_basic_S  (std::ostream& out) const;
+   void  output_basic_C  (std::ostream& out) const;
    void  output_basic_BIN(std::ostream& out) const;
 
    // Getters

@@ -162,23 +162,23 @@ CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
 
    // Output declarations
    out << "\n#include <types.h>";
-   out << "\n";
+   out << '\n';
    out << "\n//#### Width and height constants ####";
    out << "\n#define "<< m_cid <<"_W  " << m_tw;
    out << "\n#define "<< m_cid <<"_H  " << m_th;
-   out << "\n";
+   out << '\n';
    out << "\n//#### Converted layer tilemaps ####";
    out << "\n//   Visible layers: " << m_visibleLayers;
    out << "\n//";
    if (m_visibleLayers == 1) {
       out << "\nextern const u8 "<< m_cid <<"["<< m_total_bytes <<"];";
    } else {
-      out << "\n";
+      out << '\n';
       out << "\n// General layer array";
       out << "\nextern const u8 "<< m_cid <<"["<< m_visibleLayers <<"]["<< m_total_bytes <<"];";
       // Output constants for all layers
       uint16_t nvisl = 0;
-      out << "\n";
+      out << '\n';
       out << "\n// Constant pointers for immediate access";
       for (const auto& l : m_map.getLayers()) {
          if ( l->getVisible() ) {
@@ -187,42 +187,42 @@ CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
          }
       }
    }
-   out << "\n";
+   out << '\n';
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Generate output header file for basic C conversion
+// Generate output header file for basic .H.S conversion
 //
 void
 CPCT_TMX_Tilemap::output_basic_HS(std::ostream& out) const {
    output_C_code_header(out, ";;");
 
    // Output declarations
-   out << "\n//#### Width and height constants ####";
-   out << "\n#define "<< m_cid <<"_W  " << m_tw;
-   out << "\n#define "<< m_cid <<"_H  " << m_th;
-   out << "\n";
-   out << "\n//#### Converted layer tilemaps ####";
-   out << "\n//   Visible layers: " << m_visibleLayers;
-   out << "\n//";
+   out << "\n;;#### Width and height constants ####";
+   out << '\n' << m_cid <<"_W = " << m_tw;
+   out << '\n' << m_cid <<"_H = " << m_th;
+   out << '\n';
+   out << "\n;;#### Converted layer tilemaps ####";
+   out << "\n;;   Visible layers: " << m_visibleLayers;
+   out << "\n;;";
    if (m_visibleLayers == 1) {
-      out << "\nextern const u8 "<< m_cid <<"["<< m_total_bytes <<"];";
+      out << '\n' << m_cid << "_SIZE = "<< m_total_bytes;
    } else {
-      out << "\n";
-      out << "\n// General layer array";
-      out << "\nextern const u8 "<< m_cid <<"["<< m_visibleLayers <<"]["<< m_total_bytes <<"];";
+      out << '\n' << m_cid << "_LAYERS     = "<< m_visibleLayers;
+      out << '\n' << m_cid << "_LAYER_SIZE = "<< m_total_bytes;
+      out << '\n' << m_cid << "_SIZE       = "<< m_visibleLayers * m_total_bytes;
       // Output constants for all layers
       uint16_t nvisl = 0;
-      out << "\n";
-      out << "\n// Constant pointers for immediate access";
+      out << '\n';
+      out << "\n;; Offsets of the different layers with respect to the start of the data";
       for (const auto& l : m_map.getLayers()) {
          if ( l->getVisible() ) {
-            out << "\n#define "<< m_cid <<"_layer_" << nvisl <<"   (u8*)(&layers["<< nvisl <<"][0])";
+            out << '\n' << m_cid << "_layer_" << nvisl << " = " << nvisl * m_total_bytes;
             ++nvisl;
          }
       }
    }
-   out << "\n";
+   out << '\n';
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +247,6 @@ CPCT_TMX_Tilemap::insertOneTileRowInBitarray(CPCT_bitarray& b, TConstItVecTiles 
    } while (w);
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate output C-file for basic C conversion
 //
@@ -257,7 +256,7 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
 
    // Output tilemap definition
    out << "\n#include <types.h>";
-   out << "\n";
+   out << '\n';
    out << "\n//#### Converted layer tilemaps ####";
    out << "\n//   Visible layers: " << m_visibleLayers;
    out << "\n//";
@@ -323,6 +322,57 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
    // If using CPCT_MACROS, undefine the temporal macro
    if ( m_bitarray.usingCPCTMacros() && bpi > 1 && bpi < 8 ) {
       out << "\n#undef " << m_bitarray.getCPCTMacroName() << '\n';
+   }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate output C-file for basic C conversion
+//
+void
+CPCT_TMX_Tilemap::output_basic_S(std::ostream& out) const {
+   output_C_code_header(out, ";;");
+
+   // Output tilemap definition
+   out << '\n';
+   out << "\n;;#### Converted layer tilemaps ####";
+   out << "\n;;   Visible layers: " << m_visibleLayers;
+   out << "\n;;";
+
+   // Output declaration header   
+   out << "\n;;   Array '"<< m_cid <<"' size: ";
+   if (m_visibleLayers > 1){ out << m_visibleLayers * m_total_bytes; } 
+   else                    { out << m_total_bytes;                   }
+   out << '\n' << m_cid << ":";
+
+   // Output visible layers
+   uint32_t nlayer = 0;
+   for( const auto& layer : m_map.getLayers() ) {
+      // Check if layer is visible (it will be of type Tile if it is visible)
+      if ( layer->getVisible() ) {
+         const auto& vtiles = dynamic_cast<tmx::TileLayer*>(layer.get())->getTiles();
+         TConstItVecTiles it = vtiles.begin();
+
+         // Output layer header
+         if (m_visibleLayers > 1) {
+            out << "\n;;   Layer '"<< nlayer <<"' array offset: "<< nlayer * m_total_bytes <<" size: " << m_total_bytes;
+            out << "\n" << m_cid << "_l" << nlayer << ":";
+            out << '\n';
+         }
+
+         // Output row values
+         while ( it != vtiles.end() ) {
+            m_bitarray.reset();
+            insertOneTileRowInBitarray(m_bitarray, it, vtiles.end()); 
+            if ( m_bitarray.getNumItems() ) {
+               out << "  .db ";
+               m_bitarray.print(out);
+               out << '\n';
+               it = it + (uint32_t)m_bitarray.getNumItems();
+            }
+         }
+         // Next layer number
+         ++nlayer;
+      }
    }
 }
 

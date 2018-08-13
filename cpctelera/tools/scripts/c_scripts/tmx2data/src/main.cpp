@@ -33,10 +33,11 @@ CPCT_TMX_Tilemap  g_theTilemap;           // Tilemap information obtained from t
 std::string       g_outputFolder;         // Output folder for output files
 std::string       g_fileBasename;         // Basename for output files without folder or extension (only the name)
 uint16_t          g_generate_flags = 0;   // Collection of flags indicating which output files to generate (all set to false)
-const uint16_t    g_GENFLAG_C   = 1;      // Flag to indicate that a C file must be generated
-const uint16_t    g_GENFLAG_H   = 2;      // Flag to indicate that a H file must be generated
-const uint16_t    g_GENFLAG_HS  = 4;      // Flag to indicate that a H.S file must be generated
-const uint16_t    g_GENFLAG_BIN = 8;      // Flag to indicate that a BIN file must be generated
+const uint16_t    g_GENFLAG_C   =  1;     // Flag to indicate that a C file must be generated
+const uint16_t    g_GENFLAG_H   =  2;     // Flag to indicate that a H file must be generated
+const uint16_t    g_GENFLAG_HS  =  4;     // Flag to indicate that a H.S file must be generated
+const uint16_t    g_GENFLAG_BIN =  8;     // Flag to indicate that a BIN file must be generated
+const uint16_t    g_GENFLAG_ASM = 16;     // Flag to indicate that a ASM file must be generated
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TYPE DEFINITIONS
@@ -73,6 +74,8 @@ selected as CSV in tilemap properties."
       << C_CYAN         << "\n          Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -gb | --generate-bin"
       << C_CYAN         << "\n          Generates a .BIN file with a raw string containing the converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
+      << C_LIGHT_BLUE   << "\n   -gs | --generate-asm"
+      << C_CYAN         << "\n          Generates a .S (ASM) file with converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -h  | --help"
       << C_CYAN         << "\n          Shows this help information."
       << C_LIGHT_BLUE   << "\n   -nb | --number-base <base>"
@@ -125,13 +128,17 @@ void parseArguments(const TArgs& args) {
       } else if (a == "-gh" || a == "--generate-h") {
          g_generate_flags |= g_GENFLAG_H; // Set H file to be generated
 
-      //------------------------ GENERATE H OUTPUT FILE
+      //------------------------ GENERATE H.S OUTPUT FILE
       } else if (a == "-ghs" || a == "--generate-h-s") {
          g_generate_flags |= g_GENFLAG_HS; // Set .H.S file to be generated
 
       //------------------------ GENERATE BIN OUTPUT FILE
       } else if (a == "-gb" || a == "--generate-bin") {
          g_generate_flags |= g_GENFLAG_BIN; // Set BIN file to be generated
+
+      //------------------------ GENERATE BIN OUTPUT FILE
+      } else if (a == "-gs" || a == "--generate-asm") {
+         g_generate_flags |= g_GENFLAG_ASM; // Set ASM file to be generated
 
       //------------------------ SELECT NUMBER BASE
       } else if (a == "-nb" || a == "--number-base") {
@@ -214,6 +221,10 @@ int main(int argc, char **argv) {
       if ( g_generate_flags & g_GENFLAG_C   ) generateOutput(".c"    , &CPCT_TMX_Tilemap::output_basic_C    );
       if ( g_generate_flags & g_GENFLAG_H   ) generateOutput(".h"    , &CPCT_TMX_Tilemap::output_basic_H    );
       if ( g_generate_flags & g_GENFLAG_HS  ) generateOutput(".h.s"  , &CPCT_TMX_Tilemap::output_basic_HS   );
+
+      // Assembler cannot use macros
+      g_theTilemap.setUseCPCTMacros(false);
+      if ( g_generate_flags & g_GENFLAG_ASM ) generateOutput(".s"    , &CPCT_TMX_Tilemap::output_basic_S    );
       
       // And now binary files
       g_theTilemap.setOutputNumberFormat(TNumberFormat::binary);
