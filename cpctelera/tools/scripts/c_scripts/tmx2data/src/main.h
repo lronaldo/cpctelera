@@ -43,6 +43,7 @@
 //    -gh | --generate-h             - Generates a H file with the declaration of the array for C file (implies -gc)
 //    -h  | --help                   - Shows help information on the terminal.
 //    -nb | --number-base <base>     - Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)
+//    -nm | --do-not-use-cpct-macros - Does not use CPCtelera macros when producing array values. Default: macros used
 //    -of | --output-folder <folder> - Changes the output folder for generated C/H files (Default: .)
 
 #pragma once

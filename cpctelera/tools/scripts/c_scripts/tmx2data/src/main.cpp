@@ -65,6 +65,8 @@ selected as CSV in tilemap properties."
       << C_CYAN         << "\n          Shows this help information."
       << C_LIGHT_BLUE   << "\n   -nb | --number-base <base>"
       << C_CYAN         << "\n          Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)"
+      << C_LIGHT_BLUE   << "\n   -nm | --do-not-use-cpct-macros"
+      << C_CYAN         << "\n          Does not use CPCtelera macros when producing array values. Default: macros used"
       << C_LIGHT_BLUE   << "\n   -of | --output-folder <folder>"
       << C_CYAN         << "\n          Changes the output folder for generated C/H files (Default: .)"
       << "\n\n" << C_NORMAL;
@@ -109,11 +111,16 @@ void parseArguments(const TArgs& args) {
          std::string base = args[i+1];
          std::transform(base.begin(), base.end(), base.begin(), ::tolower);
          switch (str2int(base.c_str())) {
-            case str2int("dec"): g_theTilemap.setOutputNumberFormat(CPCT_TMX_Tilemap::NumberFormat::decimal);     break;
-            case str2int("hex"): g_theTilemap.setOutputNumberFormat(CPCT_TMX_Tilemap::NumberFormat::hexadecimal); break;
-            case str2int("bin"): g_theTilemap.setOutputNumberFormat(CPCT_TMX_Tilemap::NumberFormat::binary);      break;
+            case str2int("dec"): g_theTilemap.setOutputNumberFormat(TNumberFormat::decimal);     break;
+            case str2int("hex"): g_theTilemap.setOutputNumberFormat(TNumberFormat::hexadecimal); break;
+            case str2int("bin"): g_theTilemap.setOutputNumberFormat(TNumberFormat::binary_text); break;
             default: error( { "'", base, "' is not a valid numerical base for '-nb | --number-base'. Valid bases are: dec, bin, hex."} ); 
          }
+
+         ++i;
+      //------------------------ DO NOT USE CPCTELERA MACROS
+      } else if (a == "-nm" || a == "--do-not-use-cpct-macros") {
+         g_theTilemap.setUseCPCTMacros(false);
 
          ++i;
       //------------------------ SELECT OUTPUT FOLDER

@@ -1,5 +1,5 @@
 //-----------------------------LICENSE NOTICE------------------------------------
-//  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+//  This file is part of CPCtelera: An Amstrad CPC Game Engine
 //  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
-   
+
 #include "tmxtilemap.h"
-#include <tmxlite/TileLayer.hpp>
+#include "bitarray.h"
 #include <helpers.h>
 #include <iostream>
 #include <iomanip>
@@ -27,9 +27,9 @@
 #include <cmath>
 #include <ctime>
 
-CPCT_TMX_Tilemap::CPCT_TMX_Tilemap() { }
+CPCT_TMX_Tilemap::CPCT_TMX_Tilemap() : m_bitarray(8) { }
 
-CPCT_TMX_Tilemap::CPCT_TMX_Tilemap(char* tmxfilename) { loadMap(tmxfilename); }
+CPCT_TMX_Tilemap::CPCT_TMX_Tilemap(char* tmxfilename) : m_bitarray(8) { loadMap(tmxfilename); }
 
 CPCT_TMX_Tilemap::~CPCT_TMX_Tilemap() {
 }
@@ -37,40 +37,31 @@ CPCT_TMX_Tilemap::~CPCT_TMX_Tilemap() {
 void
 CPCT_TMX_Tilemap::loadMap(const char* tmxfilename) {
    // Load map and check it to be a correct TMX
-   if ( ! m_map.load(tmxfilename)) 
-      error( { "File ", tmxfilename, " does not exist, is not a TMX, is corrupted or could not be loaded." } );
+   if ( ! m_map.load(tmxfilename) ) error( { "File ", tmxfilename, " does not exist, is not a TMX, is corrupted or could not be loaded." } );
 
    // Check for required Orientation
-   if (m_map.getOrientation() != tmx::Orientation::Orthogonal)
-      error( { "'", tmxfilename, "' has a map orientation different than Orthogonal. Only Orthogonal orientation is supported."} );
+   if (m_map.getOrientation() != tmx::Orientation::Orthogonal) error( { "'", tmxfilename, "' has a map orientation different than Orthogonal. Only Orthogonal orientation is supported."} );
 
    // Check map for at least having 1 visible Layer, and all layers being of type Tile
-   // Also count for maxTileID
+   // Also count for maxTileID and check that IDs are valid for the m_bitsPerItem setting
    m_visibleLayers = 0;
    m_maxTileID = 0;
-   m_maxTileDecDigits = 1;
-   for(const auto& l : m_map.getLayers()) { 
-      if ( l->getVisible() ) { 
+   for(const auto& l : m_map.getLayers()) {
+      if ( l->getVisible() ) {
          ++m_visibleLayers;
-         if ( l->getType() != tmx::Layer::Type::Tile )
-            error ( { "'", tmxfilename, "' contains visible non-tiled layers. Only 'Tile' type layers are supported. " } );
+
+         // Check that any visible layer is of type Tile
+         if ( l->getType() != tmx::Layer::Type::Tile ) error ( { "'", tmxfilename, "' contains visible non-tiled layers. Only 'Tile' type layers are supported. " } );
 
          // Get the Tile layer and the Highest Tile ID (if we are already at 3 digits, there is no need to continue counting)
-         if (m_maxTileDecDigits < 3) {
-            const auto lt = dynamic_cast<tmx::TileLayer*>(l.get());           
-            for( const auto& t : lt->getTiles() ) { 
-               uint8_t v = adjustedTileValue(t.ID); 
-               if ( v > m_maxTileID ) {
-                  m_maxTileID = v;
-                  if      ( v >= 100 ) { m_maxTileDecDigits = 3; continue; }
-                  else if ( v >=  10 ) { m_maxTileDecDigits = 2;           }
-               }
-            }
-         }
+         updateMaxDecDigits( dynamic_cast<tmx::TileLayer*>(l.get()) );
       }
-   } 
-   if (! m_visibleLayers)
-      error( { "'", tmxfilename, "' has 0 *visible* tilemap layers. At least 1 visible tilemap layer is required. (Remember: only *visible* layers are converted)"} );
+   }
+   // Check that there is at least 1 visible Layer
+   if (! m_visibleLayers) error( { "'", tmxfilename, "' has 0 *visible* tilemap layers. At least 1 visible tilemap layer is required. (Remember: only *visible* layers are converted)"} );
+
+   // Check if the maxTileID is valid under the current bitarray settings (there must be enough bits for so many tiles)
+   if ( m_maxTileID > m_maxValidTileID ) error( {"The maximum ID of tile used is '", std::to_string(m_maxTileID), "' which requires more bits for its codification than currently selected bitarray settings ('", std::to_string(m_bitarray.getBitsPerItem()), "' bits per tile, Up to ", std::to_string(m_maxValidTileID + 1), " tiles, [0-", std::to_string(m_maxValidTileID), "])." } );
 
    // Save the filename and time at which the file has been interpreted
    m_filename = tmxfilename;
@@ -81,20 +72,36 @@ CPCT_TMX_Tilemap::loadMap(const char* tmxfilename) {
    // Calculate the parameters of the tilemap
    m_tw = m_map.getTileCount().x;
    m_th = m_map.getTileCount().y;
-   m_total_bytes = std::ceil(m_tw * m_th * m_bitsPerItem / 8.0);
-
-   // m_map.getVersion().upper << ", " << m_map.getVersion().lower << std::endl;   
+   m_total_bytes = std::ceil(m_tw * m_th * m_bitarray.getBitsPerItem() / 8.0);
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Calculate and update max number of decimal digits
+//
+void           
+CPCT_TMX_Tilemap::updateMaxDecDigits(const tmx::TileLayer* l) {
+   // Get the Tile layer and the Highest Tile ID (if we are already at 3 digits, there is no need to continue counting)
+   if (m_bitarray.getMaxDecDigits() < 3) {
+      for( const auto& t : l->getTiles() ) {
+         uint8_t v = adjustedTileValue(t.ID);   // Adjust the tile id
+         // Calculate the maximum number of decimal digits
+         if ( v > m_maxTileID ) {
+            m_maxTileID = v;
+            if      ( v >= 100 ) { m_bitarray.updateDecimalDigits(3); return; }
+            else if ( v >=  10 ) { m_bitarray.updateDecimalDigits(2);         }
+         }
+      }
+   }
+}
+
 
 void
 CPCT_TMX_Tilemap::setBitsPerItem(uint8_t bits) {
-   std::set<uint8_t> validbits { 1, 2, 4, 6, 8 };
-   if (validbits.find(bits) == validbits.end()) 
-      error( { "Invalid number of bits per item '", std::to_string(bits), "'. Valid values are: ", setToString(validbits, " ") } );
+   m_bitarray.setBitsPerItem(bits);
 
    // Update bits per item and total bytes
-   m_bitsPerItem = bits;
-   m_total_bytes = std::ceil(m_tw * m_th * m_bitsPerItem / 8.0);
+   m_maxValidTileID  = std::pow(2, bits) - 1;
+   m_total_bytes     = std::ceil(m_tw * m_th * bits / 8.0);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,8 +114,8 @@ CPCT_TMX_Tilemap::output_C_code_header(std::ostream& out) const {
    out << "\n//   * Visible Layers:  " << m_visibleLayers;
    out << "\n//   * Layer Width:     " << m_tw;
    out << "\n//   * Layer Height:    " << m_th;
-   out << "\n//   * Bits per tile:   " << (uint16_t)m_bitsPerItem;
-   out << "\n//   * Layer Bytes:     " << m_total_bytes << " ("<< m_tw <<" x "<< m_th <<" items, "<< (uint16_t)m_bitsPerItem <<" bits per item)";
+   out << "\n//   * Bits per tile:   " << (uint16_t)m_bitarray.getBitsPerItem();
+   out << "\n//   * Layer Bytes:     " << m_total_bytes << " ("<< m_tw <<" x "<< m_th <<" items, "<< (uint16_t)m_bitarray.getBitsPerItem() <<" bits per item)";
    out << "\n//   * Total Bytes:     " << m_total_bytes * m_visibleLayers << " ("<< m_total_bytes <<" x "<< m_visibleLayers <<", bytes per layer times layers)";
    out << "\n//";
    out << "\n#include <types.h>";
@@ -119,9 +126,9 @@ CPCT_TMX_Tilemap::output_C_code_header(std::ostream& out) const {
 // Change default C-identifier for output
 //
 void
-CPCT_TMX_Tilemap::setCID(std::string cid) { 
+CPCT_TMX_Tilemap::setCID(std::string cid) {
    // Check that passed identifier is valid before assigning
-   if ( !isValidCIdentifier(cid.c_str()) ) error( { "'", cid, "' is not a valid C-identifier."} ); 
+   if ( !isValidCIdentifier(cid.c_str()) ) error( { "'", cid, "' is not a valid C-identifier."} );
    m_cid = std::move(cid);
 }
 
@@ -133,7 +140,7 @@ CPCT_TMX_Tilemap::setCID(std::string cid) {
 void
 CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
    output_C_code_header(out);
-   
+
    // Output declarations
    out << "\n//#### Width and height constants ####";
    out << "\n#define "<< m_cid <<"_W  " << m_tw;
@@ -163,17 +170,27 @@ CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Outputs one tile ID formatted depending on current base and maxTileDecDigits
+// Inserts one complete row of tiles in a bitarray.
+// If bitarray is not complete after row insertion, some more tiles are inserted to complete the bitarray.
+// Bitarray can end up with less than one row if vector of tiles ends previous to bitarray completion.
 //
-void
-CPCT_TMX_Tilemap::output_formatted_tile(std::ostream& out, uint8_t tile) const {
-   uint16_t t = (uint16_t)adjustedTileValue(tile);
-   switch(m_numFormat) {
-      case NumberFormat::decimal:     out << std::setw(m_maxTileDecDigits) << std::setbase(std::ios_base::dec) << t;   break;
-      case NumberFormat::hexadecimal: out << "0x" << std::setw(2) << std::setfill('0') << std::setbase(std::ios_base::hex) << t;   break;
-      case NumberFormat::binary:      std::bitset<8> bs(t); out << "0b" << std::setw(8) << bs;                         break;
-   }
+void           
+CPCT_TMX_Tilemap::insertOneTileRowInBitarray(CPCT_bitarray& b, TConstItVecTiles it_tiles, TConstItVecTiles it_end) const {
+   uint32_t w = m_tw;
+   do {
+      // Add a complete row if there are enough tiles
+      while ( w ) {
+         // If there are no more tiles, then immediately end
+         if ( it_tiles == it_end ) return;
+         // Add next tile ID and count
+         b.addItem(adjustedTileValue(it_tiles->ID));
+         --w; ++it_tiles;
+      }
+      // If we have to add more tiles to complete the bitarray, set to add them
+      w = b.getItemsToComplete();
+   } while (w);
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate output C-file for basic C conversion (1 layer)
@@ -206,19 +223,23 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
    for( const auto& layer : m_map.getLayers() ) {
       // Check if layer is visible (it will be of type Tile if it is visible)
       if ( layer->getVisible() ) {
-         const auto l = dynamic_cast<tmx::TileLayer*>(layer.get());
-         out << std::string(3,c_margin) << c_comma << c_prev << '\n' << std::string(4, c_margin);
+         const auto& vtiles = dynamic_cast<tmx::TileLayer*>(layer.get())->getTiles();
+         TConstItVecTiles it = vtiles.begin();
 
-         // Output all tiles in this layer
+         out << std::string(3,c_margin) << c_comma << c_prev << '\n';
          char c_sep = ' ';
-         uint32_t w = m_tw;
-         for( const auto& t : l->getTiles() ) {
-            out << c_sep;
-            output_formatted_tile(out, t.ID);
-            c_sep = ',';
-            if (--w == 0) { w = m_tw; out << '\n' << std::string(4,c_margin); }
+         while ( it != vtiles.end() ) {
+            m_bitarray.reset();
+            insertOneTileRowInBitarray(m_bitarray, it, vtiles.end()); 
+            if ( m_bitarray.getNumItems() ) {
+               out << std::string(3,c_margin) << c_sep;
+               m_bitarray.print(out);
+               out << '\n';
+               it = it + (uint32_t)m_bitarray.getNumItems();
+               c_sep = ',';
+            }
          }
-         out << c_post << '\n';
+         out << std::string(3,c_margin) << c_post << '\n';
          c_comma = ',';
       }
    }

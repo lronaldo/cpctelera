@@ -19,16 +19,16 @@
 #pragma once
 
 #include <tmxlite/Map.hpp>
+#include <tmxlite/TileLayer.hpp>
 #include <string>
 #include <iostream>
+#include "outFormat.h"
+#include "bitarray.h"
 
 class CPCT_TMX_Tilemap {
 public:
-   enum class NumberFormat {
-         decimal
-      ,  hexadecimal
-      ,  binary
-   };
+   using TConstItVecTiles = std::vector<tmx::TileLayer::Tile>::const_iterator;
+   using TVecTiles        = std::vector<tmx::TileLayer::Tile>;
 
 	CPCT_TMX_Tilemap();
    CPCT_TMX_Tilemap(char* tmxfilename);
@@ -37,8 +37,9 @@ public:
    void  loadMap(const char* tmxfilename);
    void  setBitsPerItem(uint8_t bits);
    void  setCID(std::string cid);
-   void  setOutputNumberFormat(NumberFormat f)  { m_numFormat = f;         }
-   void  setInitialTileID(uint8_t id)           { m_initialTileID = id;    }
+   void  setOutputNumberFormat(TNumberFormat f) { m_bitarray.setOutFormat(f);       }
+   void  setInitialTileID(uint8_t id)           { m_initialTileID = id;             }
+   void  setUseCPCTMacros(bool use)             { m_bitarray.setUseCPCTMacros(use); }
 
    // Output operators
    void  output_C_code_header(std::ostream& out) const;
@@ -46,22 +47,22 @@ public:
    void  output_basic_C(std::ostream& out) const;
 private:
    // Attributes
+   mutable CPCT_bitarray  m_bitarray;     // Class that encapsulate conversion from bitarray numbers to C/H/BIN
    std::string    m_filename;             // Name of the TMX input file
    std::string    m_cid = "g_map";        // C-identifier for output
    tmx::Map       m_map;                  // TMX interpreter
-   uint8_t        m_bitsPerItem = 8;      // Number of bits per tile
    uint8_t        m_maxTileID;            // Highest ID amongst tiles
-   uint8_t        m_maxTileDecDigits;     // Number of decimal digits of the Highest tile ID
    uint8_t        m_initialTileID = 0;    // This will be considered the ID of the first tile
+   uint8_t        m_maxValidTileID = 255; // Max valid Tile ID number depending on bits per item
    uint32_t       m_visibleLayers;        // Number of visible layers in the TMX
-   uint32_t       m_tw, m_th;             // Tile Width and Height
+   uint32_t       m_tw = 0, m_th = 0;     // Tile Width and Height
    uint32_t       m_total_bytes;          // Total bytes for a given output array
    std::string    m_theTime;              // Current time string
-   NumberFormat   m_numFormat = NumberFormat::decimal;  // Output number format selected
 
 
    // Useful methods
-   void           output_formatted_tile(std::ostream& out, uint8_t tile) const;
+   void           updateMaxDecDigits(const tmx::TileLayer* l);
+   void           insertOneTileRowInBitarray(CPCT_bitarray& b, TConstItVecTiles it_tiles, TConstItVecTiles it_end) const;
    inline uint8_t adjustedTileValue(uint8_t tile) const { 
       if (tile) return tile - 1 + m_initialTileID;
       else      return tile + m_initialTileID;
