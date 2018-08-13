@@ -43,7 +43,7 @@ CPCT_TMX_Tilemap::loadMap(const char* tmxfilename) {
    if (m_map.getOrientation() != tmx::Orientation::Orthogonal) error( { "'", tmxfilename, "' has a map orientation different than Orthogonal. Only Orthogonal orientation is supported."} );
 
    // Check map for at least having 1 visible Layer, and all layers being of type Tile
-   // Also count for maxTileID and check that IDs are valid for the m_bitsPerItem setting
+   // Also count for maxTileID and check that IDs are valid for the bitsPerItem setting
    m_visibleLayers = 0;
    m_maxTileID = 0;
    for(const auto& l : m_map.getLayers()) {
@@ -72,7 +72,7 @@ CPCT_TMX_Tilemap::loadMap(const char* tmxfilename) {
    // Calculate the parameters of the tilemap
    m_tw = m_map.getTileCount().x;
    m_th = m_map.getTileCount().y;
-   m_total_bytes = std::ceil(m_tw * m_th * m_bitarray.getBitsPerItem() / 8.0);
+   updateTotalBytes();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,14 +94,35 @@ CPCT_TMX_Tilemap::updateMaxDecDigits(const tmx::TileLayer* l) {
    }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Calculates the total bytes that takes 1 layer in the currently selected bitsPerItem settings
+//
+void
+CPCT_TMX_Tilemap::updateTotalBytes() {
+   // Calculate number of elements, then it will be adjusted as required
+   uint64_t e = m_tw * m_th;
+   
+   // Adjust result to bytes, depending on the case
+   switch ( m_bitarray.getBitsPerItem() ) {
+      case 1: { e =  (e / 8) + ((e % 8) ? 1 : 0); break; }
+      case 2: { e =  (e / 4) + ((e % 4) ? 1 : 0); break; }
+      case 4: { e =  (e / 2) + ((e % 2) ? 1 : 0); break; }
+      case 6: { e = ((e / 4) + ((e % 4) ? 1 : 0)) * 3; break; }
+   }
+   // Set total bytes
+   m_total_bytes = e;
+}
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Sets the number of bits that will be used by each output item
+//
 void
 CPCT_TMX_Tilemap::setBitsPerItem(uint8_t bits) {
    m_bitarray.setBitsPerItem(bits);
 
    // Update bits per item and total bytes
    m_maxValidTileID  = std::pow(2, bits) - 1;
-   m_total_bytes     = std::ceil(m_tw * m_th * bits / 8.0);
+   updateTotalBytes();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

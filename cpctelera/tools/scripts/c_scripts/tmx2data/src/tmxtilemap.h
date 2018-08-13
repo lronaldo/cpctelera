@@ -61,6 +61,7 @@ private:
 
 
    // Useful methods
+   void           updateTotalBytes();
    void           updateMaxDecDigits(const tmx::TileLayer* l);
    void           insertOneTileRowInBitarray(CPCT_bitarray& b, TConstItVecTiles it_tiles, TConstItVecTiles it_end) const;
    inline uint8_t adjustedTileValue(uint8_t tile) const { 
