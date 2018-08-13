@@ -56,6 +56,7 @@ public:
    bool        usingCPCTMacros()    const { return m_useCPCTMacros;     }
    std::string getCPCTMacroName()   const { return m_CPCTMacroName;     }
    uint8_t     getItemsToComplete() const;
+   TNumberFormat getNumberFormat()  const { return m_outFormat;         }
 private:
    bool        m_useCPCTMacros = true; // Use CPCTelera bitarray macros for all text conversions
    uint8_t     m_bitsPerItem = 8;      // Bits per item in the bitarray

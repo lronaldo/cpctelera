@@ -49,11 +49,14 @@ public:
    void  setUseCPCTMacros(bool use)             { m_bitarray.setUseCPCTMacros(use); }
 
    // Output operators
-   void  output_C_code_header(std::ostream& out) const;
    void  output_basic_H(std::ostream& out) const;
+   void  output_basic_HS(std::ostream& out) const;
+
    void  output_basic_C(std::ostream& out) const;
    void  output_basic_BIN(std::ostream& out) const;
 
+   // Getters
+   TNumberFormat getNumberFormat()     { return m_bitarray.getNumberFormat(); }
 private:
    // Attributes
    mutable CPCT_bitarray  m_bitarray;     // Class that encapsulate conversion from bitarray numbers to C/H/BIN
@@ -69,6 +72,7 @@ private:
    std::string    m_theTime;              // Current time string
 
    // Useful methods
+   void           output_C_code_header(std::ostream& out, const char* comm) const;
    void           updateTotalBytes();
    void           updateMaxDecDigits(const tmx::TileLayer* l);
    void           insertOneTileRowInBitarray(CPCT_bitarray& b, TConstItVecTiles it_tiles, TConstItVecTiles it_end) const;

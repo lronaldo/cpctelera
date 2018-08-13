@@ -39,11 +39,14 @@
 // Command line options:
 //    -ba | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
 //    -ci | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
-//    -gc | --generate-c             - Generates a C file with an array containing converted values
-//    -gh | --generate-h             - Generates a H file with the declaration of the array for C file (implies -gc)
+//    -gc | --generate-c             - Generates a C file with an array containing converted values (Default: yes). Defaults are set to false on using this flag.
+//    -gh | --generate-h             - Generates a H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag.
+//    -ghs| --generate-h-s           - Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag.
+//    -gb | --generate-bin           - Generates a BIN file with a raw string containing the converted values (same values as C array) (Default: no). Defaults are set to false on using this flag.
 //    -h  | --help                   - Shows help information on the terminal.
 //    -nb | --number-base <base>     - Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)
 //    -nm | --do-not-use-cpct-macros - Does not use CPCtelera macros when producing array values. Default: macros used
 //    -of | --output-folder <folder> - Changes the output folder for generated C/H files (Default: .)
+//
 
 #pragma once

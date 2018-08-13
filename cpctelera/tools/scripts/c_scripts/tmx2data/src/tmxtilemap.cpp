@@ -129,18 +129,16 @@ CPCT_TMX_Tilemap::setBitsPerItem(uint8_t bits) {
 // Generates an output code header for either C or H files
 //
 void
-CPCT_TMX_Tilemap::output_C_code_header(std::ostream& out) const {
-   out <<   "//";
-   out << "\n// File "<< m_filename <<" converted to csv using cpct_tmx2data ["<< m_theTime <<"]";
-   out << "\n//   * Visible Layers:  " << m_visibleLayers;
-   out << "\n//   * Layer Width:     " << m_tw;
-   out << "\n//   * Layer Height:    " << m_th;
-   out << "\n//   * Bits per tile:   " << (uint16_t)m_bitarray.getBitsPerItem();
-   out << "\n//   * Layer Bytes:     " << m_total_bytes << " ("<< m_tw <<" x "<< m_th <<" items, "<< (uint16_t)m_bitarray.getBitsPerItem() <<" bits per item)";
-   out << "\n//   * Total Bytes:     " << m_total_bytes * m_visibleLayers << " ("<< m_total_bytes <<" x "<< m_visibleLayers <<", bytes per layer times layers)";
-   out << "\n//";
-   out << "\n#include <types.h>";
-   out << "\n";
+CPCT_TMX_Tilemap::output_C_code_header(std::ostream& out, const char* comm = "//") const {
+   out <<         comm;
+   out << '\n' << comm <<" File "<< m_filename <<" converted to csv using cpct_tmx2data ["<< m_theTime <<"]";
+   out << '\n' << comm <<"   * Visible Layers:  " << m_visibleLayers;
+   out << '\n' << comm <<"   * Layer Width:     " << m_tw;
+   out << '\n' << comm <<"   * Layer Height:    " << m_th;
+   out << '\n' << comm <<"   * Bits per tile:   " << (uint16_t)m_bitarray.getBitsPerItem();
+   out << '\n' << comm <<"   * Layer Bytes:     " << m_total_bytes << " ("<< m_tw <<" x "<< m_th <<" items, "<< (uint16_t)m_bitarray.getBitsPerItem() <<" bits per item)";
+   out << '\n' << comm <<"   * Total Bytes:     " << m_total_bytes * m_visibleLayers << " ("<< m_total_bytes <<" x "<< m_visibleLayers <<", bytes per layer times layers)";
+   out << '\n' << comm;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,6 +159,43 @@ CPCT_TMX_Tilemap::setCID(std::string cid) {
 void
 CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
    output_C_code_header(out);
+
+   // Output declarations
+   out << "\n#include <types.h>";
+   out << "\n";
+   out << "\n//#### Width and height constants ####";
+   out << "\n#define "<< m_cid <<"_W  " << m_tw;
+   out << "\n#define "<< m_cid <<"_H  " << m_th;
+   out << "\n";
+   out << "\n//#### Converted layer tilemaps ####";
+   out << "\n//   Visible layers: " << m_visibleLayers;
+   out << "\n//";
+   if (m_visibleLayers == 1) {
+      out << "\nextern const u8 "<< m_cid <<"["<< m_total_bytes <<"];";
+   } else {
+      out << "\n";
+      out << "\n// General layer array";
+      out << "\nextern const u8 "<< m_cid <<"["<< m_visibleLayers <<"]["<< m_total_bytes <<"];";
+      // Output constants for all layers
+      uint16_t nvisl = 0;
+      out << "\n";
+      out << "\n// Constant pointers for immediate access";
+      for (const auto& l : m_map.getLayers()) {
+         if ( l->getVisible() ) {
+            out << "\n#define "<< m_cid <<"_layer_" << nvisl <<"   (u8*)(&layers["<< nvisl <<"][0])";
+            ++nvisl;
+         }
+      }
+   }
+   out << "\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate output header file for basic C conversion
+//
+void
+CPCT_TMX_Tilemap::output_basic_HS(std::ostream& out) const {
+   output_C_code_header(out, ";;");
 
    // Output declarations
    out << "\n//#### Width and height constants ####";
@@ -221,6 +256,8 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
    output_C_code_header(out);
 
    // Output tilemap definition
+   out << "\n#include <types.h>";
+   out << "\n";
    out << "\n//#### Converted layer tilemaps ####";
    out << "\n//   Visible layers: " << m_visibleLayers;
    out << "\n//";

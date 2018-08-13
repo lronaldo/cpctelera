@@ -29,10 +29,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 //
-CPCT_TMX_Tilemap  g_theTilemap;     // Tilemap information obtained from the TMX file
-std::string       g_outputFolder;   // Output folder for output files
-std::string       g_fileBasename;   // Basename for output files without folder or extension (only the name)
+CPCT_TMX_Tilemap  g_theTilemap;           // Tilemap information obtained from the TMX file
+std::string       g_outputFolder;         // Output folder for output files
+std::string       g_fileBasename;         // Basename for output files without folder or extension (only the name)
+uint16_t          g_generate_flags = 0;   // Collection of flags indicating which output files to generate (all set to false)
+const uint16_t    g_GENFLAG_C   = 1;      // Flag to indicate that a C file must be generated
+const uint16_t    g_GENFLAG_H   = 2;      // Flag to indicate that a H file must be generated
+const uint16_t    g_GENFLAG_HS  = 4;      // Flag to indicate that a H.S file must be generated
+const uint16_t    g_GENFLAG_BIN = 8;      // Flag to indicate that a BIN file must be generated
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TYPE DEFINITIONS
+//
+typedef void (CPCT_TMX_Tilemap::*TOutputMethod)(std::ostream&) const; // Method pointer to output functions
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // USAGE FUNCTION
@@ -57,9 +66,13 @@ selected as CSV in tilemap properties."
       << C_LIGHT_BLUE   << "\n   -ci | --c-identifier <id>"
       << C_CYAN         << "\n          Sets the C-identifier that will be used for the generated array (Default: filename)"
       << C_LIGHT_BLUE   << "\n   -gc | --generate-c"
-      << C_CYAN         << "\n          Generates a C file with an array containing converted values"
+      << C_CYAN         << "\n          Generates a .C file with an array containing converted values (Default: yes). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -gh | --generate-h"
-      << C_CYAN         << "\n          Generates a H file with the declaration of the array for C file (implies -gc)"
+      << C_CYAN         << "\n          Generates a .H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag."
+      << C_LIGHT_BLUE   << "\n   -ghs| --generate-h-s"
+      << C_CYAN         << "\n          Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag."
+      << C_LIGHT_BLUE   << "\n   -gb | --generate-bin"
+      << C_CYAN         << "\n          Generates a .BIN file with a raw string containing the converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -h  | --help"
       << C_CYAN         << "\n          Shows this help information."
       << C_LIGHT_BLUE   << "\n   -nb | --number-base <base>"
@@ -104,6 +117,22 @@ void parseArguments(const TArgs& args) {
          g_theTilemap.setCID(args[i + 1]);
 
          ++i;
+      //------------------------ GENERATE C OUTPUT FILE
+      } else if (a == "-gc" || a == "--generate-c") {
+         g_generate_flags |= g_GENFLAG_C; // Set C file to be generated
+
+      //------------------------ GENERATE H OUTPUT FILE
+      } else if (a == "-gh" || a == "--generate-h") {
+         g_generate_flags |= g_GENFLAG_H; // Set H file to be generated
+
+      //------------------------ GENERATE H OUTPUT FILE
+      } else if (a == "-ghs" || a == "--generate-h-s") {
+         g_generate_flags |= g_GENFLAG_HS; // Set .H.S file to be generated
+
+      //------------------------ GENERATE BIN OUTPUT FILE
+      } else if (a == "-gb" || a == "--generate-bin") {
+         g_generate_flags |= g_GENFLAG_BIN; // Set BIN file to be generated
+
       //------------------------ SELECT NUMBER BASE
       } else if (a == "-nb" || a == "--number-base") {
          if (i + 1 >= args.size()) error( { "Modifier '-nb | --number-base' needs to be followed by selected numerical base (dec, bin or hex), but nothing found."} );
@@ -148,7 +177,28 @@ void parseArguments(const TArgs& args) {
    // Load the TMX with selected options
    if (filename == "") error( { "No TMX file given. A TMX file is required to parse its contents." } );
    g_theTilemap.loadMap(filename.c_str());
+
+   // If no generation flags selected, turn on default values
+   if ( !g_generate_flags ) 
+      g_generate_flags |= g_GENFLAG_C | g_GENFLAG_H;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE AN OUTPUT FILE
+//
+void generateOutput(std::string ext, TOutputMethod output, std::ios_base::openmode mode = std::ios_base::out) {
+   // Open the file
+   std::string filename = g_outputFolder + g_fileBasename + ext;
+   std::ofstream file(filename, mode);
+   if ( !file ) error ( { "There was an unknown problem opening '", filename, "' for writing output data." } );
+   
+   // Generate contents
+   (g_theTilemap.*output)(file);
+
+   // Close the file
+   file.close();
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN ENTRY POINT OF THE SCRIPT
@@ -160,24 +210,15 @@ int main(int argc, char **argv) {
       parseArguments(args);
 
       // Open output files and write them
-      std::string cfilename = g_outputFolder + g_fileBasename + ".c";
-      std::string hfilename = g_outputFolder + g_fileBasename + ".h";
-      std::string bfilename = g_outputFolder + g_fileBasename + ".bin";
-      std::ofstream cfile(cfilename);
-      std::ofstream hfile(hfilename);
-      std::ofstream bfile(bfilename, std::ios::out | std::ios::binary);
-      if ( !cfile ) error ( { "There was an unknown problem opening '", cfilename, "' for writing output data." } );
-      if ( !hfile ) error ( { "There was an unknown problem opening '", hfilename, "' for writing output data." } );    
-      if ( !bfile ) error ( { "There was an unknown problem opening '", hfilename, "' for writing output data." } );    
-      g_theTilemap.output_basic_C(cfile);
-      g_theTilemap.output_basic_H(hfile);
+      // First generate textual files
+      if ( g_generate_flags & g_GENFLAG_C   ) generateOutput(".c"    , &CPCT_TMX_Tilemap::output_basic_C    );
+      if ( g_generate_flags & g_GENFLAG_H   ) generateOutput(".h"    , &CPCT_TMX_Tilemap::output_basic_H    );
+      if ( g_generate_flags & g_GENFLAG_HS  ) generateOutput(".h.s"  , &CPCT_TMX_Tilemap::output_basic_HS   );
+      
+      // And now binary files
       g_theTilemap.setOutputNumberFormat(TNumberFormat::binary);
-      g_theTilemap.output_basic_BIN(bfile);
-//      uint8_t c = 17;
-//      bfile.write(reinterpret_cast<const char*>(&c), 1);
-      cfile.close();
-      hfile.close();
-      bfile.close();
+      if ( g_generate_flags & g_GENFLAG_BIN ) generateOutput(".bin"  , &CPCT_TMX_Tilemap::output_basic_BIN  );
+
    } catch (std::exception& e) {
       std::cerr << "ERROR: " << e.what() << "\n";
       return -1;
