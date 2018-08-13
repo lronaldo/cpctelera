@@ -214,7 +214,7 @@ CPCT_TMX_Tilemap::insertOneTileRowInBitarray(CPCT_bitarray& b, TConstItVecTiles 
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Generate output C-file for basic C conversion (1 layer)
+// Generate output C-file for basic C conversion
 //
 void
 CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
@@ -237,6 +237,20 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
       c_prev = '{'; c_post = '}';
    }
 
+   // If using CPCT_MACROS, create a temporal macro for clarity
+   uint8_t bpi = m_bitarray.getBitsPerItem();
+   if ( m_bitarray.usingCPCTMacros() && bpi > 1 && bpi < 8 ) {
+      out << '\n';
+      out << "\n// Macro defined for brevity and clarity ";
+      out << "\n#define " << m_bitarray.getCPCTMacroName() << "   ";
+      switch( bpi ){
+         case 2: { out << k_macro2bits; break; }
+         case 4: { out << k_macro4bits; break; }
+         case 6: { out << k_macro6bits; break; }
+      }
+      out << '\n';
+   }
+
    // Output declaration header
    out << "\nconst u8 "<< m_cid << str_layers << "["<< m_total_bytes <<"] = {\n";
 
@@ -247,6 +261,7 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
          const auto& vtiles = dynamic_cast<tmx::TileLayer*>(layer.get())->getTiles();
          TConstItVecTiles it = vtiles.begin();
 
+         // Output layer row by row
          out << std::string(3,c_margin) << c_comma << c_prev << '\n';
          char c_sep = ' ';
          while ( it != vtiles.end() ) {
@@ -267,4 +282,34 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
 
    // Output declaration end
    out << "};\n";
+
+   // If using CPCT_MACROS, undefine the temporal macro
+   if ( m_bitarray.usingCPCTMacros() && bpi > 1 && bpi < 8 ) {
+      out << "\n#undef " << m_bitarray.getCPCTMacroName() << '\n';
+   }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate output binary-file for basic conversion
+//
+void
+CPCT_TMX_Tilemap::output_basic_BIN(std::ostream& out) const {
+   // Output visible layers
+   for( const auto& layer : m_map.getLayers() ) {
+      // Check if layer is visible (it will be of type Tile if it is visible)
+      if ( layer->getVisible() ) {
+         const auto& vtiles = dynamic_cast<tmx::TileLayer*>(layer.get())->getTiles();
+         TConstItVecTiles it = vtiles.begin();
+
+         // Output layer row by row
+         while ( it != vtiles.end() ) {
+            m_bitarray.reset();
+            insertOneTileRowInBitarray(m_bitarray, it, vtiles.end()); 
+            if ( m_bitarray.getNumItems() ) {
+               m_bitarray.print(out);
+               it = it + (uint32_t)m_bitarray.getNumItems();
+            }
+         }
+      }
+   }
 }

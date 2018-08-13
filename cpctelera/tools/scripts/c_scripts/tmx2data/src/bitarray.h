@@ -53,6 +53,8 @@ public:
    uint8_t     getMaxItemValue()    const { return m_maxItemValue;      }
    uint8_t     getMaxDecDigits()    const { return m_maxDecDigits;      }
    uint8_t     getBitsPerItem()     const { return m_bitsPerItem;       }
+   bool        usingCPCTMacros()    const { return m_useCPCTMacros;     }
+   std::string getCPCTMacroName()   const { return m_CPCTMacroName;     }
    uint8_t     getItemsToComplete() const;
 private:
    bool        m_useCPCTMacros = true; // Use CPCTelera bitarray macros for all text conversions

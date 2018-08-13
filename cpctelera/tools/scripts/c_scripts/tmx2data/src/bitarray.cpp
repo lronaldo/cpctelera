@@ -68,7 +68,7 @@ CPCT_bitarray::printItem(std::ostream& out, uint8_t item) const {
    switch(m_outFormat) {
       case TNumberFormat::decimal:     { out << std::setw(m_maxDecDigits) << std::setbase(10) << pitem;                   break; }
       case TNumberFormat::binary_text: { std::bitset<8> bs(pitem); out << "0b" << std::setw(8) << bs;                     break; }
-      case TNumberFormat::binary:      { out.put(pitem);                                                                  break; }
+      case TNumberFormat::binary:      { out.put(item);                                                                   break; }
       case TNumberFormat::hexadecimal: { out << "0x" << std::setw(2) << std::setfill('0') << std::setbase(16) << pitem;   break; }
    }
 }
@@ -82,7 +82,7 @@ CPCT_bitarray::printCPCTMacro(std::ostream& out, const TVecItems& v) const {
    char c_sep = '\0';
    out << m_CPCTMacroName << "(";
    for( const auto& i : v ) {
-      out << c_sep;
+      printSeparator(out, c_sep);
       printItem(out, i);
       c_sep = m_separator;
    }
@@ -94,7 +94,7 @@ CPCT_bitarray::printCPCTMacro(std::ostream& out, const TVecItems& v) const {
 //
 void
 CPCT_bitarray::printSeparator(std::ostream& out, char c_sep) const {
-   if ( m_outFormat != TNumberFormat::binary ) out << c_sep;
+   if ( m_outFormat != TNumberFormat::binary && c_sep != '\0' ) out << c_sep;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +211,8 @@ CPCT_bitarray::print(std::ostream& out) const {
          case 6:  { n = 4; p = &CPCT_bitarray::printGroupOf4_6bits; break; }
       }
       // When CPCTMacros are in use, call method printCPCTMacro
-      if ( m_useCPCTMacros && m_outFormat != TNumberFormat::binary ) p = &CPCT_bitarray::printCPCTMacro;
+      if ( m_useCPCTMacros && m_outFormat != TNumberFormat::binary && m_bitsPerItem > 1 ) 
+         p = &CPCT_bitarray::printCPCTMacro;
       
       // Call for group printing
       printInGroups(out, n, p);

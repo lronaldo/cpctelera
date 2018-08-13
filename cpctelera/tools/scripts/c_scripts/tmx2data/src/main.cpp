@@ -20,7 +20,6 @@
 #include "tmxtilemap.h"
 #include <iostream>
 #include <fstream>
-#include <fstream>
 #include <cstring>
 #include <cctype>
 #include <sstream>
@@ -163,14 +162,22 @@ int main(int argc, char **argv) {
       // Open output files and write them
       std::string cfilename = g_outputFolder + g_fileBasename + ".c";
       std::string hfilename = g_outputFolder + g_fileBasename + ".h";
+      std::string bfilename = g_outputFolder + g_fileBasename + ".bin";
       std::ofstream cfile(cfilename);
       std::ofstream hfile(hfilename);
+      std::ofstream bfile(bfilename, std::ios::out | std::ios::binary);
       if ( !cfile ) error ( { "There was an unknown problem opening '", cfilename, "' for writing output data." } );
       if ( !hfile ) error ( { "There was an unknown problem opening '", hfilename, "' for writing output data." } );    
+      if ( !bfile ) error ( { "There was an unknown problem opening '", hfilename, "' for writing output data." } );    
       g_theTilemap.output_basic_C(cfile);
       g_theTilemap.output_basic_H(hfile);
+      g_theTilemap.setOutputNumberFormat(TNumberFormat::binary);
+      g_theTilemap.output_basic_BIN(bfile);
+//      uint8_t c = 17;
+//      bfile.write(reinterpret_cast<const char*>(&c), 1);
       cfile.close();
       hfile.close();
+      bfile.close();
    } catch (std::exception& e) {
       std::cerr << "ERROR: " << e.what() << "\n";
       return -1;

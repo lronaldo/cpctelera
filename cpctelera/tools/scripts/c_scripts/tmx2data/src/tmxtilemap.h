@@ -27,9 +27,16 @@
 
 class CPCT_TMX_Tilemap {
 public:
+   // Type aliases
    using TConstItVecTiles = std::vector<tmx::TileLayer::Tile>::const_iterator;
    using TVecTiles        = std::vector<tmx::TileLayer::Tile>;
 
+   // Constants
+   const char* k_macro2bits = "CPCT_ENCODE2BITS";
+   const char* k_macro4bits = "CPCT_ENCODE4BITS";
+   const char* k_macro6bits = "CPCT_ENCODE6BITS";
+
+   // Constructors
 	CPCT_TMX_Tilemap();
    CPCT_TMX_Tilemap(char* tmxfilename);
    ~CPCT_TMX_Tilemap();
@@ -45,6 +52,8 @@ public:
    void  output_C_code_header(std::ostream& out) const;
    void  output_basic_H(std::ostream& out) const;
    void  output_basic_C(std::ostream& out) const;
+   void  output_basic_BIN(std::ostream& out) const;
+
 private:
    // Attributes
    mutable CPCT_bitarray  m_bitarray;     // Class that encapsulate conversion from bitarray numbers to C/H/BIN
@@ -58,7 +67,6 @@ private:
    uint32_t       m_tw = 0, m_th = 0;     // Tile Width and Height
    uint32_t       m_total_bytes;          // Total bytes for a given output array
    std::string    m_theTime;              // Current time string
-
 
    // Useful methods
    void           updateTotalBytes();
