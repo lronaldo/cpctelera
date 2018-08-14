@@ -218,8 +218,12 @@ cat > ${OUTFILE}.h <<TheHFile
 // Declaration of the compressed array
 extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
 
-// Constant with the address of the latest byte of the compressed array
-#define ${ARRAYNAME}_end   ($ARRAYNAME + $COMPRESSED_BYTES - 1)
+// Address of the latest byte of the compressed array (for unpacking purposes)
+#define ${ARRAYNAME}_end      ($ARRAYNAME + $COMPRESSED_BYTES - 1)
+
+// Compressed and uncompressed sizes
+#define ${ARRAYNAME}_size_z   $COMPRESSED_BYTES
+#define ${ARRAYNAME}_size     $UNCOMPRESSED_BYTES
 
 #endif
 TheHFile
