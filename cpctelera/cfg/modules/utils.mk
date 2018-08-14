@@ -181,3 +181,64 @@ define ENSUREFILEEXISTS
 		,$(error $(strip $(2)))\
 		,)
 endef
+
+#################
+# ENSUREVALID: Checks that a value or a given list of values is/are
+# contained into a list of valid values. If any value from the seach
+# list is not found in the valid list, an error is raised.
+#
+# $(1): Search list: values to be checked as being valid
+# $(2): Valid list: valid values
+# $(3): Error message to display when a non-valid value is found
+#
+define ENSUREVALID
+	$(foreach EV_V,$(strip $(1))\
+		,$(if $(filter-out $(strip $(2)),$(EV_V))\
+			,$(error <<ERROR>> '$(EV_V)' $(strip $(3)). Valid values are: {$(strip $(2))})\
+			,))
+endef
+
+#################
+# SET_ONE_OF_MANY_VALID: Ensures that a given variable is set a value amongst
+# those valid ones. If the value is contained in the valid list of values,
+# it is assigned. If not, an error message is raised. Values are allways stripped,
+# so that leading and trailing whitespaces do not count.
+# If the value passed contains more than 1 value (has whitespaces inside)
+# an error is raised too.
+# Warning: $(1) is a variable name and not its contents
+#
+# $(1): Variable to be assigned to
+# $(2): Value to be assigned
+# $(3): List of valid values
+# $(4): Error message in case of failure
+#
+define SET_ONE_OF_MANY_VALID
+	# Error message
+	$(eval S1OM_ERR := <<ERROR>> $(strip $(4)). Valid values are: {$(strip $(3))})
+	
+	# Check that the passed value is unique
+	$(if $(filter-out $(words $(strip $(2))),1),$(error $(S1OM_ERR)),)
+
+	# Check that the passed value is valid
+	$(if $(filter-out $(strip $(3)),$(strip $(2))),$(error $(S1OM_ERR)),)
+
+	# Assign the valid value
+	$(eval $(strip $(1)) := $(strip $(2)))
+endef
+
+#################
+# ADD2SET: Adds a given value to a set of values. The value is
+# not added if it is already in the set. If it is not, it is added.
+# Values are stripped so that leading and trailing whitespaces do not count.
+# Warning: $(1) is a variable name and not its contents
+#
+# $(1): Variable containing the set (to be modified adding the new value)
+# $(2): New value to be added to the set
+#
+define ADD2SET
+	$(eval A2S_S := $(strip $(1))) 
+	$(eval A2S_E := $(strip $(2))) 
+	$(eval $(A2S_S) := $($(A2S_S)) $(if $(filter $($(A2S_S)),$(A2S_E))\
+		,\
+		,$(A2S_E)))
+endef
