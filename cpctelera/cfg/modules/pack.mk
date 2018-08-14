@@ -59,7 +59,7 @@ define PACKZX7B
 .SECONDARY: $(PACK_$(1)_target)
 $(PACK_$(1)_target): $(PACK_$(1))
 	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
-	cpct_pack $(PACK_$(1)_outfile) $(PACK_$(1))
+	$(CPCTPACK) $(PACK_$(1)_outfile) $(PACK_$(1))
 
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGCFILES   := $(PACK_$(1)_outfile).c $(IMGCFILES)

@@ -204,7 +204,7 @@ define IMG2SP_CONVERT_TARGET
 .SECONDARY: $(I2S_TGT)
 $(I2S_TGT): $(2)
 	@$(call PRINT,$(PROJNAME),$(6))
-	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) $(I2S_TILS) -bn "$(5)" -tw "$(3)" -th "$(4)" $(I2S_EXTP) $(2);
+	$(IMG2TIL) $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) $(I2S_TILS) -bn "$(5)" -tw "$(3)" -th "$(4)" $(I2S_EXTP) $(2);
 endef
 
 #################
@@ -444,7 +444,7 @@ define IMG2SPRITES
 .SECONDARY: $(I2S_CH)
 $(I2S_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting $(1) into C-arrays...")
-	cpct_img2tileset $(I2S_P) -m "$(2)" -bnp "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(10) $(1);
+	$(IMG2TIL) $(I2S_P) -m "$(2)" -bnp "$(3)" -tw "$(4)" -th "$(5)" -pf $(6) $(10) $(1);
 	@$(call PRINT,$(PROJNAME),"Moving generated files:")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_C)' > '$(I2S_C2)'")
 	@$(call PRINT,$(PROJNAME)," - '$(I2S_H)' > '$(I2S_H2)'")

@@ -245,7 +245,7 @@ define TMX2C
 .SECONDARY: $(T2C_CH)
 $(T2C_CH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into C-arrays...")
-	cpct_tmx2csv -gh -ci $(2) $(T2C_OF) $(T2C_BA) $(5) $(1)
+	$(TMX2CSV) -gh -ci $(2) $(T2C_OF) $(T2C_BA) $(5) $(1)
 
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGCFILES  := $(T2C_C2) $(IMGCFILES)
@@ -277,7 +277,7 @@ define AKS2C
 .SECONDARY: $(A2C_SH)
 $(A2C_SH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting music in $(1) into data arrays...")
-	cpct_aks2c -m "$(4)" $(A2C_OF) -id $(2) $(1)
+	$(CPCTAKS2C) -m "$(4)" $(A2C_OF) -id $(2) $(1)
 
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGASMFILES := $(A2C_S2) $(IMGASMFILES)
