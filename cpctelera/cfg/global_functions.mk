@@ -244,7 +244,7 @@ define AKS2C
 .SECONDARY: $(A2C_SH)
 $(A2C_SH): $(1)
 	@$(call PRINT,$(PROJNAME),"Converting music in $(1) into data arrays...")
-	$(CPCTAKS2C) -m "$(4)" $(A2C_OF) -id $(2) $(1)
+	$(CPCTAKS2C) -m "$(4)" $(A2C_OF) -id $(2) $(5) $(1)
 
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGASMFILES := $(A2C_S2) $(IMGASMFILES)

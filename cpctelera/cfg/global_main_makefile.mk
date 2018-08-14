@@ -51,7 +51,7 @@ prebuild_msg:
 	@$(call PRINT,$(PROJNAME),"=== PREBUILD EVENTS")
 	@$(call PRINT,$(PROJNAME),"")
 
-$(PREBUILD_OBJ): prebuild_msg $(NONLINKGENFILES) $(GENOBJFILES)
+$(PREBUILD_OBJ): prebuild_msg $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES)
 	@$(call PRINT,$(PROJNAME),"")
 	@$(call PRINT,$(PROJNAME),"=== All prebuild processing done!")
 	@$(call PRINT,$(PROJNAME),"============================================================")
