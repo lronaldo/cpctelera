@@ -46,12 +46,15 @@
 ##
 ##
 ## Command line options:
-##    -o   | --output-filename        - Set the basename for output filenames (name without extension)
-##    -m   | --memory-address         - Set the memory base address where song binary data will be located.
 ##    -bl  | --bytes-per-line [bytes] - Set the number of bytes that every generated line will contain in the .s file
-##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be written to.
-##    -id  | --c-identifier [ident]   - Sets the identifier that will be used to access the array from C programs.
+##    -gb  | --generate-bin           - Generates a binary file with song's data (Default: no). Using this switch overrides generation defaults.
+##    -gh  | --generate-header        - Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults.
+##    -gs  | --generate-asm           - Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults.
 ##    -h   | --help                   - Shows help information on the terminal.
+##    -id  | --c-identifier [ident]   - Sets the identifier that will be used to access the array from C programs.
+##    -m   | --memory-address         - Set the memory base address where song binary data will be located.
+##    -o   | --output-filename        - Set the basename for output filenames (name without extension)
+##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be written to.
 ##
 
 ## Bash Include files
@@ -69,8 +72,12 @@ TXTBINTMP=$(createTempFile)
 BYTESPERLINE=16
 OUTPUT_FILENAME=
 OUTPUTDIR=.
+GENERATE_S=0
+GENERATE_H=0
+GENERATE_BIN=0
 SFILE=music.s
 HFILE=music.h
+BINFILE=music.bin
 
 ## Show how this script is to be used and exit
 ##
@@ -98,24 +105,34 @@ You can change that location using -m modifier.
    ${COLOR_LIGHT_YELLOW}
 OPTIONS
    ${COLOR_LIGHT_BLUE}
-   -o   | --output-filename ${COLOR_CYAN}
-         Set the basename for output filenames (name without extension) \
+   -bl  | --bytes-per-line [bytes] ${COLOR_CYAN}
+         Set the number of bytes that every generated line will contain in the .s file \
+   ${COLOR_LIGHT_BLUE}
+   -h   | --help ${COLOR_CYAN}
+         Shows help information on the terminal \
+   ${COLOR_LIGHT_BLUE}
+   -gb  | --generate-bin ${COLOR_CYAN}
+         Generates a binary file with song's data (Default: no). Using this switch overrides generation defaults \
+   ${COLOR_LIGHT_BLUE}
+   -gh  | --generate-header ${COLOR_CYAN}
+         Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults. \
+   ${COLOR_LIGHT_BLUE}
+   -gs  | --generate-asm ${COLOR_CYAN}
+         Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults. \
+   ${COLOR_LIGHT_BLUE}
+   -id  | --c-identifier [ident] ${COLOR_CYAN}
+         Sets the identifier that will be used to access the array from C programs \
    ${COLOR_LIGHT_BLUE}
    -m   | --memory-address ${COLOR_CYAN}
          Set the memory base address where song binary data will be located \
    ${COLOR_LIGHT_BLUE}
-   -bl  | --bytes-per-line [bytes] ${COLOR_CYAN}
-         Set the number of bytes that every generated line will contain in \
-the .s file ${COLOR_LIGHT_BLUE}
+   -o   | --output-filename ${COLOR_CYAN}
+         Set the basename for output filenames (name without extension) \
+   ${COLOR_LIGHT_BLUE}
    -od  | --output-directory [dir] ${COLOR_CYAN}
          Sets directory where .s/.h files will be written to \
-   ${COLOR_LIGHT_BLUE}
-   -id  | --c-identifier [ident] ${COLOR_CYAN}
-         Sets the identifier that will be used to access the array from C \
-programs ${COLOR_LIGHT_BLUE}
-   -h   | --help ${COLOR_CYAN}
-         Shows help information on the terminal \
    ${COLOR_NORMAL}
+
 UsageHereDoc
    exit 1
 }
@@ -131,36 +148,6 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
-      ## Set the basename for output files
-      "-o" | "--output-filename")
-
-         ## A filename is required
-         if isEmpty "$2"; then
-            paramError "Parameter -o (--output-filename) must be followed by the name of the file." 27
-         fi
-
-         OUTPUT_FILENAME="$2"
-         shift
-      ;;
-      ## Set the number of bytes that everty converted line from the .s will have
-      "-m" | "--memory-address")
-
-         ## Must be an integer greater or equal than 1
-         if isEmpty "$2"; then
-            paramError "Parameter -m (--memory-address) must be followed by a memory address." 24
-         elif ! isCIntValue "$2"; then
-         	paramError "'$2' is not a valid integer memory address for -m (--memory-address). " 25
-         fi
-
-         ## Check memory address is inside 64K Boundaries
-         MD=$(any2Dec "$2")
-         if (( MD < 0 || MD > 65535 )); then
-         	paramError "'$2' memory address is outside 64K boundaries (0 to 65535). " 26
-         fi
-
-         MEMADDR="$2"
-         shift
-      ;;
       ## Set the number of bytes that everty converted line from the .s will have
       "-bl" | "--bytes-per-line")
          
@@ -171,9 +158,68 @@ while (( $# >= 1 )); do
             paramError "'$2' is not an integer. -bl (--bytes-per-line) requires and integer." 21
          elif (( $2 < 1 )); then
             paramError "'$2' is lower than 1. -bl (--bytes-per-line) requires an integer greater or equal than 1." 22
-         fi         	
+         fi          
 
          BYTESPERLINE="$2"
+         shift
+      ;;
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Select generation of binary file
+      "-gb" | "--generate-bin")
+         GENERATE_BIN=1
+      ;;
+      ## Select generation of C-header file
+      "-gh" | "--generate-header")
+         GENERATE_H=1
+      ;;
+      ## Select generation of assembly file
+      "-gs" | "--generate-asm")
+         GENERATE_S=1
+      ;;
+      ## Set the C-identifier for the array with the generated data     
+      "-id" | "--c-identifier")
+         
+         ## Must be a valid C-identifier
+         if isEmpty "$2"; then
+            paramError "Parameter -id (--c-identifier) must be followed by a valid C-identifier." 4
+         elif ! checkValidCIdentifier "$2"; then
+            paramError "'$2' is not a valid C-identifier for -id (--c-identifier)." 5
+         fi
+
+         C_IDENTIFIER="$2"
+         shift
+      ;;    
+      ## Set the number of bytes that everty converted line from the .s will have
+      "-m" | "--memory-address")
+
+         ## Must be an integer greater or equal than 1
+         if isEmpty "$2"; then
+            paramError "Parameter -m (--memory-address) must be followed by a memory address." 24
+         elif ! isCIntValue "$2"; then
+            paramError "'$2' is not a valid integer memory address for -m (--memory-address). " 25
+         fi
+
+         ## Check memory address is inside 64K Boundaries
+         MD=$(any2Dec "$2")
+         if (( MD < 0 || MD > 65535 )); then
+            paramError "'$2' memory address is outside 64K boundaries (0 to 65535). " 26
+         fi
+
+         MEMADDR="$2"
+         shift
+      ;;
+      ## Set the basename for output files
+      "-o" | "--output-filename")
+
+         ## A filename is required
+         if isEmpty "$2"; then
+            paramError "Parameter -o (--output-filename) must be followed by the name of the file." 27
+         fi
+
+         OUTPUT_FILENAME="$2"
          shift
       ;;
       ## Set the output directory to where .s/.h files will be written
@@ -191,22 +237,6 @@ while (( $# >= 1 )); do
          OUTPUTDIR="$2"
          shift
       ;;
-      "-id" | "--c-identifier")
-         
-         ## Must be a valid C-identifier
-         if isEmpty "$2"; then
-            paramError "Parameter -id (--c-identifier) must be followed by a valid C-identifier." 4
-         elif ! checkValidCIdentifier "$2"; then
-            paramError "'$2' is not a valid C-identifier for -id (--c-identifier)." 5
-         fi
-
-         C_IDENTIFIER="$2"
-         shift
-      ;;
-      ## Show Help
-      "-h" | "--help")
-         usage
-      ;;
       ## Get main parameter (filename)
       *)
          if isCommandLineOption "$1"; then
@@ -223,6 +253,12 @@ while (( $# >= 1 )); do
    shift
 done
 
+## If no file generation has been selected, resort to defaults (.h and .s)
+if (( GENERATE_S == 0 && GENERATE_H == 0 && GENERATE_BIN == 0 )); then
+   GENERATE_S=1
+   GENERATE_H=1
+fi
+
 ## File parameter must have been passed (not empty)
 if isEmpty "$FILE"; then
    paramError "A <filename> parameter is required." 12
@@ -232,9 +268,11 @@ fi
 if isEmpty "$OUTPUT_FILENAME"; then
    SFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").s"
    HFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").h"
+   BINFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").bin"
 else
    SFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.s"
    HFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.h"
+   BINFILE="${OUTPUTDIR}/${OUTPUT_FILENAME}.bin"
 fi
 
 ## Check AKSToBin and Wine if Required
@@ -272,16 +310,24 @@ a valid AKS song file and run this script again."
 fi
 echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
 
-## STEP 2: Convert Binary file to Text-Hexadecimal-Binary for later parsing
-## and get its size in bytes
-od -An -t x1 -v "$BINTMP" > "$TXTBINTMP"
+# If Binary was to be generated, copy BINTMP to BINFILE
+if (( GENERATE_BIN )); then
+   printf "Generating '$BINFILE' with song data in binary form..."
+   cp "$BINTMP" "$BINFILE" > /dev/null
+   echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
+fi
+
+# Calculate size in bytes
 SIZE_BYTES=$(wc -c < "$BINTMP")
 
-## STEP 3: Generate S-FILE (Assembly data output)
+## STEP 2: Generate S-File if required
+if (( GENERATE_S )); then
+   ## Convert Binary file to Text-Hexadecimal-Binary for later parsing
+   od -An -t x1 -v "$BINTMP" > "$TXTBINTMP"
 
-printf "Generating '$SFILE' with data array..."
-# Generate header, absolute location code and identifier
-cat > "$SFILE" <<HereDocument
+   printf "Generating '$SFILE' with data array..."
+   # Generate header, absolute location code and identifier
+   cat > "$SFILE" <<HereDocument
 ;;;
 ;;; File generated by cpct_aks2c CPCtelera script
 ;;; Souce file of this conversion: ${FILE}
@@ -297,44 +343,46 @@ cat > "$SFILE" <<HereDocument
 _${C_IDENTIFIER}::
 HereDocument
 
-# Convert binary to an absolutely located data array
-i=0
-while read LINE; do
-   BYTES=( $LINE )
-   LNBYTES=${#BYTES[@]}
-   b=0
-   while (( b < LNBYTES )); do
-      ## Line Start
-      if (( i == 0 )); then
-         printf ".db 0x%s" ${BYTES[$b]}
-         b=$((b+1))
-         i=1
-      fi
+   # Convert binary to an absolutely located data array
+   i=0
+   while read LINE; do
+      BYTES=( $LINE )
+      LNBYTES=${#BYTES[@]}
+      b=0
+      while (( b < LNBYTES )); do
+         ## Line Start
+         if (( i == 0 )); then
+            printf ".db 0x%s" ${BYTES[$b]}
+            b=$((b+1))
+            i=1
+         fi
+   
+         ## Line body
+         while (( i < BYTESPERLINE && b < LNBYTES )); do
+            printf ", 0x%s" ${BYTES[$b]}
+            b=$((b+1))
+            i=$((i+1))
+         done
+   
+         ## Line ending
+         if (( i >= BYTESPERLINE )); then
+            printf "\n"
+            i=0
+         fi
+      done 
+   done < "$TXTBINTMP" >> "$SFILE"
+   echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
+fi
 
-      ## Line body
-      while (( i < BYTESPERLINE && b < LNBYTES )); do
-         printf ", 0x%s" ${BYTES[$b]}
-         b=$((b+1))
-         i=$((i+1))
-      done
+## STEP 3: Generate H-FILE (header data with declarations to let data be accessable from C)
 
-      ## Line ending
-      if (( i >= BYTESPERLINE )); then
-         printf "\n"
-         i=0
-      fi
-   done 
-done < "$TXTBINTMP" >> "$SFILE"
-echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
-
-## STEP 4: Generate H-FILE (header data with declarations to let data be accessable from C)
-
-# Calculate memory address where music ends (in hexadecimal)
-ENDADDR=0x`dec2Hex $((MD + SIZE_BYTES))`
-
-# Generate output header file
-printf "Generating '$HFILE' with C declarations..."
-cat > "$HFILE" <<HereDocument
+if (( GENERATE_H )); then
+   # Calculate memory address where music ends (in hexadecimal)
+   ENDADDR=0x`dec2Hex $((MD + SIZE_BYTES))`
+   
+   # Generate output header file
+   printf "Generating '$HFILE' with C declarations..."
+   cat > "$HFILE" <<HereDocument
 ///
 /// File generated by cpct_aks2c CPCtelera script
 /// Souce file of this conversion: ${FILE}
@@ -349,4 +397,6 @@ cat > "$HFILE" <<HereDocument
 /// Song '${C_IDENTIFIER}' array declaration
 extern void ${C_IDENTIFIER}[${C_IDENTIFIER}_size];
 HereDocument
-echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
+
+   echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
+fi
