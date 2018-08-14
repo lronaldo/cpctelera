@@ -148,6 +148,7 @@ endef
 # Updates variable I2S_FOLD
 #
 define IMG2SP_SET_FOLDER
+	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [IMG2SP: SET_FOLDER] Folder '$(1)' does not exist or is not accessible)
 	$(eval I2S_FOLD := $(1))
 endef
 
