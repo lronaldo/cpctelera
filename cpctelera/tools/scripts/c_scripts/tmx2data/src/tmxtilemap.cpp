@@ -199,25 +199,25 @@ CPCT_TMX_Tilemap::output_basic_HS(std::ostream& out) const {
 
    // Output declarations
    out << "\n;;#### Width and height constants ####";
-   out << '\n' << m_cid <<"_W = " << m_tw;
-   out << '\n' << m_cid <<"_H = " << m_th;
+   out << '\n'; output_asmVar(out, m_cid); out <<"_W = " << m_tw;
+   out << '\n'; output_asmVar(out, m_cid); out <<"_H = " << m_th;
    out << '\n';
    out << "\n;;#### Converted layer tilemaps ####";
    out << "\n;;   Visible layers: " << m_visibleLayers;
    out << "\n;;";
    if (m_visibleLayers == 1) {
-      out << '\n' << m_cid << "_SIZE = "<< m_total_bytes;
+      out << '\n'; output_asmVar(out, m_cid); out << "_SIZE = "<< m_total_bytes;
    } else {
-      out << '\n' << m_cid << "_LAYERS     = "<< m_visibleLayers;
-      out << '\n' << m_cid << "_LAYER_SIZE = "<< m_total_bytes;
-      out << '\n' << m_cid << "_SIZE       = "<< m_visibleLayers * m_total_bytes;
+      out << '\n'; output_asmVar(out, m_cid); out << "_LAYERS     = "<< m_visibleLayers;
+      out << '\n'; output_asmVar(out, m_cid); out << "_LAYER_SIZE = "<< m_total_bytes;
+      out << '\n'; output_asmVar(out, m_cid); out << "_SIZE       = "<< m_visibleLayers * m_total_bytes;
       // Output constants for all layers
       uint16_t nvisl = 0;
       out << '\n';
       out << "\n;; Offsets of the different layers with respect to the start of the data";
       for (const auto& l : m_map.getLayers()) {
          if ( l->getVisible() ) {
-            out << '\n' << m_cid << "_layer_" << nvisl << "_OFF = " << nvisl * m_total_bytes;
+            out << '\n'; output_asmVar(out, m_cid); out << "_layer_" << nvisl << "_OFF = " << nvisl * m_total_bytes;
             ++nvisl;
          }
       }
@@ -265,8 +265,8 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
    std::stringstream ss;
    std::string str_layers = "";
    char c_margin  = ' ';
-   char c_prev    = '\0';
-   char c_post    = '\0';
+   char c_prev    = ' ';
+   char c_post    = ' ';
    char c_comma   = ' ';
    if (m_visibleLayers > 1) {
       ss << "[" << m_visibleLayers << "]"; str_layers = ss.str(); ss.str("");
@@ -342,7 +342,8 @@ CPCT_TMX_Tilemap::output_basic_S(std::ostream& out) const {
    out << "\n;;   Array '"<< m_cid <<"' size: ";
    if (m_visibleLayers > 1){ out << m_visibleLayers * m_total_bytes; } 
    else                    { out << m_total_bytes;                   }
-   out << '\n' << m_cid << ":";
+   out << '\n'; output_asmVar(out, m_cid);
+   out << "::\n";
 
    // Output visible layers
    uint32_t nlayer = 0;
@@ -355,7 +356,7 @@ CPCT_TMX_Tilemap::output_basic_S(std::ostream& out) const {
          // Output layer header
          if (m_visibleLayers > 1) {
             out << "\n;;   Layer '"<< std::setbase(10) << nlayer <<"' array offset: "<< nlayer * m_total_bytes <<" size: " << m_total_bytes;
-            out << "\n" << m_cid << "_l" << nlayer << ":";
+            out << "\n"; output_asmVar(out, m_cid); out << "_l" << nlayer << "::";
             out << '\n';
          }
 
@@ -399,4 +400,13 @@ CPCT_TMX_Tilemap::output_basic_BIN(std::ostream& out) const {
          }
       }
    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Outputs the name of an assembly variable, taking into account its prefix
+//
+void
+CPCT_TMX_Tilemap::output_asmVar(std::ostream& out, const std::string& var) const {
+   if (m_asmVarsPrefix) out << m_asmVarsPrefix;
+   out << var;
 }

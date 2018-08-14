@@ -37,6 +37,7 @@
 //    Conversion is output to stdout unless otherwise requested by options.
 //
 // Command line options:
+//    -au | --add-underscore-s-vars  - Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)
 //    -ba | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
 //    -ci | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
 //    -gc | --generate-c             - Generates a C file with an array containing converted values (Default: yes). Defaults are set to false on using this flag.

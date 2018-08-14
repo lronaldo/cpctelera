@@ -62,7 +62,9 @@ directive. It also reindexes tile ids starting from 0 (as in tmx files tile ids 
       << C_CYAN         << "\n    This script will only work with tmx files saved as CSV format. Output format must be \
 selected as CSV in tilemap properties."
       << C_LIGHT_YELLOW << "\n\nOPTIONS:"
-      << C_LIGHT_BLUE   << "\n\n   -ba | --bitarray <bits>"
+      << C_LIGHT_BLUE   << "\n\n   -au | --add-underscore-s-vars"
+      << C_CYAN         << "\n          Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)"
+      << C_LIGHT_BLUE   << "\n   -ba | --bitarray <bits>"
       << C_CYAN         << "\n          Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)"
       << C_LIGHT_BLUE   << "\n   -ci | --c-identifier <id>"
       << C_CYAN         << "\n          Sets the C-identifier that will be used for the generated array (Default: filename)"
@@ -102,8 +104,12 @@ void parseArguments(const TArgs& args) {
    for(std::size_t i=1; i < args.size(); ++i) {
       const auto& a = args[i];
 
+      //------------------------ SET UNDERSCORE PREFIX 
+      if (a == "-au" || a == "--add-underscore-s-vars") {
+         g_theTilemap.setASMVariablesPrefix('_') ; // Sets _ as prefix for asm variables
+
       //------------------------ BITARRAY MODIFIER
-      if (a == "-ba" || a == "--bitarray") {
+      } else if (a == "-ba" || a == "--bitarray") {
          if ( i + 1 >= args.size() ) error( { "Modifier '-ba | --bitarray' needs to be followed by the amount of bits (1, 2, 4, 6 or 8), but nothing found."} );
          std::string bits = args[i+1];
          if       ( bits == "1" ) { g_theTilemap.setBitsPerItem(1); }
@@ -157,7 +163,6 @@ void parseArguments(const TArgs& args) {
       } else if (a == "-nm" || a == "--do-not-use-cpct-macros") {
          g_theTilemap.setUseCPCTMacros(false);
 
-         ++i;
       //------------------------ SELECT OUTPUT FOLDER
       } else if (a == "-of" || a == "--output-folder") {
          if (i + 1 >= args.size()) error( { "Modifier '-of | --output-folder' needs to be followed by a folder, but nothing found."} );
@@ -187,7 +192,7 @@ void parseArguments(const TArgs& args) {
 
    // If no generation flags selected, turn on default values
    if ( !g_generate_flags ) 
-      g_generate_flags |= g_GENFLAG_C | g_GENFLAG_H;
+      g_generate_flags = g_GENFLAG_C | g_GENFLAG_H;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
