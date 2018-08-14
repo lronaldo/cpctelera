@@ -204,7 +204,7 @@ define IMG2SP_CONVERT_TARGET
 .SECONDARY: $(I2S_TGT)
 $(I2S_TGT): $(2)
 	@$(call PRINT,$(PROJNAME),$(6))
-	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) -nt -bn "$(5)" -tw "$(3)" -th "$(4)" $(I2S_EXTP) $(2);
+	cpct_img2tileset $(I2S_FMT) $(I2S_MASK) $(I2S_OUT) $(I2S_MODE) $(I2S_PAL) $(I2S_GPAL) $(I2S_TILS) -bn "$(5)" -tw "$(3)" -th "$(4)" $(I2S_EXTP) $(2);
 endef
 
 #################
