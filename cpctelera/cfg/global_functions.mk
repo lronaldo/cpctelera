@@ -32,6 +32,7 @@ THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 include $(THIS_DIR)/modules/utils.mk
 include $(THIS_DIR)/modules/pack.mk
 include $(THIS_DIR)/modules/img2sp.mk
+include $(THIS_DIR)/modules/tmx2data.mk
 
 #################
 # GETLOADADDRESS: Get load address from a created binary file (parsing hex2bin's log)
@@ -216,40 +217,6 @@ endef
 define BINFILE2C
 $(1): $(2)
 	$(BIN2C) $(2) -i "cpctelera.h" > $(1)
-endef
-
-#################
-# TMX2C: General rule to convert TMX tilemaps into C arrays.
-# Updates IMGCFILES and OBJS2CLEAN adding new C files that result from 
-# tmx conversions
-#
-# $(1): TMX file to be converted to C array
-# $(2): C identifier for the generated C array
-# $(3): Output folder for C and H files generated (Default same folder)
-# $(4): Bits per item (1,2,4 or 6 to codify tilemap into a bitarray). Blanck for normal integer tilemap array
-# $(5): Aditional options (you can use this to pass aditional modifiers to cpct_tmx2csv)
-#
-define TMX2C
-	# Set up C and H files for output
-	$(eval T2C_C := $(basename $(1)).c)
-	$(eval T2C_H := $(basename $(1)).h)
-	$(eval $(call JOINFOLDER2BASENAME, T2C_C2, $(3), $(T2C_C)))
-	$(eval $(call JOINFOLDER2BASENAME, T2C_H2, $(3), $(T2C_H)))
-	$(eval T2C_CH := $(T2C_C2) $(T2C_H2))
-
-	# Configure options for output folder $(3) and bits per item $(4)
-	$(eval T2C_OF := $(shell if [ "$(3)" != "" ]; then echo "-of $(3)"; else echo ""; fi))
-	$(eval T2C_BA := $(shell if [ "$(4)" != "" ]; then echo "-ba $(4)"; else echo ""; fi))
-
-# Generate target for tilemap conversion
-.SECONDARY: $(T2C_CH)
-$(T2C_CH): $(1)
-	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into C-arrays...")
-	$(TMX2CSV) -gh -ci $(2) $(T2C_OF) $(T2C_BA) $(5) $(1)
-
-# Variables that need to be updated to keep up with generated files and erase them on clean
-IMGCFILES  := $(T2C_C2) $(IMGCFILES)
-OBJS2CLEAN := $(T2C_CH) $(OBJS2CLEAN)
 endef
 
 #################
