@@ -721,7 +721,7 @@ function replaceTag {
 ## 
 function createTempFile {
   if checkSystem "osx"; then
-    mktemp -t tmp
+    mktemp -t tmp.XXXXX
   else
     mktemp 
   fi

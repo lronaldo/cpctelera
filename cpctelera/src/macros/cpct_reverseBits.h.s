@@ -180,7 +180,7 @@
 ;; contained pixel values left-to-right (1234 -> 4321). With respect to the 
 ;; order of the 8-bits of A, the concrete operations performed is:
 ;; (start code)
-;;    A = [012345678] == reverse-pixels ==> [10326587] = A2
+;;    A = [01234567] == reverse-pixels ==> [32107654] = A2
 ;; (end code)
 ;;    You may want to check <cpct_px2byteM1> to know how bits codify both pixels
 ;; in one single byte for screen pixel format, mode 1.
@@ -229,7 +229,7 @@
 ;; contained pixel values left-to-right (12 -> 21). With respect to the 
 ;; order of the 8-bits of A, the concrete operation performed is:
 ;; (start code)
-;;    A = [012345678] == reverse-pixels ==> [10325476] = A2
+;;    A = [01234567] == reverse-pixels ==> [10325476] = A2
 ;; (end code)
 ;;    You may want to check <cpct_px2byteM0> to know how bits codify both pixels
 ;; in one single byte for screen pixel format, mode 0.
