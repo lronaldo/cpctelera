@@ -67,7 +67,7 @@ PALETTE={ 1 6 23 24 0 }
 ##    a pre_palette[16] array will be generated with the 16 palette colours as 
 ##	  hardware colour values.
 
-$(eval $(call IMG2SPRITES,img/back.png,1,g,4,0,$(PALETTE),tileset,src/sprites,hwpalette))
-$(eval $(call IMG2SPRITES,img/fire.png,1,g,4,0,$(PALETTE),,src/sprites))
-$(eval $(call IMG2SPRITES,img/ship.png,1,g,0,0,$(PALETTE),mask,src/sprites))
-$(eval $(call IMG2SPRITES,img/title.png,1,g,0,0,$(PALETTE),,src/sprites))
+$(eval $(call IMG2SPRITES,img/back.png,1,g,4,60,$(PALETTE),tileset,src/sprites,hwpalette))
+$(eval $(call IMG2SPRITES,img/fire.png,1,g,4,6,$(PALETTE),,src/sprites))
+$(eval $(call IMG2SPRITES,img/ship.png,1,g,20,10,$(PALETTE),mask,src/sprites))
+$(eval $(call IMG2SPRITES,img/title.png,1,g,80,16,$(PALETTE),,src/sprites))

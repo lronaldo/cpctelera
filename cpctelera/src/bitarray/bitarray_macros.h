@@ -85,9 +85,9 @@
 // (end code)
 // 
 #define CPCT_6BITARRAY(Name, Elems) u8 Name[ (((Elems)/4 + !!((Elems) % 4)) * 3) ]
-#define CPCT_4BITARRAY(Name, Elems) u8 Name[ ((Elems)/2 + 1) ]
-#define CPCT_2BITARRAY(Name, Elems) u8 Name[ ((Elems)/4 + 1) ]
-#define CPCT_1BITARRAY(Name, Elems) u8 Name[ ((Elems)/8 + 1) ]
+#define CPCT_4BITARRAY(Name, Elems) u8 Name[ ( (Elems)/2 + !!((Elems) % 2) ) ]
+#define CPCT_2BITARRAY(Name, Elems) u8 Name[ ( (Elems)/4 + !!((Elems) % 4) ) ]
+#define CPCT_1BITARRAY(Name, Elems) u8 Name[ ( (Elems)/8 + !!((Elems) % 8) ) ]
 
 ////////////////////////////////////////////////////////////////////////
 // Group: Bitarray element encoding
@@ -194,8 +194,8 @@
 //    };                                        // _#########__  <  4
 // (end code)
 // 
-#define CPCT_ENCODE6BITS(A, B, C, D) ((A)<<2) | ((B)>>4), ((B)<<4) | ((C)>>2), ((C)<<6) | ((D)&0x3F)
-#define CPCT_ENCODE4BITS(A, B)       ((A)<<4) | ((B)>>4)
+#define CPCT_ENCODE6BITS(A, B, C, D) ((A)<<2) | (((B)&0x3F)>>4), ((B)<<4) | (((C)&0x3F)>>2), ((C)<<6) | ((D)&0x3F)
+#define CPCT_ENCODE4BITS(A, B)       ((A)<<4) | ((B)&0x0F)
 #define CPCT_ENCODE2BITS(A, B, C, D) ((A)<<6) | (((B)<<4)&0x30) | (((C)<<2)&0x0C) | ((D)&0x03)
 
 #endif

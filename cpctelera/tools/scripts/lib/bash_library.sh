@@ -1106,3 +1106,19 @@ Please, change it manually and run this script again."
      echo "${COLOR_LIGHT_GREEN}Success!${COLOR_NORMAL}"
   fi
 }
+
+## Converts a given string to lowercase
+##
+## $1: String to convert to lowercase
+##
+function toLower {
+   echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+## Converts a given string to uppercase
+##
+## $1: String to convert to uppercase
+##
+function toUpper {
+   echo "$1" | tr '[:lower:]' '[:upper:]'
+}

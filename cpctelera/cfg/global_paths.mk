@@ -75,6 +75,11 @@ IDSK     := $(IDSK_PATH)iDSK
 2CDT     := $(2CDT_PATH)2cdt
 BIN2C    := $(SCRIPTS_PATH)cpct_bin2c
 BIN2SNA  := $(SCRIPTS_PATH)cpct_bin2sna
+IMG2TIL  := $(SCRIPTS_PATH)cpct_img2tileset
+CPCTPACK := $(SCRIPTS_PATH)cpct_pack
+TMX2CSV	 := $(SCRIPTS_PATH)cpct_tmx2csv
+CPCTMX2DT:= $(SCRIPTS_PATH)cpct_tmx2data
+CPCTAKS2C:= $(SCRIPTS_PATH)cpct_aks2c
 
 ## SHELL TOOLS ALIASES
 TOUCH := touch

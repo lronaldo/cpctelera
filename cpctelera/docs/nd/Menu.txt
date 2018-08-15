@@ -92,6 +92,11 @@ Group: Commandline  {
    File: cpct_winape  (commandline/cpct_winape)
    }  # Group: Commandline
 
+Group: Compression  {
+
+   File: cpct_zx7b_decrunch_s  (compression/cpct_zx7b_decrunch_s.asm)
+   }  # Group: Compression
+
 Group: Easytilemaps  {
 
    File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
@@ -251,14 +256,16 @@ Group: Strings  {
 
    File: cpct_drawCharM0  (strings/cpct_drawCharM0.asm)
    File: cpct_drawCharM0_inner_asm  (strings/cpct_drawCharM0_inner.s)
-   File: cpct_drawCharM1  (strings/cpct_drawCharM1.s)
+   File: cpct_drawCharM1  (strings/cpct_drawCharM1.asm)
    File: cpct_drawCharM1_f  (strings/cpct_drawCharM1_f.s)
+   File: cpct_drawCharM1_inner_asm  (strings/cpct_drawCharM1_inner.s)
    File: cpct_drawCharM2  (strings/cpct_drawCharM2.s)
    File: cpct_drawStringM0  (strings/cpct_drawStringM0.asm)
-   File: cpct_drawStringM1  (strings/cpct_drawStringM1.s)
+   File: cpct_drawStringM1  (strings/cpct_drawStringM1.asm)
    File: cpct_drawStringM1_f  (strings/cpct_drawStringM1_f.s)
    File: cpct_drawStringM2  (strings/cpct_drawStringM2.s)
    File: cpct_setDrawCharM0  (strings/cpct_setDrawCharM0.asm)
+   File: cpct_setDrawCharM1  (strings/cpct_setDrawCharM1.asm)
    File: dc_mode0_ct  (strings/cpct_dc_mode0_ct.s)
    File: dc_mode1_ct  (strings/cpct_dc_mode1_ct.s)
    File: putchar  (strings/cpct_putChar.s)

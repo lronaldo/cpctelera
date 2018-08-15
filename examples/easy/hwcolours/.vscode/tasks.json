@@ -52,7 +52,7 @@
       ,  {
                "taskName": "run"
             ,  "command": "cpct_winape"
-            ,  "args": [ "-a" ] 
+            ,  "args": [ "-as" ] 
          }
       ]
 }

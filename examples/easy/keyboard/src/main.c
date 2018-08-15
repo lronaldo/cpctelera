@@ -18,7 +18,7 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-#include "sprites.h"
+#include "ctlogo.h"
 
 // Sprite size (in bytes)
 #define SP_W   12
@@ -42,7 +42,6 @@ void main(void) {
    cpct_disableFirmware();
 
    // Set the colour palette
-   cpct_fw2hw     (G_palette, 4); // Convert our palette from firmware to hardware colours 
    cpct_setPalette(G_palette, 4); // Set up the hardware palette using hardware colours
    
    // Set video mode 1 (320x200, 4 colours)
@@ -68,6 +67,6 @@ void main(void) {
       pvideomem = cpct_getScreenPtr(CPCT_VMEM_START, x, y);
 
       // Draw the sprite in the video memory location got from coordinates x, y
-      cpct_drawSprite(G_spriteLogoCT, pvideomem, SP_W, SP_H);
+      cpct_drawSprite(G_ctlogo, pvideomem, SP_W, SP_H);
    }
 }

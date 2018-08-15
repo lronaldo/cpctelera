@@ -1,7 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-//  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
-//  Copyright (C) 2015 Maximo / Cheesetea / ByteRealms (@rgallego87)
+//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -17,12 +16,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
-#include <types.h>
+#pragma once
 
-// Declare sprites and palette, without defining them (they are defined in sprites.c)
-
-// Palette for Cheesetea's Sprite Logo
-extern const u8 G_palette[4];
-
-// Cheesetea's Sprite Logo, by Maximo (@rgallego87)
-extern const u8 G_spriteLogoCT[744];
+////////////////////////////////////////////////////////////////////////////////
+// Definition of the valid output formats
+//
+enum class TNumberFormat {
+      decimal        // Text: decimal
+   ,  binary_text    // Text: binary
+   ,  binary         // pure binary 
+   ,  hexadecimal    // Text: hexadecimal
+};

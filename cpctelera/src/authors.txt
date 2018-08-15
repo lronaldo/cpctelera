@@ -44,6 +44,10 @@ Some makefile code and ideas:
 Arkos player original code:
    * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>
 
+Compression and decompression tools and functions:
+   * ZX7  - <Einar Saukas at https://www.ime.usp.br/~einar/>
+   * ZX7B - <Antonio Villena at https://github.com/antoniovillena>
+
 Random number generation:
    * George Marsaglia
 
@@ -90,7 +94,7 @@ Section: 3rdparty software authors
  <Retro Game Asset Studio (RGAS) at http://www.cpcwiki.eu/index.php/Retro_Game_Asset_Studio>:
    * <Lachlan Keown at http://www.twitter.com/lachlankeown> (lachlankeown@gmail.com)
 
- <Img2CPC at http://www.cpcwiki.eu/index.php/Img2CPC>: 
+ <Img2CPC at https://github.com/AugustoRuiz/Img2CPC>, <DSKGen at https://github.com/AugustoRuiz/dskgen>: 
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> (augusto.ruiz@gmail.com)
 
  <libfreeimage at http://freeimage.sourceforge.net/>:
@@ -99,6 +103,10 @@ Section: 3rdparty software authors
 
  <WinApe emulator at http://winape.net>: 
    * <Richard Wilson at mailto:rich@bitwise-systems.com>
+
+ <RetroVirtualMachine emulator at http://www.retrovirtualmachine.org/es/>: 
+    * <Juan Carlos Gonzalez Amestoi at https://twitter.com/retrovm>
+
 
 Section: Testers & Bug Reporters
 

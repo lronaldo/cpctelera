@@ -1,0 +1,296 @@
+#!/bin/bash
+
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU Lesser General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU Lesser General Public License for more details.
+##
+##  You should have received a copy of the GNU Lesser General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_pack
+##    Script for generating packed files by compressing groups of file
+## into a single one.
+##
+## Usage:
+##    <cpct_pack> [options] [outfile] [file1,[file2,...]]
+##
+## Description:
+##    This script gets a list of files, packs them into a single continuous file
+## and then compresses this latest file. It generates a unique compressed file
+## that holds the contents of all passed files sequentially, in the order
+## they are passed.
+##
+##    Default output produces two files: 
+##       - outfile.c file with an array holding all compressed file data 
+##       - outfile.h file with the exported symbols to be included in other c files. 
+##
+## Command line options:
+##    -i  | --include-header [file]     - Include a header file at the top of
+## the generated output
+##    -a  | --array-name [name]         - Sets the C identifier that will be used. 
+## <OUTFILE> is used by default.
+##    -b  | --bytes-per-line [numbytes] - Establishes the number of bytes to 
+## write at each array line in C. 16 by default
+##    -h  | --help                      - Shows help information on the terminal.
+##
+
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+   echo "${COLOR_LIGHT_YELLOW}USAGE"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<OUTFILE> <FILE1> [FILE2, [FILE3...]] [options]"
+   echo
+   echo "${COLOR_CYAN}   This script gets a list of files, packs them into a single continuous file \
+and then compresses this latest file. It generates a unique compressed file \
+that holds the contents of all passed files sequentially, in the order \
+they are passed. "
+   echo
+   echo "   Default output produces two files: "
+   echo "      - <OUTFILE>.c file with an array holding all compressed file data "
+   echo "      - <OUTFILE>.h file with the exported symbols to be included in other c files. "
+   echo
+   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
+   echo 
+   echo "${COLOR_LIGHT_BLUE}  -i | --include-header ${COLOR_NORMAL}<file>"
+   echo "${COLOR_CYAN}       Include a header file at the top of the generated output."
+   echo
+   echo "${COLOR_LIGHT_BLUE} -an | --array-name ${COLOR_NORMAL}<identifier>"
+   echo "${COLOR_CYAN}       Sets the C identifier that will be used. G_<OUTFILE> is used by default."
+   echo
+   echo "${COLOR_LIGHT_BLUE}  -b | --bytes-per-line ${COLOR_NORMAL}<numbytes>"
+   echo "${COLOR_CYAN}       Establishes the number of bytes to write at each array line in C. 16 by default."
+   echo
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo ${COLOR_NORMAL}
+   exit 1
+}
+
+##############################################################
+###############################################################
+## Check command line parameters
+##
+OUTFILE=
+INFILES=()
+OFFSETS=()
+ARRAYNAME=
+INCLUDE=
+COMPRESSOR=zx7b
+BYTESPERLINE=16
+
+## COMPRESSORS
+ZX7B=${CPCT_PATH}/tools/zx7b/bin/zx7b
+
+if (( $# < 1 )); then
+   usage
+fi
+
+while (( $# >= 1 )); do
+   case $1 in
+      ## Add an include header file in the output
+      "-i" | "--include-header")
+         if (( $# < 2 )); then
+            paramError "Modifier -h (--include-header) requires OUTFILE as include file parameter."
+         fi
+         INCLUDE="$2"
+         shift
+      ;;
+      ## Get number of bytes
+      "-b" | "--bytes-per-line")
+         if ! isInt "$2"; then
+            paramError "Parameter -b must be followed by an integer representing the number of bytes to write at each C line."
+         fi
+         BYTESPERLINE=$((10#$2))
+         shift
+      ;;
+      ## Get a name for the generated array
+      "-an" | "--array-name")
+         if ! checkValidCIdentifier "$2"; then
+            paramError "Modifier -an (--array-name) requires a valid C identifier as name for the array."
+         fi
+         ARRAYNAME="$2"
+         shift
+      ;;      
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Get outfile and other files
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         else
+            if isEmpty "$OUTFILE"; then
+               OUTFILE="$1"
+            else
+               EnsureExists file "$1"
+               INFILES+=("$1")
+            fi
+         fi
+      ;;
+   esac
+   shift
+done
+
+## Check that there is at least one OUTFILE and INFILE
+NINFILES=${#INFILES[*]}
+if isEmpty "$OUTFILE"; then
+   paramError "Parameter OUTFILE is required and has not been given."
+elif (( NINFILES < 1 )); then
+   paramError "At least one file to be packed is required and none has been provided."
+fi
+
+###############################################################
+###############################################################
+## Read and convert file
+##
+
+## Create a temporary file to store binary conversion previous to output
+TMPFILE=$(createTempFile)
+TMPPACK=$(createTempFile)
+
+## Extract the name of the file without extension as identifier for C, if no arrayname was provided
+if (( ${#ARRAYNAME} < 1 )); then
+   ARRAYNAME=$(basename "$OUTFILE") 
+   ARRAYNAME=${ARRAYNAME%.*}
+fi
+
+## Concatenate all files in a single, temporary packfile
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Creating single pack file (${COLOR_CYAN}${OUTFILE}${COLOR_YELLOW}) \
+with all these files: ${COLOR_CYAN}${INFILES[*]}${COLOR_NORMAL}" 
+for F in ${INFILES[*]}; do
+   cat "$F" >> "$TMPFILE"
+   OFFSETS+=( $(wc -c < "$F") )
+done
+
+## Calculate the total amount of bytes to be converted (in the binary file)
+UNCOMPRESSED_BYTES=$(wc -c < "$TMPFILE")
+
+## Compress Pack file using selected compressor
+case $COMPRESSOR in
+   'zx7b')
+      echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}" 
+      ${ZX7B} "$TMPFILE" "$TMPPACK" > /dev/null
+   ;;
+   *)
+      paramError "Unknown compressor algorithm '$COMPRESSOR'." 8
+   ;;
+esac
+
+COMPRESSED_BYTES=$(wc -c < "$TMPPACK")
+SAVED_BYTES=$(( UNCOMPRESSED_BYTES - COMPRESSED_BYTES ))
+
+###############################################################
+###############################################################
+## Output H file
+##
+cat > ${OUTFILE}.h <<TheHFile
+// File ${OUTFILE}.h generated using cpct_pack
+// Compresor used:   $COMPRESSOR
+// Files compressed: [ ${INFILES[*]} ]
+// Uncompressed:     $UNCOMPRESSED_BYTES bytes
+// Compressed:       $COMPRESSED_BYTES bytes
+// Space saved:      $SAVED_BYTES bytes
+//
+#ifndef ${ARRAYNAME}_${COMPRESSED_BYTES}_H
+#define ${ARRAYNAME}_${COMPRESSED_BYTES}_H
+
+// Declaration of the compressed array
+extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
+
+// Address of the latest byte of the compressed array (for unpacking purposes)
+#define ${ARRAYNAME}_end      ($ARRAYNAME + $COMPRESSED_BYTES - 1)
+
+// Compressed and uncompressed sizes
+#define ${ARRAYNAME}_size_z   $COMPRESSED_BYTES
+#define ${ARRAYNAME}_size     $UNCOMPRESSED_BYTES
+
+#endif
+TheHFile
+
+## Output file offset constants if there is more than one file compressed
+
+if (( NINFILES > 1 )); then
+   echo >> ${OUTFILE}.h
+   echo "// Define constants for starting offsets of files in the uncompressed array" >> ${OUTFILE}.h
+   OFF=0
+   for((I=0;I<NINFILES;I++)); do
+      printf "#define %s%03d   %6s   // Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> ${OUTFILE}.h
+      OFF=$(( OFF + ${OFFSETS[$I]} ))
+   done
+fi
+
+###############################################################
+###############################################################
+## Output C file
+##
+cat > ${OUTFILE}.c <<TheCFile
+// File ${OUTFILE}.c generated using cpct_pack
+// Compresor used: $COMPRESSOR
+// Files compressed: [ ${INFILES[*]} ]
+// Uncompressed:     $UNCOMPRESSED_BYTES bytes
+// Compressed:       $COMPRESSED_BYTES bytes
+// Space saved:      $SAVED_BYTES bytes
+//
+TheCFile
+
+## Output include file in case
+if (( ${#INCLUDE} > 0 )); then
+   echo
+   echo "#include <${INCLUDE}>"
+   echo
+fi >> ${OUTFILE}.c
+
+## Output the declaration line for the C Array
+echo "const unsigned char $ARRAYNAME[$COMPRESSED_BYTES] = {" >> ${OUTFILE}.c
+
+## Convert binary file to bytes in hexadecimal and store in a temporary file
+od -An -t x1 -v "$TMPPACK" > $TMPFILE
+
+## Convert binary to C Array and output to OUTFILE.c
+i=1
+COMMA=""
+while read LINE; do
+	BYTES=( $LINE )
+	for B in ${BYTES[@]}; do
+		printf "$COMMA"
+		if (( i >= BYTESPERLINE )); then
+			COMMA=",\n"
+			i=0
+		else
+			COMMA=","
+		fi
+		printf " 0x%s" $B
+		i=$((i+1))
+	done
+done < $TMPFILE >> ${OUTFILE}.c
+
+## Output end bracket and semi-colon
+echo >> ${OUTFILE}.c
+echo "};" >> ${OUTFILE}.c
+
+## Success message
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_LIGHT_GREEN} Success! ${COLOR_YELLOW}Files compressed \
+from ${COLOR_CYAN}${UNCOMPRESSED_BYTES}${COLOR_YELLOW} to ${COLOR_CYAN}${COMPRESSED_BYTES}${COLOR_YELLOW} bytes \
+(Saved ${COLOR_CYAN}${SAVED_BYTES}${COLOR_YELLOW} bytes)${COLOR_NORMAL}" 
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Generated files: ${COLOR_CYAN}${OUTFILE}.h ${OUTFILE}.c${COLOR_NORMAL}"
