@@ -1107,6 +1107,26 @@ Please, change it manually and run this script again." 122
   fi
 }
 
+## Ensures that a file of a given type exists and is readable and executable by the user. 
+## Otherwise, it throws an unrecoverable error. If the file is readable but not executable,
+## the script tries to make it executable with chmod.
+##
+## $1: Type of file (file, directory)
+## $2: File/Directory to check for existance
+## $3: Aditional error message, used when file does not exist or is not readable
+##
+function ensureExistsAndIsExecutable {
+   EnsureExists "$1" "$2" "$3"
+   ## Check file is executable and, if not, try to make it so
+   if [ ! -x "$2" ]; then
+     if ! chmod +x "$2"; then
+        Error "File '$2' is required to be executable and it is not. This script tried to change \
+it to executable, but your user has not got enough privileges to do so. Please, change it manually \
+and run this script again." 120
+     fi      
+   fi
+}
+
 ## Converts a given string to lowercase
 ##
 ## $1: String to convert to lowercase
@@ -1123,17 +1143,30 @@ function toUpper {
    echo "$1" | tr '[:lower:]' '[:upper:]'
 }
 
+## Gets a number of bytes from a given file, reading the
+## file as binary data and outputting the read bytes as an
+## ascii-hexadecimal lowercase string
+##
+## $1: File 
+## $2: Number of binary bytes to get
+## 
+function getFileInitialBytes {
+   xxd -ps -l${2} -c${2} "$1"
+}
+
 ## Checks if a given file does start by a given binary string data.
 ## Binary string data must be given in ascii-hexadecimal lowercase form.
 ## It returns 0 (true) if the file starts by the given binary data, or
 ## 1 (false) otherwise.
+## Warning: Length of $2 string must be even. Otherwise, check will always
+## return 1 (false).
 ##
 ## $1: File to check
 ## $2: Starting hexadecimal bytes (text string)
 ## 
 function binaryFileStartsWith {
    local D=$(( ${#2} / 2 ))
-   local B=$(xxd -ps -l${D} -c${D} "$1")
+   local B=$(getFileInitialBytes "$1" "$D")
    if [ "$2" = "$B" ]; then
       return 0
    fi
