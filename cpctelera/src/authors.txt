@@ -125,6 +125,9 @@ Section: Testers & Bug Reporters
  * <Martin C. Doege at https://github.com/mdoege>
  * <Trewdbal at https://github.com/Trewdbal> / <Github at https://github.com> 
  * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
+ * <Paulo Garcia at https://github.com/pedgarcia> / <VintageIsTheNewOld at https://www.vintageisthenewold.com/>
+ * <Alexis Roda at https://github.com/patxoca> / <Github at https://github.com> 
+ * <rgiot https://github.com/rgiot> / <Github at https://github.com>
 
 Section: Assets 
 
