@@ -13,7 +13,7 @@ LIBGEN  :=ar
 CC      :=gcc
 CXX     :=g++
 CXXFLAGS:=-std=c++14 -O4 -Werror -Wall -fsigned-char -static -pedantic
-CCFLAGS :=-O3 -Werror -Wall -fsigned-char -static -pedantic
+CCFLAGS :=-O3 -Werror -Wall -fno-strict-aliasing -fsigned-char -static -pedantic
 LDLIBS  :=
 
 .PHONY: showVars clean cleanall all
