@@ -235,12 +235,12 @@ else
    checkMinimumGCCVersion "$GCC_MINIMUM_VERSION"
    case "$?" in
       1) Error "CPCtelera requires GCC $GCC_MINIMUM_VERSION or greater. Please, update \
-   your GCC version and run setup again." 
+   your GCC version and run setup again." 1
       ;;
       -1) Error "It was impossible to determine your GCC version. Either your GCC version \
    is too old (previous to 1999) or something is wrong with your GCC installation. Please \
    check your GCC installation and update your version to $GCC_MINIMUM_VERSION or greater \
-   and run setup again."
+   and run setup again." 2
       ;;
       *) drawOK 
       ;;

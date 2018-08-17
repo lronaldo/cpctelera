@@ -172,12 +172,12 @@ function EnsureExists {
       directory)
          MOD="-d" ;;
       *)
-         Error "Filetype '$1' unrecognized while testing file '$2'."
+         Error "Filetype '$1' unrecognized while testing file '$2'." 121
    esac
    if [ ! $MOD "$2" ]; then
-      Error "$1 '$2' does not exist, and it is required for CPCTelera framework to work propperly. $3"
+      Error "$1 '$2' does not exist, and it is required for CPCTelera framework to work propperly. $3" 121
    elif [ ! -r "$2" ]; then
-      Error "$1 '$2' exists, but it is not readable (check for permissions). $3"
+      Error "$1 '$2' exists, but it is not readable (check for permissions). $3" 121
    fi
 }
 
@@ -270,7 +270,7 @@ function isCommandAvailable {
 function EnsureCommandAvailable {
    isCommandAvailable "$1"
    if [[ "$?" != "0" ]]; then
-      Error "$2"
+      Error "$2" 127
    fi
 }
 
@@ -288,7 +288,7 @@ function EnsureCPPHeaderAvailable {
    if [ -s "$ERRTMP" ]; then
       # File has warnings or errors. We ignore warnings.
       if grep "error" "$ERRTMP"; then
-         Error "$2"
+         Error "$2" 126
       fi
    fi
 }
@@ -391,7 +391,7 @@ Generalized initializers. ${MSG_UPGRADE}"
       if checkSystem osx; then 
          ERROR_MSG="${ERROR_MSG}${MSG_OSXUPGRADE}";
       fi
-      Error "$ERROR_MSG"
+      Error "$ERROR_MSG" 125
    fi
 }
 
@@ -814,7 +814,7 @@ function bashProfileFilename {
 ##
 function EnsureFilenameHasNoSpaces {
    case "$1" in
-      *" "*) Error "$2 ('$1')";; 
+      *" "*) Error "$2 ('$1')" 124;; 
    esac
 }
 
@@ -1010,7 +1010,7 @@ function makeWithProgressSupervision {
 
    ## Supervise the Making Process
    if ! superviseBackgroundProcess "$!" "$MAKELOG" "$LOGTOTALBYTES" "$PBARSIZE" "$CHECKDELAY"; then
-      Error "${ERRORMSG}. Please, check '${MAKELOG}' for details. Aborting. "
+      Error "${ERRORMSG}. Please, check '${MAKELOG}' for details. Aborting. " 123
    fi
    drawOK
 }
@@ -1081,11 +1081,11 @@ function checkExecutableExists {
 check CPCtelera installation is okay and this file is in its place and has \
 required user permissions."
   if   [ ! -e "$1" ]; then
-     Error "'$1' does not exist. $ERRCPSTR"
+     Error "'$1' does not exist. $ERRCPSTR" 122
   elif [ ! -f "$1" ]; then
-     Error "'$1' is not a regular file and it should be. $ERRCPSTR"
+     Error "'$1' is not a regular file and it should be. $ERRCPSTR" 122
   elif [ ! -r "$1" ]; then 
-     Error "'$1' is not readable. $ERRCPSTR"
+     Error "'$1' is not readable. $ERRCPSTR" 122
   elif [ ! -x "$1" ]; then
      echo "${COLOR_LIGHT_YELLOW}WARNING:${COLOR_CYAN}"
      echo "   '${COLOR_WHITE}$1${COLOR_CYAN}' is not executable. Execution \
@@ -1096,12 +1096,12 @@ executable? (y/n)" ANSWER
      echo "${COLOR_NORMAL}"
      echo
      if [[ "$ANSWER" == "n" ]]; then
-        paramError "'$1' has not been modified. This script cannot continue. Aborting. "
+        paramError "'$1' has not been modified. This script cannot continue. Aborting. " 121
      fi
      echo "${COLOR_CYAN}Changing '${COLOR_WHITE}$1${COLOR_CYAN}' execution permission... "
      if ! chmod +x "$1"; then
         Error "Your user has not got enough privileges to change '$1' execution permission. \
-Please, change it manually and run this script again."
+Please, change it manually and run this script again." 122
      fi
      echo "${COLOR_LIGHT_GREEN}Success!${COLOR_NORMAL}"
   fi
