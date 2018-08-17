@@ -62,11 +62,16 @@ source $(dirname $0)/lib/bash_library.sh
 
 ## AKS2BIN utility location
 AKS2BIN=${CPCT_PATH}/tools/arkosTracker-1.0/tools/AKSToBIN.exe
+STK2AKS=${CPCT_PATH}/tools/arkosTracker-1.0/tools/STKToAKS.exe
 
 ## Configuration Variables
+AKSBINSTART3="1f8b08"
+STKBINSTART3="53544b"
+FILETYPE=aks
 MEMADDR=0x100
 C_IDENTIFIER="g_music"
 BINTMP=$(createTempFile)
+STKTMP=$(createTempFile)
 EXPORTMP=$(createTempFile)
 TXTBINTMP=$(createTempFile)
 BYTESPERLINE=16
@@ -264,6 +269,18 @@ if isEmpty "$FILE"; then
    paramError "A <filename> parameter is required." 12
 fi
 
+## Check that the file is either an AKS or a STK file (reading its binary prefix)
+BINARYSTART=$(getFileInitialBytes "$FILE" 3)
+if   [ "$BINARYSTART" = "$AKSBINSTART3" ]; then
+   FILETYPE=aks
+elif [ "$BINARYSTART" = "$STKBINSTART3" ]; then
+   FILETYPE=stk
+else
+   Error "FILE '$FILE' is not a valid AKS/STK file. Please check it with Arkos/Starkos traker." 13
+fi
+echo "Detected Music Filetype: $FILETYPE" 
+
+
 ## Calculate output filenames and routes
 if isEmpty "$OUTPUT_FILENAME"; then
    SFILE="${OUTPUTDIR}/$(filenameWithNoExt "$(basename $FILE)").s"
@@ -277,20 +294,26 @@ fi
 
 ## Check AKSToBin and Wine if Required
 checkExecutableExists "$AKS2BIN"
+if [ "FILETYPE" = "stk" ]; then
+   checkExecutableExists "$STK2AKS"
+fi
 echo
 if checkSystem cygwin; then
    ## Calculate windows valid paths for input files
    FILE_CP=`cygpath -w $FILE`
    BINTMP_CP=`cygpath -w $BINTMP`
+   STKTMP_CP=`cygpath -w $STKTMP`
 else
    EnsureCommandAvailable mono "mono has not been found on the system, \
 and it's required for this script to work. Please, install mono or \
 check the installation and run this script again."
    AKS2BIN="mono $AKS2BIN"
+   STK2AKS="mono $STK2AKS"
 
    ## Paths for input files are already valid under *nix
    FILE_CP=$FILE
    BINTMP_CP=$BINTMP
+   STKTMP_CP=$STKTMP
 fi
 
 ###############################################################
@@ -298,9 +321,19 @@ fi
 ## Convert music to data array
 ##
 
+## STEP 0: When converting from Starkos to Arkos, create an intermediate AKS file
+if [ "$FILETYPE" = "stk" ]; then
+   printf "Converting '$FILE' from starkos to arkos format first..."
+   $STK2AKS "$FILE_CP" "$STKTMP_CP" > "$EXPORTMP" 2>&1
+   THEAKSFILE=$STKTMP_CP
+   echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
+else
+   THEAKSFILE=$FILE_CP
+fi
+
 ## STEP 1: Convert AKS file to Binary
 printf "Converting '$FILE' to binary..."
-$AKS2BIN -a "$MEMADDR" "$FILE_CP" "$BINTMP_CP" > "$EXPORTMP" 2>&1
+$AKS2BIN -a "$MEMADDR" "$THEAKSFILE" "$BINTMP_CP" >> "$EXPORTMP" 2>&1
 
 # Check if song has been correctly exported
 if ! grep "Song exported" < "$EXPORTMP" > /dev/null; then
