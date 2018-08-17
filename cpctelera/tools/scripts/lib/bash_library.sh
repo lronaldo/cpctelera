@@ -1122,3 +1122,20 @@ function toLower {
 function toUpper {
    echo "$1" | tr '[:lower:]' '[:upper:]'
 }
+
+## Checks if a given file does start by a given binary string data.
+## Binary string data must be given in ascii-hexadecimal lowercase form.
+## It returns 0 (true) if the file starts by the given binary data, or
+## 1 (false) otherwise.
+##
+## $1: File to check
+## $2: Starting hexadecimal bytes (text string)
+## 
+function binaryFileStartsWith {
+   local D=$(( ${#2} / 2 ))
+   local B=$(xxd -ps -l${D} -c${D} "$1")
+   if [ "$2" = "$B" ]; then
+      return 0
+   fi
+   return 1
+}
