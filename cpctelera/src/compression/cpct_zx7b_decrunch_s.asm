@@ -158,41 +158,47 @@
 ;;      from Antonio Villena, based on ZX7 algorithm by Einar Saukas.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-        ld      bc, #0x8000
-        ld      a, b
-copyby: inc     c
-        ldd
-mainlo: call    getbit
-        jr      nc, copyby
-        push    de
-        ld      d, c
-lenval: call    nc, getbit
-        rl      c
-        rl      b
-        call    getbit
-        jr      nc, lenval
-        inc     c
-        jr      z, exitdz
-        ld      e, (hl)
-        dec     hl
-        sll__e
-        jr      nc, offend
-        ld      d, #0x10
-nexbit: call    getbit
-        rl      d
-        jr      nc, nexbit
-        inc     d
-        srl     d
-offend: rr      e
-        ex      (sp), hl
-        ex      de, hl
-        adc     hl, de
-        lddr
-exitdz: pop     hl
-        jr      nc, mainlo
-getbit: add     a, a
-        ret     nz
-        ld      a, (hl)
-        dec     hl
-        adc     a, a
-        ret
+        ld      bc, #0x8000   ;; [3] marker bit at MSB of B
+        ld      a, b          ;; [1] move marker bit to A
+copyby: inc     c             ;; [1] to keep BC value after LDD
+        ldd                   ;; [5] copy literal byte
+mainlo: call    getbit        ;; [5+(5/11)] read next bit
+        jr      nc, copyby    ;; [2/3] next bit indicates either literal or sequence
+
+; determine number of bits used for length (Elias gamma coding)
+        push    de            ;; [4] store destination on stack
+        ld      d, c          ;; [1] D= 0, assume BC=$0000 here (or $8000)
+lenval: call    nc, getbit    ;; [5+(5/11)] don't call first time (to save bytes)
+        rl      c             ;; [2] 
+        rl      b             ;; [2] insert bit on BC
+        call    getbit        ;; [5+(5/11)] more bits?
+        jr      nc, lenval    ;; [2/3] repeat, final length on BC
+
+; check escape sequence
+        inc     c             ;; [1] detect escape sequence
+        jr      z, exitdz     ;; [2/3] end of algorithm
+
+; determine offset
+        ld      e, (hl)       ;; [2] load offset flag (1 bit) + offset value (7 bits)
+        dec     hl            ;; [2]
+        sll__e                ;; [2]
+        jr      nc, offend    ;; [2/3] if offset flag is set, load 4 extra bits
+        ld      d, #0x10      ;; [2] bit marker to load 4 bits
+nexbit: call    getbit        ;; [5+(5/11)]
+        rl      d             ;; [2] insert next bit into D
+        jr      nc, nexbit    ;; [2/3] repeat 4 times, until bit marker is out
+        inc     d             ;; [1] add 128 to DE
+        srl     d             ;; [2] retrieve fourth bit from D
+offend: rr      e             ;; [2] insert fourth bit into E
+        ex      (sp), hl      ;; [6] store source, restore destination
+        ex      de, hl        ;; [1] destination from HL to DE
+        adc     hl, de        ;; [3] HL = destination + offset + 1
+        lddr                  ;; [5xsize (BC)]
+exitdz: pop     hl            ;; [3] restore source address (compressed data)
+        jr      nc, mainlo    ;; [2/3] end of loop. exit with getbit instead ret (-1 byte)
+getbit: add     a, a          ;; [1] check next bit
+        ret     nz            ;; [2/4] no more bits left?
+        ld      a, (hl)       ;; [2] load another group of 8 bits
+        dec     hl            ;; [2]
+        adc     a, a          ;; [1]
+        ret                   ;; [3]
