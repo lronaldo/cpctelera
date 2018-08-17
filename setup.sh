@@ -86,6 +86,10 @@ CPCT_TEMPLATES_CFG_TMPL=${CPCT_TEMPLATES_DIR}/build_config.tmpl.mk
 CPCT_TEMPLATES_MAIN=${CPCT_TEMPLATES_DIR}/main.c
 CPCT_TEMPLATES_BASHRC=${CPCT_TEMPLATES_DIR}/bashrc.tmpl
 
+## Executable files
+CPCT_ARKOS_AKS2BIN=${CPCT_TOOLS_ARKOS_DIR}/tools/AKSToBIN.exe
+CPCT_ARKOS_STK2AKS=${CPCT_TOOLS_ARKOS_DIR}/tools/STKToAKS.exe
+
 ## All directories and files
 CPCT_DIRS=("${CPCT_MAIN_DIR}" "${CPCT_LOGS_DIR}" "${CPCT_EXAMPLES_DIR}" "${CPCT_TOOLS_DIR}"
            "${CPCT_SRC_DIR}" "${CPCT_CFG_DIR}" "${CPCT_TOOLS_2CDT_DIR}" "${CPCT_TOOLS_HEX2BIN_DIR}" 
@@ -93,6 +97,7 @@ CPCT_DIRS=("${CPCT_MAIN_DIR}" "${CPCT_LOGS_DIR}" "${CPCT_EXAMPLES_DIR}" "${CPCT_
            "${CPCT_TOOLS_IMG2CPC_DIR}" "${CPCT_TOOLS_RGAS_DIR}" "${CPCT_TOOLS_ARKOS_DIR}")
 CPCT_FILES=("${CPCT_TOOLS_MAKEFILE}" "${CPCT_LIB_MAKEFILE}" "${CPCT_EXAMPLES_MAKEFILE}" 
             "${CPCT_TEMPLATES_CFG_TMPL}" "${CPCT_TEMPLATES_MAKEFILE}" "${CPCT_TEMPLATES_MAIN}")
+CPCT_EXECUTABLE_FILES=("${CPCT_ARKOS_AKS2BIN}" "${CPCT_ARKOS_STK2AKS}")
 
 ## Generated files
 CPCT_EXAMPLES_BUILD_LOG=${CPCT_LOGS_DIR}/examples_building.log
@@ -210,6 +215,9 @@ drawOK
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking important files......."
 for (( i = 0; i < ${#CPCT_FILES[@]}; i++ )); do
    EnsureExists file "${CPCT_FILES[$i]}"
+done
+for (( i = 0; i < ${#CPCT_EXECUTABLE_FILES[@]}; i++ )); do
+   ensureExistsAndIsExecutable file "${CPCT_EXECUTABLE_FILES[$i]}"
 done
 drawOK
 
