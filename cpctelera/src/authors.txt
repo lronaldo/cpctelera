@@ -25,6 +25,7 @@ Project owner:
 Awesome collaborators:
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
    * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+   * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
    * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
    * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
@@ -138,6 +139,8 @@ Section: Assets
  * <SCI-FI Background at http://opengameart.org/content/sci-fi-background> by <hassekf at http://opengameart.org/users/hassekf>
  * <Pixel Art Dungeon Items at http://opengameart.org/content/pixel-art-dungeon-items> by <SpinachChicken at http://opengameart.org/users/spinachchicken>
  * <Little Candele Monsters at http://opengameart.org/content/little-candle-monsters> by <C-TOY at http://c-toy.blogspot.com.es>
+ * Court from software Scroll example by Miguel Sánchez (<@PixelArtM at https://twitter.com/PixelArtM>)
+
  
 Section: Special Thanks
 
