@@ -126,7 +126,7 @@ COMM_NUM=$((COMM_NUM + 1))
 COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} is required to compile SDCC. Please, install it \
 and run setup again."
 COMM_NUM=$((COMM_NUM + 1))
-GCC_MINIMUM_VERSION="4.6"
+GCC_MINIMUM_VERSION="5.1"
 
 REQUIRED_LIBRARIES=("boost/graph/adjacency_list.hpp")
 LIBRARIES_EXPLANATION[0]="${REQUIRED_LIBRARIES[0]} is part of libboost, which is required for building SDCC. Please, install boost / libboost-dev / libboost-devel or similar in your system and run setup again."
