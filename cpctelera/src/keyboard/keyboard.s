@@ -19,4 +19,4 @@
 
 ;; Definition of the cpct_keyboardStatusBuffer array where
 ;; keypresses are temporarily stored
-_cpct_keyboardStatusBuffer:: .ds 10
+_cpct_keyboardStatusBuffer:: .db 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
