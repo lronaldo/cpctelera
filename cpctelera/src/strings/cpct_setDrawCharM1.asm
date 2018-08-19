@@ -28,8 +28,8 @@
 ;;    void <cpct_setDrawCharM1> (<u8> *fg_pen*, <u8> *bg_pen*) __z88dk_callee
 ;;
 ;; Input Parameters (2 Bytes):
-;;  (1B L )  fg_pen       - Foreground palette colour index (Similar to BASIC's PEN, 0-3)
-;;  (1B H )  bg_pen       - Background palette colour index (PEN, 0-3)
+;;  (1B E )  fg_pen       - Foreground palette colour index (Similar to BASIC's PEN, 0-3)
+;;  (1B D )  bg_pen       - Background palette colour index (PEN, 0-3)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_setDrawCharM1_asm
