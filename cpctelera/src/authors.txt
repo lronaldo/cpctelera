@@ -89,6 +89,9 @@ Section: 3rdparty software authors
  <Hex2bin at http://sourceforge.net/projects/hex2bin/>:
    * <Jaques Pelletier at https://www.linkedin.com/pub/jacques-pelletier/a/668/309>
  
+ CPC2CDT:
+   * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
+
  <2CDT at http://www.cpcwiki.eu/forum/applications/2cdt/>:
    * <Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
  
