@@ -31,14 +31,23 @@ SPECTRUM - 17-BYTE HEADER (FLAG $00)
 #include <stdlib.h>
 #include <string.h>
 
+#define error(err, args...) { fprintf(stderr, ##args); exit(err); }
+
 unsigned char body[1<<16],head[1<<8];
 FILE *fi,*fo;
 char *si=0,*so=0,*sn=0;
 
 int flag_n=0,flag_b=1000,flag_bb,flag_m=0,flag_i=255,flag_o=4096,flag_t=0,flag_h=2560,flag_p=10240,flag_z=4;
-int filetype=0,filesize=0,fileload=0,fileboot=0;
+int filetype=0,filesize=0,fileload=-1,fileboot=-1;
 
 int i,j,k,status=0;
+
+typedef enum filetypes {
+		FT_Basic = 0
+	,	FT_protected = 1
+	, 	FT_binary = 2
+} TFiletype;
+
 
 void create11()
 {
@@ -118,84 +127,125 @@ void record11(unsigned char *t,int first,int l,int p)
 		fputc(255,fo);
 }
 
+void usage() {
+	error(1, "Usage: CPC2CDT [option..] infile outfile"
+		"\n\t-n\tcreate new file"
+		"\n\t-r FILE\tname to record on tape, unnamed file if missing"
+		"\n\t-t\trecord CPC file as a standard 2k block and a giant block"
+		"\n\t-m N\tmode: 0 (CPC file), 1 (CPC raw), 2 (ZX file), 3 (ZX raw) (0)"
+		"\n\t-b N\tbaud rate for CPC blocks (1000)"
+		"\n\t-i N\tID byte for raw blocks (255)"
+		"\n\t-o N\tnumber of pilot pulses for CPC blocks (4096)"
+		"\n\t-z N\tlength of CPC block trailing tone in bytes (4)"
+		"\n\t-h N\tpause between CPC file blocks, in milliseconds (2560)"
+		"\n\t-p N\tpause after the final block, in milliseconds (10240)"
+		"\n\t-l N\tload address (Default 16384)"
+		"\n\t-x N\trun/execute address (Default 16384)"
+	);
+}
+
+int hexstr2int(const char* value, int max) {
+	int v = 0;
+	const char* val = value + 2; // Jump over hex prefix
+	while (*val) {
+		v *= 16;
+		if (*val >= '0' && *val <= '9') {
+			v += *val - '0';
+		} else if (*val >= 'A' && *val <= 'F') {
+			v += *val - 'A' + 10;
+		} else if (*val >= 'a' && *val <= 'f') {
+			v += *val - 'a' + 10;
+		} else {
+			error(2, "ERROR: Incorrectly formatted hexadecimal value '%s'\n", value);
+		}
+		++val;
+	}
+	// Check maximum 
+	if (v > max) 
+		error(2, "ERROR: Hexadecimal value out of range '%s' (max: '0x%x')\n", value, max);
+
+	return v;
+}
+
+int str2int(const char* value, int max) {
+	int v = atoi(value);
+	if (v > max)
+		error(2, "ERROR: Value out of range '%s' (max: '%d')\n", value, max);
+	return v;
+}
+
+int hasHexPrefix(const char* value) {
+	return strlen(value) > 2 && value[0]=='0' && value[1]=='x';
+}
+
+int isDecimal(const char* value) {
+	while(*value) {
+		if (*value < '0' || *value > '9')
+			return 0;
+		++value;
+	}
+	return 1;
+}
+
+int get16bitValue(const char* value) {
+	if ( hasHexPrefix(value) )
+		return hexstr2int(value, 0xFFFF);
+	else if ( isDecimal(value) )
+		return str2int(value, 0xFFFF);
+
+	error(3, "ERROR: Expected decimal/hexadecimal number but found '%s'\n", value);
+}
+
+void parseCommandLineArgs(int argc, char *argv[]) {
+// Macros for clarity
+#define flag(F)              !strcmp( (F) , argv[i] )
+#define nextArg(F)           if (i+1<argc) ++i; else error(4, "Flag '%s' requires a value\n", (F));
+#define get16bitFlag(VAR, F) nextArg((F)); (VAR)=get16bitValue(argv[i]);
+#define getStrFlag(VAR, F) 	 nextArg((F)); (VAR)=argv[i];
+	
+	int i=1;
+	while (i<argc) {
+		if 		( flag("-n") ) { flag_n=1;                     }
+		else if ( flag("-b") ) { get16bitFlag(flag_b, "-b");   }
+		else if ( flag("-m") ) { get16bitFlag(flag_m, "-m");   }
+		else if ( flag("-i") ) { get16bitFlag(flag_i, "-i");   }
+		else if ( flag("-o") ) { get16bitFlag(flag_o, "-o");   }
+		else if ( flag("-t") ) { flag_t=1;                     }
+		else if ( flag("-r") ) { getStrFlag(sn, "-r");         }
+		else if ( flag("-h") ) { get16bitFlag(flag_h, "-h");   }
+		else if ( flag("-p") ) { get16bitFlag(flag_p, "-p");   }
+		else if ( flag("-z") ) { get16bitFlag(flag_z, "-z");   }
+		else if ( flag("-l") ) { get16bitFlag(fileload, "-l"); }
+		else if ( flag("-x") ) { get16bitFlag(fileboot, "-x"); }
+		else if ( !si ) si=argv[i];
+		else if ( !so ) so=argv[i];
+		else error(5, "ERROR: Unexpected parameter '%s'\n", argv[i]);
+		i++;
+	}	
+
+// Undef clarity macros
+#undef flag
+#undef get16bitFlag
+#undef getStrFlag
+#undef nextArg
+}
+
+
 int main(int argc,char *argv[])
 {
-	i=1;
-	while (i<argc)
-	{
-		if (!strcmp("-n",argv[i]))
-			flag_n=1;
-		else if (!strcmp("-b",argv[i]))
-			if (i+1<argc)
-				flag_b=atoi(argv[++i]);
-			else
-				status=1;
-		else if (!strcmp("-m",argv[i]))
-			if (i+1<argc)
-				flag_m=atoi(argv[++i]);
-			else
-				status=1;
-		else if (!strcmp("-i",argv[i]))
-			if (i+1<argc)
-				flag_i=atoi(argv[++i]);
-			else
-				status=1;
-		else if (!strcmp("-o",argv[i]))
-			if (i+1<argc)
-				flag_o=atoi(argv[++i]);
-			else
-				status=1;
-		else if (!strcmp("-t",argv[i]))
-			flag_t=1;
-		else if (!strcmp("-r",argv[i]))
-			if (i+1<argc)
-				sn=argv[++i];
-			else
-				status=1;
-		else if (!strcmp("-h",argv[i]))
-			if (i+1<argc)
-				flag_h=atoi(argv[++i]);
-			else
-				status=1;
-		else if (!strcmp("-p",argv[i]))
-			if (i+1<argc)
-				flag_p=atoi(argv[++i]);
-			else
-				status=1;
-		else if (!strcmp("-z",argv[i]))
-			if (i+1<argc)
-				flag_z=atoi(argv[++i]);
-			else
-				status=1;
-		else if (!si)
-			si=argv[i];
-		else if (!so)
-			so=argv[i];
-		else
-			status=1;
-		i++;
-	}
+	// Parse arguments
+	parseCommandLineArgs(argc, argv);
 	if (status||!so)
-	{
-		puts("Usage: CPC2CDT [option..] infile outfile"
-			"\n\t-n\tcreate new file"
-			"\n\t-r FILE\tname to record on tape, unnamed file if missing"
-			"\n\t-t\trecord CPC file as a standard 2k block and a giant block"
-			"\n\t-m N\tmode: 0 (CPC file), 1 (CPC raw), 2 (ZX file), 3 (ZX raw) (0)"
-			"\n\t-b N\tbaud rate for CPC blocks (1000)"
-			"\n\t-i N\tID byte for raw blocks (255)"
-			"\n\t-o N\tnumber of pilot pulses for CPC blocks (4096)"
-			"\n\t-z N\tlength of CPC block trailing tone in bytes (4)"
-			"\n\t-h N\tpause between CPC file blocks, in milliseconds (2560)"
-			"\n\t-p N\tpause after the final block, in milliseconds (10240)"
-		);
-		return 1;
-	}
+		usage();
+	
+	// Set up bauds
 	if (flag_b>0)
 		flag_b=(3500000/3+flag_b/2)/flag_b;
 	else
 		flag_b=-flag_b;
 	flag_bb=flag_b*2;
+
+	// Open and process input file
 	if ( (fi=fopen(si,"rb")) )
 	{
 		// READ HEADER AND DETECT FORMAT
@@ -230,10 +280,15 @@ int main(int argc,char *argv[])
 				else // NEITHER :-(
 				{
 					filesize=128+fread(body+128,1,(1<<16)-128,fi);
+					filetype=FT_binary;
+					if (fileboot < 0) fileboot = 0x4000;
+					if (fileload < 0) fileload = 0x4000;
 				}
 			}
 		}
 		fclose(fi);
+
+		// Open and process output file (CDT)
 		if ( (fo=fopen(so,flag_n?"wb":"ab")) )
 		{
 			if (flag_n)
@@ -302,16 +357,12 @@ int main(int argc,char *argv[])
 			}
 			fclose(fo);
 		}
-		else
-		{
-			puts("error: cannot handle target!");
-			return 1;
+		else { 
+			error(1, "ERROR: cannot handle target '%s'!\n", so);
 		}
+	} else {
+		error(1, "ERROR: cannot open source file '%s'!\n", si);
 	}
-	else
-	{
-		puts("error: cannot open source!");
-		return 1;
-	}
+
  	return 0;
 }
