@@ -35,7 +35,7 @@
 ;;    > call cpct_miniload_asm
 ;;
 ;; Return value (Assembly calls, return L):
-;;    <u8>  - 0 = successful loading (no error), 1 = error happened during loading
+;;    <u8>  - (0) = successful loading (no error), (>0) = error happened during loading
 ;;
 ;; Other return values (Only for assembly calls)
 ;;    Carry - Set(1) = successful loading, NotSet(0) = error happened
@@ -68,9 +68,15 @@
 ;;    This function loads a binary block of data from cassette tape directly
 ;; to a given place in memory (*mem_load*). Raw blocks of data must be codified
 ;; in cassette tape as pulses of length 740T (being T = 1/3500000s). Expected
-;; codification is 2 pulses (full) = 1 bit, being 1 = High-High and 0 = Low-Low.
-;; This makes the function perform at approximately 1576,58 bits per second.
-;; (197,07 bytes per second).
+;; codification is 2 pulses (full) = 1 bit. The duration of both pulses is used
+;; to distinguish a 1 from a 0. As our period is 740T, that would be standard
+;; duration of a 0. Double duration, 2*740T=1480T would then be considered a 1.
+;; To make it fault tolerant, the middle of both values is considered as discriminant.
+;; Therefore, 2 pulses of less than 1100T would be considered a 0, and if they are
+;; above 1100T, that would be considered a 1. As an overflow condition, a value
+;; over 400% the length of a 0 (4*740T = 2960T) would be considered as overflow,
+;; giving an error condition. All this makes the function perform at approximately 
+;; 1576,58 bits per second. (197,07 bytes per second).
 ;; 
 ;;    If there are failures during cassette loading, cassette motors are stopped
 ;; and the routine returns with an error code (1). Then you may ask user to 
@@ -180,10 +186,7 @@ bits:
    ld     b, #1-80   ;; *!* para medir dos pulsos
    call  half
    call   c, half
-   jr     c, cont    ;; No error, continue
-   ld     l, #1      ;; An error happened. Return error code
-   jr    exit
-cont:
+   jr    nc, exit    ;; On error, exit (L != 0 in this case, that will be the error code)
    sub    b
    rl     l          ;; inserta un bit s
    jr    nc, bits
@@ -196,7 +199,7 @@ cont:
    inc    a
    add    h
 
-   ld     l, #0      ;; Success loading. Return L=0 (No error)
+   ld     l, h       ;; Success loading. Return L=0 (No error). H=0 when no error happened
 exit:
    ld    bc, #0xF600 ;; F6 = PIO Port C (0x00 for cassete stop)
    out  (c), c       ;; Cassette stop
