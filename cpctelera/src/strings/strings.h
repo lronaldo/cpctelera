@@ -33,9 +33,9 @@ extern void cpct_drawCharM1_f   (void* video_memory, u8 fg_pen, u8 bg_pen, u8 as
 extern void cpct_drawCharM2     (void* video_memory, u16 ascii) __z88dk_callee;
 
 // Functions for drawing Strings with ROM Characters on Graphics Sceen
-extern void cpct_drawStringM0   (void* string, void* video_memory) __z88dk_callee;
-extern void cpct_drawStringM1   (void* string, void* video_memory) __z88dk_callee;
-extern void cpct_drawStringM1_f (void* string, void* video_memory, u8 fg_pen, u8 bg_pen);
-extern void cpct_drawStringM2   (void* string, void* video_memory) __z88dk_callee;
+extern void cpct_drawStringM0   (const char* string, void* video_memory) __z88dk_callee;
+extern void cpct_drawStringM1   (const char* string, void* video_memory) __z88dk_callee;
+extern void cpct_drawStringM1_f (const char* string, void* video_memory, u8 fg_pen, u8 bg_pen);
+extern void cpct_drawStringM2   (const char* string, void* video_memory) __z88dk_callee;
 
 #endif
