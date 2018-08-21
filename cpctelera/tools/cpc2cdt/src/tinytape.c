@@ -202,22 +202,24 @@ void tiny_tape_gen(	const char* srcfile, const char* tzxfile, int _bittype
 		error(3, "ERROR: cannot open target file '%s'\n", tzxfile);
 
 	// Output codification
+
+	// Set Bittzx
 	bit_tzx=!(bittype&7); // "4" rather than "0" forces sub-optimal encoding
-	if ((bitbyte>=0)&&(bitbyte<256))
+
+	// If we have a ID, add 1 byte for it to the blocksize
+	if ((bitbyte>=0)&&(bitbyte<256)) 
 		++blocksize;
-	if (bitsize<0)
-	{
-		bitsize=-bitsize;
-		creatblock(256+64);
-		char2block(blocksize);
-		char2block(blocksize>>8);
-		closeblock(1);
-		creatblock(256-64);
-	}
-	else
-		creatblock(256);
+
+	// Fix bitsize and create block
+	if (bitsize<0) bitsize=-bitsize;
+	else           bitsize=3500000/bitsize;
+	creatblock(256);
+
+	// Add the ID, if there is one
 	if ((bitbyte>=0)&&(bitbyte<256))
 		char2block(bitbyte);
+
+	// Add contents
 	while ((i=fgetc(fi))!=EOF)
 		char2block(i);
 	closeblock(bithold);

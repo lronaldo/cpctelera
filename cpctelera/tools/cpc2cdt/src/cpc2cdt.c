@@ -414,20 +414,6 @@ int main(int argc,char *argv[])
 		cpc2cdt_modes();
 	} else {
 		// TINYTAPE Modes
-		// <TODO>
-		//
-		//// Set for skipping the 128 byte header if the srcfile has
-		//// skipHeader = 0 by default, meaning no header has to be skipped (srcfile has no header)
-		//void tiny_tape_setSkipHeader(int sk) { skipHeader = sk; } 
-		//
-		//// srcfile:  Source file (RAW/BIN)
-		//// tzxfile:  Output file (if it exists, srcfile is appended, else tzxfile is created with srcfile)
-		//// _bittype: 0 (1 bit, full pulse), 1 (1 bit, half pulse), 2 (2 bits, full pulse), 3 (2 bits, half pulse)
-		//// _bitsize: (<0) Pulse Lenght in Ts, (>0) Bits per second
-		//// _bitbyte: Data block ID (first byte at the start of the blogk). (-1) for no block ID
-		//// _bithold: Pause in milliseconds
-		//void tiny_tape_gen(	const char* srcfile, const char* tzxfile, int _bittype
-		//				, int _bitsize, int _bitbyte, int _bithold) {
 		
 		// Convert ID value to negative if it has not been set
 		if (flag_i == 255) flag_i=-1;
@@ -446,7 +432,15 @@ int main(int argc,char *argv[])
 		// If there is a header, be it AMSDOS or PLUS3DOS, skip it
 		tiny_tape_setSkipHeader(detectedHeader);
 		
-		// Generate tape with Tiny Modes
+		// Generate tape with Tiny Modes. Parameters:
+		// 	 srcfile:  Source file (RAW/BIN)
+		// 	 tzxfile:  Output file (if it exists, srcfile is appended, else tzxfile is created with srcfile)
+		// 	 _bittype: 0 (1 bit, full pulse), 1 (1 bit, half pulse), 2 (2 bits, full pulse), 3 (2 bits, half pulse)
+		// 	 _bitsize: (<0) Pulse Lenght in Ts, (>0) Bits per second
+		// 	 _bitbyte: Data block ID (first byte at the start of the blogk). (-1) for no block ID
+		// 	 _bithold: Pause in milliseconds
+		//void tiny_tape_gen(	const char* srcfile, const char* tzxfile, int _bittype
+		//				, int _bitsize, int _bitbyte, int _bithold) {
 		tiny_tape_gen(si, so, flag_m-4, bitsize, flag_i, flag_h);
 	}
 
