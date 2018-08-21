@@ -1,32 +1,52 @@
-// ** reescrito en C (antes Pascal) por CNGSOFT el Domingo 7 de Agosto de 2016 por la noche **
-/*
-AMSDOS - 128-BYTE HEADER
-	16-BIT CHECKSUM [0..$42] = W[$43]
-	TYPE = B[$12]
-	LOAD = W[$15]
-	SIZE = W[$18], W[$40]
-	BOOT = W[$1A]
-PLUS3DOS - 128-BYTE HEADER
-	8-BIT CHECKSUM [0..$7E] = [$7F]
-	SIZE = W[$10], W[$14]
+//-----------------------------LICENSE NOTICE------------------------------------
+//  This file is part of CPCtelera: An Amstrad CPC Game Engine
+//  Copyright (C) 2016-2018 César Nicolás González (@CNGSoft)
+//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//------------------------------------------------------------------------------
 
-AMSTRAD - 28-BYTE HEADER (FLAG $2C)
-	CHAR[16] : FILENAME PADDED WITH $00
-	BYTE : BLOCK.ID (1,2,3...)
-	BYTE : LASTBLOCK?$FF:$00
-	BYTE : TYPE
- 	WORD : BLOCK SIZE ($0800)
-	WORD : START+PAST BLOCKS
-	BYTE : FIRSTBLOCK?$FF:$00
-	WORD : LENGTH
-	WORD : BOOT
-SPECTRUM - 17-BYTE HEADER (FLAG $00)
-	BYTE : TYPE
-	CHAR[10] : FILENAME PADDED WITH $20
-	WORD : START
-	WORD : LENGTH
-	WORD : LENGTH (?)
-*/
+// ** reescrito en C (antes Pascal) por CNGSOFT el Domingo 7 de Agosto de 2016 por la noche **
+// 
+// Information about headers
+// AMSDOS - 128-BYTE HEADER
+// 	16-BIT CHECKSUM [0..$42] = W[$43]
+// 	TYPE = B[$12]
+// 	LOAD = W[$15]
+// 	SIZE = W[$18], W[$40]
+// 	BOOT = W[$1A]
+// PLUS3DOS - 128-BYTE HEADER
+// 	8-BIT CHECKSUM [0..$7E] = [$7F]
+// 	SIZE = W[$10], W[$14]
+// 
+// AMSTRAD - 28-BYTE HEADER (FLAG $2C)
+// 	CHAR[16] : FILENAME PADDED WITH $00
+// 	BYTE : BLOCK.ID (1,2,3...)
+// 	BYTE : LASTBLOCK?$FF:$00
+// 	BYTE : TYPE
+//  	WORD : BLOCK SIZE ($0800)
+// 	WORD : START+PAST BLOCKS
+// 	BYTE : FIRSTBLOCK?$FF:$00
+// 	WORD : LENGTH
+// 	WORD : BOOT
+// SPECTRUM - 17-BYTE HEADER (FLAG $00)
+// 	BYTE : TYPE
+// 	CHAR[10] : FILENAME PADDED WITH $20
+// 	WORD : START
+// 	WORD : LENGTH
+// 	WORD : LENGTH (?)
+// */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
