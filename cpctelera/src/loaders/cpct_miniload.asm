@@ -87,12 +87,12 @@
 ;;    <TODO>
 ;;
 ;; Destroyed Register values: 
-;;      C-bindings - AF, BC, DE, HL, BC'
-;;    ASM-bindings - AF, BC, DE, HL, BC', IX
+;;      C-bindings - AF, BC, DE, HL, 
+;;    ASM-bindings - AF, BC, DE, HL, IX
 ;;
 ;; Required memory:
-;;      C-bindings - 127 bytes 
-;;    ASM-bindings - 114 bytes
+;;      C-bindings - 131 bytes 
+;;    ASM-bindings - 118 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -114,12 +114,14 @@
 ; IX=^OFFSET,DE=LENGTH; IX+++,DE---,H=$FF?,ABCLF!,CF=OK?
 
    di                ;; Disable interrupts before starting
+
    ld    bc, #0xF610 ;; F6 = PIO Port C (0x10 for cassete start)
    out  (c), c       ;; Cassette start
 
    ;; Function requires 7F (Gate Array port) at B'
    ;; This is guaranteed if this is called from BASIC, but not otherwise
    exx               ;; 
+   push  bc          ;; Save BC' value before changing it (it will be restored at the end)
    ld    bc, #0x7F10 ;; B = Gate array port (0x7F), C=Border Register (0x10)
    out  (c), c       ;; Select border register for later color changes
    exx               ;;
@@ -198,13 +200,16 @@ bits:
    ld     a, d
    or     e
    jr    nz, next
-   inc    a
-   add    h
+   inc    a          ;; | Final error status. If load was successful A=0, H=255. Then, these 
+   add    h          ;; | 2 instructions will produce Carry, signaling everything went OK.
 
-   ld     l, h       ;; Success loading. Return L=0 (No error). H=0 when no error happened
+   ld     l, a       ;; Success loading. Return L=0 (No error). A=0 when no error happened
 exit:
-   ld    bc, #0xF600 ;; F6 = PIO Port C (0x00 for cassete stop)
+   exx               ;; 
+   ld    bc, #0xF600 ;; F6 = PIO Port C (0x00 for cassette stop)
    out  (c), c       ;; Cassette stop
+   pop   bc          ;; Restore BC' before ending (Leave alternate register set as it was)
+   exx               ;;
    ei                ;; Enable interrupts again
    
 ;; Return instruction provided by bindings
