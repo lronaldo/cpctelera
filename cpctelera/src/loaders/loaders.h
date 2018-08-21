@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -16,22 +16,16 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
+//
+// Title: Random
+//
+#ifndef _CPCT_LOADERS_H_
+#define _CPCT_LOADERS_H_
 
 #include <types.h>
-#include <firmware/firmware.h>
-#include <memutils/memutils.h>
-#include <keyboard/keyboard.h>
-#include <bitarray/bitarray.h>
-#include <sprites/sprites.h>
-#include <strings/strings.h>
-#include <video/videomode.h>
-#include <audio/audio.h>
-#include <random/random.h>
-#include <macros/allmacros.h>
-#include <easytilemaps/easytilemaps.h>
-#include <compression/compression.h>
-#include <loaders/loaders.h>
+
+// Cassette loader in miniload format
+u8 cpct_miniload(void* mem_load, u16 size) __z88dk_callee;
 
 #endif
+

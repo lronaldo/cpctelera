@@ -25,7 +25,7 @@
 ;; place in memory. Pulse length of data bytes must be 740T (1T = 1/3500000s)
 ;;
 ;; C Definition:
-;;    <u8>  <cpct_miniload>  (void* *mem_load*, u16 *size*);
+;;    <u8>  <cpct_miniload>  (void* *mem_load*, u16 *size*) __z88dk_callee;
 ;;
 ;; Input Parameters (4 Bytes):
 ;;  (2B IX) mem_load - Pointer to the place in memory where loader will start to copy loaded bytes
@@ -87,11 +87,12 @@
 ;;    <TODO>
 ;;
 ;; Destroyed Register values: 
-;;      C-bindings - AF, BC, DE, HL, B'
-;;    ASM-bindings - AF, BC, DE, HL, B', IX
+;;      C-bindings - AF, BC, DE, HL, BC'
+;;    ASM-bindings - AF, BC, DE, HL, BC', IX
 ;;
 ;; Required memory:
-;;      xx bytes
+;;      C-bindings - 127 bytes 
+;;    ASM-bindings - 114 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -119,7 +120,8 @@
    ;; Function requires 7F (Gate Array port) at B'
    ;; This is guaranteed if this is called from BASIC, but not otherwise
    exx               ;; 
-   ld     b, #0x7F   ;; B = Gate array port (0x7F)
+   ld    bc, #0x7F10 ;; B = Gate array port (0x7F), C=Border Register (0x10)
+   out  (c), c       ;; Select border register for later color changes
    exx               ;;
 
 init: 
