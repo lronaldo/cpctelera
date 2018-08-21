@@ -71,6 +71,10 @@ tscroll_bday:
 
 .area _CODE
 
+;; Include all CPCtelera macros, including opcode macros that 
+;; we will be using later
+.include "macros/allmacros.h.s"
+
 ;; Symbols with the names of the CPCtelera functions we want to use
 ;; must be declared globl to be recognized by the compiler. Later on,
 ;; linker will do its job and make the calls go to function code.
@@ -82,6 +86,7 @@ tscroll_bday:
 .globl cpct_drawSprite_asm
 .globl cpct_waitVSYNC_asm
 .globl cpct_drawStringM0_asm
+.globl cpct_setDrawCharM0_asm
 .globl cpct_akp_musicInit_asm
 .globl cpct_akp_musicPlay_asm
 .globl cpct_setInterruptHandler_asm
@@ -201,7 +206,7 @@ moveSprite:
 ;; FUNC: redrawString
 ;;    Draws a string with a new colour value each time, on a given location
 ;; INPUT:
-;;    HL: Pointer to the string
+;;    IY: Pointer to the string
 ;;    B: y pixel coordinate where to draw the string
 ;;    C: x pixel coordinate where to draw the string
 ;; DESTROYS:
@@ -209,15 +214,19 @@ moveSprite:
 ;;
 redrawString:
    ;; Calculate screen location where to draw the string
-   push  hl                      ;; Save pointer to the string
+   ;; BC Already have screen coordinates for the string to be drawn
    ld    de, #pvideomem          ;; DE points to the start of video memory
    call  cpct_getScreenPtr_asm   ;; Return pointer to byte located at (x,y) (C, B) in HL
-   ex    de, hl                  ;; DE = pointer to video memory location to draw the sprite
+   push  hl                      ;; Returns HL = Pointer to video memory (Required by drawStringM0)
+                                 ;; We save it for later use
 
-   ;; Draw the string
-   pop   hl                      ;; Recover pointer to the string
+   ;; Set colours to be used by DrawChar/DrawStringM0 functions
    fg_colour = .+1               ;; fg_colour = location in memory of the Foreground colour value
-   ld    bc, #init_colour        ;; BC = fg/bg colours (value modified dynamically)
+   ld    hl, #init_colour        ;; HL = fg/bg colours (value modified dynamically)
+   call  cpct_setDrawCharM0_asm  ;; Set colours before using DrawStringM0
+
+   ;; Draw the string (IY points to the string)
+   pop   hl                      ;; HL Points to video memory location where the string will be drawn
    call  cpct_drawStringM0_asm   ;; Draw the string
 
    ;; Increment colour for next call
@@ -348,8 +357,10 @@ boundary_hit:
    
    ;; Redraw string with a new colour value
    ;; (BC already contains y and x coordinates)
-   ld     l, 0(ix)               ;; | HL = Pointer to the string
-   ld     h, 1(ix)               ;; |
+   ld     a, 0(ix)               ;; | IY = Pointer to the string
+   ld__iyl_a                     ;; |
+   ld     a, 1(ix)               ;; |
+   ld__iyh_a                     ;; |
    call  redrawString            ;; Redraws the string
 
    ret                           ;; Nothing more to do, return.
@@ -388,7 +399,7 @@ _main::
    call  moveSprite           ;; Do the complete sprite animation and return when finished
 
    ;; Draw octopusjig string
-   ld    hl, #str_dav         ;; HL points to @octopusjig string
+   ld    iy, #str_dav         ;; IY points to @octopusjig string
    ld    bc, #xy_str_dav      ;; BC = y, x coordinates where to draw @octopusjig string
    call  redrawString         ;; Draw the string with the initial colour
 
