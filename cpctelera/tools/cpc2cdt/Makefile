@@ -9,7 +9,7 @@ BIN  = bin
 CFLAGS  = -O3 -fsigned-char -Werror -Wall -DUNIX
 
 TARGET = $(BIN)/cpc2cdt
-FILES  = cpc2cdt
+FILES  = cpc2cdt tinytape
 F_OBJ  = $(foreach F, $(FILES), $(OBJ)/$(F).o)
 
 all: Makefile $(OBJ) $(BIN) $(F_OBJ) $(TARGET)
