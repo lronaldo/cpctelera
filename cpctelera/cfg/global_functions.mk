@@ -138,7 +138,7 @@ endef
 # $(5): Memory address where main program starts (RUN ADDRESS)
 #
 define CREATECDT
-  @$(2CDT) -n -X 0x$(5) -L 0x$(4) -r $(2) $(1) $(3) > /dev/null
+   @$(CPC2CDT) -x 0x$(5) -l 0x$(4) -t -b 2000 -r $(2) $(1) $(3) > /dev/null
 endef
 
 #################

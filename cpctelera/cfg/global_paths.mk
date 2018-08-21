@@ -58,6 +58,7 @@ SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.6.8-r9946/bin/
 HEX2BIN_PATH := $(CPCT_PATH)tools/hex2bin-2.0/bin/
 IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.13/bin/
 2CDT_PATH    := $(CPCT_PATH)tools/2cdt/bin/
+CPC2CDT_PATH := $(CPCT_PATH)tools/cpc2cdt/bin/
 SCRIPTS_PATH := $(CPCT_PATH)tools/scripts/
 
 # PATHs FOR CPCTELERA SOURCES AND LIBRARY FILE
@@ -73,6 +74,7 @@ Z80LNK   := $(SDCCBIN_PATH)sdar
 HEX2BIN  := $(HEX2BIN_PATH)hex2bin
 IDSK     := $(IDSK_PATH)iDSK
 2CDT     := $(2CDT_PATH)2cdt
+CPC2CDT  := $(CPC2CDT_PATH)cpc2cdt
 BIN2C    := $(SCRIPTS_PATH)cpct_bin2c
 BIN2SNA  := $(SCRIPTS_PATH)cpct_bin2sna
 IMG2TIL  := $(SCRIPTS_PATH)cpct_img2tileset
