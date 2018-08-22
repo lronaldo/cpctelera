@@ -120,4 +120,4 @@ constexpr bool isValidCIdentifier(const char* cid) {
    return true;
 }
 
-}; // End Namespace CPCT
+} // End Namespace CPCT

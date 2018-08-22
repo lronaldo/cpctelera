@@ -244,4 +244,4 @@ Patcher::print(std::ostream& out) const {
    out << '\n';
 }
 
-}; // End Namespace CPCT
+} // End Namespace CPCT

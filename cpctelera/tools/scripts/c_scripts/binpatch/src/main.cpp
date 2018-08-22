@@ -32,8 +32,24 @@ void usage(const std::string& prg) {
       << C_LIGHT_YELLOW << "USAGE" 
       << C_LIGHT_BLUE   << "\n   " << prg << " <binfile> [OPTIONS]"
       << C_LIGHT_YELLOW << "\n\nDescription"
-      << C_CYAN         << "\n   Patches the binfile"
-      << C_LIGHT_YELLOW << "\n\nOPTIONS:"
+      << C_CYAN         << "\n   Patches the <binfile> by directly modifying bytes at given offsets in the available "
+                        << "switches. For instance, switches '-pb 0x10 0xFF' will patch byte at offset 0x10 (16 in "
+                        << "decimal) Overwriting it with the value 0xFF (255 in decimal). Similarly, switches "
+                        << "'-ps 13000 1 2 3 4' will overwrite bytes 13000 to 13003 in the file with the values "
+                        << "1, 2, 3 and 4 (each value will overwrite next byte from offset 13000 onwards)."
+                        << "\n   You may use as many switches as you want in the command line. Switches will be read "
+                        << "and processed from left to write. <Binfile> is read in memory at the start of the process, "
+                        << "and then each new switch processed produces modifications in memory. If anything fails "
+                        << "during the process, the script ends and <binfile> is left unmodified (all modifications "
+                        << "were made in memory). Modifications are only written to the file at the end, when all "
+                        << "of them have been correctly processed. "
+                        << "\n   If you want to test your modifications before they are made to the actual <binfile> "
+                        << "you may use switch '-p'. This will make this script print out the result of the patching "
+                        << "to your terminal, without modifying the <binfile>."
+      << C_LIGHT_YELLOW << "\n\nIMPORTANT" 
+      << C_CYAN         << "\n   Your <binfile> will always result modified unless you use '-p' switch or "
+                        << "in case that any error happens."
+      << C_LIGHT_YELLOW << "\n\nOPTIONS" 
       << C_LIGHT_BLUE   << "\n\n   -h  | --help"
       << C_CYAN         << "\n          Shows this help."
       << C_LIGHT_BLUE   << "\n   -p  | --print"
@@ -126,8 +142,15 @@ void parseArguments(const CPCT::TArgs& args) {
          i += 2;
 
       //----------------------------------------------------------------------------------------------------------
+      // UNKNOWN SWITCH
+      } else if ( a[0] == '-' ) {
+         CPCT::error( {"Unknown switch '", a, "'. Check help with '-h' for valid switches."} );
+
+      //----------------------------------------------------------------------------------------------------------
       // BINARY FILE
       } else {
+         // Set the binary file if it has not being set yet
+         if ( thePatcher.filename() != "" ) CPCT::error( { "At least two parameters have been given as filenames for binfile: '", thePatcher.filename(), "' and '", a, "'." } );
          thePatcher.setBinFile(a);
       }
    }

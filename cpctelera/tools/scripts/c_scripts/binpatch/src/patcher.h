@@ -43,6 +43,8 @@ struct Patcher {
    void saveFile();
 
    void print(std::ostream& out) const;
+   const std::string& filename() { return m_filename; }
+
 private:
    // Constants
    static const uint32_t M_MAXSIZE  = 8 * 1024 * 1024; // Up to 8MB
@@ -63,4 +65,4 @@ private:
    void updateTotalSize(uint32_t addSize);
 };
 
-}; // End Namespace CPCT
+} // End Namespace CPCT

@@ -17,42 +17,39 @@
 //------------------------------------------------------------------------------
 
 //
-// File: cpct_bin2sna
+// File: cpct_binpatch
 //
-//    Creates a runnable 64K snapshot (SNA) with a binary file in its memory, ready
-// to be run.
+//    Patches a binary file
 //
 // Usage:
-//    <cpct_bin2sna> (binfile) [OPTIONS]
+//    <cpct_binpatch> (binfile) [OPTIONS]
 //
 // Description:
-//    Creates a runnable 64K snapshot (SNA) file with <binfile>
-// loaded in memory at the address given with option -l/--load-address. If no address
-// is given, binfile is loaded at 0x0000 (memory start). The value of the PC is also
-// set to 0x0000 by default and may be changed with -pc/--set-pc. Setting the PC lets
-// preparing the snapshot to start running from the entry point of the loaded binary.
+//    Patches the <binfile> by directly modifying bytes at given offsets in the available
+// switches. For instance, switches '-pb 0x10 0xFF' will patch byte at offset 0x10 (16 in
+// decimal) Overwriting it with the value 0xFF (255 in decimal). Similarly, switches
+// '-ps 13000 1 2 3 4' will overwrite bytes 13000 to 13003 in the file with the values
+// 1, 2, 3 and 4 (each value will overwrite next byte from offset 13000 onwards).
 //
-//    The rest of CPC's memory is filled up with standard values from a normal startup
-// of an Amstrad CPC 464. These values have been captured by stopping a running 464 and
-// copying memory values to this tool. 
+//    You may use as many switches as you want in the command line. Switches will be read
+// and processed from left to write. <Binfile> is read in memory at the start of the process,
+// and then each new switch processed produces modifications in memory. If anything fails
+// during the process, the script ends and <binfile> is left unmodified (all modifications
+// were made in memory). Modifications are only written to the file at the end, when all
+// of them have been correctly processed.
 //
-//    Currently, this tool only supports 64K snapshots including 464 memory images.
+//    If you want to test your modifications before they are made to the actual <binfile>
+// you may use switch '-p'. This will make this script print out the result of the patching
+// to your terminal, without modifying the <binfile>.
+//
+// IMPORTANT:
+//    Your <binfile> will always result modified unless you use '-p' switch or
+// in case that any error happens.
 //
 // Command line options:
-//   -l  | --load-address <ADDRESS> (Default 0x0000)   - Sets the memory address where 
-// to load the binary file <binfile>.
+//  -h  | --help                                - Shows this help
+//  -p  | --print                               - Prints out the result of binary patching instead of overwritting the binfile.
+//  -pb | --patch-byte <OFFSET> <8BITSVAL>      - Patches the byte at the given OFFSET with the new 8BITSVAL.
+//  -pw | --patch-word <OFFSET> <16BITSVAL>     - Patches a word at the given OFFSET with 16BITSVAL, using little endian by default.
+//  -ps | --patch-stream <OFFSET> <BYTESTREAM>  - Patches an BYTESTREAM of bytes starting at OFFSET.
 //
-//   -pc | --set-pc <ADDRESS> (Default 0x0000)         - Sets the value of the PC register
-// at execution start. This value should be set to the entry point of the application (its run address).
-//
-//   -h  | --help                                      - Shows this help.
-//       
-//
-
-//
-// Extern arrays with startup memory values
-//
-extern const uint8_t gk_sna3_header[256];
-extern const uint8_t gk_mem0000_004F[80];
-extern const uint8_t gk_mem4000_4BEF[3056];
-extern const uint8_t gk_memA670_BFFF[6544];
