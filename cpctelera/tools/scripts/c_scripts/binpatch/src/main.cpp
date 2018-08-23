@@ -102,7 +102,7 @@ void parseArguments(const CPCT::TArgs& args) {
       //----------------------------------------------------------------------------------------------------------
       // PATCH 1 STREAM
       } else if (a == "-ps" || a == "--patch-stream") {
-         if (i + 2 >= args.size()) CPCT::error( { "Modifier '-ps' needs to be followed by at least 2 values: <OFFSET> and one byte from <BYTETREAM>."} );
+         if (i + 2 >= args.size()) CPCT::error( { "Modifier '-ps' needs to be followed by at least 2 values: <OFFSET> and at least one byte from <BYTETREAM>."} );
 
          // Get the offset (first argument)
          uint16_t offset = CPCT::to16bitValue(args[i+1]);
