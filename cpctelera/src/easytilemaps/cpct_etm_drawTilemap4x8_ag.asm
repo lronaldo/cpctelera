@@ -21,8 +21,9 @@
 ;;
 ;; Function: cpct_etm_drawTilemap4x8_ag
 ;;
-;;    Draws an aligned view of a tilemap made of 4x8-bytes tiles. Tiles must be
-;; Gray-coded, with scanline order 0,1,3,2,6,7,5,4.
+;;    Draws an aligned view of a tilemap made of 4x8-bytes tiles. Tiles must be 
+;; codified as zig-zagged rows (left-to-right, then right-to-left) and with 
+;; scanlines in Gray-code order 0,1,3,2,6,7,5,4 (zgtiles format).
 ;;
 ;; C Definition:
 ;;    void <cpct_etm_drawTilemap4x8_ag> (void* *memory*, const void* *tilemap*) __z88dk_callee;
@@ -60,8 +61,13 @@
 ;;
 ;; Details:
 ;;    This function draws a view of a Tilemap on video memory. A Tilemap is a 2D tile-index
-;; matrix in which each item (1-byte) represents a tile to be drawn. A view is a window 
-;; of size (*width* x *height*) inside the Tilemap. Next figure sums up all involved concepts,
+;; matrix in which each item (1-byte) represents a tile to be drawn. Each tile is a 32-byte
+;; array containing a 2D sprite of 8x8 pixels in video screen format. Tiles must be 
+;; codified as zig-zagged rows (left-to-right, then right-to-left) and with scanlines 
+;; in Gray-code order 0,1,3,2,6,7,5,4. This format is known as 'zgtiles' format and can 
+;; be obtained as output from IMG2SP macro, configuring SET_FORMAT as 'zgtiles'. 
+;; A window of size (*width* x *height*) inside the Tilemap is named as a 'view'. Next 
+;; figure sums up all involved concepts,
 ;; (start code)
 ;; ************************* FIGURE 1 *******************************
 ;;
