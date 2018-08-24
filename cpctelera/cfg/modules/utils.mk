@@ -24,29 +24,36 @@
 ###########################################################################
 
 ## INCLUDED MACROS
-##   * PRINT 
-##   * JOINFOLDER2BASENAME
-##   * CONVERTVALUE
-##   * CHECKVARIABLEISSET
-##   * ISINT
-##   * INTINRANGE
 ##   * ADD2INTS
+##   * ADD2SET
+##   * ADD_N_ITEMS
+##   * CHECKVARIABLEISSET
+##   * CONVERTVALUE
+##   * CONVERT_FW2HW_PALETTE
 ##   * ENSURE_VALID_C_ID
 ##   * ENSUREVALID
-##   * SET_ONE_OF_MANY_VALID
-##   * ADD2SET
-##   * CONVERT_FW2HW_PALETTE
-##   * VERIFY_FW_PALETTE
+##	 * FILEEXISTS
 ##   * GREATER_THAN
-##   * ADD_N_ITEMS
-##   * STRLEN
+##   * INTINRANGE
+##   * ISINT
+##   * JOINFOLDER2BASENAME
+##   * PRINT 
 ##   * REMOVEFILEIFEXISTS
+##   * SET_ONE_OF_MANY_VALID
+##   * STRLEN
+##   * VERIFY_FW_PALETTE
 ##
 
 # ANSI Sequences for terminal colored printing
-COLOR_RED=\033[1;31;49m
-COLOR_YELLOW=\033[1;33;49m
-COLOR_NORMAL=\033[0;39;49m
+COLOR_RED    :=\033[1;31;49m
+COLOR_GREEN  :=\033[1;32;49m
+COLOR_YELLOW :=\033[1;33;49m
+COLOR_BLUE   :=\033[1;34;49m
+COLOR_MAGENTA:=\033[1;35;49m
+COLOR_CYAN   :=\033[1;36;49m
+COLOR_WHITE  :=\033[1;37;49m
+COLOR_GREY   :=\033[1;38;49m
+COLOR_NORMAL :=\033[0;39;49m
 
 #################
 # PRINT: Print a nice and colorful message
@@ -369,4 +376,29 @@ endef
 #
 define REMOVEFILEIFEXISTS
 $(shell $(RM) "./$(1)")
+endef
+
+#################
+# FILEEXISTS: Checks if a given file exists or not. Returns "true" 
+# when the file exists and empty-string otherwise. It is thought to
+# be used in makefile if functions. Parameter is striped before 
+# being tested.
+#
+# $(1): File
+#
+define FILEEXISTS
+$(shell if [ -f "$(strip $(1))" ]; then echo true; fi)
+endef
+
+#################
+# EQUALS: Checks if a given two given values are equal (they are 
+# treated as strings). If both are equal, it returns "true". otherwise
+# it returns empty-string. It is thought to be used in makefile if functions.
+# Parameter is striped before being tested.
+#
+# $(1): First member to be tested
+# $(2): Second member to be tested
+#
+define EQUALS
+$(shell if [ "$(strip $(1))" = "$(strip $(2))" ]; then echo true; fi)
 endef
