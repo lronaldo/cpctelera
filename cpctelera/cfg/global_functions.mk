@@ -33,6 +33,7 @@ include $(THIS_DIR)/modules/utils.mk
 include $(THIS_DIR)/modules/pack.mk
 include $(THIS_DIR)/modules/img2sp.mk
 include $(THIS_DIR)/modules/tmx2data.mk
+include $(THIS_DIR)/modules/cdtman.mk
 
 #################
 # GETLOADADDRESS: Get load address from a created binary file (parsing hex2bin's log)
@@ -126,19 +127,6 @@ $(3): $(2)
 	@touch $(3)
 	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
 
-endef
-
-#################
-# CREATECDT: Create a CDT file with the BINARY added to it and converted to AMSDOS BINARY
-#
-# $(1): Binary file to be inserted in the CDT
-# $(2): Name (up to 16 chars) that the file will have inside the CDT (displayed when loading)
-# $(3): CDT file to be created
-# $(4): Memory address where binary will be loaded (LOAD ADDRESS)
-# $(5): Memory address where main program starts (RUN ADDRESS)
-#
-define CREATECDT
-   @$(CPC2CDT) -x 0x$(5) -l 0x$(4) -t -b 2000 -r $(2) $(1) $(3) > /dev/null
 endef
 
 #################
