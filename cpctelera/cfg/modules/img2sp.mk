@@ -38,49 +38,6 @@ I2S_FOLD := src/
 I2S_EXTP := 
 
 #################
-# CONVERT_FW2HW_PALETTE: Converts Firmware palette values to Hardware equivalents.
-# Given palette must be verified previously to contain integers from 0 to 26 only.
-# Warning: $(2) is a variable name and not its contents
-#
-# $(1): Palette values to be converted
-# $(2): Output variable with converted palette
-#
-define CONVERT_FW2HW_PALETTE
-	$(eval HWPAL := 14 04 15 1C 18 1D 0C 05 0D 16 06 17 1E 00 1F 0E 07 0F 12 02 13 1A 19 1B 0A 03 0B)
-	$(foreach PV,$(1),$(call ADD2INTS,$(PV),1,PV1) $(eval $(2) := $($(2)) $(word $(PV1),$(HWPAL))))
-endef
-
-#################
-# VERIFY_FW_PALETTE: Verifies that a given Firmware palette is valid, raising an
-# error if there is some inconsistency in the palette.
-#
-# $(1): Palette values
-# $(2): Name of the macro that called (for error msgs)
-#
-define VERIFY_FW_PALETTE
-	# Check Palette for correctness
-	$(eval ERRORMSG:=is not a valid firmware value [$(2)]. Values must be integers from 0 to 26)
-	$(foreach ITEM,$(1),\
-		$(eval ITEM2 := $(ITEM)) \
-		$(eval $(call ISINT,ITEM2)) \
-		$(if $(filter-out "$(ITEM2)","")\
-			,\
-			,$(error <<ERROR>> '$(ITEM)' $(ERRORMSG))) \
-		$(eval $(call INTINRANGE,ITEM2,0,26)) \
-		$(if $(filter-out "$(ITEM2)","")\
-			,\
-			,$(error <<ERROR>> '$(ITEM)' $(ERRORMSG))))
-
-	# Check that palette has a valid size
-	$(eval ITEM := $(words $(1)))
-	$(eval ITEM2 := $(ITEM))
-	$(eval $(call INTINRANGE,ITEM2,1,16))
-	$(if $(filter-out "$(ITEM2)","")\
-			,\
-			,$(error <<ERROR>> [$(2)] Firmware palette must have at least 1 element and 16 at most. $(ITEM) is not a valid size.))
-endef
-
-#################
 # IMG2SP_SET_PALETTE_FW: Sets the firmware palette to be used in following IMG2SP CONVERT commands
 #
 # $(1): Firmware palette array (Array of integers from 0 to 26, max size 16)
