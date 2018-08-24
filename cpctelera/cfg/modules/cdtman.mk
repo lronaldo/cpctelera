@@ -34,6 +34,8 @@ CDTM_W        := 160
 CDTM_PALFW    := 11 15 3 24 13 20 6 26 0 2 1 18 8 5 16 9 
 CDTM_BORDERFW := 0
 CDTM_FILENAME := Game
+CDTM_SCRFILE  := 
+CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
 # 5 Vectors for files to be added to the CDT
 CDTM_CDTFILES := 
 CDTM_CDTNAMES := 
@@ -205,80 +207,65 @@ define CDTMAN_SET_MINILOAD_FILENAME
 endef
 
 #################
-# CDTMAN_GEN_MINILOADER: 
+# GEN_MINILOADER_SHOWSCR_PATCHED_RULE: Generates a makefile rule for generating
+# the Patched Show Screen binary. This rule depends on the original SCR file,
+# copies it to obj folder, converts it to screen data, packs it into a zx7b binary,
+# attaches this binary at the end of showscr.bin and finally patches resulting
+# binary to set video mode and palette values and the offset where the image ends
+# for the unpacker.
 #
-# $(1): Screen file
-#
-# Updates PREBUILDOBJS, CDTMANOBJS
-#
-define CDTMAN_GEN_MINILOADER
-	# Check file exists
-
-	# Prepare palette firmware for IMG2TILESET
-	$(if $(filter 0,$(CDTM_MODE))\
-		,$(eval CDTM_PALFWMODE := $(wordlist 1,16,$(CDTM_PALFW)))\
-		,\
-		)
-	$(if $(filter 1,$(CDTM_MODE))\
-		,$(eval CDTM_PALFWMODE := $(wordlist 1,4,$(CDTM_PALFW)))\
-		,\
-		)
-	$(if $(filter 2,$(CDTM_MODE))\
-		,$(eval CDTM_PALFWMODE := $(wordlist 1,2,$(CDTM_PALFW)))\
-		,\
-		)
-
-	# Prepare palette hardware for patcher
-	$(call CONVERT_FW2HW_PALETTE,$(CDTM_PALFW) $(CDTM_BORDERFW),_TMP)
-	$(eval CDTM_PALHW := )
-	$(foreach _C,$(_TMP),$(eval CDTM_PALHW := $(CDTM_PALHW) 0x$(_C)))
-
-	# Prepare file names and paths
-	$(eval CDTM_SUFIX:=$(suffix $(1)))
-	$(eval CDTM_OBJDIR:=$(OBJDIR)/$(dir $(1)))
-	$(call JOINFOLDER2BASENAME,CDTM_IMGF,$(CDTM_OBJDIR),$(1))
-	$(call JOINFOLDER2BASENAME,CDTM_IMGBIN,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_IMGZX7B,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.zx7b.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_SHOWSCR,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.showscr.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_SHOWSCRPCH,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.patched.showscr.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_LOADERBIN,$(CDTM_OBJDIR),$(ML_LOADER_BIN))
-	$(call JOINFOLDER2BASENAME,CDTM_LOADERPCH1,$(CDTM_OBJDIR),$(ML_LOADER_BIN:.bin=.patch1.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_LOADERPCH2,$(CDTM_OBJDIR),$(ML_LOADER_BIN:.bin=.patch2.bin))
-
-	## Add files to be generated to the list of CDT Files
-	$(call ADD_FILE_TO_CDT_LIST,$(CDTM_LOADERPCH2),firmware,$(CDTM_LOADER_LOADADDR),$(CDTM_LOADER_LOADADDR),$(CDTM_FILENAME))
-	$(call ADD_FILE_TO_CDT_LIST,$(CDTM_SHOWSCRPCH),miniload)
-	$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),miniload)
-
-## Generate pre-build event rules to convert loading screen
-
+define GEN_MINILOADER_SHOWSCR_PATCHED_RULE
 ## Rule to generate and patch Showscreen binary
-$(CDTM_SHOWSCRPCH): $(1)
-	## Prepare object dir and move file
-	$(MKDIR) $(CDTM_OBJDIR)
-	$(CP) "$(1)" "$(CDTM_IMGF)"
-	## Convert Screen
+$(CDTM_SHOWSCRPCH): $(CDTM_SCRFILE)
+	@$(call PRINT,CDTMAN,"******************")
+	@$(call PRINT,CDTMAN,"*** MINILOADER ***: setting up Screen Shower binary")
+	@$(call PRINT,CDTMAN,"******************")
+	$(CP) "$(CDTM_SCRFILE)" "$(CDTM_IMGF)"
+	@$(call PRINT,CDTMAN,"Converting given image file to mode $(CDTM_MODE) screen data...")
 	$(IMG2TIL) -nt -of bin -pf { $(CDTM_PALFWMODE) } -m $(CDTM_MODE) -scr -tw $(CDTM_W) -th 200 "$(CDTM_IMGF)"
-	## Pack it into zx7b
+	@$(call PRINT,CDTMAN,"Packing screen data with ZX7B compressor...")
 	$(ZX7B) $(CDTM_IMGBIN) $(CDTM_IMGZX7B)
-	## Add it to showscr
+	@$(call PRINT,CDTMAN,"Adding screen data at the end of Screen Shower binary...")
 	$(CAT) $(ML_SHOWSCR_BIN) $(CDTM_IMGZX7B) > $(CDTM_SHOWSCR)
-	# Calculate Screen End and patch file
+	@$(call PRINT,CDTMAN,"Patching Screen Shower binary into final patched file ($(CDTM_SHOWSCRPCH))...")
 	IMGSIZE=`wc -c < $(CDTM_SHOWSCR)` && \
 	SCREND=$$$$(( $(CDTM_SHOWSCR_LOADADDR) + IMGSIZE - 1 )) && \
 	$(BINPATCH) $(CDTM_SHOWSCR) \
 	   -pb "$(CDTM_OFFVIDEOMODE)" "$(CDTM_MODE)" \
 	   -pw "$(CDTM_OFFSCREND)" "$$$${SCREND}" \
 	   -ps "$(CDTM_OFFPAL)" $(CDTM_PALHW)
-	# Now copy it to generate the showscr patched file
 	$(CP) $(CDTM_SHOWSCR) $(CDTM_SHOWSCRPCH)
+	@$(call PRINT,CDTMAN,"Successfully generated $(CDTM_SHOWSCRPCH).")
+endef
 
-## Rule to generate and partially patch loader binary (It cannot be completely patched
-## because we still don't know Game Size, Load and Run Addresses)
+#################
+# GEN_MINILOADER_LOADER_PATCHED1_RULE: This macro generates a new rule to set 
+# up the first part of the Loader binary. This new rule copies the loader 
+# binary to the object folder and then patches it inserting showscr.bin 
+# load&run addresses and its size, and also patching calls to miniload.
+# It cannot patch the last part until BINFILE is generated. That will 
+# be done by GEN_MINILOADER_LOADER_PATCHED2_RULE
+#
+define GEN_MINILOADER_LOADER_PATCHED1_RULE
+	$(eval _C1 := $(COLOR_BLUE))
+	$(eval _C2 := $(COLOR_MAGENTA))
+	$(eval _C3 := $(COLOR_YELLOW))
+	$(eval _C := $(COLOR_NORMAL))
+## Rule to generate and partially patch loader binary (It cannot be completely patched because we still don't know Game Size, Load and Run Addresses)
 $(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH)
-	## Copy Default loader
-	$(CP) $(ML_LOADER_BIN) $(CDTM_LOADERBIN)
-	## Patch it with ShowSCR Size, Load and Run Addresses, and loader insider calls to miniload
+	@$(call PRINT,CDTMAN,"******************")
+	@$(call PRINT,CDTMAN,"*** MINILOADER ***: setting up loader binary")
+	@$(call PRINT,CDTMAN,"******************")
+	@printf "$(_C1)> Loader binary Load-address:'$(_C2)$(CDTM_LOADER_LOADADDR)$(_C1)'\n"
+	@printf "$(_C1)> Files to load and run: 1-'$(_C2)$(CDTM_SHOWSCR)$(_C1)' 2-'$(_C2)$(BINFILE)$(_C1)'\n"
+	@printf "$(_C1)> $(_C2)$(notdir $(CDTM_SHOWSCR))$(_C1) Load-address: '$(_C2)$(CDTM_SHOWSCR_LOADADDR)$(_C1)'.\n"
+	@SCRSIZE=`wc -c < $(CDTM_SHOWSCR)` && \
+	printf  "$(_C1)> $(_C2)$(notdir $(CDTM_SHOWSCR))$(_C1) size: '$(_C2)$$$${SCRSIZE}$(_C1)' bytes.\n"
+	@printf "$(_C1)> $(_C2)$(notdir $(CDTM_SHOWSCR))$(_C1) unpacks '$(_C2)$(CDTM_SCRFILE)$(_C1)' to video memory when run.\n"
+	@$(call PRINT,CDTMAN,"Now patching generic loader with the loading and run addresses for showscr.bin and miniload calls.")
+	@printf "$(_C1)> Copying '$(_C2)$(notdir $(ML_LOADER_BIN))$(_C1)' to object folder '$(_C2)$(dir $(CDTM_LOADERBIN))$(_C1)' \n"
+	@$(CP) $(ML_LOADER_BIN) $(CDTM_LOADERBIN)
+	@printf "$(_C1)> Patching '$(_C2)$(notdir $(CDTM_LOADERBIN))$(_C1)' into '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)'...$(_C)\n"
 	SCRSIZE=`wc -c < $(CDTM_SHOWSCR)` && \
 	$(BINPATCH) "$(CDTM_LOADERBIN)" \
 	   -pw "$(CDTM_OFFSCRLOAD)" "$(CDTM_SHOWSCR_LOADADDR)" \
@@ -290,22 +277,110 @@ $(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH)
 		-pw "$(CDTM_OFFMINHALF_CALL2)" "$(CDTM_MINILOAD_HALF)" \
 		-pw "$(CDTM_OFFMINFULL_CALL1)" "$(CDTM_MINILOAD_FULL)" \
 		-pw "$(CDTM_OFFMINFULL_CALL2)" "$(CDTM_MINILOAD_FULL)"
-	## Once successfully patched, create the new patched file
-	$(CP) $(CDTM_LOADERBIN) $(CDTM_LOADERPCH1)
+	@printf "$(_C1)> Successfully patched. Now writing to '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)'\n"
+	@$(CP) $(CDTM_LOADERBIN) $(CDTM_LOADERPCH1)
+	@$(call PRINT,CDTMAN,"Successfully generated '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C3)'. It will be patched again later after generating '$(_C2)$(BINFILE)$(_C3)'.")
+endef
 
+#################
+# GEN_MINILOADER_LOADER_PATCHED2_RULE: This macro generates a new rule
+# that will be launched when generating the CDT file, after having
+# generated the BINFILE. This rule will patch the binary to generate
+# a final loader binary with Load&Run address and size of the BINFILE.
+#
+define GEN_MINILOADER_LOADER_PATCHED2_RULE
+	$(eval _C1 := $(COLOR_BLUE))
+	$(eval _C2 := $(COLOR_MAGENTA))
+	$(eval _C3 := $(COLOR_YELLOW))
+	$(eval _C := $(COLOR_NORMAL))
 ## Rule to do the final patching of Loader binary, once GAME SIZE, LOADADDR and RUNADDR are known
 $(CDTM_LOADERPCH2): $(CDTM_LOADERPCH1) $(BINFILE)
-	## Get LOADADDR and RUNADDR from generated binfile
+	@$(call PRINT,CDTMAN,"******************")
+	@$(call PRINT,CDTMAN,"*** MINILOADER ***: Final patches to loader binary")
+	@$(call PRINT,CDTMAN,"******************")
 	@$(call GETALLADDRESSES,$(BINFILE))
-	## Final patch of loader binary
+	@printf "$(_C1)> Inserting '$(_C2)$(BINFILE)$(_C1)' load&run addresses and size.\n"
+	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Load Address: '$(_C2)0x$(strip $(LOADADDR))$(_C1)'\n"
+	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Run  Address: '$(_C2)0x$(strip $(RUNADDR))$(_C1)'\n"
+	@GAMESIZE=`wc -c < $(BINFILE)` \
+	&& printf  "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Binary size : '$(_C2)0x%x$(_C1)' ($(_C2)%d$(_C1) bytes)\n" "$$$${GAMESIZE}" "$$$${GAMESIZE}" \
+	&& ENDADDR=$$$$(( 0x$(LOADADDR) + GAMESIZE - 1 )) \
+	&& printf  "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' End Address : '$(_C2)0x%x$(_C1)'\n" "$$$${ENDADDR}"
+	@printf "$(_C1)> $(_C2)Loader$(_C1) Load Address: '$(_C2)$(CDTM_LOADER_LOADADDR)$(_C1)'\n"
+	@ENDADDR=$$$$(( $(CDTM_LOADER_LOADADDR) + $(CDTM_LOADER_SIZE) - 1 )) \
+	&& printf "$(_C1)> $(_C2)Loader$(_C1) End  Address: '$(_C2)0x%x$(_C1)'\n" "$$$${ENDADDR}"
+	@printf "$(_C1)> Patching '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)' into '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C1)...$(_C)'\n"
 	GAMESIZE=`wc -c < $(BINFILE)` && \
 	$(BINPATCH) "$(CDTM_LOADERPCH1)" \
 		-pw "$(CDTM_OFFGAMELOAD)" "0x$(strip $(LOADADDR))" \
 		-pw "$(CDTM_OFFGAMERUN)" "0x$(strip $(RUNADDR))" \
 		-pw "$(CDTM_OFFGAMESIZE)" "$$$${GAMESIZE}"
-	## Once successfully patched, create the new patched file
-	$(CP) $(CDTM_LOADERPCH1) $(CDTM_LOADERPCH2)
+	@printf "$(_C1)> Successfully patched. Now writing to '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C)'\n"
+	@$(CP) $(CDTM_LOADERPCH1) $(CDTM_LOADERPCH2)
+	@$(call PRINT,CDTMAN,"Successfully generated '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C3)'.")	
+endef
 
+#################
+# CDTMAN_GEN_MINILOADER: Generates the rules and commands required to 
+# automatically generate a loader based on miniload and zx7b. This 
+# basic loader is composed of 3 parts: 1) the loader itself that is 
+# added as an AMSDOS file, 2) a binary including a zx7b compressed
+# image that gets decompressed into video memory directly and 3) the
+# binary generated with CPCtelera. Both files 2) and 3) are added
+# as miniload files and loaded by 1).
+#
+# $(1): Screen file with exact resolution for selected mode (PNG, JPG...)
+#
+# Updates PREBUILDOBJS, CDTMANOBJS
+#
+define CDTMAN_GEN_MINILOADER
+	# Check file exists
+	$(if $(call FILEEXISTS,$(1))\
+		,\
+		,$(error <<ERROR>> [CDTMAN - GEN_MINILOADER] File '$(1)' does not exist and is required to generate the miniloader)
+		\)
+	$(eval CDTM_SCRFILE := $(1))
+
+	# Prepare palette firmware for IMG2TILESET
+	$(if $(call EQUALS,0,$(CDTM_MODE))\
+		,$(eval CDTM_PALFWMODE := $(wordlist 1,16,$(CDTM_PALFW)))\
+		,)
+	$(if $(call EQUALS,1,$(CDTM_MODE))\
+		,$(eval CDTM_PALFWMODE := $(wordlist 1,4,$(CDTM_PALFW)))\
+		,)
+	$(if $(call EQUALS,2,$(CDTM_MODE))\
+		,$(eval CDTM_PALFWMODE := $(wordlist 1,2,$(CDTM_PALFW)))\
+		,)
+
+	# Prepare palette hardware for patcher
+	$(call CONVERT_FW2HW_PALETTE,$(CDTM_PALFW) $(CDTM_BORDERFW),_TMP)
+	$(eval CDTM_PALHW := )
+	$(foreach _C,$(_TMP),$(eval CDTM_PALHW := $(CDTM_PALHW) 0x$(_C)))
+
+	# Prepare file names and paths
+	$(eval CDTM_SUFIX:=$(suffix $(1)))
+	$(eval CDTM_OBJDIR:=$(CDTM_OBJDIR)/$(dir $(1)))
+	$(call JOINFOLDER2BASENAME,CDTM_IMGF,$(CDTM_OBJDIR),$(1))
+	$(call JOINFOLDER2BASENAME,CDTM_IMGBIN,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.bin))
+	$(call JOINFOLDER2BASENAME,CDTM_IMGZX7B,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.zx7b.bin))
+	$(call JOINFOLDER2BASENAME,CDTM_SHOWSCR,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.showscr.bin))
+	$(call JOINFOLDER2BASENAME,CDTM_SHOWSCRPCH,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.patched.showscr.bin))
+	$(call JOINFOLDER2BASENAME,CDTM_LOADERBIN,$(CDTM_OBJDIR),$(ML_LOADER_BIN))
+	$(call JOINFOLDER2BASENAME,CDTM_LOADERPCH1,$(CDTM_OBJDIR),$(ML_LOADER_BIN:.bin=.patch1.bin))
+	$(call JOINFOLDER2BASENAME,CDTM_LOADERPCH2,$(CDTM_OBJDIR),$(ML_LOADER_BIN:.bin=.patch2.bin))
+
+	## Create the object directory
+	$(shell $(MKDIR) $(CDTM_OBJDIR))
+
+	## Generate pre-build event rules to convert loading screen
+	$(call GEN_MINILOADER_SHOWSCR_PATCHED_RULE)
+	$(call GEN_MINILOADER_LOADER_PATCHED1_RULE)
+	$(call GEN_MINILOADER_LOADER_PATCHED2_RULE)
+
+	## Add files to be generated to the list of CDT Files
+	$(call ADD_FILE_TO_CDT_LIST,$(CDTM_LOADERPCH2),firmware,$(CDTM_LOADER_LOADADDR),$(CDTM_LOADER_LOADADDR),$(CDTM_FILENAME))
+	$(call ADD_FILE_TO_CDT_LIST,$(CDTM_SHOWSCRPCH),miniload)
+	$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),miniload)
 
 # Update PREBUILDOBJS and CDTMANOBJS
 PREBUILDOBJS := $(PREBUILDOBJS) $(CDTM_LOADERPCH1)
