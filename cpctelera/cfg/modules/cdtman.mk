@@ -42,6 +42,11 @@ CDTM_CDTNAMES :=
 CDTM_CDTTYPES := 
 CDTM_CDTLOAD  := 
 CDTM_CDTRUN   := 
+# Colours for messages
+_C1 := $(COLOR_BLUE)
+_C2 := $(COLOR_MAGENTA)
+_C3 := $(COLOR_YELLOW)
+_C  := $(COLOR_NORMAL)
 
 # Load and Run Addresses of Loader and ShowSCR binaries
 # Default LoadADDR leaves 68 bytes for the stack, which is enough 
@@ -111,11 +116,11 @@ CDTM_OFFMINHALF_CALL2 :=0x75
 # $(5): Filename (for firmware calls)
 #
 define ADD_FILE_TO_CDT_LIST
-	# Parameters cannot be empty, so transform them if they are
+	@# Parameters cannot be empty, so transform them if they are
 	$(eval _L := $(if $(3),$(3),noload))
 	$(eval _R := $(if $(4),$(4),norun))
 	$(eval _N := $(if $(5),$(5),noname))
-	# And now add the file to the list
+	@# And now add the file to the list
 	$(eval CDTM_CDTFILES := $(CDTM_CDTFILES) $(strip $(1)))
 	$(eval CDTM_CDTTYPES := $(CDTM_CDTTYPES) $(strip $(2)))
 	$(eval CDTM_CDTLOAD  := $(CDTM_CDTLOAD)  $(strip $(_L)))
@@ -135,11 +140,13 @@ endef
 # $(5): Filename (for firmware calls)
 #
 define INSERT_NEXT_FILE_INTO_CDT
-	$(info Inserting file: '$(1)' '$(2)' '$(3)' '$(4)' '$(5)')
-	$(if $(filter firmware,$(2))\
-		,$(CPC2CDT) -x "$(4)" -l "$(3)" -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" \
-		,$(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" \
-		)  
+   @printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' { Format: '$(_C2)$(2)$(_C1)' "  
+	$(if $(call EQUALS,firmware,$(2))\
+		, $(CPC2CDT) -x "$(4)" -l "$(3)" -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
+		  && printf "Load: '$(_C2)$(3)$(_C1)' Run: '$(_C2)$(4)$(_C1)' Name: '$(_C2)$(5)$(_C1)'" \
+		, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" > /dev/null 
+		)
+	@printf "}$(_C)\n"
 endef
 
 #################
@@ -166,7 +173,6 @@ define CREATECDT
 		$(call INSERT_NEXT_FILE_INTO_CDT,$(_F),$(_T),$(_L),$(_R),$(_N))
 		$(call ADD2INTS,$(_I),1,_I) \
 		)
-	$(info CreateCDT ended!)
 endef
 
 #################
@@ -236,6 +242,7 @@ $(CDTM_SHOWSCRPCH): $(CDTM_SCRFILE)
 	   -ps "$(CDTM_OFFPAL)" $(CDTM_PALHW)
 	$(CP) $(CDTM_SHOWSCR) $(CDTM_SHOWSCRPCH)
 	@$(call PRINT,CDTMAN,"Successfully generated $(CDTM_SHOWSCRPCH).")
+
 endef
 
 #################
@@ -247,10 +254,6 @@ endef
 # be done by GEN_MINILOADER_LOADER_PATCHED2_RULE
 #
 define GEN_MINILOADER_LOADER_PATCHED1_RULE
-	$(eval _C1 := $(COLOR_BLUE))
-	$(eval _C2 := $(COLOR_MAGENTA))
-	$(eval _C3 := $(COLOR_YELLOW))
-	$(eval _C := $(COLOR_NORMAL))
 ## Rule to generate and partially patch loader binary (It cannot be completely patched because we still don't know Game Size, Load and Run Addresses)
 $(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH)
 	@$(call PRINT,CDTMAN,"******************")
@@ -280,6 +283,7 @@ $(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH)
 	@printf "$(_C1)> Successfully patched. Now writing to '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)'\n"
 	@$(CP) $(CDTM_LOADERBIN) $(CDTM_LOADERPCH1)
 	@$(call PRINT,CDTMAN,"Successfully generated '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C3)'. It will be patched again later after generating '$(_C2)$(BINFILE)$(_C3)'.")
+
 endef
 
 #################
@@ -289,22 +293,18 @@ endef
 # a final loader binary with Load&Run address and size of the BINFILE.
 #
 define GEN_MINILOADER_LOADER_PATCHED2_RULE
-	$(eval _C1 := $(COLOR_BLUE))
-	$(eval _C2 := $(COLOR_MAGENTA))
-	$(eval _C3 := $(COLOR_YELLOW))
-	$(eval _C := $(COLOR_NORMAL))
 ## Rule to do the final patching of Loader binary, once GAME SIZE, LOADADDR and RUNADDR are known
-$(CDTM_LOADERPCH2): $(CDTM_LOADERPCH1) $(BINFILE)
+$(CDTM_LOADERPCH2): $(BINFILE) $(CDTM_LOADERPCH1) 
 	@$(call PRINT,CDTMAN,"******************")
 	@$(call PRINT,CDTMAN,"*** MINILOADER ***: Final patches to loader binary")
 	@$(call PRINT,CDTMAN,"******************")
-	@$(call GETALLADDRESSES,$(BINFILE))
+	@$$(call GETALLADDRESSES,$(BINFILE))
 	@printf "$(_C1)> Inserting '$(_C2)$(BINFILE)$(_C1)' load&run addresses and size.\n"
-	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Load Address: '$(_C2)0x$(strip $(LOADADDR))$(_C1)'\n"
-	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Run  Address: '$(_C2)0x$(strip $(RUNADDR))$(_C1)'\n"
+	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Load Address: '$(_C2)0x$$(strip $$(LOADADDR))$(_C1)'\n"
+	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Run  Address: '$(_C2)0x$$(strip $$(RUNADDR))$(_C1)'\n"
 	@GAMESIZE=`wc -c < $(BINFILE)` \
 	&& printf  "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Binary size : '$(_C2)0x%x$(_C1)' ($(_C2)%d$(_C1) bytes)\n" "$$$${GAMESIZE}" "$$$${GAMESIZE}" \
-	&& ENDADDR=$$$$(( 0x$(LOADADDR) + GAMESIZE - 1 )) \
+	&& ENDADDR=$$$$(( 0x$$(LOADADDR) + GAMESIZE - 1 )) \
 	&& printf  "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' End Address : '$(_C2)0x%x$(_C1)'\n" "$$$${ENDADDR}"
 	@printf "$(_C1)> $(_C2)Loader$(_C1) Load Address: '$(_C2)$(CDTM_LOADER_LOADADDR)$(_C1)'\n"
 	@ENDADDR=$$$$(( $(CDTM_LOADER_LOADADDR) + $(CDTM_LOADER_SIZE) - 1 )) \
@@ -312,12 +312,13 @@ $(CDTM_LOADERPCH2): $(CDTM_LOADERPCH1) $(BINFILE)
 	@printf "$(_C1)> Patching '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)' into '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C1)...$(_C)'\n"
 	GAMESIZE=`wc -c < $(BINFILE)` && \
 	$(BINPATCH) "$(CDTM_LOADERPCH1)" \
-		-pw "$(CDTM_OFFGAMELOAD)" "0x$(strip $(LOADADDR))" \
-		-pw "$(CDTM_OFFGAMERUN)" "0x$(strip $(RUNADDR))" \
+		-pw "$(CDTM_OFFGAMELOAD)" "0x$$(strip $$(LOADADDR))" \
+		-pw "$(CDTM_OFFGAMERUN)" "0x$$(strip $$(RUNADDR))" \
 		-pw "$(CDTM_OFFGAMESIZE)" "$$$${GAMESIZE}"
 	@printf "$(_C1)> Successfully patched. Now writing to '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C)'\n"
 	@$(CP) $(CDTM_LOADERPCH1) $(CDTM_LOADERPCH2)
 	@$(call PRINT,CDTMAN,"Successfully generated '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C3)'.")	
+
 endef
 
 #################
@@ -377,10 +378,10 @@ define CDTMAN_GEN_MINILOADER
 	$(call GEN_MINILOADER_LOADER_PATCHED1_RULE)
 	$(call GEN_MINILOADER_LOADER_PATCHED2_RULE)
 
-	## Add files to be generated to the list of CDT Files
-	$(call ADD_FILE_TO_CDT_LIST,$(CDTM_LOADERPCH2),firmware,$(CDTM_LOADER_LOADADDR),$(CDTM_LOADER_LOADADDR),$(CDTM_FILENAME))
-	$(call ADD_FILE_TO_CDT_LIST,$(CDTM_SHOWSCRPCH),miniload)
-	$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),miniload)
+	@## Add files to be generated to the list of CDT Files
+	@$(call ADD_FILE_TO_CDT_LIST,$(CDTM_LOADERPCH2),firmware,$(CDTM_LOADER_LOADADDR),$(CDTM_LOADER_LOADADDR),$(CDTM_FILENAME))
+	@$(call ADD_FILE_TO_CDT_LIST,$(CDTM_SHOWSCRPCH),miniload)
+	@$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),miniload)
 
 # Update PREBUILDOBJS and CDTMANOBJS
 PREBUILDOBJS := $(PREBUILDOBJS) $(CDTM_LOADERPCH1)
