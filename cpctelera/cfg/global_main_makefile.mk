@@ -51,7 +51,7 @@ prebuild_msg:
 	@$(call PRINT,$(PROJNAME),"=== PREBUILD EVENTS")
 	@$(call PRINT,$(PROJNAME),"")
 
-$(PREBUILD_OBJ): prebuild_msg $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES)
+$(PREBUILD_OBJ): prebuild_msg $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES) $(PREBUILDOBJS)
 	@$(call PRINT,$(PROJNAME),"")
 	@$(call PRINT,$(PROJNAME),"=== All prebuild processing done!")
 	@$(call PRINT,$(PROJNAME),"============================================================")
@@ -83,7 +83,7 @@ $(DSK): $(BINFILE) $(BINADDRLOG)
 	@$(call PRINT,$(PROJNAME),"Successfully created $@")
 
 # GENERATE A CASSETTE FILE (.CDT) AND INCLUDE BINARY FILE (.BIN) INTO IT
-$(CDT): $(BINFILE) $(BINADDRLOG)
+$(CDT): $(BINFILE) $(BINADDRLOG) $(CDTMANOBJS)
 	@$(call GETALLADDRESSES,$<)
 	@$(call PRINT,$(PROJNAME),"Creating Cassette File $@")
 	@$(call CREATECDT,$<,$(notdir $<),$@,$(LOADADDR),$(RUNADDR))
