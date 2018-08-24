@@ -23,6 +23,26 @@
 ## use to simplify calculations. These are to be considered helper funcs.##
 ###########################################################################
 
+## INCLUDED MACROS
+##   * PRINT 
+##   * JOINFOLDER2BASENAME
+##   * CONVERTVALUE
+##   * CHECKVARIABLEISSET
+##   * ISINT
+##   * INTINRANGE
+##   * ADD2INTS
+##   * ENSURE_VALID_C_ID
+##   * ENSUREVALID
+##   * SET_ONE_OF_MANY_VALID
+##   * ADD2SET
+##   * CONVERT_FW2HW_PALETTE
+##   * VERIFY_FW_PALETTE
+##   * GREATER_THAN
+##   * ADD_N_ITEMS
+##   * STRLEN
+##   * REMOVEFILEIFEXISTS
+##
+
 # ANSI Sequences for terminal colored printing
 COLOR_RED=\033[1;31;49m
 COLOR_YELLOW=\033[1;33;49m
@@ -241,4 +261,112 @@ define ADD2SET
 	$(eval $(A2S_S) := $($(A2S_S)) $(if $(filter $($(A2S_S)),$(A2S_E))\
 		,\
 		,$(A2S_E)))
+endef
+
+#################
+# CONVERT_FW2HW_PALETTE: Converts Firmware palette values to Hardware equivalents.
+# Given palette must be verified previously to contain integers from 0 to 26 only.
+# Warning: $(2) is a variable name and not its contents
+#
+# $(1): Palette values to be converted
+# $(2): Output variable with converted palette
+#
+define CONVERT_FW2HW_PALETTE
+	$(eval HWPAL := 14 04 15 1C 18 1D 0C 05 0D 16 06 17 1E 00 1F 0E 07 0F 12 02 13 1A 19 1B 0A 03 0B)
+	$(foreach PV,$(1),$(call ADD2INTS,$(PV),1,PV1) $(eval $(2) := $($(2)) $(word $(PV1),$(HWPAL))))
+endef
+
+#################
+# VERIFY_FW_PALETTE: Verifies that a given Firmware palette is valid, raising an
+# error if there is some inconsistency in the palette.
+#
+# $(1): Palette values
+# $(2): Name of the macro that called (for error msgs)
+#
+define VERIFY_FW_PALETTE
+	# Check Palette for correctness
+	$(eval ERRORMSG:=is not a valid firmware value [$(2)]. Values must be integers from 0 to 26)
+	$(foreach ITEM,$(1),\
+		$(eval ITEM2 := $(ITEM)) \
+		$(eval $(call ISINT,ITEM2)) \
+		$(if $(filter-out "$(ITEM2)","")\
+			,\
+			,$(error <<ERROR>> '$(ITEM)' $(ERRORMSG))) \
+		$(eval $(call INTINRANGE,ITEM2,0,26)) \
+		$(if $(filter-out "$(ITEM2)","")\
+			,\
+			,$(error <<ERROR>> '$(ITEM)' $(ERRORMSG))))
+
+	# Check that palette has a valid size
+	$(eval ITEM := $(words $(1)))
+	$(eval ITEM2 := $(ITEM))
+	$(eval $(call INTINRANGE,ITEM2,1,16))
+	$(if $(filter-out "$(ITEM2)","")\
+			,\
+			,$(error <<ERROR>> [$(2)] Firmware palette must have at least 1 element and 16 at most. $(ITEM) is not a valid size.))
+endef
+
+#################
+# ENSURE_SINGLE_VALUE: Ensures that passed parameter is comprised of a single 
+# value (be it a word, and integer or whatever) after stripping whitespaces.
+# If the value is not single, throw an error (given as second parameter)
+#
+# $(1): Value to be cheched as single
+# $(2): Error message in case the value is not single
+#
+define ENSURE_SINGLE_VALUE
+	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
+	$(if $(filter-out $(words $(strip $(1))),1)\
+		,$(error $(strip $(2)))\
+		,)
+endef
+
+#################
+# GREATER_THAN: Performs a check about an integer being greater than
+# other, returning string "true" or empty string (false) depending 
+# on the result. It is thought to be used in conjunction with makefile if functions
+#
+# $(1): Left value 
+# $(2): right value
+#
+define GREATER_THAN
+$(shell test "$(strip $(1))" -gt "$(strip $(2))" && echo true)
+endef
+
+#################
+# ADD_N_ITEMS: Adds $(2) times the item $(3) to at the end of the contents of a 
+# given variable $(1), separated by spaces.
+# Warning: $(1) is a variable name and not its contents
+#
+# $(1): Variable where contents will be added at its end
+# $(2): Number of elements to be added
+# $(3): element
+#
+define ADD_N_ITEMS
+	# Performs only if N is greater than 0
+	$(eval _TMP_I := $(shell seq 1 $(2)))
+	$(foreach _I,$(_TMP_I),$(eval $(1) := $($(1)) $(strip $(3))))
+endef
+
+#################
+# STRLEN: Evals to the length of the string passed as parameter $(1)
+# after being stripped.
+#
+# $(1): String to calculate its length
+#
+define STRLEN
+$(shell expr length '$(strip $(1))')
+endef
+
+#################
+# REMOVEFILEIFEXISTS: Removes a file if it exists in the filesystem,
+# doing nothing if the file does not exist. Path to the file must 
+# be relative to prevent problems with failed absolute paths. A ./
+# sign will be added in front before removing the file. Directories
+# are never removed in any case
+#
+# $(1): File (with relative path)
+#
+define REMOVEFILEIFEXISTS
+$(shell $(RM) "./$(1)")
 endef
