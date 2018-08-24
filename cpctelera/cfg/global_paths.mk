@@ -58,8 +58,10 @@ SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.6.8-r9946/bin/
 HEX2BIN_PATH := $(CPCT_PATH)tools/hex2bin-2.0/bin/
 IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.13/bin/
 2CDT_PATH    := $(CPCT_PATH)tools/2cdt/bin/
+ZX7B_PATH    := $(CPCT_PATH)tools/zx7b/bin/
 CPC2CDT_PATH := $(CPCT_PATH)tools/cpc2cdt/bin/
 SCRIPTS_PATH := $(CPCT_PATH)tools/scripts/
+BINS_PATH    := $(CPCT_PATH)bin/
 
 # PATHs FOR CPCTELERA SOURCES AND LIBRARY FILE
 CPCT_SRC := $(CPCT_PATH)src
@@ -74,17 +76,29 @@ Z80LNK   := $(SDCCBIN_PATH)sdar
 HEX2BIN  := $(HEX2BIN_PATH)hex2bin
 IDSK     := $(IDSK_PATH)iDSK
 2CDT     := $(2CDT_PATH)2cdt
+ZX7B     := $(ZX7B_PATH)zx7b
 CPC2CDT  := $(CPC2CDT_PATH)cpc2cdt
 BIN2C    := $(SCRIPTS_PATH)cpct_bin2c
 BIN2SNA  := $(SCRIPTS_PATH)cpct_bin2sna
+BINPATCH := $(SCRIPTS_PATH)cpct_binpatch
 IMG2TIL  := $(SCRIPTS_PATH)cpct_img2tileset
 CPCTPACK := $(SCRIPTS_PATH)cpct_pack
 TMX2CSV	 := $(SCRIPTS_PATH)cpct_tmx2csv
 CPCTMX2DT:= $(SCRIPTS_PATH)cpct_tmx2data
 CPCTAKS2C:= $(SCRIPTS_PATH)cpct_aks2c
 
+# Z80 PRECOMPILED USEFUL BINARIES
+ML_LOADER_BIN  := $(BINS_PATH)miniload/loader.bin
+ML_SHOWSCR_BIN := $(BINS_PATH)miniload/showscr.bin
+
 ## SHELL TOOLS ALIASES
 TOUCH := touch
 MKDIR := mkdir -p
 RM    := rm -f
+CP    := cp
 TEE   := tee
+CAT   := cat
+
+## USEFUL TRICKS (Like defining a space)
+SPACE := 
+SPACE += 
