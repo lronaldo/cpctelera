@@ -37,6 +37,7 @@ CDTM_FILENAME := Game
 CDTM_SCRFILE  := 
 CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
 CDTM_DEPEND   := cfg/cdt_manager.mk
+CDTMANOBJS    := $(CDTMANOBJS) $(CDTM_DEPEND)
 # 5 Vectors for files to be added to the CDT
 CDTM_CDTFILES := 
 CDTM_CDTNAMES := 
@@ -141,11 +142,15 @@ endef
 # $(5): Filename (for firmware calls)
 #
 define INSERT_NEXT_FILE_INTO_CDT
-   printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' { Format: '$(_C2)$(2)$(_C1)' "  
+	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [CDTMAN]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)')
+   printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' {Format:'$(_C2)$(2)$(_C1)' "
 	$(if $(call EQUALS,firmware,$(2))\
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
-		  && printf "Load: '$(_C2)$(3)$(_C1)' Run: '$(_C2)$(4)$(_C1)' Name: '$(_C2)$(5)$(_C1)'" \
-		, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" > /dev/null 
+		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
+		, $(if $(call EQUALS,miniload,$(2))\
+				, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> out.txt \
+				, $(error <<ERROR>> [CDTMAN]: Unknown format '$(2)' for file '$(1)'. Valid formats are: { firmware, miniload }) \
+			) \
 		)
 	printf "}$(_C)\n"
 endef
@@ -176,8 +181,58 @@ define CREATECDT
 		)
 endef
 
+
 #################
-# CDTMAN_SET_MINILOAD_LOAD_ADDRESS: Sets the memory address where the 
+# ENSURE_ADDRESS_VALID: Ensures that a given memory 
+# address is a valid 16-bits address, checking that it is
+# either a decimal or hexadecimal number between 0 and 65535.
+# If it is not valid, it raises an error.
+#
+# $(1): Address to be checked
+# $(2): Error Message Header from the routine that called
+#
+define ENSURE_ADDRESS_VALID
+# Error MSG header
+$(eval _R := $(2))
+
+# Check that load address is valid
+$(eval _A := $(strip $(1)))
+$(call ENSURE_SINGLE_VALUE,$(_A),$(_R) '$(1)' is not a valid 16-bits address. It is not a single value)
+$(if $(call ISHEX,$(_A))\
+	,$(eval _A := $(call HEX2DEC,$(_A)))\
+	,$(if $(call ISINT,$(_A)),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is neither a decimal, nor an hexadecimal integer)))
+$(if $(call INTINRANGE,$(_A),0,65535),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is not in the range [0 - 65535]/[0x0000-0xFFFF]))
+endef
+
+#################
+# CDTMAN_ADDFILE: Adds a new file to the list of files 
+# that will be inserted into the CDT file. The file needs
+# to be a plain binary without header. It will be inserted
+# either as firmware or as miniload format. miniload format
+# does not require parameters. firmware format requires 
+# a Load Address and a Run Address. Also, firmware files
+# will use current CDTM_FILENAME as cassette filename.
+#
+# $(1): Format { firmware, miniload }
+# $(2): File to be added
+# $(3): Load Address (Only for firmware formats)
+# $(4): Run Address (Only for firmware formats)
+#
+_VALID := firmware miniload
+define CDTMAN_ADDFILE
+	# Check constraints
+	$(call ENSUREVALID,$(1),$(_VALID),<<ERROR>> [ CDTMAN - ADDFILE ]: Format '$(1)' for file '$(2) is not valid. Valid formats are: { $(_VALID) }')
+	$(if $(call EQUALS,$(1),firmware)\
+		, $(call ENSURE_ADDRESS_VALID,$(3),<<ERROR>> [ CDTMAN - ADDFILE ]:) \
+		  $(call ENSURE_ADDRESS_VALID,$(4),<<ERROR>> [ CDTMAN - ADDFILE ]:) \
+		,)	
+
+	# Add to list of files to be inserted in the CDT
+	$(call ADD_FILE_TO_CDT_LIST,$(2),$(1),$(3),$(4),$(CDTM_FILENAME))
+endef
+
+#################
+# CDTMAN_SET_MINILOAD_LOADER_ADDRESS: Sets the memory address where the 
 # miniload loader binary will be loaded. This binary includes code 
 # to load and run the compressed image file, then load and run the
 # game. It also includes miniloads code. It takes 146 bytes in total
@@ -185,17 +240,9 @@ endef
 #
 # $(1): Memory LOAD ADDRESS for Loader
 #
-define CDTMAN_SET_MINILOAD_LOAD_ADDRESS
-	# Error MSG header
-	$(eval _R := <<ERROR>> [ CDTMAN - SET_MINILOAD_LOAD_ADDRESS ]:)
-	
-	# Check that load address is valid
-	$(eval _A := $(strip $(1)))
-	$(call ENSURE_SINGLE_VALUE,$(_A),$(_R) '$(1)' is not a valid 16-bits address. It is not a single value)
-	$(if $(call ISHEX,$(_A))\
-		,$(eval _A := $(call HEX2DEC,$(_A)))\
-		,$(if $(call ISINT,$(_A)),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is neither a decimal, nor an hexadecimal integer)))
-	$(if $(call INTINRANGE,$(_A),0,65535),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is not in the range [0 - 65535]/[0x0000-0xFFFF]))
+define CDTMAN_SET_MINILOAD_LOADER_ADDRESS
+	# Ensure that the address is valid
+	$(call ENSURE_ADDRESS_VALID,$(1),<<ERROR>> [ CDTMAN - SET_MINILOAD_LOADER_ADDRESS ])
 
 	# Now set the new address and calculate corresponding Offsets
 	$(eval CDTM_MINILOAD_RUN    := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_RUN))))
@@ -203,7 +250,6 @@ define CDTMAN_SET_MINILOAD_LOAD_ADDRESS
 	$(eval CDTM_MINILOAD_HALF   := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_HALF))))
 	$(eval CDTM_LOADER_LOADADDR := $(call DEC2HEX,$(_A)))
 endef
-
 
 #################
 # CDTMAN_SET_MINILOAD_MODE: Sets the CPC video mode that will be used
@@ -462,12 +508,12 @@ endef
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
 #
-# Valid Commands: SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOAD_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW
+# Valid Commands: ADDFILE SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW 
 # Info about each command can be found looking into its correspondent makefile macro CDTMAN_<COMMAND>
 #
 define CDTMAN
 	# Set the list of valid commands
-	$(eval CDTMAN_F_FUNCTIONS := SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOAD_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
+	$(eval CDTMAN_F_FUNCTIONS := ADDFILE SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
 
 	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
 	$(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [CDTMAN] '$(strip $(1))' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces. Valid commands: {$(CDTMAN_F_FUNCTIONS)})
