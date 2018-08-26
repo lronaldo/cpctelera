@@ -60,6 +60,7 @@ IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.13/bin/
 2CDT_PATH    := $(CPCT_PATH)tools/2cdt/bin/
 ZX7B_PATH    := $(CPCT_PATH)tools/zx7b/bin/
 CPC2CDT_PATH := $(CPCT_PATH)tools/cpc2cdt/bin/
+IMG2CPC_PATH := $(CPCT_PATH)tools/img2cpc/bin/
 SCRIPTS_PATH := $(CPCT_PATH)tools/scripts/
 BINS_PATH    := $(CPCT_PATH)bin/
 
@@ -78,6 +79,7 @@ IDSK     := $(IDSK_PATH)iDSK
 2CDT     := $(2CDT_PATH)2cdt
 ZX7B     := $(ZX7B_PATH)zx7b
 CPC2CDT  := $(CPC2CDT_PATH)cpc2cdt
+IMG2CPC  := $(IMG2CPC_PATH)img2cpc
 BIN2C    := $(SCRIPTS_PATH)cpct_bin2c
 BIN2SNA  := $(SCRIPTS_PATH)cpct_bin2sna
 BINPATCH := $(SCRIPTS_PATH)cpct_binpatch
