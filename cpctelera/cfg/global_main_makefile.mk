@@ -77,22 +77,23 @@ $(BINADDRLOG): $(BINFILE)
 # GENERATE A DISK FILE (.DSK) AND INCLUDE BINARY FILE (.BIN) INTO IT
 $(DSK): $(BINFILE) $(BINADDRLOG)
 	@$(call GETALLADDRESSES,$<)
-	@$(call PRINT,$(PROJNAME),"Creating Disk File $@")
+	@$(call PRINT,$(PROJNAME),"Creating Disk File '$@'")
 	@$(call CREATEEMPTYDSK,$@)
 	@$(call ADDCODEFILETODSK,$@,$<,$(LOADADDR),$(RUNADDR),$(<:%=%.$(DSKINC_EXT)))
-	@$(call PRINT,$(PROJNAME),"Successfully created $@")
+	@$(call PRINT,$(PROJNAME),"Successfully created '$@'")
 
 # GENERATE A CASSETTE FILE (.CDT) AND INCLUDE BINARY FILE (.BIN) INTO IT
 $(CDT): $(BINFILE) $(BINADDRLOG) $(CDTMANOBJS)
+	@$(call PRINT,$(PROJNAME),"Creating Cassette file '$@'")
 	@$(call CREATECDT,)
-	@$(call PRINT,$(PROJNAME),"Successfully created $@")
+	@$(call PRINT,$(PROJNAME),"Successfully created '$@'")
 
 # GENERATE A SNAPSHOP FILE (.SNA) AND INCLUDE BINARY FILE (.BIN) INTO IT
 $(SNA): $(BINFILE) $(BINADDRLOG)
 	@$(call GETALLADDRESSES,$<)
-	@$(call PRINT,$(PROJNAME),"Creating Snapshot File $@")
+	@$(call PRINT,$(PROJNAME),"Creating Snapshot File '$@'")
 	@$(call CREATESNA,$<,$@,$(LOADADDR),$(RUNADDR))
-	@$(call PRINT,$(PROJNAME),"Successfully created $@")
+	@$(call PRINT,$(PROJNAME),"Successfully created '$@'")
 
 ## Include files in DSKFILESDIR to DSK, print a message and generate a flag file DSKINC
 $(DSKINC): $(DSK) $(DSKINCOBJFILES)
