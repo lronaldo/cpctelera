@@ -30,12 +30,17 @@
 ##   * CHECKVARIABLEISSET
 ##   * CONVERTVALUE
 ##   * CONVERT_FW2HW_PALETTE
+##   * DEC2HEX
 ##   * ENSURE_VALID_C_ID
+##   * ENSURE_SINGLE_VALUE
 ##   * ENSUREVALID
+##   * ENSUREFILEEXISTS
 ##	 * FILEEXISTS
 ##   * GET_IMG_SIZE
 ##   * GREATER_THAN
+##   * HEX2DEC
 ##   * INTINRANGE
+##   * ISHEX
 ##   * ISINT
 ##   * JOINFOLDER2BASENAME
 ##   * PRINT 
@@ -139,41 +144,55 @@ endef
 
 #################
 # ISINT: Checks if a variable contains an integer or not. 
-# If the variable contains an integer, it remains unchanged.
-# If the variable does not contains an integer, it gets emptied.
-# Warning: $(1) must be a variable name, not its contents
+# If the variable contains an integer, string "true" is returned,
+# otherwise, empty-string is returned. This is designed to be
+# used in makefile if functions.
+# Value is striped before being checked
 #
-# $(1): Variable name to be checked
+# $(1): Value to be checked as integer
 #
 define ISINT
-	$(eval $(1) := $(shell if [[ $($(1)) =~ ^[-+]?[0-9]+$$ ]]; then echo "$($(1))"; else echo ""; fi))
+$(shell if [[ $(strip $(1)) =~ ^[-+]?[0-9]+$$ ]]; then echo "true"; fi)
 endef
 
 #################
-# INTINRANGE: Checks if a variable containing an integer value is in a given range or not.
-# If the value is in range, it remains unchanged.
-# If the value is not in range, it gets emptied.
-# Warning: $(1) must be a variable name, not its contents
+# ISHEX: Checks if a variable contains an hexadecimal integer or not.
+# If the variable contains an integer, string "true" is returned,
+# otherwise, empty-string is returned. This is designed to be
+# used in makefile if functions.
+# Value is striped before being checked
 #
-# $(1): Variable name to be checked
+# $(1): Value to be checked as an hexadecimal integer
+#
+define ISHEX
+$(shell if [[ $(strip $(1)) =~ ^[-+]?0[xX][0-9A-Fa-f]+$$ ]]; then echo "true"; fi)
+endef 
+
+
+#################
+# INTINRANGE: Checks if an integer value is in a given range or not. 
+# If the value is in range, it returns the string "true". otherwise, 
+# empty-string is returned. This is designed to be used in makefile 
+# 'if' functions.
+# Values are striped before being checked
+#
+# $(1): Value to be checked
 # $(2): Minimum integer value of the range
 # $(3): Maximum integer value of the range
 #
 define INTINRANGE
-	$(eval $(1) := $(shell if (( $($(1)) >= $(2) && $($(1)) <= $(3) )); then echo "$($(1))"; else echo ""; fi))
+$(shell if [[ "$(strip $(1))" -ge "$(strip $(2))" && "$(strip $(3))" -ge "$(strip $(1))" ]]; then echo "true"; fi)
 endef
 
 #################
-# ADD2INTS: Adds two integer values and places result in a given variable.
+# ADD2INTS: Adds two integer values and echoes the result.
 # Integers received are not checked. If a non-integer is passed, it will fail.
-# Warning: $(3) must be a variable name, not its contents
 #
 # $(1): First int to be added
 # $(2): Second int to be added
-# $(3): Variable to store the result of addition
 #
 define ADD2INTS
-	$(eval $(3) := $(shell echo $$(( $(1) + $(2) ))))
+$(shell echo $$(( $(1) + $(2) )))
 endef
 
 #################
@@ -279,9 +298,12 @@ endef
 # $(1): Palette values to be converted
 # $(2): Output variable with converted palette
 #
+_HWPAL := 14 04 15 1C 18 1D 0C 05 0D 16 06 17 1E 00 1F 0E 07 0F 12 02 13 1A 19 1B 0A 03 0B
 define CONVERT_FW2HW_PALETTE
-	$(eval HWPAL := 14 04 15 1C 18 1D 0C 05 0D 16 06 17 1E 00 1F 0E 07 0F 12 02 13 1A 19 1B 0A 03 0B)
-	$(foreach PV,$(1),$(call ADD2INTS,$(PV),1,PV1) $(eval $(2) := $($(2)) $(word $(PV1),$(HWPAL))))
+	$(foreach _PV,$(1),\
+		$(eval _PV1 := $(call ADD2INTS,$(_PV),1))\
+		$(eval $(2) := $($(2)) $(word $(_PV1),$(_HWPAL)))\
+		)
 endef
 
 #################
@@ -293,25 +315,14 @@ endef
 #
 define VERIFY_FW_PALETTE
 	# Check Palette for correctness
-	$(eval ERRORMSG:=is not a valid firmware value [$(2)]. Values must be integers from 0 to 26)
-	$(foreach ITEM,$(1),\
-		$(eval ITEM2 := $(ITEM)) \
-		$(eval $(call ISINT,ITEM2)) \
-		$(if $(filter-out "$(ITEM2)","")\
-			,\
-			,$(error <<ERROR>> '$(ITEM)' $(ERRORMSG))) \
-		$(eval $(call INTINRANGE,ITEM2,0,26)) \
-		$(if $(filter-out "$(ITEM2)","")\
-			,\
-			,$(error <<ERROR>> '$(ITEM)' $(ERRORMSG))))
+	$(eval _MSG:=is not a valid firmware value [$(2)]. Values must be integers from 0 to 26)
+	$(foreach _I,$(1),\
+		$(if $(call ISINT,$(_I)),,$(error <<ERROR>> '$(_I)' $(_MSG))) \
+		$(if $(call INTINRANGE,$(_I),0,26),,$(error <<ERROR>> '$(_I)' $(_MSG)))\
+		)
 
 	# Check that palette has a valid size
-	$(eval ITEM := $(words $(1)))
-	$(eval ITEM2 := $(ITEM))
-	$(eval $(call INTINRANGE,ITEM2,1,16))
-	$(if $(filter-out "$(ITEM2)","")\
-			,\
-			,$(error <<ERROR>> [$(2)] Firmware palette must have at least 1 element and 16 at most. $(ITEM) is not a valid size.))
+	$(if $(call INTINRANGE,$(words $(1)),1,16),,$(error <<ERROR>> [$(2)] Firmware palette must have at least 1 element and 16 at most. $(ITEM) is not a valid size.))
 endef
 
 #################
@@ -319,14 +330,11 @@ endef
 # value (be it a word, and integer or whatever) after stripping whitespaces.
 # If the value is not single, throw an error (given as second parameter)
 #
-# $(1): Value to be cheched as single
+# $(1): Value to be checked as single
 # $(2): Error message in case the value is not single
 #
 define ENSURE_SINGLE_VALUE
-	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
-	$(if $(filter-out $(words $(strip $(1))),1)\
-		,$(error $(strip $(2)))\
-		,)
+$(if $(call EQUALS,$(words $(strip $(1))),1),,$(error $(strip $(2))))
 endef
 
 #################
@@ -420,4 +428,23 @@ $(eval _SIZES   := $(shell $(IMG2CPC) --img-size "$(strip $(1))")) \
 $(eval _SWIDTH  := $(word 1,$(_SIZES))) \
 $(if $(call EQUALS,xxx,$(_SWIDTH)),$(error $(strip $(2))),) \
 $(_SIZES)
+endef
+
+#################
+# HEX2DEC: It converts an hexadecimal value to 
+# a decimal one.
+#
+# $(1): hexadecimal value to be converted
+#
+define HEX2DEC
+$(shell printf "%d" "$(strip $(1))")
+endef
+
+#################
+# DEC2HEX: It converts a decimal value to an hexadecimal one.
+#
+# $(1): Decimal value to be converted
+#
+define DEC2HEX
+$(shell printf "0x%x" "$(strip $(1))")
 endef
