@@ -148,7 +148,7 @@ define INSERT_NEXT_FILE_INTO_CDT
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
 		, $(if $(call EQUALS,miniload,$(2))\
-				, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> out.txt \
+				, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> /dev/null \
 				, $(error <<ERROR>> [CDTMAN]: Unknown format '$(2)' for file '$(1)'. Valid formats are: { firmware, miniload }) \
 			) \
 		)
