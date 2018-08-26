@@ -1,4 +1,5 @@
 #include "img2cpc.hpp"
+#include "FileUtils.hpp"
 
 int initializeParser(ezOptionParser &parser) {
 	parser.overview = "img2cpc - (c) 2007-2018 Retroworks.";
@@ -36,6 +37,8 @@ int initializeParser(ezOptionParser &parser) {
 	parser.add("", 0, 0, 0, "No mask data. And/Or tables will be used.", "-nm", "--noMasks");
 
 	parser.add("", 0, 0, 0, "Don't create tileset. Use this if you are creating sprites and do not need a table with all the tile pointers.", "-nt", "--noTileset");
+
+	parser.add("", 0, 0, 0, "Output only information about sizes of the images provided.", "--img-size");
 
 	parser.add("", 0, 0, 0, "Output palette (hardware values).", "-ophw");
 	parser.add("", 0, 0, 0, "Output palette (firmware values).", "-opfw");
@@ -347,6 +350,21 @@ void createAndOrTables(ConversionOptions &convOptions) {
 	}
 }
 
+int outputImageWidthAndHeightOnly(const vector<string*> lastArgs) {
+	int result = 0;
+	for (auto* fileName : lastArgs) {
+		FIBITMAP *dib = FileUtils::LoadImage(*fileName);
+		if ( dib ) {
+			cout << FreeImage_GetWidth(dib) << '\t' << FreeImage_GetHeight(dib) << '\t' << *fileName << '\n';
+		} else {
+			cerr << "xxx" << '\t' << "xxx" << '\t' << "Error processing image '"<< *fileName << "' Please check that file is readable and is a valid image file." << '\n';
+			result = 1;
+		}
+	}
+
+	return result;
+}
+
 int main(int argc, const char** argv)
 {
 	if (initializeImageLoader()) {
@@ -364,6 +382,12 @@ int main(int argc, const char** argv)
 		return 0;
 	}
 
+	vector<string *> &lastArgs = options.lastArgs;
+
+	if (options.isSet("--img-size")) {
+		return outputImageWidthAndHeightOnly(lastArgs);
+	}
+
 	ConversionOptions convOptions;
 	int optionsResult = extractConversionOptions(options, convOptions);
 	if (optionsResult) {
@@ -372,14 +396,12 @@ int main(int argc, const char** argv)
 	}
 		//convOptions.Dump();
 
-	vector<string *> &lastArgs = options.lastArgs;
 	vector<Tile*> tiles;
-
 	for (long int i = 0, li = lastArgs.size(); i < li; ++i) {
 		string filename = *lastArgs[i];
 		int result = processImage(filename, tiles, convOptions, options);
 		if (result) {
-			cout << "Error processing image: " << filename << endl;
+			cerr << "Error processing image: " << filename << endl;
 			return result;
 		}
 	}
