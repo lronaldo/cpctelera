@@ -33,6 +33,7 @@
 ##   * ENSURE_VALID_C_ID
 ##   * ENSUREVALID
 ##	 * FILEEXISTS
+##   * GET_IMG_SIZE
 ##   * GREATER_THAN
 ##   * INTINRANGE
 ##   * ISINT
@@ -401,4 +402,22 @@ endef
 #
 define EQUALS
 $(shell if [ "$(strip $(1))" = "$(strip $(2))" ]; then echo true; fi)
+endef
+
+#################
+# GET_IMG_SIZE: It evaluates to a string including width, height
+# and filename of the given image file. This string can then be 
+# easily patched using 'word' makefile function to obtain image
+# sizes. If given image file has any problem and does not return 
+# its size (because it is not a valid file or valid image file, 
+# for instance), the error message passed as $(2) is raised.
+#
+# $(1): Image file 
+# $(2): Error msg
+#
+define GET_IMG_SIZE
+$(eval _SIZES   := $(shell $(IMG2CPC) --img-size "$(strip $(1))")) \
+$(eval _SWIDTH  := $(word 1,$(_SIZES))) \
+$(if $(call EQUALS,xxx,$(_SWIDTH)),$(error $(strip $(2))),) \
+$(_SIZES)
 endef
