@@ -36,6 +36,7 @@ CDTM_BORDERFW := 0
 CDTM_FILENAME := Game
 CDTM_SCRFILE  := 
 CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
+CDTM_DEPEND   := cfg/cdt_manager.mk
 # 5 Vectors for files to be added to the CDT
 CDTM_CDTFILES := 
 CDTM_CDTNAMES := 
@@ -69,11 +70,11 @@ CDTM_LOADER_SIZE      :=146
 #   * MINILOAD_HALF: Same internal routine, but with different entry point, for a half pulse
 # These calls must be patched every time the LOADER is placed at a different point in Memory
 #
-# 0xBF62 = 0xBF46 + 0x1C (0x1C = OFFSET MINILOAD_RUN)
+# 0xBF46 = 0xBF2A + 0x1C (0x1C = OFFSET MINILOAD_RUN)
 CDTM_MINILOAD_RUN     :=0xBF46
-# 0xBF8C = 0xBF46 + 0x46 (0x46 = OFFSET MINILOAD_FULL)
+# 0xBF70 = 0xBF2A + 0x46 (0x46 = OFFSET MINILOAD_FULL)
 CDTM_MINILOAD_FULL    :=0xBF70
-# 0xBF8E = 0xBF46 + 0x48 (0x48 = OFFSET MINILOAD_HALF)
+# 0xBF72 = 0xBF2A + 0x48 (0x48 = OFFSET MINILOAD_HALF)
 CDTM_MINILOAD_HALF    :=0xBF72
 # Offsets relative to LOADER_LOADDADDR of the same 3 calls. These
 # Are used to recalculate previous 3 calls in case of binary relocation
@@ -171,9 +172,38 @@ define CREATECDT
 		$(eval _L := $(word $(_I), $(CDTM_CDTLOAD))) \
 		$(eval _R := $(word $(_I), $(CDTM_CDTRUN))) \
 		$(call INSERT_NEXT_FILE_INTO_CDT,$(_F),$(_T),$(_L),$(_R),$(_N))
-		$(call ADD2INTS,$(_I),1,_I) \
+		$(eval _I := $(call ADD2INTS,$(_I),1)) \
 		)
 endef
+
+#################
+# CDTMAN_SET_MINILOAD_LOAD_ADDRESS: Sets the memory address where the 
+# miniload loader binary will be loaded. This binary includes code 
+# to load and run the compressed image file, then load and run the
+# game. It also includes miniloads code. It takes 146 bytes in total
+# from this loading address.
+#
+# $(1): Memory LOAD ADDRESS for Loader
+#
+define CDTMAN_SET_MINILOAD_LOAD_ADDRESS
+	# Error MSG header
+	$(eval _R := <<ERROR>> [ CDTMAN - SET_MINILOAD_LOAD_ADDRESS ]:)
+	
+	# Check that load address is valid
+	$(eval _A := $(strip $(1)))
+	$(call ENSURE_SINGLE_VALUE,$(_A),$(_R) '$(1)' is not a valid 16-bits address. It is not a single value)
+	$(if $(call ISHEX,$(_A))\
+		,$(eval _A := $(call HEX2DEC,$(_A)))\
+		,$(if $(call ISINT,$(_A)),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is neither a decimal, nor an hexadecimal integer)))
+	$(if $(call INTINRANGE,$(_A),0,65535),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is not in the range [0 - 65535]/[0x0000-0xFFFF]))
+
+	# Now set the new address and calculate corresponding Offsets
+	$(eval CDTM_MINILOAD_RUN    := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_RUN))))
+	$(eval CDTM_MINILOAD_FULL   := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_FULL))))
+	$(eval CDTM_MINILOAD_HALF   := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_HALF))))
+	$(eval CDTM_LOADER_LOADADDR := $(call DEC2HEX,$(_A)))
+endef
+
 
 #################
 # CDTMAN_SET_MINILOAD_MODE: Sets the CPC video mode that will be used
@@ -222,7 +252,7 @@ endef
 #
 define GEN_MINILOADER_SHOWSCR_PATCHED_RULE
 ## Rule to generate and patch Showscreen binary
-$(CDTM_SHOWSCRPCH): $(CDTM_SCRFILE)
+$(CDTM_SHOWSCRPCH): $(CDTM_SCRFILE) $(CDTM_DEPEND)
 	@$(call PRINT,CDTMAN,"******************")
 	@$(call PRINT,CDTMAN,"*** MINILOADER ***: setting up Screen Shower binary")
 	@$(call PRINT,CDTMAN,"******************")
@@ -255,7 +285,7 @@ endef
 #
 define GEN_MINILOADER_LOADER_PATCHED1_RULE
 
-$(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH)
+$(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH) $(CDTM_DEPEND)
 	@$(call PRINT,CDTMAN,"******************")
 	@$(call PRINT,CDTMAN,"*** MINILOADER ***: setting up loader binary")
 	@$(call PRINT,CDTMAN,"******************")
@@ -294,7 +324,7 @@ endef
 #
 define GEN_MINILOADER_LOADER_PATCHED2_RULE
 
-$(CDTM_LOADERPCH2): $(BINFILE) $(CDTM_LOADERPCH1) 
+$(CDTM_LOADERPCH2): $(BINFILE) $(CDTM_LOADERPCH1) $(CDTM_DEPEND)
 	@$(call PRINT,CDTMAN,"******************")
 	@$(call PRINT,CDTMAN,"*** MINILOADER ***: Final patches to loader binary")
 	@$(call PRINT,CDTMAN,"******************")
@@ -393,7 +423,7 @@ define CDTMAN_GEN_MINILOADER
 
 # Update PREBUILDOBJS and CDTMANOBJS
 PREBUILDOBJS := $(PREBUILDOBJS) $(CDTM_LOADERPCH1)
-CDTMANOBJS   := $(CCDTMANOBJS) $(CDTM_LOADERPCH2)
+CDTMANOBJS   := $(CDTMANOBJS) $(CDTM_LOADERPCH2)
 endef
 
 #################
@@ -417,7 +447,7 @@ define CDTMAN_SET_MINILOAD_PALETTE_FW
 	$(eval CDTM_PALFW:=$(2))
 
 	# Complete palette up to 16 values if it conatins less than that
-	$(call ADD2INTS,16,-$(words $(CDTM_PALFW)),CDTM_PALSIZE)
+	$(eval CDTM_PALSIZE := $(call ADD2INTS,16,-$(words $(CDTM_PALFW))))
 	$(call ADD_N_ITEMS,CDTM_PALFW,$(CDTM_PALSIZE),0)
 
 	# Add the border colour at the end of the palette
@@ -432,12 +462,12 @@ endef
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
 #
-# Valid Commands: SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW
+# Valid Commands: SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOAD_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW
 # Info about each command can be found looking into its correspondent makefile macro CDTMAN_<COMMAND>
 #
 define CDTMAN
 	# Set the list of valid commands
-	$(eval CDTMAN_F_FUNCTIONS := SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
+	$(eval CDTMAN_F_FUNCTIONS := SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOAD_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
 
 	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
 	$(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [CDTMAN] '$(strip $(1))' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces. Valid commands: {$(CDTMAN_F_FUNCTIONS)})
