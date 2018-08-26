@@ -116,16 +116,16 @@ CDTM_OFFMINHALF_CALL2 :=0x75
 # $(5): Filename (for firmware calls)
 #
 define ADD_FILE_TO_CDT_LIST
-	@# Parameters cannot be empty, so transform them if they are
-	$(eval _L := $(if $(3),$(3),noload))
-	$(eval _R := $(if $(4),$(4),norun))
-	$(eval _N := $(if $(5),$(5),noname))
-	@# And now add the file to the list
-	$(eval CDTM_CDTFILES := $(CDTM_CDTFILES) $(strip $(1)))
-	$(eval CDTM_CDTTYPES := $(CDTM_CDTTYPES) $(strip $(2)))
-	$(eval CDTM_CDTLOAD  := $(CDTM_CDTLOAD)  $(strip $(_L)))
-	$(eval CDTM_CDTRUN   := $(CDTM_CDTRUN)   $(strip $(_R)))
-	$(eval CDTM_CDTNAMES := $(CDTM_CDTNAMES) $(subst $(SPACE),',$(strip $(_N))))
+# Parameters cannot be empty, so transform them if they are
+$(eval _L := $(if $(3),$(3),noload))
+$(eval _R := $(if $(4),$(4),norun))
+$(eval _N := $(if $(5),$(5),noname))
+# And now add the file to the list
+$(eval CDTM_CDTFILES := $(CDTM_CDTFILES) $(strip $(1)))
+$(eval CDTM_CDTTYPES := $(CDTM_CDTTYPES) $(strip $(2)))
+$(eval CDTM_CDTLOAD  := $(CDTM_CDTLOAD)  $(strip $(_L)))
+$(eval CDTM_CDTRUN   := $(CDTM_CDTRUN)   $(strip $(_R)))
+$(eval CDTM_CDTNAMES := $(CDTM_CDTNAMES) $(subst $(SPACE),',$(strip $(_N))))
 endef
 
 #################
@@ -140,13 +140,13 @@ endef
 # $(5): Filename (for firmware calls)
 #
 define INSERT_NEXT_FILE_INTO_CDT
-   @printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' { Format: '$(_C2)$(2)$(_C1)' "  
+   printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' { Format: '$(_C2)$(2)$(_C1)' "  
 	$(if $(call EQUALS,firmware,$(2))\
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Load: '$(_C2)$(3)$(_C1)' Run: '$(_C2)$(4)$(_C1)' Name: '$(_C2)$(5)$(_C1)'" \
 		, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" > /dev/null 
 		)
-	@printf "}$(_C)\n"
+	printf "}$(_C)\n"
 endef
 
 #################
@@ -161,7 +161,7 @@ define CREATECDT
 	$(if $(CDTM_CDTFILES)\
 		,\
 		,$(call GETALLADDRESSES,$(BINFILE)); \
-		 $(call INSERT_NEXT_FILE_INTO_CDT,$(BINFILE),firmware,0x$(strip $(LOADADDR)),0x$(strip $(RUNADDR)),$(CDTM_FILENAME))
+		 $(call INSERT_NEXT_FILE_INTO_CDT,$(BINFILE),firmware,0x$(strip $(LOADADDR)),0x$(strip $(RUNADDR)),$(CDTM_FILENAME)) \
 		)
 	# Add all the files to the CDT one by one
 	$(eval _I:=1)
@@ -193,22 +193,22 @@ define CDTMAN_SET_MINILOAD_MODE
 endef
 
 #################
-# CDTMAN_SET_MINILOAD_FILENAME: Sets the filename that will be used
-# for the loader when loading it from BASIC. This filename will act
-# as your game's filename. Maximum: 16 characters
+# CDTMAN_SET_FILENAME: Sets the filename that next firmware added file
+# will use when loading from BASIC. This filename will act as your game's 
+# filename in many cases. Maximum: 16 characters
 #
 # $(1): Filename
 #
 # Updates variable CDTM_FILENAME
 #
-define CDTMAN_SET_MINILOAD_FILENAME
+define CDTMAN_SET_FILENAME
 	# Remove any single quotes from filename
 	$(eval CDTM_FILENAME := $(subst ',,$(1)))
 
 	# Ensure Length of Filename is not greater than 16
 	$(eval CDTM_FLEN := $(call STRLEN,$(CDTM_FILENAME)))
 	$(if $(call GREATER_THAN,$(CDTM_FLEN),16)\
-		,$(error <<ERROR>> [CDTMAN - SET_MINILOAD_FILENAME]: Filename '$(CDTM_FILENAME)' is longer than the maximum cassette filename length: '$(CDTM_FLEN)'>16)\
+		,$(error <<ERROR>> [CDTMAN - SET_FILENAME]: Filename '$(CDTM_FILENAME)' is longer than the maximum cassette filename length: '$(CDTM_FLEN)'>16)\
 		,)
 endef
 
@@ -254,7 +254,7 @@ endef
 # be done by GEN_MINILOADER_LOADER_PATCHED2_RULE
 #
 define GEN_MINILOADER_LOADER_PATCHED1_RULE
-## Rule to generate and partially patch loader binary (It cannot be completely patched because we still don't know Game Size, Load and Run Addresses)
+
 $(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH)
 	@$(call PRINT,CDTMAN,"******************")
 	@$(call PRINT,CDTMAN,"*** MINILOADER ***: setting up loader binary")
@@ -293,7 +293,7 @@ endef
 # a final loader binary with Load&Run address and size of the BINFILE.
 #
 define GEN_MINILOADER_LOADER_PATCHED2_RULE
-## Rule to do the final patching of Loader binary, once GAME SIZE, LOADADDR and RUNADDR are known
+
 $(CDTM_LOADERPCH2): $(BINFILE) $(CDTM_LOADERPCH1) 
 	@$(call PRINT,CDTMAN,"******************")
 	@$(call PRINT,CDTMAN,"*** MINILOADER ***: Final patches to loader binary")
@@ -336,22 +336,30 @@ endef
 #
 define CDTMAN_GEN_MINILOADER
 	# Check file exists
-	$(if $(call FILEEXISTS,$(1))\
-		,\
-		,$(error <<ERROR>> [CDTMAN - GEN_MINILOADER] File '$(1)' does not exist and is required to generate the miniloader)
-		\)
+	$(if $(call FILEEXISTS,$(1)),,$(error <<ERROR>> [CDTMAN - GEN_MINILOADER] File '$(1)' does not exist and is required to generate the miniloader))
 	$(eval CDTM_SCRFILE := $(1))
 
-	# Prepare palette firmware for IMG2TILESET
+	# Prepare firmware palette and resolution width for IMG2TILESET
 	$(if $(call EQUALS,0,$(CDTM_MODE))\
 		,$(eval CDTM_PALFWMODE := $(wordlist 1,16,$(CDTM_PALFW)))\
+		 $(eval CDTM_W := 160) \
 		,)
 	$(if $(call EQUALS,1,$(CDTM_MODE))\
 		,$(eval CDTM_PALFWMODE := $(wordlist 1,4,$(CDTM_PALFW)))\
+		 $(eval CDTM_W := 320) \
 		,)
 	$(if $(call EQUALS,2,$(CDTM_MODE))\
 		,$(eval CDTM_PALFWMODE := $(wordlist 1,2,$(CDTM_PALFW)))\
+		 $(eval CDTM_W := 640) \
 		,)
+
+	# Check file is an image and has the appropriate size constraints
+	$(eval _S := $(call GET_IMG_SIZE,$(1),<<ERROR>> [CDTMAN - GEN_MINILOADER] '$(1)' is not a valid image file.))
+	$(eval _W := $(word 1,$(_S)))
+	$(eval _H := $(word 2,$(_S)))	
+	$(eval _R := <<ERROR>> [CDTMAN - GEN_MINILOADER] '$(1)' Incorrect image resolution '$(_W)x$(_H)'. Mode '$(CDTM_MODE)' requires a screen of '$(CDTM_W)x200' pixels)
+	$(if $(call EQUALS,$(_W),$(CDTM_W)),,$(error $(_R)))
+	$(if $(call EQUALS,$(_H),200),,$(error $(_R)))
 
 	# Prepare palette hardware for patcher
 	$(call CONVERT_FW2HW_PALETTE,$(CDTM_PALFW) $(CDTM_BORDERFW),_TMP)
@@ -424,12 +432,12 @@ endef
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
 #
-# Valid Commands: SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW
+# Valid Commands: SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW
 # Info about each command can be found looking into its correspondent makefile macro CDTMAN_<COMMAND>
 #
 define CDTMAN
 	# Set the list of valid commands
-	$(eval CDTMAN_F_FUNCTIONS := SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
+	$(eval CDTMAN_F_FUNCTIONS := SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
 
 	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
 	$(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [CDTMAN] '$(strip $(1))' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces. Valid commands: {$(CDTMAN_F_FUNCTIONS)})
