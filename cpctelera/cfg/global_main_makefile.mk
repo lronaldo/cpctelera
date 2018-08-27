@@ -30,7 +30,7 @@
 BINADDRLOG   := $(OBJDIR)/binaryAddresses.log
 PREBUILD_OBJ := $(OBJDIR)/prebuildstep.objectfile
 
-.PHONY: all clean cleanall prebuild_msg
+.PHONY: all clean cleanall
 
 # MAIN TARGET
 .DEFAULT_GOAL := all
@@ -46,15 +46,11 @@ $(foreach OF, $(ASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $
 $(foreach SF, $(DSKINCSRCFILES), $(eval $(call ADDBINFILETODSK, $(DSK), $(SF), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(SF)).$(DSKINC_EXT))))
 
 # PREVIOUS BUILDING STEP (CONVERSION TOOLS NORMALLY)
-prebuild_msg:
-	@$(call PRINT,$(PROJNAME),"============================================================")
-	@$(call PRINT,$(PROJNAME),"=== PREBUILD EVENTS")
+$(PREBUILD_OBJ): $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES) $(PREBUILDOBJS)
 	@$(call PRINT,$(PROJNAME),"")
-
-$(PREBUILD_OBJ): prebuild_msg $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES) $(PREBUILDOBJS)
-	@$(call PRINT,$(PROJNAME),"")
-	@$(call PRINT,$(PROJNAME),"=== All prebuild processing done!")
+	@$(call PRINT,$(PROJNAME),"=== PREBUILD PROCCESSING DONE!")
 	@$(call PRINT,$(PROJNAME),"============================================================")
+	@$(call PRINT,$(PROJNAME),"")
 	@touch $(PREBUILD_OBJ)
 
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
