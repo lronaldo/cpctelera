@@ -139,11 +139,13 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
 
-# Convert images and tilemaps
+# Convert images, tilemaps and music
 include cfg/image_conversion.mk
 include cfg/tilemap_conversion.mk
 include cfg/music_conversion.mk
+# Create compressed packs and manage CDT
 include cfg/compression.mk
+include cfg/cdt_manager.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
