@@ -62,6 +62,7 @@ VSCODE=true
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
 TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates/newprj
+TEMPLATE_DIRECTORY_RSLIB=${SCRIPT_FULL_PATH}/templates
 CPCTELERA_DIRECTORY=$(dirname $(dirname "$SCRIPT_FULL_PATH"))
 SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/src/main.c
 MAKE_TEMPLATE=${TEMPLATE_DIRECTORY}/Makefile
@@ -138,8 +139,8 @@ while (( $# >= 1 )); do
    case $1 in
       ## Generate a CPCRSLib enabled project
       "-c" | "--cpcrslib")
-         CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/cpcrslib/build_config.mk
-         SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/cpcrslib/main.c
+         CFG_TEMPLATE=${TEMPLATE_DIRECTORY_RSLIB}/cpcrslib/build_config.mk
+         SRC_TEMPLATE=${TEMPLATE_DIRECTORY_RSLIB}/cpcrslib/main.c
          CPCRSLIB=true
       ;;
       ## Get an specific project name
