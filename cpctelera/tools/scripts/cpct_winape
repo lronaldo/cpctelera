@@ -135,7 +135,12 @@ function ensureExecutionPrerequisitesAreInstalled {
       ## Do CYGWIN required stuff
       EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
 running this script. Please, check cygwin installation and run this script again."
+   elif checkSystem win10linux; then
+      ## Do Linux under Windows 10 stuff
+      EnsureCommandAvailable wslpath "wslpath has not been found on the system, and it's required \
+for running this script."
    else
+
       ## Do Linux/MacOSX required stuff (wine configuration)
       EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
 running this script. Please, install wine or check the installation and run this script again."
@@ -154,6 +159,9 @@ function getMySystemPath {
    if checkSystem cygwin; then
       ## Do CYGWIN required stuff
       echo "$(cygpath -a -w ${1} 2> /dev/null)" 
+   elif checkSystem win10linux; then
+      ## Do Linux under Windows 10 stuff
+      echo "$(wslpath -w $(pwd)/${1} 2> /dev/null)"
    else
       ## Do Linux/MacOSX required stuff (wine configuration)
       echo "$(winepath -w ${1} 2> /dev/null)" 
@@ -366,9 +374,13 @@ done
 # First, check WinAPE installation
 checkWinapeInstallation "$WAPE"
 
-# On CygWin, there is no need for wine, but WinAPE.exe 
-# must be executable by Cygwin
-if checkSystem cygwin; then
+# Remove the need for wine on Windows systems
+if checkSystem win10linux; then
+   # On win10linux there is no need for wine
+   WINE=""
+elif checkSystem cygwin; then
+   # On CygWin, there is no need for wine, but WinAPE.exe 
+   # must be executable by Cygwin
    WINE=""
    chmod +x "$WAPE"
 fi

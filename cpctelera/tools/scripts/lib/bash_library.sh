@@ -751,6 +751,14 @@ function checkSystem {
                return 0
             fi
          ;;
+         "win10linux")
+            if [[ "$SYS" =~ "Linux" ]]; then
+               # Use /proc/version for better compatibilty 
+               if grep -qE "(Microsoft|WSL)" /proc/version &> /dev/null; then
+                  return 0;
+               fi
+            fi
+         ;;
          "linux") 
             if [[ "$SYS" =~ "Linux" ]] || [[ "$SYS" =~ "GNU" ]]; then
                return 0
