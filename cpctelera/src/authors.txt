@@ -26,6 +26,7 @@ Awesome collaborators:
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
    * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
    * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
+   * <Cpcitor at http://github.com/cpcitor>
    * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
    * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
@@ -51,12 +52,6 @@ Compression and decompression tools and functions:
 
 Random number generation:
    * George Marsaglia
-
-Graphical assets:
-   * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
-   * <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
-   * <Miguel Sánchez aka PixelArtM at https://twitter.com/PixelArtM>
-   * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
 
 (see logos_composite_long.png)
 
@@ -112,7 +107,7 @@ Section: 3rdparty software authors
     * <Juan Carlos Gonzalez Amestoi at https://twitter.com/retrovm>
 
 
-Section: Testers & Bug Reporters
+Section: Testers & Bug Reporters 
 
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
  * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
@@ -131,12 +126,13 @@ Section: Testers & Bug Reporters
  * <Paulo Garcia at https://github.com/pedgarcia> / <VintageIsTheNewOld at https://www.vintageisthenewold.com/>
  * <Alexis Roda at https://github.com/patxoca> / <Github at https://github.com> 
  * <rgiot https://github.com/rgiot> / <Github at https://github.com>
+ * <David Asta at mailto:davidasta@gmail.com>
 
 Section: Assets 
 
  * SpritesEMR, Persea, Fremos Logo, Frame Tile Sprite, Death with an oil lamp, Background and others by Emilio Molina Reig (<Dardalorth at https://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
  * GNG Like tiles by <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
- * Court, Building, Frames and tilesets <Miguel Sánchez aka PixelArtM at https://twitter.com/PixelArtM>
+ * Court, Building, Frames and tilesets for software Scroll example by <Miguel Sánchez aka PixelArtM at https://twitter.com/PixelArtM>
  * Goku, No13, Vegeta by <SunWay at mailto:oferrer@carlio.es> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
  * <Hand Painted Texture at http://opengameart.org/content/hand-painted-texture-sandstone> by <The Chayed - KIIRA at http://opengameart.org/users/the-chayed-kiira>
  * <The Knight - Free Sprite at http://opengameart.org/content/the-knight-free-sprite> by <pzUH at http://opengameart.org/users/pzuh>
@@ -145,8 +141,6 @@ Section: Assets
  * <SCI-FI Background at http://opengameart.org/content/sci-fi-background> by <hassekf at http://opengameart.org/users/hassekf>
  * <Pixel Art Dungeon Items at http://opengameart.org/content/pixel-art-dungeon-items> by <SpinachChicken at http://opengameart.org/users/spinachchicken>
  * <Little Candele Monsters at http://opengameart.org/content/little-candle-monsters> by <C-TOY at http://c-toy.blogspot.com.es>
- * Court from software Scroll example by Miguel Sánchez (<@PixelArtM at https://twitter.com/PixelArtM>)
-
  
 Section: Special Thanks
 
@@ -164,5 +158,3 @@ Section: Special Thanks
  * <Prodatron at http://www.prodatron.net/> / Symbiosis for producting such a great deal of incredible software for the Amstrad CPC and for being always helpful and kind.
  * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs, Z80 programming and random number generators)
  * <Z88DK at http://www.z88dk.org/forum/> developers for sharing their really nice Z80 codebase.
-
- 
