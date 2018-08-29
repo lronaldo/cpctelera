@@ -27,6 +27,51 @@
 ## here.                                                                 ##
 ###########################################################################
 
+#
+# Default values for all AKS2DATA functions
+#
+A2D_OUTFOLD := $(SRCDIR)
+A2D_ERR     := <<ERROR>> [AKS2DATA -
+A2D_GEN     :=-gs -gh
+A2D_GENF	:=.s .h
+
+# Ensure that music_conversion.mk exists for compatibility with older CPCtelera projects
+A2D_DEPEND  := cfg/music_conversion.mk
+TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) $(A2D_DEPEND)
+
+
+#################
+# AKS2DATA_SET_FOLDER: Sets the output folder where all generated
+# files will be stored
+#
+# $(1): Output folder
+#
+define AKS2DATA_SET_FOLDER
+	$(if $(call FOLDERISWRITABLE,$(1)),,$(error $(A2D_ERR) SET_FOLDER] Folder '$(1)' does not exist, is not a folder or is not accessible))
+	$(eval A2D_OUTFOLD := $(1))
+endef
+
+#################
+# AKS2DATA_SET_OUTPUTS: Selects the output formats that will be produced.
+# One file will be produced for each selected output format.
+# Valid output formats are: h (c-header) hs (asm-header) s (asm-file) bin (binary)
+#
+# $(1): List of output formats to be generated
+#
+define AKS2DATA_SET_OUTPUTS
+	# Check that the passed value is valid and assign it 
+	$(eval _VALID := h hs s bin)
+	$(call ENSUREVALID,$(1),$(_VALID),is not a valid output format [AKS2DATA - SET_OUTPUTS])
+	# Convert outputs
+	$(eval _CON := .h .h.s .s .bin)
+	$(eval A2D_GENF :=)
+	$(foreach _V,$(1),$(call CONVERTVALUE,$(_V),_VALID,_CON,,_V2) $(call ADD2SET,A2D_GENF,$(_V2)))
+	$(eval _CON := -gh -ghs -gs -gb)
+	$(eval A2D_GEN :=)
+	$(foreach _V,$(1),$(call CONVERTVALUE,$(_V),_VALID,_CON,,_V2) $(call ADD2SET,A2D_GEN,$(_V2)))
+endef
+
+
 #################
 # AKS2DATA: Front-end to access all functionalities of AKS2DATA macros about Arkos 
 # music conversion into data for programs.
@@ -34,12 +79,12 @@
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
 #
-# Valid Commands: 
+# Valid Commands: SET_FOLDER SET_OUTPUTS CONVERT CONVERT_SFX
 # Info about each command can be found looking into its correspondent makefile macro AKS2DATA_<COMMAND>
 #
 define AKS2DATA
 	# Set the list of valid commands
-	$(eval AKS2DATA_F_FUNCTIONS := SET_FOLDER SET_FORMATS CONVERT CONVERT_SFX)
+	$(eval AKS2DATA_F_FUNCTIONS := SET_FOLDER SET_OUTPUTS CONVERT CONVERT_SFX)
 
 	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
 	$(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [AKS2DATA] '$(strip $(1))' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces. Valid commands: {$(AKS2DATA_F_FUNCTIONS)})
