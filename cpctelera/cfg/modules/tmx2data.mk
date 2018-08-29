@@ -42,7 +42,8 @@ T2D_OUTFOLD	:=src/
 T2D_EXTRA   :=
 
 # Ensure that tilemap_conversion.mk exists for compatibility with older CPCtelera projects
-TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) cfg/tilemap_conversion.mk
+T2D_DEPEND  := cfg/tilemap_conversion.mk
+TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) $(T2D_DEPEND)
 
 
 #################
@@ -170,7 +171,7 @@ define TMX2DATA_CONVERT
 
 # Generate target for tilemap conversion
 .SECONDARY: $(T2D_JGFS)
-$(T2D_JGFS): $(1)
+$(T2D_JGFS): $(1) $(T2D_DEPEND)
 	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into data...")
 	$(CPCTMX2DT) $(T2D_NUMBASE) $(T2D_CMACROS) $(T2D_ASMPREF) $(T2D_GEN) $(T2D_CIDENT) $(T2C_OF) $(T2C_BITARR) -of $(T2D_OUTFOLD) $(T2D_EXTRA) $(1)
 
@@ -238,7 +239,7 @@ define TMX2C
 
 # Generate target for tilemap conversion
 .SECONDARY: $(T2C_CH)
-$(T2C_CH): $(1)
+$(T2C_CH): $(1) 
 	@$(call PRINT,$(PROJNAME),"Converting tilemap in $(1) into C-arrays...")
 	$(TMX2CSV) -gh -ci $(2) $(T2C_OF) $(T2C_BA) $(5) $(1)
 

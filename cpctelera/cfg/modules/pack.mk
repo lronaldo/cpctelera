@@ -24,7 +24,8 @@
 ###########################################################################
 
 # Ensure that compression.mk exists for compatibility with older CPCtelera projects
-TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) cfg/compression.mk
+A2P_DEPEND := cfg/compression.mk
+TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) $(A2P_DEPEND)
 
 #################
 # ADD2PACK: Adds a new file to a compressed pack file. It actually adds the file
@@ -60,7 +61,7 @@ define PACKZX7B
 
 # Generate target for file compression
 .SECONDARY: $(PACK_$(1)_target)
-$(PACK_$(1)_target): $(PACK_$(1))
+$(PACK_$(1)_target): $(PACK_$(1)) $(A2P_DEPEND)
 	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
 	$(CPCTPACK) $(PACK_$(1)_outfile) $(PACK_$(1))
 
