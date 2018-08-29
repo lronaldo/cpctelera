@@ -219,9 +219,9 @@ endef
 # $(3): Load Address (Only for firmware formats)
 # $(4): Run Address (Only for firmware formats)
 #
-_VALID := firmware miniload
 define CDTMAN_ADDFILE
 	# Check constraints
+	$(eval _VALID := firmware miniload)
 	$(call ENSUREVALID,$(1),$(_VALID),<<ERROR>> [ CDTMAN - ADDFILE ]: Format '$(1)' for file '$(2) is not valid. Valid formats are: { $(_VALID) }')
 	$(if $(call EQUALS,$(1),firmware)\
 		, $(call ENSURE_ADDRESS_VALID,$(3),<<ERROR>> [ CDTMAN - ADDFILE ]:) \
@@ -503,8 +503,8 @@ endef
 
 
 #################
-# CDTMAN: Front-end to access all functionalities of CDTMAN macros about TMX file 
-# conversion into data (arrays and/or binary files)
+# CDTMAN: Front-end to access all functionalities of CDTMAN macros about CDT 
+# generation and file management.
 #
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
