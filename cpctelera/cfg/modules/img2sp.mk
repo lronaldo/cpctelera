@@ -36,6 +36,7 @@ I2S_FMT  :=
 I2S_OUT  := -of c
 I2S_FOLD := src/
 I2S_EXTP := 
+I2S_ERR  := <<ERROR>> [IMG2SP - 
 
 #################
 # IMG2SP_SET_PALETTE_FW: Sets the firmware palette to be used in following IMG2SP CONVERT commands
@@ -46,7 +47,7 @@ I2S_EXTP :=
 #
 define IMG2SP_SET_PALETTE_FW
 	# Verify passed firmware palette
-	$(call VERIFY_FW_PALETTE,$(1),SET_PALETTE_FW)
+	$(call VERIFY_FW_PALETTE,$(1),IMG2SP - SET_PALETTE_FW)
 
 	# All checks passed, add brackets to palette
 	$(eval I2S_PAL := -pf { $(1) })
@@ -62,7 +63,7 @@ endef
 define IMG2SP_SET_MODE
 	$(eval I2S_VALIDMODES := 0 1 2)
 	$(eval I2S_MODE := $(filter $(I2S_VALIDMODES),$(1)))
-	$(if $(filter-out "$(I2S_MODE)",""),,$(error <<ERROR>> '$(1)' is not valid for IMG2SP SET_MODE. Valid items are: {$(I2S_VALIDMODES)}))
+	$(if $(filter-out "$(I2S_MODE)",""),,$(error $(I2S_ERR) SET_MODE]: '$(1)' is not valid. Valid items are: {$(I2S_VALIDMODES)}))
 	$(eval I2S_MODE := -m $(I2S_MODE))
 endef
 
@@ -78,23 +79,22 @@ define IMG2SP_SET_MASK
 	$(eval I2S_MASK_VALS :=  interlaced none)
 	$(eval I2S_MASK_OPS  :=  -im)
 	$(eval $(call CONVERTVALUE,$(1),I2S_MASK_VALS,I2S_MASK_OPS,default,I2S_MASK))
-	$(if $(filter-out $(I2S_MASK),default),,$(error <<ERROR>> Value '$(1)' is not valid for IMG2SP SET_MASK. Expected values are: {$(I2S_MASK_VALS)}))
+	$(if $(filter-out $(I2S_MASK),default),,$(error $(I2S_ERR) SET_MASK]: Value '$(1)' is not valid. Expected values are: {$(I2S_MASK_VALS)}))
 endef
 
 #################
 # IMG2SP_SET_OUTPUT: Sets the output format for following IMG2SP CONVERT commands
 #
-# $(1): Output format {c binary}
+# $(1): Output format {c bin}
 #
 # Updates variable I2S_OUT
 #
 define IMG2SP_SET_OUTPUT
 	# Configure output option
-	$(eval I2S_OUTPUT_VALS :=  c binary)
-	$(eval I2S_OUTPUT_OPS  :=  c bin)
-	$(eval $(call CONVERTVALUE,$(1),I2S_OUTPUT_VALS,I2S_OUTPUT_OPS,default,I2S_OUT))
-	$(if $(filter-out $(I2S_OUT),default),,$(error <<ERROR>> Value '$(1)' is not valid for IMG2SP SET_OUTPUT. Expected values are: {$(I2S_OUTPUT_VALS)}))
-	$(eval I2S_OUT := -of $(I2S_OUT))
+	$(eval _VALID := c bin)	
+	$(call ENSURE_SINGLE_VALUE,$(1),$(I2S_ERR) SET_OUTPUT]: '$(1)' is not valid. It must be a SINGLE value from: {$(_VALID)})
+	$(call ENSUREVALID,$(1),$(_VALID),is not valid [IMG2SP - SET_OUTPUT])
+	$(eval I2S_OUT := -of $(1))
 endef
 
 #################
@@ -105,21 +105,21 @@ endef
 # Updates variable I2S_FOLD
 #
 define IMG2SP_SET_FOLDER
-	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [IMG2SP: SET_FOLDER] Folder '$(1)' does not exist or is not accessible)
+	$(call ENSUREFILEEXISTS,$(1),$(I2S_ERR) SET_FOLDER]: Folder '$(1)' does not exist or is not accessible)
 	$(eval I2S_FOLD := $(1))
 endef
 
 #################
-# IMG2SP_SET_FORMAT: Sets the pixel format to be used for following IMG2SP CONVERT commands
+# IMG2SP_SET_IMG_FORMAT: Sets the pixel format to be used for following IMG2SP CONVERT commands
 #
 # $(1): Pixel Format { sprites, zgtiles, screen }
 #
 # Updates variable I2S_FOLD
 #
-define IMG2SP_SET_FORMAT
+define IMG2SP_SET_IMG_FORMAT
 	# Check that selected format is valid
 	$(eval I2S_FMT_VALS := sprites zgtiles screen)
-	$(if $(filter $(I2S_FMT_VALS),$(1)),,$(error <<ERROR>> '$(1)' is not valid for IMG2SP SET_FORMAT. Valid values are: {$(I2S_FMT_VALS)}))
+	$(if $(filter $(I2S_FMT_VALS),$(1)),,$(error $(I2S_ERR) SET_IMG_FORMAT]: '$(1)' is not valid. Valid values are: {$(I2S_FMT_VALS)}))
 
 	# Convert selected format into options
 	$(eval I2S_FMT := $(if $(filter-out $(1),sprites),,))
@@ -156,7 +156,7 @@ define IMG2SP_CONVERT_TARGET
 	$(eval I2S_TGT := $($(1)))
 
 	# Check that image file exists
-	$(call ENSUREFILEEXISTS,$(2),<<ERROR>> [CONVERT] '$(2)' file does not exist or is not readable)	
+	$(call ENSUREFILEEXISTS,$(2),$(I2S_ERR) CONVERT]: '$(2)' file does not exist or is not readable)	
 
 # Generate target for image conversion
 .SECONDARY: $(I2S_TGT)
@@ -185,7 +185,7 @@ define IMG2SP_CONVERT_PALETTE
 	$(eval I2SCP_PSZ := $(words $(1)))
 
 	# Check that it is a valid C-identifier
-	$(call ENSURE_VALID_C_ID,$(I2SCP_CID),<<ERROR>> [CONVERT_PALETTE] '$(I2SCP_CID)' is not a valid C-identifier. \
+	$(call ENSURE_VALID_C_ID,$(I2SCP_CID),$(I2S_ERR) CONVERT_PALETTE]: '$(I2SCP_CID)' is not a valid C-identifier. \
 		As it will be used both for filename and array identifier, it needs to be a valid C-identifier)
 
 	# Generate filenames
@@ -330,7 +330,7 @@ endef
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
 #
-# Valid Commands: SET_PALETTE_FW SET_MODE SET_FORMAT SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT CONVERT_PALETTE
+# Valid Commands: SET_PALETTE_FW SET_MODE SET_IMG_FORMAT SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT CONVERT_PALETTE
 # Info about each command can be found looking into its correspondent makefile macro IMG2SP_<COMMAND>
 #
 # When using CONVERT commands, IMGCFILES and OBJS2CLEAN are updated to add new C files that result from the pack generation.
@@ -338,16 +338,16 @@ endef
 define IMG2SP 
 	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
 	$(if $(filter-out $(words $(strip $(1))),1)\
-		,$(error <<ERROR>> '$(1)' is not a valid command for IMG2SP. Commands must be exactly one-word in lenght with no whitespaces)\
+		,$(error $(I2S_ERR)]: '$(1)' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces)\
 		,)
 	# Set the list of valid commands
-	$(eval IMG2SP_F_FUNCTIONS = SET_PALETTE_FW SET_MODE SET_FORMAT SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT CONVERT_PALETTE)
+	$(eval IMG2SP_F_FUNCTIONS = SET_PALETTE_FW SET_MODE SET_IMG_FORMAT SET_MASK SET_OUTPUT SET_FOLDER SET_EXTRAPAR CONVERT CONVERT_PALETTE)
 	# Filter given command as $(1) to see if it is one of the valid commands
 	$(eval IMG2SP_F_SF = $(filter $(IMG2SP_F_FUNCTIONS),$(1)))
 	# If the given command is valid, it will be non-empty, then we proceed to call the command (up to 8 arguments). Otherwise, raise an error
 	$(if $(IMG2SP_F_SF)\
 		,$(eval $(call IMG2SP_$(IMG2SP_F_SF),$(strip $(2)),$(strip $(3)),$(strip $(4)),$(strip $(5)),$(strip $(6)),$(strip $(7)),$(strip $(8))))\
-		,$(error <<ERROR>> '$(1)' is not a valid command for IMG2SP))
+		,$(error $(I2S_ERR)]: '$(1)' is not a valid command. Valid commands are: {$(IMG2SP_F_FUNCTIONS)}))
 endef
 
 #################################################################################################################################################
