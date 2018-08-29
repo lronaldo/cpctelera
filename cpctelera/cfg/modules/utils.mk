@@ -36,6 +36,8 @@
 ##   * ENSUREVALID
 ##   * ENSUREFILEEXISTS
 ##	 * FILEEXISTS
+##	 * FOLDEREXISTS
+##	 * FOLDERISWRITABLE
 ##   * GET_IMG_SIZE
 ##   * GREATER_THAN
 ##   * HEX2DEC
@@ -117,7 +119,7 @@ endef
 #
 # $(1): Searched value
 # $(2): Variable holding search array
-# $(3): Variable golding conversion array
+# $(3): Variable holding conversion array
 # $(4): Default value (for not-found output)
 # $(5): Output variable
 #
@@ -229,6 +231,7 @@ define ENSUREFILEEXISTS
 		,)
 endef
 
+
 #################
 # ENSUREVALID: Checks that a value or a given list of values is/are
 # contained into a list of valid values. If any value from the seach
@@ -283,11 +286,11 @@ endef
 # $(2): New value to be added to the set
 #
 define ADD2SET
-	$(eval A2S_S := $(strip $(1))) 
-	$(eval A2S_E := $(strip $(2))) 
-	$(eval $(A2S_S) := $($(A2S_S)) $(if $(filter $($(A2S_S)),$(A2S_E))\
+	$(eval _S := $(strip $(1))) 
+	$(eval _E := $(strip $(2))) 
+	$(if $(filter $($(_S)),$(_E))\
 		,\
-		,$(A2S_E)))
+		,$(eval $(_S) := $($(_S)) $(_E)))
 endef
 
 #################
@@ -397,6 +400,30 @@ endef
 #
 define FILEEXISTS
 $(shell if [ -f "$(strip $(1))" ]; then echo true; fi)
+endef
+
+#################
+# FOLDEREXISTS: Checks if a given folder exists or not. Returns "true" 
+# when the file exists and empty-string otherwise. It is thought to
+# be used in makefile if functions. Parameter is striped before 
+# being tested.
+#
+# $(1): folder (must not be a file)
+#
+define FOLDEREXISTS
+$(shell if [ -d "$(strip $(1))" ]; then echo true; fi)
+endef
+
+#################
+# FOLDERISWRITABLE: Checks if a given folder exists and is writable 
+# or not. Returns "true" when the file exists and empty-string 
+# otherwise. It is thought to be used in makefile if functions. 
+# Parameter is striped before being tested.
+#
+# $(1): folder (must not be a file)
+#
+define FOLDERISWRITABLE
+$(shell if [[ -d "$(strip $(1))" && -w "$(strip $(1))" && -x "$(strip $(1))" ]]; then echo true; fi)
 endef
 
 #################
