@@ -38,6 +38,10 @@ I2S_FOLD := src/
 I2S_EXTP := 
 I2S_ERR  := <<ERROR>> [IMG2SP - 
 
+# Ensure that image_conversion.mk exists for compatibility with older CPCtelera projects
+TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) cfg/image_conversion.mk
+
+
 #################
 # IMG2SP_SET_PALETTE_FW: Sets the firmware palette to be used in following IMG2SP CONVERT commands
 #

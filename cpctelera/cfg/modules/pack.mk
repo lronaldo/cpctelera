@@ -23,6 +23,9 @@
 ## files and packs  												     ##
 ###########################################################################
 
+# Ensure that compression.mk exists for compatibility with older CPCtelera projects
+TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) cfg/compression.mk
+
 #################
 # ADD2PACK: Adds a new file to a compressed pack file. It actually adds the file
 # given as $(2) to a variable with the name PACK_$(1)

@@ -41,6 +41,10 @@ T2D_ASMPREF	:=
 T2D_OUTFOLD	:=src/
 T2D_EXTRA   :=
 
+# Ensure that tilemap_conversion.mk exists for compatibility with older CPCtelera projects
+TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) cfg/tilemap_conversion.mk
+
+
 #################
 # TMX2DATA_SET_ASMVARPREFIX: Sets an underscore prefix for all
 # assembly variables and labels.
