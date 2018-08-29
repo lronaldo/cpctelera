@@ -45,6 +45,10 @@ $(foreach OF, $(ASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $
 ## Generate an Add-BIN-to-DSK rule for each Binary file in DSKFILESDIR
 $(foreach SF, $(DSKINCSRCFILES), $(eval $(call ADDBINFILETODSK, $(DSK), $(SF), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(SF)).$(DSKINC_EXT))))
 
+# Files to be created if they do not exist (for compatibility)
+$(TOUCHIFNOTEXIST):
+	@$(TOUCH) $(TOUCHIFNOTEXIST)
+
 # PREVIOUS BUILDING STEP (CONVERSION TOOLS NORMALLY)
 $(PREBUILD_OBJ): $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES) $(PREBUILDOBJS)
 	@$(call PRINT,$(PROJNAME),"")

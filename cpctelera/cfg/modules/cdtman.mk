@@ -38,6 +38,7 @@ CDTM_SCRFILE  :=
 CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
 CDTM_DEPEND   := cfg/cdt_manager.mk
 CDTMANOBJS    := $(CDTMANOBJS) $(CDTM_DEPEND)
+TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) $(CDTM_DEPEND)
 # 5 Vectors for files to be added to the CDT
 CDTM_CDTFILES := 
 CDTM_CDTNAMES := 
@@ -143,7 +144,7 @@ endef
 #
 define INSERT_NEXT_FILE_INTO_CDT
 	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [CDTMAN]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)')
-   printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' {Format:'$(_C2)$(2)$(_C1)' "
+	printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' {Format:'$(_C2)$(2)$(_C1)' "
 	$(if $(call EQUALS,firmware,$(2))\
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
