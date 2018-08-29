@@ -145,7 +145,7 @@ define INSERT_NEXT_FILE_INTO_CDT
 	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [CDTMAN]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)')
    printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' {Format:'$(_C2)$(2)$(_C1)' "
 	$(if $(call EQUALS,firmware,$(2))\
-		, $(CPC2CDT) -x "$(4)" -l "$(3)" -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
+		, $(CPC2CDT) -x "$(4)" -l "$(3)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
 		, $(if $(call EQUALS,miniload,$(2))\
 				, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> /dev/null \
@@ -525,4 +525,42 @@ define CDTMAN
 	$(if $(CDTMAN_F_SF)\
 		,$(eval $(call CDTMAN_$(CDTMAN_F_SF),$(strip $(2)),$(strip $(3)),$(strip $(4)),$(strip $(5)),$(strip $(6)),$(strip $(7)),$(strip $(8))))\
 		,$(error <<ERROR>> [CDTMAN] '$(strip $(1))' is not a valid command. Valid commands: {$(CDTMAN_F_FUNCTIONS)}))
+endef
+
+#################################################################################################################################################
+### OLD MACROS (Deprecated)
+### Maintained here for compatibility
+#################################################################################################################################################
+
+#################
+# CREATEBLANKCDT: Create a Blank CDT file
+#
+# $(1): CDT file to be created
+#
+define CREATEBLANKCDT
+	@$(2CDT) -n . $(1) > /dev/null
+endef
+
+#################
+# ADDBASICFILETOCDT: Adds a BASIC file to a CDT file
+#
+# $(1): CDT file where the BASIC file will be added
+# $(2): BASIC file to be added (path to it in the filesystem)
+# $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
+#
+define ADDBASICFILETOCDT
+	@$(2CDT) -F 0 $(2) -r $(3) $(1) > /dev/null
+endef
+
+#################
+# ADDBINARYFILETOCDT: Adds a BINARY file to a CDT file
+#
+# $(1): CDT file where the BINARY file will be added
+# $(2): Binary file to be inserted in the CDT
+# $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
+# $(4): Memory address where binary will be loaded (LOAD ADDRESS)
+# $(5): Memory address where main program starts (RUN ADDRESS)
+#
+define ADDBINARYFILETOCDT
+	@$(2CDT) -X 0x$(5) -L 0x$(4) -r $(3) $(2) $(1) > /dev/null
 endef
