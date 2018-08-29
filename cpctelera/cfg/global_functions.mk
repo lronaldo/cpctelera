@@ -34,6 +34,7 @@ include $(THIS_DIR)/modules/pack.mk
 include $(THIS_DIR)/modules/img2sp.mk
 include $(THIS_DIR)/modules/tmx2data.mk
 include $(THIS_DIR)/modules/cdtman.mk
+include $(THIS_DIR)/modules/aks2data.mk
 
 #################
 # GETLOADADDRESS: Get load address from a created binary file (parsing hex2bin's log)
@@ -172,36 +173,4 @@ endef
 define BINFILE2C
 $(1): $(2)
 	$(BIN2C) $(2) -i "cpctelera.h" > $(1)
-endef
-
-#################
-# AKS2C: General rule to convert AKS music files into data arrays usable from C and ASM.
-# Updates IMGASMFILES and OBJS2CLEAN adding new .s/.h files that result from AKS conversions
-#
-# $(1): AKS file to be converted to data array
-# $(2): C identifier for the generated data array (will have underscore in front on ASM)
-# $(3): Output folder for .s and .h files generated (Default same folder)
-# $(4): Memory address where music data will be loaded
-# $(5): Aditional options (you can use this to pass aditional modifiers to cpct_aks2c)
-#
-define AKS2C
-	# Set up C and H files for output
-	$(eval A2C_S := $(basename $(1)).s)
-	$(eval A2C_H := $(basename $(1)).h)
-	$(eval $(call JOINFOLDER2BASENAME, A2C_S2, $(3), $(A2C_S)))
-	$(eval $(call JOINFOLDER2BASENAME, A2C_H2, $(3), $(A2C_H)))
-	$(eval A2C_SH := $(A2C_S2) $(A2C_H2))
-
-	# Configure options for output folder $(3)
-	$(eval A2C_OF := $(shell if [ ! "$(3)" = "" ]; then echo "-od $(3)"; else echo ""; fi))
-
-# Generate target for music converstion
-.SECONDARY: $(A2C_SH)
-$(A2C_SH): $(1)
-	@$(call PRINT,$(PROJNAME),"Converting music in $(1) into data arrays...")
-	$(CPCTAKS2C) -m "$(4)" $(A2C_OF) -id $(2) $(5) $(1)
-
-# Variables that need to be updated to keep up with generated files and erase them on clean
-IMGASMFILES := $(A2C_S2) $(IMGASMFILES)
-OBJS2CLEAN  := $(A2C_SH) $(OBJS2CLEAN)
 endef
