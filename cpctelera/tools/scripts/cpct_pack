@@ -41,13 +41,10 @@
 ##       - outfile.h file with the exported symbols to be included in other c files. 
 ##
 ## Command line options:
-##    -i  | --include-header [file]     - Include a header file at the top of
-## the generated output
-##    -a  | --array-name [name]         - Sets the C identifier that will be used. 
-## <OUTFILE> is used by default.
-##    -b  | --bytes-per-line [numbytes] - Establishes the number of bytes to 
-## write at each array line in C. 16 by default
+##    -an | --array-name [name]         - Sets the C identifier that will be used. <OUTFILE> is used by default.
+##    -b  | --bytes-per-line [numbytes] - Establishes the number of bytes to write at each array line in C. 16 by default
 ##    -h  | --help                      - Shows help information on the terminal.
+##    -i  | --include-header [file]     - Include a header file at the top of the generated output
 ##
 
 
@@ -57,32 +54,30 @@ source $(dirname $0)/lib/bash_library.sh
 ## Show how this script is to be used and exit
 ##
 function usage() {
-   echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}<OUTFILE> <FILE1> [FILE2, [FILE3...]] [options]"
-   echo
-   echo "${COLOR_CYAN}   This script gets a list of files, packs them into a single continuous file \
+cat <<UsageHereDoc
+${COLOR_LIGHT_YELLOW}USAGE${COLOR_LIGHT_BLUE}
+   $(basename $0) ${COLOR_LIGHT_CYAN}[options] <OUTFILE> <FILE1> [FILE2, [FILE3...]]
+${COLOR_CYAN}
+   This script gets a list of files, packs them into a single continuous file \
 and then compresses this latest file. It generates a unique compressed file \
 that holds the contents of all passed files sequentially, in the order \
-they are passed. "
-   echo
-   echo "   Default output produces two files: "
-   echo "      - <OUTFILE>.c file with an array holding all compressed file data "
-   echo "      - <OUTFILE>.h file with the exported symbols to be included in other c files. "
-   echo
-   echo "${COLOR_LIGHT_YELLOW}OPTIONS"
-   echo 
-   echo "${COLOR_LIGHT_BLUE}  -i | --include-header ${COLOR_NORMAL}<file>"
-   echo "${COLOR_CYAN}       Include a header file at the top of the generated output."
-   echo
-   echo "${COLOR_LIGHT_BLUE} -an | --array-name ${COLOR_NORMAL}<identifier>"
-   echo "${COLOR_CYAN}       Sets the C identifier that will be used. G_<OUTFILE> is used by default."
-   echo
-   echo "${COLOR_LIGHT_BLUE}  -b | --bytes-per-line ${COLOR_NORMAL}<numbytes>"
-   echo "${COLOR_CYAN}       Establishes the number of bytes to write at each array line in C. 16 by default."
-   echo
-   echo "${COLOR_LIGHT_BLUE}  -h | --help"
-   echo "${COLOR_CYAN}       Shows this help information"
-   echo ${COLOR_NORMAL}
+they are passed.
+
+Default output produces two files:
+   - <OUTFILE>.c file with an array holding all compressed file data 
+   - <OUTFILE>.h file with the exported symbols to be included in other c files. 
+${COLOR_LIGHT_YELLOW}
+OPTIONS ${COLOR_LIGHT_BLUE}
+   -an | --array-name ${COLOR_NORMAL}<identifier> ${COLOR_CYAN}
+      Sets the C identifier that will be used. G_<OUTFILE> is used by default. ${COLOR_LIGHT_BLUE}
+   -b  | --bytes-per-line ${COLOR_NORMAL}<numbytes> ${COLOR_CYAN}
+      Establishes the number of bytes to write at each array line in C. 16 by default. ${COLOR_LIGHT_BLUE}
+   -h  | --help ${COLOR_CYAN}
+      Shows this help information ${COLOR_LIGHT_BLUE}
+   -i  | --include-header ${COLOR_NORMAL}<file> ${COLOR_CYAN}
+      Include a header file at the top of the generated output. ${COLOR_LIGHT_BLUE}
+${COLOR_NORMAL}
+UsageHereDoc
    exit 1
 }
 
