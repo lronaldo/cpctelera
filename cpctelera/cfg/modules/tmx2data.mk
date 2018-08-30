@@ -37,7 +37,7 @@ T2D_GEN     :=-gc -gh
 T2D_GENF	:=.c .h
 T2D_NUMBASE :=
 T2D_CMACROS	:=
-T2D_ASMPREF	:=
+T2D_ASMPREF	:=-au
 T2D_OUTFOLD	:=src/
 T2D_EXTRA   :=
 
@@ -55,8 +55,8 @@ TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) $(T2D_DEPEND)
 define TMX2DATA_SET_ASMVARPREFIX
 	# Check that the passed value is valid and assign it 
 	$(eval T2D_VALID := yes no)
-	$(call SET_ONE_OF_MANY_VALID,T2D_NUMBASE,$(1),$(T2D_VALID),[TMX2DATA: SET_ASMVARPREFIX] '$(1)' is not valid.)
-	$(eval T2D_ASMPREF := $(if $(filter yes,$(1)),-au,))
+	$(call SET_ONE_OF_MANY_VALID,_S,$(1),$(T2D_VALID),[TMX2DATA: SET_ASMVARPREFIX] '$(1)' is not valid.)
+	$(eval T2D_ASMPREF := $(if $(call EQUALS,$(_S),yes),-au,))
 endef
 
 #################
@@ -68,8 +68,8 @@ endef
 define TMX2DATA_SET_USEMACROS
 	# Check that the passed value is valid and assign it 
 	$(eval T2D_VALID := yes no)
-	$(call SET_ONE_OF_MANY_VALID,T2D_NUMBASE,$(1),$(T2D_VALID),[TMX2DATA: SET_USEMACROS] '$(1)' is not valid.)
-	$(eval T2D_CMACROS := $(if $(filter no,$(1)),-nm,))
+	$(call SET_ONE_OF_MANY_VALID,_S,$(1),$(T2D_VALID),[TMX2DATA: SET_USEMACROS] '$(1)' is not valid.)
+	$(eval T2D_CMACROS := $(if $(call EQUALS,$(_S),no),-nm,))
 endef
 
 
@@ -115,8 +115,8 @@ endef
 define TMX2DATA_SET_BASE
 	# Check that the passed value is valid and assign it 
 	$(eval T2D_VALID := dec hex bin)
-	$(call SET_ONE_OF_MANY_VALID,T2D_NUMBASE,$(1),$(T2D_VALID),[TMX2DATA: SET_BASE] '$(1)' is not a valid numerical base.)
-	$(eval T2D_NUMBASE := -nb $(T2D_NUMBASE))
+	$(call SET_ONE_OF_MANY_VALID,_S,$(1),$(T2D_VALID),[TMX2DATA: SET_BASE] '$(1)' is not a valid numerical base.)
+	$(eval T2D_NUMBASE := -nb $(_S))
 endef
 
 
