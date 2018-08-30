@@ -56,6 +56,7 @@
 ##    -m   | --memory-address         - Set the memory base address where song binary data will be located.
 ##    -o   | --output-filename        - Set the basename for output filenames (name without extension)
 ##    -od  | --output-directory [dir] - Sets directory where .s/.h files will be written to.
+##    -sfx | --only-sfx               - Converts songs' instrument data only for sound effects
 ##
 
 ## Bash Include files
@@ -78,6 +79,8 @@ TXTBINTMP=$(createTempFile)
 BYTESPERLINE=16
 OUTPUT_FILENAME=
 OUTPUTDIR=.
+SFXONLY=0
+SFXFLAG=
 GENERATE_S=0
 GENERATE_H=0
 GENERATE_H_S=0
@@ -142,6 +145,9 @@ OPTIONS
    ${COLOR_LIGHT_BLUE}
    -od  | --output-directory [dir] ${COLOR_CYAN}
          Sets directory where .s/.h files will be written to \
+   ${COLOR_LIGHT_BLUE}
+   -sfx | --only-sfx ${COLOR_CYAN}
+         Converts songs' instrument data only for sound effects \
    ${COLOR_NORMAL}
 
 UsageHereDoc
@@ -252,6 +258,11 @@ while (( $# >= 1 )); do
          OUTPUTDIR="$2"
          shift
       ;;
+      ## Generate only Sound effects
+      "-sfx" | "--only-sfx")
+         SFXONLY=1
+         SFXFLAG=-s
+      ;;
       ## Get main parameter (filename)
       *)
          if isCommandLineOption "$1"; then
@@ -345,7 +356,7 @@ fi
 
 ## STEP 1: Convert AKS file to Binary
 printf "Converting '$FILE' to binary..."
-$AKS2BIN -a "$MEMADDR" "$THEAKSFILE" "$BINTMP_CP" >> "$EXPORTMP" 2>&1
+$AKS2BIN ${SFXFLAG} -a "$MEMADDR" "$THEAKSFILE" "$BINTMP_CP" >> "$EXPORTMP" 2>&1
 
 # Check if song has been correctly exported
 if ! grep "Song exported" < "$EXPORTMP" > /dev/null; then
