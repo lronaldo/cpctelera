@@ -79,9 +79,15 @@ Group: Bitarray  {
 
 Group: Commandline  {
 
+   Group: C_scripts  {
+
+      File: cpct_bin2sna  (commandline/c_scripts/bin2sna/src/main.h)
+      File: cpct_binpatch  (commandline/c_scripts/binpatch/src/main.h)
+      File: cpct_tmx2data  (commandline/c_scripts/tmx2data/src/main.h)
+      }  # Group: C_scripts
+
    File: cpct_aks2c  (commandline/cpct_aks2c)
    File: cpct_bin2c  (commandline/cpct_bin2c)
-   File: cpct_bin2sna  (commandline/c_scripts/bin2sna/src/main.h)
    File: cpct_img2tileset  (commandline/cpct_img2tileset)
    File: cpct_installrslib  (commandline/cpct_installrslib)
    File: cpct_mkproject  (commandline/cpct_mkproject)
@@ -90,7 +96,6 @@ Group: Commandline  {
    File: cpct_rvm  (commandline/cpct_rvm)
    File: cpct_sp2tile  (commandline/cpct_sp2tiles)
    File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
-   File: cpct_tmx2data  (commandline/c_scripts/tmx2data/src/main.h)
    File: cpct_winape  (commandline/cpct_winape)
    }  # Group: Commandline
 
@@ -169,10 +174,8 @@ Group: Random  {
    File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
    File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
    File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
-   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
    File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
    File: cpct_nextRandom_mxor532_u8  (random/cpct_nextRandom_mxor532_u8.s)
-   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
    File: cpct_restoreState_mxor_u16  (random/cpct_restoreState_mxor_u16.s)
    File: cpct_restoreState_mxor_u8  (random/cpct_restoreState_mxor_u8.s)
    File: cpct_setSeed_glfsr16  (random/cpct_setSeed_glfsr.s)
@@ -294,6 +297,8 @@ Group: Video  {
 
 Text: ______________________________________________________________________
 File: License  (gpl-license.txt)
+File: cpct_miniload  (loaders/cpct_miniload.asm)
+File: Random  (loaders/loaders.h)
 
 Group: Index  {
 
