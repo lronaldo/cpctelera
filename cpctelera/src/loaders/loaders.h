@@ -16,9 +16,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-//
-// Title: Random
-//
 #ifndef _CPCT_LOADERS_H_
 #define _CPCT_LOADERS_H_
 
