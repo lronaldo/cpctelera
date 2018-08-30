@@ -141,6 +141,11 @@ Group: Keyboard  {
    File: Keyboard Technicals  (keyboard/keyboard.txt)
    }  # Group: Keyboard
 
+Group: Loaders  {
+
+   File: cpct_miniload  (loaders/cpct_miniload.asm)
+   }  # Group: Loaders
+
 Group: Macros  {
 
    File: allmacros.h  (macros/allmacros.h)
@@ -297,8 +302,6 @@ Group: Video  {
 
 Text: ______________________________________________________________________
 File: License  (gpl-license.txt)
-File: cpct_miniload  (loaders/cpct_miniload.asm)
-File: Random  (loaders/loaders.h)
 
 Group: Index  {
 
