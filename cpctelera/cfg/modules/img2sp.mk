@@ -127,9 +127,8 @@ define IMG2SP_SET_IMG_FORMAT
 	$(if $(filter $(I2S_FMT_VALS),$(1)),,$(error $(I2S_ERR) SET_IMG_FORMAT]: '$(1)' is not valid. Valid values are: {$(I2S_FMT_VALS)}))
 
 	# Convert selected format into options
-	$(eval I2S_FMT := $(if $(filter-out $(1),sprites),,))
-	$(eval I2S_FMT := $(if $(filter-out $(1),zgtiles),,-z -g))
-	$(eval I2S_FMT := $(if $(filter-out $(1),screen),,-scr))	
+	$(eval I2S_FMT := $(if $(call EQUALS,$(1),zgtiles),-z -g,))
+	$(eval I2S_FMT := $(if $(call EQUALS,$(1),screen),-scr,))
 endef
 
 #################
