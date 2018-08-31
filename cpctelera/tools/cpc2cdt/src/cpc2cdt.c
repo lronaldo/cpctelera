@@ -52,8 +52,6 @@
 #include <string.h>
 #include "tinytape.h"
 
-#define error(err, args...) { fprintf(stderr, ##args); exit(err); }
-
 unsigned char body[1<<16],head[1<<8];
 FILE *fi,*fo;
 char *si=0,*so=0,*sn=0,*mode=0;

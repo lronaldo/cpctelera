@@ -6,7 +6,7 @@ OBJ  = obj
 SRC  = src
 BIN  = bin
 
-CFLAGS  = -O3 -fsigned-char -Werror -Wall -DUNIX
+CFLAGS  = -O3 -fsigned-char -Wall -DUNIX -pedantic
 
 TARGET = $(BIN)/cpc2cdt
 FILES  = cpc2cdt tinytape

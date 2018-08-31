@@ -27,6 +27,9 @@ into either half or full pulses.
 
 #pragma once
 
+// USEFUL VARDIADIC MACRO FOR RAISING ERRORS
+#define error(err, ...) { fprintf(stderr, __VA_ARGS__); exit(err); }
+
 // PUBLIC FUNCTION DECLARATIONS
 void tiny_tape_usage();
 void tiny_tape_setBitGaps(int bg);

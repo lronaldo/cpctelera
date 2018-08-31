@@ -27,13 +27,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "tinytape.h"
 
 FILE *fi,*fo;
 int bittype,bitsize,bithold,bitbyte,bitgaps=-1,bit_tzx;
 int databytes,lastbyte,polarity,skipHeader=0;
 unsigned char databyte[1<<19];
 
-#define error(err, args...) { fprintf(stderr, ##args); exit(err); }
 #define fputcc(i,f); { fputc((i)&255,f); fputc((i)>>8,f); }
 
 inline void write_sample(int i)
