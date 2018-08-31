@@ -23,6 +23,24 @@
 ## original files (like Arkos Tracker .aks) into data arrays.             ##
 ############################################################################
 
+##
+## NEW MACROS
+##
+
+# Default values
+#$(eval $(call AKS2DATA, SET_FOLDER   , src/ ))
+#$(eval $(call AKS2DATA, SET_OUTPUTS  , h s  )) { bin, h, hs, s }
+#$(eval $(call AKS2DATA, SET_SFXONLY  , no   )) { yes, no       }
+#$(eval $(call AKS2DATA, SET_EXTRAPAR ,      )) 
+# Conversion
+#$(eval $(call AKS2DATA, CONVERT      , music.aks , array , mem_address ))
+
+
+
+##
+## OLD MACROS (For compatibility)
+##
+
 ## AUTOMATED MUSIC CONVERSION EXAMPLE (Uncomment EVAL line to use)
 
 ## Convert music/song.aks to src/music/song.s and src/music/song.h
@@ -32,9 +50,6 @@
 ##
 
 #$(eval $(call AKS2C,music/song.aks,g_mysong,src/music/,0x42A0))
-
-
-
 
 ############################################################################
 ##              DETAILED INSTRUCTIONS AND PARAMETERS                      ##

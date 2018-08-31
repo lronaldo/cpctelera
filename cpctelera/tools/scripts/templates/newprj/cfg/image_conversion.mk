@@ -23,6 +23,28 @@
 ## PNG, GIF, etc. into C-arrays.                                          ##
 ############################################################################
 
+##
+## NEW MACROS
+##
+
+## 16 colours palette
+#PALETTE=0 1 2 3 6 9 11 12 13 15 16 18 20 24 25 26
+
+## Default values
+#$(eval $(call IMG2SP, SET_MODE        , 0                  ))  { 0, 1, 2 }
+#$(eval $(call IMG2SP, SET_MASK        , none               ))  { interlaced, none }
+#$(eval $(call IMG2SP, SET_FOLDER      , src/               ))
+#$(eval $(call IMG2SP, SET_EXTRAPAR    ,                    ))
+#$(eval $(call IMG2SP, SET_IMG_FORMAT  , sprites            ))	{ sprites, zgtiles, screen }
+#$(eval $(call IMG2SP, SET_OUTPUT      , c                  ))  { bin, c }
+#$(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE)         ))
+#$(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE), g_palette ))
+#$(eval $(call IMG2SP, CONVERT         , img.png , w, h, array, palette, tileset))
+
+##
+## OLD MACROS (For compatibility)
+##
+
 ## Example firmware palette definition as variable in cpct_img2tileset format
 
 # PALETTE={0 1 3 4 7 9 10 12 13 16 19 20 21 24 25 26}
@@ -37,7 +59,6 @@
 ##	  hardware colour values.
 
 #$(eval $(call IMG2SPRITES,img/example.png,0,pre,24,12,$(PALETTE),mask,src/,hwpalette))
-
 
 
 
