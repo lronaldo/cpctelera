@@ -10,7 +10,7 @@ RM      :=rm -rf
 
 CC      :=gcc
 CXX     :=g++
-CXXFLAGS:=-std=c++14 -O4 -Werror -Wall -fsigned-char -pedantic
+CXXFLAGS:=-std=c++14 -O4 -Wall -fsigned-char -pedantic
 LDLIBS  :=
 
 .PHONY: showVars clean cleanall all

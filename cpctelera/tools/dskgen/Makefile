@@ -9,7 +9,7 @@ RM=rm -rf
 
 CC=gcc
 CXX=g++
-CXXFLAGS=-std=c++0x -O3 -Werror -Wall -fsigned-char
+CXXFLAGS=-std=c++0x -O3 -Wall -fsigned-char
 LDLIBS=
 
 .PHONY: showVars clean cleanall all
