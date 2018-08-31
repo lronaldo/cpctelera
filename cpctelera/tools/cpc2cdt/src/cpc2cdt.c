@@ -302,7 +302,7 @@ void detectHeaderInInputFile() {
 			filesize=body[0x40]+body[0x41]*256;
 			fileload=body[0x15]+body[0x16]*256;
 			fileboot=body[0x1A]+body[0x1B]*256;
-			fread(body,1,filesize,fi);
+			if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading AMSDOS header");
 			detectedHeader = 1;
 		} else {
 			while (i<0x7F)
@@ -312,7 +312,7 @@ void detectHeaderInInputFile() {
 				filesize=body[0x10]+body[0x11]*256;
 				fileload=body[0x12]+body[0x13]*256;
 				fileboot=body[0x14]+body[0x15]*256;
-				fread(body,1,filesize,fi);
+				if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading PLUS3DOS header");
 				detectedHeader = 1;
 			}
 		}
