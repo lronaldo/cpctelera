@@ -23,6 +23,7 @@ on the PC */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "defs.h"
 #include "tzxfile.h"
 #include "getopt.h"
