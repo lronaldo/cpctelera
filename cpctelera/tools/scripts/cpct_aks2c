@@ -474,7 +474,7 @@ ${C_IDENTIFIER}_size    = ${SIZE_BYTES}
 ${C_IDENTIFIER}_end     = ${ENDADDR}
 
 ;;;; Song '${C_IDENTIFIER}' declaration
-.globl ${C_IDENTIFIER}
+.globl _${C_IDENTIFIER}
 HereDocument
 
    echo "${COLOR_LIGHT_GREEN}SUCCESS!${COLOR_NORMAL}"
