@@ -124,12 +124,15 @@ endef
 # $(5): Output variable
 #
 define CONVERTVALUE
-	$(eval CO_CNV := $($(3)))
-	$(eval $(5) := $(4))
-	$(eval $(foreach F,$($(2))\
-		,$(if $(filter-out $F,$(1))\
-			,$(eval CO_CNV  := $(filter-out $(firstword $(CO_CNV)),$(CO_CNV)))\
-			,$(eval $(5)    := $(firstword $(CO_CNV))))))
+	$(eval _CNV := $(strip $($(3))))
+	$(eval $(strip $(5)) := $(strip $(4)))
+	$(eval $(foreach _F,$(strip $($(2))) \
+				, $(if $(filter-out $(_F),$(strip $(1))) \
+					, $(eval _CNV := $(filter-out $(firstword $(_CNV)),$(_CNV))) \
+					, $(eval $(5) := $(firstword $(_CNV))) \
+				)\
+			)\
+	 	)
 endef
 
 #################
