@@ -122,13 +122,16 @@ endef
 # Updates variable I2S_FOLD
 #
 define IMG2SP_SET_IMG_FORMAT
-	# Check that selected format is valid
-	$(eval I2S_FMT_VALS := sprites zgtiles screen)
-	$(if $(filter $(I2S_FMT_VALS),$(1)),,$(error $(I2S_ERR) SET_IMG_FORMAT]: '$(1)' is not valid. Valid values are: {$(I2S_FMT_VALS)}))
-
 	# Convert selected format into options
-	$(eval I2S_FMT := $(if $(call EQUALS,$(1),zgtiles),-z -g,))
-	$(eval I2S_FMT := $(if $(call EQUALS,$(1),screen),-scr,))
+	$(eval _VALID := zgtiles screen sprites)
+	$(eval _CNV := -z'-g -scr '')
+	$(call CONVERTVALUE,$(1),_VALID,_CNV,none,_F)
+	
+	# Check that selected format is valid
+	$(if $(call EQUALS,$(_F),none),$(error $(I2S_ERR) SET_IMG_FORMAT]: '$(1)' is not valid. Valid values are: {$(_VALID)}),)
+
+	# Perform assignment (Translating ' into spaces)
+	$(eval I2S_FMT := $(subst ',$(SPACE),$(_F)))
 endef
 
 #################
