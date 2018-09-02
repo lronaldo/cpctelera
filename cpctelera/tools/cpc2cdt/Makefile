@@ -1,6 +1,5 @@
 .PHONY: clean cleanall all
 CC   = gcc
-BIND = gcc
 RM   = rm
 OBJ  = obj
 SRC  = src
@@ -9,13 +8,13 @@ BIN  = bin
 CFLAGS  = -O3 -fsigned-char -Wall -DUNIX -pedantic
 
 TARGET = $(BIN)/cpc2cdt
-FILES  = cpc2cdt tinytape
+FILES  = tinytape cpc2cdt
 F_OBJ  = $(foreach F, $(FILES), $(OBJ)/$(F).o)
 
 all: Makefile $(OBJ) $(BIN) $(F_OBJ) $(TARGET)
 
 $(TARGET): $(F_OBJ) Makefile 
-	$(BIND) $(F_OBJ) -o $(TARGET) $(CFLAGS)
+	$(CC) $(F_OBJ) -o $(TARGET) $(CFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) $< -c -o $@

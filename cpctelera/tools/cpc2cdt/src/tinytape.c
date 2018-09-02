@@ -36,7 +36,7 @@ unsigned char databyte[1<<19];
 
 #define fputcc(i,f); { fputc((i)&255,f); fputc((i)>>8,f); }
 
-inline void write_sample(int i)
+void write_sample(int i)
 {
 	if (lastbyte>=256)
 	{
@@ -45,10 +45,10 @@ inline void write_sample(int i)
 	}
 	lastbyte=lastbyte*2+i;
 }
-inline void repeat_write() { write_sample(polarity); }
-inline void toggle_write() { write_sample(polarity=1-polarity); }
+void repeat_write() { write_sample(polarity); }
+void toggle_write() { write_sample(polarity=1-polarity); }
 
-inline void write_byte(int i)
+void write_byte(int i)
 {
 	if (bit_tzx)
 		databyte[databytes++]=i;
