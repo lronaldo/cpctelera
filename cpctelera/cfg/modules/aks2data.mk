@@ -130,7 +130,6 @@ define AKS2DATA_CONVERT
 		)
 
 # Generate target for music converstion
-.SECONDARY: $(_OBJS)
 $(_OBJS): $(1) $(A2D_DEPEND)
 	@$(call PRINT,$(PROJNAME),"Converting music in $(1) into data...")
 	$(CPCTAKS2C) $(A2D_GEN) $(A2D_SFX) $(A2D_EXTRAPAR) -m "$(3)" -od "$(A2D_OUTFOLD)" -id "$(2)" "$(1)"
