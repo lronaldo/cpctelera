@@ -55,7 +55,7 @@ Z80CODELOC := 0x4000
 ## OBJDIR      = Object files generated on compilation
 ##
 SRCDIR      := src
-DSKFILESDIR := dsk_files
+DSKFILESDIR := dsk
 OBJDIR      := obj
 
 ##
@@ -86,6 +86,7 @@ IHXFILE := $(OBJDIR)/$(PROJNAME).ihx
 BINFILE := $(OBJDIR)/$(PROJNAME).bin
 CDT     := $(PROJNAME).cdt
 DSK     := $(PROJNAME).dsk
+SNA     := $(PROJNAME).sna
 DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 
 ##
@@ -93,9 +94,10 @@ DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 ##
 ##  $(CDT):    Generates the CDT file with main binary
 ##  $(DSK):    Generates the DSK file with main binary
+##  $(SNA):    Generates the SNA file with main binary
 ##  $(DSKINC): Includes all files from DSKFILESDIR into DSK as binaries 
 ##
-TARGET := $(CDT) $(DSK) $(DSKINC)
+TARGET := $(CDT) $(DSK) $(DSKINC) $(SNA)
 
 ##
 ## OBJS2CLEAN: Additional objects to be removed when running "make clean"
@@ -119,7 +121,7 @@ include $(CPCT_PATH)/cfg/global_paths.mk
 #####
 Z80CCFLAGS    :=
 Z80ASMFLAGS   := -l -o -s
-Z80CCINCLUDE  := -I$(CPCT_SRC)
+Z80CCINCLUDE  := -I$(CPCT_SRC) -I$(SRCDIR)
 Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
                  --code-loc $(Z80CODELOC) \
                  --data-loc 0 -l$(CPCT_LIB)
@@ -137,6 +139,9 @@ include $(CPCT_PATH)/cfg/global_functions.mk
 include cfg/image_conversion.mk
 include cfg/tilemap_conversion.mk
 include cfg/music_conversion.mk
+# Create compressed packs and manage CDT
+include cfg/compression.mk
+include cfg/cdt_manager.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
@@ -149,6 +154,7 @@ CFILES         := $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
 ASMFILES       := $(filter-out $(IMGASMFILES), $(ASMFILES))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
+BIN2CFILES     := $(filter-out $(IMGBINFILES), $(BIN2CFILES))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
 
 # Calculate all object files
@@ -161,3 +167,4 @@ ASM_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.
 DSKINCOBJFILES := $(foreach FILE, $(DSKINCSRCFILES), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(FILE)).$(DSKINC_EXT))
 OBJFILES       := $(C_OBJFILES) $(ASM_OBJFILES)
 GENOBJFILES    := $(GENC_OBJFILES) $(GENASM_OBJFILES)
+NONLINKGENFILES:= $(IMGBINFILES)
