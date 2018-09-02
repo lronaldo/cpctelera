@@ -166,7 +166,7 @@ void parseArguments(const TArgs& args) {
       //------------------------ SELECT OUTPUT FOLDER
       } else if (a == "-of" || a == "--output-folder") {
          if (i + 1 >= args.size()) error( { "Modifier '-of | --output-folder' needs to be followed by a folder, but nothing found."} );
-         g_outputFolder = std::move(removeRepetitions(args[i + 1], '/'));
+         g_outputFolder = removeRepetitions(args[i + 1], '/');
          ensureOnly1CharBack(g_outputFolder, '/');
          if ( !isFolderWritable(g_outputFolder.c_str()) ) error ({ "Folder '", g_outputFolder, "' does not exist, is not a folder or is not writable." });
 
