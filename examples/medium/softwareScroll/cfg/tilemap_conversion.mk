@@ -23,6 +23,10 @@
 ## original files (like Tiled .tmx) into C-arrays.                        ##
 ############################################################################
 
+##
+## NEW MACROS
+##
+
 ## AUTOMATED TILEMAP CONVERSIONS
 ##
 ## We automatically convert 3 tilemaps into arrays: 
@@ -31,17 +35,59 @@
 ##	- img/building.tmx 			(Building tilemap that will be scrolled inside the frame)
 ##
 
+## Set output folder for converted tilemaps to src/maps/
+$(eval $(call TMX2DATA, SET_FOLDER, src/maps/ )) 
+
 ## CONVERT: img/building.tmx to src/maps/building.c & src/maps/building.h
 ##	Generates a g_building C-Array, with 1-byte tile indexes defining the building
-$(eval $(call TMX2C,img/building.tmx,g_building,src/maps/,))
+$(eval $(call TMX2DATA, CONVERT, img/building.tmx        , g_building)) 
+
 
 ## CONVERT: img/frame_updown.tmx to src/maps/frame_updown.c & src/maps/frame_updown.h
 ##	Generates a g_frame_ud C-Array, with 1-byte tile indexes defining Upper and Lower parts of the frame
-$(eval $(call TMX2C,img/frame_updown.tmx,g_frame_ud,src/maps/,))
+$(eval $(call TMX2DATA, CONVERT, img/frame_updown.tmx    , g_frame_ud)) 
 
 ## CONVERT: img/frame_leftright.tmx to src/maps/frame_leftright.c & src/maps/frame_leftright.h
 ##	Generates a g_frame_lr C-Array, with 1-byte tile indexes defining Left and Right parts of the frame
-$(eval $(call TMX2C,img/frame_leftright.tmx,g_frame_lr,src/maps/,))
+$(eval $(call TMX2DATA, CONVERT, img/frame_leftright.tmx , g_frame_lr)) 
+
+# Default values
+#$(eval $(call TMX2DATA, SET_ASMVARPREFIX, yes       ))   { yes, no      }
+#$(eval $(call TMX2DATA, SET_USEMACROS   , yes       ))   { yes, no      }
+#$(eval $(call TMX2DATA, SET_OUTPUTS     , h c       ))   { bin hs h s c }
+#$(eval $(call TMX2DATA, SET_BASE        , dec       ))   { dec hex bin }
+#$(eval $(call TMX2DATA, SET_BITSPERITEM , 8         ))   { 1, 2, 4, 6, 8 }
+#$(eval $(call TMX2DATA, SET_FOLDER      , src/      )) 
+#$(eval $(call TMX2DATA, SET_EXTRAPAR    ,           ))	
+# Conversion 
+#$(eval $(call TMX2DATA, CONVERT, tmxfile, array )) 
+
+
+##
+## OLD MACROS (For compatibility)
+##
+
+## TILEMAP CONVERSION EXAMPLES (Uncomment EVAL lines to use)
+##
+
+## Convert img/tilemap.tmx to src/tilemap.c and src/tilemap.h
+##		This file contains a tilemap created with Tiled that uses tiles
+## in img/tiles.png. This macro will convert the tilemap into a C-array
+## named g_tilemap, containing all the IDs of the tiles that are located 
+## at each given location of the C-array. 
+##
+
+#$(eval $(call TMX2C,img/tilemap.tmx,g_tilemap,src/,4))
+
+## Convert img/level0b.tmx to src/levels/level0b.c and src/levels/level0b.h
+##		This file contains another tilemap created with Tiled. This macro 
+## will convert the tilemap into a C bitarray of 4-bits per item. The array
+## will be named g_level0_4bit. For each tile ID included into the final 
+## bitarray, only 4 bits will be used. Therefore, each byte of the array 
+## will contain 2 tile IDs.
+##
+
+#$(eval $(call TMX2C,img/level0b.tmx,g_level0_4bit,src/levels/,4))
 
 
 

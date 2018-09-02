@@ -23,11 +23,7 @@
 ## original files (like Arkos Tracker .aks) into data arrays.             ##
 ############################################################################
 
-##
-## No music in this example
-##
-
-
+# No Music in this example
 
 ############################################################################
 ##              DETAILED INSTRUCTIONS AND PARAMETERS                      ##

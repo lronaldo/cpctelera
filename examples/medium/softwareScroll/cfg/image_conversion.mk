@@ -31,7 +31,7 @@
 #  6: Bright Red      9: Green            11: Sky Blue        13: White
 # 15: Orange         18: Bright Green     19: Sea Green       20: Bright Cyan
 # 21: Lime           22: Pastel Green     23: Pastel Cyan     24: Bright Yellow
-PALETTE={1 0 2 3 6 9 11 13 15 18 19 20 21 22 23 24}
+PALETTE=1 0 2 3 6 9 11 13 15 18 19 20 21 22 23 24
 
 # Palette first colour is 1 as will be used as background, and we want background
 # to be Blue in this example.
@@ -41,16 +41,19 @@ PALETTE={1 0 2 3 6 9 11 13 15 18 19 20 21 22 23 24}
 #
 # It will split img/tileset.png into 8x8 pixel mode 0 tiles and generate an array 
 # of screen pixel format values for each tile. Each array will be named using 
-# prefix 'g_' followed by the name of the file 'tileset' and a suffix '_XX' with
-# the number of the tile (For instance, g_tileset_00, g_tileset_01...). Conversion 
-# will use previously defined $(PALETTE) to generate pixel format values. 
-# 'zgtiles' option generates tiles in Zig-Zag pixel order and Gray-Code row order.
+# prefix 'g_tileset' and a suffix '_XX' with the number of the tile (For instance, 
+# g_tileset_00, g_tileset_01...). Conversion will use previously defined $(PALETTE) 
+# to generate pixel format values. 
+# 'zgtiles' FORMAT generates tiles in Zig-Zag pixel order and Gray-Code row order. 
 # This format is optimal for drawing to screen and required all functions with
 # the suffix '_g' in their names, like cpct_etm_drawTilemap4x8_ag (_a: aligned, 
-# _g: Zig-Zag pixel order, Gray-Code row order). Finally, a 'g_palette' array 
-# containing hardware numbers for all 16 colours will also be generated. 
-$(eval $(call IMG2SPRITES,img/tileset.png,0,g,8,8,$(PALETTE),zgtiles,src/maps/,hwpalette,))
-
+# _g: Zig-Zag pixel order, Gray-Code row order). 
+# Finally, a 'g_palette' array containing hardware numbers for all 16 colours will 
+# also be generated. 
+$(eval $(call IMG2SP, SET_FOLDER     , src/maps/))
+$(eval $(call IMG2SP, SET_IMG_FORMAT , zgtiles))
+$(eval $(call IMG2SP, SET_PALETTE_FW , $(PALETTE)))
+$(eval $(call IMG2SP, CONVERT        , img/tileset.png, 8, 8, g_tileset, g_palette,))
 
 
 
