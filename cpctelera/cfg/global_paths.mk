@@ -52,6 +52,9 @@
 THIS_FILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 CPCT_PATH      := $(patsubst %cfg/,%,$(THIS_FILE_PATH))
 
+# Selected SHELL used for $ ( shell ) functions
+SHELL := /bin/bash
+
 # PATHs FOR BUILDING TOOLS BINARIES
 #  Absolute paths for SDCC, Hex2bin, iDSK and 2CDT 
 SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.6.8-r9946/bin/
