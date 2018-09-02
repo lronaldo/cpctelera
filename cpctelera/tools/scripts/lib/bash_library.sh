@@ -570,7 +570,7 @@ function dec2Bin {
 ## $1: integer decimal number
 ##
 function dec2Hex {
-   echo "obase=16;$1" | bc
+   printf "%x" "$1"
 }
 
 ## Converts a number to decimal, be it a Binary or an hexadecimal one
@@ -1159,7 +1159,7 @@ function toUpper {
 ## $2: Number of binary bytes to get
 ## 
 function getFileInitialBytes {
-   xxd -ps -l${2} -c${2} "$1"
+   od -An -t x1 -N "$2" -v "$1" | tr -d " "
 }
 
 ## Checks if a given file does start by a given binary string data.
