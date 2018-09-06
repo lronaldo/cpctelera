@@ -48,6 +48,7 @@
 ##    -gs  | --generate-asm              - Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults.
 ##    -h   | --help                      - Shows help information on the terminal.
 ##    -i   | --include-header [file]     - Include a header file at the top of the generated output
+##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
 ##
 
 
@@ -72,10 +73,10 @@ Default output produces two files:
 ${COLOR_LIGHT_YELLOW}
 OPTIONS \
    ${COLOR_LIGHT_BLUE}
-   -an | --array-name ${COLOR_NORMAL}<identifier> ${COLOR_CYAN}
+   -an  | --array-name ${COLOR_NORMAL}<identifier> ${COLOR_CYAN}
       Sets the C identifier that will be used. G_<OUTFILE> is used by default. \
    ${COLOR_LIGHT_BLUE}
-   -b  | --bytes-per-line ${COLOR_NORMAL}<numbytes> ${COLOR_CYAN}
+   -b   | --bytes-per-line ${COLOR_NORMAL}<numbytes> ${COLOR_CYAN}
       Establishes the number of bytes to write at each array line in C. 16 by default. \
    ${COLOR_LIGHT_BLUE}
    -gh  | --generate-header ${COLOR_CYAN}
@@ -87,11 +88,15 @@ OPTIONS \
    -gs  | --generate-asm ${COLOR_CYAN}
          Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults. \
    ${COLOR_LIGHT_BLUE}
-   -h  | --help ${COLOR_CYAN}
+   -h   | --help ${COLOR_CYAN}
       Shows this help information. \
    ${COLOR_LIGHT_BLUE}
-   -i  | --include-header ${COLOR_NORMAL}<file> ${COLOR_CYAN}
-      Include a header file at the top of the generated output.
+   -i   | --include-header ${COLOR_NORMAL}<file> ${COLOR_CYAN}
+      Include a header file at the top of the generated output. \
+   ${COLOR_LIGHT_BLUE}
+   -org | --origin-asm ${COLOR_NORMAL}<address> ${COLOR_CYAN}
+      Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
+
 ${COLOR_NORMAL}
 UsageHereDoc
    exit 1
@@ -111,6 +116,7 @@ BYTESPERLINE=16
 GENERATE_S=0
 GENERATE_H=0
 GENERATE_H_S=0
+ORGADDRESS=
 
 ## COMPRESSORS
 ZX7B=${CPCT_PATH}/tools/zx7b/bin/zx7b
@@ -160,6 +166,19 @@ while (( $# >= 1 )); do
       ## Select generation of assembly file
       "-gs" | "--generate-asm")
          GENERATE_S=1
+      ;;
+      ## Assembly origin address
+      "-org" | "--origin-asm")
+         if ! isCIntValue "$2"; then
+            paramError "'$2' is not a valid value for -org. It must be followed by a valid 16-bits address."
+         fi
+         ORGADDRESS=$(any2Dec "$2")
+         if (( ORGADDRESS < 0 || ORGADDRESS > 65535 )); then
+            paramError "'$2' is an out-of-range address for -org. If must be in the range [0-65535]." 
+         fi
+         ORGADDRESS=0x$(dec2Hex "$ORGADDRESS")
+
+         shift
       ;;
       ## Get outfile and other files
       *)
@@ -350,9 +369,23 @@ cat > ${OFILE} <<TheSFile
 ;; Compressed:       $COMPRESSED_BYTES bytes
 ;; Space saved:      $SAVED_BYTES bytes
 ;;
-
-_$ARRAYNAME::
 TheSFile
+
+# If there is an ORG ADDRESS, we have to position the code
+if [ ! -z "$ORGADDRESS" ]; then
+
+cat > ${OFILE} <<TheSFile
+;; Absolute data location: '$ORGADDRESS'
+.area _${ARRAYNAME}_area_ (ABS)
+.org $ORGADDRESS
+
+TheSFile
+
+fi
+
+   echo ";; Data array definition" >> ${OFILE}
+   echo "_$ARRAYNAME::" >> ${OFILE}
+
 
    ## Convert binary file to bytes in hexadecimal and store in a temporary file
    od -An -t x1 -v "$TMPPACK" > $TMPFILE
