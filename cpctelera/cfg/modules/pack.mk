@@ -48,12 +48,20 @@ endef
 #
 # $(1): Compressed pack file name
 # $(2): Output folder for generated files
+# $(3): Origin absolute address for the generated packed data
 #
 define PACKZX7B
 	# First, check that a PACK name has been passed
 	$(if $(1),,$(error <<ERROR>> PACKZX7B requires a PACK filename as first parameter))
 	# Now, check that $(1) is non-empty to ensure that some files have been previously added to variable
 	$(if $(PACK_$(1)),,$(error <<ERROR>> PACK filename '$(1)' does not contain any file to be packed. Is the PACK filename correctly spelled?))
+	# Check if there is a valid origin absolute address
+	$(eval _A := $(strip $(3)))
+	$(if $(_A)\
+		, $(call ENSURE_ADDRESS_VALID,$(_A),PACKZX7B) \
+		  $(eval _A := -org $(_A)) \
+	)
+
 	# Now generate output filename depending on output folder
 	$(eval PACK_$(1)_outfile := $(if $(2),$(2:/=)/$(1),$(1)))
 	# Construct the build target
@@ -63,7 +71,7 @@ define PACKZX7B
 .SECONDARY: $(PACK_$(1)_target)
 $(PACK_$(1)_target): $(PACK_$(1)) $(A2P_DEPEND)
 	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
-	$(CPCTPACK) $(PACK_$(1)_outfile) $(PACK_$(1))
+	$(CPCTPACK) $(_A) $(PACK_$(1)_outfile) $(PACK_$(1))
 
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGASMFILES := $(PACK_$(1)_outfile).s $(IMGASMFILES)
