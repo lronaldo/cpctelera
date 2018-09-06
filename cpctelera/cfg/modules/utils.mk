@@ -31,6 +31,7 @@
 ##   * CONVERTVALUE
 ##   * CONVERT_FW2HW_PALETTE
 ##   * DEC2HEX
+##   * ENSURE_ADDRESS_VALID
 ##   * ENSURE_VALID_C_ID
 ##   * ENSURE_SINGLE_VALUE
 ##   * ENSUREVALID
@@ -477,4 +478,26 @@ endef
 #
 define DEC2HEX
 $(shell printf "0x%x" "$(strip $(1))")
+endef
+
+#################
+# ENSURE_ADDRESS_VALID: Ensures that a given memory 
+# address is a valid 16-bits address, checking that it is
+# either a decimal or hexadecimal number between 0 and 65535.
+# If it is not valid, it raises an error.
+#
+# $(1): Address to be checked
+# $(2): Error Message Header from the routine that called
+#
+define ENSURE_ADDRESS_VALID
+# Error MSG header
+$(eval _R := $(2))
+
+# Check that load address is valid
+$(eval _A := $(strip $(1)))
+$(call ENSURE_SINGLE_VALUE,$(_A),$(_R) '$(1)' is not a valid 16-bits address. It is not a single value)
+$(if $(call ISHEX,$(_A))\
+	,$(eval _A := $(call HEX2DEC,$(_A)))\
+	,$(if $(call ISINT,$(_A)),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is neither a decimal, nor an hexadecimal integer)))
+$(if $(call INTINRANGE,$(_A),0,65535),,$(error $(_R) '$(1)' is not a valid 16-bits address. It is not in the range [0 - 65535]/[0x0000-0xFFFF]))
 endef
