@@ -26,7 +26,7 @@
 ;;    Sets the value of a concrete bit into a bitarray to 0 or 1
 ;;
 ;; C Definition:
-;;    void <cpct_setBit>  (void* *array*, <u16> *index*, <u8> *value*)
+;;    void <cpct_setBit>  (void* *array*, <u16> *value*, <u16> *index*)
 ;;
 ;; Input Parameters (6 Bytes, B register ignored, only C register is used for value):
 ;;    (2B DE) array - Pointer to the first byte of the array
