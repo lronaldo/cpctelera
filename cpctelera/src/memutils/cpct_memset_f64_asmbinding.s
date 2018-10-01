@@ -20,6 +20,6 @@
 ;;
 ;; Assembly binding for <cpct_memset_f64> function
 ;; 
-_cpct_memset_f64_asm::
+cpct_memset_f64_asm::
 
 .include /cpct_memset_f64.asm/
