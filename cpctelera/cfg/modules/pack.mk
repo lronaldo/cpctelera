@@ -25,6 +25,7 @@
 
 # Ensure that compression.mk exists for compatibility with older CPCtelera projects
 A2P_DEPEND := cfg/compression.mk
+A2P_OPTS   := -ghs -gh -gs
 TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) $(A2P_DEPEND)
 
 #################
@@ -71,9 +72,9 @@ define PACKZX7B
 .SECONDARY: $(PACK_$(1)_target)
 $(PACK_$(1)_target): $(PACK_$(1)) $(A2P_DEPEND)
 	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
-	$(CPCTPACK) $(_A) $(PACK_$(1)_outfile) $(PACK_$(1))
+	$(CPCTPACK) $(A2P_OPTS) $(_A) $(PACK_$(1)_outfile) $(PACK_$(1))
 
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGASMFILES := $(PACK_$(1)_outfile).s $(IMGASMFILES)
-OBJS2CLEAN  := $(PACK_$(1)_target) $(OBJS2CLEAN)
+OBJS2CLEAN  := $(PACK_$(1)_outfile).h.s $(PACK_$(1)_target) $(OBJS2CLEAN)
 endef
