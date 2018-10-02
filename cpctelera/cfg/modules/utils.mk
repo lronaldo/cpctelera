@@ -91,22 +91,21 @@ endef
 #
 define JOINFOLDER2BASENAME
 	# Strip parameters
-	$(eval J2B_1 := $(strip $(1)))
-	$(eval J2B_2 := $(strip $(2)))
-	$(eval J2B_3 := $(strip $(3)))
+	$(eval _J2B_1 := $(strip $(1)))
+	$(eval _J2B_2 := $(strip $(2)))
+	$(eval _J2B_3 := $(strip $(3)))
 	# First, check if FILE is empty
-	$(if $(J2B_3),,$(error <<ERROR>> Empty filename when trying to join with its path. {VAR: '$(J2B_1)', PATH: '$(J2B_2)', FILE: '$(J2B_3)'}))
+	$(if $(_J2B_3),,$(error <<ERROR>> Empty filename when trying to join with its path. {VAR: '$(_J2B_1)', PATH: '$(_J2B_2)', FILE: '$(_J2B_3)'}))
 	# Revome FILE's path if it had one
-	$(eval JF2BN_F := $(notdir $(J2B_3)))
+	$(eval _JF2BN_F := $(notdir $(_J2B_3)))
 	# Depending on path being empty or not, joining has to be done in a different way
-	$(eval $(J2B_1) := $(shell \
-		if [ "$(J2B_2)" != "" ]; then \
-			A="$(J2B_2)"; A="$${A%%/}"; \
-			echo "$${A}/$(JF2BN_F)"; \
+	$(eval $(_J2B_1) := $(shell \
+		if [ "$(_J2B_2)" != "" ]; then \
+			A="$(_J2B_2)"; A="$${A%%/}"; \
+			echo "$${A}/$(_JF2BN_F)"; \
 		else \
-			echo "$(J2B_3)"; \
+			echo "$(_J2B_3)"; \
 		fi))
-	$(eval undefine JF2BN_F)
 endef
 
 #################
@@ -378,7 +377,7 @@ endef
 # $(1): String to calculate its length
 #
 define STRLEN
-$(shell expr length '$(strip $(1))')
+$(shell _SLV='$(strip $(1))' && echo $${#_SLV})
 endef
 
 #################
