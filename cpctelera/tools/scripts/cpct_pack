@@ -326,11 +326,10 @@ cat > ${OFILE} <<TheHFile
 ;; Space saved:      $SAVED_BYTES bytes
 ;;
 
-;; Declaration of the compressed array
+;; Declaration of the compressed array and
+;; the address of the latest byte of the compressed array (for unpacking purposes)
 .globl _$ARRAYNAME
-
-;; Address of the latest byte of the compressed array (for unpacking purposes)
-_${ARRAYNAME}_end = _$ARRAYNAME + $COMPRESSED_BYTES - 1
+.globl _${ARRAYNAME}_end
 
 ;; Compressed and uncompressed sizes
 _${ARRAYNAME}_size_z = $COMPRESSED_BYTES
@@ -407,6 +406,11 @@ fi
          i=$((i+1))
       done
    done < $TMPFILE >> ${OFILE}
+
+   ## Generate constant pointer to the end of the array
+   echo >> ${OFILE}
+   echo ";; Address of the latest byte of the compressed array (for unpacking purposes)" >> ${OFILE}
+   echo "_${ARRAYNAME}_end == . - 1" >> ${OFILE}
 
    ## Output a line ending
    echo >> ${OFILE}
