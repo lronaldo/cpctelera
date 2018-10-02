@@ -305,7 +305,7 @@ endef
 # $(1): Palette values to be converted
 # $(2): Output variable with converted palette
 #
-_HWPAL := 14 04 15 1C 18 1D 0C 05 0D 16 06 17 1E 00 1F 0E 07 0F 12 02 13 1A 19 1B 0A 03 0B
+_HWPAL := 54 44 55 5C 58 5D 4C 45 4D 56 46 57 5E 40 5F 4E 47 4F 52 42 53 5A 59 5B 4A 43 4B
 define CONVERT_FW2HW_PALETTE
 	$(foreach _PV,$(1),\
 		$(eval _PV1 := $(call ADD2INTS,$(_PV),1))\
