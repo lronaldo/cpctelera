@@ -20,7 +20,7 @@
 ;;
 ;; Assembly binding for cpct_memset_f8 function
 ;; 
-_cpct_memset_f8_asm::
+cpct_memset_f8_asm::
 
 
 .include /cpct_memset_f8.asm/
