@@ -54,6 +54,7 @@
 ##    -a  | --any-dsk         - Lauches RVM and loads first DSK file to match *.dsk
 ##    -ac | --any-cdt         - Lauches RVM and loads first CDT file to match *.cdt
 ##    -as | --any-sna         - Lauches RVM and loads first SNA file to match *.sna
+##    -ds | --default-shader  - Execute RVM with default postprocessing shader activated
 ##    -n  | --no-execute      - Lauches RVM but does not automatically RUN any DSK program.
 ##    -nw | --no-warp         - Does not automatically enter Warp Mode on CDT load.
 ##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}
@@ -85,6 +86,7 @@ COMMAND=""
 WARP=true
 WARPMODE=""
 MACHINE=""
+SHADER="-ns"
 DEFAULTMACHINE_CDT="cpc464"
 DEFAULTMACHINE_SNA="cpc464"
 DEFAULTMACHINE_DSK="cpc664"
@@ -129,6 +131,8 @@ commands are required (they should be installed in the system)."
    echo "${COLOR_CYAN}       Lauches RVM and loads first CDT file to match *.cdt."
    echo "${COLOR_LIGHT_BLUE}  -as| --any-sna"
    echo "${COLOR_CYAN}       Lauches RVM and loads first SNA file to match *.sna."
+   echo "${COLOR_LIGHT_BLUE}  -ds| --default-shader"
+   echo "${COLOR_CYAN}       Execute RVM with default postprocessing shader activated"
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches RVM but does not automatically RUN any DSK program."
    echo "${COLOR_LIGHT_BLUE}  -nw| --no-warp"
@@ -330,12 +334,6 @@ readConfigFile
 # Proccess command line parameters
 while (( $# > 0 )); do
    case "$1" in
-      "-n" | "--no-execute")
-         EXECUTE=false
-      ;;
-      "-nw"| "--no-warp")
-         WARP=false
-      ;;
       "-a" | "--any-dsk")
          FILE=$(echo *.[dD][sS][kK])
       ;;
@@ -345,12 +343,11 @@ while (( $# > 0 )); do
       "-as" | "--any-sna")
          FILE=$(echo *.[sS][nN][aA])
       ;;
-      "-r" | "--run")
-         if (( $# < 2 )); then
-            paramError "'-r/--run' requires a filename to be run as parameter" 12            
-         fi 
-         COMMAND="RUN\"${2}\"\n"
-         shift
+      "-ds" | "--default-shader")
+         SHADER=""
+      ;;
+      "-h" | "--help")
+        usage
       ;;
       "-m" | "--machine")
          MACHINE="$2"
@@ -359,8 +356,18 @@ while (( $# > 0 )); do
          fi 
          shift
       ;;
-      "-h" | "--help")
-        usage
+      "-n" | "--no-execute")
+         EXECUTE=false
+      ;;
+      "-nw"| "--no-warp")
+         WARP=false
+      ;;
+      "-r" | "--run")
+         if (( $# < 2 )); then
+            paramError "'-r/--run' requires a filename to be run as parameter" 12            
+         fi 
+         COMMAND="RUN\"${2}\"\n"
+         shift
       ;;
       *)
          if isCommandLineOption "$1"; then
@@ -449,4 +456,4 @@ fi
 echo "${COLOR_NORMAL}"
 
 # Launch RVM with appropriate path for DSK/SNA file
-"${RVM}" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$WARPMODE" "$AUTOPLAY" "$EXECUTEFILE" &> /dev/null &
+"${RVM}" "$SHADER" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$WARPMODE" "$AUTOPLAY" "$EXECUTEFILE" &> /dev/null &
