@@ -406,6 +406,7 @@ FILEPATH=$(getMySystemPath "$FILE")
 EXT=$(echo ${FILEPATH:${#FILEPATH}-3:${#FILEPATH}} | tr /a-z/ /A-Z/)
 if [ "$EXT" = "SNA" ]; then
    FILEPATH="/SN:$FILEPATH"
+   MODIFIER=""
 fi
 
 # Launch Winape with appropriate path for DSK/SNA file
