@@ -89,33 +89,21 @@
 
 ;; Pixel colour table defined in cpct_drawCharM0
 .globl dc_mode0_ct
-
-;; Macro that computes A = *(DE + A)
-;;  to access vales stored in tables pointed by DE
-;;
-.macro A_eq__DEplusA__
-   ;; Compute DE += A
-   add   e               ;; [1] | E += A
-   ld    e, a            ;; [1] |
-   sub   a               ;; [1] A = 0 (preserving Carry Flag)
-   adc   d               ;; [1] | D += Carry
-   ld    d, a            ;; [1] |
-
-   ;; A = *(DE + A)
-   ld    a, (de)         ;; [2] A = Value stored at the table pointed by DE 
-.endm
+.include "macros/cpct_maths.h.s"
 
    ;; Convert first parameter (Pixel 0) to screen pixel format
    ld   a, l             ;; [1] A = L (A = First parameter, pixel 0, palette index)
    ld  de, #dc_mode0_ct  ;; [3] DE points to conversion table (dc_mode0_ct)
-   A_eq__DEplusA__       ;; [7] A = *(DE + A) => A = Pixel 0 converted to screen pixel format
+   add_de_a              ;; [5] DE = DE + A
+   ld   a, (de)          ;; [2] A = *(DE + A) => A = Pixel 0 converted to screen pixel format
    sla  a                ;; [2] A <<= 1, as Screen formats in table are in Pixel Y disposition 
    ld   b, a             ;; [1] B = Pixel 0 in screen format
 
    ;; Convert second parameter (Pixel 1) to screen pixel format
    ld   a, h             ;; [1] A = H (A = Second parameter, pixel 1, palette index)
    ld  de, #dc_mode0_ct  ;; [3] DE points to conversion table (dc_mode0_ct)
-   A_eq__DEplusA__       ;; [7] A = *(DE + A) => A = Pixel 1 converted to screen pixel format
+   add_de_a              ;; [5] DE = DE + A
+   ld   a, (de)          ;; [2] A = *(DE + A) => A = Pixel 1 converted to screen pixel format
 
    ;; Mix both pixels in a single byte and return
    or   b                ;; [1] A = A or B (Mix Pixel 0 and Pixel 1 screen pixel format into A)
