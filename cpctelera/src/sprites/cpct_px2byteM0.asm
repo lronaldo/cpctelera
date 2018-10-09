@@ -89,7 +89,14 @@
 
 ;; Pixel colour table defined in cpct_drawCharM0
 .globl dc_mode0_ct
-.include "macros/cpct_maths.h.s"
+
+.macro add_de_a
+   add   e     ;; [1]   A'  = E + A (Generating Carry if > 0xFF)
+   ld    e, a  ;; [1]   E'  = E + A 
+   adc   d     ;; [1] / A'' = D + A' + Carry = D + E + A + Carry 
+   sub   e     ;; [1] | A'''= A'' - E' = D + E + A + Carry - E - A = D + Carry
+   ld    d, a  ;; [1] \ D'  = D + Carry
+.endm
 
    ;; Convert first parameter (Pixel 0) to screen pixel format
    ld   a, l             ;; [1] A = L (A = First parameter, pixel 0, palette index)
