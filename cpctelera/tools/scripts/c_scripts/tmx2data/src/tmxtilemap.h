@@ -48,6 +48,7 @@ public:
    void  setInitialTileID(uint8_t id)           { m_initialTileID = id;             }
    void  setUseCPCTMacros(bool use)             { m_bitarray.setUseCPCTMacros(use); }
    void  setASMVariablesPrefix(char p)          { m_asmVarsPrefix = p;              }
+   void  setASMConstantsLocal(bool b)           { m_asmConstantsLocal = b;          }
 
    // Output operators
    void  output_basic_H  (std::ostream& out) const;
@@ -60,18 +61,19 @@ public:
    TNumberFormat getNumberFormat()     { return m_bitarray.getNumberFormat(); }
 private:
    // Attributes
-   mutable CPCT_bitarray  m_bitarray;     // Class that encapsulate conversion from bitarray numbers to C/H/BIN
-   std::string    m_filename;             // Name of the TMX input file
-   std::string    m_cid = "g_map";        // C-identifier for output
-   tmx::Map       m_map;                  // TMX interpreter
-   uint8_t        m_maxTileID;            // Highest ID amongst tiles
-   uint8_t        m_initialTileID = 0;    // This will be considered the ID of the first tile
-   uint8_t        m_maxValidTileID = 255; // Max valid Tile ID number depending on bits per item
-   uint32_t       m_visibleLayers;        // Number of visible layers in the TMX
-   uint32_t       m_tw = 0, m_th = 0;     // Tile Width and Height
-   uint32_t       m_total_bytes;          // Total bytes for a given output array
-   std::string    m_theTime;              // Current time string
-   char           m_asmVarsPrefix = 0;    // Prefix for assembly variable names (Default: none)
+   mutable CPCT_bitarray  m_bitarray;           // Class that encapsulate conversion from bitarray numbers to C/H/BIN
+   std::string    m_filename;                   // Name of the TMX input file
+   std::string    m_cid = "g_map";              // C-identifier for output
+   tmx::Map       m_map;                        // TMX interpreter
+   uint8_t        m_maxTileID;                  // Highest ID amongst tiles
+   uint8_t        m_initialTileID = 0;          // This will be considered the ID of the first tile
+   uint8_t        m_maxValidTileID = 255;       // Max valid Tile ID number depending on bits per item
+   uint32_t       m_visibleLayers;              // Number of visible layers in the TMX
+   uint32_t       m_tw = 0, m_th = 0;           // Tile Width and Height
+   uint32_t       m_total_bytes;                // Total bytes for a given output array
+   std::string    m_theTime;                    // Current time string
+   char           m_asmVarsPrefix = 0;          // Prefix for assembly variable names (Default: none)
+   bool           m_asmConstantsLocal = false;  // Decide if assembly generated constants have to be local or global
 
    // Useful methods
    void           output_asmVar(std::ostream& out, const std::string& var) const;

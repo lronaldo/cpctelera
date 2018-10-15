@@ -37,18 +37,19 @@
 //    Conversion is output to stdout unless otherwise requested by options.
 //
 // Command line options:
-//    -au | --add-underscore-s-vars  - Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)
-//    -ba | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
-//    -ci | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
-//    -gc | --generate-c             - Generates a C file with an array containing converted values (Default: yes). Defaults are set to false on using this flag.
-//    -gh | --generate-h             - Generates a H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag.
-//    -ghs| --generate-h-s           - Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag.
-//    -gb | --generate-bin           - Generates a BIN file with a raw string containing the converted values (same values as C array) (Default: no). Defaults are set to false on using this flag.
-//    -gs | --generate-asm           - Generates a .S (ASM) file with converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
-//    -h  | --help                   - Shows help information on the terminal.
-//    -nb | --number-base <base>     - Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)
-//    -nm | --do-not-use-cpct-macros - Does not use CPCtelera macros when producing array values. Default: macros used
-//    -of | --output-folder <folder> - Changes the output folder for generated C/H files (Default: .)
+//    -alc | --asm-local-constants    - Make assembly generated constants local instead of global (Default: no)
+//    -au  | --add-underscore-s-vars  - Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)
+//    -ba  | --bitarray <bits>        - Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)
+//    -ci  | --c-identifier <id>      - Sets the C-identifier that will be used for the generated array (Default: filename)
+//    -gc  | --generate-c             - Generates a C file with an array containing converted values (Default: yes). Defaults are set to false on using this flag.
+//    -gh  | --generate-h             - Generates a H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag.
+//    -ghs | --generate-h-s           - Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag.
+//    -gb  | --generate-bin           - Generates a BIN file with a raw string containing the converted values (same values as C array) (Default: no). Defaults are set to false on using this flag.
+//    -gs  | --generate-asm           - Generates a .S (ASM) file with converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
+//    -h   | --help                   - Shows help information on the terminal.
+//    -nb  | --number-base <base>     - Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)
+//    -nm  | --do-not-use-cpct-macros - Does not use CPCtelera macros when producing array values. Default: macros used
+//    -of  | --output-folder <folder> - Changes the output folder for generated C/H files (Default: .)
 //
 
 #pragma once

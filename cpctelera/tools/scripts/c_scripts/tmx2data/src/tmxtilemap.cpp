@@ -197,27 +197,30 @@ void
 CPCT_TMX_Tilemap::output_basic_HS(std::ostream& out) const {
    output_C_code_header(out, ";;");
 
+   // Select equals sign depending on assembly constant selection
+   const char* equal = (m_asmConstantsLocal) ? "=" : "==";
+
    // Output declarations
    out << "\n;;#### Width and height constants ####";
-   out << '\n'; output_asmVar(out, m_cid); out <<"_W = " << m_tw;
-   out << '\n'; output_asmVar(out, m_cid); out <<"_H = " << m_th;
+   out << '\n'; output_asmVar(out, m_cid); out <<"_W " << equal << " " << m_tw;
+   out << '\n'; output_asmVar(out, m_cid); out <<"_H " << equal << " " << m_th;
    out << '\n';
    out << "\n;;#### Converted layer tilemaps ####";
    out << "\n;;   Visible layers: " << m_visibleLayers;
    out << "\n;;";
    if (m_visibleLayers == 1) {
-      out << '\n'; output_asmVar(out, m_cid); out << "_SIZE = "<< m_total_bytes;
+      out << '\n'; output_asmVar(out, m_cid); out << "_SIZE " << equal << " " << m_total_bytes;
    } else {
-      out << '\n'; output_asmVar(out, m_cid); out << "_LAYERS     = "<< m_visibleLayers;
-      out << '\n'; output_asmVar(out, m_cid); out << "_LAYER_SIZE = "<< m_total_bytes;
-      out << '\n'; output_asmVar(out, m_cid); out << "_SIZE       = "<< m_visibleLayers * m_total_bytes;
+      out << '\n'; output_asmVar(out, m_cid); out << "_LAYERS     " << equal << " " << m_visibleLayers;
+      out << '\n'; output_asmVar(out, m_cid); out << "_LAYER_SIZE " << equal << " " << m_total_bytes;
+      out << '\n'; output_asmVar(out, m_cid); out << "_SIZE       " << equal << " " << m_visibleLayers * m_total_bytes;
       // Output constants for all layers
       uint16_t nvisl = 0;
       out << '\n';
       out << "\n;; Offsets of the different layers with respect to the start of the data";
       for (const auto& l : m_map.getLayers()) {
          if ( l->getVisible() ) {
-            out << '\n'; output_asmVar(out, m_cid); out << "_layer_" << nvisl << "_OFF = " << nvisl * m_total_bytes;
+            out << '\n'; output_asmVar(out, m_cid); out << "_layer_" << nvisl << "_OFF " << equal << " " << nvisl * m_total_bytes;
             ++nvisl;
          }
       }

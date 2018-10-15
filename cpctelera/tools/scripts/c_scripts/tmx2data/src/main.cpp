@@ -62,29 +62,31 @@ directive. It also reindexes tile ids starting from 0 (as in tmx files tile ids 
       << C_CYAN         << "\n    This script will only work with tmx files saved as CSV format. Output format must be \
 selected as CSV in tilemap properties."
       << C_LIGHT_YELLOW << "\n\nOPTIONS:"
-      << C_LIGHT_BLUE   << "\n\n   -au | --add-underscore-s-vars"
+      << C_LIGHT_BLUE   << "\n\n   -alc | --asm-local-constants"
+      << C_CYAN         << "\n          Make assembly generated constants local instead of global (Default: no)"
+      << C_LIGHT_BLUE   << "\n   -au  | --add-underscore-s-vars"
       << C_CYAN         << "\n          Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)"
-      << C_LIGHT_BLUE   << "\n   -ba | --bitarray <bits>"
+      << C_LIGHT_BLUE   << "\n   -ba  | --bitarray <bits>"
       << C_CYAN         << "\n          Generates output as an array of bits, being <bits> the amount of bits for every element (1, 2, 4 or 6)"
-      << C_LIGHT_BLUE   << "\n   -ci | --c-identifier <id>"
+      << C_LIGHT_BLUE   << "\n   -ci  | --c-identifier <id>"
       << C_CYAN         << "\n          Sets the C-identifier that will be used for the generated array (Default: filename)"
-      << C_LIGHT_BLUE   << "\n   -gc | --generate-c"
+      << C_LIGHT_BLUE   << "\n   -gc  | --generate-c"
       << C_CYAN         << "\n          Generates a .C file with an array containing converted values (Default: yes). Defaults are set to false on using this flag."
-      << C_LIGHT_BLUE   << "\n   -gh | --generate-h"
+      << C_LIGHT_BLUE   << "\n   -gh  | --generate-h"
       << C_CYAN         << "\n          Generates a .H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag."
-      << C_LIGHT_BLUE   << "\n   -ghs| --generate-h-s"
+      << C_LIGHT_BLUE   << "\n   -ghs | --generate-h-s"
       << C_CYAN         << "\n          Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag."
-      << C_LIGHT_BLUE   << "\n   -gb | --generate-bin"
+      << C_LIGHT_BLUE   << "\n   -gb  | --generate-bin"
       << C_CYAN         << "\n          Generates a .BIN file with a raw string containing the converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
-      << C_LIGHT_BLUE   << "\n   -gs | --generate-asm"
+      << C_LIGHT_BLUE   << "\n   -gs  | --generate-asm"
       << C_CYAN         << "\n          Generates a .S (ASM) file with converted values (same values as C array) (Default: no). Defaults are set to false on using this flag."
-      << C_LIGHT_BLUE   << "\n   -h  | --help"
+      << C_LIGHT_BLUE   << "\n   -h   | --help"
       << C_CYAN         << "\n          Shows this help information."
-      << C_LIGHT_BLUE   << "\n   -nb | --number-base <base>"
+      << C_LIGHT_BLUE   << "\n   -nb  | --number-base <base>"
       << C_CYAN         << "\n          Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)"
-      << C_LIGHT_BLUE   << "\n   -nm | --do-not-use-cpct-macros"
+      << C_LIGHT_BLUE   << "\n   -nm  | --do-not-use-cpct-macros"
       << C_CYAN         << "\n          Does not use CPCtelera macros when producing array values. Default: macros used"
-      << C_LIGHT_BLUE   << "\n   -of | --output-folder <folder>"
+      << C_LIGHT_BLUE   << "\n   -of  | --output-folder <folder>"
       << C_CYAN         << "\n          Changes the output folder for generated C/H files (Default: .)"
       << "\n\n" << C_NORMAL;
 
@@ -104,8 +106,12 @@ void parseArguments(const TArgs& args) {
    for(std::size_t i=1; i < args.size(); ++i) {
       const auto& a = args[i];
 
+      //------------------------ MAKE ASSEMBLY CONSTANTS LOCAL
+      if (a == "-alc" || a == "--asm-local-constants") {
+         g_theTilemap.setASMConstantsLocal(true) ; // Sets generated constants to be local
+
       //------------------------ SET UNDERSCORE PREFIX 
-      if (a == "-au" || a == "--add-underscore-s-vars") {
+      } else if (a == "-au" || a == "--add-underscore-s-vars") {
          g_theTilemap.setASMVariablesPrefix('_') ; // Sets _ as prefix for asm variables
 
       //------------------------ BITARRAY MODIFIER
