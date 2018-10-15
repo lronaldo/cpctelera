@@ -42,6 +42,7 @@
 ##
 ## Command line options:
 ##    -an  | --array-name [name]         - Sets the C identifier that will be used. <OUTFILE> is used by default.
+##    -alc | --asm-local-constants       - Makes generated assembly constants local instead of global
 ##    -b   | --bytes-per-line [numbytes] - Establishes the number of bytes to write at each array line in C. 16 by default
 ##    -gh  | --generate-header           - Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults.
 ##    -ghs | --generate-asm-header       - Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults.
@@ -75,6 +76,9 @@ OPTIONS \
    ${COLOR_LIGHT_BLUE}
    -an  | --array-name ${COLOR_NORMAL}<identifier> ${COLOR_CYAN}
       Sets the C identifier that will be used. G_<OUTFILE> is used by default. \
+   ${COLOR_LIGHT_BLUE}
+   -alc  | --asm-local-constants ${COLOR_CYAN}
+      Makes generated assembly constants local instead of global. \
    ${COLOR_LIGHT_BLUE}
    -b   | --bytes-per-line ${COLOR_NORMAL}<numbytes> ${COLOR_CYAN}
       Establishes the number of bytes to write at each array line in C. 16 by default. \
@@ -117,6 +121,7 @@ GENERATE_S=0
 GENERATE_H=0
 GENERATE_H_S=0
 ORGADDRESS=
+ASMCNST='=='
 
 ## COMPRESSORS
 ZX7B=${CPCT_PATH}/tools/zx7b/bin/zx7b
@@ -134,7 +139,11 @@ while (( $# >= 1 )); do
          fi
          ARRAYNAME="$2"
          shift
-      ;;      
+      ;;    
+      ## Make assembly generated constants local
+      "-alc" | "--asm-local-constants")
+         ASMCNST='='
+      ;;    
       ## Get number of bytes
       "-b" | "--bytes-per-line")
          if ! isInt "$2"; then
@@ -332,8 +341,8 @@ cat > ${OFILE} <<TheHFile
 .globl _${ARRAYNAME}_end
 
 ;; Compressed and uncompressed sizes
-_${ARRAYNAME}_size_z = $COMPRESSED_BYTES
-_${ARRAYNAME}_size   = $UNCOMPRESSED_BYTES
+_${ARRAYNAME}_size_z $ASMCNST $COMPRESSED_BYTES
+_${ARRAYNAME}_size   $ASMCNST $UNCOMPRESSED_BYTES
 
 TheHFile
 
@@ -343,7 +352,7 @@ TheHFile
       echo ";; Define constants for starting offsets of files in the uncompressed array" >> ${OFILE}
       OFF=0
       for((I=0;I<NINFILES;I++)); do
-         printf "_%s%03d = %6s   ;; Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> ${OFILE}
+         printf "_%s%03d %s %6s   ;; Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "$ASMCNST" "${OFF}" "${INFILES[$I]}" >> ${OFILE}
          OFF=$(( OFF + ${OFFSETS[$I]} ))
       done
    fi
