@@ -412,8 +412,8 @@ public:
 			if(options.OutputSize) {
 				string defineBase = t->Name;
 				transform(defineBase.begin(), defineBase.end(), defineBase.begin(), ::toupper);
-				ofs << defineBase << "_W = #0x" << toHexString(t->TileWidthInBytes) << endl;
-				ofs << defineBase << "_H = #0x" << toHexString(t->TileHeight) << endl;						
+				ofs << defineBase << "_W == #0x" << toHexString(t->TileWidthInBytes) << endl;
+				ofs << defineBase << "_H == #0x" << toHexString(t->TileHeight) << endl;						
 			}
 
 			ofs << t->Name << "::" << endl;
@@ -566,8 +566,8 @@ public:
 		ss << "palette";
 		string palette_name = ss.str();
 		transform(palette_name.begin(), palette_name.end(), palette_name.begin(), ::toupper);
-		os << palette_name << "_OFF  = 0\n";
-		os << palette_name << "_SIZE = " << totalBytes << "\n\n";
+		os << palette_name << "_OFF  == 0\n";
+		os << palette_name << "_SIZE == " << totalBytes << "\n\n";
 		oh << "#define " << palette_name << "_OFF    0\n";
 		oh << "#define " << palette_name << "_SIZE   " << totalBytes << "\n\n";
 
@@ -602,10 +602,10 @@ public:
 
 					// Tile constants
 					if(options.OutputSize) {
-						os << defineBase << "_OFF      = " << totalBytes << '\n';
-						os << defineBase << "_SIZE     = " << numBytes << '\n';
-						os << defineBase << "_W        = " << t->TileWidthInBytes << '\n';
-						os << defineBase << "_H        = " << t->TileHeight << '\n';
+						os << defineBase << "_OFF      == " << totalBytes << '\n';
+						os << defineBase << "_SIZE     == " << numBytes << '\n';
+						os << defineBase << "_W        == " << t->TileWidthInBytes << '\n';
+						os << defineBase << "_H        == " << t->TileHeight << '\n';
 						oh << "#define " << defineBase << "_OFF        " << totalBytes << '\n';
 						oh << "#define " << defineBase << "_SIZE       " << numBytes << '\n';
 						oh << "#define " << defineBase << "_W          " << t->TileWidthInBytes << '\n';
@@ -630,7 +630,7 @@ public:
 						if (options.Palette.TransparentIndex >= 0 && !(options.NoMaskData)) {
 							//os << t->Name << "_mask:" << '\n';
 							totalBytes += numBytes;
-							os << defineBase << "_MASK_OFF = " << totalBytes << '\n';
+							os << defineBase << "_MASK_OFF == " << totalBytes << '\n';
 							oh << "#define " << defineBase << "_MASK_OFF   " << totalBytes << '\n';
 
 							for (int i = 0; i < numBytes; ++i) {
