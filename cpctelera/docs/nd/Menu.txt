@@ -240,7 +240,7 @@ Group: Sprites  {
       File: cpct_hflipSpriteMaskedM1  (sprites/flipping/cpct_hflipSpriteMaskedM1.asm)
       File: cpct_hflipSpriteMaskedM2  (sprites/flipping/cpct_hflipSpriteMaskedM2.asm)
       File: cpct_vflipSprite  (sprites/flipping/cpct_vflipSprite.asm)
-      File: cpctm_spbloff  (sprites/flipping/flipping_macros.h.s)
+      File: cpctm_ld_spbloff  (sprites/flipping/flipping_macros.h.s)
       File: flipping_macros.h  (sprites/flipping/flipping_macros.h)
       File: Pixel Horizontally Flipping Macros  (sprites/flipping/flipping_table_macros.h)
       File: Pixel Horizontally Flipping Tables  (sprites/flipping/flipping_tables.h)
