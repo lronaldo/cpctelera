@@ -29,8 +29,8 @@
 ;; Input Parameters (4 bytes):
 ;;  (1B  C) width  - Width of the sprite in *bytes* (*NOT* in pixels!). Must be >= 1.
 ;;  (1B  B) height - Height of the sprite in pixels / bytes (both are the same). Must be >= 1.
-;;  (2B HL) spbl   - Pointer to the bottom-left byte of the sprite
-;;  (2B DE) sprite - Pointer to the sprite array (top-left byte)
+;;  (2B DE) spbl   - Pointer to the bottom-left byte of the sprite
+;;  (2B HL) sprite - Pointer to the sprite array (top-left byte)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_vflipSprite_asm

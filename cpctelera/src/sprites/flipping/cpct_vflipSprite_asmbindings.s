@@ -22,6 +22,6 @@
 ;;
 ;;   0 us, 0 bytes
 ;;
-_cpct_vflipSprite_asm::
+cpct_vflipSprite_asm::
 
 .include /cpct_vflipSprite.asm/
