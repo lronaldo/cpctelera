@@ -220,7 +220,7 @@ cpct_page00_asm = 0x00
 ;;   Changes the colour of the screen border.
 ;;
 ;; ASM Definition:
-;;   .macro <cpct_setBorder_asm> HWC 
+;;   .macro <cpctm_setBorder_asm> HWC 
 ;;
 ;; Input Parameters (1 Byte):
 ;;   (1B) HWC - Hardware colour value for the screen border in *hexadecimal [00-1B]*.
@@ -251,10 +251,15 @@ cpct_page00_asm = 0x00
 ;; ways.
 ;;
 ;;   For more information, check the real function <cpct_setPALColour>, which
-;; is called when using <cpct_setBorder_asm> (It is called using 16 as *pen*
+;; is called when using <cpctm_setBorder_asm> (It is called using 16 as *pen*
 ;; argument, which identifies the border).
 ;;
 .macro cpctm_setBorder_asm HWC
+   .radix h
+   cpctm_setBorder_raw_asm \HWC ;; [28] Macro that does the job, but requires a number value to be passed
+   .radix d
+.endm
+.macro cpctm_setBorder_raw_asm HWC
    .globl cpct_setPALColour_asm
    ld   hl, #0x'HWC'10         ;; [3]  H=Hardware value of desired colour, L=Border INK (16)
    call cpct_setPALColour_asm  ;; [25] Set Palette colour of the border
