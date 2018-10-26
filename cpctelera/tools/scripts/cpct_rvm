@@ -54,6 +54,7 @@
 ##    -a  | --any-dsk         - Lauches RVM and loads first DSK file to match *.dsk
 ##    -ac | --any-cdt         - Lauches RVM and loads first CDT file to match *.cdt
 ##    -as | --any-sna         - Lauches RVM and loads first SNA file to match *.sna
+##    -c  | --command         - Automatically execute command after emulator startup
 ##    -ds | --default-shader  - Execute RVM with default postprocessing shader activated
 ##    -n  | --no-execute      - Lauches RVM but does not automatically RUN any DSK program.
 ##    -nw | --no-warp         - Does not automatically enter Warp Mode on CDT load.
@@ -131,6 +132,8 @@ commands are required (they should be installed in the system)."
    echo "${COLOR_CYAN}       Lauches RVM and loads first CDT file to match *.cdt."
    echo "${COLOR_LIGHT_BLUE}  -as| --any-sna"
    echo "${COLOR_CYAN}       Lauches RVM and loads first SNA file to match *.sna."
+   echo "${COLOR_LIGHT_BLUE}  -c | --command"
+   echo "${COLOR_CYAN}       Automatically execute command after emulator startup."
    echo "${COLOR_LIGHT_BLUE}  -ds| --default-shader"
    echo "${COLOR_CYAN}       Execute RVM with default postprocessing shader activated"
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
@@ -342,6 +345,13 @@ while (( $# > 0 )); do
       ;;
       "-as" | "--any-sna")
          FILE=$(echo *.[sS][nN][aA])
+      ;;
+      "-c" | "--command")
+         if (( $# < 2 )); then
+            paramError "'-c/--command' requires a command to be executed as parameter" 18
+         fi 
+         COMMAND="${2}\n"
+         shift
       ;;
       "-ds" | "--default-shader")
          SHADER=""
