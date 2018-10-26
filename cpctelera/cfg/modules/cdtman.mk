@@ -34,6 +34,7 @@ CDTM_W        := 160
 CDTM_PALFW    := 11 15 3 24 13 20 6 26 0 2 1 18 8 5 16 9 
 CDTM_BORDERFW := 0
 CDTM_FILENAME := Game
+CDTM_VALIDFORMATS := firmware basic miniload
 CDTM_SCRFILE  := 
 CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
 CDTM_DEPEND   := cfg/cdt_manager.mk
@@ -113,7 +114,7 @@ CDTM_OFFMINHALF_CALL2 :=0x75
 # at the end of the building process. 
 #
 # $(1): File
-# $(2): Type {firmware, miniload}
+# $(2): Type {firmware, basic, miniload}
 # $(3): Load Address (for firmware calls)
 # $(4): Run Address (for firmware calls)
 # $(5): Filename (for firmware calls)
@@ -137,22 +138,29 @@ endef
 # to insert it RAW in raw1full format or adding AMSDOS header
 #
 # $(1): File
-# $(2): Type {firmware, miniload}
+# $(2): Type {firmware, basic, miniload}
 # $(3): Load Address (for firmware calls)
 # $(4): Run Address (for firmware calls)
 # $(5): Filename (for firmware calls)
 #
 define INSERT_NEXT_FILE_INTO_CDT
-	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [CDTMAN]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)')
+	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [ CDTMAN - INSERT FILE ]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)')
+	$(call ENSUREVALID,$(2),$(CDTM_VALIDFORMATS),<<ERROR>> [ CDTMAN - INSERT FILE ]: Format '$(2)' for file '$(1) is not valid. Valid formats are: { $(CDTM_VALIDFORMATS) }')
+
 	printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' {Format:'$(_C2)$(2)$(_C1)' "
+
 	$(if $(call EQUALS,firmware,$(2))\
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
-		, $(if $(call EQUALS,miniload,$(2))\
-				, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> /dev/null \
-				, $(error <<ERROR>> [CDTMAN]: Unknown format '$(2)' for file '$(1)'. Valid formats are: { firmware, miniload }) \
-			) \
-		)
+	)
+	$(if $(call EQUALS,miniload,$(2))\
+		, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> /dev/null \
+	)
+	$(if $(call EQUALS,basic,$(2))\
+		, $(CPC2CDT) -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
+		  && printf "Name:'$(_C2)$(5)$(_C1)'" \
+	)
+
 	printf "}$(_C)\n"
 endef
 
@@ -192,15 +200,14 @@ endef
 # a Load Address and a Run Address. Also, firmware files
 # will use current CDTM_FILENAME as cassette filename.
 #
-# $(1): Format { firmware, miniload }
+# $(1): Format { firmware, basic, miniload }
 # $(2): File to be added
 # $(3): Load Address (Only for firmware formats)
 # $(4): Run Address (Only for firmware formats)
 #
 define CDTMAN_ADDFILE
 	# Check constraints
-	$(eval _VALID := firmware miniload)
-	$(call ENSUREVALID,$(1),$(_VALID),<<ERROR>> [ CDTMAN - ADDFILE ]: Format '$(1)' for file '$(2) is not valid. Valid formats are: { $(_VALID) }')
+	$(call ENSUREVALID,$(1),$(CDTM_VALIDFORMATS),<<ERROR>> [ CDTMAN - ADDFILE ]: Format '$(1)' for file '$(2) is not valid. Valid formats are: { $(CDTM_VALIDFORMATS) }')
 	$(if $(call EQUALS,$(1),firmware)\
 		, $(call ENSURE_ADDRESS_VALID,$(3),<<ERROR>> [ CDTMAN - ADDFILE ]:) \
 		  $(call ENSURE_ADDRESS_VALID,$(4),<<ERROR>> [ CDTMAN - ADDFILE ]:) \
