@@ -185,13 +185,21 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ## processed sequentially, in order, one by one. That lets you add as many   ##
 ## files as you want to the CDT and in the order you want.                   ##
 ##                                                                           ##
-##    ADDFILE can add 2 types of files:                                      ##
+##    ADDFILE can add 3 types of files:                                      ##
 ##      - 'firmware'                                                         ##
 ##           It will add an AMSDOS header to the file. This enables the      ##
 ##           firmware to read the file when you type RUN". Resulting file    ##
 ##           will be saved in 2 blocks, the first 2K in block 1, and the     ##
 ##           rest in block 2. Saving will use 2000 bauds with standard       ##
 ##           firmware codification.                                          ##
+##      - 'basic'                                                            ##
+##           It will add binary-codified BASIC file (not valid for BASIC     ##
+##           files saved as ASCII text). The file will be added using the    ##
+##           currently set name (set previously using SET_FILENAME). BASIC   ##
+##           files are like firmware files but do not require load or run    ##
+##           addresses. They will also be added using 2 blocks and 2000      ##
+##           bauds(like firmware files). They will be able to be read and    ##
+##           executed using standard RUN/LOAD BASIC commands.                ##
 ##      - 'miniload'                                                         ##
 ##           This will add a raw file, without any header, only its binary   ##
 ##           data to the CDT. This file will be codified in miniload format: ##
@@ -211,10 +219,11 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ## USAGE,                                                                    ##
 ##                                <type>                                     ##
 ## $(eval $(call CDTMAN, ADDFILE, miniload, <file>))                         ##
+## $(eval $(call CDTMAN, ADDFILE, basic   , <file>))                         ##
 ## $(eval $(call CDTMAN, ADDFILE, firmware, <file>, <load_add>, <run_add>))  ##
 ##                                                                           ##
 ##    MANDATORY PARAMETERS                                                   ##
-##     - <type>    : filetype of the file to add ('firmware' or 'miniload')  ##
+##     - <type>    : filetype of the file {'firmware', 'basic', 'miniload'}  ##
 ##     - <file>    : file you want to add (relative path)                    ##
 ##                                                                           ##
 ##    PARAMETERS ONLY FOR 'firmware' FILES                                   ##
