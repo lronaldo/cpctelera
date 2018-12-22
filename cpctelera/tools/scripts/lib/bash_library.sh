@@ -764,6 +764,22 @@ function checkSystem {
                return 0
             fi
          ;;
+         "linux64")
+            if [[ "$SYS" =~ "Linux" ]] || [[ "$SYS" =~ "GNU" ]]; then
+               SYS=$(uname -m)
+               if [[ "$SYS" =~ "64" ]]; then
+                  return 0
+               fi
+            fi
+         ;;
+         "linux32")
+            if [[ "$SYS" =~ "Linux" ]] || [[ "$SYS" =~ "GNU" ]]; then
+               SYS=$(uname -m)
+               if [[ ! "$SYS" =~ "64" ]]; then
+                  return 0
+               fi
+            fi
+         ;;
          "cygwin") 
             if [[ "$SYS" =~ "CYGWIN" ]]; then
                return 0
@@ -772,7 +788,7 @@ function checkSystem {
          "cygwin32") 
             if [[ "$SYS" =~ "CYGWIN" ]]; then
                SYS=$(uname -a)
-               if [[ ! "$SYS" =~ "x86_64" ]]; then
+               if [[ ! "$SYS" =~ "64" ]]; then
                   return 0
                fi
             fi
@@ -780,7 +796,7 @@ function checkSystem {
          "cygwin64") 
             if [[ "$SYS" =~ "CYGWIN" ]]; then
                SYS=$(uname -a)
-               if [[ "$SYS" =~ "x86_64" ]]; then
+               if [[ "$SYS" =~ "64" ]]; then
                   return 0
                fi
             fi
