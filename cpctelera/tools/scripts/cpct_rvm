@@ -69,9 +69,11 @@
 
 # Script configuration
 CPCT_TOOLS_FOLDER=$(dirname $0)/..
-WWW_RVM=http://RVM.net/download/RVM20B2.zip
+WWW_RVM_LINUX64=http://static2.retrovirtualmachine.org/release/beta1/linux/x64/RetroVirtualMachine.2.0.beta-1.r0.linux.x64.zip
+WWW_RVM_LINUX32=http://static2.retrovirtualmachine.org/release/beta1/linux/x86/RetroVirtualMachine.2.0.beta-1.r0.linux.x86.zip
+WWW_RVM_WIN64=http://static2.retrovirtualmachine.org/release/beta1/windows/x64/RetroVirtualMachine.2.0.beta-1.r0.windows.x64.zip
+WWW_RVM_WIN32=http://static2.retrovirtualmachine.org/release/beta1/windows/x86/RetroVirtualMachine.2.0.beta-1.r0.windows.x86.zip
 RVM_EXE=RetroVirtualMachine
-RVM_INI=noinifile
 RVM_ZIP=${CPCT_TOOLS_FOLDER}/RVM.zip
 RVM_DIR=${CPCT_TOOLS_FOLDER}/rvm
 RVM=/path/to/RVM ## Should be read from config file
@@ -230,6 +232,22 @@ configure this script later on."
    done   
 }
 
+function selectRVMURLForCurrentOS {
+   if checkSystem linux32; then
+      echo ${WWW_RVM_LINUX32}
+   elif checkSystem linux64; then
+      echo ${WWW_RVM_LINUX64}
+   elif checkSystem win10linux; then
+      echo ${WWW_RVM_WIN64}
+   elif checkSystem cygwin32; then
+      echo ${WWW_RVM_WIN32}
+   elif checkSystem cygwin64; then
+      echo ${WWW_RVM_WIN64}
+   else
+      echo norvmurl
+   fi
+}
+
 ## Create a new installation of RVM inside CPCtelera tools folder
 ##  Returns 0 on install success, errorCode otherwise
 ##
@@ -254,18 +272,24 @@ ${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder 
 & installed${COLOR_LIGHT_BLUE} (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?" ANS
    echo ${COLOR_LIGHT_WHITE}$ANS
    if [[ "$ANS" == "y" || "$ANS" == "Y" ]]; then
-      echo "${COLOR_RED} RVM2 is still unavailable for download."
-      #echo "${COLOR_CYAN} Downloading RVM from (${COLOR_WHITE}${WWW_RVM}${COLOR_CYAN})...${COLOR_NORMAL}"
-      #wget -nv --progress=bar -O "$RVM_ZIP" "$WWW_RVM"
-      #echo "${COLOR_CYAN}Unpacking RVM...${COLOR_NORMAL}"
-      #unzip -o -q "$RVM_ZIP" -d "$RVM_DIR" 
-      #rm "$RVM_ZIP"
-      #setRVMPath "${RVM_DIR}/${RVM_EXE}"
+      echo "${COLOR_CYAN} Selecting appropriate URL for your Operative System...${COLOR_NORMAL}"
+      local WWW_RVM=$(selectRVMURLForCurrentOS)
+      if [[ "${WWW_RVM}" = "norvmurl" ]]; then
+         echo "${COLOR_RED}Your operative system is not supported for automatic download and installation. ${COLOR_NORMAL}"
+         echo "${COLOR_RED}Please, kindly manually download & install RVM2 then setup this script by giving it RVM2's executable path. ${COLOR_NORMAL}"
+         exitNoConfig
+      else 
+         echo "${COLOR_CYAN} Downloading RVM from (${COLOR_WHITE}${WWW_RVM}${COLOR_CYAN})...${COLOR_NORMAL}"
+         wget -nv --progress=bar -O "$RVM_ZIP" "$WWW_RVM"
+         echo "${COLOR_CYAN}Unpacking RVM...${COLOR_NORMAL}"
+         unzip -o -q "$RVM_ZIP" -d "$RVM_DIR" 
+         rm "$RVM_ZIP"
+         setRVMPath "${RVM_DIR}/${RVM_EXE}"
 
-      #echo "${COLOR_LIGHT_CYAN}RVM${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
-#${RVM_DIR}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
-      #echo
-      exitNoConfig
+         echo "${COLOR_LIGHT_CYAN}RVM${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
+   #${RVM_DIR}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
+         echo
+      fi
    else 
       exitNoConfig
    fi
