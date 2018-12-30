@@ -75,6 +75,7 @@ WWW_RVM_WIN64=http://static2.retrovirtualmachine.org/release/beta1/windows/x64/R
 WWW_RVM_WIN32=http://static2.retrovirtualmachine.org/release/beta1/windows/x86/RetroVirtualMachine.2.0.beta-1.r1.windows.x86.zip
 WWW_RVM_OSX=http://static2.retrovirtualmachine.org/release/beta1/macos/RetroVirtualMachine.2.0.beta-1.r1.macos.zip
 RVM_EXE=RetroVirtualMachine
+RVM_EXE_OSX="Retro\ Virtual\ Machine\ 2.app/Contents/MacOS/Retro\ Virtual\ Machine\ 2"
 RVM_ZIP=${CPCT_TOOLS_FOLDER}/RVM.zip
 RVM_DIR=${CPCT_TOOLS_FOLDER}/rvm
 RVM=/path/to/RVM ## Should be read from config file
@@ -290,7 +291,11 @@ ${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder 
          echo "${COLOR_CYAN}Unpacking RVM...${COLOR_NORMAL}"
          unzip -o -q "$RVM_ZIP" -d "$RVM_DIR" 
          rm "$RVM_ZIP"
-         setRVMPath "${RVM_DIR}/${RVM_EXE}"
+         if checkSystem osx; then
+            setRVMPath "${RVM_DIR}/${RVM_EXE_OSX}"
+         else
+            setRVMPath "${RVM_DIR}/${RVM_EXE}"
+         fi
 
          echo "${COLOR_LIGHT_CYAN}RVM${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
    #${RVM_DIR}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
