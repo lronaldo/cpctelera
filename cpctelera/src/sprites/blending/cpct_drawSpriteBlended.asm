@@ -196,11 +196,11 @@ _cpct_dsb_blendFunction::
 
    pop  de         ;; [3] Recover DE from stack. We use it to calculate start of next pixel line on screen
 
-   dec   c         ;; [1] B holds sprite height. We decrease it to count another pixel line finished
+   dec   c         ;; [1] C holds sprite height. We decrease it to count another pixel line finished
    jr    z,copy_ended;; [2/3] If 0, we have finished the last sprite line.
                                 ;;      - If not 0, we have to move pointers to the next pixel line
 
-   ld__b_ixl       ;; [3] Restore Sprite Width into C
+   ld__b_ixl       ;; [3] Restore Sprite Width into B
 
    ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
    add   #0x08     ;; [2]    so we add it to DE (just by adding 0x08 to D)
