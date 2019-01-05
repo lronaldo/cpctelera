@@ -14,6 +14,7 @@ Section: Donnors
    29/05/2016 - Oliver Lenz
    13/01/2018 - Rafael Castillo García
    31/03/2018 - Augusto Ruíz García
+   16/11/2018 - Carlos Pérez Peregrín
 
 Section: Project authors
    
@@ -26,6 +27,7 @@ Awesome collaborators:
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
    * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
    * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
+   * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
    * <Cpcitor at http://github.com/cpcitor>
    * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
    * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
@@ -127,6 +129,9 @@ Section: Testers & Bug Reporters
  * <Alexis Roda at https://github.com/patxoca> / <Github at https://github.com> 
  * <rgiot https://github.com/rgiot> / <Github at https://github.com>
  * <David Asta at mailto:davidasta@gmail.com>
+ * Álvaro Amador Ruiz (@SararyCow at http://twitter.com/SararyCow)
+ * <John Lobo at https://github.com/johnlobo> / <Github at https://github.com> 
+ * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
 
 Section: Assets 
 
