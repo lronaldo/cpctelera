@@ -21,7 +21,7 @@
 ;;
 ;; Function: cpct_memset_f64
 ;;
-;;    Fills up a complete array in memory setting bytes 2-by-2, in chuncks of 
+;;    Fills up a complete array in memory setting bytes 2-by-2, in chunks of 
 ;; 64 bytes. Size of the array must be multiple of 64.
 ;;
 ;; C Definition:
@@ -48,7 +48,7 @@
 ;; important parts of your program, the screen, the firmware... Use it with care.
 ;;  * *size* must be greater than 63 and multiple of 64. It represents the size of the 
 ;; array, or the number of total bytes that will be set to the *value*. This function 
-;; sets bytes 2-by-2, in chuncks of 64 bytes, so the minimum amount of bytes to be set is 64. 
+;; sets bytes 2-by-2, in chunks of 64 bytes, so the minimum amount of bytes to be set is 64. 
 ;; *Beware!* sizes below 64 can cause this function to *overwrite the entire memory*. 
 ;;  * *value* could be any 16-bit value, without restrictions. It is considered as 
 ;; a pair of bytes that will be copied to every 2-bytes in the array.
@@ -64,7 +64,7 @@
 ;;
 ;;  1 - It saves the value of SP to recover it at the end of the function
 ;;  2 - It places SP at the last 2-bytes of the array
-;;  3 - It uses PUSH instructions to set bytes 2-by-2, in chuncks of 64 bytes, until the entire array is set
+;;  3 - It uses PUSH instructions to set bytes 2-by-2, in chunks of 64 bytes, until the entire array is set
 ;;
 ;;    This function works for array sizes from 64 to 65472. However, it is recommended 
 ;; that you use it for values much greater than 64. 
@@ -88,7 +88,7 @@
 ;; ----------------------------------------------------------
 ;; (end code)
 ;;    BC   = *array size* (Number of total bytes to set)
-;;    CH   = BC \ 64 (number of *chuncks*, 1 chunck = 64 bytes)
+;;    CH   = BC \ 64 (number of *chunks*, 1 chunk = 64 bytes)
 ;;    CHHH = CH \ 256 - 1
 ;;     \ = integer division
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -112,18 +112,18 @@
    and  #0x03        ;; [2] C = C % 4 (Only the last 2 bits of C are valid, as dividing by 64 should
    ld   c, a         ;; [1]            left us with the 6 most significant bits to 0)
       
-   ;; B (contains NumberOfChunks % 256). That will be the number of chuncks to copy on first pass.
-   ;;    If B != 0, we copy C chuncks to memory, then 256*(C-1) chuncks to memory (Standard)
+   ;; B (contains NumberOfChunks % 256). That will be the number of chunks to copy on first pass.
+   ;;    If B != 0, we copy C chunks to memory, then 256*(C-1) chunks to memory (Standard)
    ;;    IF B  = 0, we only have to copy 256*(C-1). That is, we discount first pass, as it is of C=0 chunks.
    dec  b            ;; [1]  Decrement B to test if it is 0 or not
    jp   p, startcopy ;; [3]  IF C = 0, then
-   dec  c            ;; [1]    Discount first pass (C = 0 chuncks), then continue doing B-1 passes of 256 chunks
+   dec  c            ;; [1]    Discount first pass (C = 0 chunks), then continue doing B-1 passes of 256 chunks
 
 startcopy:
    inc  b            ;; [1] Restore the actual value of b
 
 copyloop:
-   push de           ;; [4] Push a chunck of 64-bytes to memory, 2-by-2
+   push de           ;; [4] Push a chunk of 64-bytes to memory, 2-by-2
    push de           ;; [4]  (So, 32 pushes)
    push de           ;; [4]
    push de           ;; [4]
@@ -155,9 +155,9 @@ copyloop:
    push de           ;; [4]
    push de           ;; [4]
    push de           ;; [4]
-   djnz copyloop     ;; [4/3] 1 Less chunk. Continue if there still are more chuncks (B != 0)
+   djnz copyloop     ;; [4/3] 1 Less chunk. Continue if there still are more chunks (B != 0)
    dec  c            ;; [1] 256 less chunks (b runned up to 0, decrement c by 1)
-   jp   p, copyloop  ;; [3] Continue 256 chuncks more if C >= 0 (positive)
+   jp   p, copyloop  ;; [3] Continue 256 chunks more if C >= 0 (positive)
 
 msf64_restoreSP:
    ld   sp, #0000    ;; [3] Placeholder for restoring SP value before returning
