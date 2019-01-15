@@ -21,6 +21,6 @@
 ;;
 ;; Assembly binding for <cpct_memset_f64_i> function
 ;; 
-_cpct_memset_f64_i_asm::
+cpct_memset_f64_i_asm::
 
 .include /cpct_memset_f64_i.asm/
