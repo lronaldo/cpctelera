@@ -83,14 +83,14 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 76 bytes 
-;;    ASM-binding - 71 bytes  
+;;    C-binding   - 79 bytes 
+;;    ASM-binding - 74 bytes  
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case      |   microSecs (us)   |      CPU Cycles       |
 ;; ----------------------------------------------------------
-;;    Any      | 44 + 145CH + 3CHHH | 176 + 580*CH + 12CHHH |
+;;    Any      | 47 + 145CH + 3CHHH | 188 + 580*CH + 12CHHH |
 ;; ----------------------------------------------------------
 ;;  CH%256 = 0 |         +1         |         +4            |
 ;; ----------------------------------------------------------
@@ -105,6 +105,12 @@
 
    ;; Move SP to the end of the array
    add  hl, bc       ;; [3] HL += BC (HL points to the end of the array)
+
+   ;; The 16-bit value inside DE will be written to memory in little-endian form. 
+   ;; If we want it to be in the order the user introduced it, D and E must be swapped
+   ld   a, e         ;; [1] / 
+   ld   e, d         ;; [1] | Swap D and E contents to simulate big-endian memory writing 
+   ld   d, a         ;; [1] \ 
 
    ;; Calculate the total number of chunks to copy
    ld   a, c         ;; [1] BC = BC / 64 but with B and C interchanged

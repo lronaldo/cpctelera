@@ -74,14 +74,14 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 46 bytes
-;;    ASM-binding - 41 bytes
+;;    C-binding   - 49 bytes
+;;    ASM-binding - 44 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
 ;;   Case      |   microSecs (us)  |     CPU Cycles         |
 ;; ----------------------------------------------------------
-;;    Any      | 53 + 20CH + 3CHHH | 212 + 80*CH + 12(CHHH) |
+;;    Any      | 56 + 20CH + 3CHHH | 224 + 80*CH + 12(CHHH) |
 ;; ----------------------------------------------------------
 ;; Asm saving  |      -16          |         -64            |
 ;; ----------------------------------------------------------
@@ -93,14 +93,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-;; 
+   ;; The 16-bit value inside DE will be written to memory in little-endian form. 
+   ;; If we want it to be in the order the user introduced it, D and E must be swapped
+   ld   a, e         ;; [1] / 
+   ld   e, d         ;; [1] | Swap D and E contents to simulate big-endian memory writing 
+   ld   d, a         ;; [1] \ 
 
    ;; Save SP to restore it later, as this function makes use of it
-   di                            ;; [1] Disable interrupts first
-   ld   (msf8_restoreSP + 1), sp ;; [6] Save SP to recover it later on
+   ld   (restore_sp), sp ;; [6] Save SP to recover it later on
 
    ;; Move SP to the end of the array
    add  hl, bc       ;; [3] HL += BC (HL points to the end of the array)
+   di                ;; [1] Disable interrupts just before modifying sp
    ld   sp, hl       ;; [2] SP = HL  (SP points to the end of the array)
 
    ;; Calculate the total number of chunks to copy
@@ -131,7 +135,7 @@ copyloop:
    dec  c            ;; [1] 256 less chunks (b runned up to 0, decrement c by 1)
    jp   p, copyloop  ;; [3] Continue 256 chuncks more if C >= 0 (positive)
 
-msf8_restoreSP:
+restore_sp = .+1
    ld   sp, #0000    ;; [3] Placeholder for restoring SP value before returning
    ei                ;; [1] Reenable interrupts
 
