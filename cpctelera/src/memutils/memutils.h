@@ -35,7 +35,6 @@ extern void cpct_memset      (void *array, u8  value, u16 size) __z88dk_callee;
 extern void cpct_memset_f8   (void *array, u16 value, u16 size) __z88dk_callee;
 extern void cpct_memset_f64  (void *array, u16 value, u16 size) __z88dk_callee;
 extern void cpct_memset_f64_i(void* array, u16 value, u16 size) __z88dk_callee;
-extern void cpct_memset_f8_i (void* array, u16 value, u16 size) __z88dk_callee;
 extern void cpct_memcpy      (void *to, const void *from, u16 size) __z88dk_callee;
 
 // Stack manipulation
