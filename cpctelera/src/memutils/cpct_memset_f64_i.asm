@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -19,19 +20,20 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_memset_f64
+;; Function: cpct_memset_f64_i
 ;;
 ;;    Fills up a complete array in memory setting bytes 2-by-2, in chunks of 
-;; 64 bytes. Size of the array must be multiple of 64.
+;; 64 bytes. Size of the array must be multiple of 64. Interrupts are disabled
+;; at the start of each 64-bytes-chunk and reenabled at its end.
 ;;
 ;; C Definition:
-;;    void <cpct_memset_f64> (void* *array*, <u16> *value*, <u16> *size*);
+;;    void <cpct_memset_f64_i> (void* *array*, <u16> *value*, <u16> *size*);
 ;;
 ;; Warning:
 ;;    * This function disables interrupts while operating and uses the stack
 ;; pointer. Take it into account when you require interrupts or the stack
 ;; pointer. When in doubt, use <cpct_memset> instead.
-;;    * At the end of the function, it reenables interrupts, no matter how
+;;    * At the end of each chunk, it reenables interrupts, no matter how
 ;; they were before. Please, take into account.
 ;;
 ;; Input Parameters (5 Bytes):
@@ -40,7 +42,7 @@
 ;;  (2B BC) size  - Number of bytes to be set (>= 64, multiple of 64)
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_memset_f64_asm
+;;    > call cpct_memset_f64_i_asm
 ;;
 ;; Parameter Restrictions:
 ;;  * *array* could theoretically be any 16-bit memory location. However, take into 
@@ -62,25 +64,33 @@
 ;; of being faster and letting the user define the contents 16-bits-by-16-bits instead of
 ;; 8. The technique used by this function is as follows:
 ;;
-;;  1 - It saves the value of SP to recover it at the end of the function
+;;  1 - It saves the value of SP to recover it at the end of the Chuck
 ;;  2 - It places SP at the last 2-bytes of the array
 ;;  3 - It uses PUSH instructions to set bytes 2-by-2, in chunks of 64 bytes, until the entire array is set
 ;;
 ;;    This function works for array sizes from 64 to 65472. However, it is recommended 
-;; that you use it for values much greater than 64. 
+;; that you use it for values much greater than 64. The higher the value, the greater the
+;; gain in terms or less microseconds to do the memory setting operation.
+;;
+;;    This function works identical to <cpct_memset_f64> but in a 'interrupt-friendly' way.
+;; <cpct_memset_f64> disables interrupts at its start to be able to use the stack, and reenables
+;; them only at the end of the full copy process. In contrast, this version disables and 
+;; reenables interrupts at the start and end of every 64-byte chunk to be copied. This makes
+;; this version of the function a little bit slower (it takes 23 microseconds more for each
+;; 64-byte chunk to be copied) but it lets you mix it along with your interrupt-handler code.
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-binding   - 75 bytes
-;;    ASM-binding - 70 bytes
+;;    C-binding   - 79 bytes 
+;;    ASM-binding - 74 bytes  
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;   Case      |   microSecs (us)   |      CPU Cycles       |
 ;; ----------------------------------------------------------
-;;    Any      | 50 + 132CH + 3CHHH | 200 + 528*CH + 12CHHH |
+;;    Any      | 47 + 145CH + 3CHHH | 188 + 580*CH + 12CHHH |
 ;; ----------------------------------------------------------
 ;;  CH%256 = 0 |         +1         |         +4            |
 ;; ----------------------------------------------------------
@@ -92,21 +102,15 @@
 ;;    CHHH = CH \ 256 - 1
 ;;     \ = integer division
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;
+
+   ;; Move SP to the end of the array
+   add  hl, bc       ;; [3] HL += BC (HL points to the end of the array)
 
    ;; The 16-bit value inside DE will be written to memory in little-endian form. 
    ;; If we want it to be in the order the user introduced it, D and E must be swapped
    ld   a, e         ;; [1] / 
    ld   e, d         ;; [1] | Swap D and E contents to simulate big-endian memory writing 
    ld   d, a         ;; [1] \ 
-
-   ;; Save SP to restore it later, as this function makes use of it
-   ld   (restore_sp), sp ;; [6] Save SP to recover it later on
-
-   ;; Move SP to the end of the array
-   add  hl, bc       ;; [3] HL += BC (HL points to the end of the array)
-   di                ;; [1] Disable interrupts just before modifying SP
-   ld   sp, hl       ;; [2] SP = HL  (SP points to the end of the array)
 
    ;; Calculate the total number of chunks to copy
    ld   a, c         ;; [1] BC = BC / 64 but with B and C interchanged
@@ -126,9 +130,13 @@
    dec  c            ;; [1]    Discount first pass (C = 0 chunks), then continue doing B-1 passes of 256 chunks
 
 startcopy:
-   inc  b            ;; [1] Restore the actual value of b
+   inc  b                ;; [1] Restore the actual value of b
+   ld   (restore_sp), sp ;; [6] Save SP to recover it later on
 
 copyloop:
+   di                ;; [1] Disable interrupts first
+   ld   sp, hl       ;; [2] SP = HL (SP points to the end of the array)
+
    push de           ;; [4] Push a chunk of 64-bytes to memory, 2-by-2
    push de           ;; [4]  (So, 32 pushes)
    push de           ;; [4]
@@ -145,7 +153,6 @@ copyloop:
    push de           ;; [4]
    push de           ;; [4]
    push de           ;; [4]
-   push de           ;; [4] 
    push de           ;; [4]
    push de           ;; [4]
    push de           ;; [4]
@@ -161,12 +168,17 @@ copyloop:
    push de           ;; [4]
    push de           ;; [4]
    push de           ;; [4]
+   push de           ;; [4]
+   
+   ld    sp, #-64    ;; [3] | 
+   add   hl, sp      ;; [3] \ HL = HL - 64 (Compute next Chunk start)
+   
+restore_sp = .+1
+   ld    sp, #0000   ;; [3] Placeholder for restoring SP value
+   ei                ;; [1] Reenable interrupts   
+   
    djnz copyloop     ;; [4/3] 1 Less chunk. Continue if there still are more chunks (B != 0)
    dec  c            ;; [1] 256 less chunks (b runned up to 0, decrement c by 1)
    jp   p, copyloop  ;; [3] Continue 256 chunks more if C >= 0 (positive)
-
-restore_sp = .+1
-   ld   sp, #0000    ;; [3] Placeholder for restoring SP value before returning
-   ei                ;; [1] Reenable interrupts
 
    ret               ;; [3] Return  
