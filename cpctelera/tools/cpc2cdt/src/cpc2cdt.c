@@ -294,26 +294,33 @@ void detectHeaderInInputFile() {
 	memset(body,0,1<<16);
 	filesize=fread(body,1,128,fi);
 	if (filesize==128) {
-		i=j=0;
-		while (i<0x43)
-			j+=body[i++];
-		if ((body[0x43]+256*body[0x44])==j) { // AMSDOS!
-			filetype=body[0x12];
-			filesize=body[0x40]+body[0x41]*256;
-			fileload=body[0x15]+body[0x16]*256;
-			fileboot=body[0x1A]+body[0x1B]*256;
-			if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading AMSDOS header");
-			detectedHeader = 1;
-		} else {
-			while (i<0x7F)
+		// Prevent detection of sequence of 128 zeros as an AMSDOS header
+		j=0;
+		for (i=0; i < 128; ++i) 
+			j += body[i];
+		// j must be not 0 for this to be recognized as a valid AMSDOS header
+		if ( j != 0 ) {
+			i=j=0;
+			while (i<0x43)
 				j+=body[i++];
-			if ((j&0xFF)==body[0x7F]) { // PLUS3DOS!
-				filetype=body[0x0F];
-				filesize=body[0x10]+body[0x11]*256;
-				fileload=body[0x12]+body[0x13]*256;
-				fileboot=body[0x14]+body[0x15]*256;
-				if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading PLUS3DOS header");
+			if ((body[0x43]+256*body[0x44])==j) { // AMSDOS!
+				filetype=body[0x12];
+				filesize=body[0x40]+body[0x41]*256;
+				fileload=body[0x15]+body[0x16]*256;
+				fileboot=body[0x1A]+body[0x1B]*256;
+				if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading AMSDOS header");
 				detectedHeader = 1;
+			} else {
+				while (i<0x7F)
+					j+=body[i++];
+				if ((j&0xFF)==body[0x7F]) { // PLUS3DOS!
+					filetype=body[0x0F];
+					filesize=body[0x10]+body[0x11]*256;
+					fileload=body[0x12]+body[0x13]*256;
+					fileboot=body[0x14]+body[0x15]*256;
+					if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading PLUS3DOS header");
+					detectedHeader = 1;
+				}
 			}
 		}
 	}
