@@ -35,6 +35,7 @@ include $(THIS_DIR)/modules/img2sp.mk
 include $(THIS_DIR)/modules/tmx2data.mk
 include $(THIS_DIR)/modules/cdtman.mk
 include $(THIS_DIR)/modules/aks2data.mk
+include $(THIS_DIR)/modules/android.mk
 
 #################
 # GETLOADADDRESS: Get load address from a created binary file (parsing hex2bin's log)
