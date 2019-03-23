@@ -26,14 +26,67 @@
 ###########################################################################
 
 ## TODO: Set tools appropriately
-AND_OBJDIR   := $(OBJDIR)/_android
-ANDROID_PATH := $(CPCT_PATH)/tools/android
-DEFAULT_APK  := $(ANDROID_PATH)/rvmengine/defaultRVMapp.apk
-ZIPALIGN     := $(ANDROID_PATH)/bin/zipalign.linux32
-JARSIGNER    := $(ANDROID_PATH)/bin/jarsigner.linux64
-APKTOOL      := $(JAVA) -jar $(ANDROID_PATH)/bin/apktool/apktool_2.4.0.jar
-SET_PKG_ID   := $(JAVA) -jar $(ANDROID_PATH)/bin/setAxmlPkgName/setAxmlPkgName.jar
-TMP_APK      := $(AND_OBJDIR)/$(APK).tmp
+## 
+AND_OBJDIR        := $(OBJDIR)/_android
+AND_OBJAPKDIR     := $(AND_OBJDIR)/apkcontents
+AND_OBJAPKDIR_ASS := $(AND_OBJDIR)/apkcontents/assets
+AND_OBJAPKDIR_RES := $(AND_OBJDIR)/apkcontents/res
+AND_STRINGRESFILE := $(AND_OBJDIR)/res/values/strings.xml
+AND_OBJPAYLOADSNA := $(AND_OBJAPKDIR)/assets/payload.sna
+AND_APPNAMETAG    := %%%CPCTRVMEngineAppName%%%
+AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
+AND_DEFAULT_APK   := $(ANDROID_PATH)/rvmengine/defaultRVMapp.apk
+ANDROID_PATH      := $(CPCT_PATH)/tools/android
+ZIPALIGN          := $(ANDROID_PATH)/bin/zipalign.linux32
+JARSIGNER         := $(ANDROID_PATH)/bin/jarsigner.linux64
+APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)/bin/apktool/apktool_2.4.0.jar
+SET_PKG_ID        := $(JAVA) -jar $(ANDROID_PATH)/bin/setAxmlPkgName/setAxmlPkgName.jar
+TMP_APK           := $(AND_OBJDIR)/$(APK).tmp
+
+#################
+# ADD_SNA_AND_ASSETS2APK: Decodes the default APK to a folder
+# in the AND_OBJDIR folder of the project and replaces strings, SNA and
+# assets before packing it again into a new APK ready to be used.
+# (It will require to be signed and ID-replaced, but for the rest, it
+# is ready to be used)
+#
+# $(1): APK File to generate with new assets and SNA
+# $(2): SNA File to be added
+# $(3): New application name to be used
+# $(4): Assets folder to be copied to the APK
+# $(5): Resources folder to be copied to the APK
+#
+define ADD_SNA_AND_ASSETS2APK
+# Strip parameters
+	$(eval _ASA_APK   := $(strip $(1)))
+	$(eval _ASA_SNA   := $(strip $(2)))
+	$(eval _ASA_NAME  := $(strip $(3)))
+	$(eval _ASA_ASSETS:= $(strip $(4)))
+	$(eval _ASA_RES   := $(strip $(5)))
+# Ensure SNA and Default APK Exist
+	$(call ENSUREFILEEXISTS,$(AND_DEFAULT_APK),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<CRITICAL-ERROR>> File '$(AND_DEFAULT_APK)' does not exist or cannot be read when trying to add it to '$(_ASA_APK)'. '$(AND_DEFAULT_APK)' is installed along with CPCtelera, so this means that your installation folder/files have been modified. Please check for this file or reinstall CPCtelera.)
+	$(call ENSUREFILEEXISTS,$(_ASA_SNA),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> File '$(_ASA_SNA)' does not exist or cannot be read when trying to add it to '$(_ASA_APK)'. '$(_ASA_SNA)' should have been generated when compiling your CPCtelera project. Please review your project configuration and generate it again.)
+# DECODE APK
+	@$(APKTOOL) decode $(AND_DEFAULT_APK) -f -o $(AND_OBJAPKDIR)
+# REPLACE SNA
+	$(call ENSUREFILEEXISTS,$(AND_OBJPAYLOADSNA),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> File '$(AND_OBJPAYLOADSNA)' was not found after decompressing '$(AND_DEFAULT_APK)'. Please review that '$(AND_DEFAULT_APK)' was completely decompressed into '$(AND_OBJAPKDIR)', there are no filesystem permission problems and enough space for decompression.)
+	@$(CP) "$(_ASA_SNA)" "$(AND_OBJPAYLOADSNA)"
+# REPLACE ASSETS IF THE USER HAS SUPPLIED WITH SOME
+	$(call ENSUREFILEEXISTS,$(AND_OBJAPKDIR_ASS),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> Folder '$(AND_OBJAPKDIR_ASS)' was not found after decompressing '$(AND_DEFAULT_APK)'. Please review that '$(AND_DEFAULT_APK)' was completely decompressed into '$(AND_OBJAPKDIR)', there are no filesystem permission problems and enough space for decompression.)
+	$(if $(call FOLDERISREADABLE,$(_ASA_ASSETS))\
+		,@$(CP) -R $(_ASA_ASSETS)/* $(AND_OBJAPKDIR_ASS)\
+		,$(call WARNING, ADD_SNA_AND_ASSETS2APK did not found your assets folder '$(_ASA_ASSETS)'. It will not be copied to the APK file '$(_ASA_APK)')\
+	)
+# REPLACE RESOURCES IF THE USER HAS SUPPLIED WITH SOME
+	$(call ENSUREFILEEXISTS,$(AND_OBJAPKDIR_RES),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> Folder '$(AND_OBJAPKDIR_RES)' was not found after decompressing '$(AND_DEFAULT_APK)'. Please review that '$(AND_DEFAULT_APK)' was completely decompressed into '$(AND_OBJAPKDIR)', there are no filesystem permission problems and enough space for decompression.)
+	$(if $(call FOLDERISREADABLE,$(_ASA_RES))\
+		,@$(CP) -R $(_ASA_RES)/* $(AND_OBJAPKDIR_RES)\
+		,$(call WARNING, ADD_SNA_AND_ASSETS2APK did not found your resources folder '$(_ASA_RES)'. It will not be copied to the APK file '$(_ASA_APK)')\
+	)
+# REPLACE APPLICATION NAME
+# @sed -i -e '/<resources>/,/<\/resources>/ s|<string name="app_name">[0-9a-Z.]\{1,\}</string>|<string name="app_name">$(CUSTOM_APP_NAME)</string>|g' $(AND_OBJDIR)res/values/strings.xml
+	$(call REPLACETAG,$(AND_APPNAMETAG),$(_ASA_NAME),$(AND_STRINGRESFILE))
+endef
 
 #################
 # ADD_FILE_TO_CDT_LIST: Adds a file to the list of files
@@ -48,13 +101,6 @@ TMP_APK      := $(AND_OBJDIR)/$(APK).tmp
 #
 define GENERATE_APK
 $(APK): $(SNA)
-	# DECODE APK
-	@$(APKTOOL) decode $(DEFAULT_APK) -f -o $(AND_OBJDIR)
-	# REPLACE ASSETS
-	@$(CP) $(SNA) $(AND_OBJDIR)/assets/payload.sna
-	#@$(CP) -R $(AND_ASSETS)* $(AND_OBJDIR)
-	# REPLACE APPLICATION NAME
-	@sed -i -e '/<resources>/,/<\/resources>/ s|<string name="app_name">[0-9a-Z.]\{1,\}</string>|<string name="app_name">$(CUSTOM_APP_NAME)</string>|g' $(AND_OBJDIR)res/values/strings.xml
 	# BUILD APK
 	@$(APKTOOL) build $(AND_OBJDIR) -o $(TMP_APK)
 	# REPLACE APPLICATION ID
@@ -68,423 +114,4 @@ $(APK): $(SNA)
 	@$(RM) $(TMP_APK).tmp
 
 	@$(call PRINT,$(PROJNAME),"Successfully created 'game.apk'")
-endef
-
-#################
-# INSERT_NEXT_FILE_INTO_CDT: Adds a new file to the CDT file using
-# CPC2CDT and taking into account file codification (firmware or miniload)
-# to insert it RAW in raw1full format or adding AMSDOS header
-#
-# $(1): File
-# $(2): Type {firmware, basic, miniload}
-# $(3): Load Address (for firmware calls)
-# $(4): Run Address (for firmware calls)
-# $(5): Filename (for firmware calls)
-#
-define INSERT_NEXT_FILE_INTO_CDT
-	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [ CDTMAN - INSERT FILE ]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)')
-	$(call ENSUREVALID,$(2),$(CDTM_VALIDFORMATS),<<ERROR>> [ CDTMAN - INSERT FILE ]: Format '$(2)' for file '$(1) is not valid. Valid formats are: { $(CDTM_VALIDFORMATS) }')
-
-	printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' {Format:'$(_C2)$(2)$(_C1)' "
-
-	$(if $(call EQUALS,firmware,$(2))\
-		, $(CPC2CDT) -x "$(4)" -l "$(3)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
-		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
-	)
-	$(if $(call EQUALS,miniload,$(2))\
-		, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> /dev/null \
-	)
-	$(if $(call EQUALS,basic,$(2))\
-		, $(CPC2CDT) -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
-		  && printf "Name:'$(_C2)$(5)$(_C1)'" \
-	)
-
-	printf "}$(_C)\n"
-endef
-
-#################
-# CREATECDT: Creates the final CDT file with the files 
-# that have been added by the configuration macros.
-#
-define CREATECDT
-	# If CDT file already exists, remove it first to create a new one
-	$(call REMOVEFILEIFEXISTS,$(CDT))
-
-	# If no file is to be added to the CDT, just add the generated as a firmware file
-	$(if $(CDTM_CDTFILES)\
-		,\
-		,$(call GETALLADDRESSES,$(BINFILE)); \
-		 $(call INSERT_NEXT_FILE_INTO_CDT,$(BINFILE),firmware,0x$(strip $(LOADADDR)),0x$(strip $(RUNADDR)),$(CDTM_FILENAME)) \
-		)
-	# Add all the files to the CDT one by one
-	$(eval _I:=1)
-	$(foreach _F,$(CDTM_CDTFILES),\
-		$(eval _T := $(word $(_I), $(CDTM_CDTTYPES))) \
-		$(eval _N := $(subst ',$(SPACE),$(word $(_I), $(CDTM_CDTNAMES)))) \
-		$(eval _L := $(word $(_I), $(CDTM_CDTLOAD))) \
-		$(eval _R := $(word $(_I), $(CDTM_CDTRUN))) \
-		$(call INSERT_NEXT_FILE_INTO_CDT,$(_F),$(_T),$(_L),$(_R),$(_N))
-		$(eval _I := $(call ADD2INTS,$(_I),1)) \
-		)
-endef
-
-
-#################
-# CDTMAN_ADDFILE: Adds a new file to the list of files 
-# that will be inserted into the CDT file. The file needs
-# to be a plain binary without header. It will be inserted
-# either as firmware or as miniload format. miniload format
-# does not require parameters. firmware format requires 
-# a Load Address and a Run Address. Also, firmware files
-# will use current CDTM_FILENAME as cassette filename.
-#
-# $(1): Format { firmware, basic, miniload }
-# $(2): File to be added
-# $(3): Load Address (Only for firmware formats)
-# $(4): Run Address (Only for firmware formats)
-#
-define CDTMAN_ADDFILE
-	# Check constraints
-	$(call ENSUREVALID,$(1),$(CDTM_VALIDFORMATS),<<ERROR>> [ CDTMAN - ADDFILE ]: Format '$(1)' for file '$(2) is not valid. Valid formats are: { $(CDTM_VALIDFORMATS) }')
-	$(if $(call EQUALS,$(1),firmware)\
-		, $(call ENSURE_ADDRESS_VALID,$(3),<<ERROR>> [ CDTMAN - ADDFILE ]:) \
-		  $(call ENSURE_ADDRESS_VALID,$(4),<<ERROR>> [ CDTMAN - ADDFILE ]:) \
-		,)	
-
-	# Add to list of files to be inserted in the CDT
-	$(call ADD_FILE_TO_CDT_LIST,$(2),$(1),$(3),$(4),$(CDTM_FILENAME))
-endef
-
-#################
-# CDTMAN_SET_MINILOAD_LOADER_ADDRESS: Sets the memory address where the 
-# miniload loader binary will be loaded. This binary includes code 
-# to load and run the compressed image file, then load and run the
-# game. It also includes miniloads code. It takes 146 bytes in total
-# from this loading address.
-#
-# $(1): Memory LOAD ADDRESS for Loader
-#
-define CDTMAN_SET_MINILOAD_LOADER_ADDRESS
-	# Ensure that the address is valid
-	$(call ENSURE_ADDRESS_VALID,$(1),<<ERROR>> [ CDTMAN - SET_MINILOAD_LOADER_ADDRESS ])
-
-	# Now set the new address and calculate corresponding Offsets
-	$(eval CDTM_MINILOAD_RUN    := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_RUN))))
-	$(eval CDTM_MINILOAD_FULL   := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_FULL))))
-	$(eval CDTM_MINILOAD_HALF   := $(call DEC2HEX,$(call ADD2INTS,$(_A),$(CDTM_OFFMINILOAD_HALF))))
-	$(eval CDTM_LOADER_LOADADDR := $(call DEC2HEX,$(_A)))
-endef
-
-#################
-# CDTMAN_SET_MINILOAD_MODE: Sets the CPC video mode that will be used
-# for the image that will be loaded by the miniloader. Only standard
-# video modes are valid: 0 1 2
-#
-# $(1): Amstrad CPC Video Mode
-#
-# Updates variable CDTM_MODE, CDTM_W
-#
-define CDTMAN_SET_MINILOAD_MODE
-	# Check that the passed value is valid and assign it 
-	$(eval CDTM_VALID:=0 1 2)
-	$(eval CDTM_WIDTHS:=160 320 640)
-	$(call SET_ONE_OF_MANY_VALID,CDTM_MODE,$(1),$(CDTM_VALID),[CDTMAN - SET_MINILOAD_MODE]: '$(1)' is not a valid video mode)
-	$(call CONVERTVALUE,$(CDTM_MODE),CDTM_VALID,CDTM_WIDTHS,160,CDTM_W)
-endef
-
-#################
-# CDTMAN_SET_FILENAME: Sets the filename that next firmware added file
-# will use when loading from BASIC. This filename will act as your game's 
-# filename in many cases. Maximum: 16 characters
-#
-# $(1): Filename
-#
-# Updates variable CDTM_FILENAME
-#
-define CDTMAN_SET_FILENAME
-	# Remove any single quotes from filename
-	$(eval CDTM_FILENAME := $(subst ',,$(1)))
-
-	# Ensure Length of Filename is not greater than 16
-	$(eval CDTM_FLEN := $(call STRLEN,$(CDTM_FILENAME)))
-	$(if $(call GREATER_THAN,$(CDTM_FLEN),16)\
-		,$(error <<ERROR>> [CDTMAN - SET_FILENAME]: Filename '$(CDTM_FILENAME)' is longer than the maximum cassette filename length: '$(CDTM_FLEN)'>16)\
-		,)
-endef
-
-#################
-# GEN_MINILOADER_SHOWSCR_PATCHED_RULE: Generates a makefile rule for generating
-# the Patched Show Screen binary. This rule depends on the original SCR file,
-# copies it to obj folder, converts it to screen data, packs it into a zx7b binary,
-# attaches this binary at the end of showscr.bin and finally patches resulting
-# binary to set video mode and palette values and the offset where the image ends
-# for the unpacker.
-#
-define GEN_MINILOADER_SHOWSCR_PATCHED_RULE
-## Rule to generate and patch Showscreen binary
-$(CDTM_SHOWSCRPCH): $(CDTM_SCRFILE) $(CDTM_DEPEND)
-	@$(call PRINT,CDTMAN,"******************")
-	@$(call PRINT,CDTMAN,"*** MINILOADER ***: setting up Screen Shower binary")
-	@$(call PRINT,CDTMAN,"******************")
-	$(CP) "$(CDTM_SCRFILE)" "$(CDTM_IMGF)"
-	@$(call PRINT,CDTMAN,"Converting given image file to mode $(CDTM_MODE) screen data...")
-	$(IMG2TIL) -nt -of bin -pf { $(CDTM_PALFWMODE) } -m $(CDTM_MODE) -scr -tw $(CDTM_W) -th 200 "$(CDTM_IMGF)"
-	@$(call PRINT,CDTMAN,"Packing screen data with ZX7B compressor...")
-	$(ZX7B) $(CDTM_IMGBIN) $(CDTM_IMGZX7B)
-	@$(call PRINT,CDTMAN,"Adding screen data at the end of Screen Shower binary...")
-	$(CAT) $(ML_SHOWSCR_BIN) $(CDTM_IMGZX7B) > $(CDTM_SHOWSCR)
-	@$(call PRINT,CDTMAN,"Patching Screen Shower binary into final patched file ($(CDTM_SHOWSCRPCH))...")
-	IMGSIZE=`wc -c < $(CDTM_SHOWSCR)` && \
-	SCREND=$$$$(( $(CDTM_SHOWSCR_LOADADDR) + IMGSIZE - 1 )) && \
-	$(BINPATCH) $(CDTM_SHOWSCR) \
-	   -pb "$(CDTM_OFFVIDEOMODE)" "$(CDTM_MODE)" \
-	   -pw "$(CDTM_OFFSCREND)" "$$$${SCREND}" \
-	   -ps "$(CDTM_OFFPAL)" $(CDTM_PALHW)
-	$(CP) $(CDTM_SHOWSCR) $(CDTM_SHOWSCRPCH)
-	@$(call PRINT,CDTMAN,"Successfully generated $(CDTM_SHOWSCRPCH).")
-
-endef
-
-#################
-# GEN_MINILOADER_LOADER_PATCHED1_RULE: This macro generates a new rule to set 
-# up the first part of the Loader binary. This new rule copies the loader 
-# binary to the object folder and then patches it inserting showscr.bin 
-# load&run addresses and its size, and also patching calls to miniload.
-# It cannot patch the last part until BINFILE is generated. That will 
-# be done by GEN_MINILOADER_LOADER_PATCHED2_RULE
-#
-define GEN_MINILOADER_LOADER_PATCHED1_RULE
-
-$(CDTM_LOADERPCH1): $(CDTM_SHOWSCRPCH) $(CDTM_DEPEND)
-	@$(call PRINT,CDTMAN,"******************")
-	@$(call PRINT,CDTMAN,"*** MINILOADER ***: setting up loader binary")
-	@$(call PRINT,CDTMAN,"******************")
-	@printf "$(_C1)> Loader binary Load-address:'$(_C2)$(CDTM_LOADER_LOADADDR)$(_C1)'\n"
-	@printf "$(_C1)> Files to load and run: 1-'$(_C2)$(CDTM_SHOWSCR)$(_C1)' 2-'$(_C2)$(BINFILE)$(_C1)'\n"
-	@printf "$(_C1)> $(_C2)$(notdir $(CDTM_SHOWSCR))$(_C1) Load-address: '$(_C2)$(CDTM_SHOWSCR_LOADADDR)$(_C1)'.\n"
-	@SCRSIZE=`wc -c < $(CDTM_SHOWSCR)` && \
-	printf  "$(_C1)> $(_C2)$(notdir $(CDTM_SHOWSCR))$(_C1) size: '$(_C2)$$$${SCRSIZE}$(_C1)' bytes.\n"
-	@printf "$(_C1)> $(_C2)$(notdir $(CDTM_SHOWSCR))$(_C1) unpacks '$(_C2)$(CDTM_SCRFILE)$(_C1)' to video memory when run.\n"
-	@$(call PRINT,CDTMAN,"Now patching generic loader with the loading and run addresses for showscr.bin and miniload calls.")
-	@printf "$(_C1)> Copying '$(_C2)$(notdir $(ML_LOADER_BIN))$(_C1)' to object folder '$(_C2)$(dir $(CDTM_LOADERBIN))$(_C1)' \n"
-	@$(CP) $(ML_LOADER_BIN) $(CDTM_LOADERBIN)
-	@printf "$(_C1)> Patching '$(_C2)$(notdir $(CDTM_LOADERBIN))$(_C1)' into '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)'...$(_C)\n"
-	SCRSIZE=`wc -c < $(CDTM_SHOWSCR)` && \
-	$(BINPATCH) "$(CDTM_LOADERBIN)" \
-	   -pw "$(CDTM_OFFSCRLOAD)" "$(CDTM_SHOWSCR_LOADADDR)" \
-	   -pw "$(CDTM_OFFSCRRUN)" "$(CDTM_SHOWSCR_LOADADDR)" \
-		-pw "$(CDTM_OFFSCRSIZE)" "$$$${SCRSIZE}" \
-		-pw "$(CDTM_OFFMINILOAD_CALL1)" "$(CDTM_MINILOAD_RUN)" \
-		-pw "$(CDTM_OFFMINILOAD_CALL2)" "$(CDTM_MINILOAD_RUN)" \
-		-pw "$(CDTM_OFFMINHALF_CALL1)" "$(CDTM_MINILOAD_HALF)" \
-		-pw "$(CDTM_OFFMINHALF_CALL2)" "$(CDTM_MINILOAD_HALF)" \
-		-pw "$(CDTM_OFFMINFULL_CALL1)" "$(CDTM_MINILOAD_FULL)" \
-		-pw "$(CDTM_OFFMINFULL_CALL2)" "$(CDTM_MINILOAD_FULL)"
-	@printf "$(_C1)> Successfully patched. Now writing to '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)'\n"
-	@$(CP) $(CDTM_LOADERBIN) $(CDTM_LOADERPCH1)
-	@$(call PRINT,CDTMAN,"Successfully generated '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C3)'. It will be patched again later after generating '$(_C2)$(BINFILE)$(_C3)'.")
-
-endef
-
-#################
-# GEN_MINILOADER_LOADER_PATCHED2_RULE: This macro generates a new rule
-# that will be launched when generating the CDT file, after having
-# generated the BINFILE. This rule will patch the binary to generate
-# a final loader binary with Load&Run address and size of the BINFILE.
-#
-define GEN_MINILOADER_LOADER_PATCHED2_RULE
-
-$(CDTM_LOADERPCH2): $(BINFILE) $(CDTM_LOADERPCH1) $(CDTM_DEPEND)
-	@$(call PRINT,CDTMAN,"******************")
-	@$(call PRINT,CDTMAN,"*** MINILOADER ***: Final patches to loader binary")
-	@$(call PRINT,CDTMAN,"******************")
-	@$$(call GETALLADDRESSES,$(BINFILE))
-	@printf "$(_C1)> Inserting '$(_C2)$(BINFILE)$(_C1)' load&run addresses and size.\n"
-	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Load Address: '$(_C2)0x$$(strip $$(LOADADDR))$(_C1)'\n"
-	@printf "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Run  Address: '$(_C2)0x$$(strip $$(RUNADDR))$(_C1)'\n"
-	@GAMESIZE=`wc -c < $(BINFILE)` \
-	&& printf  "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' Binary size : '$(_C2)0x%x$(_C1)' ($(_C2)%d$(_C1) bytes)\n" "$$$${GAMESIZE}" "$$$${GAMESIZE}" \
-	&& ENDADDR=$$$$(( 0x$$(LOADADDR) + GAMESIZE - 1 )) \
-	&& printf  "$(_C1)> '$(_C2)$(BINFILE)$(_C1)' End Address : '$(_C2)0x%x$(_C1)'\n" "$$$${ENDADDR}"
-	@printf "$(_C1)> $(_C2)Loader$(_C1) Load Address: '$(_C2)$(CDTM_LOADER_LOADADDR)$(_C1)'\n"
-	@ENDADDR=$$$$(( $(CDTM_LOADER_LOADADDR) + $(CDTM_LOADER_SIZE) - 1 )) \
-	&& printf "$(_C1)> $(_C2)Loader$(_C1) End  Address: '$(_C2)0x%x$(_C1)'\n" "$$$${ENDADDR}"
-	@printf "$(_C1)> Patching '$(_C2)$(notdir $(CDTM_LOADERPCH1))$(_C1)' into '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C1)...$(_C)'\n"
-	GAMESIZE=`wc -c < $(BINFILE)` && \
-	$(BINPATCH) "$(CDTM_LOADERPCH1)" \
-		-pw "$(CDTM_OFFGAMELOAD)" "0x$$(strip $$(LOADADDR))" \
-		-pw "$(CDTM_OFFGAMERUN)" "0x$$(strip $$(RUNADDR))" \
-		-pw "$(CDTM_OFFGAMESIZE)" "$$$${GAMESIZE}"
-	@printf "$(_C1)> Successfully patched. Now writing to '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C)'\n"
-	@$(CP) $(CDTM_LOADERPCH1) $(CDTM_LOADERPCH2)
-	@$(call PRINT,CDTMAN,"Successfully generated '$(_C2)$(notdir $(CDTM_LOADERPCH2))$(_C3)'.")	
-
-endef
-
-#################
-# CDTMAN_GEN_MINILOADER: Generates the rules and commands required to 
-# automatically generate a loader based on miniload and zx7b. This 
-# basic loader is composed of 3 parts: 1) the loader itself that is 
-# added as an AMSDOS file, 2) a binary including a zx7b compressed
-# image that gets decompressed into video memory directly and 3) the
-# binary generated with CPCtelera. Both files 2) and 3) are added
-# as miniload files and loaded by 1).
-#
-# $(1): Screen file with exact resolution for selected mode (PNG, JPG...)
-#
-# Updates PREBUILDOBJS, CDTMANOBJS
-#
-define CDTMAN_GEN_MINILOADER
-	# Check file exists
-	$(if $(call FILEEXISTS,$(1)),,$(error <<ERROR>> [CDTMAN - GEN_MINILOADER] File '$(1)' does not exist and is required to generate the miniloader))
-	$(eval CDTM_SCRFILE := $(1))
-
-	# Prepare firmware palette and resolution width for IMG2TILESET
-	$(if $(call EQUALS,0,$(CDTM_MODE))\
-		,$(eval CDTM_PALFWMODE := $(wordlist 1,16,$(CDTM_PALFW)))\
-		 $(eval CDTM_W := 160) \
-		,)
-	$(if $(call EQUALS,1,$(CDTM_MODE))\
-		,$(eval CDTM_PALFWMODE := $(wordlist 1,4,$(CDTM_PALFW)))\
-		 $(eval CDTM_W := 320) \
-		,)
-	$(if $(call EQUALS,2,$(CDTM_MODE))\
-		,$(eval CDTM_PALFWMODE := $(wordlist 1,2,$(CDTM_PALFW)))\
-		 $(eval CDTM_W := 640) \
-		,)
-
-	# Check file is an image and has the appropriate size constraints
-	$(eval _S := $(call GET_IMG_SIZE,$(1),<<ERROR>> [CDTMAN - GEN_MINILOADER] '$(1)' is not a valid image file.))
-	$(eval _W := $(word 1,$(_S)))
-	$(eval _H := $(word 2,$(_S)))	
-	$(eval _R := <<ERROR>> [CDTMAN - GEN_MINILOADER] '$(1)' Incorrect image resolution '$(_W)x$(_H)'. Mode '$(CDTM_MODE)' requires a screen of '$(CDTM_W)x200' pixels)
-	$(if $(call EQUALS,$(_W),$(CDTM_W)),,$(error $(_R)))
-	$(if $(call EQUALS,$(_H),200),,$(error $(_R)))
-
-	# Prepare palette hardware for patcher
-	$(call CONVERT_FW2HW_PALETTE,$(CDTM_PALFW) $(CDTM_BORDERFW),_TMP)
-	$(eval CDTM_PALHW := )
-	$(foreach _C,$(_TMP),$(eval CDTM_PALHW := $(CDTM_PALHW) 0x$(_C)))
-
-	# Prepare file names and paths
-	$(eval CDTM_SUFIX:=$(suffix $(1)))
-	$(eval CDTM_OBJDIR:=$(CDTM_OBJDIR)/$(dir $(1)))
-	$(call JOINFOLDER2BASENAME,CDTM_IMGF,$(CDTM_OBJDIR),$(1))
-	$(call JOINFOLDER2BASENAME,CDTM_IMGBIN,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_IMGZX7B,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.zx7b.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_SHOWSCR,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.showscr.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_SHOWSCRPCH,$(CDTM_OBJDIR),$(1:$(CDTM_SUFIX)=.patched.showscr.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_LOADERBIN,$(CDTM_OBJDIR),$(ML_LOADER_BIN))
-	$(call JOINFOLDER2BASENAME,CDTM_LOADERPCH1,$(CDTM_OBJDIR),$(ML_LOADER_BIN:.bin=.patch1.bin))
-	$(call JOINFOLDER2BASENAME,CDTM_LOADERPCH2,$(CDTM_OBJDIR),$(ML_LOADER_BIN:.bin=.patch2.bin))
-
-	## Create the object directory
-	$(shell $(MKDIR) $(CDTM_OBJDIR))
-
-	## Generate pre-build event rules to convert loading screen
-	$(call GEN_MINILOADER_SHOWSCR_PATCHED_RULE)
-	$(call GEN_MINILOADER_LOADER_PATCHED1_RULE)
-	$(call GEN_MINILOADER_LOADER_PATCHED2_RULE)
-
-	@## Add files to be generated to the list of CDT Files
-	@$(call ADD_FILE_TO_CDT_LIST,$(CDTM_LOADERPCH2),firmware,$(CDTM_LOADER_LOADADDR),$(CDTM_LOADER_LOADADDR),$(CDTM_FILENAME))
-	@$(call ADD_FILE_TO_CDT_LIST,$(CDTM_SHOWSCRPCH),miniload)
-	@$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),miniload)
-
-# Update PREBUILDOBJS and CDTMANOBJS
-PREBUILDOBJS := $(PREBUILDOBJS) $(CDTM_LOADERPCH1)
-CDTMANOBJS   := $(CDTMANOBJS) $(CDTM_LOADERPCH2)
-endef
-
-#################
-# CDTMAN_SET_MINILOAD_PALETTE_FW: Sets the firmware palette to be used in following CDTMAN CONVERT commands
-#
-# $(1): Border colour as firmware value (single value, from 0 to 16)
-# $(2): Firmware palette array (Array of integers from 0 to 26, max size 16)
-#
-# Updates variable CDTM_PALFW
-#
-define CDTMAN_SET_MINILOAD_PALETTE_FW
-	# Ensure Border Colour is a single value and firmware palette valid
-	$(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [CDTMAN - SET_MINILOAD_PALETTE_FW]: '$(1)' is not valid as border colour. It must be a SINGLE integer between 0 and 26)
-	$(call VERIFY_FW_PALETTE,$(1),CDTMAN - SET_MINILOAD_PALETTE_FW)
-	$(eval CDTM_BORDERFW:=$(1))
-	
-	# Verify passed firmware palette
-	$(call VERIFY_FW_PALETTE,$(2),CDTMAN - SET_MINILOAD_PALETTE_FW)
-
-	# All checks passed, set the palette
-	$(eval CDTM_PALFW:=$(2))
-
-	# Complete palette up to 16 values if it conatins less than that
-	$(eval CDTM_PALSIZE := $(call ADD2INTS,16,-$(words $(CDTM_PALFW))))
-	$(call ADD_N_ITEMS,CDTM_PALFW,$(CDTM_PALSIZE),0)
-
-	# Add the border colour at the end of the palette
-	#(eval CDTM_PALFW:=$(CDTM_PALFW) $(CDTM_BORDERFW))
-endef
-
-
-#################
-# CDTMAN: Front-end to access all functionalities of CDTMAN macros about CDT 
-# generation and file management.
-#
-# $(1): Command to be performed
-# $(2-8): Valid arguments to be passed to the selected command
-#
-# Valid Commands: ADDFILE SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW 
-# Info about each command can be found looking into its correspondent makefile macro CDTMAN_<COMMAND>
-#
-define CDTMAN
-	# Set the list of valid commands
-	$(eval CDTMAN_F_FUNCTIONS := ADDFILE SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
-
-	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
-	$(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [CDTMAN] '$(strip $(1))' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces. Valid commands: {$(CDTMAN_F_FUNCTIONS)})
-
-	# Filter given command as $(1) to see if it is one of the valid commands
-	$(eval CDTMAN_F_SF = $(filter $(CDTMAN_F_FUNCTIONS),$(1)))
-
-	# If the given command is valid, it will be non-empty, then we proceed to call the command (up to 8 arguments). Otherwise, raise an error
-	$(if $(CDTMAN_F_SF)\
-		,$(eval $(call CDTMAN_$(CDTMAN_F_SF),$(strip $(2)),$(strip $(3)),$(strip $(4)),$(strip $(5)),$(strip $(6)),$(strip $(7)),$(strip $(8))))\
-		,$(error <<ERROR>> [CDTMAN] '$(strip $(1))' is not a valid command. Valid commands: {$(CDTMAN_F_FUNCTIONS)}))
-endef
-
-#################################################################################################################################################
-### OLD MACROS (Deprecated)
-### Maintained here for compatibility
-#################################################################################################################################################
-
-#################
-# CREATEBLANKCDT: Create a Blank CDT file
-#
-# $(1): CDT file to be created
-#
-define CREATEBLANKCDT
-	@$(2CDT) -n . $(1) > /dev/null
-endef
-
-#################
-# ADDBASICFILETOCDT: Adds a BASIC file to a CDT file
-#
-# $(1): CDT file where the BASIC file will be added
-# $(2): BASIC file to be added (path to it in the filesystem)
-# $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
-#
-define ADDBASICFILETOCDT
-	@$(2CDT) -F 0 $(2) -r $(3) $(1) > /dev/null
-endef
-
-#################
-# ADDBINARYFILETOCDT: Adds a BINARY file to a CDT file
-#
-# $(1): CDT file where the BINARY file will be added
-# $(2): Binary file to be inserted in the CDT
-# $(3): Name (up to 16 characters) to assign to the file inside the CDT (displayed when loading)
-# $(4): Memory address where binary will be loaded (LOAD ADDRESS)
-# $(5): Memory address where main program starts (RUN ADDRESS)
-#
-define ADDBINARYFILETOCDT
-	@$(2CDT) -X 0x$(5) -L 0x$(4) -r $(3) $(2) $(1) > /dev/null
 endef
