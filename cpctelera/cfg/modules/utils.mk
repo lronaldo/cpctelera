@@ -36,10 +36,12 @@
 ##   * ENSURE_ADDRESS_VALID
 ##   * ENSURE_VALID_C_ID
 ##   * ENSURE_SINGLE_VALUE
+##   * ENSUREFOLDERISREADABLE
 ##   * ENSUREVALID
 ##   * ENSUREFILEEXISTS
 ##	  * FILEEXISTS
 ##	  * FOLDEREXISTS
+##   * FOLDERISREADABLE
 ##	  * FOLDERISWRITABLE
 ##   * GET_IMG_SIZE
 ##   * GREATER_THAN
@@ -55,6 +57,7 @@
 ##   * SET_ONE_OF_MANY_VALID
 ##   * STRLEN
 ##   * VERIFY_FW_PALETTE
+##   * WARNING
 ##
 
 # ANSI Sequences for terminal colored printing
@@ -78,6 +81,18 @@ define PRINT
 	@printf "$(COLOR_RED)["
 	@printf $(1)
 	@printf "]$(COLOR_YELLOW) "
+	@printf $(2)
+	@printf "$(COLOR_NORMAL)\n"
+endef
+
+#################
+# WARNING: Print a warning to the user
+#
+# $(1): Warning message to be printed
+#
+define WARNING
+	@printf "$(COLOR_CYAN)[ Warning ]:"
+	@printf "$(COLOR_GREY) "
 	@printf $(2)
 	@printf "$(COLOR_NORMAL)\n"
 endef
@@ -160,11 +175,11 @@ endef
 
 ########################
 ## REPLACETAG
-## Replaces all ocurrences of tag inside a file with a given string
+## Replaces all occurrences of tag inside a file with a given string
 ## $1: Tag to be searched
 ## $2: String to replace the tag
 ## $3: File to modify
-## $4: sed deliminer (optional)
+## $4: sed delimiter (optional)
 ##
 define REPLACETAG
 	# Strip parameters
@@ -308,6 +323,20 @@ define ENSUREFILEEXISTS
 	$(if $(filter-out $(wildcard $(EFE_THEFILE)),$(EFE_THEFILE))\
 		,$(error $(strip $(2)))\
 		,)
+endef
+
+#################
+# ENSUREFOLDERISREADABLE: Checks if a given folder exists and is readable and
+# if not, raises an error.
+#
+# $(1): folder
+# $(2): Error Message if it does not exist
+#
+define ENSUREFOLDERISREADABLE
+	$(if $(call FOLDERISREADABLE $(strip $(1)))\
+		,\
+		,$(error $(strip $(2)))\
+	)
 endef
 
 
@@ -503,6 +532,18 @@ endef
 #
 define FOLDERISWRITABLE
 $(shell if [[ -d "$(strip $(1))" && -w "$(strip $(1))" && -x "$(strip $(1))" ]]; then echo true; fi)
+endef
+
+#################
+# FOLDERISREADABLE: Checks if a given folder exists and is readable
+# or not. Returns "true" when the file exists and empty-string 
+# otherwise. It is thought to be used in makefile if functions. 
+# Parameter is striped before being tested.
+#
+# $(1): folder (must not be a file)
+#
+define FOLDERISREADABLE
+$(shell if [[ -d "$(strip $(1))" && -r "$(strip $(1))" && -x "$(strip $(1))" ]]; then echo true; fi)
 endef
 
 #################
