@@ -25,93 +25,101 @@
 ## with an snapshot of the game and the RVMengine embedded for Android.  ##
 ###########################################################################
 
+## User configurable values
+AND_APPNAME := CPCtelera game
+AND_SNAFILE := $(if $(SNA),$(SNA),game.sna)
+AND_ASSETS  := android/assets
+AND_RES     := android/res
+AND_APPID   := com.cpctelera
+
 ## TODO: Set tools appropriately
 ## 
 AND_OBJDIR        := $(OBJDIR)/_android
 AND_OBJAPKDIR     := $(AND_OBJDIR)/apkcontents
-AND_OBJAPKDIR_ASS := $(AND_OBJDIR)/apkcontents/assets
-AND_OBJAPKDIR_RES := $(AND_OBJDIR)/apkcontents/res
-AND_STRINGRESFILE := $(AND_OBJDIR)/res/values/strings.xml
-AND_OBJPAYLOADSNA := $(AND_OBJAPKDIR)/assets/payload.sna
+AND_OBJAPKDIR_ASS := $(AND_OBJAPKDIR)/assets
+AND_OBJAPKDIR_RES := $(AND_OBJAPKDIR)/res
+AND_OBJAPKMANIFEST:= $(AND_OBJAPKDIR)/original/AndroidManifest.xml
+AND_STRINGRESFILE := $(AND_OBJAPKDIR_RES)/values/strings.xml
+AND_OBJPAYLOADSNA := $(AND_OBJAPKDIR_ASS)/payload.sna
 AND_APPNAMETAG    := %%%CPCTRVMEngineAppName%%%
 AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
-AND_DEFAULT_APK   := $(ANDROID_PATH)/rvmengine/defaultRVMapp.apk
-ANDROID_PATH      := $(CPCT_PATH)/tools/android
-ZIPALIGN          := $(ANDROID_PATH)/bin/zipalign.linux32
-JARSIGNER         := $(ANDROID_PATH)/bin/jarsigner.linux64
-APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)/bin/apktool/apktool_2.4.0.jar
-SET_PKG_ID        := $(JAVA) -jar $(ANDROID_PATH)/bin/setAxmlPkgName/setAxmlPkgName.jar
-TMP_APK           := $(AND_OBJDIR)/$(APK).tmp
+AND_DEFAULT_APK   := $(ANDROID_PATH)rvmengine/defaultRVMapp.apk
+AND_TMPAPK        := $(AND_OBJDIR)/$(APK).tmp
+ZIPALIGN          := $(ANDROID_PATH)bin/zipalign.linux32
+JARSIGNER         := $(ANDROID_PATH)bin/jarsigner.linux64
+APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar
+SET_PKG_ID        := $(JAVA) -jar $(ANDROID_PATH)bin/setAxmlPkgName/setAxmlPkgName.jar
 
 #################
-# ADD_SNA_AND_ASSETS2APK: Decodes the default APK to a folder
-# in the AND_OBJDIR folder of the project and replaces strings, SNA and
-# assets before packing it again into a new APK ready to be used.
-# (It will require to be signed and ID-replaced, but for the rest, it
-# is ready to be used)
+# AND_SET_SNA: Sets the SNA file to be used as payload in 
+# the android application
 #
-# $(1): APK File to generate with new assets and SNA
-# $(2): SNA File to be added
-# $(3): New application name to be used
-# $(4): Assets folder to be copied to the APK
-# $(5): Resources folder to be copied to the APK
+# $(1): SNA File to be added
 #
-define ADD_SNA_AND_ASSETS2APK
-# Strip parameters
-	$(eval _ASA_APK   := $(strip $(1)))
-	$(eval _ASA_SNA   := $(strip $(2)))
-	$(eval _ASA_NAME  := $(strip $(3)))
-	$(eval _ASA_ASSETS:= $(strip $(4)))
-	$(eval _ASA_RES   := $(strip $(5)))
-# Ensure SNA and Default APK Exist
-	$(call ENSUREFILEEXISTS,$(AND_DEFAULT_APK),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<CRITICAL-ERROR>> File '$(AND_DEFAULT_APK)' does not exist or cannot be read when trying to add it to '$(_ASA_APK)'. '$(AND_DEFAULT_APK)' is installed along with CPCtelera, so this means that your installation folder/files have been modified. Please check for this file or reinstall CPCtelera.)
-	$(call ENSUREFILEEXISTS,$(_ASA_SNA),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> File '$(_ASA_SNA)' does not exist or cannot be read when trying to add it to '$(_ASA_APK)'. '$(_ASA_SNA)' should have been generated when compiling your CPCtelera project. Please review your project configuration and generate it again.)
-# DECODE APK
-	@$(APKTOOL) decode $(AND_DEFAULT_APK) -f -o $(AND_OBJAPKDIR)
-# REPLACE SNA
-	$(call ENSUREFILEEXISTS,$(AND_OBJPAYLOADSNA),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> File '$(AND_OBJPAYLOADSNA)' was not found after decompressing '$(AND_DEFAULT_APK)'. Please review that '$(AND_DEFAULT_APK)' was completely decompressed into '$(AND_OBJAPKDIR)', there are no filesystem permission problems and enough space for decompression.)
-	@$(CP) "$(_ASA_SNA)" "$(AND_OBJPAYLOADSNA)"
-# REPLACE ASSETS IF THE USER HAS SUPPLIED WITH SOME
-	$(call ENSUREFILEEXISTS,$(AND_OBJAPKDIR_ASS),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> Folder '$(AND_OBJAPKDIR_ASS)' was not found after decompressing '$(AND_DEFAULT_APK)'. Please review that '$(AND_DEFAULT_APK)' was completely decompressed into '$(AND_OBJAPKDIR)', there are no filesystem permission problems and enough space for decompression.)
-	$(if $(call FOLDERISREADABLE,$(_ASA_ASSETS))\
-		,@$(CP) -R $(_ASA_ASSETS)/* $(AND_OBJAPKDIR_ASS)\
-		,$(call WARNING, ADD_SNA_AND_ASSETS2APK did not found your assets folder '$(_ASA_ASSETS)'. It will not be copied to the APK file '$(_ASA_APK)')\
-	)
-# REPLACE RESOURCES IF THE USER HAS SUPPLIED WITH SOME
-	$(call ENSUREFILEEXISTS,$(AND_OBJAPKDIR_RES),[ ANDROID - ADD_SNA_AND_ASSETS2APK ]: <<ERROR>> Folder '$(AND_OBJAPKDIR_RES)' was not found after decompressing '$(AND_DEFAULT_APK)'. Please review that '$(AND_DEFAULT_APK)' was completely decompressed into '$(AND_OBJAPKDIR)', there are no filesystem permission problems and enough space for decompression.)
-	$(if $(call FOLDERISREADABLE,$(_ASA_RES))\
-		,@$(CP) -R $(_ASA_RES)/* $(AND_OBJAPKDIR_RES)\
-		,$(call WARNING, ADD_SNA_AND_ASSETS2APK did not found your resources folder '$(_ASA_RES)'. It will not be copied to the APK file '$(_ASA_APK)')\
-	)
-# REPLACE APPLICATION NAME
-# @sed -i -e '/<resources>/,/<\/resources>/ s|<string name="app_name">[0-9a-Z.]\{1,\}</string>|<string name="app_name">$(CUSTOM_APP_NAME)</string>|g' $(AND_OBJDIR)res/values/strings.xml
-	$(call REPLACETAG,$(AND_APPNAMETAG),$(_ASA_NAME),$(AND_STRINGRESFILE))
+define AND_SET_SNA
+ # Set SNA file
+ $(eval AND_SNAFILE := $(strip $(1)))
 endef
 
 #################
-# ADD_FILE_TO_CDT_LIST: Adds a file to the list of files
-# that will be included in the final CDT to be produced
-# at the end of the building process. 
+# AND_SET_APPID: Sets the APP ID for the android application
 #
-# $(1): Fil
-# $(2): Type {firmware, basic, miniload}
-# $(3): Load Address (for firmware calls)
-# $(4): Run Address (for firmware calls)
-# $(5): Filename (for firmware calls)
+# $(1): APP ID 
 #
-define GENERATE_APK
-$(APK): $(SNA)
-	# BUILD APK
-	@$(APKTOOL) build $(AND_OBJDIR) -o $(TMP_APK)
-	# REPLACE APPLICATION ID
-	@$(APKRENAME) $(TMP_APK) $(CUSTOM_APP_ID)
-	@$(RM) -rf tmpForApkRename
-	# SIGN APK
-	@$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore cert.keystore -storepass android $(TMP_APK) cert
-	# ALIGN APK
-	@mv $(TMP_APK) $(TMP_APK).tmp
-	@$(ZIPALIGN) -f -p 4 $(TMP_APK).tmp $(TMP_APK)
-	@$(RM) $(TMP_APK).tmp
+define AND_SET_APPID
+ # Set APP ID
+ $(eval AND_APPID := com.cpctelera.$(strip $(1)))
+endef
 
-	@$(call PRINT,$(PROJNAME),"Successfully created 'game.apk'")
+#################
+# AND_SET_ASSET_FOLDERS: Sets the paths to the folders with 
+# android assets required
+#
+# $(1): Assets folder to be copied to the APK
+# $(2): Resources folder to be copied to the APK
+#
+define AND_SET_ASSET_FOLDERS
+ # Set folders and check for their existence
+ $(eval AND_ASSETS := $(strip $(1)))
+ $(eval AND_RES    := $(strip $(2)))
+ $(call ENSUREFOLDERISREADABLE,$(AND_ASSETS),[ AND_SET_ASSET_FOLDERS ]: <<ERROR>> Folder '$(AND_ASSETS)' does not exist or is not readable. '$(AND_ASSETS)' will be required to generate the android APK file)
+ $(call ENSUREFOLDERISREADABLE,$(AND_RES),[ AND_SET_ASSET_FOLDERS ]: <<ERROR>> Folder '$(AND_RES)' does not exist or is not readable. '$(AND_RES)' will be required to generate the android APK file)
+endef
+
+#################
+# AND_SET_APPNAME: Sets the name for the Android Application
+#
+# $(1): Application name
+#
+define AND_SET_APPNAME
+ # Set the name
+ $(eval AND_APPNAME := $(strip $(1)))
+endef
+
+#################
+# AND_GENERATE_APK: Commands to generate the APK 
+#
+define AND_GENERATE_APK
+	@# DECODE APK
+	$(APKTOOL) decode "$(AND_DEFAULT_APK)" -f -o "$(AND_OBJAPKDIR)"
+	@# REPLACE SNA
+	$(CP) "$(AND_SNAFILE)" "$(AND_OBJPAYLOADSNA)"
+	@# REPLACE ASSETS IF THE USER HAS SUPPLIED WITH SOME
+	$(CP) -r "$(AND_ASSETS)"/* "$(AND_OBJAPKDIR_ASS)"
+	@# REPLACE RESOURCES IF THE USER HAS SUPPLIED WITH SOME
+	$(CP) -r "$(AND_RES)"/* "$(AND_OBJAPKDIR_RES)"
+	@# REPLACE APPLICATION NAME
+	@# @sed -i -e '/<resources>/,/<\/resources>/ s|<string name="app_name">[0-9a-Z.]\{1,\}</string>|<string name="app_name">$(CUSTOM_APP_NAME)</string>|g' $(AND_OBJDIR)res/values/strings.xml
+	$(call REPLACETAG_RT,$(AND_APPNAMETAG),$(AND_APPNAME),$(AND_STRINGRESFILE))
+	@# REPLACE APPLICATION ID
+	$(SET_PKG_ID) "$(AND_OBJAPKMANIFEST)" "$(AND_APPID)"
+	@# BUILD APK
+	$(APKTOOL) build "$(AND_OBJAPKDIR)" -o "$(AND_TMPAPK)"
+	@# SIGN APK
+	LD_LIBRARY_PATH=/usr/lib/jvm/java-8-openjdk/jre/lib/amd64/jli/ $(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore cert.keystore -storepass android $(AND_TMPAPK) cert
+	@# ALIGN APK
+	$(ZIPALIGN) -f -p 4 $(AND_TMPAPK) $(AND_TMPAPK)
+	$(RM) $(AND_TMPAPK).tmp
+
+	$(call PRINT,$(PROJNAME),"Successfully created 'game.apk'")
 endef
