@@ -66,6 +66,7 @@ CPC2CDT_PATH := $(CPCT_PATH)tools/cpc2cdt/bin/
 IMG2CPC_PATH := $(CPCT_PATH)tools/img2cpc/bin/
 SCRIPTS_PATH := $(CPCT_PATH)tools/scripts/
 BINS_PATH    := $(CPCT_PATH)bin/
+ANDROID_PATH := $(CPCT_PATH)tools/android/
 
 # PATHs FOR CPCTELERA SOURCES AND LIBRARY FILE
 CPCT_SRC := $(CPCT_PATH)src
