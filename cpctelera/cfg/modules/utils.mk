@@ -52,12 +52,11 @@
 ##   * JOINFOLDER2BASENAME
 ##   * PRINT 
 ##   * REMOVEFILEIFEXISTS
-##   * REPLACETAG
+##   * REPLACETAG_RT
 ##   * REPLACETAGGEDLINE
 ##   * SET_ONE_OF_MANY_VALID
 ##   * STRLEN
 ##   * VERIFY_FW_PALETTE
-##   * WARNING
 ##
 
 # ANSI Sequences for terminal colored printing
@@ -81,18 +80,6 @@ define PRINT
 	@printf "$(COLOR_RED)["
 	@printf $(1)
 	@printf "]$(COLOR_YELLOW) "
-	@printf $(2)
-	@printf "$(COLOR_NORMAL)\n"
-endef
-
-#################
-# WARNING: Print a warning to the user
-#
-# $(1): Warning message to be printed
-#
-define WARNING
-	@printf "$(COLOR_CYAN)[ Warning ]:"
-	@printf "$(COLOR_GREY) "
 	@printf $(2)
 	@printf "$(COLOR_NORMAL)\n"
 endef
@@ -174,29 +161,28 @@ define REPLACETAGGEDLINE
 endef
 
 ########################
-## REPLACETAG
-## Replaces all occurrences of tag inside a file with a given string
+## REPLACETAG_RT
+## Replaces all occurrences of tag inside a file with a given string. 
+## This macro expands a piece of shell code that needs to be executed
+## later on, inside a rule.
 ## $1: Tag to be searched
 ## $2: String to replace the tag
 ## $3: File to modify
 ## $4: sed delimiter (optional)
 ##
-define REPLACETAG
-	# Strip parameters
+define REPLACETAG_RT
+	@# Strip parameters
 	$(eval _RTL_1 :=$(1))
 	$(eval _RTL_2 :=$(2))
 	$(eval _RTL_3 :=$(strip $(3)))
-	# Check file exists
-	$(call ENSUREFILEEXISTS,$(_RTL_3),[REPLACETAG]: <<ERROR>> File '$(_RTL_3)' not found when trying to replace tag '$(_RTL_1)' in it)
-	# Set up sed delimiter
+	@# Set up sed delimiter
 	$(eval _RTL_4 := $(if $(strip $(4)),$(strip $(4)),/))
-	# Create temporary file
+	@# Create temporary file
 	$(eval _RTL_TMP := $(call CREATETMPFILENAME))
-	# Replace tagged line with new line
-	$(shell \
-		if cat "$(_RTL_3)" | sed "s$(_RTL_4)$(_RTL_1)$(_RTL_4)$(_RTL_2)$(_RTL_4)g" > $(_RTL_TMP); then \
-			mv "$(_RTL_TMP)" "$(_RTL_3)"; \
-		fi)
+	@# Replace tagged line with new line
+	@if cat "$(_RTL_3)" | sed "s$(_RTL_4)$(_RTL_1)$(_RTL_4)$(_RTL_2)$(_RTL_4)g" > $(_RTL_TMP); then \
+		mv "$(_RTL_TMP)" "$(_RTL_3)"; \
+	fi
 endef
 
 #################
@@ -313,7 +299,8 @@ define ENSURE_VALID_C_ID
 endef
 
 #################
-# ENSUREFILEEXISTS: Checks if a given file exists and, if not, raises an error
+# ENSUREFILEEXISTS: Checks if a given file exists and, if not, raises an error.
+# As this is a makefile macro, it is expanded and executed previous to rule execution.
 #
 # $(1): file
 # $(2): Error Message if it does not exist
@@ -333,7 +320,7 @@ endef
 # $(2): Error Message if it does not exist
 #
 define ENSUREFOLDERISREADABLE
-	$(if $(call FOLDERISREADABLE $(strip $(1)))\
+	$(if $(call FOLDERISREADABLE,$(strip $(1)))\
 		,\
 		,$(error $(strip $(2)))\
 	)
