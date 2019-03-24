@@ -46,7 +46,7 @@ AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
 AND_DEFAULT_APK   := $(ANDROID_PATH)rvmengine/defaultRVMapp.apk
 AND_TMPAPK        := $(AND_OBJDIR)/$(APK).tmp
 ZIPALIGN          := $(ANDROID_PATH)bin/zipalign.linux32
-JARSIGNER         := $(ANDROID_PATH)bin/jarsigner.linux64
+JARSIGNER         := $(JAVA) -jar $(ANDROID_PATH)bin/jarsigner.jar
 APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar
 SET_PKG_ID        := $(JAVA) -jar $(ANDROID_PATH)bin/setAxmlPkgName/setAxmlPkgName.jar
 
@@ -116,7 +116,7 @@ define AND_GENERATE_APK
 	@# BUILD APK
 	$(APKTOOL) build "$(AND_OBJAPKDIR)" -o "$(AND_TMPAPK)"
 	@# SIGN APK
-	LD_LIBRARY_PATH=/usr/lib/jvm/java-8-openjdk/jre/lib/amd64/jli/ $(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore cert.keystore -storepass android $(AND_TMPAPK) cert
+	$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore cert.keystore -storepass android $(AND_TMPAPK) cert
 	@# ALIGN APK
 	$(ZIPALIGN) -f -p 4 $(AND_TMPAPK) $(AND_TMPAPK)
 	$(RM) $(AND_TMPAPK).tmp
