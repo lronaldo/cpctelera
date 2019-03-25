@@ -25,15 +25,10 @@
 ## with an snapshot of the game and the RVMengine embedded for Android.  ##
 ###########################################################################
 
-## User configurable values
-AND_APPNAME := CPCtelera game
-AND_SNAFILE := $(if $(SNA),$(SNA),game.sna)
-AND_ASSETS  := android/assets
-AND_RES     := android/res
-AND_APPID   := com.cpctelera
-
 ## TODO: Set tools appropriately
 ## 
+AND_APK           := game.apk
+AND_APPID_PREFIX  := com.cpctelera.rvmengine
 AND_OBJDIR        := $(OBJDIR)/_android
 AND_OBJAPKDIR     := $(AND_OBJDIR)/apkcontents
 AND_OBJAPKDIR_ASS := $(AND_OBJAPKDIR)/assets
@@ -44,11 +39,25 @@ AND_OBJPAYLOADSNA := $(AND_OBJAPKDIR_ASS)/payload.sna
 AND_APPNAMETAG    := %%%CPCTRVMEngineAppName%%%
 AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
 AND_DEFAULT_APK   := $(ANDROID_PATH)rvmengine/defaultRVMapp.apk
-AND_TMPAPK        := $(AND_OBJDIR)/$(APK).tmp
+AND_KEYSTORE_DIR  := $(ANDROID_PATH)certs
+AND_TMPAPK        := $(AND_OBJDIR)/$(AND_APK).tmp
 ZIPALIGN          := $(ANDROID_PATH)bin/zipalign.linux32
-JARSIGNER         := $(JAVA) -jar $(ANDROID_PATH)bin/jarsigner.jar
+KEYTOOL				:= $(JAVA) -jar $(ANDROID_PATH)bin/sun/keytool.jar
+JARSIGNER         := $(JAVA) -jar $(ANDROID_PATH)bin/sun/jarsigner.jar
 APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar
 SET_PKG_ID        := $(JAVA) -jar $(ANDROID_PATH)bin/setAxmlPkgName/setAxmlPkgName.jar
+
+## User configurable values
+AND_APPNAME := CPCtelera game
+AND_SNAFILE := $(if $(SNA),$(SNA),game.sna)
+AND_ASSETS  := android/assets
+AND_RES     := android/res
+AND_APPID   := $(AND_APPID_PREFIX).game
+AND_KEYSTORE:= $(AND_KEYSTORE_DIR)/cpctelera.user.keystore.jks
+AND_KEYALIAS:= cpctelera.user.cert
+AND_KEYVALID:= 10000
+AND_KEYSIZE := 2048
+AND_KEYALG  := RSA
 
 #################
 # AND_SET_SNA: Sets the SNA file to be used as payload in 
@@ -68,7 +77,7 @@ endef
 #
 define AND_SET_APPID
  # Set APP ID
- $(eval AND_APPID := com.cpctelera.$(strip $(1)))
+ $(eval AND_APPID := $(AND_APPID_PREFIX).$(strip $(1)))
 endef
 
 #################
@@ -97,9 +106,41 @@ define AND_SET_APPNAME
 endef
 
 #################
+# AND_GEN_USER_CERT: Generates a new user certificate and configures
+# it to be the user default certificate.
+#
+define AND_GEN_USER_CERT
+	$(KEYTOOL) -genkeypair -keystore "$(AND_KEYSTORE)" -keyalg $(AND_KEYALG) -keysize $(AND_KEYSIZE) -validity $(AND_KEYVALID) -alias $(AND_KEYALIAS); \
+	if [ ! -f "$(AND_KEYSTORE)" ]; then\
+		echo "<<<ERROR>>> Could not generate certificate keystore '$(AND_KEYSTORE)'. Please read error messages and try again.";\
+		exit 1;\
+	fi
+endef
+
+#################
+# AND_CHECK_USER_CERT: Checks that there is a valid user certificate file 
+# selected. Otherwise, launches AND_GEN_USER_CERT to generate a valid
+# user certificate file
+#
+define AND_CHECK_USER_CERT
+ 	@if [ ! -f "$(AND_KEYSTORE)" ]; then\
+	 	echo "IMPORTANT: No user private certificate configured.";\
+	 	echo "   - A user private certificate is required to sign apk files. Only signed files can be installed on Android platforms or uploaded to Google Play Store. Please provide information to generate your own personal Android signing certificate.";\
+	 	echo "   - REMEMBER:";\
+	 	echo "       * Your INFORMATION must be accurate. Otherwise you may have problems when uploading your APKs to any online store.";\
+	 	echo "       * Pick up a PASSWORD you remember. If you forget your password you will need to create a new certificate, losing control of previously signed and uploaded applications.":\
+	 	echo "       * SAVE your generated SIGNING KEY. You may found it in '$(AND_KEYSTORE)'.";\
+	 	echo "";\
+ 		$(call AND_GEN_USER_CERT);\
+ 	fi
+endef
+
+#################
 # AND_GENERATE_APK: Commands to generate the APK 
 #
 define AND_GENERATE_APK
+	@# CHECK USER CERTIFICATE BEFORE STARTING
+	$(call AND_CHECK_USER_CERT)
 	@# DECODE APK
 	$(APKTOOL) decode "$(AND_DEFAULT_APK)" -f -o "$(AND_OBJAPKDIR)"
 	@# REPLACE SNA
@@ -109,17 +150,17 @@ define AND_GENERATE_APK
 	@# REPLACE RESOURCES IF THE USER HAS SUPPLIED WITH SOME
 	$(CP) -r "$(AND_RES)"/* "$(AND_OBJAPKDIR_RES)"
 	@# REPLACE APPLICATION NAME
-	@# @sed -i -e '/<resources>/,/<\/resources>/ s|<string name="app_name">[0-9a-Z.]\{1,\}</string>|<string name="app_name">$(CUSTOM_APP_NAME)</string>|g' $(AND_OBJDIR)res/values/strings.xml
 	$(call REPLACETAG_RT,$(AND_APPNAMETAG),$(AND_APPNAME),$(AND_STRINGRESFILE))
 	@# REPLACE APPLICATION ID
 	$(SET_PKG_ID) "$(AND_OBJAPKMANIFEST)" "$(AND_APPID)"
 	@# BUILD APK
 	$(APKTOOL) build "$(AND_OBJAPKDIR)" -o "$(AND_TMPAPK)"
 	@# SIGN APK
-	$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore cert.keystore -storepass android $(AND_TMPAPK) cert
+	$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$(AND_KEYSTORE)" "$(AND_TMPAPK)" $(AND_KEYALIAS)
 	@# ALIGN APK
-	$(ZIPALIGN) -f -p 4 $(AND_TMPAPK) $(AND_TMPAPK)
-	$(RM) $(AND_TMPAPK).tmp
+	$(ZIPALIGN) -f -v 4 "$(AND_TMPAPK)" "$(AND_APK)"
+	$(RM) "$(AND_TMPAPK)"
 
-	$(call PRINT,$(PROJNAME),"Successfully created 'game.apk'")
+	$(call PRINT,$(PROJNAME),"Successfully created '$(AND_APK)'")
 endef
+
