@@ -1,7 +1,7 @@
 #!/bin/bash
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015-2016 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2015-2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -60,10 +60,12 @@ LOADADDRESS=4000
 CPCRSLIB=false
 VSCODE=true
 ASMPROJ=false
+ANDROID=true
 
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
 TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates/newprj
+TEMPLATE_EXPORT_DIRECTORY=${TEMPLATE_DIRECTORY}/cfg/export
 TEMPLATE_DIRECTORY_RSLIB=${SCRIPT_FULL_PATH}/templates
 CPCTELERA_DIRECTORY=$(dirname $(dirname "$SCRIPT_FULL_PATH"))
 SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/src/main.c
@@ -74,9 +76,12 @@ MUSCON_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/music_conversion.mk
 PACKIN_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/compression.mk
 CDTMAN_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/cdt_manager.mk
 CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/build_config.mk
+ANDROID_EXPORT_TEMPLATE=${TEMPLATE_EXPORT_DIRECTORY}/android.mk
 VSCODE_TEMPLATE_DIR=${TEMPLATE_DIRECTORY}/vscode/
+ANDROID_FILES_DIR=${CPCTELERA_DIRECTORY}/tools/android/rvmengine/android
 ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE} \
-                    ${IMGCON_TEMPLATE} ${TMXCON_TEMPLATE} ${MUSCON_TEMPLATE})
+                    ${IMGCON_TEMPLATE} ${TMXCON_TEMPLATE} ${MUSCON_TEMPLATE}\
+                    ${PACKIN_TEMPLATE} ${CDTMAN_TEMPLATE} ${ANDROID_EXPORT_TEMPLATE})
 
 ## Replacement tags
 TAG_PROJECTNAME="%%%PROJECT_NAME%%%"
@@ -218,6 +223,9 @@ fi
 SOURCE_DIR=${PROJECTDIR}/src
 DSKINC_DIR=${PROJECTDIR}/dsk
 CONFIG_DIR=${PROJECTDIR}/cfg
+EXPORTER_DIR=${PROJECTDIR}/exp
+EXP_ANDROID_DIR=${EXPORTER_DIR}/android
+CONFIG_EXPORT_DIR=${PROJECTDIR}/cfg/export
 NEW_VSCODE=${PROJECTDIR}/.vscode
 NEW_MAIN=${SOURCE_DIR}/$(basename ${SRC_TEMPLATE})
 NEW_BUILD=${CONFIG_DIR}/$(basename ${CFG_TEMPLATE})
@@ -226,6 +234,7 @@ NEW_TMXCON=${CONFIG_DIR}/$(basename ${TMXCON_TEMPLATE})
 NEW_MUSCON=${CONFIG_DIR}/$(basename ${MUSCON_TEMPLATE})
 NEW_PACKIN=${CONFIG_DIR}/$(basename ${PACKIN_TEMPLATE})
 NEW_CDTMAN=${CONFIG_DIR}/$(basename ${CDTMAN_TEMPLATE})
+NEW_EXPORT_ANDROID=${CONFIG_EXPORT_DIR}/$(basename ${ANDROID_EXPORT_TEMPLATE})
 NEW_MAKE=${PROJECTDIR}/$(basename ${MAKE_TEMPLATE})
 
 # Welcome message
@@ -245,6 +254,7 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Creating project folder structure...
 mkdir -p ${SOURCE_DIR}
 mkdir -p ${CONFIG_DIR}
 mkdir -p ${DSKINC_DIR}
+mkdir -p ${CONFIG_EXPORT_DIR}
 drawOK
 
 ## Copy templates substituting tags
@@ -257,6 +267,7 @@ cp ${TMXCON_TEMPLATE} ${NEW_TMXCON}
 cp ${MUSCON_TEMPLATE} ${NEW_MUSCON}
 cp ${PACKIN_TEMPLATE} ${NEW_PACKIN}
 cp ${CDTMAN_TEMPLATE} ${NEW_CDTMAN}
+cp ${ANDROID_EXPORT_TEMPLATE} ${NEW_EXPORT_ANDROID}
 drawOK
 
 ## Copy VSCode config directory template
@@ -266,6 +277,13 @@ if $VSCODE; then
    drawOK
 fi
 
+## Generate ANDROID exporter and files
+if $ANDROID; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring Android APK exporter..."
+   mkdir -p ${EXP_ANDROID_DIR}
+   cp -r "${ANDROID_FILES_DIR}"/* "${EXP_ANDROID_DIR}"
+   drawOK
+fi
 
 # Configuring project values into CFG_TEMPLATE
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring project name to: ${COLOR_WHITE}${PROJECTNAME}"
