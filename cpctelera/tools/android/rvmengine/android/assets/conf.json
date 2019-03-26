@@ -1,12 +1,15 @@
 {
-  "keymap": {
-    "up"   :"cursor up",
-    "down" :"cursor down",
-    "left" :"cursor left",
-    "right":"cursor right",
-    "fire1":"fire1",
-    "fire2":"fire2",
-    "fire3":"space",
+  "keymap":{
+    "up"   :"joy up",
+    "down" :"joy down",
+    "left" :"joy left",
+    "right":"joy right",
+    "fire1":"joy fire1",
+    "fire2":"joy fire2",
+    "fire3":"return",
     "fire4":"esc"
+  },
+  "video": {
+    "overscan": 0.6
   }
 }
