@@ -25,9 +25,8 @@
 ## with an snapshot of the game and the RVMengine embedded for Android.  ##
 ###########################################################################
 
-## TODO: Set tools appropriately
-## 
-AND_APK           := game.apk
+## General functionalities configuration
+##
 AND_APPID_PREFIX  := com.cpctelera.rvmengine
 AND_OBJDIR        := $(OBJDIR)/_android
 AND_OBJAPKDIR     := $(AND_OBJDIR)/apkcontents
@@ -48,6 +47,7 @@ JARSIGNER         := $(JAVA) -jar $(ANDROID_PATH)bin/sun/jarsigner.jar
 APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar
 
 ## User configurable values
+AND_APK     := game.apk
 AND_APPNAME := CPCtelera game
 AND_SNAFILE := $(if $(SNA),$(SNA),game.sna)
 AND_ASSETS  := android/assets
@@ -61,13 +61,15 @@ AND_KEYALG  := RSA
 
 #################
 # AND_SET_SNA: Sets the SNA file to be used as payload in 
-# the android application
+# the android application. It also sets the name of the resulting
+# APK file, just by changing snafile extension
 #
 # $(1): SNA File to be added
 #
 define AND_SET_SNA
  # Set SNA file
  $(eval AND_SNAFILE := $(strip $(1)))
+ $(eval AND_APK     := $(basename $(AND_SNAFILE)).apk)
 endef
 
 #################
@@ -136,9 +138,19 @@ define AND_CHECK_USER_CERT
 endef
 
 #################
-# AND_GENERATE_APK: Commands to generate the APK 
+# AND_GENERATE_APK_RULE: Generates a rule mean to be launched when wanting to 
+# generate the apk file. The rule will depend on the Snapshot file configured,
+# launching SNA regeneration when required
 #
-define AND_GENERATE_APK
+# $(1): Rule Name
+#
+define AND_GENERATE_APK_RULE
+$(eval _AND_RULENAME := $(strip $(1)))
+.PHONY: $(_AND_RULENAME)
+$(_AND_RULENAME): $(AND_SNAFILE)
+	@# Anounce generation of APK
+	@$(call PRINT,$(PROJNAME),"Started generation of Android Package '$(AND_APK)'")
+	
 	@# CHECK USER CERTIFICATE BEFORE STARTING
 	$(call AND_CHECK_USER_CERT)
 	@# DECODE APK
@@ -159,8 +171,34 @@ define AND_GENERATE_APK
 	$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$(AND_KEYSTORE)" "$(AND_TMPAPK)" $(AND_KEYALIAS)
 	@# ALIGN APK
 	$(ZIPALIGN) -f -v 4 "$(AND_TMPAPK)" "$(AND_APK)"
-	$(RM) "$(AND_TMPAPK)"
+	$(RM) "./$(AND_TMPAPK)"
 
+	@# APK Successfully generated
 	$(call PRINT,$(PROJNAME),"Successfully created '$(AND_APK)'")
+
 endef
 
+#################
+# APKMAN: Front-end to access all the functionalities on the android apk generator
+#
+# $(1): Command to be performed
+# $(2-3): Valid arguments to be passed to the selected command
+#
+# Valid Commands: SET_SNA SET_APPID SET_APPNAME SET_ASSET_FOLDERS GENERATE_APK_RULE
+# Info about each command can be found looking into its correspondent makefile macro APKGEN_<COMMAND>
+#
+define APKMAN
+ # Set the list of valid commands
+ $(eval APKGEN_F_FUNCTIONS := SET_SNA SET_APPID SET_APPNAME SET_ASSET_FOLDERS GENERATE_APK_RULE)
+
+ # Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
+ $(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [APKGEN] '$(strip $(1))' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces. Valid commands: {$(APKGEN_F_FUNCTIONS)})
+
+ # Filter given command as $(1) to see if it is one of the valid commands
+ $(eval APKGEN_F_SF = $(filter $(APKGEN_F_FUNCTIONS),$(1)))
+
+ # If the given command is valid, it will be non-empty, then we proceed to call the command (up to 8 arguments). Otherwise, raise an error
+ $(if $(APKGEN_F_SF)\
+    ,$(eval $(call AND_$(APKGEN_F_SF),$(strip $(2)),$(strip $(3))))\
+    ,$(error <<ERROR>> [APKGEN] '$(strip $(1))' is not a valid command. Valid commands: {$(APKGEN_F_FUNCTIONS)}))
+endef
