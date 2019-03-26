@@ -1,0 +1,10 @@
+{
+  "keymap": {
+    "up"   :"cursor up",
+    "down" :"cursor down",
+    "left" :"cursor left",
+    "right":"cursor right",
+    "fire1":"fire1",
+    "fire2":"fire2"
+  }
+}
