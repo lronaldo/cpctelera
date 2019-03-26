@@ -33,19 +33,19 @@ AND_OBJDIR        := $(OBJDIR)/_android
 AND_OBJAPKDIR     := $(AND_OBJDIR)/apkcontents
 AND_OBJAPKDIR_ASS := $(AND_OBJAPKDIR)/assets
 AND_OBJAPKDIR_RES := $(AND_OBJAPKDIR)/res
-AND_OBJAPKMANIFEST:= $(AND_OBJAPKDIR)/original/AndroidManifest.xml
+AND_OBJAPKMANIFEST:= $(AND_OBJAPKDIR)/AndroidManifest.xml
 AND_STRINGRESFILE := $(AND_OBJAPKDIR_RES)/values/strings.xml
 AND_OBJPAYLOADSNA := $(AND_OBJAPKDIR_ASS)/payload.sna
+AND_APPIDTAG      := ___CPCT.RVMEngine.AppID___
 AND_APPNAMETAG    := %%%CPCTRVMEngineAppName%%%
 AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
 AND_DEFAULT_APK   := $(ANDROID_PATH)rvmengine/defaultRVMapp.apk
 AND_KEYSTORE_DIR  := $(ANDROID_PATH)certs
 AND_TMPAPK        := $(AND_OBJDIR)/$(AND_APK).tmp
-ZIPALIGN          := $(ANDROID_PATH)bin/zipalign.linux32
+ZIPALIGN          := $(ANDROID_PATH)bin/zipalign/linux/zipalign32
 KEYTOOL				:= $(JAVA) -jar $(ANDROID_PATH)bin/sun/keytool.jar
 JARSIGNER         := $(JAVA) -jar $(ANDROID_PATH)bin/sun/jarsigner.jar
 APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar
-SET_PKG_ID        := $(JAVA) -jar $(ANDROID_PATH)bin/setAxmlPkgName/setAxmlPkgName.jar
 
 ## User configurable values
 AND_APPNAME := CPCtelera game
@@ -152,7 +152,7 @@ define AND_GENERATE_APK
 	@# REPLACE APPLICATION NAME
 	$(call REPLACETAG_RT,$(AND_APPNAMETAG),$(AND_APPNAME),$(AND_STRINGRESFILE))
 	@# REPLACE APPLICATION ID
-	$(SET_PKG_ID) "$(AND_OBJAPKMANIFEST)" "$(AND_APPID)"
+	$(call REPLACETAG_RT,$(AND_APPIDTAG),$(AND_APPID),$(AND_OBJAPKMANIFEST))
 	@# BUILD APK
 	$(APKTOOL) build "$(AND_OBJAPKDIR)" -o "$(AND_TMPAPK)"
 	@# SIGN APK
