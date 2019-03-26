@@ -51,7 +51,7 @@ $(eval $(call APKMAN, SET_APPNAME       , $(GAME_ID) ))
 # These two folder are created along with your CPCtelera project and contain the standard required files.
 # You may modify those files to suit your needs, or move them in your folder structure, then point
 # here to them both.
-$(eval $(call APKMAN, SET_ASSET_FOLDERS , android/assets, android/res))
+$(eval $(call APKMAN, SET_ASSET_FOLDERS , exp/android/assets, exp/android/res))
 
 # Finally, this call generates the makefile rule you will use to produce your APK file whenever you
 # wanted. You give here the name of the rule. You will use this name as a parameter to 'make' to 

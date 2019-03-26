@@ -146,6 +146,8 @@ include cfg/music_conversion.mk
 # Create compressed packs and manage CDT
 include cfg/compression.mk
 include cfg/cdt_manager.mk
+# Exporters to other platforms
+include cfg/export/android.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
