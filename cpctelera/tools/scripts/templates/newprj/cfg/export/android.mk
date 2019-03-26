@@ -27,57 +27,58 @@
 ## to be played on Android devices. 												 ##
 ###########################################################################
 
-## APP GLOBAL CONFIGURATION
-##
-## - UNIQUE ID
-##   	Your application must have a __unique ID__ that identifies it on Android. This 
-## ID is generated when your CPCTelera project is created. You may change this ID
-## but take into account that it identifies your application. If you have already used
-## previous ID on any Android device or in the Google Play Store, changing the ID will
-## make new compilations of your game to be seen as a different application.
-##
-##	- NAME
-##	  	This is just the name for your application. A text string that will be displayed
-## to the user showing what your application is. 
+## ANDROID APK EXPORTER CONFIGURATION
+
+# Name of the snapshot with the game that will be included in the APK. Normally, you want
+# to use your own Game Snapshot here which is already $(SNA)
+$(eval $(call APKMAN, SET_SNA           , $(SNA) ))
+
+# Android Application ID. This ID must be unique for every application uploaded to Google Play
+# or to any mobile phone. Please, configure your ID once and do not change it afterwards. Otherwise,
+# newer versions of your game will be considered a different APP. You may use here any 
+# combination of letters, numbers, '.' and '_'
+GAME_ID := $(basename $(SNA))
+$(eval $(call APKMAN, SET_APPID         , $(GAME_ID) ))
+
+# This is the name that your mobile phone will display for your game in the installed APPs. You may
+# use any string you wanted, and you may change it whenever you want. This does not affect to how
+# Google Play or your mobile phone recognize your APP. It is only the string displayed as APP Name.
+$(eval $(call APKMAN, SET_APPNAME       , $(GAME_ID) ))
+
+# These are the folders were you store the assets that will be used to produce your APP. 
+#  - assets folder must contain the file 'conf.json' with the configuration of the emulation and keymap
+#  - res folder must contain all the resources (icons, splashes, etc) in their different resolutions
+# These two folder are created along with your CPCtelera project and contain the standard required files.
+# You may modify those files to suit your needs, or move them in your folder structure, then point
+# here to them both.
+$(eval $(call APKMAN, SET_ASSET_FOLDERS , android/assets, android/res))
+
+# Finally, this call generates the makefile rule you will use to produce your APK file whenever you
+# wanted. You give here the name of the rule. You will use this name as a parameter to 'make' to 
+# produce your APK. For instance, calling it 'apk', the command 'make apk' produces your APK.
+$(eval $(call APKMAN, GENERATE_APK_RULE , apk ))
+
+
+## OTHER IMPORTANT DETAILS
 ##
 ## - CERTIFICATE
 ##		You need a valid personal certificate to sign your application before uploading
-## it to any Android device or the Google Play Store. You may create your certificate using
-## cpct_android_cert. 
+## it to any Android device or the Google Play Store. The first time you use 'make apk',
+## CPCtelera will ask you to create your personal certificate. Important things about
+## your certificate to take into account
+##		1) If you lose it or forget the password, you may have problems with your published
+## 		apps and games on Google Play Store. Your certificate identifies you, and creating
+##       a new one is like becoming a new person. You may not be able to update your previously
+##       published apps and games.
 ##
-CUSTOM_APP_NAME   := My Custom Name
-CUSTOM_APP_ID     := org.cpctelera.customid
-CUSTOM_APP_CERT   := cert.keystore
-
-## TODO: Set tools appropriately
-AND_OBJDIR   := $(OBJDIR)/_android
-ANDROID_PATH := $(CPCT_PATH)/tools/android
-DEFAULT_APK  := $(ANDROID_PATH)/rvmengine/defaultRVMapp.apk
-ZIPALIGN     := $(ANDROID_PATH)/bin/zipalign.linux32
-JARSIGNER    := $(ANDROID_PATH)/bin/jarsigner.linux64
-JAVA         := java
-APKTOOL      := $(JAVA) -jar $(ANDROID_PATH)/bin/apktool/apktool_2.4.0.jar
-SET_PKG_ID   := java -jar $(ANDROID_PATH)/bin/setAxmlPkgName/setAxmlPkgName.jar
-TMP_APK      := $(APK).tmp
-
-$(APK): $(SNA)
-	# DECODE APK
-	@$(APKTOOL) decode $(DEFAULT_APK) -f -o $(AND_OBJDIR)
-	# REPLACE ASSETS
-	@$(CP) $(SNA) $(AND_OBJDIR)/assets/payload.sna
-	#@$(CP) -R $(AND_ASSETS)* $(AND_OBJDIR)
-	# REPLACE APPLICATION NAME
-	@sed -i -e '/<resources>/,/<\/resources>/ s|<string name="app_name">[0-9a-Z.]\{1,\}</string>|<string name="app_name">$(CUSTOM_APP_NAME)</string>|g' $(AND_OBJDIR)res/values/strings.xml
-	# BUILD APK
-	@$(APKTOOL) build $(AND_OBJDIR) -o $(TMP_APK)
-	# REPLACE APPLICATION ID
-	@$(APKRENAME) $(TMP_APK) $(CUSTOM_APP_ID)
-	@$(RM) -rf tmpForApkRename
-	# SIGN APK
-	@$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore cert.keystore -storepass android $(TMP_APK) cert
-	# ALIGN APK
-	@mv $(TMP_APK) $(TMP_APK).tmp
-	@$(ZIPALIGN) -f -p 4 $(TMP_APK).tmp $(TMP_APK)
-	@$(RM) $(TMP_APK).tmp
-
-	@$(call PRINT,$(PROJNAME),"Successfully created 'game.apk'")
+##    2) Your certificate information must be real and accurate if you want to publish 
+##       your apps or games on any Store or Market. You may get banned or incur in serious legal 
+##       troubles if your information is not real or accurate. Take this seriously. 
+##
+##    3) You are encouraged to make backups of your certificate. Your certificate is stored
+##       in your CPCtelera folder path, inside cpctelera/tools/android/certs/cpctelera.user.keystore.jks.
+##       This is a Java Keystore containing your certificate. Please back it up and restore it
+##       whenever you need. Just by replacing it with any previous personal keystore of yours CPCtelera
+##       will recognize and use it. In fact, if you want to use your personal keystore, just make 
+##       a copy and replace this file (or use a symbolic link).
+##
