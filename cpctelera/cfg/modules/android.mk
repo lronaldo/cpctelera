@@ -125,16 +125,43 @@ endef
 # user certificate file
 #
 define AND_CHECK_USER_CERT
- 	@if [ ! -f "$(AND_KEYSTORE)" ]; then\
-	 	echo "IMPORTANT: No user private certificate configured.";\
-	 	echo "   - A user private certificate is required to sign apk files. Only signed files can be installed on Android platforms or uploaded to Google Play Store. Please provide information to generate your own personal Android signing certificate.";\
-	 	echo "   - REMEMBER:";\
-	 	echo "       * Your INFORMATION must be accurate. Otherwise you may have problems when uploading your APKs to any online store.";\
-	 	echo "       * Pick up a PASSWORD you remember. If you forget your password you will need to create a new certificate, losing control of previously signed and uploaded applications.":\
-	 	echo "       * SAVE your generated SIGNING KEY. You may found it in '$(AND_KEYSTORE)'.";\
-	 	echo "";\
- 		$(call AND_GEN_USER_CERT);\
+ 	@if [ ! -f "$(AND_KEYSTORE)" ]; then                                                           \
+	 	echo   "IMPORTANT: No user private certificate configured."                                ;\
+	 	printf "   - A user private certificate is required to sign apk files. Only signed files"  ;\
+	 	printf "can be installed on Android platforms or uploaded to Google Play Store.  Please"   ;\
+	 	echo   "provide information to generate your own personal Android signing certificate."    ;\
+	 	echo   "   - REMEMBER:"                                                                    ;\
+	 	printf "       * Your INFORMATION must be accurate. Otherwise you may have problems when " ;\
+	 	echo   "uploading your APKs to any online store."                                          ;\
+	 	printf "       * Pick up a PASSWORD you remember. If you forget your password you will "   ;\
+	 	printf "need to create a new certificate, losing control of previously signed and uploaded";\
+	 	echo   " applications."                                                                    ;\
+	 	echo   "       * SAVE your generated SIGNING KEY. You may found it in '$(AND_KEYSTORE)'."  ;\
+	 	echo   ""                                                                                  ;\
+ 		$(call AND_GEN_USER_CERT)                                                                  ;\
  	fi
+endef
+
+#################
+# AND_CHECK_JAVA_VERSION: Checks that the appropriate java version is installed
+# before continuing. If it is not installed, it warns the user.
+#
+define AND_CHECK_JAVA_VERSION
+	@__ERRORMSG="     Java Runtime Enviroment (JRE) 1.8 or higher is required to produce Android APK files. P\
+lease, install JRE 1.8 or higher in your system and the launch APK generation again."                      ;\
+	java &> /dev/null                                                                                       ;\
+	if (( $$$$? != 127 )); then                                                                              \
+		__JAVA=$$$$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')                ;\
+		if (( __JAVA < 18 )); then                                                                            \
+		   echo   "[[ ERROR ]]: Your java version is too old. "                                              ;\
+		   echo   "$$$${__ERRORMSG}"                                                                         ;\
+		   exit 1                                                                                            ;\
+		fi                                                                                                   ;\
+	else                                                                                                     \
+		echo   "[[ ERROR ]]: Java is not installed in your system. "                                         ;\
+      echo   "$$$${__ERRORMSG}"                                                                            ;\
+	   exit 1                                                                                               ;\
+	fi
 endef
 
 #################
@@ -151,8 +178,10 @@ $(_AND_RULENAME): $(AND_SNAFILE)
 	@# Anounce generation of APK
 	@$(call PRINT,$(PROJNAME),"Started generation of Android Package '$(AND_APK)'")
 	
-	@# CHECK USER CERTIFICATE BEFORE STARTING
+	@# CHECK JAVA INSTALLATION AND USER CERTIFICATE BEFORE STARTING
+	$(call AND_CHECK_JAVA_VERSION)
 	$(call AND_CHECK_USER_CERT)
+
 	@# DECODE APK
 	$(APKTOOL) decode "$(AND_DEFAULT_APK)" -f -o "$(AND_OBJAPKDIR)"
 	@# REPLACE SNA
