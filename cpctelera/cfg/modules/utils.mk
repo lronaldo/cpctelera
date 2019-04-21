@@ -57,6 +57,7 @@
 ##   * REPLACETAGGEDLINE
 ##   * SET_ONE_OF_MANY_VALID
 ##   * STRLEN
+##   * SYSPATH
 ##   * VERIFY_FW_PALETTE
 ##
 
@@ -124,11 +125,13 @@ endef
 ##   $(1): Unix-style path
 ##
 define SYSPATH
-$(if $(call CHECKSYSTEMCYGWIN)\
-	,$(shell cygpath -w $(strip $(1)))\
-	,$(strip $(1)))
+$(strip \
+	$(if $(call CHECKSYSTEMCYGWIN)\
+		,$(shell cygpath -w $(strip $(1)))\
+		,$(strip $(1))\
+	)\
+)
 endef
-
 
 ########################
 ## CHECKSYSTEMOSX
