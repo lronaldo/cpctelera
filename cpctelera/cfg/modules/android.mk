@@ -38,13 +38,16 @@ AND_OBJPAYLOADSNA := $(AND_OBJAPKDIR_ASS)/payload.sna
 AND_APPIDTAG      := ___CPCT.RVMEngine.AppID___
 AND_APPNAMETAG    := %%%CPCTRVMEngineAppName%%%
 AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
-AND_DEFAULT_APK   := $(ANDROID_PATH)rvmengine/defaultRVMapp.apk
+AND_DEFAULT_APK   := $(call SYSPATH,$(ANDROID_PATH)rvmengine/defaultRVMapp.apk)
 AND_KEYSTORE_DIR  := $(ANDROID_PATH)certs
 AND_TMPAPK        := $(AND_OBJDIR)/$(AND_APK).tmp
 ZIPALIGN          := $(ANDROID_PATH)bin/zipalign/linux/zipalign32
-KEYTOOL				:= $(JAVA) -jar $(ANDROID_PATH)bin/sun/keytool.jar
-JARSIGNER         := $(JAVA) -jar $(ANDROID_PATH)bin/sun/jarsigner.jar
-APKTOOL           := $(JAVA) -jar $(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar
+KEYTOOL_JAR       := $(call SYSPATH,$(ANDROID_PATH)bin/sun/keytool.jar)
+JARSIGNER_JAR     := $(call SYSPATH,$(ANDROID_PATH)bin/sun/jarsigner.jar)
+APKTOOL_JAR       := $(call SYSPATH,$(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar)
+KEYTOOL           := $(JAVA) -jar "$(KEYTOOL_JAR)"
+JARSIGNER         := $(JAVA) -jar "$(JARSIGNER_JAR)"
+APKTOOL           := $(JAVA) -jar "$(APKTOOL_JAR)"
 
 ## User configurable values
 AND_APK     := game.apk
@@ -53,11 +56,17 @@ AND_SNAFILE := $(if $(SNA),$(SNA),game.sna)
 AND_ASSETS  := android/assets
 AND_RES     := android/res
 AND_APPID   := $(AND_APPID_PREFIX).game
-AND_KEYSTORE:= $(AND_KEYSTORE_DIR)/cpctelera.user.keystore.jks
+AND_KEYSTORE:= $(call SYSPATH,$(AND_KEYSTORE_DIR)/cpctelera.user.keystore.jks)
 AND_KEYALIAS:= cpctelera.user.cert
 AND_KEYVALID:= 10000
 AND_KEYSIZE := 2048
 AND_KEYALG  := RSA
+
+## JAVA Version
+AND_JAVA_VER     := $(shell java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\.\(.*\)_.*"/\1\2\3/p;')
+AND_JAVA_UPD     := $(shell java -version 2>&1 | sed -n ';s/.* version ".*\..*\..*_\(.*\)"/\1/p;')
+AND_MIN_JAVA_VER := 180
+AND_MIN_JAVA_UPD := 101
 
 #################
 # AND_SET_SNA: Sets the SNA file to be used as payload in 
@@ -147,20 +156,21 @@ endef
 # before continuing. If it is not installed, it warns the user.
 #
 define AND_CHECK_JAVA_VERSION
-	@__ERRORMSG="     Java Runtime Enviroment (JRE) 1.8 or higher is required to produce Android APK files. P\
-lease, install JRE 1.8 or higher in your system and the launch APK generation again."                      ;\
-	java &> /dev/null                                                                                       ;\
-	if (( $$$$? != 127 )); then                                                                              \
-		__JAVA=$$$$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')                ;\
-		if (( __JAVA < 18 )); then                                                                            \
-		   echo   "[[ ERROR ]]: Your java version is too old. "                                              ;\
-		   echo   "$$$${__ERRORMSG}"                                                                         ;\
-		   exit 1                                                                                            ;\
-		fi                                                                                                   ;\
-	else                                                                                                     \
-		echo   "[[ ERROR ]]: Java is not installed in your system. "                                         ;\
-      echo   "$$$${__ERRORMSG}"                                                                            ;\
-	   exit 1                                                                                               ;\
+	@__ERRORMSG="Java Runtime Enviroment (JRE) 1.8.0 update 101 (u101) or higher is required to produce Android\
+  APK files. Please, install JRE 1.8.0_101 or higher in your system and the launch APK generation again."    ;\
+    java &> /dev/null                                                                                        ;\
+    if (( $$$$? != 127 )); then                                                                               \
+        if (( $(AND_JAVA_VER) < $(AND_MIN_JAVA_VER) ||                                                        \
+             ( $(AND_JAVA_VER) == $(AND_MIN_JAVA_VER) && $(AND_JAVA_UPD) < $(AND_MIN_JAVA_UPD) ) )); then     \
+            echo   "[[ ERROR ]]: Your java version is too old. "                                             ;\
+            echo   "             Installed: [ VERSION=$(AND_MIN_JAVA_VER) UPDATE=$(AND_JAVA_UPD) ] "         ;\
+            echo   "$$$${__ERRORMSG}"                                                                        ;\
+            exit 1                                                                                           ;\
+        fi                                                                                                   ;\
+    else                                                                                                      \
+        echo   "[[ ERROR ]]: Java is not installed in your system. "                                         ;\
+        echo   "$$$${__ERRORMSG}"                                                                            ;\
+        exit 1                                                                                               ;\
 	fi
 endef
 
