@@ -41,7 +41,9 @@ AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
 AND_DEFAULT_APK   := $(call SYSPATH,$(ANDROID_PATH)rvmengine/defaultRVMapp.apk)
 AND_KEYSTORE_DIR  := $(ANDROID_PATH)certs
 AND_TMPAPK        := $(AND_OBJDIR)/$(AND_APK).tmp
-ZIPALIGN          := $(ANDROID_PATH)bin/zipalign/linux/zipalign32
+ZIPALIGN_LINUX    := $(ANDROID_PATH)bin/zipalign/linux/zipalign32
+ZIPALIGN_WIN      := $(ANDROID_PATH)bin/zipalign/win/32/zipalign.exe
+ZIPALIGN          := $(if $(call CHECKSYSTEMCYGWIN),$(ZIPALIGN_WIN),$(ZIPALIGN_LINUX))
 KEYTOOL_JAR       := $(call SYSPATH,$(ANDROID_PATH)bin/sun/keytool.jar)
 JARSIGNER_JAR     := $(call SYSPATH,$(ANDROID_PATH)bin/sun/jarsigner.jar)
 APKTOOL_JAR       := $(call SYSPATH,$(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar)
@@ -157,7 +159,8 @@ endef
 #
 define AND_CHECK_JAVA_VERSION
 	@__ERRORMSG="Java Runtime Enviroment (JRE) 1.8.0 update 101 (u101) or higher is required to produce Android\
-  APK files. Please, install JRE 1.8.0_101 or higher in your system and the launch APK generation again."    ;\
+ APK files. Please, install JRE 1.8.0_101 or higher in your system and the launch APK generation again. You may\
+find latest java runtime available for download at https://www.java.com/"                                    ;\
     java &> /dev/null                                                                                        ;\
     if (( $$$$? != 127 )); then                                                                               \
         if (( $(AND_JAVA_VER) < $(AND_MIN_JAVA_VER) ||                                                        \
