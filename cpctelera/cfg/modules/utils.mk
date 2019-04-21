@@ -28,6 +28,7 @@
 ##   * ADD2SET
 ##   * ADD_N_ITEMS
 ##   * CHECKSYSTEMOSX
+##   * CHECKSYSTEMCYGWIN
 ##   * CHECKVARIABLEISSET
 ##   * CONVERTVALUE
 ##   * CONVERT_FW2HW_PALETTE
@@ -39,10 +40,10 @@
 ##   * ENSUREFOLDERISREADABLE
 ##   * ENSUREVALID
 ##   * ENSUREFILEEXISTS
-##	  * FILEEXISTS
-##	  * FOLDEREXISTS
+##   * FILEEXISTS
+##   * FOLDEREXISTS
 ##   * FOLDERISREADABLE
-##	  * FOLDERISWRITABLE
+##   * FOLDERISWRITABLE
 ##   * GET_IMG_SIZE
 ##   * GREATER_THAN
 ##   * HEX2DEC
@@ -115,12 +116,36 @@ define JOINFOLDER2BASENAME
 endef
 
 ########################
+## SYSPATH
+##   Returns System-Dependent valid path for a unix-style path
+## input. This path is only changed (into a Windows-style path)
+## when detected system is cygwin. Then, cygpath is used to 
+## return the windows-style path.
+##   $(1): Unix-style path
+##
+define SYSPATH
+$(if $(call CHECKSYSTEMCYGWIN)\
+	,$(shell cygpath -w $(strip $(1)))\
+	,$(strip $(1)))
+endef
+
+
+########################
 ## CHECKSYSTEMOSX
 ##   Returns "OSX" if system is OSX, empty otherwise.
 ## This is designed to be used in makefile if macros
 ##
 define CHECKSYSTEMOSX
-$(shell if [[ "$SYS" =~ "Darwin" ]]; then echo "OSX"; fi)
+$(shell if [[ `uname` =~ "Darwin" ]]; then echo "OSX"; fi)
+endef
+
+########################
+## CHECKSYSTEMCYGWIN
+##   Returns "CYGWIN" if system is Cygwin, empty otherwise.
+## This is designed to be used in makefile if macros
+##
+define CHECKSYSTEMCYGWIN
+$(shell if [[ `uname` =~ "CYGWIN" ]]; then echo "CYGWIN"; fi)
 endef
 
 ########################
