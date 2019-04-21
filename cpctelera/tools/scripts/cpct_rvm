@@ -69,17 +69,19 @@
 
 # Script configuration
 CPCT_TOOLS_FOLDER=$(dirname $0)/..
-WWW_RVM_LINUX64=http://static2.retrovirtualmachine.org/release/beta1/linux/x64/RetroVirtualMachine.2.0.beta-1.r1.linux.x64.zip
-WWW_RVM_LINUX32=http://static2.retrovirtualmachine.org/release/beta1/linux/x86/RetroVirtualMachine.2.0.beta-1.r1.linux.x86.zip
-WWW_RVM_WIN64=http://static2.retrovirtualmachine.org/release/beta1/windows/x64/RetroVirtualMachine.2.0.beta-1.r1.windows.x64.zip
-WWW_RVM_WIN32=http://static2.retrovirtualmachine.org/release/beta1/windows/x86/RetroVirtualMachine.2.0.beta-1.r1.windows.x86.zip
-WWW_RVM_OSX=http://static2.retrovirtualmachine.org/release/beta1/macos/RetroVirtualMachine.2.0.beta-1.r1.macos.zip
+
+WWW_RVM_LINUX64=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/linux/x64/RetroVirtualMachine.2.0.beta-1.r6.linux.x64.zip
+WWW_RVM_LINUX32=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/linux/x86/RetroVirtualMachine.2.0.beta-1.r6.linux.x86.zip
+WWW_RVM_WIN64=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/windows/x64/RetroVirtualMachine.2.0.beta-1.r6.windows.x64.zip
+WWW_RVM_WIN32=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/windows/x86/RetroVirtualMachine.2.0.beta-1.r6.windows.x86.zip
+WWW_RVM_OSX=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/macos/RetroVirtualMachine.2.0.beta-1.r6.macos.zip
 RVM_EXE=RetroVirtualMachine
 RVM_EXE_OSX="Retro\ Virtual\ Machine\ 2.app/Contents/MacOS/Retro\ Virtual\ Machine\ 2"
 RVM_ZIP=${CPCT_TOOLS_FOLDER}/RVM.zip
 RVM_DIR=${CPCT_TOOLS_FOLDER}/rvm
 RVM=/path/to/RVM ## Should be read from config file
 CONFIG_FILE=$(dirname $0)/.cpct_rvm.config
+CYGSTART=""
 
 # Command line parameter variables
 FILE=""
@@ -162,6 +164,8 @@ function ensureExecutionPrerequisitesAreInstalled {
    if checkSystem cygwin; then
       ## Do CYGWIN required stuff
       EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
+running this script. Please, check cygwin installation and run this script again."
+      EnsureCommandAvailable cygstart "cytstart has not been found on the system, and it's required for \
 running this script. Please, check cygwin installation and run this script again."
    fi
 }
@@ -289,7 +293,8 @@ ${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder 
          echo "${COLOR_CYAN} Downloading RVM from (${COLOR_WHITE}${WWW_RVM}${COLOR_CYAN})...${COLOR_NORMAL}"
          wget -nv --progress=bar -O "$RVM_ZIP" "$WWW_RVM"
          echo "${COLOR_CYAN}Unpacking RVM...${COLOR_NORMAL}"
-         unzip -o -q "$RVM_ZIP" -d "$RVM_DIR" 
+         unzip -o -q "$RVM_ZIP" -d "$RVM_DIR"
+         chmod +x "${RVM_DIR}/${RVM_EXE}"
          rm "$RVM_ZIP"
          if checkSystem osx; then
             setRVMPath "${RVM_DIR}/${RVM_EXE_OSX}"
@@ -500,5 +505,10 @@ if [ "$WARPMODE" != "" ]; then
 fi
 echo "${COLOR_NORMAL}"
 
+# On Windows-Cygwin Systems, we need to use cygstart to launch RVM
+if checkSystem cygwin; then
+   CYGSTART=cygstart
+fi
+
 # Launch RVM with appropriate path for DSK/SNA file
-"${RVM}" "$SHADER" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$WARPMODE" "$AUTOPLAY" "$EXECUTEFILE" &> /dev/null &
+"${CYGSTART}" "${RVM}" "$SHADER" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$WARPMODE" "$AUTOPLAY" "$EXECUTEFILE" &> /dev/null &
