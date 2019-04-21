@@ -63,15 +63,17 @@
 ##
 
 # Script configuration
-CPCT_TOOLS_FOLDER=$(dirname $0)/..
+CPCT_SCRIPTS_FOLDER=$(dirname $0)
+CPCT_TOOLS_FOLDER=${CPCT_SCRIPTS_FOLDER}/..
 WWW_WINAPE=http://winape.net/download/WinAPE20B2.zip
 WINAPE_EXE=WinApe.exe
 WINAPE_INI=WinAPE.ini
 WINAPE_ZIP=${CPCT_TOOLS_FOLDER}/winape.zip
 WINAPE_DIR=${CPCT_TOOLS_FOLDER}/winape
+WINAPE_DEFAULT_INI=${CPCT_SCRIPTS_FOLDER}/templates/winape/WinAPE.ini
 WINE=wine
 WAPE=/path/to/WinAPE ## Should be read from config file
-CONFIG_FILE=$(dirname $0)/.cpct_winape.config
+CONFIG_FILE=${CPCT_SCRIPTS_FOLDER}/.cpct_winape.config
 
 # Command line parameter variables
 FILE=""
@@ -253,13 +255,11 @@ ${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder 
       rm "$WINAPE_ZIP"
       setWinapePath "${WINAPE_DIR}/${WINAPE_EXE}"
 
-      ## If system is not Cygwin, turn off DirectX Stretch feature from WinAPE, 
-      ## as it does not work well under wine
-      if ! checkSystem cygwin; then
-         echo "${COLOR_CYAN}Disabling DirectX Stretch WinAPE feature...${COLOR_NORMAL}"
-         replaceTag "^\[Configuration\]" \
-                    "\[Configuration\]\nDirectX Stretch=false\n" "${WINAPE_DIR}/${WINAPE_INI}"
-      fi
+      ## Put a personal default WinAPE configuration, to ensure proper ROMS are loaded
+      ## sound is well configured and everything works as expected
+      echo "${COLOR_CYAN}Setting CPCTelera default WinAPE.ini file...${COLOR_NORMAL}"
+      cp "${WINAPE_DEFAULT_INI}" "${WINAPE_DIR}/${WINAPE_INI}"
+
       echo "${COLOR_LIGHT_CYAN}WinAPE${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
 ${WINAPE_DIR}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
       echo
