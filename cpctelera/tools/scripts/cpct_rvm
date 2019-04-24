@@ -81,7 +81,6 @@ RVM_ZIP=${CPCT_TOOLS_FOLDER}/RVM.zip
 RVM_DIR=${CPCT_TOOLS_FOLDER}/rvm
 RVM=/path/to/RVM ## Should be read from config file
 CONFIG_FILE=$(dirname $0)/.cpct_rvm.config
-CYGSTART=""
 
 # Command line parameter variables
 FILE=""
