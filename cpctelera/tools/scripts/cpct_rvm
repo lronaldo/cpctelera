@@ -507,8 +507,8 @@ echo "${COLOR_NORMAL}"
 
 # On Windows-Cygwin Systems, we need to use cygstart to launch RVM
 if checkSystem cygwin; then
-   CYGSTART=cygstart
+   RVM=("cygstart" "${RVM}")
 fi
 
 # Launch RVM with appropriate path for DSK/SNA file
-"${CYGSTART}" "${RVM}" "$SHADER" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$WARPMODE" "$AUTOPLAY" "$EXECUTEFILE" &> /dev/null &
+"${RVM[@]}" "$SHADER" -b="$MACHINE" "$FILEMOD" "$FILEPATH" "$WARPMODE" "$AUTOPLAY" "$EXECUTEFILE" &> /dev/null &
