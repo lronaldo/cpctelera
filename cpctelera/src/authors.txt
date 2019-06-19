@@ -132,6 +132,7 @@ Section: Testers & Bug Reporters
  * Álvaro Amador Ruiz (@SararyCow at http://twitter.com/SararyCow)
  * <John Lobo at https://github.com/johnlobo> / <Github at https://github.com> 
  * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
+ * Iván Fernández Álvarez (SpDizzy)
 
 Section: Assets 
 
