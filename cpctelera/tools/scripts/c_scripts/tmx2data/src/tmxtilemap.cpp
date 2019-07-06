@@ -161,7 +161,7 @@ CPCT_TMX_Tilemap::output_basic_H(std::ostream& out) const {
    output_C_code_header(out);
 
    // Output declarations
-   out << "\n#include <types.h>";
+   out << "\n#include <cpctelera.h>";
    out << '\n';
    out << "\n//#### Width and height constants ####";
    out << "\n#define "<< m_cid <<"_W  " << m_tw;
@@ -258,7 +258,7 @@ CPCT_TMX_Tilemap::output_basic_C(std::ostream& out) const {
    output_C_code_header(out);
 
    // Output tilemap definition
-   out << "\n#include <types.h>";
+   out << "\n#include <cpctelera.h>";
    out << '\n';
    out << "\n//#### Converted layer tilemaps ####";
    out << "\n//   Visible layers: " << m_visibleLayers;
