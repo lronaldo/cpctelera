@@ -25,7 +25,7 @@
 
 # Ensure that compression.mk exists for compatibility with older CPCtelera projects
 A2P_DEPEND := cfg/compression.mk
-A2P_OPTS   := -ghs -gh -gs
+A2P_OPTS   := -ghs -gh -gs -gb
 TOUCHIFNOTEXIST := $(TOUCHIFNOTEXIST) $(A2P_DEPEND)
 
 #################
