@@ -46,7 +46,7 @@
 ##    -b   | --bytes-per-line [numbytes] - Establishes the number of bytes to write at each array line in C. 16 by default
 ##    -gh  | --generate-header           - Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults.
 ##    -ghs | --generate-asm-header       - Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults.
-##    -gs  | --generate-asm              - Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults.
+##    -gs  | --generate-asm              - Generates an assembly file with compressed data (Default: yes). Using this switch overrides generation defaults.
 ##    -gb  | --generate-bin              - Generates a binary file with compressed data (Default: no). Using this switch overrides generation defaults.
 ##    -h   | --help                      - Shows help information on the terminal.
 ##    -i   | --include-header [file]     - Include a header file at the top of the generated output
@@ -91,7 +91,7 @@ OPTIONS \
          Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults. \
    ${COLOR_LIGHT_BLUE}
    -gs  | --generate-asm ${COLOR_CYAN}
-         Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults. \
+         Generates an assembly file with compressed data (Default: yes). Using this switch overrides generation defaults. \
    ${COLOR_LIGHT_BLUE}
    -gb  | --generate-bin ${COLOR_CYAN}
          Generates a binary file with compressed data (Default: no). Using this switch overrides generation defaults. \
