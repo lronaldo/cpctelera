@@ -60,6 +60,7 @@
 ##    -nw | --no-warp         - Does not automatically enter Warp Mode on CDT load.
 ##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}
 ##    -r  | --run <FILENAME>  - Automatically runs FILENAME with the command RUN"FILENAME
+##    -w  | --warp            - Does automatically enter Warp Mode.
 ##    -h  | --help            - Shows help information on the terminal.
 ##
 
@@ -410,6 +411,7 @@ while (( $# > 0 )); do
       ;;
       "-nw"| "--no-warp")
          WARP=false
+         WARPMODE=""
       ;;
       "-r" | "--run")
          if (( $# < 2 )); then
@@ -417,6 +419,10 @@ while (( $# > 0 )); do
          fi 
          COMMAND="RUN\"${2}\"\n"
          shift
+      ;;
+      "-w"| "--warp")
+         WARP=true
+         WARPMODE="-w"
       ;;
       *)
          if isCommandLineOption "$1"; then
