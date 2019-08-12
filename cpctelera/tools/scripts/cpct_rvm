@@ -476,8 +476,11 @@ if [[ "$FILE" != "" ]]; then
             COMMAND="RUN\"\n "
          else
             ## Remove Path and extension from File to get just the name
+            ## Cap the lenght of the name up to 8 characters (AMSDOS standard)
             COMMAND=${FILE##*/}
-            COMMAND="RUN\"${COMMAND%%.*}\""
+            COMMAND=${COMMAND%%.*}
+            COMMAND=${COMMAND:0:8}
+            COMMAND="RUN\"${COMMAND}\""
          fi
       fi
       ## Construct EXECUTEFILE command to be given on launch
