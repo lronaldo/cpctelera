@@ -247,7 +247,8 @@ fi
 ## Concatenate all files in a single, temporary packfile
 echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Creating single pack file (${COLOR_CYAN}${OUTFILE}${COLOR_YELLOW}) \
 with all these files: ${COLOR_CYAN}${INFILES[*]}${COLOR_NORMAL}" 
-for F in ${INFILES[*]}; do
+for I in $( seq 0 $(($NINFILES-1)) ); do
+   F=${INFILES[I]}
    cat "$F" >> "$TMPFILE"
    OFFSETS+=( $(wc -c < "$F") )
 done
@@ -276,7 +277,7 @@ SAVED_BYTES=$(( UNCOMPRESSED_BYTES - COMPRESSED_BYTES ))
 if (( GENERATE_H )); then 
 
 OFILE="${OUTFILE}.h"
-cat > ${OFILE} <<TheHFile
+cat > "${OFILE}" <<TheHFile
 // File ${OFILE} generated using cpct_pack
 // Compresor used:   $COMPRESSOR
 // Files compressed: [ ${INFILES[*]} ]
@@ -292,11 +293,11 @@ TheHFile
    ## Output include files in case
    if (( ${#INCLUDE[@]} > 0 )); then
       for I in ${INCLUDE[*]}; do
-         echo "#include <${INCLUDE}>" >> ${OFILE}
+         echo "#include <${INCLUDE}>" >> "${OFILE}"
       done
    fi 
 
-cat >> ${OFILE} <<TheHFile
+cat >> "${OFILE}" <<TheHFile
 
 // Declaration of the compressed array
 extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
@@ -313,18 +314,18 @@ TheHFile
 
    ## Output file offset constants if there is more than one file compressed
    if (( NINFILES > 1 )); then
-      echo >> ${OFILE}
-      echo "// Define constants for starting offsets of files in the uncompressed array" >> ${OFILE}
+      echo >> "${OFILE}"
+      echo "// Define constants for starting offsets of files in the uncompressed array" >> "${OFILE}"
       OFF=0
       for((I=0;I<NINFILES;I++)); do
-         printf "#define %s%03d   %6s   // Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> ${OFILE}
+         printf "#define %s%03d   %6s   // Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> "${OFILE}"
          OFF=$(( OFF + ${OFFSETS[$I]} ))
       done
    fi
 
-   printf "\n#endif\n" >> ${OFILE}
+   printf "\n#endif\n" >> "${OFILE}"
 
-   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}${OFILE}${COLOR_NORMAL} Generated."
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
 fi
 
 
@@ -334,8 +335,8 @@ fi
 ##
 if (( GENERATE_H_S )); then 
 
-OFILE=${OUTFILE}.h.s
-cat > ${OFILE} <<TheHFile
+OFILE="${OUTFILE}.h.s"
+cat > "${OFILE}" <<TheHFile
 ;; File ${OFILE} generated using cpct_pack
 ;; Compresor used:   $COMPRESSOR
 ;; Files compressed: [ ${INFILES[*]} ]
@@ -357,18 +358,18 @@ TheHFile
 
    ## Output file offset constants if there is more than one file compressed
    if (( NINFILES > 1 )); then
-      echo >> ${OFILE}
-      echo ";; Define constants for starting offsets of files in the uncompressed array" >> ${OFILE}
+      echo >> "${OFILE}"
+      echo ";; Define constants for starting offsets of files in the uncompressed array" >> "${OFILE}"
       OFF=0
       for((I=0;I<NINFILES;I++)); do
-         printf "_%s%03d %s %6s   ;; Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "$ASMCNST" "${OFF}" "${INFILES[$I]}" >> ${OFILE}
+         printf "_%s%03d %s %6s   ;; Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "$ASMCNST" "${OFF}" "${INFILES[$I]}" >> "${OFILE}"
          OFF=$(( OFF + ${OFFSETS[$I]} ))
       done
    fi
 
-   echo >> ${OFILE}
+   echo >> "${OFILE}"
 
-   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}${OFILE}${COLOR_NORMAL} Generated."
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
 fi
 
 ###############################################################
@@ -377,8 +378,8 @@ fi
 ##
 if (( GENERATE_S )); then
 
-OFILE=${OUTFILE}.s
-cat > ${OFILE} <<TheSFile
+OFILE="${OUTFILE}.s"
+cat > "${OFILE}" <<TheSFile
 ;; File ${OFILE} generated using cpct_pack
 ;; Compresor used: $COMPRESSOR
 ;; Files compressed: [ ${INFILES[*]} ]
@@ -391,7 +392,7 @@ TheSFile
 # If there is an ORG ADDRESS, we have to position the code
 if [ ! -z "$ORGADDRESS" ]; then
 
-cat > ${OFILE} <<TheSFile
+cat > "${OFILE}" <<TheSFile
 ;; Absolute data location: '$ORGADDRESS'
 .area _${ARRAYNAME}_area_ (ABS)
 .org $ORGADDRESS
@@ -400,8 +401,8 @@ TheSFile
 
 fi
 
-   echo ";; Data array definition" >> ${OFILE}
-   echo "_$ARRAYNAME::" >> ${OFILE}
+   echo ";; Data array definition" >> "${OFILE}"
+   echo "_$ARRAYNAME::" >> "${OFILE}"
 
 
    ## Convert binary file to bytes in hexadecimal and store in a temporary file
@@ -423,17 +424,17 @@ fi
          printf " 0x%s" $B
          i=$((i+1))
       done
-   done < $TMPFILE >> ${OFILE}
+   done < $TMPFILE >> "${OFILE}"
 
    ## Generate constant pointer to the end of the array
-   echo >> ${OFILE}
-   echo ";; Address of the latest byte of the compressed array (for unpacking purposes)" >> ${OFILE}
-   echo "_${ARRAYNAME}_end == . - 1" >> ${OFILE}
+   echo >> "${OFILE}"
+   echo ";; Address of the latest byte of the compressed array (for unpacking purposes)" >> "${OFILE}"
+   echo "_${ARRAYNAME}_end == . - 1" >> "${OFILE}"
 
    ## Output a line ending
-   echo >> ${OFILE}
+   echo >> "${OFILE}"
 
-   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}${OFILE}${COLOR_NORMAL} Generated."
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
 fi
 
 ###############################################################
@@ -442,9 +443,9 @@ fi
 ##
 if (( GENERATE_B )); then
    ## Moves the binary file generated by compressor to the output location
-   OFILE=${OUTFILE}.bin
-   mv $TMPPACK ${OFILE}
-   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}${OFILE}${COLOR_NORMAL} Generated."
+   OFILE="${OUTFILE}.bin"
+   cp "$TMPPACK" "${OFILE}"
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
 fi
 
 ## Success message
