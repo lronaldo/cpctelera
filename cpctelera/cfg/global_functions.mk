@@ -139,7 +139,7 @@ endef
 # $(4): Memory address where main program starts (RUN ADDRESS)
 #
 define CREATESNA
-  @$(BIN2SNA) -pc 0x$(4) -l 0x$(3) $(1) > $(2)
+  @$(BIN2SNA) -pc 0x$(4) $(1) 0x$(3) > $(2)
 endef
 
 #################
