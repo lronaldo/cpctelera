@@ -259,7 +259,7 @@ void parseArguments(const TArgs& args) {
 
       // BINARY FILE FOLLOWED BY LOADADDRESS
       } else {
-         if (i + 1 >= args.size()) error( { "Binary files need to be given one by one, separated by spaces, and followed by each of their Loading Addresses. Example: cpct_bin2sna file1 0x0000 file2 0x0500 file3 0xA000" } );
+         if (i + 1 >= args.size()) error( { "File '", a,"' is not followed by its load address. \nBinary files need to be given one by one, separated by spaces, and followed by each of their Loading Addresses. Example: cpct_bin2sna file1 0x0000 file2 0x0500 file3 0xA000" } );
          theBinary = a;
          address = to16bitAddress(args[i+1]);
          theSNA.loadBinary(theBinary, address);
