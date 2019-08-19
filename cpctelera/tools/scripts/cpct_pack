@@ -302,9 +302,9 @@ SAVED_BYTES=$(( UNCOMPRESSED_BYTES - COMPRESSED_BYTES ))
 ##
 if (( GENERATE_H )); then 
 
-OFILE="${OUTFILE}.h"
-generateCommentInfoHeader "//" "${OFILE}"
-cat >> "${OFILE}" <<TheHFile
+   OFILE="${OUTFILE}.h"
+   generateCommentInfoHeader "//" "${OFILE}"
+   cat >> "${OFILE}" <<TheHFile
 #ifndef ${ARRAYNAME}_${COMPRESSED_BYTES}_H
 #define ${ARRAYNAME}_${COMPRESSED_BYTES}_H
 
@@ -317,7 +317,7 @@ TheHFile
       done
    fi 
 
-cat >> "${OFILE}" <<TheHFile
+   cat >> "${OFILE}" <<TheHFile
 
 // Declaration of the compressed array
 extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
@@ -394,17 +394,17 @@ if (( GENERATE_S )); then
    OFILE="${OUTFILE}.s"
    generateCommentInfoHeader ";;" "${OFILE}"
 
-# If there is an ORG ADDRESS, we have to position the code
-if [ ! -z "$ORGADDRESS" ]; then
+   # If there is an ORG ADDRESS, we have to position the code
+   if [ ! -z "$ORGADDRESS" ]; then
 
-cat > "${OFILE}" <<TheSFile
+   cat > "${OFILE}" <<TheSFile
 ;; Absolute data location: '$ORGADDRESS'
 .area _${ARRAYNAME}_area_ (ABS)
 .org $ORGADDRESS
 
 TheSFile
 
-fi
+   fi
 
    echo ";; Data array definition" >> "${OFILE}"
    echo "_$ARRAYNAME::" >> "${OFILE}"
