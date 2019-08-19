@@ -107,6 +107,16 @@ Section: 3rdparty software authors
  <RetroVirtualMachine emulator at http://www.retrovirtualmachine.org/es/>: 
     * <Juan Carlos Gonzalez Amestoi at https://twitter.com/retrovm>
 
+Section: Code & fixes contributors
+
+   * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
+   * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+   * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
+   * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
+   * Jose Manuel Ladrón de Guevara García (<@jmlg97 / Github at https://github.com/jmlg97>)
+   * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+   * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
+   * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
 
 Section: Testers & Bug Reporters 
 
