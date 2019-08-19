@@ -247,8 +247,10 @@ fi
 ## Concatenate all files in a single, temporary packfile
 echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Creating single pack file (${COLOR_CYAN}${OUTFILE}${COLOR_YELLOW}) \
 with all these files: ${COLOR_CYAN}${INFILES[*]}${COLOR_NORMAL}" 
+## Use Index sequence to access file to prevent problems with spaced-names (@jmlg97 fix)
+## Could also use "${INFILES[@]}" quoted expansion
 for I in $( seq 0 $(($NINFILES-1)) ); do
-   F=${INFILES[I]}
+   F="${INFILES[$I]}"
    cat "$F" >> "$TMPFILE"
    OFFSETS+=( $(wc -c < "$F") )
 done
