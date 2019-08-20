@@ -65,23 +65,40 @@ typedef enum filetypes {
 		FT_Basic = 0
 	,	FT_protected = 1
 	, 	FT_binary = 2
+	,  FT_ascii = 0x16
+	,  FT_none
 } TFiletype;
 
+typedef enum tapemodes {
+		TM_cpc 		= 0
+	,  TM_cpcraw 	= 1
+	,	TM_zx			= 2
+	,  TM_zxraw    = 3
+	,  TM_raw1full = 4
+	,  TM_raw1half = 5
+	,  TM_raw2full = 6
+	,  TM_raw2half = 7
+	,  TM_cpctxt   = 8
 
-void create11()
-{
+	,  TM_ntotalModes
+} TTapeMode;
+
+
+void create11(TFiletype filetype_override) {
 	memset(head,0,16);
 	if (sn)
 		strcpy((char*)head,sn);
-	head[0x12]=filetype;
+	if (filetype_override == FT_none)
+		head[0x12]=filetype;
+	else
+		head[0x12]=filetype_override;
 	head[0x18]=filesize;
 	head[0x19]=filesize>>8;
 	head[0x1A]=fileboot;
 	head[0x1B]=fileboot>>8;
 }
 
-void update11(int n,int is1st,int islast,int l)
-{
+void update11(int n,int is1st,int islast,int l) {
 	head[0x10]=n;
 	head[0x11]=islast?-1:0;
 	head[0x13]=l;
@@ -151,7 +168,8 @@ void usage() {
 		"\n   -r  FILE name to record on tape, unnamed file if missing"
 		"\n   -t       record CPC file as a standard 2k block and a giant block"
 		"\n   -m  N    mode: one of these { cpc cpcraw zx zxraw raw1full raw1half raw2full raw2half }"
-		"\n             / cpc:      Standard CPC File with AMSDOS header."
+		"\n             / cpc:      Standard CPC File (basic/binary) with/adding AMSDOS header."
+		"\n             | cpctxt:   ASCII text file with CRLF line endings, adding AMSDOS header."
 		"\n    CPC2CDT  | cpcraw:   CPC File without AMSDOS header."
 		"\n      MODES  | zx:       Standard ZX spectrum file with PLUS3DOS header."
 		"\n             \\ zxraw:    ZX spectrum file without PLUS3DOS header."
@@ -236,16 +254,22 @@ int get16bitValue(const char* value) {
 	error(3, "ERROR: Expected decimal/hexadecimal number but found '%s'\n", value);
 }
 
-int str2conversionMode(char *_mode) {
-	static const unsigned char nmodes = 8;
-	static const char* modes[] = { "cpc", "cpcraw", "zx", "zxraw", "raw1full", "raw1half", "raw2full", "raw2half" };
+TTapeMode str2conversionMode(char *_mode) {
+	static const unsigned char nmodes = TM_ntotalModes;
+	static const char* modes[] = 
+	{ 			"cpc"			, "cpcraw"
+			, 	"zx"			, "zxraw"
+			, 	"raw1full"	, "raw1half"
+			, 	"raw2full"	, "raw2half"
+			, 	"cpctxt" 
+	};
 	mode = _mode;
 	tolowerstr(mode);
 	for (unsigned char i=0; i < nmodes; ++i) {
 		if ( !strcmp(mode, modes[i]) )
 			return i;
 	}
-	error(3	, "ERROR: Expected mode but found '%s'. Valid modes are: { %s, %s, %s, %s, %s, %s, %s, %s }\n", mode, modes[0], modes[1], modes[2], modes[3], modes[4], modes[5], modes[6], modes[7]);
+	error(3, "ERROR: Expected mode but found '%s'. Valid modes are: { %s, %s, %s, %s, %s, %s, %s, %s, %s }\n", mode, modes[0], modes[1], modes[2], modes[3], modes[4], modes[5], modes[6], modes[7], modes[8]);
 }
 
 void parseCommandLineArgs(int argc, char *argv[]) {
@@ -335,6 +359,48 @@ void detectHeaderInInputFile() {
 	fclose(fi);
 }
 
+///
+/// Writes a basic/binary or ascii file to the tape
+/// using CPC firmware blocks
+///
+void writeCPCFile(TTapeMode mode) {
+	// Set correct filetype
+	TFiletype ft = FT_none;
+	if (mode == TM_cpctxt) ft = FT_ascii;
+	
+	// Create header
+	create11(ft);
+	
+	// Create tape blocks
+	if (filesize>0x800) {
+		update11(j=1,1,0,0x800); // FIRST BLOCK
+		record11(head,44,28,16);
+		record11(body,22,0x800,flag_h);
+		k=filesize-0x800;
+		i=0x800;
+		if (!flag_t)
+			while (k>0x800)
+			{
+				fileload+=0x800;
+				update11(++j,0,0,0x800); // MID BLOCK
+				record11(head,44,28,16);
+				record11(body+i,22,0x800,flag_h);
+				k-=0x800;
+				i+=0x800;
+			}
+		fileload+=0x800;
+		update11(++j,0,1,k); // LAST BLOCK
+		record11(head,44,28,16);
+		record11(body+i,22,k,flag_p);
+	}
+	else
+	{
+		update11(1,1,1,filesize); // SINGLE BLOCK
+		record11(head,44,28,16);
+		record11(body,22,filesize,flag_p);
+	}
+}
+
 void cpc2cdt_modes() {
 	// Set up bauds
 	if (flag_b>0)
@@ -359,41 +425,17 @@ void cpc2cdt_modes() {
 	// Process file depending on selected mode
 	switch (flag_m)
 	{
-		case 0:
-			create11();
-			if (filesize>0x800)
-			{
-				update11(j=1,1,0,0x800); // FIRST BLOCK
-				record11(head,44,28,16);
-				record11(body,22,0x800,flag_h);
-				k=filesize-0x800;
-				i=0x800;
-				if (!flag_t)
-					while (k>0x800)
-					{
-						fileload+=0x800;
-						update11(++j,0,0,0x800); // MID BLOCK
-						record11(head,44,28,16);
-						record11(body+i,22,0x800,flag_h);
-						k-=0x800;
-						i+=0x800;
-					}
-				fileload+=0x800;
-				update11(++j,0,1,k); // LAST BLOCK
-				record11(head,44,28,16);
-				record11(body+i,22,k,flag_p);
-			}
-			else
-			{
-				update11(1,1,1,filesize); // SINGLE BLOCK
-				record11(head,44,28,16);
-				record11(body,22,filesize,flag_p);
-			}
+		//----------------------------------------------------------
+		case TM_cpc:
+		case TM_cpctxt:
+			writeCPCFile(flag_m);
 			break;
-		case 1:
+		//----------------------------------------------------------
+		case TM_cpcraw:
 			record11(body,flag_i,filesize,flag_p);
 			break;
-		case 2:
+		//----------------------------------------------------------
+		case TM_zx:
 			head[0]=filetype;
 			memset(head+1,32,10);
 			if (sn)
@@ -415,7 +457,8 @@ void cpc2cdt_modes() {
 			record10(head,0,17,1000);
 			record10(body,255,filesize,flag_p);
 			break;
-		case 3:
+		//----------------------------------------------------------
+		case TM_zxraw:
 			record10(body,flag_i,filesize,flag_p);
 			break;
 	}
@@ -434,39 +477,47 @@ int main(int argc,char *argv[])
 	detectHeaderInInputFile();
 
 	// Process depending on mode
-	if (flag_m < 4) {
-		// CPC2CDT Modes
-		cpc2cdt_modes();
-	} else {
-		// TINYTAPE Modes
-		
-		// Convert ID value to negative if it has not been set
-		if (flag_i == 255) flag_i=-1;
-
-		// Pulselength or bitspersec must be set for tiny tape
-		if 		(pulselength > 0) bitsize = -pulselength;
-		else if (bitspersec  > 0) bitsize = bitspersec;
-		else	error(6, "ERROR: Mode '%s' requires '-rp' or '-rb' to be set.\n", mode);
-
-		// Set Bitgaps
-		// Bitgaps are the number of bytes per page. At the end of each page
-		// a byte (0xFE or 0xFC) is written to act as counter, for counter-enabled loaders.
-		// bitgaps = -1 by default, meaning that nothing should be written in-between pages
-		tiny_tape_setBitGaps(bytesperpage);
-
-		// If there is a header, be it AMSDOS or PLUS3DOS, skip it
-		tiny_tape_setSkipHeader(detectedHeader);
-		
-		// Generate tape with Tiny Modes. Parameters:
-		// 	 srcfile:  Source file (RAW/BIN)
-		// 	 tzxfile:  Output file (if it exists, srcfile is appended, else tzxfile is created with srcfile)
-		// 	 _bittype: 0 (1 bit, full pulse), 1 (1 bit, half pulse), 2 (2 bits, full pulse), 3 (2 bits, half pulse)
-		// 	 _bitsize: (<0) Pulse Lenght in Ts, (>0) Bits per second
-		// 	 _bitbyte: Data block ID (first byte at the start of the blogk). (-1) for no block ID
-		// 	 _bithold: Pause in milliseconds
-		//void tiny_tape_gen(	const char* srcfile, const char* tzxfile, int _bittype
-		//				, int _bitsize, int _bitbyte, int _bithold) {
-		tiny_tape_gen(si, so, flag_m-4, bitsize, flag_i, flag_h);
+	switch (flag_m) {
+		case TM_cpc:
+		case TM_cpctxt:
+		case TM_cpcraw:
+		case TM_zxraw:
+		case TM_zx: {
+			// CPC2CDT Modes
+			cpc2cdt_modes();
+			break;
+		}
+		default: {
+			// TINYTAPE Modes
+			
+			// Convert ID value to negative if it has not been set
+			if (flag_i == 255) flag_i=-1;
+	
+			// Pulselength or bitspersec must be set for tiny tape
+			if 		(pulselength > 0) bitsize = -pulselength;
+			else if (bitspersec  > 0) bitsize = bitspersec;
+			else	error(6, "ERROR: Mode '%s' requires '-rp' or '-rb' to be set.\n", mode);
+	
+			// Set Bitgaps
+			// Bitgaps are the number of bytes per page. At the end of each page
+			// a byte (0xFE or 0xFC) is written to act as counter, for counter-enabled loaders.
+			// bitgaps = -1 by default, meaning that nothing should be written in-between pages
+			tiny_tape_setBitGaps(bytesperpage);
+	
+			// If there is a header, be it AMSDOS or PLUS3DOS, skip it
+			tiny_tape_setSkipHeader(detectedHeader);
+			
+			// Generate tape with Tiny Modes. Parameters:
+			// 	 srcfile:  Source file (RAW/BIN)
+			// 	 tzxfile:  Output file (if it exists, srcfile is appended, else tzxfile is created with srcfile)
+			// 	 _bittype: 0 (1 bit, full pulse), 1 (1 bit, half pulse), 2 (2 bits, full pulse), 3 (2 bits, half pulse)
+			// 	 _bitsize: (<0) Pulse Lenght in Ts, (>0) Bits per second
+			// 	 _bitbyte: Data block ID (first byte at the start of the blogk). (-1) for no block ID
+			// 	 _bithold: Pause in milliseconds
+			//void tiny_tape_gen(	const char* srcfile, const char* tzxfile, int _bittype
+			//				, int _bitsize, int _bitbyte, int _bithold) {
+			tiny_tape_gen(si, so, flag_m-4, bitsize, flag_i, flag_h);
+		}
 	}
 
  	return 0;
