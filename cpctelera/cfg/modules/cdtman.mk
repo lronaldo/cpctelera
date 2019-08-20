@@ -34,7 +34,7 @@ CDTM_W        := 160
 CDTM_PALFW    := 11 15 3 24 13 20 6 26 0 2 1 18 8 5 16 9 
 CDTM_BORDERFW := 0
 CDTM_FILENAME := Game
-CDTM_VALIDFORMATS := firmware basic miniload
+CDTM_VALIDFORMATS := generated_fw firmware basic miniload
 CDTM_SCRFILE  := 
 CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
 CDTM_DEPEND   := cfg/cdt_manager.mk
@@ -138,17 +138,27 @@ endef
 # to insert it RAW in raw1full format or adding AMSDOS header
 #
 # $(1): File
-# $(2): Type {firmware, basic, miniload}
+# $(2): Type {generated_fw, firmware, basic, miniload}
 # $(3): Load Address (for firmware calls)
 # $(4): Run Address (for firmware calls)
 # $(5): Filename (for firmware calls)
 #
 define INSERT_NEXT_FILE_INTO_CDT
-	$(call ENSUREFILEEXISTS,$(1),<<ERROR>> [ CDTMAN - INSERT FILE ]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)')
-	$(call ENSUREVALID,$(2),$(CDTM_VALIDFORMATS),<<ERROR>> [ CDTMAN - INSERT FILE ]: Format '$(2)' for file '$(1) is not valid. Valid formats are: { $(CDTM_VALIDFORMATS) }')
+	$(if $(call EQUALS,generated_fw,$(2))\
+		,\
+		, $(call ENSUREFILEEXISTS,$(1),<<ERROR>> [ CDTMAN - INSERT FILE ]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)') \
+		  $(call ENSUREVALID,$(2),$(CDTM_VALIDFORMATS),<<ERROR>> [ CDTMAN - INSERT FILE ]: Format '$(2)' for file '$(1) is not valid. Valid formats are: { $(CDTM_VALIDFORMATS) }') \
+   )
 
 	printf "$(_C1)'$(_C2)$(CDT)$(_C1)' < '$(_C2)$(notdir $(1))$(_C1)' {Format:'$(_C2)$(2)$(_C1)' "
 
+	$(if $(call EQUALS,generated_fw,$(2))\
+		, $(call GETALLADDRESSES,$(BINFILE)) \
+		  $(eval _LA:=$(if $(call EQUALS,noload,$(3)),0x$(strip $(LOADADDR)),$(3))) \
+		  $(eval _RA:=$(if $(call EQUALS,norun,$(4)),0x$(strip $(RUNADDR)),$(4))) \
+		  && $(CPC2CDT) -x "$(_RA)" -l "$(_LA)" -p 3000 -t -b 2000 -r "$(CDTM_FILENAME)" "$(1)" "$(CDT)" > /dev/null \
+		  && printf "Load:'$(_C2)$(_LA)$(_C1)' Run:'$(_C2)$(_RA)$(_C1)' Name:'$(_C2)$(CDTM_FILENAME)$(_C1)'" \
+	)
 	$(if $(call EQUALS,firmware,$(2))\
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
@@ -215,6 +225,38 @@ define CDTMAN_ADDFILE
 
 	# Add to list of files to be inserted in the CDT
 	$(call ADD_FILE_TO_CDT_LIST,$(2),$(1),$(3),$(4),$(CDTM_FILENAME))
+endef
+
+#################
+# CDTMAN_ADD_GENERATED_BIN: Adds the binary file generated
+# by the compilation of the proyect into the CDT file. 
+# The file is added as firmware format, and will use
+# default Load Address and Run Address got from generated
+# .bin.log file. It will also use current CDTM_FILENAME 
+# as cassette filename.
+# Load & Run Address parameters can be overriden by 
+# passing parameters $(1) and $(2) to this macro. If 
+# they are not null, they will be used as Load and Run
+# addresses respectively, discarding those from .bin.log.
+#
+# $(1): Load Address (Optional. Overrides value in .bin.log)
+# $(2): Run  Address (Optional. Overrides value in .bin.log)
+#
+define CDTMAN_ADD_GENERATED_BIN
+	# Check constraints
+	$(eval _LA:=)
+	$(eval _RA:=)
+	$(if $(1)\
+		, $(call ENSURE_ADDRESS_VALID,$(1),<<ERROR>> [ CDTMAN - CDTMAN_ADDGENERATEDBIN ]:) \
+        $(eval _LA := $(strip $(1))) \
+		,)	
+	$(if $(2)\
+		, $(call ENSURE_ADDRESS_VALID,$(2),<<ERROR>> [ CDTMAN - CDTMAN_ADDGENERATEDBIN ]:) \
+        $(eval _RA := $(strip $(2))) \
+		,)	
+
+	# Add to list of files to be inserted in the CDT
+	$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),generated_fw,$(_LA),$(_RA),$(CDTM_FILENAME))
 endef
 
 #################
@@ -494,12 +536,12 @@ endef
 # $(1): Command to be performed
 # $(2-8): Valid arguments to be passed to the selected command
 #
-# Valid Commands: ADDFILE SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW 
+# Valid Commands: ADDFILE ADD_GENERATED_BIN SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW 
 # Info about each command can be found looking into its correspondent makefile macro CDTMAN_<COMMAND>
 #
 define CDTMAN
 	# Set the list of valid commands
-	$(eval CDTMAN_F_FUNCTIONS := ADDFILE SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
+	$(eval CDTMAN_F_FUNCTIONS := ADDFILE ADD_GENERATED_BIN SET_MINILOAD_MODE SET_MINILOAD_PALETTE_FW SET_MINILOAD_LOADER_ADDRESS SET_FILENAME GEN_MINILOADER SET_FORMAT ADDFILE_RAW)
 
 	# Check that command parameter ($(1)) is exactly one-word after stripping whitespaces
 	$(call ENSURE_SINGLE_VALUE,$(1),<<ERROR>> [CDTMAN] '$(strip $(1))' is not a valid command. Commands must be exactly one-word in lenght with no whitespaces. Valid commands: {$(CDTMAN_F_FUNCTIONS)})
