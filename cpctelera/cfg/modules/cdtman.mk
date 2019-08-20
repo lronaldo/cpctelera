@@ -34,7 +34,7 @@ CDTM_W        := 160
 CDTM_PALFW    := 11 15 3 24 13 20 6 26 0 2 1 18 8 5 16 9 
 CDTM_BORDERFW := 0
 CDTM_FILENAME := Game
-CDTM_VALIDFORMATS := generated_fw firmware basic miniload
+CDTM_VALIDFORMATS := firmware basic miniload generated_fw generated_ml 
 CDTM_SCRFILE  := 
 CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
 CDTM_DEPEND   := cfg/cdt_manager.mk
@@ -144,7 +144,7 @@ endef
 # $(5): Filename (for firmware calls)
 #
 define INSERT_NEXT_FILE_INTO_CDT
-	$(if $(call EQUALS,generated_fw,$(2))\
+	$(if $(call CONTAINED_IN,$(2),generated_fw generated_ml)\
 		,\
 		, $(call ENSUREFILEEXISTS,$(1),<<ERROR>> [ CDTMAN - INSERT FILE ]: File '$(1)' does not exist or cannot be read when trying to add it to '$(CDT)') \
 		  $(call ENSUREVALID,$(2),$(CDTM_VALIDFORMATS),<<ERROR>> [ CDTMAN - INSERT FILE ]: Format '$(2)' for file '$(1) is not valid. Valid formats are: { $(CDTM_VALIDFORMATS) }') \
@@ -163,7 +163,7 @@ define INSERT_NEXT_FILE_INTO_CDT
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Load:'$(_C2)$(3)$(_C1)' Run:'$(_C2)$(4)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
 	)
-	$(if $(call EQUALS,miniload,$(2))\
+	$(if $(call CONTAINED_IN,$(2),miniload generated_ml)\
 		, $(CPC2CDT) -m raw1full -rl 740 "$(1)" "$(CDT)" >> /dev/null \
 	)
 	$(if $(call EQUALS,basic,$(2))\
@@ -210,7 +210,7 @@ endef
 # a Load Address and a Run Address. Also, firmware files
 # will use current CDTM_FILENAME as cassette filename.
 #
-# $(1): Format { firmware, basic, miniload }
+# $(1): Format { generated_fw, firmware, basic, miniload }
 # $(2): File to be added
 # $(3): Load Address (Only for firmware formats)
 # $(4): Run Address (Only for firmware formats)
@@ -239,24 +239,31 @@ endef
 # they are not null, they will be used as Load and Run
 # addresses respectively, discarding those from .bin.log.
 #
-# $(1): Load Address (Optional. Overrides value in .bin.log)
-# $(2): Run  Address (Optional. Overrides value in .bin.log)
+# $(1): [Optional] Format { firmware, miniload } ( firmware by default ) 
+# $(2): [Optional] Load Address (Overrides default value got from .bin.log)
+# $(3): [Optional] Run  Address (Overrides default value got from .bin.log)
 #
 define CDTMAN_ADD_GENERATED_BIN
 	# Check constraints
 	$(eval _LA:=)
 	$(eval _RA:=)
-	$(if $(1)\
-		, $(call ENSURE_ADDRESS_VALID,$(1),<<ERROR>> [ CDTMAN - CDTMAN_ADDGENERATEDBIN ]:) \
-        $(eval _LA := $(strip $(1))) \
-		,)	
+	$(eval _FMT:=generated_fw)
+	$(eval _ERRH:=<<ERROR>> [ CDTMAN - ADD_GENERATED_BIN ]: )
+   $(if $(1)\
+      , $(call ENSUREVALID,$(strip $(1)),firmware miniload,$(_ERRH)Format '$(1)' for file '$(BINFILE)' is not valid. Valid formats are: { firmware miniload }) \
+        $(eval _FMT:=$(if $(call EQUALS,$(_FMT),firmware),generated_fw,generated_ml))
+      ,)
 	$(if $(2)\
-		, $(call ENSURE_ADDRESS_VALID,$(2),<<ERROR>> [ CDTMAN - CDTMAN_ADDGENERATEDBIN ]:) \
-        $(eval _RA := $(strip $(2))) \
+		, $(call ENSURE_ADDRESS_VALID,$(strip $(2)),$(_ERRH)) \
+        $(eval _LA := $(strip $(2))) \
+		,)	
+	$(if $(3)\
+		, $(call ENSURE_ADDRESS_VALID,$(strip $(3)),$(_ERRH)) \
+        $(eval _RA := $(strip $(3))) \
 		,)	
 
 	# Add to list of files to be inserted in the CDT
-	$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),generated_fw,$(_LA),$(_RA),$(CDTM_FILENAME))
+	$(call ADD_FILE_TO_CDT_LIST,$(BINFILE),$(_FMT),$(_LA),$(_RA),$(CDTM_FILENAME))
 endef
 
 #################
