@@ -17,25 +17,18 @@
 ##------------------------------------------------------------------------------
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
-##                 Automatic image conversion file                        ##
+##                      Cassette file manager                             ##
 ##------------------------------------------------------------------------##
-## This file is intended for users to automate image conversion from JPG, ##
-## PNG, GIF, etc. into C-arrays.                                          ##
+## This file is intended for users to automate the inclusion of files and ##
+## loaders in the final production CDT file.                              ##
 ############################################################################
 
-
-## Convert credits.png into credits.c and credits.h
-##   This is a mode 0, 40x27 pixels sprite, that is used as authors' credits
-## minibanner. The image will be converted into a C-array called G_credits 
-## (G is prefix for _credits) without interlaced mask. credits.c and credits.h
-## will be output to src/sprites.
-#$(eval $(call IMG2SPRITES,assets/credits.png,0,G,40,27,$(PALETTE),,src/sprites/))
-
-## Firmware palette definition in cpct_img2tileset format
-PALETTE=11 15 3 24 13 20 6 26 0 2 1 18 8 5 16 9
-
-## Default values
-$(eval $(call IMG2SP, SET_FOLDER      , src/sprites/ ))
-$(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE)   ))
-$(eval $(call IMG2SP, CONVERT         , assets/credits.png, 40, 27, G_credits, g_palette))
-
+## Add BASIC loader PCLIMBER.BAS first
+$(eval $(call CDTMAN, SET_FILENAME, PLATFORM CLIMBER))
+$(eval $(call CDTMAN, ADDFILE, basic, dsk/PCLIMBER.BAS))
+## Then add the screen.scr file as a firmware file to be loaded at video memory location
+$(eval $(call CDTMAN, SET_FILENAME, SCREEN.SCR))
+$(eval $(call CDTMAN, ADDFILE, firmware, dsk/SCREEN.SCR, 0xC000, 0xC000))
+## Finally, add the generated game binary, that the basic loader will look for
+$(eval $(call CDTMAN, SET_FILENAME, GAME))
+$(eval $(call CDTMAN, ADD_GENERATED_BIN))
