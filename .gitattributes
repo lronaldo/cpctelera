@@ -1,0 +1,4 @@
+# Works starting with git 2.10 . On git 2.9 and earlier, this will
+# probably not work.
+# See https://github.com/git/git/blob/master/Documentation/RelNotes/2.10.0.txt#L248
+* text eol=lf

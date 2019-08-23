@@ -44,9 +44,10 @@
 ##    -an  | --array-name [name]         - Sets the C identifier that will be used. <OUTFILE> is used by default.
 ##    -alc | --asm-local-constants       - Makes generated assembly constants local instead of global
 ##    -b   | --bytes-per-line [numbytes] - Establishes the number of bytes to write at each array line in C. 16 by default
+##    -gb  | --generate-bin              - Generates a binary file with compressed data (Default: no). Using this switch overrides generation defaults.
 ##    -gh  | --generate-header           - Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults.
 ##    -ghs | --generate-asm-header       - Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults.
-##    -gs  | --generate-asm              - Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults.
+##    -gs  | --generate-asm              - Generates an assembly file with compressed data (Default: yes). Using this switch overrides generation defaults.
 ##    -h   | --help                      - Shows help information on the terminal.
 ##    -i   | --include-header [file]     - Include a header file at the top of the generated output
 ##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
@@ -83,6 +84,9 @@ OPTIONS \
    -b   | --bytes-per-line ${COLOR_NORMAL}<numbytes> ${COLOR_CYAN}
       Establishes the number of bytes to write at each array line in C. 16 by default. \
    ${COLOR_LIGHT_BLUE}
+   -gb  | --generate-bin ${COLOR_CYAN}
+         Generates a binary file with compressed data (Default: no). Using this switch overrides generation defaults. \
+   ${COLOR_LIGHT_BLUE}
    -gh  | --generate-header ${COLOR_CYAN}
          Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults. \
    ${COLOR_LIGHT_BLUE}
@@ -90,7 +94,7 @@ OPTIONS \
          Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults. \
    ${COLOR_LIGHT_BLUE}
    -gs  | --generate-asm ${COLOR_CYAN}
-         Generates an assembly file with song's data (Default: yes). Using this switch overrides generation defaults. \
+         Generates an assembly file with compressed data (Default: yes). Using this switch overrides generation defaults. \
    ${COLOR_LIGHT_BLUE}
    -h   | --help ${COLOR_CYAN}
       Shows this help information. \
@@ -108,6 +112,30 @@ UsageHereDoc
 
 ##############################################################
 ###############################################################
+## Output commented information header for generated files.
+## Beware! Uses global variables from the script that contain
+## the information that should be output to the file.
+## $1: Comment prefix (";;", "//", etc)
+## $2: Ouput file
+##
+function generateCommentInfoHeader() {
+   local CPREF="$1"
+   local OUTFILE="$2"
+   ## Generate info Header
+   cat > "${OUTFILE}" <<CommentInfoHeader
+$CPREF File '${OUTFILE}' generated using cpct_pack
+$CPREF Compresor used:   $COMPRESSOR
+$CPREF Files compressed: [$(for F in "${INFILES[@]}"; do printf " '%s'" $F; done) ]
+$CPREF Uncompressed:     $UNCOMPRESSED_BYTES bytes
+$CPREF Compressed:       $COMPRESSED_BYTES bytes
+$CPREF Space saved:      $SAVED_BYTES bytes
+$CPREF
+
+CommentInfoHeader
+}
+
+##############################################################
+###############################################################
 ## Check command line parameters
 ##
 OUTFILE=
@@ -120,6 +148,7 @@ BYTESPERLINE=16
 GENERATE_S=0
 GENERATE_H=0
 GENERATE_H_S=0
+GENERATE_B=0
 ORGADDRESS=
 ASMCNST='=='
 
@@ -176,6 +205,10 @@ while (( $# >= 1 )); do
       "-gs" | "--generate-asm")
          GENERATE_S=1
       ;;
+      ## Select generation of binary file
+      "-gb" | "--generate-bin")
+         GENERATE_B=1
+      ;;
       ## Assembly origin address
       "-org" | "--origin-asm")
          if ! isCIntValue "$2"; then
@@ -207,7 +240,7 @@ while (( $# >= 1 )); do
 done
 
 ## If no file generation has been selected, resort to defaults (.h and .s)
-if (( GENERATE_S == 0 && GENERATE_H == 0 && GENERATE_H_S == 0 )); then
+if (( GENERATE_S == 0 && GENERATE_H == 0 && GENERATE_H_S == 0 && GENERATE_B == 0 )); then
    GENERATE_S=1
    GENERATE_H=1
 fi
@@ -238,7 +271,10 @@ fi
 ## Concatenate all files in a single, temporary packfile
 echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Creating single pack file (${COLOR_CYAN}${OUTFILE}${COLOR_YELLOW}) \
 with all these files: ${COLOR_CYAN}${INFILES[*]}${COLOR_NORMAL}" 
-for F in ${INFILES[*]}; do
+## Use Index sequence to access file to prevent problems with spaced-names (@jmlg97 fix)
+## Could also use "${INFILES[@]}" quoted expansion
+for I in $( seq 0 $(($NINFILES-1)) ); do
+   F="${INFILES[$I]}"
    cat "$F" >> "$TMPFILE"
    OFFSETS+=( $(wc -c < "$F") )
 done
@@ -266,15 +302,9 @@ SAVED_BYTES=$(( UNCOMPRESSED_BYTES - COMPRESSED_BYTES ))
 ##
 if (( GENERATE_H )); then 
 
-OFILE="${OUTFILE}.h"
-cat > ${OFILE} <<TheHFile
-// File ${OFILE} generated using cpct_pack
-// Compresor used:   $COMPRESSOR
-// Files compressed: [ ${INFILES[*]} ]
-// Uncompressed:     $UNCOMPRESSED_BYTES bytes
-// Compressed:       $COMPRESSED_BYTES bytes
-// Space saved:      $SAVED_BYTES bytes
-//
+   OFILE="${OUTFILE}.h"
+   generateCommentInfoHeader "//" "${OFILE}"
+   cat >> "${OFILE}" <<TheHFile
 #ifndef ${ARRAYNAME}_${COMPRESSED_BYTES}_H
 #define ${ARRAYNAME}_${COMPRESSED_BYTES}_H
 
@@ -283,11 +313,11 @@ TheHFile
    ## Output include files in case
    if (( ${#INCLUDE[@]} > 0 )); then
       for I in ${INCLUDE[*]}; do
-         echo "#include <${INCLUDE}>" >> ${OFILE}
+         echo "#include <${INCLUDE}>" >> "${OFILE}"
       done
    fi 
 
-cat >> ${OFILE} <<TheHFile
+   cat >> "${OFILE}" <<TheHFile
 
 // Declaration of the compressed array
 extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
@@ -304,18 +334,18 @@ TheHFile
 
    ## Output file offset constants if there is more than one file compressed
    if (( NINFILES > 1 )); then
-      echo >> ${OFILE}
-      echo "// Define constants for starting offsets of files in the uncompressed array" >> ${OFILE}
+      echo >> "${OFILE}"
+      echo "// Define constants for starting offsets of files in the uncompressed array" >> "${OFILE}"
       OFF=0
       for((I=0;I<NINFILES;I++)); do
-         printf "#define %s%03d   %6s   // Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> ${OFILE}
+         printf "#define %s%03d   %6s   // Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> "${OFILE}"
          OFF=$(( OFF + ${OFFSETS[$I]} ))
       done
    fi
 
-   printf "\n#endif\n" >> ${OFILE}
+   printf "\n#endif\n" >> "${OFILE}"
 
-   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}${OFILE}${COLOR_NORMAL} Generated."
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
 fi
 
 
@@ -325,16 +355,9 @@ fi
 ##
 if (( GENERATE_H_S )); then 
 
-OFILE=${OUTFILE}.h.s
-cat > ${OFILE} <<TheHFile
-;; File ${OFILE} generated using cpct_pack
-;; Compresor used:   $COMPRESSOR
-;; Files compressed: [ ${INFILES[*]} ]
-;; Uncompressed:     $UNCOMPRESSED_BYTES bytes
-;; Compressed:       $COMPRESSED_BYTES bytes
-;; Space saved:      $SAVED_BYTES bytes
-;;
-
+   OFILE="${OUTFILE}.h.s"
+   generateCommentInfoHeader ";;" "${OFILE}"
+   cat >> "${OFILE}" <<TheHFile
 ;; Declaration of the compressed array and
 ;; the address of the latest byte of the compressed array (for unpacking purposes)
 .globl _$ARRAYNAME
@@ -348,18 +371,18 @@ TheHFile
 
    ## Output file offset constants if there is more than one file compressed
    if (( NINFILES > 1 )); then
-      echo >> ${OFILE}
-      echo ";; Define constants for starting offsets of files in the uncompressed array" >> ${OFILE}
+      echo >> "${OFILE}"
+      echo ";; Define constants for starting offsets of files in the uncompressed array" >> "${OFILE}"
       OFF=0
       for((I=0;I<NINFILES;I++)); do
-         printf "_%s%03d %s %6s   ;; Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "$ASMCNST" "${OFF}" "${INFILES[$I]}" >> ${OFILE}
+         printf "_%s%03d %s %6s   ;; Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "$ASMCNST" "${OFF}" "${INFILES[$I]}" >> "${OFILE}"
          OFF=$(( OFF + ${OFFSETS[$I]} ))
       done
    fi
 
-   echo >> ${OFILE}
+   echo >> "${OFILE}"
 
-   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}${OFILE}${COLOR_NORMAL} Generated."
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
 fi
 
 ###############################################################
@@ -368,31 +391,23 @@ fi
 ##
 if (( GENERATE_S )); then
 
-OFILE=${OUTFILE}.s
-cat > ${OFILE} <<TheSFile
-;; File ${OFILE} generated using cpct_pack
-;; Compresor used: $COMPRESSOR
-;; Files compressed: [ ${INFILES[*]} ]
-;; Uncompressed:     $UNCOMPRESSED_BYTES bytes
-;; Compressed:       $COMPRESSED_BYTES bytes
-;; Space saved:      $SAVED_BYTES bytes
-;;
-TheSFile
+   OFILE="${OUTFILE}.s"
+   generateCommentInfoHeader ";;" "${OFILE}"
 
-# If there is an ORG ADDRESS, we have to position the code
-if [ ! -z "$ORGADDRESS" ]; then
+   # If there is an ORG ADDRESS, we have to position the code
+   if [ ! -z "$ORGADDRESS" ]; then
 
-cat > ${OFILE} <<TheSFile
+   cat > "${OFILE}" <<TheSFile
 ;; Absolute data location: '$ORGADDRESS'
 .area _${ARRAYNAME}_area_ (ABS)
 .org $ORGADDRESS
 
 TheSFile
 
-fi
+   fi
 
-   echo ";; Data array definition" >> ${OFILE}
-   echo "_$ARRAYNAME::" >> ${OFILE}
+   echo ";; Data array definition" >> "${OFILE}"
+   echo "_$ARRAYNAME::" >> "${OFILE}"
 
 
    ## Convert binary file to bytes in hexadecimal and store in a temporary file
@@ -414,17 +429,28 @@ fi
          printf " 0x%s" $B
          i=$((i+1))
       done
-   done < $TMPFILE >> ${OFILE}
+   done < $TMPFILE >> "${OFILE}"
 
    ## Generate constant pointer to the end of the array
-   echo >> ${OFILE}
-   echo ";; Address of the latest byte of the compressed array (for unpacking purposes)" >> ${OFILE}
-   echo "_${ARRAYNAME}_end == . - 1" >> ${OFILE}
+   echo >> "${OFILE}"
+   echo ";; Address of the latest byte of the compressed array (for unpacking purposes)" >> "${OFILE}"
+   echo "_${ARRAYNAME}_end == . - 1" >> "${OFILE}"
 
    ## Output a line ending
-   echo >> ${OFILE}
+   echo >> "${OFILE}"
 
-   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}${OFILE}${COLOR_NORMAL} Generated."
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
+fi
+
+###############################################################
+###############################################################
+## Output Bin file
+##
+if (( GENERATE_B )); then
+   ## Moves the binary file generated by compressor to the output location
+   OFILE="${OUTFILE}.bin"
+   cp "$TMPPACK" "${OFILE}"
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}'${OFILE}'${COLOR_NORMAL} Generated."
 fi
 
 ## Success message

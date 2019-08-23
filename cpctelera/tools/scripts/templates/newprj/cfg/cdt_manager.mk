@@ -29,8 +29,8 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ###############################################################################
 ##                    CASSETE FILE MANAGER HELP INDEX                        ##
 ##---------------------------------------------------------------------------##
-## 	SECTION 1: BASIC CDT GENERATION                                          ##
-## 	SECTION 2: AUTOMATIC GENERATION OF A CASSETE LOADER WITH MINILOAD        ##
+##  SECTION 1: BASIC CDT GENERATION                                          ##
+##  SECTION 2: AUTOMATIC GENERATION OF A CASSETE LOADER WITH MINILOAD        ##
 ##  SECTION 3: ADVANCED INClUSION OF FILES INTO CDT                          ##
 ##                                                                           ##
 ##  Just search for the title of the section to jump and read it.            ##
@@ -55,6 +55,36 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ##    As you guessed, this command sets the name of the filename, in this    ##
 ## case to "FIGHTING GAME". Filenames can have up to 16 characters including ##
 ## spaces, but all letters will always be uppercase.                         ##
+##                                                                           ##
+##    There is another way to create a simple CDT file including the         ##
+## generated binary file resulting from compilation. You may use this way    ##
+## for some tweaking or advanced uses if you like. For this, you may use     ##
+## ADD_GENERATED_BIN function, like in the next example.                     ##
+##                                                                           ##
+## EXAMPLE:                                                                  ##
+##                                                                           ##
+## ## Set the filename of the game to "FIGHTING GAME"                        ##
+## $(eval $(call CDTMAN, SET_FILENAME, Fighting Game))                       ##
+## $(eval $(call CDTMAN, ADD_GENERATED_BIN))                                 ##
+##                                                                           ##
+##    This example is exactly equivalent to the previous one. The previous   ##
+## one used default inclusion, and now we asked it to do so manually. This   ##
+## second way lets us override 3 default parameters: the format in which the ##
+## file is added to de CDT, its Load Address and its Run Address. Next       ##
+## example shows how to set this parameters manually                         ##
+##                                                                           ##
+## EXAMPLE:                                                                  ##
+##                                                                           ##
+## ## Set the filename of the game to "FIGHTING GAME"                        ##
+## $(eval $(call CDTMAN, SET_FILENAME, Fighting Game))                       ##
+##                                                                           ##
+## ## Set it to load the binary at 0x8000 in memory and start executing      ##
+## ## (Run address) at 0x9A5F. The file is added as a normal firmware file   ##
+## ## so it can be run using standard RUN" command from BASIC.               ##
+## $(eval $(call CDTMAN, ADD_GENERATED_BIN,firmware,0x8000,0x9A5F))          ##
+##                                                                           ##
+##    Normally, you would prefer to leave the default parameters, but these  ##
+## are available for any advanced uses you may need.                         ##
 ##                                                                           ##
 ###############################################################################
 ##          AUTOMATIC GENERATION OF A CASSETE LOADER WITH MINILOAD           ##
@@ -216,7 +246,18 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ## with two headers. Give just binary data to ADDFILE and use the type you   ##
 ## needed.                                                                   ##
 ##                                                                           ##
+##    As previously commented, you may also easily add the generated binary  ##
+## file (the one resulting from compiling your CPCtelera project) using      ##
+## ADD_GENERATED_BIN. This command works same as ADDFILE, but it does not    ##
+## require the file name (because it uses the generated binary file) and it  ##
+## only supports firmware or miniload types, as CPCtelera does not generate  ##
+## basic files.                                                              ##
+##                                                                           ##
 ## USAGE,                                                                    ##
+##                                          <type>                           ##
+## $(eval $(call CDTMAN, ADD_GENERATED_BIN, firmware, <load_add>, <run_add>))##
+## $(eval $(call CDTMAN, ADD_GENERATED_BIN, miniload, <load_add>, <run_add>))##
+##                                                                           ##
 ##                                <type>                                     ##
 ## $(eval $(call CDTMAN, ADDFILE, miniload, <file>))                         ##
 ## $(eval $(call CDTMAN, ADDFILE, basic   , <file>))                         ##
@@ -258,6 +299,11 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ## ## current CPCtelera project, so it will be in the obj/ folder.           ##
 ## $(eval $(call CDTMAN, ADDFILE, miniload, obj/game.bin ))                  ##
 ##                                                                           ##
+## ## We could also alternatively use ADD_GENERATED_BIN for this. As         ##
+## ## parameters given are optional, we only give the format parameter       ##
+## ## to include our binary in miniload format. No need for load&run address ##
+## ## $(eval $(call CDTMAN, ADD_GENERATED_BIN, miniload))                    ##
+##                                                                           ##
 ## ## As you see in this example, 'miniload' files do no include load and/or ##
 ## ## run addresses. However, these files will be loaded at a given memory   ##
 ## ## address and, if they include executable code, a jump to another memory ##
@@ -280,7 +326,16 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ## ## as a 'firmware' file for this purpose. Afterwards, the game will use   ##
 ## ## cpct_miniload function to load next levels. Game binary loads at       ##
 ## ## 0x4000 and takes 32K, up to 0xBFFF. Main function is placed at 0x52AA  ##
-## $(eval $(call CDTMAN, ADDFILE, firmware, obj/mygame.bin, 0x4000, 0x52AA)) ##
+## ## The easiest way to include the file is used ADD_GENERATED_BIN, which   ##
+## ## does exactly this by default. It adds the generated binary as firmware,##
+## ## and sets appropriately its Load and Run addresses as they are set in   ##
+## ## our CPCtelera project.                                                 ##
+## $(eval $(call CDTMAN, ADD_GENERATED_BIN))                                 ##
+##                                                                           ##
+## ## Alternatively, we could do this manually, by giving ADDFILE all data   ##
+## ## $(eval $(call CDTMAN, ADDFILE,firmware,obj/mygame.bin,0x4000,0x52AA))  ##
+## ## ADD_GENERATED_BIN also lets us give all data manually, if wanted       ##
+## ## $(eval $(call CDTMAN, ADD_GENERATED_BIN, firmware, 0x4000, 0x52AA))    ##
 ##                                                                           ##
 ## ## Level data is placed from 0x0000 to 0x3FFF, with each level taking 16K ##
 ## ## Levels are added to the CDT consecutively, in miniload format. The     ##

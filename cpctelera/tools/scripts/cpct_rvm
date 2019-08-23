@@ -60,6 +60,7 @@
 ##    -nw | --no-warp         - Does not automatically enter Warp Mode on CDT load.
 ##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}
 ##    -r  | --run <FILENAME>  - Automatically runs FILENAME with the command RUN"FILENAME
+##    -w  | --warp            - Does automatically enter Warp Mode.
 ##    -h  | --help            - Shows help information on the terminal.
 ##
 
@@ -70,11 +71,11 @@
 # Script configuration
 CPCT_TOOLS_FOLDER=$(dirname $0)/..
 
-WWW_RVM_LINUX64=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/linux/x64/RetroVirtualMachine.2.0.beta-1.r6.linux.x64.zip
-WWW_RVM_LINUX32=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/linux/x86/RetroVirtualMachine.2.0.beta-1.r6.linux.x86.zip
-WWW_RVM_WIN64=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/windows/x64/RetroVirtualMachine.2.0.beta-1.r6.windows.x64.zip
-WWW_RVM_WIN32=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/windows/x86/RetroVirtualMachine.2.0.beta-1.r6.windows.x86.zip
-WWW_RVM_OSX=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/macos/RetroVirtualMachine.2.0.beta-1.r6.macos.zip
+WWW_RVM_LINUX64=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/linux/x64/RetroVirtualMachine.2.0.beta-1.r7.linux.x64.zip
+WWW_RVM_LINUX32=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/linux/x86/RetroVirtualMachine.2.0.beta-1.r7.linux.x86.zip
+WWW_RVM_WIN64=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/windows/x64/RetroVirtualMachine.2.0.beta-1.r7.windows.x64.zip
+WWW_RVM_WIN32=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/windows/x86/RetroVirtualMachine.2.0.beta-1.r7.windows.x86.zip
+WWW_RVM_OSX=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/macos/RetroVirtualMachine.2.0.beta-1.r7.macos.zip
 RVM_EXE=RetroVirtualMachine
 RVM_EXE_OSX="Retro\ Virtual\ Machine\ 2.app/Contents/MacOS/Retro\ Virtual\ Machine\ 2"
 RVM_ZIP=${CPCT_TOOLS_FOLDER}/RVM.zip
@@ -410,6 +411,7 @@ while (( $# > 0 )); do
       ;;
       "-nw"| "--no-warp")
          WARP=false
+         WARPMODE=""
       ;;
       "-r" | "--run")
          if (( $# < 2 )); then
@@ -417,6 +419,10 @@ while (( $# > 0 )); do
          fi 
          COMMAND="RUN\"${2}\"\n"
          shift
+      ;;
+      "-w"| "--warp")
+         WARP=true
+         WARPMODE="-w"
       ;;
       *)
          if isCommandLineOption "$1"; then
@@ -470,8 +476,11 @@ if [[ "$FILE" != "" ]]; then
             COMMAND="RUN\"\n "
          else
             ## Remove Path and extension from File to get just the name
+            ## Cap the lenght of the name up to 8 characters (AMSDOS standard)
             COMMAND=${FILE##*/}
-            COMMAND="RUN\"${COMMAND%%.*}\""
+            COMMAND=${COMMAND%%.*}
+            COMMAND=${COMMAND:0:8}
+            COMMAND="RUN\"${COMMAND}\""
          fi
       fi
       ## Construct EXECUTEFILE command to be given on launch

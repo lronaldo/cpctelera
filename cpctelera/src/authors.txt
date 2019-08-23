@@ -28,7 +28,6 @@ Awesome collaborators:
    * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
    * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
    * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
-   * <Cpcitor at http://github.com/cpcitor>
    * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
    * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
@@ -42,8 +41,8 @@ Bitarrays idea and original implementation:
 Some original code and ideas for sprite drawing and firmware enabling/disabling:
    * Raúl Simarro (Artaburu / ESP Soft)
  
-Some makefile code and ideas:
-   * <Cpcitor at http://github.com/cpcitor>
+Some makefile code, reviews and many great ideas:
+   * Stéphane Gourichon <cpcitor at http://github.com/cpcitor>
  
 Arkos player original code:
    * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>
@@ -108,6 +107,16 @@ Section: 3rdparty software authors
  <RetroVirtualMachine emulator at http://www.retrovirtualmachine.org/es/>: 
     * <Juan Carlos Gonzalez Amestoi at https://twitter.com/retrovm>
 
+Section: Code & fixes contributors
+
+   * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
+   * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+   * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
+   * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
+   * Jose Manuel Ladrón de Guevara García (<@jmlg97 / Github at https://github.com/jmlg97>)
+   * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+   * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
+   * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
 
 Section: Testers & Bug Reporters 
 
@@ -132,6 +141,7 @@ Section: Testers & Bug Reporters
  * Álvaro Amador Ruiz (@SararyCow at http://twitter.com/SararyCow)
  * <John Lobo at https://github.com/johnlobo> / <Github at https://github.com> 
  * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
+ * Iván Fernández Álvarez (<SpDizzy at http://twitter.com/dizzy_sp>)
 
 Section: Assets 
 
@@ -153,7 +163,7 @@ Section: Special Thanks
 
  * <Lachlan Keown at http://www.twitter.com/lachlankeown> (For being incredibly kind and helpful, and adding every required modification to better integrate RGAS with *CPCtelera*)
  * <Tim Riemann / Octoate at http://www.octoate.de> (For supporting CPCtelera and spreading news amount the community with a big smile)
- * <Cpcitor at http://github.com/cpcitor> (for his great help and advice, and for developing <cpc-dev-tool-chain at http://github.com/cpcitor/cpc-dev-tool-chain>)
+ * <Stéphane Gourichon / cpcitor at http://github.com/cpcitor> (for his great help and advice, and for developing <cpc-dev-tool-chain at http://github.com/cpcitor/cpc-dev-tool-chain>)
  * <CPCWiki at http://cpcwiki.eu> & <Grimware at http://grimware.org/> (for providing great technical documentations and examples)
  * Raúl Simarro (for developing <CPCRSLib at http://sourceforge.net/projects/cpcrslib/> game creation library)
  * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> (for developing Arkos Traker&Player and giving great support on adding it to *CPCtelera*. Also for giving general advice during development of *CPCtelera*)

@@ -30,10 +30,12 @@
 ##   * CHECKSYSTEMOSX
 ##   * CHECKSYSTEMCYGWIN
 ##   * CHECKVARIABLEISSET
+##   * CONTAINED_IN
 ##   * CONVERTVALUE
 ##   * CONVERT_FW2HW_PALETTE
 ##   * CREATETMPFILENAME
 ##   * DEC2HEX
+##   * EQUALS
 ##   * ENSURE_ADDRESS_VALID
 ##   * ENSURE_VALID_C_ID
 ##   * ENSURE_SINGLE_VALUE
@@ -473,6 +475,18 @@ endef
 #
 define GREATER_THAN
 $(shell test "$(strip $(1))" -gt "$(strip $(2))" && echo true)
+endef
+
+#################
+# CONTAINED_IN: Checks if a value is contained in a set or not
+# It returns de value if it is contained or empty (false) if not.
+# It is thought to be used in conjunction with makefile if functions.
+#
+# $(1): Value to be checked in the set
+# $(2): Set of values separated by spaces
+#
+define CONTAINED_IN
+$(filter $(strip $(1)),$(strip $(2)))
 endef
 
 #################

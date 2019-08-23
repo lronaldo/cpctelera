@@ -56,21 +56,29 @@ const std::string C_NORMAL { "\033[0;39;49m" };
 void usage(const std::string& prg) {
    std::cerr 
       << C_LIGHT_YELLOW << "USAGE" 
-      << C_LIGHT_BLUE   << "\n   " << prg << " <binfile> [OPTIONS]"
+      << C_LIGHT_BLUE   << "\n   " << prg << " [OPTIONS] <binfile1> <loadaddress1> [<binfile2> <loadaddress2>...]"
       << C_LIGHT_YELLOW << "\n\nDescription"
-      << C_CYAN         << "\n   Creates a runnable 64K snapshot (SNA) file with <binfile> \
-loaded in memory at the address given with option -l/--load-address. If no address \
-is given, binfile is loaded at 0x0000 (memory start). The value of the PC is also  \
+      << C_CYAN         << "\n   Creates a runnable 64K snapshot (SNA) file with all \
+binfiles loaded in memory at the addresses given. Binary files have to be mandatorily \
+provided with their load address, in pairs, separated by spaces. The value of the PC is \
 set to 0x0000 by default and may be changed with -pc/--set-pc. Setting the PC lets \
-preparing the snapshot to start running from the entry point of the loaded binary. \
+preparing the snapshot to start running from the desired entry point. \
 \n\n   The rest of CPC's memory is filled up with standard values from a normal startup \
 of an Amstrad CPC 464. These values have been captured by stopping a running 464 and \
 copying memory values to this tool. \
-\n\n   Currently, this tool only supports 64K snapshots including 464 memory images."
+\n\n   Currently, this tool only supports 64K snapshots including 464 memory images. "
+      << C_LIGHT_YELLOW << "\n\nIMPORTANT CONSIDERATIONS: "
+      << C_CYAN         << "\n   - This tool does not check your binaries and load \
+addresses for collisions. Files are copied into SNA memory in the order they are provided. \
+If one of them reaches the address space of a previous one, it will simply overwrite it \
+silently. Similarly, your files may overwrite previous memory contents like firmware \
+variables or video memory. "
+                        << "\n   - If your software needs to use the firmware or other \
+memory contents, take into account that this tool uses a default memory status of \
+firmware variables for firmware 1.0 at the start of the system. If you want a different \
+setup, you may want to provide it directly with your binaries overwritting default values."
       << C_LIGHT_YELLOW << "\n\nOPTIONS:"
-      << C_LIGHT_BLUE   << "\n\n   -l  | --load-address <ADDRESS> (Default 0x0000)"
-      << C_CYAN         << "\n          Sets the memory address where to load the binary file <binfile>. "
-      << C_LIGHT_BLUE   << "\n   -pc | --set-pc <ADDRESS> (Default 0x0000)"
+      << C_LIGHT_BLUE   << "\n\n   -pc | --set-pc <ADDRESS> (Default 0x0000)"
       << C_CYAN         << "\n          Sets the value of the PC register at execution start. This value should"
       << " be set to the entry point of the application (its run address)."
       << C_LIGHT_BLUE   << "\n   -h  | --help"
@@ -132,15 +140,14 @@ struct SNA {
       m_header[idx]  = static_cast<uint8_t>(value & 0x00FF);
       m_header[idx+1]= static_cast<uint8_t>(value >> 8);
    }
-   void setLoadAddress(uint16_t add) { m_loadAddress = add; }
-   void loadBinary(const std::string& binfile) {
+   void loadBinary(const std::string& binfile, uint16_t loadAddress = 0) {
       std::ifstream bin(binfile, std::ios::in | std::ios::binary);
       
       // Check file constraints
       if (!bin.is_open()) error( {"Could not open binary file '", binfile, "' for reading."} );
       bin.ignore( 65537 );
       auto length = bin.gcount();
-      if ( length + m_loadAddress > 65536 ) error ( {"File '", binfile, "' has a size of '", std::to_string(length), "' and cannot be loaded at '", std::to_string(m_loadAddress) ,"' because it will exceed 64K memory boundaries."} );
+      if ( length + loadAddress > 65536 ) error ( {"File '", binfile, "' has a size of '", std::to_string(length), "' and cannot be loaded at '", std::to_string(loadAddress) ,"' because it will exceed 64K memory boundaries."} );
 
       // Rewind file 
       bin.clear();
@@ -148,9 +155,8 @@ struct SNA {
 
       // Insert it into memory
       char byte;
-      uint16_t add = m_loadAddress;
       while(bin.get(byte)) 
-         m_memory[add++] = byte;
+         m_memory[loadAddress++] = byte;
 
       // Close file 
       bin.close();
@@ -162,7 +168,6 @@ struct SNA {
    }
 
 private:
-   uint16_t m_loadAddress     = 0;
    uint8_t  m_memory[65536]   = {0};
    uint8_t  m_header[256]     = {0};
 };
@@ -232,6 +237,7 @@ uint16_t to16bitAddress(const std::string& str) {
 // PARSES ARGUMENTS GIVEN TO THIS SCRIPT
 //
 void parseArguments(const TArgs& args) {
+   uint16_t nbinaries = 0;
    std::string theBinary {""};
    uint16_t address;
 
@@ -247,29 +253,24 @@ void parseArguments(const TArgs& args) {
          theSNA.setReg(TRegister::PC, address);
          ++i;
 
-      // LOAD ADDRESS
-      } else if (a == "-l" || a == "--load-address") {
-         if (i + 1 >= args.size()) error( { "Modifier '-l' needs to be followed by a 16-bits address, but nothing found."} );
-
-         address = to16bitAddress(args[i+1]);
-         theSNA.setLoadAddress(address);
-         ++i;
-
       // SHOW HELP
       } else if (a == "-h" || a == "--help") {
          usage(args[0]);
 
-      // BINARY FILE
+      // BINARY FILE FOLLOWED BY LOADADDRESS
       } else {
-         if (theBinary.size() != 0) error ( { "Unrecognized or duplicated parameter '", a, "'" } );
+         if (i + 1 >= args.size()) error( { "File '", a,"' is not followed by its load address. \nBinary files need to be given one by one, separated by spaces, and followed by each of their Loading Addresses. Example: cpct_bin2sna file1 0x0000 file2 0x0500 file3 0xA000" } );
          theBinary = a;
+         address = to16bitAddress(args[i+1]);
+         theSNA.loadBinary(theBinary, address);
+         ++i;
+         ++nbinaries;
       }
    }
 
    // FINAL CHECKS AND PARSING
    if (args.size()==1) usage(args[0]);
-   if (theBinary.size() == 0) error ( {"Binary file required to create the SNA file."} );
-   theSNA.loadBinary(theBinary);
+   if (nbinaries == 0) error ( {"At least one binary and its loading address is required to create the SNA file."} );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
