@@ -210,7 +210,7 @@ endef
 # a Load Address and a Run Address. Also, firmware files
 # will use current CDTM_FILENAME as cassette filename.
 #
-# $(1): Format { generated_fw, firmware, basic, miniload }
+# $(1): Format { firmware, basic, miniload, generated_fw, generated_ml }
 # $(2): File to be added
 # $(3): Load Address (Only for firmware formats)
 # $(4): Run Address (Only for firmware formats)
