@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b613ea3d-3cff-4025-9b3e-8643f2bb4fe6}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{fc0b3ed3-ef96-43d3-a63c-b8e4551b40f6}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Custom Build">
+      <UniqueIdentifier>{6c387ed2-8c02-44f4-904c-683998af7386}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="device.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="genarith.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="genutils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graph.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcodeflow.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcodepeep.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcoderegs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ralloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pcode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pcodeflow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pcoderegs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ralloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="peeph.def">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

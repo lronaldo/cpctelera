@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5339F39B-0A44-4248-972C-F8833B0F5537}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="SDCC.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="SDCC.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <TypeLibraryName>.\Debug/all.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <TypeLibraryName>.\Release/all.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="bin_vc\sdranlib.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdranlib.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdranlib.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdcdb.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdcdb.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcdb.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <None Include="ChangeLog" />
+    <CustomBuild Include="bin_vc\makebin.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\makebin.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\makebin.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\packihx.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\packihx.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\packihx.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdas6808.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdas6808.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdas6808.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdas8051.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdas8051.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdas8051.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdasgb.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdasgb.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdasgb.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdasrab.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdasrab.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdasrab.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdasz80.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdasz80.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdasz80.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdcc.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdcc.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcc.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdcclib.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdcclib.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcclib.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdcpp.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdcpp.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdcpp.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="bin_vc\sdld.exe">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy %(Identity) bin\sdld.exe /y &gt; nul
+copy %(Identity) bin\sdldz80.exe /y &gt; nul
+copy %(Identity) bin\sdldrab.exe /y &gt; nul
+copy %(Identity) bin\sdldgb.exe /y &gt; nul
+copy %(Identity) bin\sdldstm8.exe /y &gt; nul
+copy %(Identity) bin\sdld6808.exe /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\sdld.exe;bin\sdldz80.exe;bin\sdldrab.exe;bin\sdldstm8.exe;bin\sdldgb.exe;bin\sdld6808.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy %(Identity) bin\sdld.exe /y &gt; nul
+copy %(Identity) bin\sdldz80.exe /y &gt; nul
+copy %(Identity) bin\sdldrab.exe /y &gt; nul
+copy %(Identity) bin\sdldgb.exe /y &gt; nul
+copy %(Identity) bin\sdldstm8.exe /y &gt; nul
+copy %(Identity) bin\sdld6808.exe /y &gt; nul</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\sdld.exe;bin\sdldz80.exe;bin\sdldrab.exe;bin\sdldstm8.exe;bin\sdldgb.exe;bin\sdld6808.exe;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="debugger\mcs51\sdcdb.vcxproj">
+      <Project>{76b78c5a-6b31-4ba1-9226-f1409b48f839}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="sdas\as6808\as_hc08.vcxproj">
+      <Project>{c81f84d7-f847-4100-969f-0791a95d2e4c}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="sdas\as8051\asx8051.vcxproj">
+      <Project>{c14982c0-731b-46a0-9dd2-845e3811cf18}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="sdas\asgb\asgb.vcxproj">
+      <Project>{37192eef-c964-4598-a8bd-4395df7ef5bf}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="sdas\asz80\as_z80.vcxproj">
+      <Project>{a281c655-04b3-4f24-b0c4-e61567d60b5b}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="sdas\linksrc\aslink.vcxproj">
+      <Project>{6e94db45-345e-4697-98da-6c72237d6eca}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="src\sdcc.vcxproj">
+      <Project>{f9485499-151b-4886-935c-7d687c4a0549}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="support\cpp\sdcpp.vcxproj">
+      <Project>{57bcb0f8-ef4a-4688-9b36-55a8f6dc93bf}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="support\librarian\librarian.vcxproj">
+      <Project>{fc989bcf-4aad-4f53-8a21-3d6ff8f2f0b5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="support\packihx\PackIhx.vcxproj">
+      <Project>{437b836f-bee5-43b8-9821-4b0e5e328575}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
