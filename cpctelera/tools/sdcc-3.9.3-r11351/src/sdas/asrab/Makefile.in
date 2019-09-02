@@ -1,0 +1,137 @@
+#
+#
+#
+
+VERSION         = @VERSION@
+VERSIONHI       = @VERSIONHI@
+VERSIONLO       = @VERSIONLO@
+VERSIONP        = @VERSIONP@
+
+SHELL           = /bin/sh
+CC              = @CC@
+CPP             = @CPP@
+INSTALL         = @INSTALL@
+STRIP           = @STRIP@
+MAKEDEP         = @MAKEDEP@
+
+top_builddir    = @top_builddir@
+top_srcdir      = @top_srcdir@
+
+srcdir          = @srcdir@
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
+datadir         = @datadir@
+datarootdir     = @datarootdir@
+includedir      = @includedir@
+mandir          = @mandir@
+man1dir         = $(mandir)/man1
+man2dir         = $(mandir)/man2
+infodir         = @info@
+
+EXEEXT          = @EXEEXT@
+
+VPATH           = @srcdir@
+
+CPPFLAGS        = @CPPFLAGS@ -DSDCDB -DNOICE -DINDEXLIB -I. -I$(srcdir) -I$(srcdir)/../asxxsrc -I$(srcdir)/../../support/util
+CFLAGS          = @CFLAGS@ @WALL_FLAG@ $(CPPFLAGS)
+LDFLAGS         = @LDFLAGS@
+LIBS            = -lm
+
+OBJDIR = obj
+
+UTILLIB = $(srcdir)/../../support/util
+UTILSRC = dbuf.c dbuf_string.c
+UTILLIBOBJS = $(UTILSRC:%.c=$(OBJDIR)/%.o)
+
+ASXXLIB = $(srcdir)/../asxxsrc
+ASXXLIBSRC = asdbg.c asdata.c asexpr.c aslex.c aslist.c asmain.c asout.c assubr.c assym.c asmcro.c sdas.c strcmpi.c
+ASXXLIBOBJS = $(ASXXLIBSRC:%.c=$(OBJDIR)/%.o)
+
+SRC = rabpst.c rabmch.c rabadr.c
+OBJS = $(SRC:%.c=$(OBJDIR)/%.o)
+
+ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c)
+
+ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
+
+ASX = $(top_builddir)/bin/sdasrab$(EXEEXT)
+#DEST = $(DESTDIR)$(bindir)/sdasrab$(EXEEXT)
+DEST = sdasrab
+DESTPATH = $(DESTDIR)$(bindir)/
+
+transform       = @program_transform_name@
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: checkconf $(ASX)
+
+$(ASX): $(ASOBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ASOBJECTS) $(LIBS)
+
+# Compiling and installing everything and running test
+# ----------------------------------------------------
+install: all installdirs
+	$(INSTALL) $(ASX) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`$(EXEEXT)
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	rm -f $(DESTPATH)`echo $(DEST)|sed '$(transform)'`$(EXEEXT)
+
+
+# Performing self-test
+# --------------------
+check:
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+
+
+# Creating dependencies
+# ---------------------
+dep: Makefile.dep
+
+Makefile.dep: $(ASSOURCES) $(srcdir)/*.h
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.c,$^) >Makefile.dep
+
+ifeq "$(findstring $(MAKECMDGOALS),uninstall check installcheck installdirs \
+                                   clean distclean mostlyclean realclean)" ""
+  -include Makefile.dep
+endif
+include $(srcdir)/clean.mk
+
+# My rules
+# --------
+$(OBJDIR)/.stamp:
+	mkdir -p $(OBJDIR)
+	touch $(OBJDIR)/.stamp
+
+$(OBJDIR)/%.o: %.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(ASXXLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(UTILLIB)/%.c $(OBJDIR)/.stamp
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+
+# Remaking configuration
+# ----------------------
+checkconf:
+	@if [ -f $(top_builddir)/devel ]; then\
+          $(MAKE) -f ../conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+        fi
+
+# End of Makefile
