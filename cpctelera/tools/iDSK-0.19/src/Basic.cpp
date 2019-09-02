@@ -1,12 +1,12 @@
 #include <iostream>
-#include <cstdio>
 using namespace std;
-#include <math.h>
-#include <string.h>
-#include "MyType.h"
-#include "Itoa.h"
-#include "Basic.h"
+#include <cmath>
+#include <cstring>
+#include <cstdio>
+#include <ctype.h>
 
+#include "MyType.h"
+#include "Basic.h"
 
 
 //static char ConvCpcFr[ 128 ] = " !\"#$%&'()*+,-./0123456789:;<=>?àABCDEFGHIJKLMNOPQRSTUVWXYZ[ç]^_`abcdefghijklmnopqrstuvwxyzéùè~";
@@ -85,11 +85,11 @@ void Basic( BYTE * BufFile, char * Listing, bool IsBasic, bool CrLf )
     int exp;
 	int Deprotect=0;
 	//cout << BufFile <<endl;
-    const char * Nbre[ 11 ] =
+    static const char * Nbre[ 11 ] =
         {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
         };
-    const char * MotsClefs[ 0x80 ] =
+    static const char * MotsClefs[ 0x80 ] =
         {
         "AFTER", "AUTO", "BORDER", "CALL", "CAT", "CHAIN", "CLEAR", "CLG",
         "CLOSEIN", "CLOSEOUT", "CLS", "CONT", "DATA", "DEF", "DEFINT",
@@ -109,7 +109,7 @@ void Basic( BYTE * BufFile, char * Listing, bool IsBasic, bool CrLf )
         "#FF"
         };
 
-    const char * Fcts[ 0x80 ] =
+    static const char * Fcts[ 0x80 ] =
         {
         "ABS", "ASC", "ATN", "CHR$", "CINT", "COS", "CREAL", "EXP", "FIX",
         "FRE", "INKEY", "INP", "INT", "JOY", "LEN", "LOG", "LOG10", "LOWER$",
@@ -220,6 +220,15 @@ void Basic( BYTE * BufFile, char * Listing, bool IsBasic, bool CrLf )
                                     strcat( Listing, "$" );
                                     break;
 
+                                case 0x04 : // Variable float (type !)
+                                    Pos = AddWord( BufFile
+                                                 , 2 + Pos
+                                                 , Listing
+                                                 , Deprotect
+                                                 );
+                                    strcat( Listing, "!" );
+                                    break;
+
                                 case 0x0B :
                                 case 0x0C :
                                 case 0x0D : // Variable "standard"
@@ -231,13 +240,13 @@ void Basic( BYTE * BufFile, char * Listing, bool IsBasic, bool CrLf )
                                     break;
 
                                 case 0x19 : // Constante entière 8 bits
-                                    strcat( Listing , itoa( (BYTE)GetByte( BufFile, Pos, Deprotect), Tmp, 10 )); 
+									sprintf(Listing+strlen(Listing),"%d",(BYTE)GetByte( BufFile, Pos, Deprotect)); 
                                     Pos++;
                                     break;
 
                                 case 0x1A :
                                 case 0x1E : // Constante entière 16 bits
-                                    strcat( Listing, itoa( GetWord( BufFile, Pos, Deprotect), Tmp, 10));
+									sprintf(Listing+strlen(Listing),"%d",GetWord( BufFile, Pos, Deprotect));
                                     Pos += 2;
                                     break;
 
@@ -271,7 +280,7 @@ void Basic( BYTE * BufFile, char * Listing, bool IsBasic, bool CrLf )
 
                                     exp = GetByte( BufFile, Pos + 4, Deprotect ) - 129;
                                     Pos += 5;
-                                    sprintf( Tmp, "%f", f * pow( 2, exp ) );
+                                    sprintf( Tmp, "%f", f * pow( (double) 2, exp ) );
                                     // Suppression des '0' inutiles
                                     p = &Tmp[ strlen( Tmp ) - 1 ];
                                     while( * p == '0' )

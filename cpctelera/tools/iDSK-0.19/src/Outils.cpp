@@ -1,8 +1,7 @@
 #include <iostream>
+#include <cstring>
 #include <cstdio>
-#include <string.h>
 using namespace std;
-#include "Itoa.h"
 #include "Outils.h"
 
 //
@@ -104,7 +103,7 @@ void SetBuffViewHexa( unsigned char * src, char * Hex, char * Ascii, unsigned sh
 char * GetUser( int u )
 {
     static char User[ 8 ];
-    itoa(u,User,10);
+	sprintf(User, "%d", u);
     return( User);
 }
 
@@ -125,8 +124,16 @@ char * GetTaille( int t )
 //
 // Retourne le nom du fichier formatt� amsdos (8+3)
 //
-char * GetNomAmsdos(char * AmsName )
+char * GetNomAmsdos(const char * AmsName )
 {
+	// Extract the name (without directory components)
+	const char* lastSlash = strrchr(AmsName, '/');
+	const char* lastBackslash = strrchr(AmsName, '\\');
+	if (lastSlash > lastBackslash)
+		AmsName = lastSlash + 1;
+	else if (lastSlash < lastBackslash)
+		AmsName = lastBackslash + 1;
+
     static char NomAmsdos[ 16 ];
 		int i;
 
@@ -138,9 +145,8 @@ char * GetNomAmsdos(char * AmsName )
 			* p++ = * AmsName++;*/
 	}
 
-   while( * AmsName != '.' && * AmsName ) {
+    while( * AmsName != '.' && * AmsName )
         AmsName++;
-   }
 
 	AmsName++;
 	
