@@ -1,0 +1,29 @@
+#!/bin/sh
+# Script to crosscompile with mingw32
+if [ $(expr $(hostname) : '.*\.') != '0' ]
+then
+  HOSTNAME=$(expr $(hostname) : '\([^.]*\).')
+else
+  HOSTNAME=$(hostname)
+fi
+TOOLSPREFIX=${HOME}/local-${HOSTNAME}/cross-tools/bin/i586-mingw32msvc-
+
+export CC=${TOOLSPREFIX}gcc
+export CXX=${TOOLSPREFIX}g++
+export AR=${TOOLSPREFIX}ar
+export RANLIB=${TOOLSPREFIX}ranlib
+export STRIP=${TOOLSPREFIX}strip
+
+export SDCCCONFIGUREFLAGS=" \
+--prefix=/sdcc \
+--datarootdir=/sdcc \
+docdir=\${datarootdir}/doc \
+include_dir_suffix=include \
+non_free_include_dir_suffix=non-free/include \
+lib_dir_suffix=lib \
+non_free_lib_dir_suffix=non-free/lib \
+sdccconf_h_dir_separator=\\\\ \
+--disable-device-lib \
+--host=i586-mingw32msvc --build=unknown-unknown-linux-gnu"
+
+( ../sdcc/configure ${SDCCCONFIGUREFLAGS} && make ) 2>&1 | tee make.log

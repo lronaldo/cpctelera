@@ -1,0 +1,210 @@
+NOTES file for SDCC pic16 port
+$Id: NOTES 5487 2009-08-08 15:04:04Z MaartenBrock $
+
+Current pic16 port status is: Development
+
+Some things may change without notification between port updates. The latest
+SVN snapshot is guarenteed to compile without problems, but does not
+guarantee backwards compatibility.
+
+For any questions please ask the current port
+developers.
+
+Current developer:
+Raphael Neider	<rneider AT web.de>
+
+Other people to contact:
+Vangelis Rokas	<vrokas AT users.sourceforge.net>
+Scott Dattalo	<scott AT dattalo.com>
+
+======================================================================
+======================================================================
+2006-Mar-14 Vangelis Rokas
+1. Added enviroment variable 'PIC16_PACKED_BITFIELDS' which agressively
+packs bitfields in structures
+
+2005-Mar-23 Vangelis Rokas
+1. I have added some optimizations that are controlled via enviroment
+variables to allow checking. Later these will be either enabled globally
+or controlled by command line options. The variables are:
+	a. OPTIMIZE_BITFIELD_POINTER_GET : optimizes bit field pointer reads
+
+	b. NO_REG_OPT : there is no register optimization performed by pCode
+			optimizer
+
+
+
+2004-Oct-29 Vangelis Rokas
+1. Function parameters are passed now all via stack. This might
+lower performance, but some issues are solved this way. Later
+we can enable passing through WREG,PRODL,PRODH,FSR0L by implementing
+specific pragmas
+
+
+2004-Sep-27 Vangelis Rokas
+1. Function parameters have been extended to cover functions with
+variable arguments. Now function parameters follow the rules below:
+
+  a) void foo(long a, int b, char c)
+     void foo(long a, int b, char c) reentrant
+
+Stack layout: c, b+1, b, a+3, a+2, a+1 and WREG = a
+
+  b) prototype: void foo(long a, int b, ...)
+
+	example: foo(0xaaffeedd, 0xbbcc, 0x4455, 0x7788);
+
+Stack layout: 0x77, 0x88, 0x44, 0x55, 0xbb, 0xcc, 0xaa, 0xff, 0xee, 0xdd
+
+WREG is not used in functions with variable arguments so that the address
+of the first parameter can be taken.
+
+
+
+
+2004-Sep-24 Vangelis Rokas
+1. Began implementation of generic pointers, current specs are:
+	0x0 xxxxxxx -> code pointer
+	0x8 xxxxxxx -> data pointer
+	0x4 xxxxxxx -> eeprom pointer (currently unimplemented)
+
+
+2004-Aug-30 Vangelis Rokas
+1. A few months ago Hans Dorn had the idea to support general pointer
+for accessing all code, eeprom data and data ram memory. These pointers
+would have 3 bytes of size (24-bits), of which only the 21 lower bits
+would be useful. The rest of them could be used to indicate the pointer
+type. I.e.
+0x4xxxxxxx would mean code pointer
+0x8xxxxxxx would mean eeprom pointer
+0xcxxxxxxx would mean data ram pointer
+
+The implementatio of such pointers needs a lot of work and general
+reform of pointer access, data initializing functions and the writing
+of support functions for decoding their type.
+
+The implementation of such pointers along with the implementation of
+a more SDCC like stack access system will allow the writing of variable
+arguments functions like printf etc... Also one set of functions will be
+able to handle all data types without having to worry about where they
+are placed.
+
+
+2004-May-23 Vangelis Rokas
+
+1. The improvement of the port has been stalled a bit. But, struct/union
+SFR headers are ready for the PIC18F[45][45][28] chips along with their
+respective sources.
+
+2. The genCmp function should be rewritten from scratch.
+
+3. The internal helper functions for char/int/long/float arithmetic
+now compile and will be placed in the appropriate directory under device/
+
+
+
+2004-Feb-20 Vangelis Rokas
+Major update with many bugfixes.
+
+1. The most of the pic16 regression tests (former pic regression tests) pass
+successfully. Many thanks to Hans Dorn who did a great job with the
+arithmetic, shift and pointer functions.
+
+2. Bit fields now work properly.
+
+3. Stack is permanently enabled. Command argument -pstack-enable is deleted
+and no more recognized by the port.
+
+
+2004-Feb-07 Vangelis Rokas
+
+1. Fixed a bug so that compiler allocated internal registered, will
+be shared along multiple sources via '.registers' section placed
+in absolute data memory address 0x0000. Registers 0x00 to 0x7f are
+considered as internal since they can be used for fast access.
+
+
+
+2004-Jan-11 Vangelis Rokas
+
+1. Compiling
+The current release of the port can produce object code which is not
+completely bug free. To use the new features the user should enable them via
+command line arguments. A sane set of command arguments that I use to test
+programs is:
+
+- debug options
+	--debug		enable sdcc debug information
+	--debug-xtra	enable pic16 port debug information (most useful)
+	--debug-ralloc	enable register allocator debug messages
+	--pcode-verbose	enable verbose pcode generator messages
+
+- port options
+	--pno-banksel	disable banksel directives for the assembler
+	--pomit-config-words	does not emit configuration instruction in
+			the translation This is useful when copmiling
+			multiple sources, when you do not want multiple
+			config instructions in the end file
+	--pomit-ivt	disables the dumping of the interrupt vector tables
+			in the translation for the same reasons as above
+	--penable-stack	enables stack support. This option uses stack to
+			pass function arguments, and reuses registers between
+			functions by saving the registers used in the function
+			on the stack
+
+- compiler options
+	--all-callee-saves	you may omit this options as the port
+			enables it by default, all functions are currently
+			compiled as reentrant and they are marked as
+			callee-saves
+	--no-peep	peephole optimizer is better to be switched off,
+			because it behaves strangely in some cases
+	--fomit-frame-pointer	this omits frame pointer in functions that
+			don't use registers (maybe changed later, not
+			important)
+
+
+2. Functions
+The current implementation puts every function in its own code section in
+PIC's program memory. This may not be the standard, but I think its more
+flexible.
+
+3. Pragmas
+Since SDCC is goind for a release, its better to document pragmas available.
+
+3.1. code
+The 'code' pragma emits a function's code at a specific address in program
+memory. Currently it is only used for functions.
+Syntax:
+#pragma code [function_name] [address]
+
+3.2. stack
+The 'stack' pragma initializes the stack/frame pointer at an address of the
+data ram other than the default (which is the end of the available data ram)
+Synatx:
+#pragma stack [address]
+
+3.3. maxram
+The 'maxram' pragma sets maximum data ram of the device. Currently is not
+used at all, but it may be useful in the future when devices with external
+memory will be supported.
+Syntax:
+#pragma maxram [max_address]
+
+
+4. Internal compiler functions
+Internal SDCC functions like, __fsmul, etc... are currently supported by the
+port, but the libraries for the pic16 port are not yet ready. So one cannot
+use long and float variables.
+
+
+5. Special Function Registers (SFRs)
+The processor SFRs are not anymore declared in any header file. The user can
+define by himself all the needed SFR's. The code to that is:
+
+sfr at [sfr_address] [sfr_name];
+
+Where sfr_address is the SFR address in the data ram, and sfr_name is the
+name of the SFR. i.e.:
+
+sfr at 0xf80 PORTA;

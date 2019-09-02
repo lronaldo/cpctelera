@@ -1,0 +1,26 @@
+# SDCC test script for the PIC Port
+# 
+USAGE="Usage: `basename $0` GPSIM_SCRIPT OUTPUT"
+
+if [ $# -lt 2 ] ; then
+  echo "$USAGE"
+  exit 1
+fi
+
+if [ "$GPSIM_PATH" != "" ] ; then
+  PATH=$GPSIM_PATH:$PATH
+fi
+
+GPSIM_SCRIPT=$1
+LOGFILE=$2
+echo "Test $GPSIM_SCRIPT" | tee -a $LOGFILE
+gpsim --cli -c $GPSIM_SCRIPT | tee -a $LOGFILE |\
+sed -n -e '/running\.\.\./,$ {
+/^ *Message:/ {
+s/^ *Message:\(.*\)$/\1/p
+q
+}
+}
+$ a\
+===> FAILED
+' | tee -a $LOGFILE

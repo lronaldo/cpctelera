@@ -1,0 +1,7 @@
+VPATH         = @srcdir@
+srcdir        = @srcdir@
+top_builddir  = @top_builddir@
+top_srcdir    = @top_srcdir@
+
+# Make all in this directory
+include $(srcdir)/../port.mk
