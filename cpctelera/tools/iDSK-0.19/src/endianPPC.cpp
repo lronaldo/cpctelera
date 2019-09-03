@@ -7,6 +7,7 @@ using namespace std;
 #include <sys/param.h>
 #if defined(__FreeBSD__)
 #include <machine/endian.h>
+#elif __APPLE__
 #else
 #include <endian.h>
 #endif
