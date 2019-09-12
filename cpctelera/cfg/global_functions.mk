@@ -100,8 +100,9 @@ define CREATEEMPTYDSK
 endef
 
 #################
-# ADDCODEFILETODSK: General rule to include a compiled binary file of a program into a 
-#    DSK automatically. It takes into account memory load point and entry point for the binary
+# ADDCODEFILETODSK: Commands to use inside the body of a rule to include a 
+#    compiled binary file of a program into a DSK automatically. It takes 
+#    into account memory load point and entry point for the binary
 #
 # $(1): DSK file where the binary will be included
 # $(2): Binary file to be included 
@@ -112,21 +113,57 @@ endef
 define ADDCODEFILETODSK
 	@$(IDSK) $(1) -i $(2) -e $(4) -c $(3) -t 1 -f &> /dev/null
 	@touch $(5)
-	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
+	@$(call PRINT,$(1),"Added BIN file '$(2:$(DSKFILESDIR)/%=%)'")
 endef
 
 #################
-# ADDBINFILETODSK: General rule to include a binary file into a DSK automatically
+# ADDBINFILETODSK: Commands to use inside the body of a rule to include 
+#     a binary file into a DSK automatically
 #
 # $(1): DSK file where the binary will be included
 # $(2): Binary file to be included 
 # $(3): Blank object file generated to flag that this inclusion is already done (not to repeat it)
 #
 define ADDBINFILETODSK
-$(3): $(2)
 	@$(IDSK) $(1) -i $(2) -t 1 -f &> /dev/null
 	@touch $(3)
-	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
+	@$(call PRINT,$(1),"Added BIN file '$(2:$(DSKFILESDIR)/%=%)'")
+
+endef
+
+#################
+# ADDTXTFILETODSK: Commands to use inside the body of a rule to include 
+#     an ASCII file into a DSK automatically
+#
+# $(1): DSK file where the binary will be included
+# $(2): ASCII file to be included 
+# $(3): Blank object file generated to flag that this inclusion is already done (not to repeat it)
+#
+define ADDTXTFILETODSK
+	@$(IDSK) $(1) -i $(2) -t 0 -f &> /dev/null
+	@touch $(3)
+	@$(call PRINT,$(1),"Added ASCII file '$(2:$(DSKFILESDIR)/%=%)'")
+
+endef
+
+#################
+# ADDFILETODSK: General rule to include a file (binary or ASCII) into a DSK 
+# automatically. The rule detects the type of the file before proceeding
+#
+# $(1): DSK file where the binary will be included
+# $(2): File to be included 
+# $(3): Blank object file generated to flag that this inclusion is already done (not to repeat it)
+#
+define ADDFILETODSK
+$(3): $(2)
+	$(eval _D=$(strip $(1)))
+	$(eval _F=$(strip $(2)))
+	$(eval _O=$(strip $(3)))
+	$(eval _T=$(shell file "$(_F)" | grep ASCII))
+	$(if $(_T)\
+      ,$(call ADDTXTFILETODSK,$(_D),$(_F),$(_O))\
+      ,$(call ADDBINFILETODSK,$(_D),$(_F),$(_O))\
+	)
 
 endef
 
