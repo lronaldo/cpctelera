@@ -161,6 +161,7 @@ Group: Memutils  {
    File: cpct_memcpy  (memutils/cpct_memcpy.asm)
    File: cpct_memset  (memutils/cpct_memset.asm)
    File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
+   File: cpct_memset_f64_i  (memutils/cpct_memset_f64_i.asm)
    File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
    File: cpct_pageMemory  (memutils/cpct_pageMemory.asm)
    File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
@@ -179,8 +180,10 @@ Group: Random  {
    File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
    File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
    File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
+   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
    File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
    File: cpct_nextRandom_mxor532_u8  (random/cpct_nextRandom_mxor532_u8.s)
+   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
    File: cpct_restoreState_mxor_u16  (random/cpct_restoreState_mxor_u16.s)
    File: cpct_restoreState_mxor_u8  (random/cpct_restoreState_mxor_u8.s)
    File: cpct_setSeed_glfsr16  (random/cpct_setSeed_glfsr.s)
@@ -277,6 +280,7 @@ Group: Strings  {
    File: cpct_setDrawCharM2  (strings/cpct_setDrawCharM2.asm)
    File: dc_mode0_ct  (strings/cpct_dc_mode0_ct.s)
    File: dc_mode1_ct  (strings/cpct_dc_mode1_ct.s)
+   File: getchar  (strings/cpct_getchar.s)
    File: putchar  (strings/cpct_putChar.s)
    }  # Group: Strings
 
