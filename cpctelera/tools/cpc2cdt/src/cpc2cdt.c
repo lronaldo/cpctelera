@@ -167,7 +167,7 @@ void usage() {
 	error(1, "Usage: CPC2CDT [option..] infile outfile"
 		"\n   -r  FILE name to record on tape, unnamed file if missing"
 		"\n   -t       record CPC file as a standard 2k block and a giant block"
-		"\n   -m  N    mode: one of these { cpc cpcraw zx zxraw raw1full raw1half raw2full raw2half }"
+		"\n   -m  N    mode: one of these { cpc cpcraw cpctxt zx zxraw raw1full raw1half raw2full raw2half }"
 		"\n             / cpc:      Standard CPC File (basic/binary) with/adding AMSDOS header."
 		"\n             | cpctxt:   ASCII text file with CRLF line endings, adding AMSDOS header."
 		"\n    CPC2CDT  | cpcraw:   CPC File without AMSDOS header."
