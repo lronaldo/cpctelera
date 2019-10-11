@@ -234,7 +234,7 @@ cpct_page00_asm = 0x00
 ;; performed at assembler time.
 ;;
 ;; Destroyed Registers:
-;;    HL
+;;    AF, B, HL
 ;;
 ;; Size of generated code:
 ;;    * 16 bytes 
