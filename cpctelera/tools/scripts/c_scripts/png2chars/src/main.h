@@ -32,21 +32,23 @@
 // treated as a 1. Black and white PNGs are recommended not to make mistakes when editing the 
 // UDG characters. 
 //
-//   Conversion is output to stdout unless otherwise requested by options.
+//   Conversion is output to stdout unless otherwise requested by options. Folder and file options 
+// enable output to files.
 //
 // Command line options:
-//    -alc | --asm-local-constants    - Make assembly generated constants local instead of global (Default: no)
+//    -alc | --asm-local              - Make assembly generated labels local instead of global (Default: no)
 //    -au  | --add-underscore-s-vars  - Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)
-//    -ci  | --c-identifier <id>      - Sets the C/ASM-identifier that will be used for the generated array (Default: chardata)
-//    -gc  | --generate-c             - Generates a C file with an array all UDG definitions together, one per line (Default: yes). Defaults are set to false on using this flag.
-//    -gh  | --generate-h             - Generates a H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag.
-//    -ghs | --generate-h-s           - Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag.
+//    -ci  | --c-identifier <id>      - Sets the C/ASM-identifier that will be used for the generated array (Default: filename)
 //    -gb  | --generate-bin           - Generates a BIN file with raw data of the UDG character definitions (same values as C array) (Default: no). Defaults are set to false on using this flag.
 //    -gbas| --generate-basic         - Generates a .BAS file with SYMBOL lines containing the UDG definitions (Default: no). Defaults are set to false on using this flag.
+//    -gc  | --generate-c             - Generates a C file with an array all UDG definitions together, one per line (Default: yes). Defaults are set to false on using this flag.
+//    -gh  | --generate-h             - Generates a .H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag.
+//    -ghs | --generate-h-s           - Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag.
 //    -gs  | --generate-asm           - Generates a .S (ASM) file with UDG character definitions in one array (same values as C array) (Default: no). Defaults are set to false on using this flag.
 //    -h   | --help                   - Shows help information on the terminal.
 //    -nb  | --number-base <base>     - Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)
-//    -of  | --output-folder <folder> - Changes the output folder for generated files (Default: .)
+//    -o   | --output-filename <filename> - Sets the basename for the files that will be generated. Enables file output. By default, files will be written to current working folder.
+//    -of  | --output-folder <folder> - Changes the output folder for generated files and enables file output.
 //
 
 #pragma once

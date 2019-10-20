@@ -29,7 +29,7 @@
 // Global variables used for script configuration
 //
 std::string g_outputFolder {""};
-std::string g_fileBasename {""};
+std::string g_outputFilename {""};
 PNGDecoder  g_thePNGDecoder {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,10 +50,11 @@ definitions. Therefore, PNG width and height must both be a multiple of 8. \
 treated as a 1. Black and white PNGs are recommended not to make mistakes when editing the \
 UDG characters. \
 \n\
-\n   Conversion is output to stdout unless otherwise requested by options."
+\n   Conversion is output to stdout unless otherwise requested by options. Folder and file options \
+enable output to files."
       << C_LIGHT_YELLOW << "\n\nOPTIONS:"
-      << C_LIGHT_BLUE   << "\n\n   -alc | --asm-local-constants"
-      << C_CYAN         << "\n          Make assembly generated constants local instead of global (Default: no)"
+      << C_LIGHT_BLUE   << "\n\n   -al  | --asm-local"
+      << C_CYAN         << "\n          Make assembly generated labels local instead of global (Default: no)"
       << C_LIGHT_BLUE   << "\n   -au  | --add-underscore-s-vars"
       << C_CYAN         << "\n          Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)"
       << C_LIGHT_BLUE   << "\n   -ci  | --c-identifier <id>"
@@ -76,8 +77,10 @@ UDG characters. \
       << C_CYAN         << "\n          Shows this help information."
       << C_LIGHT_BLUE   << "\n   -nb  | --number-base <base>"
       << C_CYAN         << "\n          Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)"
+      << C_LIGHT_BLUE   << "\n   -o   | --output-filename <filename>"
+      << C_CYAN         << "\n          Sets the basename for the files that will be generated. Enables file output. By default, files will be written to current working folder."
       << C_LIGHT_BLUE   << "\n   -of  | --output-folder <folder>"
-      << C_CYAN         << "\n          Changes the output folder for generated files (Default: .)"
+      << C_CYAN         << "\n          Changes the output folder for generated files and enables file output."
       << "\n\n" << C_NORMAL;
 }
 
@@ -120,6 +123,11 @@ void setOutputFolder(const TArgs& args) {
    if ( !isFolderWritable(g_outputFolder.c_str()) ) error ({ "Folder '", g_outputFolder, "' does not exist, is not a folder or is not writable." });
 }
 
+void setOutputFilename(const TArgs& args) {
+   g_outputFilename = args[1];
+   if ( g_outputFolder == "" ) g_outputFolder = ".";
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STRUCTURE TO HOLD THE COMMAND LINE OPTION MODIFIERS AND THE FUNCTIONS THAT
@@ -132,11 +140,11 @@ struct ParseFunction_t {
    std::function<void(const TArgs&)> parseFunc;
 };
 
-constexpr uint16_t knum_modifiers = 13;
+constexpr uint16_t knum_modifiers = 14;
 
 using std::placeholders::_1;
 std::array<ParseFunction_t, knum_modifiers> Modifiers {{
-      { "-alc" , "--asm-local-constants"   , 0, std::bind(setASMConstantsLocal, true, _1) }
+      { "-al"  , "--asm-local"             , 0, std::bind(setASMConstantsLocal, true, _1) }
    ,  { "-au"  , "--add-underscore-s-vars" , 0, std::bind(setASMVariablesPrefix, '_', _1) }
    ,  { "-ci"  , "--c-identifier"          , 1, std::bind(setCID, _1) }
    ,  { "-gb"  , "--generate-binary"       , 0, std::bind(generate, PNGDecoder::_BIN, _1) }
@@ -146,9 +154,10 @@ std::array<ParseFunction_t, knum_modifiers> Modifiers {{
    ,  { "-ghs" , "--generate-h-s"          , 0, std::bind(generate, PNGDecoder::_HS, _1) }
    ,  { "-gs"  , "--generate-s"            , 0, std::bind(generate, PNGDecoder::_S, _1) }
    ,  { "-gtrm", "--generate-terminal"     , 0, std::bind(generate, PNGDecoder::_DRAW, _1) }
+   ,  { "-h"   , "--help"                  , 0, std::bind(callUsage, "cpct_png2chars", _1) }
    ,  { "-nb"  , "--number-base"           , 1, std::bind(changeNumberBase, _1) }
    ,  { "-of"  , "--output-folder"         , 1, std::bind(setOutputFolder, _1) }
-   ,  { "-h"   , "--help"                  , 0, std::bind(callUsage, "cpct_png2chars", _1) }
+   ,  { "-o"   , "--output-filename"       , 1, std::bind(setOutputFilename, _1) }
 }};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,7 +169,7 @@ void parseArguments(const TArgs& args) {
 
    // FIRST ARGUMENT MUST BE THE FILENAME
    // Start the PNG Decoder with the given filename
-   g_fileBasename = notdir(basename(args[1]), '/');
+   g_outputFilename = notdir(basename(args[1]), '/');
    g_thePNGDecoder.readFile(args[1]);
 
    // PARSE ARGUMENTS ONE BY ONE
@@ -211,7 +220,7 @@ int main(int argc, char **argv) {
       TArgs args(argv, argv + argc);
       parseArguments(args);
 
-      g_thePNGDecoder.convert(g_outputFolder, g_fileBasename);
+      g_thePNGDecoder.convert(g_outputFolder, g_outputFilename);
    } catch (const std::runtime_error& e) {
       std::cerr << "### ERROR ###\n";
       std::cerr << " - " << e.what() << "\n";
