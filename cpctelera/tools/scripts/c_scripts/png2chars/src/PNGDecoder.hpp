@@ -59,6 +59,7 @@ struct PNGDecoder {
    struct ConversorPack {
       std::unique_ptr<RGBAConversor> conv;
       PNGDecoder::Generate flag;
+      std::string ext;
    };
    using TArrayConversors  = std::array<ConversorPack, knum_conversors>;
    
@@ -87,7 +88,7 @@ struct PNGDecoder {
 
    // Conversion functions
    void readFile(std::string filename);
-   void convert() const;
+   void convert(std::string& outputFolder, std::string& fileBaseName) const;
 
 private:
    TVecUchar         m_image;

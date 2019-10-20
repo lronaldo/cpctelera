@@ -25,8 +25,12 @@
 #include <functional>
 #include <algorithm>
 
-
-PNGDecoder thePNGDecoder;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Global variables used for script configuration
+//
+std::string g_outputFolder {""};
+std::string g_fileBasename {""};
+PNGDecoder  g_thePNGDecoder {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // USAGE FUNCTION
@@ -79,16 +83,16 @@ UDG characters. \
 
 
 void setASMConstantsLocal(bool st, const TArgs& args) {
-   thePNGDecoder.setASMConstantLocal(st);
+   g_thePNGDecoder.setASMConstantLocal(st);
 }
 
 void setASMVariablesPrefix(char prefix, const TArgs& args){
-   thePNGDecoder.setIdentifierPrefix(prefix);
+   g_thePNGDecoder.setIdentifierPrefix(prefix);
 }
 
 void setCID(const TArgs& args) {
    if ( !isValidCIdentifier(args[1].c_str()) ) error({ "'", args[1], "' is not a valid C-identifier for '", args[0], "' modifier." });
-   thePNGDecoder.setCArrayName(args[1]);
+   g_thePNGDecoder.setCArrayName(args[1]);
 }
 
 void callUsage(std::string progname, const TArgs& args){
@@ -96,21 +100,26 @@ void callUsage(std::string progname, const TArgs& args){
 }
 
 void generate(uint8_t gen, const TArgs& args) {
-   thePNGDecoder.setGenerate(gen);
+   g_thePNGDecoder.setGenerate(gen);
 }
 
 void changeNumberBase(const TArgs& args) {
-   std::cout << "MUERE AQUI\n";
    std::string base = args[1];
-   std::cout << "MUERE AQUI\n";
    std::transform(base.begin(), base.end(), base.begin(), ::tolower);
    switch (str2int(base.c_str())) {
-      case str2int("dec"): thePNGDecoder.setOutputNumberFormat(TNumberFormat::decimal);     break;
-      case str2int("hex"): thePNGDecoder.setOutputNumberFormat(TNumberFormat::hexadecimal); break;
-      case str2int("bin"): thePNGDecoder.setOutputNumberFormat(TNumberFormat::binary_text); break;
+      case str2int("dec"): g_thePNGDecoder.setOutputNumberFormat(TNumberFormat::decimal);     break;
+      case str2int("hex"): g_thePNGDecoder.setOutputNumberFormat(TNumberFormat::hexadecimal); break;
+      case str2int("bin"): g_thePNGDecoder.setOutputNumberFormat(TNumberFormat::binary_text); break;
       default: error( { "'", base, "' is not a valid numerical base for '", args[0], "'. Valid bases are: dec, bin, hex."} ); 
    }
 }
+
+void setOutputFolder(const TArgs& args) {
+   g_outputFolder = removeRepetitions(args[1], '/');
+   ensureOnly1CharBack(g_outputFolder, '/');
+   if ( !isFolderWritable(g_outputFolder.c_str()) ) error ({ "Folder '", g_outputFolder, "' does not exist, is not a folder or is not writable." });
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STRUCTURE TO HOLD THE COMMAND LINE OPTION MODIFIERS AND THE FUNCTIONS THAT
@@ -123,7 +132,7 @@ struct ParseFunction_t {
    std::function<void(const TArgs&)> parseFunc;
 };
 
-constexpr uint16_t knum_modifiers = 12;
+constexpr uint16_t knum_modifiers = 13;
 
 using std::placeholders::_1;
 std::array<ParseFunction_t, knum_modifiers> Modifiers {{
@@ -138,6 +147,7 @@ std::array<ParseFunction_t, knum_modifiers> Modifiers {{
    ,  { "-gs"  , "--generate-s"            , 0, std::bind(generate, PNGDecoder::_S, _1) }
    ,  { "-gtrm", "--generate-terminal"     , 0, std::bind(generate, PNGDecoder::_DRAW, _1) }
    ,  { "-nb"  , "--number-base"           , 1, std::bind(changeNumberBase, _1) }
+   ,  { "-of"  , "--output-folder"         , 1, std::bind(setOutputFolder, _1) }
    ,  { "-h"   , "--help"                  , 0, std::bind(callUsage, "cpct_png2chars", _1) }
 }};
 
@@ -148,8 +158,13 @@ void parseArguments(const TArgs& args) {
    // Check that the number of arguments is valid
    if (args.size() < 2) throw std::bad_exception();
 
+   // FIRST ARGUMENT MUST BE THE FILENAME
+   // Start the PNG Decoder with the given filename
+   g_fileBasename = notdir(basename(args[1]), '/');
+   g_thePNGDecoder.readFile(args[1]);
+
    // PARSE ARGUMENTS ONE BY ONE
-   for(std::size_t i=1; i < args.size(); ++i) {
+   for(std::size_t i=2; i < args.size(); ++i) {
       const auto& a = args[i];
 
       // Is it a Modifier?
@@ -174,43 +189,15 @@ void parseArguments(const TArgs& args) {
             }
          }
          // No modifier coincides with this argument
-         error({ "Unrecognized modifier '", a, "' " });
+         error({ "Unrecognized modifier '", a, "'. Check -h | --help for a complete list of valid modifiers." });
       } else {
-         // Not a modifier
-         thePNGDecoder.readFile(a);
+         // Not a modifier, unrecognized 
+         error({ "Unexpected parameter '", a, "'. After the filename, all values must be '-' modifiers with their own parameters." });
       }
 
       nextarg:
       ;
    }
-
-/*
-
-
-      //------------------------ SELECT OUTPUT FOLDER
-      } else if (a == "-of" || a == "--output-folder") {
-         if (i + 1 >= args.size()) error( { "Modifier '-of | --output-folder' needs to be followed by a folder, but nothing found."} );
-         g_outputFolder = removeRepetitions(args[i + 1], '/');
-         ensureOnly1CharBack(g_outputFolder, '/');
-         if ( !isFolderWritable(g_outputFolder.c_str()) ) error ({ "Folder '", g_outputFolder, "' does not exist, is not a folder or is not writable." });
-
-         ++i;
-      
-      //------------------------ TMX FILE
-      } else {
-         filename = args[i];
-         g_fileBasename = notdir(basename(filename), '/');
-      }
-   }
-
-   // Load the TMX with selected options
-   if (filename == "") error( { "No TMX file given. A TMX file is required to parse its contents." } );
-   g_theTilemap.loadMap(filename.c_str());
-
-   // If no generation flags selected, turn on default values
-   if ( !g_generate_flags ) 
-      g_generate_flags = g_GENFLAG_C | g_GENFLAG_H;
-*/
 }
 
 
@@ -224,7 +211,7 @@ int main(int argc, char **argv) {
       TArgs args(argv, argv + argc);
       parseArguments(args);
 
-      thePNGDecoder.convert();
+      g_thePNGDecoder.convert(g_outputFolder, g_fileBasename);
    } catch (const std::runtime_error& e) {
       std::cerr << "### ERROR ###\n";
       std::cerr << " - " << e.what() << "\n";
