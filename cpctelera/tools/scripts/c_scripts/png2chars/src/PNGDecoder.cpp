@@ -52,19 +52,19 @@ PNGDecoder::readFile(std::string filename) {
    // Set-up conversors array
    auto cnit = m_conversors.begin();
    cnit->conv = std::make_unique<CConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _C; cnit->ext = ".c"; ++cnit;
+   cnit->flag = _C; cnit->ext = ".c"; cnit->formatName = "C-SOURCE"; ++cnit;
    cnit->conv = std::make_unique<ASMConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _S; cnit->ext = ".s"; ++cnit;
+   cnit->flag = _S; cnit->ext = ".s"; cnit->formatName = "ASM-ASZ80-SOURCE"; ++cnit;
    cnit->conv = std::make_unique<BASICConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _BAS; cnit->ext = ".bas"; ++cnit;
+   cnit->flag = _BAS; cnit->ext = ".bas"; cnit->formatName = "BASIC"; ++cnit;
    cnit->conv = std::make_unique<BINConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _BIN; cnit->ext = ".bin"; ++cnit;
+   cnit->flag = _BIN; cnit->ext = ".bin"; cnit->formatName = "RAW BINARY"; ++cnit;
    cnit->conv = std::make_unique<HConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _H; cnit->ext = ".h"; ++cnit;
+   cnit->flag = _H; cnit->ext = ".h"; cnit->formatName = "C-HEADER"; ++cnit;
    cnit->conv = std::make_unique<HSConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _HS; cnit->ext = ".h.s"; ++cnit;
+   cnit->flag = _HS; cnit->ext = ".h.s"; cnit->formatName = "ASM-ASZ80-HEADER"; ++cnit;
    cnit->conv = std::make_unique<TerminalTestDrawConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _DRAW; cnit->ext = ".txt"; ++cnit;
+   cnit->flag = _DRAW; cnit->ext = ".txt"; cnit->formatName = "TEXT/TERMINAL DRAWING"; ++cnit;
 }
 
 void
@@ -75,20 +75,37 @@ PNGDecoder::setForAll(std::function<void(ConversorPack&)>&& f) {
 void 
 PNGDecoder::convert(std::string& outputFolder, std::string& fileBaseName) const {
    if ( outputFolder != "" ) {
+      // General message when converting to files
+      std::cerr << C_INVERTED_LIGHT_YELLOW << " CPCT_PNG2CHARS: " << C_LIGHT_YELLOW << " Conversion Started ("<< C_YELLOW << fileBaseName << C_LIGHT_YELLOW << ")\n";
+      std::cerr << C_LIGHT_CYAN     << "Converting file:     '"<< C_WHITE << m_filename << C_LIGHT_CYAN << "'\n";
+      std::cerr << C_LIGHT_CYAN     << "File size:           '"<< C_WHITE << m_width << "x" << m_height << C_LIGHT_CYAN << "' pixels" << "\n";
+      std::cerr << C_LIGHT_CYAN     << "Selected conversors: { " << C_WHITE;
+      for(auto&& c : m_conversors) {
+         if ( m_generate & c.flag ) {
+            std::cerr << c.formatName << " ";
+         }
+      }
+      std::cerr << C_LIGHT_CYAN << "}\n";
+      std::cerr << C_LIGHT_CYAN     << "Output folder:       '" << C_WHITE << outputFolder << C_LIGHT_CYAN << "'\n";
+      std::cerr << C_LIGHT_GREEN    << "Converting...\n";
+
       // Converting To Files
       for(auto&& c : m_conversors) {
          if ( m_generate & c.flag ) {
             std::string filename = outputFolder + "/" + fileBaseName + c.ext;
 
-            std::cerr << "* Converting: '" << m_filename << "' => '"<< filename << "'...";
+            std::cerr << C_LIGHT_CYAN << " * ";
+            std::cerr << C_BLUE << "Producing file '"<< C_WHITE << filename << C_BLUE << "'\t (" << C_WHITE << c.formatName << C_BLUE << ") ...";
 
             std::ofstream file(filename);
             if (!file) error({ "There was an error opening file '", filename, "' for writting. Please check output folder, permissions and disk space." });
             c.conv->convert(file);
 
-            std::cerr << "Ok!\n";
+            std::cerr << C_LIGHT_GREEN << "Ok!\n";
          }
       }      
+      std::cerr << C_INVERTED_LIGHT_GREEN << " CPCT_PNG2CHARS: " << C_LIGHT_GREEN << " Conversion finished ("<< C_GREEN << fileBaseName << C_LIGHT_GREEN << ")\n";
+      std::cerr << C_NORMAL;
    } else {
       // Converting to STD::COUT
       for(auto&& c : m_conversors) {

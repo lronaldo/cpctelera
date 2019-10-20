@@ -60,6 +60,7 @@ struct PNGDecoder {
       std::unique_ptr<RGBAConversor> conv;
       PNGDecoder::Generate flag;
       std::string ext;
+      std::string formatName;
    };
    using TArrayConversors  = std::array<ConversorPack, knum_conversors>;
    
