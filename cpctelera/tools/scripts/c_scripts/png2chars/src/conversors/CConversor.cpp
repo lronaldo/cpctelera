@@ -13,10 +13,10 @@ CConversor::outputCharDefs_p(
    out << std::hex << std::setfill('0');
    for (uint8_t i=0; i < size-1; ++i) {
       out << "0x" << std::setw(2) 
-                  << uint16_t(chardef[i]) << ",";
+                  << cast8bit2print(chardef[i]) << ",";
    }
    out   << "0x"  << std::setw(2)
-                  << uint16_t(chardef[size-1]) << "\n";
+                  << cast8bit2print(chardef[size-1]) << "\n";
    out << std::dec << std::setfill(' ');
 }
 

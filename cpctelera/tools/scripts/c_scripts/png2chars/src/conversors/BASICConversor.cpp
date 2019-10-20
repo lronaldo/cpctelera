@@ -9,7 +9,7 @@ BASICConversor::outputCharDefs_p(
 {
    out << line << " SYMBOL " << symbol;
    for (auto c : chardef) {
-      out << "," << uint16_t(c);
+      out << "," << cast8bit2print(c);
    }
    out << "\n";
 }

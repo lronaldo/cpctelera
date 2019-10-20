@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <ostream>
 #include <array>
+#include <chrono>
+#include <ctime>
+#include <iostream>
 
 struct RGBAConversor {
    using TArrayChar8x8 = std::array<char, 8>;
@@ -38,7 +41,7 @@ protected:
 
    // Protected functions
    TArrayChar8x8 getNextChar_p() const {
-      TArrayChar8x8 chardef;
+      TArrayChar8x8 chardef{};
 
       // If coordinates outside image, return blank character
       if (m_convWidth >= m_width || m_convHeight >= m_height)
@@ -46,12 +49,12 @@ protected:
 
       // Set pointer to current widht and height
       const unsigned char* pixels = m_image;
-      pixels +=  m_convHeight * m_width*4
+      pixels +=   m_convHeight * m_width*4
                +  m_convWidth * 4;
 
       // Perform conversion
       for (uint16_t i=0; i < 8;  ++i) {
-         unsigned char row { 0 };
+         char row { 0 };
          for (uint16_t j=0; j < 8; ++j) { 
             uint16_t val = *pixels + *(pixels+1) + *(pixels+2);
             row <<= 1;
@@ -71,6 +74,32 @@ protected:
    
       // Return character definition
       return chardef;
+   }
+
+   void outputTextHeader_p(std::ostream& out, const char* comment) const {
+      using namespace std::chrono;
+
+      uint64_t numchars = m_width*m_height / 64;
+      auto now = system_clock::to_time_t( system_clock::now() );
+      std::string date = std::ctime( &now );
+
+      out << comment << "\n";
+      out << comment << " File generated using CPCtelera/cpct_png2chars\n";
+      out << comment << " Date generated: " << date;
+      out << comment << " Original image size: " << m_width << "x" << m_height << " pixels.\n";
+      out << comment << " Characters generated: " << numchars << "\n";
+      out << comment << " Output buffer size: " << 8*numchars << " bytes\n";
+      out << comment << "\n";
+   }
+
+   int16_t cast8bit2print(char n) const {
+      return (n + 0) & 0xFF;
+   }
+   uint16_t cast8bit2print(uint8_t n) const {
+      return (n + 0) & 0xFF;
+   }
+   int16_t cast8bit2print(int8_t n) const {
+      return (n + 0) & 0xFF;
    }
 
    // Protected members
