@@ -47,14 +47,17 @@ PNGDecoder::readFile(std::string filename) {
    if ( m_height & 7 ) error({"Image height (", std::to_string(m_height), ") is not a multiple of 8."});
 
    // Set-up conversors array
-   m_conversors[0].conv = std::make_unique<CConversor>(m_image.data(), m_width, m_height);
-   m_conversors[1].conv = std::make_unique<ASMConversor>(m_image.data(), m_width, m_height);
-   m_conversors[2].conv = std::make_unique<BASICConversor>(m_image.data(), m_width, m_height);
-   m_conversors[3].conv = std::make_unique<TerminalTestDrawConversor>(m_image.data(), m_width, m_height);
-   m_conversors[0].flag = _C;
-   m_conversors[1].flag = _S;
-   m_conversors[2].flag = _BAS;
-   m_conversors[3].flag = _DRAW;
+   auto cnit = m_conversors.begin();
+   cnit->conv = std::make_unique<CConversor>(m_image.data(), m_width, m_height);
+   cnit->flag = _C; ++cnit;
+   cnit->conv = std::make_unique<ASMConversor>(m_image.data(), m_width, m_height);
+   cnit->flag = _S; ++cnit;
+   cnit->conv = std::make_unique<BASICConversor>(m_image.data(), m_width, m_height);
+   cnit->flag = _BAS; ++cnit;
+   cnit->conv = std::make_unique<BINConversor>(m_image.data(), m_width, m_height);
+   cnit->flag = _BIN; ++cnit;
+   cnit->conv = std::make_unique<TerminalTestDrawConversor>(m_image.data(), m_width, m_height);
+   cnit->flag = _DRAW; ++cnit;
 }
 
 void

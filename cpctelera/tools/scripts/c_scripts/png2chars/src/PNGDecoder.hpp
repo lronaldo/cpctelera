@@ -22,6 +22,7 @@
 #include <conversors/CConversor.hpp>
 #include <conversors/ASMConversor.hpp>
 #include <conversors/BASICConversor.hpp>
+#include <conversors/BINConversor.hpp>
 #include <conversors/TerminalTestDrawConversor.hpp>
 
 #include <vector>
@@ -33,10 +34,13 @@
 // Forward declarations
 struct RGBAConversor;
 
-using TVecUchar         = std::vector<unsigned char>;
-using TArrayChar8x8     = std::array<unsigned char, 8>;
+using TVecUchar      = std::vector<unsigned char>;
+using TArrayChar8x8  = std::array<unsigned char, 8>;
 
 struct PNGDecoder {
+   // Total number of conversors
+   static constexpr uint16_t knum_conversors { 5 };
+
    // Types
    enum Generate {
          _C    = 0x01
@@ -52,7 +56,7 @@ struct PNGDecoder {
       std::unique_ptr<RGBAConversor> conv;
       PNGDecoder::Generate flag;
    };
-   using TArrayConversors  = std::array<ConversorPack, 4>;
+   using TArrayConversors  = std::array<ConversorPack, knum_conversors>;
    
    // Explicit initialization
    explicit PNGDecoder();

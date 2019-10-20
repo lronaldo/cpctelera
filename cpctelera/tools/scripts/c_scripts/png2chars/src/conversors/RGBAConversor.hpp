@@ -5,7 +5,7 @@
 #include <array>
 
 struct RGBAConversor {
-   using TArrayChar8x8 = std::array<unsigned char, 8>;
+   using TArrayChar8x8 = std::array<char, 8>;
 
    // Explicit construction (non-default)
    explicit RGBAConversor(const unsigned char* img, uint64_t w, uint64_t h) 

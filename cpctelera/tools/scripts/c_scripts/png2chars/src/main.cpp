@@ -108,11 +108,14 @@ struct ParseFunction_t {
    std::function<void(const TArgs&)> parseFunc;
 };
 
+constexpr uint16_t knum_modifiers = 9;
+
 using std::placeholders::_1;
-std::array<ParseFunction_t, 8> Modifiers {{
+std::array<ParseFunction_t, knum_modifiers> Modifiers {{
       { "-alc" , "--asm-local-constants"   , 0, std::bind(setASMConstantsLocal, true, _1) }
    ,  { "-au"  , "--add-underscore-s-vars" , 0, std::bind(setASMVariablesPrefix, '_', _1) }
    ,  { "-ci"  , "--c-identifier"          , 1, std::bind(setCID, _1) }
+   ,  { "-gb"  , "--generate-binary"       , 0, std::bind(generate, PNGDecoder::_BIN, _1) }
    ,  { "-gbas", "--generate-basic"        , 0, std::bind(generate, PNGDecoder::_BAS, _1) }
    ,  { "-gc"  , "--generate-c"            , 0, std::bind(generate, PNGDecoder::_C, _1) }
    ,  { "-gs"  , "--generate-s"            , 0, std::bind(generate, PNGDecoder::_S, _1) }
