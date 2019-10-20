@@ -16,12 +16,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
+#include <helpers.h>
+#include <PNGDecoder.hpp>
+
 #include <iostream>
 #include <cstdint>
 #include <array>
 #include <functional>
-#include <helpers.h>
-#include <PNGDecoder.hpp>
+#include <algorithm>
 
 
 PNGDecoder thePNGDecoder;
@@ -97,6 +99,19 @@ void generate(uint8_t gen, const TArgs& args) {
    thePNGDecoder.setGenerate(gen);
 }
 
+void changeNumberBase(const TArgs& args) {
+   std::cout << "MUERE AQUI\n";
+   std::string base = args[1];
+   std::cout << "MUERE AQUI\n";
+   std::transform(base.begin(), base.end(), base.begin(), ::tolower);
+   switch (str2int(base.c_str())) {
+      case str2int("dec"): thePNGDecoder.setOutputNumberFormat(TNumberFormat::decimal);     break;
+      case str2int("hex"): thePNGDecoder.setOutputNumberFormat(TNumberFormat::hexadecimal); break;
+      case str2int("bin"): thePNGDecoder.setOutputNumberFormat(TNumberFormat::binary_text); break;
+      default: error( { "'", base, "' is not a valid numerical base for '", args[0], "'. Valid bases are: dec, bin, hex."} ); 
+   }
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STRUCTURE TO HOLD THE COMMAND LINE OPTION MODIFIERS AND THE FUNCTIONS THAT
 // WILL BE CALLED WHEN EACH OF THIS MODIFIERS IS MET
@@ -108,7 +123,7 @@ struct ParseFunction_t {
    std::function<void(const TArgs&)> parseFunc;
 };
 
-constexpr uint16_t knum_modifiers = 10;
+constexpr uint16_t knum_modifiers = 12;
 
 using std::placeholders::_1;
 std::array<ParseFunction_t, knum_modifiers> Modifiers {{
@@ -119,8 +134,10 @@ std::array<ParseFunction_t, knum_modifiers> Modifiers {{
    ,  { "-gbas", "--generate-basic"        , 0, std::bind(generate, PNGDecoder::_BAS, _1) }
    ,  { "-gc"  , "--generate-c"            , 0, std::bind(generate, PNGDecoder::_C, _1) }
    ,  { "-gh"  , "--generate-h"            , 0, std::bind(generate, PNGDecoder::_H, _1) }
+   ,  { "-ghs" , "--generate-h-s"          , 0, std::bind(generate, PNGDecoder::_HS, _1) }
    ,  { "-gs"  , "--generate-s"            , 0, std::bind(generate, PNGDecoder::_S, _1) }
    ,  { "-gtrm", "--generate-terminal"     , 0, std::bind(generate, PNGDecoder::_DRAW, _1) }
+   ,  { "-nb"  , "--number-base"           , 1, std::bind(changeNumberBase, _1) }
    ,  { "-h"   , "--help"                  , 0, std::bind(callUsage, "cpct_png2chars", _1) }
 }};
 
@@ -168,19 +185,7 @@ void parseArguments(const TArgs& args) {
    }
 
 /*
-      //------------------------ SELECT NUMBER BASE
-      } else if (a == "-nb" || a == "--number-base") {
-         if (i + 1 >= args.size()) error( { "Modifier '-nb | --number-base' needs to be followed by selected numerical base (dec, bin or hex), but nothing found."} );
-         std::string base = args[i+1];
-         std::transform(base.begin(), base.end(), base.begin(), ::tolower);
-         switch (str2int(base.c_str())) {
-            case str2int("dec"): g_theTilemap.setOutputNumberFormat(TNumberFormat::decimal);     break;
-            case str2int("hex"): g_theTilemap.setOutputNumberFormat(TNumberFormat::hexadecimal); break;
-            case str2int("bin"): g_theTilemap.setOutputNumberFormat(TNumberFormat::binary_text); break;
-            default: error( { "'", base, "' is not a valid numerical base for '-nb | --number-base'. Valid bases are: dec, bin, hex."} ); 
-         }
 
-         ++i;
 
       //------------------------ SELECT OUTPUT FOLDER
       } else if (a == "-of" || a == "--output-folder") {

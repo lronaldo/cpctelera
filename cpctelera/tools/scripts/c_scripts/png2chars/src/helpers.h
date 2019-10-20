@@ -28,6 +28,12 @@
 // TYPES
 typedef std::vector<std::string> TArgs;
 
+enum class TNumberFormat {
+      decimal
+   ,  hexadecimal
+   ,  binary_text
+};
+
 // CONSTANTS
 // Colors definitions
 const std::string C_LIGHT_RED { "\033[1;31;49m" };

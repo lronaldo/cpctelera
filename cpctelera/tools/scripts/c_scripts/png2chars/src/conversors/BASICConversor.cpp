@@ -9,7 +9,8 @@ BASICConversor::outputCharDefs_p(
 {
    out << line << " SYMBOL " << symbol;
    for (auto c : chardef) {
-      out << "," << cast8bit2print(c);
+      out << ",";
+      print8bitNumberFormatted(out, c, true);
    }
    out << "\n";
 }

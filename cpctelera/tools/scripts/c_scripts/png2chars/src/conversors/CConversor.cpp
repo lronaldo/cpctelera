@@ -10,14 +10,12 @@ CConversor::outputCharDefs_p(
    uint16_t size = chardef.size();
 
    out << " /* " << std::setw(3) << charnum << " */ " << comma;
-   out << std::hex << std::setfill('0');
    for (uint8_t i=0; i < size-1; ++i) {
-      out << "0x" << std::setw(2) 
-                  << cast8bit2print(chardef[i]) << ",";
+      print8bitNumberFormatted(out, chardef[i]);
+      out << ",";
    }
-   out   << "0x"  << std::setw(2)
-                  << cast8bit2print(chardef[size-1]) << "\n";
-   out << std::dec << std::setfill(' ');
+   print8bitNumberFormatted(out, chardef[size-1]);
+   out << "\n" << std::dec << std::setfill(' ');
 }
 
 void 

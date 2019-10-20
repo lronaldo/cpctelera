@@ -10,11 +10,11 @@ ASMConversor::outputCharDefs_p(
    uint16_t size = chardef.size();
 
    out << " .db ";
-   out << std::hex << std::setfill('0');
    for (uint8_t i=0; i < size-1; ++i) {
-      out << "0x" << std::setw(2) << cast8bit2print(chardef[i]) << ",";
+      print8bitNumberFormatted(out, chardef[i]);
+      out << ",";
    }
-   out << "0x" << std::setw(2) << cast8bit2print(chardef[size-1]);
+   print8bitNumberFormatted(out, chardef[size-1]);
    out << std::dec << std::setfill(' ');
    out << "  ;; " << std::setw(3) << std::dec << charnum << "\n";
 }

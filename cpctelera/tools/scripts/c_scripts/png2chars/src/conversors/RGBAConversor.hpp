@@ -1,11 +1,13 @@
 #pragma once
 
+#include <helpers.h>
+
 #include <cstdint>
 #include <ostream>
 #include <array>
 #include <chrono>
 #include <ctime>
-#include <iostream>
+#include <iomanip>
 
 struct RGBAConversor {
    using TArrayChar8x8 = std::array<char, 8>;
@@ -26,6 +28,7 @@ struct RGBAConversor {
    void setCIdentifier(const char* cid)   { setCIdentifier_p(cid); }
    void setLocalConstant(bool l)          { setLocalConstant_p(l); }
    void setCharPrefix(char p)             { setCharPrefix_p(p); }
+   void setNumberFormat(TNumberFormat nf) { m_format = nf; }
 
 protected:
    // Pure virtual function to make this class abstract (non-instantiable)
@@ -86,7 +89,7 @@ protected:
       out << comment << "\n";
       out << comment << " File generated using CPCtelera/cpct_png2chars\n";
       out << comment << " Date generated: " << date;
-      out << comment << " Original image size: " << m_width << "x" << m_height << " pixels.\n";
+      out << comment << " Original image size: " << m_width << "x" << m_height << " pixels\n";
       out << comment << " Characters generated: " << numchars << "\n";
       out << comment << " Output buffer size: " << 8*numchars << " bytes\n";
       out << comment << "\n";
@@ -102,7 +105,35 @@ protected:
       return (n + 0) & 0xFF;
    }
 
+   template <typename NumType>
+   void print8bitNumberFormatted(std::ostream &out, NumType n8bits, bool basic=false) const {
+      auto num = cast8bit2print(n8bits);
+      switch (m_format) {
+         case TNumberFormat::decimal:     { 
+            out << std::dec << std::setw(3) << std::setfill(' ') << num;
+            break;
+         }
+         case TNumberFormat::hexadecimal: { 
+            if (basic) out << "&";
+            else       out << "0x";
+            out << std::hex << std::setw(2) << std::setfill('0') << num; break; 
+            break;
+         }
+         case TNumberFormat::binary_text: { 
+            if (basic) out << "&x";
+            else       out << "0b";
+            for (uint8_t i = 0; i < 8; ++i) {
+               if ( num & 0x80 ) out << '1';
+               else              out << '0';
+               num <<= 1;
+            }
+            break;
+         }
+      }
+   }
+
    // Protected members
+   TNumberFormat        m_format { TNumberFormat::hexadecimal };
    const unsigned char* m_image {nullptr};
    uint64_t             m_width {0}, m_height {0};
    mutable uint64_t     m_convWidth {0}, m_convHeight {0};

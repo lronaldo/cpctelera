@@ -10,7 +10,7 @@ RM      :=rm -rf
 
 CC      :=gcc
 CXX     :=g++
-CXXFLAGS:=-std=c++14 -Wall -fsigned-char -pedantic -O3
+CXXFLAGS:=-std=c++14 -Wall -fsigned-char -pedantic
 LDLIBS  :=
 SUBLIBS :=
 

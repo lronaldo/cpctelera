@@ -21,10 +21,12 @@
 #include <conversors/RGBAConversor.hpp>
 #include <conversors/CConversor.hpp>
 #include <conversors/HConversor.hpp>
+#include <conversors/HSConversor.hpp>
 #include <conversors/ASMConversor.hpp>
 #include <conversors/BASICConversor.hpp>
 #include <conversors/BINConversor.hpp>
 #include <conversors/TerminalTestDrawConversor.hpp>
+#include <helpers.h>
 
 #include <vector>
 #include <cstdint>
@@ -40,7 +42,7 @@ using TArrayChar8x8  = std::array<unsigned char, 8>;
 
 struct PNGDecoder {
    // Total number of conversors
-   static constexpr uint16_t knum_conversors { 6 };
+   static constexpr uint16_t knum_conversors { 7 };
 
    // Types
    enum Generate {
@@ -53,6 +55,7 @@ struct PNGDecoder {
       ,  _DRAW = 0x40
       ,  _DEF  = 0x80
    };
+
    struct ConversorPack {
       std::unique_ptr<RGBAConversor> conv;
       PNGDecoder::Generate flag;
@@ -73,6 +76,10 @@ struct PNGDecoder {
    void setASMConstantLocal(bool l) {
       setForAll( [l](ConversorPack& c) { c.conv->setLocalConstant(l); });
    }
+   void setOutputNumberFormat(TNumberFormat nf) {
+      setForAll( [nf](ConversorPack& c) { c.conv->setNumberFormat(nf); });
+   }
+
    void setGenerate(uint8_t gen) { 
       if ( m_generate & _DEF ) m_generate = gen;   // Remove defaults
       else m_generate |= gen;                      // Add new value, defaults are already removed
