@@ -84,7 +84,10 @@ enable output to files."
       << "\n\n" << C_NORMAL;
 }
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// COMMAND LINE PARAMETER PROCESSING FUNCTIONS
+//  These functions are called when any of the command line switches is detected
+//
 void setASMConstantsLocal(bool st, const TArgs& args) {
    g_thePNGDecoder.setASMConstantLocal(st);
 }

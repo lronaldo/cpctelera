@@ -7,7 +7,7 @@ BASICConversor::outputCharDefs_p(
       std::ostream& out, const TArrayChar8x8& chardef
    ,  uint16_t symbol, uint16_t line) const 
 {
-   out << line << " SYMBOL " << symbol;
+   out << std::dec << line << " SYMBOL " << symbol;
    for (auto c : chardef) {
       out << ",";
       print8bitNumberFormatted(out, c, true);

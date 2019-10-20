@@ -95,4 +95,5 @@ private:
    uint64_t          m_width {0}, m_height {0};
    uint8_t           m_generate { _DEF | _C | _H };
    TArrayConversors  m_conversors{};
+   std::string       m_filename{};
 };

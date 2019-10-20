@@ -28,7 +28,8 @@ CConversor::convert_p(std::ostream& out) const {
 
    // Convert characters to C
    start_p();
-   out << m_c_identifier << "[8*" << numchars << "] = {\n";
+   out << "#include <cpctelera.h>\n\n";
+   out << "u8 " << m_c_identifier << "[8*" << numchars << "] = {\n";
    outputCharDefs_p( out, getNextChar_p(), sym, ' ');
    for (uint32_t i=1; i < numchars; ++i) {
       ++sym;

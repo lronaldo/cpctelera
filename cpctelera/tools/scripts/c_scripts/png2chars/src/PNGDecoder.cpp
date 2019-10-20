@@ -33,6 +33,9 @@ PNGDecoder::PNGDecoder() {}
 
 void 
 PNGDecoder::readFile(std::string filename) {
+   // Save filename for later use
+   m_filename = filename;
+
    // Read PNG file into memory
    std::ifstream fontfile(filename, std::ios::binary);
    if ( !fontfile ) error({"File '", filename, "' could not be opened."});  
@@ -76,9 +79,14 @@ PNGDecoder::convert(std::string& outputFolder, std::string& fileBaseName) const 
       for(auto&& c : m_conversors) {
          if ( m_generate & c.flag ) {
             std::string filename = outputFolder + "/" + fileBaseName + c.ext;
+
+            std::cerr << "* Converting: '" << m_filename << "' => '"<< filename << "'...";
+
             std::ofstream file(filename);
             if (!file) error({ "There was an error opening file '", filename, "' for writting. Please check output folder, permissions and disk space." });
             c.conv->convert(file);
+
+            std::cerr << "Ok!\n";
          }
       }      
    } else {
