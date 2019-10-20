@@ -52,18 +52,20 @@ UDG characters. \
       << C_CYAN         << "\n          Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)"
       << C_LIGHT_BLUE   << "\n   -ci  | --c-identifier <id>"
       << C_CYAN         << "\n          Sets the C/ASM-identifier that will be used for the generated array (Default: filename)"
+      << C_LIGHT_BLUE   << "\n   -gb  | --generate-bin"
+      << C_CYAN         << "\n          Generates a BIN file with raw data of the UDG character definitions (same values as C array) (Default: no). Defaults are set to false on using this flag."
+      << C_LIGHT_BLUE   << "\n   -gbas| --generate-basic"
+      << C_CYAN         << "\n          Generates a .BAS file with SYMBOL lines containing the UDG definitions (Default: no). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -gc  | --generate-c"
       << C_CYAN         << "\n          Generates a C file with an array all UDG definitions together, one per line (Default: yes). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -gh  | --generate-h"
       << C_CYAN         << "\n          Generates a .H file with the declaration of the array for C file (Default: yes). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -ghs | --generate-h-s"
       << C_CYAN         << "\n          Generates a .H.S file with the declaration of the array for ASM file (Default: no). Defaults are set to false on using this flag."
-      << C_LIGHT_BLUE   << "\n   -gb  | --generate-bin"
-      << C_CYAN         << "\n          Generates a BIN file with raw data of the UDG character definitions (same values as C array) (Default: no). Defaults are set to false on using this flag."
-      << C_LIGHT_BLUE   << "\n   -gbas| --generate-basic"
-      << C_CYAN         << "\n          Generates a .BAS file with SYMBOL lines containing the UDG definitions (Default: no). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -gs  | --generate-asm"
       << C_CYAN         << "\n          Generates a .S (ASM) file with UDG character definitions in one array (same values as C array) (Default: no). Defaults are set to false on using this flag."
+      << C_LIGHT_BLUE   << "\n   -gtrm| --generate-terminal"
+      << C_CYAN         << "\n          Generates a terminal output which draws all UDG in 8x8 character matrices. This is for testing purposes. (Default: no). Defaults are set to false on using this flag."
       << C_LIGHT_BLUE   << "\n   -h   | --help"
       << C_CYAN         << "\n          Shows this help information."
       << C_LIGHT_BLUE   << "\n   -nb  | --number-base <base>"
@@ -107,13 +109,14 @@ struct ParseFunction_t {
 };
 
 using std::placeholders::_1;
-std::array<ParseFunction_t, 7> Modifiers {{
+std::array<ParseFunction_t, 8> Modifiers {{
       { "-alc" , "--asm-local-constants"   , 0, std::bind(setASMConstantsLocal, true, _1) }
    ,  { "-au"  , "--add-underscore-s-vars" , 0, std::bind(setASMVariablesPrefix, '_', _1) }
    ,  { "-ci"  , "--c-identifier"          , 1, std::bind(setCID, _1) }
+   ,  { "-gbas", "--generate-basic"        , 0, std::bind(generate, PNGDecoder::_BAS, _1) }
    ,  { "-gc"  , "--generate-c"            , 0, std::bind(generate, PNGDecoder::_C, _1) }
    ,  { "-gs"  , "--generate-s"            , 0, std::bind(generate, PNGDecoder::_S, _1) }
-   ,  { "-gbas", "--generate-basic"        , 0, std::bind(generate, PNGDecoder::_BAS, _1) }
+   ,  { "-gtrm", "--generate-terminal"     , 0, std::bind(generate, PNGDecoder::_DRAW, _1) }
    ,  { "-h"   , "--help"                  , 0, std::bind(callUsage, "cpct_png2chars", _1) }
 }};
 
@@ -205,6 +208,7 @@ void parseArguments(const TArgs& args) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN ENTRY POINT OF THE SCRIPT
 //
+#include <memory>
 int main(int argc, char **argv) {
    // Get and parse commandline arguments
    try {

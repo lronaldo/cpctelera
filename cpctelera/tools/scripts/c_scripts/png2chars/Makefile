@@ -10,7 +10,7 @@ RM      :=rm -rf
 
 CC      :=gcc
 CXX     :=g++
-CXXFLAGS:=-std=c++17 -Wall -fsigned-char -pedantic -O3
+CXXFLAGS:=-std=c++14 -Wall -fsigned-char -pedantic -O3
 LDLIBS  :=
 SUBLIBS :=
 
@@ -19,25 +19,23 @@ SUBLIBS :=
 vpath %.hpp $(INCDIRS)
 vpath %.h   $(INCDIRS)
 vpath %.cpp $(SRCDIR)
-vpath %.cc $(SRCDIR)
 vpath %.o $(OBJDIR)
 
 HEADERS := $(foreach D,$(INCDIRS),$(shell find $(D)/ -type f -name '*.h') $(shell find $(D)/ -type f -name '*.hpp'))
-SRCS    := $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/*.cpp)
-OBJS    := $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cc,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
+SRCS    := $(shell find $(SRCDIR) -type f -iname '*.cpp')
+OBJS    := $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cpp,%.o,$(SRCS)))
 APP     := $(BINDIR)/${APPNAME}
 INCMODS := $(foreach D,$(INCDIRS),-I$(D))
 SUBLIBOBJS := $(foreach L,$(SUBLIBS),$(LIBDIR)/$(L)/bin/$(L).a)
+SRCSUBDIRS := $(filter-out $(SRCDIR),$(shell find $(SRCDIR) -type d))
+OBJSUBDIRS := $(OBJDIR) $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(SRCSUBDIRS))
 
 all: cygwinstaticbuild $(APP)
 
-$(APP): $(SUBLIBOBJS) $(BINDIR) $(OBJDIR) $(OBJS)
+$(APP): $(SUBLIBOBJS) $(BINDIR) $(OBJSUBDIRS) $(OBJS)
 	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) $(SUBLIBOBJS)
 
-$(OBJDIR)/%.o: %.cc
-	$(CXX) $(CXXFLAGS) -o $@ -c $(INCMODS) $<
-
-$(OBJDIR)/%.o: %.cpp
+$(OBJDIR)/%.o: %.cpp 
 	$(CXX) $(CXXFLAGS) -o $@ -c $(INCMODS) $<
 
 %.a:
@@ -58,12 +56,14 @@ showVars:
 	$(info $(HEADERS))
 	$(info $(SRCS))
 	$(info $(OBJS))
+	$(info $(SRCSUBDIRS))
+	$(info $(OBJSUBDIRS))
 
 $(BINDIR): 
 	@$(MKDIR) $(BINDIR)
 
-$(OBJDIR): 
-	@$(MKDIR) $(OBJDIR)
+$(OBJSUBDIRS): 
+	@$(MKDIR) "$@"
 	
 clean:
 	$(RM) $(OBJDIR)

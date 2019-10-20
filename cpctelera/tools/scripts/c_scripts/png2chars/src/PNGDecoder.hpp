@@ -18,53 +18,68 @@
 
 #pragma once
 
+#include <conversors/RGBAConversor.hpp>
+#include <conversors/CConversor.hpp>
+#include <conversors/ASMConversor.hpp>
+#include <conversors/BASICConversor.hpp>
+#include <conversors/TerminalTestDrawConversor.hpp>
+
 #include <vector>
 #include <cstdint>
 #include <array>
+#include <memory>
+#include <functional>
 
-using TVecUchar      = std::vector<unsigned char>;
-using TArrayChar8x8  = std::array<unsigned char, 8>;
+// Forward declarations
+struct RGBAConversor;
+
+using TVecUchar         = std::vector<unsigned char>;
+using TArrayChar8x8     = std::array<unsigned char, 8>;
 
 struct PNGDecoder {
+   // Types
    enum Generate {
-         _C  = 0x01
-      ,  _S  = 0x02
-      ,  _HS = 0x04
-      ,  _H  = 0x08
-      ,  _BIN= 0x10
-      ,  _BAS= 0x20
-      ,  _DEF= 0x80
+         _C    = 0x01
+      ,  _S    = 0x02
+      ,  _HS   = 0x04
+      ,  _H    = 0x08
+      ,  _BIN  = 0x10
+      ,  _BAS  = 0x20
+      ,  _DRAW = 0x40
+      ,  _DEF  = 0x80
    };
-
+   struct ConversorPack {
+      std::unique_ptr<RGBAConversor> conv;
+      PNGDecoder::Generate flag;
+   };
+   using TArrayConversors  = std::array<ConversorPack, 4>;
+   
+   // Explicit initialization
    explicit PNGDecoder();
-   void readFile(std::string filename);
-   void startConversion() const;
-   TArrayChar8x8 convertNextCharacter() const;
-   void drawPNGCharacter8x8(const TArrayChar8x8& chardef) const;
-   void outputCharDefsBASIC(const TArrayChar8x8& chardef, uint16_t symbol, uint16_t line) const;
-   void outputCharDefsCArrayData(const TArrayChar8x8& chardef, uint16_t charnum, char comma) const;
-   void outputCharDefsASMData(const TArrayChar8x8& chardef, uint16_t charnum) const;
-   void convertAllCharsToBASIC() const;
-   void convertAllCharsToC() const;
-   void convertAllCharsToASM() const;
-   void convert() const;
-   void drawPNGCharByChar() const;
-   void setCArrayName(std::string cid) { m_CArrayName = cid; }
-   void setIdentifierPrefix(char p) { m_idPrefix = '_'; }
-   void setASMConstantLocal(bool l) { m_asmConstantLocal = l; }
+
+   // Setters
+   void setForAll(std::function<void(ConversorPack&)>&& f);
+   void setCArrayName(std::string cid) {
+      setForAll( [cid](ConversorPack& c) { c.conv->setCIdentifier(cid.c_str()); });
+   }
+   void setIdentifierPrefix(char p) { 
+      setForAll( [p](ConversorPack& c) { c.conv->setCharPrefix(p); });
+   }
+   void setASMConstantLocal(bool l) {
+      setForAll( [l](ConversorPack& c) { c.conv->setLocalConstant(l); });
+   }
    void setGenerate(uint8_t gen) { 
       if ( m_generate & _DEF ) m_generate = gen;   // Remove defaults
       else m_generate |= gen;                      // Add new value, defaults are already removed
    }   
 
+   // Conversion functions
+   void readFile(std::string filename);
+   void convert() const;
+
 private:
    TVecUchar         m_image;
    uint64_t          m_width {0}, m_height {0};
-   uint16_t          m_basicLine {10}, m_basicSymbol {32};
-   std::string       m_CArrayName {"chardata"};
-   char              m_idPrefix {' '};
-   bool              m_asmConstantLocal { false };
    uint8_t           m_generate { _DEF | _C | _H };
-   mutable uint64_t  m_convWidth {0}, m_convHeight {0};
+   TArrayConversors  m_conversors{};
 };
-
