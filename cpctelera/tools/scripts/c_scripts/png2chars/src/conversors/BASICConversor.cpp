@@ -20,6 +20,9 @@ BASICConversor::convert_p(std::ostream& out) const {
    uint16_t line     = m_firstLine;
    uint32_t numchars = m_width*m_height/64;
 
+   // Ouput header information
+   outputTextHeader_p(out, "1 '");
+
    // Convert characters to BASIC
    start_p();
    while(numchars--) {

@@ -25,6 +25,9 @@ CConversor::convert_p(std::ostream& out) const {
    uint16_t sym      = uint16_t(m_firstUDG);
    uint64_t numchars = m_width*m_height/64;
 
+   // Ouput header information
+   outputTextHeader_p(out, "//");
+
    // Convert characters to C
    start_p();
    out << m_c_identifier << "[" << m_width << "*" << m_height << "] = {\n";
