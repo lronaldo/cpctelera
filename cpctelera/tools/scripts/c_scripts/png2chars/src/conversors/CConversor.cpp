@@ -30,7 +30,7 @@ CConversor::convert_p(std::ostream& out) const {
 
    // Convert characters to C
    start_p();
-   out << m_c_identifier << "[" << m_width << "*" << m_height << "] = {\n";
+   out << m_c_identifier << "[8*" << numchars << "] = {\n";
    outputCharDefs_p( out, getNextChar_p(), sym, ' ');
    for (uint32_t i=1; i < numchars; ++i) {
       ++sym;

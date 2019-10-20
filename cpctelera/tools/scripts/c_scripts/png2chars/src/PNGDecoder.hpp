@@ -20,6 +20,7 @@
 
 #include <conversors/RGBAConversor.hpp>
 #include <conversors/CConversor.hpp>
+#include <conversors/HConversor.hpp>
 #include <conversors/ASMConversor.hpp>
 #include <conversors/BASICConversor.hpp>
 #include <conversors/BINConversor.hpp>
@@ -39,7 +40,7 @@ using TArrayChar8x8  = std::array<unsigned char, 8>;
 
 struct PNGDecoder {
    // Total number of conversors
-   static constexpr uint16_t knum_conversors { 5 };
+   static constexpr uint16_t knum_conversors { 6 };
 
    // Types
    enum Generate {

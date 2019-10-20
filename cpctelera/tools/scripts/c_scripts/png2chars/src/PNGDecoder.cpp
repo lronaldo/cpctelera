@@ -56,6 +56,8 @@ PNGDecoder::readFile(std::string filename) {
    cnit->flag = _BAS; ++cnit;
    cnit->conv = std::make_unique<BINConversor>(m_image.data(), m_width, m_height);
    cnit->flag = _BIN; ++cnit;
+   cnit->conv = std::make_unique<HConversor>(m_image.data(), m_width, m_height);
+   cnit->flag = _H; ++cnit;
    cnit->conv = std::make_unique<TerminalTestDrawConversor>(m_image.data(), m_width, m_height);
    cnit->flag = _DRAW; ++cnit;
 }
