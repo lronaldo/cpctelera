@@ -27,11 +27,11 @@
 ;; Description of the bits:
 ;;  > [ GGGIRRnn ]
 ;;    GGG - Command for video mode and ROM selection (100)
-;;    I   - Interrupt Generation Enabled (1)
+;;    I   - Interrupt Generation Reset (0)
 ;;    RR  - Reading from Lower and Upper ROM Disabled (11) (a 0 value means ROM enabled)
 ;;    nn  - Video Mode 1 (01)
 ;;
-;; Default value: 0x9C = (10011100)
+;; Default value: 0x8D = (10001101)
 ;;
-_cpct_mode_rom_status:: .db #0x9D
+_cpct_mode_rom_status:: .db #0x8D
 
