@@ -1,5 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
+;;  Copyright (C) 2019 Arnaud bouche (@Arnaud6128)
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -23,24 +24,16 @@
 ;;
 ;; C bindings for <cpct_drawSolidBox>
 ;;
-;;   29 us, 14 bytes
+;;   19 us, 7 bytes
 ;;
 _cpct_drawSolidBox::
-   ;; GET Parameters from the stack
-   ld   hl, #2      ;; [3] HL Points to SP+2 (first 2 bytes are return address)
-   add  hl, sp      ;; [3]    , to use it for getting parameters from stack
-   ld    e, (hl)    ;; [2] DE = First Parameter (Video memory pointer)
-   inc  hl          ;; [2]
-   ld    d, (hl)    ;; [2]
-   inc  hl          ;; [2]  / Copy first value to video memory (upper-left corner of the box)
-   ldi              ;; [5] (HL)->(DE) Move 2nd parameter (1-byte Colour Pattern) directly into 1st byte of the box in memory
-   ld    c, (hl)    ;; [2] C = Third Parameter (Box Width)
-   inc  hl          ;; [2]
-   ld    b, (hl)    ;; [2] B = Fourth Parameter (Box Height)
-
-   ;; Prepare HL and DE pointers for copying bytes consecutively
-   ld    h, d       ;; [1] HL = DE - 1 (HL Points to the first byte of the box, the one that contains the colour pattern)
-   ld    l, e       ;; [1]
-   dec   hl         ;; [2]
+   ;; GET Parameters from the stack 
+   pop   af         ;; [3] AF = Return Address
+   pop   hl         ;; [3] HL = First Parameter (Video memory pointer)
+   dec   sp         ;; [2] Move SP 1 byte as next parameter (Colour Pattern is 1-Byte length)
+   pop   de         ;; [3] DE = 1-Byte Colour Pattern (D = 1-Byte Colour Pattern, E = not used)
+   ld    e, d       ;; [1] E = D (Colour Pattern)
+   pop   bc         ;; [3] BC = Height/Width (B = Height, C = Width)
+   push  af         ;; [4] Put returning address in the stack again as this function uses __z88dk_callee convention
 
 .include /cpct_drawSolidBox.asm/

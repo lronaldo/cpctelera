@@ -1,5 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
+;;  Copyright (C) 2019 Arnaud bouche (@Arnaud6128)
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -21,14 +22,8 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; AS; bindings for <cpct_drawSolidBox>
-;;
-;;   6 us, 4 bytes
+;; ASM bindings for <cpct_drawSolidBox>
 ;;
 cpct_drawSolidBox_asm::    
-   ld    h, d    ;; [1] HL = DE (HL Points to the first byte of the box, 
-   ld    l, e    ;; [1] ... the one that will contain the colour pattern)
-   ld (de), a    ;; [2] Copy colour pattern (first byte) to video memory
-   inc  de       ;; [2] DE points to the next byte (where 2nd byte will be copied)
 
 .include /cpct_drawSolidBox.asm/
