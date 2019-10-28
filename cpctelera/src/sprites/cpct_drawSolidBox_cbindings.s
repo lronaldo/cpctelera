@@ -34,6 +34,6 @@ _cpct_drawSolidBox::
    dec   sp          ;; [2] SP-- (To get next 2 bytes aligned with Memory Address)
    pop   bc          ;; [3] B = Height, C = Width
    push  af          ;; [4] Leave return address in the stack to fullfill __z88dk_callee convention
-   ld    a, l        ;; [1] A = Colour Pattern
+   ld     a, l       ;; [1] A = Colour Pattern
 
 .include /cpct_drawSolidBox.asm/
