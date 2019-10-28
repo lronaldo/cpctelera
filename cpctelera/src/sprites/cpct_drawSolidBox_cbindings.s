@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2019 Arnaud bouche (@Arnaud6128)
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -27,13 +27,13 @@
 ;;   19 us, 7 bytes
 ;;
 _cpct_drawSolidBox::
-   ;; GET Parameters from the stack 
-   pop   af         ;; [3] AF = Return Address
-   pop   hl         ;; [3] HL = First Parameter (Video memory pointer)
-   dec   sp         ;; [2] Move SP 1 byte as next parameter (Colour Pattern is 1-Byte length)
-   pop   de         ;; [3] DE = 1-Byte Colour Pattern (D = 1-Byte Colour Pattern, E = not used)
-   ld    e, d       ;; [1] E = D (Colour Pattern)
-   pop   bc         ;; [3] BC = Height/Width (B = Height, C = Width)
-   push  af         ;; [4] Put returning address in the stack again as this function uses __z88dk_callee convention
+   ;; GET Parameters from the stack
+   pop   af          ;; [3] AF = Return address
+   pop   bc          ;; [3] B = Height, C = Width
+   pop   hl          ;; [3] L = Colour Pattern
+   dec   sp          ;; [2] SP-- (To get next 2 bytes aligned with Memory Address)
+   pop   de          ;; [3] DE = Video Memory Address
+   push  af          ;; [4] Leave return address in the stack to fullfill __z88dk_callee convention
+   ld     a, l       ;; [1] A = Colour Pattern
 
 .include /cpct_drawSolidBox.asm/
