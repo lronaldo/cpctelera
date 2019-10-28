@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2019 Arnaud bouche (@Arnaud6128)
+;;  Copyright (C) 2019 Arnaud Bouche (@Arnaud6128)
 ;;  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 ;;
 ;; Input Parameters (5 bytes):
 ;;  (2B DE) memory         - Video memory pointer to the upper left box corner byte
-;;  (2B A ) colour_pattern - 1-byte colour pattern (in screen pixel format) to fill the box with
+;;  (1B A ) colour_pattern - 1-byte colour pattern (in screen pixel format) to fill the box with
 ;;  (1B C ) width          - Box width *in bytes* [1-64] (Beware! *not* in pixels!)
 ;;  (1B B ) height         - Box height in bytes (>0)
 ;;
@@ -123,20 +123,19 @@
 .endm
 
 ;; DrawSolidBox code starts here (immediately after getting parameters from stack)
- 
-   ld     h, d              ;; [1] / HL = DE  
-   ld     l, e              ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
-   ld     e, a              ;; [1] E=A (Colour pattern)
+   ld     h, d             ;; [1] / HL = DE  
+   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
+   ld     e, a             ;; [1] E=A (Colour pattern)
    
    ;; Modify code using width to jump to ensure
    ;; that only width bytes are copied each line 
-   ld     a, #126           ;; [2] We need to jump 126 bytes (63 COPY2HL_n_INC*2 bytes) minus the width of the sprite * 2 (2B)
-   sub    c                 ;; [1]  to do as much COPY2HL_n_INC as bytes the Sprite is wide
-   sub    c                 ;; [1]
-   ld (_jr_offset), a       ;; [4] Modify JR data to create the jump we need
+   ld     a, #126          ;; [2] We need to jump 126 bytes (63 COPY2HL_n_INC*2 bytes) minus the width of the sprite * 2 (2B)
+   sub    c                ;; [1]  to do as much COPY2HL_n_INC as bytes the Sprite is wide
+   sub    c                ;; [1]
+   ld (_jr_offset), a      ;; [4] Modify JR data to create the jump we need
    
-   ld     c, e              ;; [1] C=E (Colour pattern)
-   ld     e, l              ;; [1] Restore DE = HL
+   ld     c, e             ;; [1] C=E (Colour pattern)
+   ld     e, l             ;; [1] Restore DE = HL
 
 _next_line:
 _jr_offset = .+1
@@ -155,11 +154,11 @@ _jr_offset = .+1
    ret   z                 ;; [2/4] If that was the last line, we safely return
 
    ;; Jump destination pointer to the start of the next line in video memory
-   ld     a, #0x8          ;; [2] / HL = DE = DE + 0x800
-   add    d                ;; [1] | DE holds the pointer to the start of this line
-   ld     h, a             ;; [1] | Adding 0x800 makes HL point to the start of
-   ld     d, a             ;; [1] | the next line to be filled in with values
-   ld     l, e             ;; [1] \ DE holds a copy which won't be modified
+   ld    a, #0x8           ;; [2] / HL = DE = DE + 0x800
+   add   d                 ;; [1] | DE holds the pointer to the start of this line
+   ld    h, a              ;; [1] | Adding 0x800 makes HL point to the start of
+   ld    d, a              ;; [1] | the next line to be filled in with values
+   ld    l, e              ;; [1] \ DE holds a copy which won't be modified
    ;; We check if we have crossed video memory boundaries (which will happen every 8 lines). 
    ;; ... If that happens, bits 13,12 and 11 of destination pointer will be 0
    and   #0x38             ;; [2] leave out only bits 13,12 and 11 from new memory address (00xxx000 00000000)
@@ -170,8 +169,8 @@ _jr_offset = .+1
    ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
    ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
    ;; and our 16bit pointers cycle over it
-   ld   hl, #0xC050   ;; [3] We advance destination pointer to next line
-   add  hl, de        ;; [3] HL = DE + 0xC050
-   ld    d, h         ;; [1] / DE = HL
-   ld    e, l         ;; [1] \
-   jp   _next_line    ;; [3] Continue copying   
+   ld   hl, #0xC050        ;; [3] We advance destination pointer to next line
+   add  hl, de             ;; [3] HL = DE + 0xC050
+   ld    d, h              ;; [1] / DE = HL
+   ld    e, l              ;; [1] \
+   jp   _next_line         ;; [3] Continue copying   
