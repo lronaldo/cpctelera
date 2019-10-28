@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2019 Arnaud bouche (@Arnaud6128)
+;;  Copyright (C) 2019 Arnaud Bouche (@Arnaud6128)
 ;;  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -27,12 +27,12 @@
 ;;   19 us, 7 bytes
 ;;
 _cpct_drawSolidBox::
-   ;; GET Parameters from the stack
+   ;; GET Parameters from the stack 
    pop   af          ;; [3] AF = Return address
-   pop   bc          ;; [3] B = Height, C = Width
+   pop   de          ;; [3] DE = Video Memory Address
    pop   hl          ;; [3] L = Colour Pattern
    dec   sp          ;; [2] SP-- (To get next 2 bytes aligned with Memory Address)
-   pop   de          ;; [3] DE = Video Memory Address
+   pop   bc          ;; [3] B = Height, C = Width
    push  af          ;; [4] Leave return address in the stack to fullfill __z88dk_callee convention
    ld     a, l       ;; [1] A = Colour Pattern
 
