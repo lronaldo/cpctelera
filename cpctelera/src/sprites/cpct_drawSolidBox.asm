@@ -118,8 +118,8 @@
 ;;    reg8 - any 8-bits register
 ;;
 .macro COPY2HL_n_INC reg8
-   ld (hl), reg8           ;; [2] (HL) = reg8
-   inc hl                  ;; [2] HL++  
+   ld   (hl), reg8         ;; [2] (HL) = reg8
+   inc   hl                ;; [2] HL++  
 .endm
 
 ;; DrawSolidBox code starts here (immediately after getting parameters from stack)
@@ -150,15 +150,15 @@ _jr_offset = .+1
    COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 63 times }
 .endm
  
-   dec   b                 ;; [1] Another line finished: we discount it from D
-   ret   z                 ;; [2/4] If that was the last line, we safely return
+   dec    b                ;; [1] Another line finished: we discount it from D
+   ret    z                ;; [2/4] If that was the last line, we safely return
 
    ;; Jump destination pointer to the start of the next line in video memory
-   ld    a, #0x8           ;; [2] / HL = DE = DE + 0x800
-   add   d                 ;; [1] | DE holds the pointer to the start of this line
-   ld    h, a              ;; [1] | Adding 0x800 makes HL point to the start of
-   ld    d, a              ;; [1] | the next line to be filled in with values
-   ld    l, e              ;; [1] \ DE holds a copy which won't be modified
+   ld     a, #0x8          ;; [2] / HL = DE = DE + 0x800
+   add    d                ;; [1] | DE holds the pointer to the start of this line
+   ld     h, a             ;; [1] | Adding 0x800 makes HL point to the start of
+   ld     d, a             ;; [1] | the next line to be filled in with values
+   ld     l, e             ;; [1] \ DE holds a copy which won't be modified
    ;; We check if we have crossed video memory boundaries (which will happen every 8 lines). 
    ;; ... If that happens, bits 13,12 and 11 of destination pointer will be 0
    and   #0x38             ;; [2] leave out only bits 13,12 and 11 from new memory address (00xxx000 00000000)
@@ -169,8 +169,8 @@ _jr_offset = .+1
    ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
    ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
    ;; and our 16bit pointers cycle over it
-   ld   hl, #0xC050        ;; [3] We advance destination pointer to next line
-   add  hl, de             ;; [3] HL = DE + 0xC050
-   ld    d, h              ;; [1] / DE = HL
-   ld    e, l              ;; [1] \
+   ld    hl, #0xC050       ;; [3] We advance destination pointer to next line
+   add   hl, de            ;; [3] HL = DE + 0xC050
+   ld     d, h             ;; [1] / DE = HL
+   ld     e, l             ;; [1] \
    jp   _next_line         ;; [3] Continue copying   
