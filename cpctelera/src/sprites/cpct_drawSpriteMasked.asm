@@ -23,6 +23,7 @@
 ;;
 ;;    Copies a masked sprite from an array to video memory (or to a screen buffer),
 ;; using mask as transparency information, to prevent erasing the background.
+;; All palette colors can be used for sprite because no color is used as transparency.
 ;;
 ;; C Definition:
 ;;    void <cpct_drawSpriteMasked> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*) __z88dk_callee;
@@ -63,6 +64,7 @@
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
+;;  * This function *will not work from ROM*, as it uses self-modifying code.
 ;;
 ;; Known limitations:
 ;;    * This function does not do any kind of boundary check or clipping. If you 
@@ -124,18 +126,18 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 47 bytes
-;;  ASM-bindints - 42 bytes
+;;    C-bindings - 43 bytes
+;;  ASM-bindints - 38 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |    microSecs (us)        |    CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      |  21 + (22 + 18W)H + 10HH | 84 + (88 + 72W)H + 40HH
+;;  Best      |  21 + (20 + 17W)H + 11HH | 84 + (80 + 68W)H + 44HH
 ;;  Worst     |       Best + 10          |     Best + 40
 ;; ----------------------------------------------------------------
-;;  W=2,H=16  |        957 /  967        |    3828 /  3868
-;;  W=4,H=32  |       3057 / 3067        |   12228 / 12268
+;;  W=2,H=16  |       907 / 917          |    3628 /  3668
+;;  W=4,H=32  |       2881 / 2891        |   11524 / 11564
 ;; ----------------------------------------------------------------
 ;; Asm saving |          -16             |       -64
 ;; ----------------------------------------------------------------
@@ -143,40 +145,40 @@
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   push ix         ;; [5] Save IX regiter before using it as temporal var
-   ld__ixl_c       ;; [3] Save Sprite Width into IXL for later use
-
+;; cpct_drawSpriteMasked code starts here (immediately after getting parameters from stack)
+   ld   a, c                               ;; [1] A = C (Sprite Width)
+   ld  (dms_sprite_restore_width + #1), a  ;; [4] Save A (Sprite Width) for later use (next screen line) 
+   
 dms_sprite_height_loop:
    push de         ;; [4] Save DE for later use (jump to next screen line)
 
 dms_sprite_width_loop:
-   ld    a ,(de)   ;; [2] Get next background byte into A
+   ld   a, (de)    ;; [2] Get next background byte into A
    and (hl)        ;; [2] Erase background part that is to be overwritten (Mask step 1)
    inc  hl         ;; [2] HL += 1 => Point HL to Sprite Colour information
    or  (hl)        ;; [2] Add up background and sprite information in one byte (Mask step 2)
    ld  (de), a     ;; [2] Save modified background + sprite data information into memory
-   inc  de         ;; [2] Next bytes (sprite and memory)
-   inc  hl         ;; [2] 
-
-   dec   c         ;; [1] C holds sprite width, we decrease it to count pixels in this line.
-   jr   nz,dms_sprite_width_loop;; [2/3] While not 0, we are still painting this sprite line 
-                                ;;      - When 0, we have to jump to next pixel line
-
+   inc  de         ;; [2] Next bytes (memory and sprite)
+   inc  hl         ;; [2] |
+   
+   dec  c          ;; [1] C holds sprite width, we decrease it to count pixels in this line.
+   jr   nz, dms_sprite_width_loop ;; [2/3] While not 0, we are still painting this sprite line 
+                                  ;;      - When 0, we have to jump to next pixel line
+   
    pop  de         ;; [3] Recover DE from stack. We use it to calculate start of next pixel line on screen
+   dec  b          ;; [1] B holds sprite height. We decrease it to count another pixel line finished
+   ret  z          ;; [2/4] If that was the last line, we safely return to caller
 
-   dec   b         ;; [1] B holds sprite height. We decrease it to count another pixel line finished
-   jr    z,dms_sprite_copy_ended;; [2/3] If 0, we have finished the last sprite line.
-                                ;;      - If not 0, we have to move pointers to the next pixel line
+dms_sprite_restore_width:
+   ld   c, #00     ;; [2] C = Sprite Width (#00 is a place holder)
 
-   ld__c_ixl       ;; [3] Restore Sprite Width into C
-
-   ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
-   add   #0x08     ;; [2]    so we add it to DE (just by adding 0x08 to D)
-   ld    d, a      ;; [1]
-   and   #0x38     ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)
+   ld   a, d       ;; [1] Start of next pixel line normally is 0x0800 bytes away.
+   add  #0x08      ;; [2] So we add it to DE (just by adding 0x08 to D)
+   ld   d, a       ;; [1] |
+   and  #0x38      ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)
    jr   nz, dms_sprite_height_loop ;; [2/3]  by checking the 4 bits that identify present memory line. 
                                    ;; ....  If 0, we have crossed boundaries
-
+								   
 dms_sprite_8bit_boundary_crossed:
    ld    a, e      ;; [1] DE = DE + 0xC050h
    add   #0x50     ;; [2] -- Relocate DE pointer to the start of the next pixel line:
@@ -186,7 +188,3 @@ dms_sprite_8bit_boundary_crossed:
    ld    d, a      ;; [1] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
 
    jr  dms_sprite_height_loop ;; [3] Jump to continue with next pixel line
-
-dms_sprite_copy_ended:
-   pop  ix         ;; [5] Restore IX before returning
-   ret             ;; [3] Return to caller
