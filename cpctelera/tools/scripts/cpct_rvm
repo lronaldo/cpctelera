@@ -56,12 +56,12 @@
 ##    -as | --any-sna         - Lauches RVM and loads first SNA file to match *.sna
 ##    -c  | --command         - Automatically execute command after emulator startup
 ##    -ds | --default-shader  - Execute RVM with default postprocessing shader activated
+##    -h  | --help            - Shows help information on the terminal.
+##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}
 ##    -n  | --no-execute      - Lauches RVM but does not automatically RUN any DSK program.
 ##    -nw | --no-warp         - Does not automatically enter Warp Mode on CDT load.
-##    -m  | --machine <MACH>  - Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}
 ##    -r  | --run <FILENAME>  - Automatically runs FILENAME with the command RUN"FILENAME
 ##    -w  | --warp            - Does automatically enter Warp Mode.
-##    -h  | --help            - Shows help information on the terminal.
 ##
 
 ##
@@ -142,16 +142,18 @@ commands are required (they should be installed in the system)."
    echo "${COLOR_CYAN}       Automatically execute command after emulator startup."
    echo "${COLOR_LIGHT_BLUE}  -ds| --default-shader"
    echo "${COLOR_CYAN}       Execute RVM with default postprocessing shader activated"
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
+   echo "${COLOR_LIGHT_BLUE}  -m | --machine <MACH>"
+   echo "${COLOR_CYAN}       Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}"
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches RVM but does not automatically RUN any DSK program."
    echo "${COLOR_LIGHT_BLUE}  -nw| --no-warp"
    echo "${COLOR_CYAN}       Does not automatically enter Warp Mode on CDT load."
-   echo "${COLOR_LIGHT_BLUE}  -m | --machine <MACH>"
-   echo "${COLOR_CYAN}       Selects a specific machine MACH to be emulated {cpc464, cpc664, cpc6128}"
    echo "${COLOR_LIGHT_BLUE}  -r | --run <FILENAME>"
    echo "${COLOR_CYAN}       Automatically runs FILENAME with the command RUN\"FILENAME"
-   echo "${COLOR_LIGHT_BLUE}  -h | --help"
-   echo "${COLOR_CYAN}       Shows this help information"
+   echo "${COLOR_LIGHT_BLUE}  -w | --warp"
+   echo "${COLOR_CYAN}       Does automatically enter Warp Mode."
    echo ${COLOR_NORMAL}
    exit 1
 }

@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2019 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -23,24 +24,16 @@
 ;;
 ;; C bindings for <cpct_drawSolidBox>
 ;;
-;;   29 us, 14 bytes
+;;   19 us, 7 bytes
 ;;
 _cpct_drawSolidBox::
-   ;; GET Parameters from the stack
-   ld   hl, #2      ;; [3] HL Points to SP+2 (first 2 bytes are return address)
-   add  hl, sp      ;; [3]    , to use it for getting parameters from stack
-   ld    e, (hl)    ;; [2] DE = First Parameter (Video memory pointer)
-   inc  hl          ;; [2]
-   ld    d, (hl)    ;; [2]
-   inc  hl          ;; [2]  / Copy first value to video memory (upper-left corner of the box)
-   ldi              ;; [5] (HL)->(DE) Move 2nd parameter (1-byte Colour Pattern) directly into 1st byte of the box in memory
-   ld    c, (hl)    ;; [2] C = Third Parameter (Box Width)
-   inc  hl          ;; [2]
-   ld    b, (hl)    ;; [2] B = Fourth Parameter (Box Height)
-
-   ;; Prepare HL and DE pointers for copying bytes consecutively
-   ld    h, d       ;; [1] HL = DE - 1 (HL Points to the first byte of the box, the one that contains the colour pattern)
-   ld    l, e       ;; [1]
-   dec   hl         ;; [2]
+   ;; GET Parameters from the stack 
+   pop   af          ;; [3] AF = Return address
+   pop   de          ;; [3] DE = Video Memory Address
+   pop   hl          ;; [3] L = Colour Pattern
+   dec   sp          ;; [2] SP-- (To get next 2 bytes aligned with Memory Address)
+   pop   bc          ;; [3] B = Height, C = Width
+   push  af          ;; [4] Leave return address in the stack to fullfill __z88dk_callee convention
+   ld     a, l       ;; [1] A = Colour Pattern
 
 .include /cpct_drawSolidBox.asm/

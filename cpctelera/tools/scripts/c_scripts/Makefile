@@ -27,7 +27,7 @@
 # INCLUDES
 include ../../../cfg/global_functions.mk
 
-TOOLS      :=bin2sna tmx2data binpatch
+TOOLS      :=bin2sna tmx2data binpatch png2chars
 TOOLSYSTEM :=ToolMaker::c_scripts
 SCRIPTS_DIR:=..
 

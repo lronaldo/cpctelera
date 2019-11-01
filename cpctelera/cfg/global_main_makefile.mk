@@ -43,7 +43,7 @@ $(foreach OF, $(GENASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubs
 $(foreach OF, $(C_OBJFILES), $(eval $(call COMPILECFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(C_EXT))))))
 $(foreach OF, $(ASM_OBJFILES), $(eval $(call COMPILEASMFILE, $(OF), $(patsubst $(OBJDIR)%,$(SRCDIR)%,$(OF:%.$(OBJ_EXT)=%.$(ASM_EXT))))))
 ## Generate an Add-BIN-to-DSK rule for each Binary file in DSKFILESDIR
-$(foreach SF, $(DSKINCSRCFILES), $(eval $(call ADDBINFILETODSK, $(DSK), $(SF), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(SF)).$(DSKINC_EXT))))
+$(foreach SF, $(DSKINCSRCFILES), $(eval $(call ADDFILETODSK,$(DSK),$(SF),$(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(SF)).$(DSKINC_EXT))))
 
 # Files to be created if they do not exist (for compatibility)
 $(TOUCHIFNOTEXIST):

@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2019 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -26,7 +27,7 @@
 ;; erasing screen rectangles easily.
 ;;
 ;; C Definition:
-;;    void <cpct_drawSolidBox> (void* *memory*, <u8> *colour_pattern*, <u8> *width*, <u8> *height*);
+;;    void <cpct_drawSolidBox> (void* *memory*, <u8> *colour_pattern*, <u8> *width*, <u8> *height*) __z88dk_callee;
 ;;
 ;; Input Parameters (5 bytes):
 ;;  (2B DE) memory         - Video memory pointer to the upper left box corner byte
@@ -82,138 +83,94 @@
 ;; of a given colour pattern) anywhere at the video memory or screen buffer.
 ;; It does so by copying the colour pattern byte to the top-left byte 
 ;; of the box and then cloning that byte to the next bytes of the box.
-;; As it does so using an unrolled LDIR and a dynamic JR, it is limited 
-;; to 64 LDIs (64 bytes-wide at most). 
+;; As it does so using a dynamic JR, the Rectangle Width is limited 
+;; to 64 Bytes (64 bytes-wide at most). 
 ;;
 ;; Destroyed Register values: 
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 184 bytes
-;;  ASM-bindings - 172 bytes
+;;    C-bindings - 169 bytes
+;;  ASM-bindings - 162 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |      microSecs (us)      |      CPU Cycles
 ;; ---------------------------------------------------------------------
-;;  Best      |  35 + (29 + 5W)H  + 11HH | 140 + (116 + 20W)H  + 44HH
-;;  Worst     |        Best + 11         |      Best + 44
+;;  Best      |  4 + (17 + 4W)H + 11HH   | 16 + (68 + 16W)H  + 44HH
+;;  Worst     |         Best + 11        |      Best + 44
 ;; ---------------------------------------------------------------------
-;;  W=2,H=16  |         670 /  681       |     2680 / 2724
-;;  W=4,H=32  |        1636 / 1647       |     6544 / 6588
+;;  W=2,H=8   |         204 /  215       |      816 /  860
+;;  W=2,H=16  |         415 /  426       |     1660 / 1704
+;;  W=4,H=16  |         543 /  554       |     2172 / 2216
+;;  W=4,H=32  |        1093 / 1104       |     4372 / 4416
 ;; ---------------------------------------------------------------------
-;; Asm saving |         -23              |        -92
+;; Asm saving |         -19              |        -76
 ;; ---------------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   push  hl         ;; [4] Save HL (Pointer to the first byte of the box) for later use
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; COPY2HL_n_INC Macro 
+;;  Copy Register To (HL) and Increment HL
+;; INPUT:
+;;    reg8 - any 8-bits register
+;;
+.macro COPY2HL_n_INC reg8
+   ld   (hl), reg8         ;; [2] (HL) = reg8
+   inc   hl                ;; [2] HL++  
+.endm
 
-   ;; Modify code using width to jump in drawSpriteWidth
-   dec   c          ;; [1] The first line of bytes has 1 byte less to be copied (the first value we have already copied)
-   ld    a, #126    ;; [2] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite*2 (2B)
-   sub   c          ;; [1]    to do as much LDIs as bytes the Sprite is wide
-   sub   c          ;; [1]
-   ld (dsb_drawFirstLine+3), a ;; [5] Modify JR data to create the jump we need
-   jr dsb_drawFirstLine        ;; [3] Jump to the code required for the first line (different from next lines)
+;; DrawSolidBox code starts here (immediately after getting parameters from stack)
+   ld     h, d             ;; [1] / HL = DE  
+   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
+   ld     e, a             ;; [1] E=A (Colour pattern)
+   
+   ;; Modify code using width to jump to ensure
+   ;; that only width bytes are copied each line 
+   ld     a, #126          ;; [2] We need to jump 126 bytes (63 COPY2HL_n_INC*2 bytes) minus the width of the sprite * 2 (2B)
+   sub    c                ;; [1]  to do as much COPY2HL_n_INC as bytes the Sprite is wide
+   sub    c                ;; [1]
+   ld (_jr_offset), a      ;; [4] Modify JR data to create the jump we need
+   
+   ld     c, e             ;; [1] C=E (Colour pattern)
+   ld     e, l             ;; [1] Restore DE = HL
 
-   ;; Draw a sprite-line of n bytes 
-dsb_drawSpriteWidth:
-   push de          ;; [4] Save DE pointer, at the start of this next line to be copied
-   ldi              ;; [5] Copy the first byte, as next code is configured for width-1 bytes
-dsb_drawFirstLine:
-   ld c, #0xFF      ;; [2] C = 255 to ensure B never gets modified by LDIs (that discount 1 from BC)
-   jr__0            ;; [3] Self modifying instruction: the '00' will be substituted by the required jump forward.
-                    ;;      (Note: Writing JR 0 compiles but later it gives odd linking errors)
-   ldi              ;; [5] <| 63 LDIs, which are able to copy up to 63 bytes each time.
-   ldi              ;; [5]  | That means that each Sprite line should be 63 bytes width at most.
-   ldi              ;; [5]  | The JR instruction at the start makes us ignore the LDIs we don't need (jumping over them)
-   ldi              ;; [5] <| That ensures we will be doing only as much LDIs as bytes our sprite is wide
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
-   ldi              ;; [5] <|
-   ldi              ;; [5] <|
-   ldi              ;; [5]  |
-   ldi              ;; [5]  |
+_next_line:
+_jr_offset = .+1
+   jr__0                   ;; [3] Self modifying instruction: the '00' will be substituted by the required jump forward. 
+                           ;; ... (Note: Writting JR 0 compiles but later it gives odd linking errors)  
+;; 63 COPY2HL_n_INC c, which are able to copy up to 63 bytes each time.
+;; That means that each Sprite line should be 63 bytes width at most.
+;; The JR instruction at the start makes us ignore the COPY2HL_n_INC we don't need 
+;; (jumping over them) That ensures we will be doing only as much COPY2HL_n_INC 
+;; as bytes our sprite is wide.
+.rept 63
+   COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 63 times }
+.endm
+ 
+   dec    b                ;; [1] Another line finished: we discount it from D
+   ret    z                ;; [2/4] If that was the last line, we safely return
 
-   pop hl           ;; [3] HL = Pointer to the start of the last completed line (was saved previously with push de)
+   ;; Jump destination pointer to the start of the next line in video memory
+   ld     a, #0x8          ;; [2] / HL = DE = DE + 0x800
+   add    d                ;; [1] | DE holds the pointer to the start of this line
+   ld     h, a             ;; [1] | Adding 0x800 makes HL point to the start of
+   ld     d, a             ;; [1] | the next line to be filled in with values
+   ld     l, e             ;; [1] \ DE holds a copy which won't be modified
+   ;; We check if we have crossed video memory boundaries (which will happen every 8 lines). 
+   ;; ... If that happens, bits 13,12 and 11 of destination pointer will be 0
+   and   #0x38             ;; [2] leave out only bits 13,12 and 11 from new memory address (00xxx000 00000000)
+   jp    nz, _next_line    ;; [3] If any bit from {13,12,11} is not 0, we are still inside 
+                           ;; ... video memory boundaries, so proceed with next line
 
-   dec b            ;; [1] Another line finished: we discount it from B (Height)
-   ret z            ;; [2/4] If that was the last line, we safely return
-
-   ;; Set up HL and DE pointers for copying next line of bytes
-   ;; HL will point to the start of the last completed line and DE to the start of the next
-
-   ;; Next pixel line is +0x800 bytes away (7 out of every 8 times)
-   ld   e, l                   ;; [1] To make DE = HL (previous to incrementing it to the next line), we first copy E = L
-   ld   a, h                   ;; [1] D = H + 0x08 (Add 0x800 to DE, which is equal to HL, because E = L)
-   add #8                      ;; [2]
-   ld   d, a                   ;; [1]
-                               ;; Check if DE (next line) is first line of a screen character (8-byte aligned)...
-   and #0x38                   ;; [1] ...by checking bits xx000xxxx. If the 3 of them are 0, it is the start of a new...
-   jp  nz,dsb_drawSpriteWidth  ;; [3] ...screen character, and next pixel line is -0xFB0 (+0xC050) bytes away... 
-                               ;;     ...else, DE already points to next pixel line, with previoys +0x800 bytes added.      
-                               
-   ;; Next pixel line is -0xFB0 (+0xC050) bytes away
-dsb_next8block:
-   ld   a, e              ;; [1] DE = DE + 0xC050 (DE Points to next pixel line)
-   add #0x50              ;; [2]
-   ld   e, a              ;; [1]
-   ld   a, d              ;; [1]
-   adc #0xC0              ;; [2]
-   ld   d, a              ;; [1]
-   jp dsb_drawSpriteWidth ;; [3] Draw next pixel line
+   ;; Every 8 lines, we cross the 16K video memory boundaries and have to
+   ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
+   ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
+   ;; and our 16bit pointers cycle over it
+   ld    hl, #0xC050       ;; [3] We advance destination pointer to next line
+   add   hl, de            ;; [3] HL = DE + 0xC050
+   ld     d, h             ;; [1] / DE = HL
+   ld     e, l             ;; [1] \
+   jp   _next_line         ;; [3] Continue copying   

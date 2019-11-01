@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -131,11 +131,13 @@
 ;; (start code)
 ;;  Case      |    microSecs (us)        |    CPU Cycles
 ;; ----------------------------------------------------------------
-;;  Best      |  21 + (22 + 18W)H + 10HH | 84 + (88 + 72W)H + 40HH
-;;  Worst     |       Best + 10          |     Best + 40
-;; ----------------------------------------------------------------
-;;  W=2,H=16  |        957 /  967        |    3828 /  3868
-;;  W=4,H=32  |       3057 / 3067        |   12228 / 12268
+;;  Best      |  20 + (20 + 18W)H + 10HH | 80 + (80 + 72W)H + 40HH
+;;  Worst     |       Best + 10          |     Best + 40;
+; ----------------------------------------------------------------
+;;  W=2,H= 8  |        478 /  488        |    1912 /  1952
+;;  W=2,H=16  |        926 /  936        |    3704 /  3744
+;;  W=4,H=16  |       1502 / 1512        |    6008 /  6048
+;;  W=6,H=24  |       3112 / 3122        |   12448 / 12488
 ;; ----------------------------------------------------------------
 ;; Asm saving |          -16             |       -64
 ;; ----------------------------------------------------------------
@@ -144,7 +146,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    push ix         ;; [5] Save IX regiter before using it as temporal var
-   ld__ixl_c       ;; [3] Save Sprite Width into IXL for later use
+   ld__ixl_c       ;; [2] Save Sprite Width into IXL for later use
 
 dms_sprite_height_loop:
    push de         ;; [4] Save DE for later use (jump to next screen line)
@@ -168,7 +170,7 @@ dms_sprite_width_loop:
    jr    z,dms_sprite_copy_ended;; [2/3] If 0, we have finished the last sprite line.
                                 ;;      - If not 0, we have to move pointers to the next pixel line
 
-   ld__c_ixl       ;; [3] Restore Sprite Width into C
+   ld__c_ixl       ;; [2] Restore Sprite Width into C
 
    ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
    add   #0x08     ;; [2]    so we add it to DE (just by adding 0x08 to D)

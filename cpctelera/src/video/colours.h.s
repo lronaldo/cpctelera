@@ -16,10 +16,15 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
+;;//////////////////////////////////////////////////////////////////////
+;;//////////////////////////////////////////////////////////////////////
 ;; File: Colours (asm)
+;;//////////////////////////////////////////////////////////////////////
+;;//////////////////////////////////////////////////////////////////////
 ;;
 ;;    Constants and utilities to manage the 27 colours from
 ;; the CPC Palette comfortably in assembler.
+;;
 ;;
 
 ;; Constant: Firmware colour values
@@ -46,8 +51,8 @@
 ;;   | FW_BRIGHT_YELLOW  | 24 | FW_PASTEL_YELLOW  | 25 |
 ;;   | FW_BRIGHT_WHITE   | 26 |                   |    |
 ;;   [=================================================]
-;;(end code)
-;;
+;; (end code)
+
 FW_BLACK          =  0
 FW_BLUE           =  1
 FW_BRIGHT_BLUE    =  2
@@ -100,7 +105,7 @@ FW_BRIGHT_WHITE   = 26
 ;;   | HW_BRIGHT_YELLOW  | 0x0A | HW_PASTEL_YELLOW  | 0x03 |
 ;;   | HW_BRIGHT_WHITE   | 0x0B |                   |      |
 ;;   [=====================================================]
-;;(end code)
+;; (end code)
 ;;
 HW_BLACK          = 0x14
 HW_BLUE           = 0x04
