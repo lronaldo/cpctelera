@@ -150,13 +150,13 @@ std::array<ParseFunction_t, knum_modifiers> Modifiers {{
       { "-al"  , "--asm-local"             , 0, std::bind(setASMConstantsLocal, true, _1) }
    ,  { "-au"  , "--add-underscore-s-vars" , 0, std::bind(setASMVariablesPrefix, '_', _1) }
    ,  { "-ci"  , "--c-identifier"          , 1, std::bind(setCID, _1) }
-   ,  { "-gb"  , "--generate-binary"       , 0, std::bind(generate, PNGDecoder::_BIN, _1) }
-   ,  { "-gbas", "--generate-basic"        , 0, std::bind(generate, PNGDecoder::_BAS, _1) }
-   ,  { "-gc"  , "--generate-c"            , 0, std::bind(generate, PNGDecoder::_C, _1) }
-   ,  { "-gh"  , "--generate-h"            , 0, std::bind(generate, PNGDecoder::_H, _1) }
-   ,  { "-ghs" , "--generate-h-s"          , 0, std::bind(generate, PNGDecoder::_HS, _1) }
-   ,  { "-gs"  , "--generate-s"            , 0, std::bind(generate, PNGDecoder::_S, _1) }
-   ,  { "-gtrm", "--generate-terminal"     , 0, std::bind(generate, PNGDecoder::_DRAW, _1) }
+   ,  { "-gb"  , "--generate-binary"       , 0, std::bind(generate, PNGDecoder::GN_BIN, _1) }
+   ,  { "-gbas", "--generate-basic"        , 0, std::bind(generate, PNGDecoder::GN_BAS, _1) }
+   ,  { "-gc"  , "--generate-c"            , 0, std::bind(generate, PNGDecoder::GN_C, _1) }
+   ,  { "-gh"  , "--generate-h"            , 0, std::bind(generate, PNGDecoder::GN_H, _1) }
+   ,  { "-ghs" , "--generate-h-s"          , 0, std::bind(generate, PNGDecoder::GN_HS, _1) }
+   ,  { "-gs"  , "--generate-s"            , 0, std::bind(generate, PNGDecoder::GN_S, _1) }
+   ,  { "-gtrm", "--generate-terminal"     , 0, std::bind(generate, PNGDecoder::GN_DRAW, _1) }
    ,  { "-h"   , "--help"                  , 0, std::bind(callUsage, "cpct_png2chars", _1) }
    ,  { "-nb"  , "--number-base"           , 1, std::bind(changeNumberBase, _1) }
    ,  { "-of"  , "--output-folder"         , 1, std::bind(setOutputFolder, _1) }
