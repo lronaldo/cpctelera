@@ -90,8 +90,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 169 bytes
-;;  ASM-bindings - 162 bytes
+;;    C-bindings - 171 bytes
+;;  ASM-bindings - 164 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -129,7 +129,7 @@
    
    ;; Modify code using width to jump to ensure
    ;; that only width bytes are copied each line 
-   ld     a, #126          ;; [2] We need to jump 126 bytes (63 COPY2HL_n_INC*2 bytes) minus the width of the sprite * 2 (2B)
+   ld     a, #128          ;; [2] We need to jump 128 bytes (64 COPY2HL_n_INC*2 bytes) minus the width of the sprite * 2 (2B)
    sub    c                ;; [1]  to do as much COPY2HL_n_INC as bytes the Sprite is wide
    sub    c                ;; [1]
    ld (_jr_offset), a      ;; [4] Modify JR data to create the jump we need
@@ -141,13 +141,13 @@ _next_line:
 _jr_offset = .+1
    jr__0                   ;; [3] Self modifying instruction: the '00' will be substituted by the required jump forward. 
                            ;; ... (Note: Writting JR 0 compiles but later it gives odd linking errors)  
-;; 63 COPY2HL_n_INC c, which are able to copy up to 63 bytes each time.
-;; That means that each Sprite line should be 63 bytes width at most.
+;; 64 COPY2HL_n_INC c, which are able to copy up to 64 bytes each time.
+;; That means that each Sprite line should be 64 bytes width at most.
 ;; The JR instruction at the start makes us ignore the COPY2HL_n_INC we don't need 
 ;; (jumping over them) That ensures we will be doing only as much COPY2HL_n_INC 
 ;; as bytes our sprite is wide.
-.rept 63
-   COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 63 times }
+.rept 64
+   COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 64 times }
 .endm
  
    dec    b                ;; [1] Another line finished: we discount it from D
