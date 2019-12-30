@@ -15,6 +15,7 @@ Section: Donnors
    13/01/2018 - Rafael Castillo García
    31/03/2018 - Augusto Ruíz García
    16/11/2018 - Carlos Pérez Peregrín
+   12/12/2019 - Carlos Pérez Peregrín
 
 Section: Project authors
    
@@ -142,6 +143,7 @@ Section: Testers & Bug Reporters
  * <John Lobo at https://github.com/johnlobo> / <Github at https://github.com> 
  * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
  * Iván Fernández Álvarez (<SpDizzy at http://twitter.com/dizzy_sp>)
+ * Carlos Pérez Peregrín (<cperezprg at https://www.youtube.com/user/cperezprg/> / <cperezgrin at https://www.readyandplay.com/author/cperezgrin/>)
 
 Section: Assets 
 
