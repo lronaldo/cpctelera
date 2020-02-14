@@ -42,7 +42,7 @@ extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;
 extern   u8 cpct_px2byteM1 (u8 px0, u8 px1, u8 px2, u8 px3);
 
 // Sprite and box drawing functions
-extern void cpct_drawSolidBox        (void *memory, u8 colour_pattern, u8 width, u8 height) __z88dk_callee;
+extern void cpct_drawSolidBox        (void *memory, u16 colour_pattern, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSprite          (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSpriteMasked    (void *sprite, void* memory, u8 width, u8 height) __z88dk_callee;
 extern void cpct_drawSpriteMaskedAlignedTable(const void *psprite, void* pvideomem, 

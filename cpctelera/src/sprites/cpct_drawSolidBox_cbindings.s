@@ -24,14 +24,13 @@
 ;;
 ;; C bindings for <cpct_drawSolidBox>
 ;;
-;;   19 us, 7 bytes
+;;   17 us, 6 bytes
 ;;
 _cpct_drawSolidBox::
    ;; GET Parameters from the stack 
    pop   af          ;; [3] AF = Return address
    pop   de          ;; [3] DE = Video Memory Address
    pop   hl          ;; [3] L = Colour Pattern
-   dec   sp          ;; [2] SP-- (To get next 2 bytes aligned with Memory Address)
    pop   bc          ;; [3] B = Height, C = Width
    push  af          ;; [4] Leave return address in the stack to fullfill __z88dk_callee convention
    ld     a, l       ;; [1] A = Colour Pattern
