@@ -31,9 +31,9 @@
 ;; Input Parameters (7 bytes):
 ;;  (1B   A) width_to_draw  - Sprite Width to draw (<= width)
 ;;  (2B  DE) sprite         - Source Sprite Pointer
-;;  (2B  BC) memory         - Destination video memory pointer
-;;  (1B   L) width          - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
-;;  (1B   H) height         - Sprite Height in bytes (>0)
+;;  (1B   C) width          - Sprite Width in *bytes* (>0) (Beware, *not* in pixels!)
+;;  (1B   B) height         - Sprite Height in bytes (>0)
+;;  (2B  HL) memory         - Destination video memory pointer
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteClipped_asm
@@ -101,11 +101,11 @@
 ;; (start code)
 ;;  Case      |      microSecs (us)      |       CPU Cycles
 ;; ------------------------------------------------------------------
-;;  Best      |  37 + (29 + 6W)H + 9HH   | 148 + (116 + 24W)H + 36HH
+;;  Best      |  36 + (29 + 6W)H + 9HH   | 144 + (116 + 24W)H + 36HH
 ;;  Worst     |       Best + 9           |      Best + 36
 ;; ------------------------------------------------------------------
-;;  W=2,H=16  |        947 / 956         |      3788 /  3824
-;;  W=4,H=32  |       2817 / 2826        |     11268 / 11304
+;;  W=2,H=16  |        946 / 955         |      3784 /  3820
+;;  W=4,H=32  |       2816 / 2825        |     11264 / 11300
 ;; ------------------------------------------------------------------
 ;; Asm saving |          -20             |         -80
 ;; ------------------------------------------------------------------
@@ -116,11 +116,9 @@
    ld  (width_to_draw), a        ;; [4] Store Sprite width_to_draw at placeholder    
    neg                           ;; [1] Compute next pixel line Lsb (0x0800 - width_to_draw = 0x07LL)
    ld  (offset_to_next_line), a  ;; [4] Store A to Lsb offset for next line placeholder
-   add  l                        ;; [1] A = Sprite Offset (Sprite Width (L) - Sprite Width_to_draw (A))
+   add  c                        ;; [1] A = Sprite Offset (Sprite Width (C) - Sprite Width_to_draw (A))
    ld  (offset_sprite), a        ;; [4] Store Sprite offset at placeholder  
-   ld   a, h                     ;; [1] A = H (Sprite height)
-   ld   h, b                     ;; [1] HL = BC (Destination Video Mem)
-   ld   l, c                     ;; [1] |
+   ld   a, b                     ;; [1] A = B (Sprite height)
    
 ;; Draw partial Sprite loop
 draw_clip_loop:
