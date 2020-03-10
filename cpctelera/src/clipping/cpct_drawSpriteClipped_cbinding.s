@@ -32,7 +32,7 @@ _cpct_drawSpriteClipped::
    dec  sp                       ;; [2] Move SP 1 byte as next parameter (width_to_draw is 1-byte length)
    pop  af                       ;; [3] A  = Sprite width_to_draw
    pop  de                       ;; [3] DE = Source pointer (Sprite data array)
-   pop  bc                       ;; [3] BC = Destination pointer (Video mem) 
-   ex  (sp), hl                  ;; [6] HL = Height/Width (H = Height, L = Width) <-> (SP) = Returning back address because __z88dk_callee convention  
+   pop  bc                       ;; [3] BC = Height/Width (B = Height, C = Width) 
+   ex  (sp), hl                  ;; [6] HL = Destination pointer (Video mem) <-> (SP) Returning back address because __z88dk_callee convention  
   
 .include /cpct_drawSpriteClipped.asm/
