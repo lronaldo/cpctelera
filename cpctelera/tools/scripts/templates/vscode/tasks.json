@@ -18,41 +18,72 @@
 // See https://go.microsoft.com/fwlink/?LinkId=733558
 // for the documentation about the tasks.json format
 {
-      "version": "0.1.0"
-   ,  "command": "make"
-   ,  "isShellCommand": true
-   ,  "args": []
-   ,  "showOutput": "always"
-   ,  "suppressTaskName": true
-   ,  "tasks": [ 
-         {
-               "taskName": "make"
-            ,  "args": []
-            ,  "isBuildCommand": true
-            ,  "problemMatcher": {
-                     "owner": "base"
-                  ,  "fileLocation": ["relative", "${workspaceRoot}"]
-                  ,  "pattern": {
-                        "regexp": "^(.*):(\\d+):\\s+(warning|error|syntax error)[^:]*:\\s+(.*)$"
-                     ,  "file": 1
-                     ,  "line": 2
-                     ,  "severity": 3
-                     ,  "message": 4
-                     }
-                 }
-         }
-      ,  {
-               "taskName": "clean"
-            ,  "args": ["clean"]
-         }
-      ,  {
-               "taskName": "cleanall"
-            ,  "args": ["cleanall"]
-         }
-      ,  {
-               "taskName": "run"
-            ,  "command": "cpct_winape"
-            ,  "args": [ "-a" ] 
-         }
-      ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "owner": "base",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):\\s+(warning|error|syntax error)[^:]*:\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "cleanall",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "cleanall"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "windows": {
+                "command": "cpct_winape",
+                "args": [
+                    "-a"
+                ]
+            },
+            "osx": {
+                "command": "/Applications/Emulators/Retro Virtual Machine 2.app/Contents/MacOS/Retro Virtual Machine 2",
+                "args": [
+                    "-b=cpc464",
+                    "-i",
+                    "${workspaceFolder}/${workspaceFolderBasename}.cdt",
+                    "-w",
+                    "-c='run\"\\n'",
+                    "-p"
+                ]
+            },
+            "problemMatcher": []
+        }
+    ]
 }
