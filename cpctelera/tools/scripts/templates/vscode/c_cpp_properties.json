@@ -1,0 +1,83 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceRoot}",
+                "/usr/include",
+                "/usr/local/include",
+                "${env:CPCT_PATH}/src"
+            ],
+            "defines": [],
+            "browse": {
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include",
+                    "${env:CPCT_PATH}/src"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "intelliSenseMode": "clang-x64",
+            "macFrameworkPath": [
+                "/System/Library/Frameworks",
+                "/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceRoot}",
+                "/usr/include/c++/7.1.1",
+                "/usr/include/c++/7.1.1/x86_64-pc-linux-gnu",
+                "/usr/local/include",
+                "/usr/lib/clang/4.0.0/include",
+                "/usr/include",
+                "${env:CPCT_PATH}/src"
+            ],
+            "defines": [],
+            "browse": {
+                "path": [
+                    "${env:CPCT_PATH}/src",
+                    "/usr/include/c++/7.1.1",
+                    "/usr/include/c++/7.1.1/x86_64-pc-linux-gnu",
+                    "/usr/local/include",
+                    "/usr/lib/clang/4.0.0/include",
+                    "/usr/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceRoot}",
+                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE"
+            ],
+            "browse": {
+                "path": [
+                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "intelliSenseMode": "msvc-x64",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
