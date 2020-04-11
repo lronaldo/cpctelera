@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9ea8618e-5b35-434a-8483-cbb54ce77efe}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libcpp">
+      <UniqueIdentifier>{fbe76a09-a173-490d-b6b2-c513882e3379}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libiberty">
+      <UniqueIdentifier>{c359aa07-8032-4d56-bcd1-10116c18ccaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32">
+      <UniqueIdentifier>{91bececb-ff6f-4e1a-ac50-e893b4f567a9}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{27267bd9-1c5d-4e30-b898-aac7cffa3138}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\libcpp_h">
+      <UniqueIdentifier>{77609fd9-1b04-4cc1-9bc6-9d65fb8799f1}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\libcpp_h\include">
+      <UniqueIdentifier>{4ec4ee85-9d9f-4749-a495-0f3a96079d5f}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\win32_h">
+      <UniqueIdentifier>{9e3e99c3-3f00-41e5-9964-8e386b8ba272}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Custom Build">
+      <UniqueIdentifier>{8f30d6d7-0e72-4612-b478-b9c5a74ec6cb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="c-incpath.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c-ppoutput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cppdefault.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="opts-common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="opts.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prefix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdcpp-diagnostic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdcpp-opts.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdcpp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="version.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\charset.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\directives.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\errors.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\expr.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\files.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\identifiers.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\init.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\lex.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\line-map.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\macro.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\mkdeps.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\symtab.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="libcpp\traditional.c">
+      <Filter>Source Files\libcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\concat.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\fopen_unlocked.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\getpwd.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\hashtab.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\hex.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\lbasename.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\md5.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\obstack.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\safe-ctype.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\alloca.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\vasprintf.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\xexit.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\xmalloc.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\xmemdup.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\xstrdup.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sdbinutils\libiberty\xstrerror.c">
+      <Filter>Source Files\libiberty</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\dirent.c">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ansidecl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="c-incpath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cppdefault.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hwint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="intl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdbinutils\include\libiberty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="md5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="prefix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdbinutils\include\safe-ctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdcpp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdbinutils\include\splay-tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="symcat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\internal.h">
+      <Filter>Header Files\libcpp_h</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\system.h">
+      <Filter>Header Files\libcpp_h</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\ucnid.h">
+      <Filter>Header Files\libcpp_h</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\include\cpp-id-data.h">
+      <Filter>Header Files\libcpp_h\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\include\cpplib.h">
+      <Filter>Header Files\libcpp_h\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\include\line-map.h">
+      <Filter>Header Files\libcpp_h\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\include\mkdeps.h">
+      <Filter>Header Files\libcpp_h\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libcpp\include\symtab.h">
+      <Filter>Header Files\libcpp_h\include</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\dirent.h">
+      <Filter>Header Files\win32_h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdbinutils\include\filenames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdbinutils\include\hashtab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sdbinutils\include\obstack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="auto-host.h">
+      <Filter>Header Files\libcpp_h\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="auto-host_vc_in.h">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="sdcpp.opt">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="optc-gen.awk">
+      <Filter>Custom Build</Filter>
+    </None>
+    <None Include="opt-functions.awk">
+      <Filter>Custom Build</Filter>
+    </None>
+    <None Include="opt-gather.awk">
+      <Filter>Custom Build</Filter>
+    </None>
+    <None Include="opth-gen.awk">
+      <Filter>Custom Build</Filter>
+    </None>
+  </ItemGroup>
+</Project>

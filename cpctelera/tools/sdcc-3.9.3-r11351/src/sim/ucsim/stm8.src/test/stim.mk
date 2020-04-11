@@ -1,0 +1,1 @@
+DEVICES		= SDISC

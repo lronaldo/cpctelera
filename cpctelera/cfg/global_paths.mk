@@ -57,9 +57,9 @@ SHELL := /bin/bash
 
 # PATHs FOR BUILDING TOOLS BINARIES
 #  Absolute paths for SDCC, Hex2bin, iDSK and 2CDT 
-SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.6.8-r9946/bin/
+SDCCBIN_PATH := $(CPCT_PATH)tools/sdcc-3.9.3-r11351/bin/
 HEX2BIN_PATH := $(CPCT_PATH)tools/hex2bin-2.0/bin/
-IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.13/bin/
+IDSK_PATH    := $(CPCT_PATH)tools/iDSK-0.19/bin/
 2CDT_PATH    := $(CPCT_PATH)tools/2cdt/bin/
 ZX7B_PATH    := $(CPCT_PATH)tools/zx7b/bin/
 CPC2CDT_PATH := $(CPCT_PATH)tools/cpc2cdt/bin/
