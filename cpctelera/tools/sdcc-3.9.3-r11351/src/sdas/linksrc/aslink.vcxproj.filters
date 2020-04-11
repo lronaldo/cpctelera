@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{70ec888e-7e88-4771-9b0f-3a755c8eef6e}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{46a8178b-b880-434b-8c7b-3e1ea46bad08}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lk_readnl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkaomf51.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkarea.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkdata.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkelf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkeval.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkhead.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lklex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lklib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lklibr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lklist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkmain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkmem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lknoice.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkrel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkrloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lks19.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lksdcclib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lksym.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sdld.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\asxxsrc\strcmpi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lksdcdb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkbank.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkrloc3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lkout.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="aslink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="asxxxx_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lk_readnl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lkar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lklibr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lkrel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

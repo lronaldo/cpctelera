@@ -1,0 +1,3 @@
+DEVICES		= SDISC LDISC
+
+OTHERS		= serial
