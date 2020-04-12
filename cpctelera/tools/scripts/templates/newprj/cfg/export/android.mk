@@ -24,7 +24,7 @@
 ## This file holds the configuration of the android APK exporter based   ##
 ## on RetroVirtualMachine engine embedded emulator. You may change these ##
 ## values in order to suit your needs when creating an APK for your game ##
-## to be played on Android devices. 												 ##
+## to be played on Android devices.                                      ##
 ###########################################################################
 
 ## ANDROID APK EXPORTER CONFIGURATION
@@ -62,12 +62,12 @@ $(eval $(call APKMAN, GENERATE_APK_RULE , apk ))
 ## OTHER IMPORTANT DETAILS
 ##
 ## - CERTIFICATE
-##		You need a valid personal certificate to sign your application before uploading
+##    You need a valid personal certificate to sign your application before uploading
 ## it to any Android device or the Google Play Store. The first time you use 'make apk',
 ## CPCtelera will ask you to create your personal certificate. Important things about
 ## your certificate to take into account
-##		1) If you lose it or forget the password, you may have problems with your published
-## 		apps and games on Google Play Store. Your certificate identifies you, and creating
+##    1) If you lose it or forget the password, you may have problems with your published
+##       apps and games on Google Play Store. Your certificate identifies you, and creating
 ##       a new one is like becoming a new person. You may not be able to update your previously
 ##       published apps and games.
 ##
