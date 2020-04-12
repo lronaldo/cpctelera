@@ -107,5 +107,4 @@ TEE   := tee
 CAT   := cat
 
 ## USEFUL TRICKS (Like defining a space)
-SPACE := 
-SPACE += 
+SPACE := $(subst a,,a a)

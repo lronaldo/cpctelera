@@ -52,19 +52,19 @@ PNGDecoder::readFile(std::string filename) {
    // Set-up conversors array
    auto cnit = m_conversors.begin();
    cnit->conv = std::make_unique<CConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _C; cnit->ext = ".c"; cnit->formatName = "C-SOURCE"; ++cnit;
+   cnit->flag = GN_C; cnit->ext = ".c"; cnit->formatName = "C-SOURCE"; ++cnit;
    cnit->conv = std::make_unique<ASMConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _S; cnit->ext = ".s"; cnit->formatName = "ASM-ASZ80-SOURCE"; ++cnit;
+   cnit->flag = GN_S; cnit->ext = ".s"; cnit->formatName = "ASM-ASZ80-SOURCE"; ++cnit;
    cnit->conv = std::make_unique<BASICConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _BAS; cnit->ext = ".bas"; cnit->formatName = "BASIC"; ++cnit;
+   cnit->flag = GN_BAS; cnit->ext = ".bas"; cnit->formatName = "BASIC"; ++cnit;
    cnit->conv = std::make_unique<BINConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _BIN; cnit->ext = ".bin"; cnit->formatName = "RAW BINARY"; ++cnit;
+   cnit->flag = GN_BIN; cnit->ext = ".bin"; cnit->formatName = "RAW BINARY"; ++cnit;
    cnit->conv = std::make_unique<HConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _H; cnit->ext = ".h"; cnit->formatName = "C-HEADER"; ++cnit;
+   cnit->flag = GN_H; cnit->ext = ".h"; cnit->formatName = "C-HEADER"; ++cnit;
    cnit->conv = std::make_unique<HSConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _HS; cnit->ext = ".h.s"; cnit->formatName = "ASM-ASZ80-HEADER"; ++cnit;
+   cnit->flag = GN_HS; cnit->ext = ".h.s"; cnit->formatName = "ASM-ASZ80-HEADER"; ++cnit;
    cnit->conv = std::make_unique<TerminalTestDrawConversor>(m_image.data(), m_width, m_height);
-   cnit->flag = _DRAW; cnit->ext = ".txt"; cnit->formatName = "TEXT/TERMINAL DRAWING"; ++cnit;
+   cnit->flag = GN_DRAW; cnit->ext = ".txt"; cnit->formatName = "TEXT/TERMINAL DRAWING"; ++cnit;
 }
 
 void

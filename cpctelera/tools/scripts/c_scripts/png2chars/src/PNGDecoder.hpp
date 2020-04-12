@@ -46,14 +46,14 @@ struct PNGDecoder {
 
    // Types
    enum Generate {
-         _C    = 0x01
-      ,  _S    = 0x02
-      ,  _HS   = 0x04
-      ,  _H    = 0x08
-      ,  _BIN  = 0x10
-      ,  _BAS  = 0x20
-      ,  _DRAW = 0x40
-      ,  _DEF  = 0x80
+         GN_C    = 0x01
+      ,  GN_S    = 0x02
+      ,  GN_HS   = 0x04
+      ,  GN_H    = 0x08
+      ,  GN_BIN  = 0x10
+      ,  GN_BAS  = 0x20
+      ,  GN_DRAW = 0x40
+      ,  GN_DEF  = 0x80
    };
 
    struct ConversorPack {
@@ -83,8 +83,8 @@ struct PNGDecoder {
    }
 
    void setGenerate(uint8_t gen) { 
-      if ( m_generate & _DEF ) m_generate = gen;   // Remove defaults
-      else m_generate |= gen;                      // Add new value, defaults are already removed
+      if ( m_generate & GN_DEF ) m_generate = gen;   // Remove defaults
+      else m_generate |= gen;                        // Add new value, defaults are already removed
    }   
 
    // Conversion functions
@@ -94,7 +94,7 @@ struct PNGDecoder {
 private:
    TVecUchar         m_image;
    long unsigned     m_width {0}, m_height {0};
-   uint8_t           m_generate { _DEF | _C | _H };
+   uint8_t           m_generate { GN_DEF | GN_C | GN_H };
    TArrayConversors  m_conversors{};
    std::string       m_filename{};
 };

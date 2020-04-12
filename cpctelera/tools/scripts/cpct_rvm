@@ -24,20 +24,21 @@
 ##
 ## File: cpct_rvm
 ##    This script lets the user execute RetroVirtualMachine from command line 
-## and automatically run a file from a DSK/SNA at will. 
+## and automatically run a file from a DSK/SNA/CDT at will. 
 ##
 ## Usage:
-##    <cpct_rvm> [options] [DSKFile/SNAFile]
+##    <cpct_rvm> [options] [DSKFile/SNAFile/CDTFile]
 ##
 ## Description:
 ##    This script automatically launches RetroVirtualMachine emulator (RVM) 
-## and executes an Amstrad CPC. If required, it additionally passes a DSK/SNA file 
+## and executes an Amstrad CPC. If required, it additionally passes a DSK/SNA/CDT file 
 ## which gets automatically loaded and executed. When loading a DSK file, it will 
 ## be into RVM's FD1 ('A' unit) and a file with the same name of the DSK file will
 ## be executed with a 'RUN "FILE"' command. Please, refer to this script's options
 ## if you wanted to configure this RUN command. SNA files are automatically
 ## restored into memory and execution continues from their PC location (included 
-## in the SNA). 
+## in the SNA). CDT files are also automatically loaded with a RUN command that
+## uses the filename by default.
 ##
 ##    By default, RVM is run with a CPC464 machine configuration for SNA files, 
 ## and with a CPC664 for DSK files. Refer to this script's options to select 
@@ -77,7 +78,7 @@ WWW_RVM_WIN64=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/bet
 WWW_RVM_WIN32=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/windows/x86/RetroVirtualMachine.2.0.beta-1.r7.windows.x86.zip
 WWW_RVM_OSX=http://retrovirtualmachine.ams3.digitaloceanspaces.com/release/beta1/macos/RetroVirtualMachine.2.0.beta-1.r7.macos.zip
 RVM_EXE=RetroVirtualMachine
-RVM_EXE_OSX="Retro\ Virtual\ Machine\ 2.app/Contents/MacOS/Retro\ Virtual\ Machine\ 2"
+RVM_EXE_OSX="Retro Virtual Machine 2.app/Contents/MacOS/Retro Virtual Machine 2"
 RVM_ZIP=${CPCT_TOOLS_FOLDER}/RVM.zip
 RVM_DIR=${CPCT_TOOLS_FOLDER}/rvm
 RVM=/path/to/RVM ## Should be read from config file
@@ -106,19 +107,20 @@ source $(dirname $0)/lib/bash_library.sh
 ##
 function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK/SNA File]"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK/SNA/CDT File]"
    echo
    echo "${COLOR_CYAN}  Lets the user execute RetroVirtualMachine from command line and automatically \
-run a file from a DSK at will."
+run a file from a DSK/SNA/CDT at will."
    echo
    echo "${COLOR_CYAN}     This script automatically launches RetroVirtualMachine emulator (RVM) \
-and executes an Amstrad CPC. If required, it additionally passes a DSK/SNA file \
+and executes an Amstrad CPC. If required, it additionally passes a DSK/SNA/CDT file \
 which gets automatically loaded and executed. When loading a DSK file, it will \
 be into RVM's FD1 ('A' unit) and a file with the same name of the DSK file will \
 be executed with a 'RUN "FILE"' command. Please, refer to this script's options \
 if you wanted to configure this RUN command. SNA files are automatically \
 restored into memory and execution continues from their PC location (included \
-in the SNA)."
+in the SNA). CDT files are also automatically loaded with a RUN command that \
+uses the filename by default."
    echo
    echo "${COLOR_CYAN}     By default, RVM is run with a CPC464 machine configuration for SNA files, \
 and with a CPC664 for DSK files. Refer to this script's options to select \
@@ -431,11 +433,11 @@ while (( $# > 0 )); do
             paramError "Unrecognized command line option '$1'" 7
          elif [[ "$FILE" == "" ]]; then
             if [ ! -f "$1" ]; then
-               paramError "'$1' is not a valid readable file (a DSK/SNA file was expected)." 8
+               paramError "'$1' is not a valid readable file (a DSK/SNA/CDT file was expected)." 8
             fi
             FILE="${1}"
          else
-            paramError "'${1}' unexpected parameter. Are you trying to provide more than one DSK/SNA file?" 9
+            paramError "'${1}' unexpected parameter. Are you trying to provide more than one DSK/SNA/CDT file?" 9
          fi
       ;; 
    esac

@@ -34,7 +34,7 @@ CDTM_W        := 160
 CDTM_PALFW    := 11 15 3 24 13 20 6 26 0 2 1 18 8 5 16 9 
 CDTM_BORDERFW := 0
 CDTM_FILENAME := Game
-CDTM_VALIDFORMATS := firmware basic miniload generated_fw generated_ml 
+CDTM_VALIDFORMATS := firmware basic miniload ascii generated_fw generated_ml 
 CDTM_SCRFILE  := 
 CDTM_OBJDIR   := $(OBJDIR)/_cdtmanager
 CDTM_DEPEND   := cfg/cdt_manager.mk
@@ -138,7 +138,7 @@ endef
 # to insert it RAW in raw1full format or adding AMSDOS header
 #
 # $(1): File
-# $(2): Type {generated_fw, firmware, basic, miniload}
+# $(2): Type {generated_fw, firmware, basic, miniload, ascii}
 # $(3): Load Address (for firmware calls)
 # $(4): Run Address (for firmware calls)
 # $(5): Filename (for firmware calls)
@@ -156,8 +156,8 @@ define INSERT_NEXT_FILE_INTO_CDT
 		, $(call GETALLADDRESSES,$(BINFILE)) \
 		  $(eval _LA:=$(if $(call EQUALS,noload,$(3)),0x$(strip $(LOADADDR)),$(3))) \
 		  $(eval _RA:=$(if $(call EQUALS,norun,$(4)),0x$(strip $(RUNADDR)),$(4))) \
-		  && $(CPC2CDT) -x "$(_RA)" -l "$(_LA)" -p 3000 -t -b 2000 -r "$(CDTM_FILENAME)" "$(1)" "$(CDT)" > /dev/null \
-		  && printf "Load:'$(_C2)$(_LA)$(_C1)' Run:'$(_C2)$(_RA)$(_C1)' Name:'$(_C2)$(CDTM_FILENAME)$(_C1)'" \
+		  && $(CPC2CDT) -x "$(_RA)" -l "$(_LA)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
+		  && printf "Load:'$(_C2)$(_LA)$(_C1)' Run:'$(_C2)$(_RA)$(_C1)' Name:'$(_C2)$(5)$(_C1)'" \
 	)
 	$(if $(call EQUALS,firmware,$(2))\
 		, $(CPC2CDT) -x "$(4)" -l "$(3)" -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
@@ -168,6 +168,10 @@ define INSERT_NEXT_FILE_INTO_CDT
 	)
 	$(if $(call EQUALS,basic,$(2))\
 		, $(CPC2CDT) -p 3000 -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
+		  && printf "Name:'$(_C2)$(5)$(_C1)'" \
+	)
+	$(if $(call EQUALS,ascii,$(2))\
+		, $(CPC2CDT) -m cpctxt -t -b 2000 -r "$(5)" "$(1)" "$(CDT)" > /dev/null \
 		  && printf "Name:'$(_C2)$(5)$(_C1)'" \
 	)
 
@@ -195,7 +199,7 @@ define CREATECDT
 		$(eval _N := $(subst ',$(SPACE),$(word $(_I), $(CDTM_CDTNAMES)))) \
 		$(eval _L := $(word $(_I), $(CDTM_CDTLOAD))) \
 		$(eval _R := $(word $(_I), $(CDTM_CDTRUN))) \
-		$(call INSERT_NEXT_FILE_INTO_CDT,$(_F),$(_T),$(_L),$(_R),$(_N))
+		$(call INSERT_NEXT_FILE_INTO_CDT,$(_F),$(_T),$(_L),$(_R),$(_N)) \
 		$(eval _I := $(call ADD2INTS,$(_I),1)) \
 		)
 endef

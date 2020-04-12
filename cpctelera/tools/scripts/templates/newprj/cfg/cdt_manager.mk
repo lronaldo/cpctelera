@@ -238,6 +238,16 @@ $(eval $(call CDTMAN, SET_FILENAME, Game))
 ##           by using <cpct_miniload> function. You may create files with    ##
 ##           data and read them wherever you wanted in memory. This enables  ##
 ##           you to create your own loaders or multiload games, for instance.##
+##      - 'ascii'                                                            ##
+##           It will add ASCII-codified BASIC file (not valid for BASIC      ##
+##           binary files). The file will be added using the currently set   ##
+##           name (set previously using SET_FILENAME). File will be saved    ##
+##           as ASCII raw data that BASIC can read, parse and interpret.     ##
+##           Therefore, RUN/LOAD addresses are not required. Files will use  ##
+##           2 blocks and 2000 bauds(like firmware files). They will be able ##
+##           to be read and executed using standard RUN/LOAD BASIC commands. ##
+##           WARNING: input ASCII files must have CR/LF line endings (MSDOS  ##
+##           format) and all lines must end on a new line.                   ##
 ##                                                                           ##
 ##    IMPORTANT: Any file you give to ADDFILE will be inserted in the CDT as ##
 ## binary data. Files should not have any header you did not want them to    ##
