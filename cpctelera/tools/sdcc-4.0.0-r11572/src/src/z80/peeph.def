@@ -1,0 +1,7 @@
+// peeph.def - Common Z80 and gbz80 peephole rules
+
+// This file should contain common Z80/GBZ80 peepholes.
+// However the GBZ80 port is currently unmaintained;
+// a GBZ80 expert could extract peepholes that are useful for both Z80 and GBZ80
+// from peeph-z80.def and peeph-gbz80.def and move them here.
+

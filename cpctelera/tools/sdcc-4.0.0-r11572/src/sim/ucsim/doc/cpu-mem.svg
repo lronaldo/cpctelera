@@ -1,0 +1,329 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: fig2dev Version 3.2 Patchlevel 6-beta -->
+<!-- CreationDate: Wed Jul 20 21:15:51 2016 -->
+<!-- Magnification: 1.050 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="5.5in" height="4.1in"
+	viewBox="3294 771 6544 4910">
+<g style="stroke-width:.025in; fill:none">
+<!-- Line -->
+<polyline points="6283,3372
+6283,4866
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 6283 4866 - 6283 3338-->
+<polyline points="6314 3482
+6283 3356
+6251 3482
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="7795,3372
+7795,5055
+6519,5055
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 7795 5055 - 7795 3338-->
+<polyline points="7826 3482
+7795 3356
+7763 3482
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polygon points="5858,3543
+5763,3543
+5952,3354
+6141,3543
+6047,3543
+6047,3732
+6141,3732
+5952,3921
+5763,3732
+5858,3732
+5858,3543
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#0000ff;
+"/>
+<!-- Line -->
+<polygon points="7370,3543
+7275,3543
+7464,3354
+7653,3543
+7559,3543
+7559,3732
+7653,3732
+7464,3921
+7275,3732
+7370,3732
+7370,3543
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#0000ff;
+"/>
+<!-- Line -->
+<polygon points="9212,3543
+9118,3543
+9307,3354
+9496,3543
+9401,3543
+9401,3732
+9496,3732
+9307,3921
+9118,3732
+9212,3732
+9212,3543
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#0000ff;
+"/>
+<!-- Line: box -->
+<rect x="4535" y="3921" width="5007" height="188" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#0000ff;
+"/>
+<!-- Line: box -->
+<rect x="3307" y="1653" width="1228" height="3401" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#b46100;
+"/>
+<!-- Line: box -->
+<rect x="5338" y="2551" width="1086" height="803" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#00d1d1;
+"/>
+<!-- Line: box -->
+<rect x="6850" y="2551" width="1086" height="803" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#00d1d1;
+"/>
+<!-- Line: box -->
+<rect x="8692" y="2551" width="1086" height="803" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#008f8f;
+"/>
+<!-- Line -->
+<polyline points="8881,3354
+9070,3543
+8976,3543
+8976,4629
+4913,4629
+5102,4960
+5102,4866
+5244,5102
+5102,5338
+5102,5244
+4818,4818
+4535,4818
+4535,4299
+5433,4299
+5433,3543
+5338,3543
+5527,3354
+5716,3543
+5622,3543
+5622,4299
+6944,4299
+6944,3543
+6850,3543
+7039,3354
+7228,3543
+7133,3543
+7133,4299
+8787,4299
+8787,3543
+8692,3543
+8881,3354
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#00ff00;
+"/>
+<!-- Line -->
+<polyline points="4535,2267
+6992,2267
+6992,2533
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 6992 2267 - 6992 2566-->
+<polyline points="6960 2423
+6992 2549
+7023 2423
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="4535,2125
+7181,2125
+7181,2533
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 7181 2125 - 7181 2566-->
+<polyline points="7149 2423
+7181 2549
+7212 2423
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="5433,2534
+5433,2267
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 5433 2267 - 5433 2566-->
+<polyline points="5401 2423
+5433 2549
+5464 2423
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="5622,2534
+5622,2125
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 5622 2125 - 5622 2566-->
+<polyline points="5590 2423
+5622 2549
+5653 2423
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="4535,1937
+8881,1937
+8881,2533
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 8881 1937 - 8881 2566-->
+<polyline points="8850 2423
+8881 2549
+8913 2423
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="9070,2534
+9070,1795
+4535,1795
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 9070 1795 - 9070 2566-->
+<polyline points="9039 2423
+9070 2549
+9102 2423
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="5385,1511
+5480,1417
+6519,1417
+6614,1322
+6708,1417
+7748,1417
+7842,1511
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="8692,1511
+8787,1417
+9165,1417
+9259,1322
+9354,1417
+9732,1417
+9826,1511
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Text -->
+<text xml:space="preserve" x="8031" y="2173" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Control lines</text>
+<!-- Text -->
+<text xml:space="preserve" x="8031" y="2409" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">(R/W)</text>
+<!-- Text -->
+<text xml:space="preserve" x="8314" y="3874" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Data bus</text>
+<!-- Text -->
+<text xml:space="preserve" x="6803" y="4535" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Address bus</text>
+<!-- Text -->
+<text xml:space="preserve" x="6614" y="1181" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Address Space I.</text>
+<!-- Text -->
+<text xml:space="preserve" x="9259" y="1181" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Space II.</text>
+<!-- Text -->
+<text xml:space="preserve" x="9259" y="944" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Address</text>
+<!-- Line: box -->
+<rect x="5244" y="4866" width="1275" height="803" rx="0" 
+style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#00b000;
+"/>
+<!-- Text -->
+<text xml:space="preserve" x="5905" y="3023" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Mem1</text>
+<!-- Text -->
+<text xml:space="preserve" x="7417" y="3023" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Mem2</text>
+<!-- Text -->
+<text xml:space="preserve" x="9212" y="3023" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Mem3</text>
+<!-- Text -->
+<text xml:space="preserve" x="3874" y="3212" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">CPU</text>
+<!-- Line -->
+<polyline points="9637,3372
+9637,5196
+6519,5196
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 9637 5196 - 9637 3338-->
+<polyline points="9669 3482
+9637 3356
+9606 3482
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="4629,1795
+4677,1842
+4677,5527
+5226,5527
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 4677 5527 - 5259 5527-->
+<polyline points="5116 5559
+5241 5527
+5116 5496
+" style="stroke:#000000;stroke-width:8;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="4629,1937
+4677,1984
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="4629,2125
+4677,2173
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="4629,2267
+4677,2314
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Text -->
+<text xml:space="preserve" x="5858" y="5480" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Decoder</text>
+<!-- Text -->
+<text xml:space="preserve" x="5858" y="5244" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Address</text>
+<!-- Text -->
+<text xml:space="preserve" x="8078" y="5480" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="152" text-anchor="middle">Chip select lines</text>
+</g>
+</svg>

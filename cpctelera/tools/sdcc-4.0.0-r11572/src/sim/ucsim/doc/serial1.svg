@@ -1,0 +1,133 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: fig2dev Version 3.2 Patchlevel 6-beta -->
+<!-- CreationDate: Wed Jul 20 21:20:20 2016 -->
+<!-- Magnification: 1.000 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="5.9in" height="3.3in"
+	viewBox="813 2025 7105 3912">
+<g style="stroke-width:.025in; fill:none">
+<!-- Arc -->
+<path style="stroke:#000000;stroke-width:7;stroke-linecap:butt;"
+d="M 5025,2250 A 187 187  0  0  1  5025  2550 " />
+<!-- Ellipse -->
+<ellipse transform="translate(3825,2400) rotate(-0.00000000)" rx="75" ry="150"
+ style="fill:#000000;stroke:#000000;stroke-width:7;"/>
+<!-- Line -->
+<polyline points="3825,2250
+5025,2250
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="3825,2550
+5025,2550
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arc -->
+<path style="stroke:#000000;stroke-width:7;stroke-linecap:butt;"
+d="M 5175,5625 A 187 187  0  0  1  5175  5925 " />
+<!-- Ellipse -->
+<ellipse transform="translate(3975,5775) rotate(-0.00000000)" rx="75" ry="150"
+ style="fill:#000000;stroke:#000000;stroke-width:7;"/>
+<!-- Line -->
+<polyline points="3975,5625
+5175,5625
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="3975,5925
+5175,5925
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="2264,3442
+3675,2475
+" style="stroke:#ff0000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 3675 2475 - 2237 3458-->
+<polyline points="2333 3356
+2251 3449
+2366 3406
+" style="stroke:#ff0000;stroke-width:7;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="6300,3675
+5260,2486
+" style="stroke:#ff0000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 6300 3675 - 5240 2463-->
+<polyline points="5352 2545
+5251 2475
+5307 2585
+" style="stroke:#ff0000;stroke-width:7;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="6965,3987
+5400,5775
+" style="stroke:#00ff00;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 5400 5775 - 6984 3963-->
+<polyline points="6916 4085
+6973 3975
+6871 4045
+" style="stroke:#00ff00;stroke-width:7;stroke-miterlimit:8;
+"/>
+<!-- Line -->
+<polyline points="3000,3675
+3819,5760
+" style="stroke:#00ff00;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arrowhead on XXXpoint 3000 3675 - 3830 5788-->
+<polyline points="3752 5672
+3824 5773
+3808 5650
+" style="stroke:#00ff00;stroke-width:7;stroke-miterlimit:8;
+"/>
+<!-- Line: box -->
+<rect x="825" y="2925" width="3075" height="300" rx="0" 
+style="stroke:#0000b0;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line: box -->
+<rect x="825" y="3225" width="3075" height="1650" rx="0" 
+style="stroke:#0000b0;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line: box -->
+<rect x="4800" y="3600" width="3075" height="1650" rx="0" 
+style="stroke:#0000b0;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line: box -->
+<rect x="4800" y="3300" width="3075" height="300" rx="0" 
+style="stroke:#0000b0;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Text -->
+<text xml:space="preserve" x="4425" y="2175" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">2-1</text>
+<!-- Text -->
+<text xml:space="preserve" x="4575" y="5550" fill="#000000"  font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">1-2</text>
+<!-- Text -->
+<text xml:space="preserve" x="6375" y="3525" fill="#0000b0"  font-family="Helvetica" font-style="normal" font-weight="bold" font-size="144" text-anchor="middle">term2</text>
+<!-- Text -->
+<text xml:space="preserve" x="2325" y="3150" fill="#0000b0"  font-family="Helvetica" font-style="normal" font-weight="bold" font-size="144" text-anchor="middle">term1</text>
+<!-- Text -->
+<text xml:space="preserve" x="900" y="3600" fill="#0000ff"  font-family="Courier" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">$ s51 -Sin=2-1,out=1-2 \</text>
+<!-- Text -->
+<text xml:space="preserve" x="900" y="3810" fill="#0000ff"  font-family="Courier" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">program_1_.hex</text>
+<!-- Text -->
+<text xml:space="preserve" x="4950" y="4125" fill="#0000ff"  font-family="Courier" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">program_2_.hex</text>
+<!-- Text -->
+<text xml:space="preserve" x="4950" y="3900" fill="#0000ff"  font-family="Courier" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">$ s51 -Sout=2-1,in=1-2 \</text>
+</g>
+</svg>

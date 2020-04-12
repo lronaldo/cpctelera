@@ -1,0 +1,69 @@
+// peeph.def - PDK peephole rules
+
+replace restart {
+	mov	%1, %2
+} by {
+	; peephole 0 removed dead load into %1 from %2.
+} if notUsed(%1), notVolatile(%1), notVolatile(%2)
+
+replace restart {
+	clear	%1
+} by {
+	; peephole 1 removed dead clear of %1.
+} if notUsed(%1)
+
+replace restart {
+	mov	%1, a
+	mov	a, %1
+} by {
+	mov	%1, a
+	; peephole 2 removed redundant load from %1 into a.
+} if notVolatile(%1)
+
+replace restart {
+	push	%1
+	pop	%1
+} by {
+	; peephole 3 removed redundant push / pop.
+}
+
+
+replace restart {
+	mov	a, #%1
+	ret
+} by {
+	; peephole 4 moved load to ret.
+	ret	#%1
+}
+
+replace restart {
+	xch	a, %1
+	xch	a, %1
+} by {
+	; peephole 5 removed redundant double exchange between a and %1.
+} if notVolatile(%1)
+
+replace restart {
+	mov	a, #0x00
+	slc	a
+	and	a, #0x01
+} by {
+	mov	a, #0x00
+	slc	a
+	; peephole 6 removed redundant and.
+}
+
+replace restart {
+%1:
+} by {
+	; peephole j0 removed unused label %1.
+} if labelRefCount(%1 0)
+
+replace restart {
+	ret	%1
+	ret
+} by {
+	ret	%1
+	; peephole j1 removed redundant ret after ret k.
+}
+

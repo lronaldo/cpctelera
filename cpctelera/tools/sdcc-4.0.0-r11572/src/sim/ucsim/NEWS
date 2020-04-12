@@ -1,0 +1,49 @@
+0.6
+
+- New commands: "memory info" (same as "info memory"), "get error"
+  (same as "show error").
+
+- Simulator interface (virtual hw element).
+
+- Simulator control over serial line terminal. Escape character is ^x
+  (CTRL-x) but it is configurable for every uarts. Available functions
+  are: start, stop, quit, reset, close.
+
+- Command line editing and history
+
+- More operators for expressions
+
+- New simulators: TLCS90, Padauk
+
+- VCD output
+
+- Read information from cdb and omf files
+
+- Variables
+
+- New option: "-e command" to specify startup command
+
+- Colors. New program option "-o colspec" to specify color values and
+  -b to omit coloring. New options "color_XXX" to hold values.
+  
+
+0.5
+
+- Bug fixes to run sdcc regression tests
+
+- Implementation of missing instruction ORL C,\bit of MCS51
+
+- Fix of AVR instruction decoder
+
+- Expressions
+
+- Memory simulation redesigned: address space, chip, address decoder
+
+
+0.4
+
+- Stack tracking.
+
+- Error handling.
+
+- Redirection of output of commands.

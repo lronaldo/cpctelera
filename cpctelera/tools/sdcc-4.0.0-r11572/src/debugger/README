@@ -1,0 +1,518 @@
+sdcc/debugger
+
+SDCDB debugger - Development notes.
+======================
+
+
+ddd - Notes from Martin Helmling, May   23, 2003
+========================
+
+Additionally following new commands work:
+
+ignore <breakpointnumber> <ignorecount> - ignore the breakpoint n times
+condition <breakpointnumber> <variable> <|>|<=|>=|==|!= <constant> - break condition
+commands - see gdb description -
+
+ddd - Notes from Martin Helmling, April 28, 2003
+========================
+
+To fullfill the requirements of 'ddd' ( Data Display Debugger ) to use it at
+graphical frontend to 'sdcdb' some new commands must be implemented.
+
+Now you can run the ddd with the commandline
+
+ddd -debugger 'sdcdb -cpu 8032 <file>'
+
+Following commands are additional implemented:
+
+1. execution:
+
+stepi - Step one instruction exactly using simulator 'step' command.
+nexti - Step one instruction, but proceed through subroutine calls using simulator 'next' command.
+break *<addr> - Set breakpoint at program address
+
+log examples:
+-> "stepi\n"
+<- "Simulator stopped at Address 0x0051\n"
+   "\032\032x.c:31:1:beg:0x00000051\n"
+   "(sdcdb) "
+-> "nexti\n"
+<- "Simulator stopped at Address 0x0055\n"
+   "\032\032x.c:33:1:beg:0x00000055\n"
+   "(sdcdb) "
+
+2. show machine code window:
+
+x /i  - disassemble one asm command
+x disassemble asm commands
+
+log examples:
+-> "x /i 0x00000055\n"
+<- "0x00000055 <main+6>:\t\tmov\tr0,#_l\n"
+   "(sdcdb) "
+-> "disassemble 0x00000055\n"
+<- "Dump of assembler code for function main:\n"
+   "0x0000004f <main>:\t\tmov\tr0,#_ttt\n"
+   "0x00000051 <main+2>:\t\tmov\t@r0,#0x01\n"
+<- "0x00000053 <main+4>:\t\tmov\tr2,#0x09\n"
+   "0x00000055 <main+6>:\t\tmov\tr0,#_l\n"
+...
+   "0x000000c1 <main+114>:\t\tret\n"
+   "End of assembler dump.\n"
+   "(sdcdb) "
+-> "disassemble 0x40 0x45\n"
+<- "Dump of assembler code from 0x00000040 to 0x00000045:\n"
+   "0x00000040 <subfunc1+8>:\t\tinc\tr0\n"
+   "0x00000041 <subfunc1+9>:\t\tmov\t@r0,ar3\n"
+   "0x00000043 <subfunc1+11>:\t\tmov\ta,r3\n"
+   "0x00000044 <subfunc1+12>:\t\trlc\ta\n"
+   "0x00000045 <subfunc1+13>:\t\tsubb\ta,acc\n"
+   "End of assembler dump.\n"
+   "(sdcdb) "
+-> "break x.c:23\n"
+<- "Breakpoint 1 at 0x4b: file x.c, line 23.\n"
+   "(sdcdb) "
+-> "info breakpoints\n"
+<- "Num Type           Disp Enb Address    What\n"
+   "1   breakpoint     keep y   0x0000004b at x.c:23\n"
+   "(sdcdb) "
+->
+
+3. show registers and stack
+
+frame - print information about the current Stack
+where - print stack
+up    - Select and print stack frame that called this one
+down  - Select and print stack frame that called this one
+info registers - show registers
+info all-registers - show also special these function registers,
+                     which are symbolical defined.
+help <cmd> show short help for ddd tooltip info
+log examples:
+
+-> "where\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "#1  0x0000004f in main () at x.c:31\n"
+   "(sdcdb) "
+-> "frame\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "\032\032x.c:23:1:beg:0x0000004b\n"
+   "(sdcdb) "
+-> "up\n"
+<- "#1  0x0000004f in main () at x.c:31\n"
+   "\032\032x.c:31:1:beg:0x0000004f\n"
+   "(sdcdb) "
+-> "frame\n"
+<- "#1  0x0000004f in main () at x.c:31\n"
+   "\032\032x.c:31:1:beg:0x0000004f\n"
+   "(sdcdb) "
+-> "down\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "\032\032x.c:23:1:beg:0x0000004b\n"
+   "(sdcdb) "
+-> "frame\n"
+<- "#0  0x0000004b in subfunc1 () at x.c:23\n"
+   "\032\032x.c:23:1:beg:0x0000004b\n"
+   "(sdcdb) "
+-> "info registers\n"
+<- "R0  : 0x87 135 .\n"
+   "R1  : 0x00 0 .\n"
+   "R2  : 0x05 5 .\n"
+   "R3  : 0x00 0 .\n"
+   "R4  : 0x00 0 .\n"
+   "R5  : 0x08 8 .\n"
+   "R6  : 0x00 0 .\n"
+   "ACC : 0x00 0 .\n"
+   "B   : 0x00 0 .\n"
+   "DPTR: 0x0005 5\n"
+   "@DPTR: 0x00 0 .\n"
+   "PSW  : 0x00 | CY : 0 | AC : 0 | OV : 0 | P : 0\n"
+   "(sdcdb) "
+#  Showing all registers.
+-> "info all-registers\n"
+<- "R0  : 0x87 135 .\n"
+   "R1  : 0x00 0 .\n"
+   "R2  : 0x05 5 .\n"
+   "R3  : 0x00 0 .\n"
+   "R4  : 0x00 0 .\n"
+   "R5  : 0x08 8 .\n"
+   "R6  : 0x00 0 .\n"
+   "ACC : 0x00 0 .\n"
+   "B   : 0x00 0 .\n"
+   "DPTR: 0x0005 5\n"
+   "@DPTR: 0x00 0 .\n"
+   "PSW  : 0x00 | CY : 0 | AC : 0 | OV : 0 | P : 0\n"
+   "Special Function Registers:\n"
+<- "P0=0xff P0_0=1 P0_1=1 P0_2=1 P0_3=1\n"
+   "SP=0x13\n"
+   "(sdcdb) "
+-> "help step\n"
+<- "Step program until it reaches a different source line.\n"
+   "(sdcdb) "
+-> "help stepi\n"
+<- "Step one instruction exactly.\n"
+   "(sdcdb) "
+
+4. show and set variables:
+output  [/<fmt>] <expr1> print value of <expr1> without newline for tooltip of ddd
+print   [/<fmt>] <expr1> print value of <expr1> with newline
+display [/<fmt>] <expr1> print value of <expr1> every time the program is stopped 
+                          or 'display' command without args is used.
+
+set variable <expr1> = <value> 
+
+
+<fmt> is the format for the basic type which is print out. 
+If no format is set the default format is used.
+format is set by ddd  'x' as hex 'o' as octal, 'd' as dezimal and 't' as binary.
+
+<expr1> can by a variable , a array element , a structure element ( [] and . is parsed ).
+indices of arrays may be constants or variables.
+( dereference of pointers and casting today not implemented !! )
+
+log examples:
+code:
+
+typedef unsigned char uchar;
+idata long  l;
+typedef struct _txstate
+{
+    uchar dstatus[4];
+    uchar avalue [8 ];
+} txstate_t;
+
+xdata txstate_t txstates[8];
+
+-> "output l\n"
+<- "5(sdcdb) "
+-> "display l\n"
+<- "(sdcdb) "
+-> "display /x l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "display /o l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "3: /o l = 00000000005\n"
+   "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "display /d l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "4: /d l = 5\n"
+   "3: /o l = 00000000005\n"
+   "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "display /t l\n"
+<- "(sdcdb) "
+-> "display\n"
+<- "5: /t l = 00000000000000000000000000000101\n"
+   "4: /d l = 5\n"
+   "3: /o l = 00000000005\n"
+   "2: /x l = 0x00000005\n"
+   "1: l = 5\n"
+   "(sdcdb) "
+-> "output l\n"
+<- "5(sdcdb) "
+-> "print txstates\n"
+<- "$2 = { { dstatus = {\'\\1\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\2\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\375\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\4\',\'\\0\',\'\\0\',\'\\0\',\
+'\\0\'}}, { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\'}},
+ { dstatus = {\'\\0\',\'\\0\',\'\\0\',\'\\0\'},
+ avalue = {\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\0\',\'\\
+0\'}}}\n"
+   "(sdcdb) "
+-> "print txstates[1].dstatus[1]\n"
+<- "$5 = \'\\2\'\n"
+   "(sdcdb) "
+-> "print /x txstates[1].dstatus[1]\n"
+<- "$7 = 0x02\n"
+-> "output txstates[1].dstatus[1]\n"
+<- "\'\\2\'(sdcdb) "
+-> "set variable txstates[1].dstatus[1] = 0x10\n"
+<- "(sdcdb) "
+-> "print /t txstates[1].dstatus[1]\n"
+<- "$9 = 00010000\n"
+-> "print /x txstates[1].dstatus[1]\n"
+<- "$10 = 0x10\n"
+
+-> "output l\n"
+<- "5(sdcdb) "
+-> "set variable l = 2\n"
+<- "(sdcdb) "
+-> "print l\n"
+<- "$15 = 2\n"
+-> "print /x txstates[l].dstatus[2]\n"
+<- "$16 = 0xfd\n"
+
+
+---------------------------------------------------
+
+Implementation Notes:
+
+IMEM and XMEM are cached to optimize the printaut of structures and arrays
+
+
+
+Notes April 23, 2003
+========================
+Martin Helmling added support for ddd GUI debugger.
+Code added to display assembly, set variables, and other commands
+to interface to ddd.
+
+From Martins email:
+
+in the attachment is my actual patch.
+
+The 'up' and 'down' stack commands are not implemented.
+But the features for 'ddd' to see bopth the c source and the assembler 
+works,
+also the display of variables.
+Set variables are only implemented for basic types.
+Register variables can also displayed, but here I think a problem in the 
+*.cdb file exists.
+Sometimes the register name not exists:
+
+S:LcacheTxAnalogValue$offset$1$1({1}SC:U),E,0,0
+S:LcacheTxAnalogValue$i$1$1({1}SC:S),R,0,0,[]
+S:LcacheTxAnalogValue$val$1$1({4}ST__00020000:S),E,0,0
+S:LcacheTxAnalogValue$value$1$1({1}SC:U),R,0,0,[]
+S:LcacheTxAnalogValue$sloc0$1$0({4}SL:U),E,0,0
+S:LsetRelays$addr$1$1({1}SC:U),R,0,0,[r2]
+S:LsetRelays$state$1$1({1}SC:U),R,0,0,[r3]
+S:LsetRelays$value$1$1({1}SC:U),R,0,0,[r5]
+S:L_main$i$1$1({1}SC:U),R,0,0,[]
+S:L_main$j$1$1({1}SC:U),R,0,0,[r3]
+S:L_main$ok$1$1({1}SC:U),R,0,0,[r3]
+
+the empty [] I mean !!
+
+Is this a known bug  in sdcc ?
+
+Also sometimes not the correct breakpoints for stepping found  in sdcdb. 
+I try to fix this tomorrow.
+
+Additional patches and notes from Martin(4-24-03):
+in the attachment you found three patches:
+debugpatch: Only for debugging, you can switch on and off the 4 different
+             debug and you can grep the debug by the prefix.
+signalpatch:Now the simulator stops if the user sends an interrupt
+             ( or 'ddd' ) and also the simulator does not die by another
+             user signal.
+
+sympatch:   This is not a feature, THIS is the fix of a BUG !!!
+             In some circumstances in the *.cdb file the Symbol record
+             comes before the function record. So the symbol was
+             generated TWO TIMES in the symbol list. The L:G and L:XG 
+
+             records then insert entry and exit address to the wrong
+             symbol. So before a new symbol is generated for the
+             function, a lookup in the symboltable is done.
+
+Example of a *.cdb:
+
+S:G$ZpuInitialize$0$0({2}DF,SV:S),C,0,0
+S:G$ZpuInitialize$0$0({2}DF,SV:S),C,0,0
+F:G$ZpuInitialize$0$0({2}DF,SV:S),Z,0,0,0,0,0
+S:LZpuInitialize$i$1$1({2}SI:S),R,0,0,[]
+L:G$ZpuInitialize$0$0:ADF
+L:XG$ZpuInitialize$0$0:BBB
+
+
+Notes Feb 10, 2002 - Karl Bongers
+========================
+
+SDCDB is a debugger for SDCC compiler.  It works as a front
+end to the ucSim simulator/disassembler program.
+
+WARNING: SDCDB is EXPERIMENTAL and NOT A FULLY FUNCTIONING TOOL.
+
+SDCDB does hold out promise for a nice debugger tool that
+could integrate well with ucSim and other SDCC tools.  It has
+some nice functionality that could augment ucSim nicely.
+It reads in a lot of symbolic information from the .CDB
+debug files as well as the source code and assembly
+listings referred to in these CDB files.
+This can be used to display your program data, list
+c or asm source code and set breakpoints.
+
+Unfortunately, SDCDB is not quite finished and does not
+function well enough yet to recommend for general use.
+
+
+Usage Notes
+======================
+Compile with --debug option:
+sdcc --debug hi.c
+This should generate .cdb symbolic debug files.
+
+Load sdcdb, like this:
+sdcdb hi.ihx
+
+Then you need to do an initial "run" command.  It should hopefully
+stop somewhere at the main() entrypoint.
+
+Now you should be able to list code, and set breakpoints.  Type
+"c" to continue running to a breakpoint, or type "s" to single
+step or "n" to skip function calls.  Tpye "help" for a summary
+of commands.
+
+Use a preceeding bang("!") to do s51 simulator commands.  So for
+example:
+!pc
+will send the "pc" command to ucSim and
+give you the program counter and list the current line of assembly.
+!help
+will give you the brief command line help listing of ucSim.  But
+this help will scroll of the screen.  So to get a list, I redirect
+stdout to a text file to examine like this:
+sdcdb hi.ihx 2>&1 | tee sdcdb.log
+
+Type '.' to toggle to a full time ucSim prompt.
+
+
+SDCDB problem areas.
+======================
+
+Ok, so what are some of its problems?  Lets try to itemize
+them so we can fix them:
+
+* It hangs sometimes when trying to do step or next.
+
+   This probably has something to do with the context
+   sdcdb tries to build dynamically.  Sdcdb tries to
+   trace program operation by placing hidden breakpoints
+   and stepping threw the simulation between these.
+
+* Does not print variables properly.  Seems to use the
+  wrong address for the variable. (fixed)
+
+* ASM listing not implemented.
+  This should be easy enough to add.  This feature
+  really needs to be implemented before this is a useful
+  tool.  That or addresses of code functions need to be
+  readily available for raw ucSim commands.
+
+* No way to browse symbols, files names.
+  Preferably, it is easy to learn the addresses of variables
+  and functions too.
+  (working on this... see new ls,lm,lf commands)
+
+* Does not allow listing, setting breakpoints or viewing variables
+  before starting the simulation.
+  (I am fixing now, partly fixed)
+
+* p codestr - print on code char * broken, could be CDB info invalid.
+
+
+Changes Made
+======================
+
+Added a -z option.  Any options after -z on sdcdb invocation line
+ are passed directly to ucSim.
+
+Fixed print basic variable command(was not parsing or expecting
+  "0x" in data coming from ucSim).  Dump bit command changed from
+  "db" to "dump".
+
+Add support for the following alternative ucSim binaries:
+ -mz80 - use "uz80" simulator.
+ -mavr - use "uavr" simulator.
+ -mxa - use "uxa" simulator.
+
+  Note that Z80(and probably avr/xa) does not produce enough
+  CDB debugging information to
+  make SDCDB useful.  Hopefully CDB support will be
+  added to these other linkers and code generators.
+
+Added lf,lm,ls commands(list functions, list modules, list symbols).
+ This allows browsing some the CDB information SDCDB pulls in
+ to do the wonderful things it does.
+
+Added '.' prefix/command, used alone switches back and forth
+ from ucSim/SDCDB command mode).  Also when at the (ucsim) prompt,
+ if a command is prefixed with '.' it will route the command to
+ the SDCDB command processor.  (This could obsolete the '!' prefix).
+
+
+======================
+
+Fix any remaining shortcomings above and make sdcdb integrate better with
+ucSim.
+
+Concerning the hanging on next/step instructions:  This is critical
+to fix.  I beleive the problem is related to SDCDB's attempt to
+dynamically track context.  To do this, it sets many temporary break
+points and uses these to progress step by step through the source code.
+It does not seem reliable.  It might be an idea to offer a simplified
+mode of stepping and breakpoints.  Need to study this more.
+
+Make SDCDB integrate better with ucSim.
+I think if sdcdb can act more transparently in regard to ucSim
+it would be used more.  So stress adding value and enhancing
+ucSim operation, and not block or hide the functionality of ucSim.
+
+* combine print "p" & "pt" together.  We have room on the screen,
+might as well print its type, address and value in one command.
+
+* "fr" command prints the current position in the C code.
+Should also print the raw code address for dumping ucSim code.
+
+
+
+Developer Notes:
+======================
+To debug, it might be helpful to turn on verbose debug dumps
+by uncommenting #define SDCDB_DEBUG in sdcdb.h.
+
+Some basic layout:
+sdcdb.c - main shell of the program.
+cmd.c - process user commands typed in.
+simi.c - handle talking to the simulator via a socket connection.
+symtab.c - Misc. functions to translate and process linked list
+  structures(modules, functions, symbols, etc) and CDB file
+  parsing.
+break.c - track and implement break points.
+
+Understanding the structures and access mechanisms of SDCDB
+is a bit of work.  The structures include generic linked list
+and function access.  These lists are accessed in part by the
+functions from ../../src/SDCCset.c and SDCChash.c.  See the
+cmd.c:infoSymbols() routine to gain some insight into these
+main program structures.  Or type "info symbols" to dump
+out some of these.  The new ls,lm,lf commands are also based
+on showing information about these lists of structures.
+
+Generic functions are used to act on these linked lists of
+structures.  For example, in cmd.c, DEFSETFUNC(funcWithName)
+function will find a function structure with a given name.
+So the linked list of function structures(with the head
+"functions") is traversed and when one is found with a matching
+name, a pointer to the function structure is returned.
+
+The src/SDCCset.c,SDCCset.h contain much of the core helper
+routines to allowed to implement these linked list access
+functions.
+
+The dynamic context tracking is difficult to understand.
+It has some concept of stack use, as in
+cmd.c:printSymValue(), where it can print variables relative
+to the stack pointer.
+
+
