@@ -17,7 +17,7 @@
     "a": "disabled",
     "b": "disabled",
     "x": "joy_fire1",
-    "y": "jou_fire2",
+    "y": "joy_fire2",
     "start": "return",
     "select": "space"
   },
