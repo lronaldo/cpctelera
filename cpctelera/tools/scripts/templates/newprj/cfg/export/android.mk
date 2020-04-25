@@ -29,10 +29,6 @@
 
 ## ANDROID APK EXPORTER CONFIGURATION
 
-# Name of the snapshot with the game that will be included in the APK. Normally, you want
-# to use your own Game Snapshot here which is already $(SNA)
-$(eval $(call APKMAN, SET_SNA           , $(SNA) ))
-
 # Android Application ID. This ID must be unique for every application uploaded to Google Play
 # or to any mobile phone. Please, configure your ID once and do not change it afterwards. Otherwise,
 # newer versions of your game will be considered a different APP. You may use here any 
