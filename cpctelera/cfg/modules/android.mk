@@ -41,6 +41,8 @@ AND_APPNAMETAG    := %%%CPCTRVMEngineAppName%%%
 AND_APPSPLASHTAG  := %%%CPCTRVMEngineSplash%%%
 AND_DEFAULT_APK   := $(call SYSPATH,$(ANDROID_PATH)rvmengine/defaultRVMapp.apk)
 AND_KEYSTORE_DIR  := $(ANDROID_PATH)certs
+AND_LICENSE_FILE  := $(ANDROID_PATH)LICENSE
+AND_LICENSE_ACC   := $(AND_KEYSTORE_DIR)/.CPCTRVMEngineEndUserLicenseAccepted
 AND_TMPAPK        := $(AND_OBJDIR)/$(AND_APK).tmp
 ZIPALIGN_LINUX    := $(ANDROID_PATH)bin/zipalign/linux/zipalign32
 ZIPALIGN_WIN      := $(ANDROID_PATH)bin/zipalign/win/32/zipalign.exe
@@ -133,6 +135,73 @@ define AND_GEN_USER_CERT
 endef
 
 #################
+# AND_BETA_LICENSE_MESSAGE: Shows the beta license and asks the user
+# to accept it before continuing. Only after accepting the beta
+# license the user will be authorized to continue
+#
+define AND_BETA_LICENSE_MESSAGE
+ 	@if [ ! -f "$(AND_LICENSE_ACC)" ]; then                                                          \
+		printf "$(COLOR_WHITE)"                                                                      ;\
+		printf "\n==================================================================================";\
+		printf "\n$(COLOR_RED)CPCtelera Android Exporter Beta & RVMEngine:$(COLOR_YELLOW) User license Agreement.";\
+	 	printf "$(COLOR_WHITE)"                                                                      ;\
+		printf "\n==================================================================================";\
+		printf "\n$(COLOR_RED)The authors:"                                                          ;\
+		printf "\n$(COLOR_WHITE)CPCtelera Android Exporter Beta"                                     ;\
+		printf "\n$(COLOR_CYAN)   (C)opyright 2019. José Luís Luri Bolinski (jose.luis.luri@gmail.com)";\
+		printf "\n$(COLOR_CYAN)   (C)opyright 2020. Francisco J. Gallego-Durán (ronaldo@cheesetea.com)";\
+		printf "\n$(COLOR_WHITE)RVMEngine"                                                           ;\
+		printf "\n$(COLOR_CYAN)   (C)opyright 2020. Juan Carlos González Amestoy (rvm@retrovirtualmachine.org)";\
+	 	printf "$(COLOR_WHITE)"                                                                      ;\
+		printf "\n==================================================================================";\
+	 	printf "$(COLOR_NORMAL)"                                                                     ;\
+	 	printf "\n    The authors of CPCtelera Android Exporter Beta and RVMEngine grant you "       ;\
+	 	printf "\npermission to use this software, provided that you accept the following license "  ;\
+	 	printf "\nterms:"                                                                            ;\
+	 	printf "$(COLOR_CYAN)"                                                                       ;\
+	 	printf "\n\n    (1) You are only allowed to generate and distribute APK packages for Amstrad";\
+	 	printf "\nCPC software snapshots (SNA) of your own. You MUST always possess CopyRights of "  ;\
+	 	printf "\nthe software you will distribute using these tools."                               ;\
+	 	printf "\n    (2) You are NOT allowed to modify or redistribute RVMEngine by any means. You ";\
+	 	printf "\nare ONLY permitted to use it together with CPCtelera Android Exporter, and ONLY "  ;\
+	 	printf "\nto distribute software whose rights you own."                                      ;\
+	 	printf "\n    (3) You are permitted to distribute APK packages generated with CPCtelera "    ;\
+	 	printf "\nAndroid Exporter Beta only for NON-COMMERTIAL PURPOSES. In order to sell your "    ;\
+	 	printf "\ngenerated APKs you will need special permission from the authors. "                ;\
+	 	printf "\n    (4) You are not allowed to remove the CPCtelera and RVMEngine logos from the " ;\
+	 	printf "\nsplash screen of your generated APKs, unless you are given special permission from";\
+	 	printf "\nthe authors. "                                                                     ;\
+	 	printf "\n    (5) THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS ";\
+	 	printf "\nOR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS";\
+	 	printf "\nFOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR "   ;\
+		printf "\nCOPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN ";\
+		printf "\nAN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  " ;\
+		printf "\nWITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE  "                  ;\
+	 	printf "$(COLOR_WHITE)"                                                                      ;\
+		printf "\n==================================================================================";\
+	 	printf "$(COLOR_YELLOW)"                                                                     ;\
+		printf "\nIf you agree with these license terms, then type-in 'I AGREE'\n"                   ;\
+	 	printf "$(COLOR_NORMAL)"                                                                     ;\
+		read ANSWER                                                                                  ;\
+		ANSWER=`echo $$$$ANSWER | tr '[:lower:]' '[:upper:]' | xargs`                                ;\
+		if [[ "$$$$ANSWER" = "I AGREE" ]]; then                                                       \
+			printf "\n$(COLOR_GREEN)License Accepted. You may use the CPCtelera Android Exporter "    ;\
+			printf "Beta and RVMEngine to create and distribute APKs of your own software. \n\n"      ;\
+			printf "User accepted license on: `date`" > $(AND_LICENSE_ACC)                            ;\
+		else                                                                                          \
+			printf "\n$(COLOR_RED)You did not accept the license. You are not permitted to use "      ;\
+			printf "CPCtelera Android Exporter Beta nor RVMEngine. "                                  ;\
+			printf "\n\n$(COLOR_NORMAL)"                                                              ;\
+			exit 3                                                                                    ;\
+		fi                                                                                           ;\
+		printf "\n\n$(COLOR_NORMAL)"                                                                 ;\
+	fi                                                                                              ;\
+	cp "$(AND_LICENSE_FILE)" "$(AND_ASSETS)"                                                        ;\
+	cp "$(AND_LICENSE_ACC)" "$(AND_ASSETS)"
+endef
+
+
+#################
 # AND_CHECK_USER_CERT: Checks that there is a valid user certificate file 
 # selected. Otherwise, launches AND_GEN_USER_CERT to generate a valid
 # user certificate file
@@ -221,6 +290,9 @@ $(eval _AND_RULENAME := $(strip $(1)))
 $(eval AND_APK     := $(basename $(AND_SNAFILE)).apk)
 .PHONY: $(_AND_RULENAME)
 $(_AND_RULENAME): $(AND_SNAFILE)
+	@# Show License Message and wait acceptance
+	$(call AND_BETA_LICENSE_MESSAGE)
+
 	@# Anounce generation of APK
 	@$(call PRINT,$(PROJNAME),"Started generation of Android Package '$(AND_APK)'")
 	@printf " On errors consult logfile '$(AND_OBJLOG)'.\n"
@@ -243,13 +315,13 @@ $(_AND_RULENAME): $(AND_SNAFILE)
 	@# REPLACE SNA
 	@printf "  -b: Injecting assets, icons and content..."
 	@printf "\n[[COMMAND]]: $(CP) $(AND_SNAFILE) $(AND_OBJPAYLOADSNA)\n\n" &>> $(AND_OBJLOG)
-	@$(CP) "$(AND_SNAFILE)" "$(AND_OBJPAYLOADSNA)" &>> $(AND_OBJLOG)
+	@$(CP) -v "$(AND_SNAFILE)" "$(AND_OBJPAYLOADSNA)" &>> $(AND_OBJLOG)
 	@# REPLACE ASSETS IF THE USER HAS SUPPLIED WITH SOME
 	@printf "\n[[COMMAND]]: $(CP) -r $(AND_ASSETS)/* $(AND_OBJAPKDIR_ASS)\n\n" &>> $(AND_OBJLOG)
-	@$(CP) -r "$(AND_ASSETS)"/* "$(AND_OBJAPKDIR_ASS)" &>> $(AND_OBJLOG)
+	@$(CP) -rv "$(AND_ASSETS)"/. "$(AND_OBJAPKDIR_ASS)" &>> $(AND_OBJLOG)
 	@# REPLACE RESOURCES IF THE USER HAS SUPPLIED WITH SOME
 	@printf "\n[[COMMAND]]: $(CP) -r $(AND_RES)/* $(AND_OBJAPKDIR_RES)\n\n" &>> $(AND_OBJLOG)
-	@$(CP) -r "$(AND_RES)"/* "$(AND_OBJAPKDIR_RES)" &>> $(AND_OBJLOG)
+	@$(CP) -rv "$(AND_RES)"/. "$(AND_OBJAPKDIR_RES)" &>> $(AND_OBJLOG)
 	@# REPLACE APPLICATION NAME
 	@printf "\n[[COMMAND]]: Replace tags\n\n" &>> $(AND_OBJLOG)
 	@$(call REPLACETAG_RT,$(AND_APPNAMETAG),$(AND_APPNAME),$(AND_STRINGRESFILE)) &>> $(AND_OBJLOG)
