@@ -1,7 +1,7 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ##  Copyright (C) 2019 José Luís Luri
-##  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2020 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -52,17 +52,18 @@ JARSIGNER         := $(JAVA) -jar "$(JARSIGNER_JAR)"
 APKTOOL           := $(JAVA) -jar "$(APKTOOL_JAR)"
 
 ## User configurable values
-AND_APK     := game.apk
-AND_APPNAME := CPCtelera game
-AND_SNAFILE := $(if $(SNA),$(SNA),game.sna)
-AND_ASSETS  := android/assets
-AND_RES     := android/res
-AND_APPID   := $(AND_APPID_PREFIX).game
-AND_KEYSTORE:= $(call SYSPATH,$(AND_KEYSTORE_DIR)/cpctelera.user.keystore.jks)
-AND_KEYALIAS:= cpctelera.user.cert
-AND_KEYVALID:= 10000
-AND_KEYSIZE := 2048
-AND_KEYALG  := RSA
+AND_APK      := game.apk
+AND_APPNAME  := CPCtelera game
+AND_SNAFILE  := $(if $(SNA),$(SNA),)
+AND_ASSETS   := android/assets
+AND_RES      := android/res
+AND_APPID    := $(AND_APPID_PREFIX).game
+AND_KEYSTORE := $(call SYSPATH,$(AND_KEYSTORE_DIR)/cpctelera.user.keystore.jks)
+AND_KEYALIAS := cpctelera.user.cert
+AND_KEYVALID := 10000
+AND_KEYSIZE  := 2048
+AND_KEYALG   := RSA
+AND_STORETYPE:= pkcs12
 
 ## JAVA Version
 AND_JAVA_VER     := $(shell java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\.\(.*\)_.*"/\1\2\3/p;')
@@ -123,7 +124,7 @@ endef
 # it to be the user default certificate.
 #
 define AND_GEN_USER_CERT
-	$(KEYTOOL) -genkeypair -keystore "$(AND_KEYSTORE)" -keyalg $(AND_KEYALG) -keysize $(AND_KEYSIZE) -validity $(AND_KEYVALID) -alias $(AND_KEYALIAS); \
+	$(KEYTOOL) -genkeypair -keystore "$(AND_KEYSTORE)" -storetype "$(AND_STORETYPE)" -keyalg $(AND_KEYALG) -keysize $(AND_KEYSIZE) -validity $(AND_KEYVALID) -alias $(AND_KEYALIAS); \
 	if [ ! -f "$(AND_KEYSTORE)" ]; then\
 		echo "<<<ERROR>>> Could not generate certificate keystore '$(AND_KEYSTORE)'. Please read error messages and try again.";\
 		exit 1;\
@@ -136,21 +137,51 @@ endef
 # user certificate file
 #
 define AND_CHECK_USER_CERT
- 	@if [ ! -f "$(AND_KEYSTORE)" ]; then                                                           \
-	 	echo   "IMPORTANT: No user private certificate configured."                                ;\
-	 	printf "   - A user private certificate is required to sign apk files. Only signed files"  ;\
-	 	printf "can be installed on Android platforms or uploaded to Google Play Store.  Please"   ;\
-	 	echo   "provide information to generate your own personal Android signing certificate."    ;\
-	 	echo   "   - REMEMBER:"                                                                    ;\
-	 	printf "       * Your INFORMATION must be accurate. Otherwise you may have problems when " ;\
-	 	echo   "uploading your APKs to any online store."                                          ;\
-	 	printf "       * Pick up a PASSWORD you remember. If you forget your password you will "   ;\
-	 	printf "need to create a new certificate, losing control of previously signed and uploaded";\
-	 	echo   " applications."                                                                    ;\
-	 	echo   "       * SAVE your generated SIGNING KEY. You may found it in '$(AND_KEYSTORE)'."  ;\
-	 	echo   ""                                                                                  ;\
- 		$(call AND_GEN_USER_CERT)                                                                  ;\
+ 	@if [ ! -f "$(AND_KEYSTORE)" ]; then                                                             \
+		printf "$(COLOR_WHITE)"                                                                      ;\
+		printf "\n==================================================================================";\
+		printf "\n$(COLOR_RED)IMPORTANT:$(COLOR_YELLOW) No user private certificate configured."     ;\
+	 	printf "$(COLOR_WHITE)"                                                                      ;\
+		printf "\n==================================================================================";\
+	 	printf "$(COLOR_CYAN)"                                                                       ;\
+	 	printf "\n    A user private certificate is REQUIRED to sign apk files. Only signed files"   ;\
+	 	printf " can be installed on Android platforms or uploaded to Google Play Store. Please "    ;\
+	 	printf "provide information to generate your own personal Android signing certificate. "     ;\
+		printf "Next steps will create a personal self-signed certificate that you will be able "    ;\
+		printf "to use to sign you APK files automatically. "                                        ;\
+		printf "\n\n    If you prefer, you may use any previous certificate. You need to import it " ;\
+		printf "into a JKS key store (you may use keytool for that). Then, just copy your JKS key"   ;\
+		printf "store to '$(COLOR_NORMAL)$(AND_KEYSTORE)$(COLOR_CYAN)' and CPCtelera will use it to ";\
+	 	printf "sign your APKs."                                                                     ;\
+		printf "\n\n$(COLOR_RED)   - REMEMBER:$(COLOR_CYAN)"                                         ;\
+	 	printf "\n       1. Your INFORMATION must be accurate. Otherwise you may have problems when ";\
+	 	printf "uploading your APKs to any online store."                                            ;\
+	 	printf "\n       2. Pick up a PASSWORD you remember. If you forget your password you will "  ;\
+	 	printf "need to create a new certificate, losing control of previously signed and uploaded"  ;\
+	 	printf " applications."                                                                      ;\
+	 	printf "\n       3. $(COLOR_YELLOW)BACKUP$(COLOR_CYAN) your generated $(COLOR_YELLOW)SIGNING";\
+		printf " KEY$(COLOR_CYAN). You may found it in '$(COLOR_NORMAL)$(AND_KEYSTORE)$(COLOR_CYAN)'.";\
+	 	printf "$(COLOR_WHITE)"                                                                      ;\
+		printf "\n==================================================================================";\
+	 	printf "\n\n$(COLOR_NORMAL)"                                                                 ;\
+ 		$(call AND_GEN_USER_CERT)                                                                    ;\
  	fi
+endef
+
+#################
+# AND_CHECK_SNA: Checks that a valid SNA file has been generated and
+# is ready to be used for APK generation.
+#
+define AND_CHECK_SNA
+	@if [ ! -f "$(AND_SNAFILE)" ]; then                                                             \
+		printf "\n$(COLOR_RED)ERROR:$(COLOR_YELLOW) SNA file '$(AND_SNAFILE)' not found."            ;\
+		printf "$(COLOR_CYAN)"                                                                       ;\
+		printf "\n    An SNA file is required to generate Android APK package. This file is included";\
+		printf " within the package and launched when the user starts the APK. Check your project "  ;\
+		printf "configuration and be sure to generate a SNA file before generating APK."             ;\
+		printf "\n\n$(COLOR_NORMAL)"                                                                 ;\
+		exit 2                                                                                       ;\
+	fi
 endef
 
 #################
@@ -186,12 +217,14 @@ endef
 #
 define AND_GENERATE_APK_RULE
 $(eval _AND_RULENAME := $(strip $(1)))
+$(eval AND_APK     := $(basename $(AND_SNAFILE)).apk)
 .PHONY: $(_AND_RULENAME)
 $(_AND_RULENAME): $(AND_SNAFILE)
 	@# Anounce generation of APK
 	@$(call PRINT,$(PROJNAME),"Started generation of Android Package '$(AND_APK)'")
 	
 	@# CHECK JAVA INSTALLATION AND USER CERTIFICATE BEFORE STARTING
+	$(call AND_CHECK_SNA)
 	$(call AND_CHECK_JAVA_VERSION)
 	$(call AND_CHECK_USER_CERT)
 
