@@ -29,6 +29,7 @@
 ##
 AND_APPID_PREFIX  := com.cpctelera.rvmengine
 AND_OBJDIR        := $(OBJDIR)/_android
+AND_OBJLOG        := $(AND_OBJDIR)/apk-generation.log
 AND_OBJAPKDIR     := $(AND_OBJDIR)/apkcontents
 AND_OBJAPKDIR_ASS := $(AND_OBJAPKDIR)/assets
 AND_OBJAPKDIR_RES := $(AND_OBJAPKDIR)/res
@@ -222,31 +223,57 @@ $(eval AND_APK     := $(basename $(AND_SNAFILE)).apk)
 $(_AND_RULENAME): $(AND_SNAFILE)
 	@# Anounce generation of APK
 	@$(call PRINT,$(PROJNAME),"Started generation of Android Package '$(AND_APK)'")
+	@printf " On errors consult logfile '$(AND_OBJLOG)'.\n"
 	
 	@# CHECK JAVA INSTALLATION AND USER CERTIFICATE BEFORE STARTING
+	@printf "$(COLOR_CYAN) (1/4): Checking SNA, Java Version and User Certificate...$(COLOR_NORMAL)"
 	$(call AND_CHECK_SNA)
 	$(call AND_CHECK_JAVA_VERSION)
 	$(call AND_CHECK_USER_CERT)
+	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
 
 	@# DECODE APK
-	$(APKTOOL) decode "$(AND_DEFAULT_APK)" -f -o "$(AND_OBJAPKDIR)"
+	@printf "$(COLOR_CYAN) (2/4): Generating APK...\n$(COLOR_NORMAL)"
+	@printf "  -a: Decoding..."
+	@date &> $(AND_OBJLOG)
+	@$(MKDIR) $(AND_OBJDIR)
+	@printf "\n[[COMMAND]]: $(APKTOOL) decode $(AND_DEFAULT_APK) -f -o $(AND_OBJAPKDIR)\n\n" &>> $(AND_OBJLOG)
+	@$(APKTOOL) decode "$(AND_DEFAULT_APK)" -f -o "$(AND_OBJAPKDIR)" &>> $(AND_OBJLOG)
+	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
 	@# REPLACE SNA
-	$(CP) "$(AND_SNAFILE)" "$(AND_OBJPAYLOADSNA)"
+	@printf "  -b: Injecting assets, icons and content..."
+	@printf "\n[[COMMAND]]: $(CP) $(AND_SNAFILE) $(AND_OBJPAYLOADSNA)\n\n" &>> $(AND_OBJLOG)
+	@$(CP) "$(AND_SNAFILE)" "$(AND_OBJPAYLOADSNA)" &>> $(AND_OBJLOG)
 	@# REPLACE ASSETS IF THE USER HAS SUPPLIED WITH SOME
-	$(CP) -r "$(AND_ASSETS)"/* "$(AND_OBJAPKDIR_ASS)"
+	@printf "\n[[COMMAND]]: $(CP) -r $(AND_ASSETS)/* $(AND_OBJAPKDIR_ASS)\n\n" &>> $(AND_OBJLOG)
+	@$(CP) -r "$(AND_ASSETS)"/* "$(AND_OBJAPKDIR_ASS)" &>> $(AND_OBJLOG)
 	@# REPLACE RESOURCES IF THE USER HAS SUPPLIED WITH SOME
-	$(CP) -r "$(AND_RES)"/* "$(AND_OBJAPKDIR_RES)"
+	@printf "\n[[COMMAND]]: $(CP) -r $(AND_RES)/* $(AND_OBJAPKDIR_RES)\n\n" &>> $(AND_OBJLOG)
+	@$(CP) -r "$(AND_RES)"/* "$(AND_OBJAPKDIR_RES)" &>> $(AND_OBJLOG)
 	@# REPLACE APPLICATION NAME
-	$(call REPLACETAG_RT,$(AND_APPNAMETAG),$(AND_APPNAME),$(AND_STRINGRESFILE))
+	@printf "\n[[COMMAND]]: Replace tags\n\n" &>> $(AND_OBJLOG)
+	@$(call REPLACETAG_RT,$(AND_APPNAMETAG),$(AND_APPNAME),$(AND_STRINGRESFILE)) &>> $(AND_OBJLOG)
 	@# REPLACE APPLICATION ID
-	$(call REPLACETAG_RT,$(AND_APPIDTAG),$(AND_APPID),$(AND_OBJAPKMANIFEST))
+	@$(call REPLACETAG_RT,$(AND_APPIDTAG),$(AND_APPID),$(AND_OBJAPKMANIFEST)) &>> $(AND_OBJLOG)
+	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
 	@# BUILD APK
-	$(APKTOOL) build "$(AND_OBJAPKDIR)" -o "$(AND_TMPAPK)"
+	@printf "  -c: Rebuilding..."
+	@printf "\n[[COMMAND]]: $(APKTOOL) build $(AND_OBJAPKDIR) -o $(AND_TMPAPK)\n\n" &>> $(AND_OBJLOG)
+	@$(APKTOOL) build "$(AND_OBJAPKDIR)" -o "$(AND_TMPAPK)" &>> $(AND_OBJLOG)
+	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
+	@printf "\n[[COMMAND]]: $(RM) -r \"./$(AND_OBJAPKDIR)\"\n\n" &>> $(AND_OBJLOG)
+	@$(RM) -r "./$(AND_OBJAPKDIR)" &>> $(AND_OBJLOG)
 	@# SIGN APK
-	$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$(AND_KEYSTORE)" "$(AND_TMPAPK)" $(AND_KEYALIAS)
+	@printf "$(COLOR_CYAN) (3/4): Signing APK...\n$(COLOR_NORMAL)"
+	@printf "\n[[COMMAND]]: $(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $(AND_KEYSTORE) $(AND_TMPAPK) $(AND_KEYALIAS)\n\n" &>> $(AND_OBJLOG)
+	@$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$(AND_KEYSTORE)" "$(AND_TMPAPK)" $(AND_KEYALIAS)
 	@# ALIGN APK
-	$(ZIPALIGN) -f -v 4 "$(AND_TMPAPK)" "$(AND_APK)"
-	$(RM) "./$(AND_TMPAPK)"
+	@printf "$(COLOR_CYAN) (4/4): Aligning...$(COLOR_NORMAL)"
+	@printf "\n[[COMMAND]]: $(ZIPALIGN) -f -v 4 $(AND_TMPAPK) $(AND_APK)\n\n" &>> $(AND_OBJLOG)
+	@$(ZIPALIGN) -f -v 4 "$(AND_TMPAPK)" "$(AND_APK)" &>> $(AND_OBJLOG)
+	@printf "\n[[COMMAND]]: $(RM) ./$(AND_TMPAPK)\n\n" &>> $(AND_OBJLOG)
+	@$(RM) "./$(AND_TMPAPK)" &>> $(AND_OBJLOG)
+	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
 
 	@# APK Successfully generated
 	$(call PRINT,$(PROJNAME),"Successfully created '$(AND_APK)'")
