@@ -1,0 +1,40 @@
+==================================================================================
+CPCtelera Android Exporter Beta 
+   (C)opyright 2019. José Luís Luri Bolinski    (jose.luis.luri@gmail.com)
+   (C)opyright 2020. Francisco J. Gallego-Durán (@FranGallegoBR, ronaldo@cheesetea.com)
+RVMEngine 
+   (C)opyright 2020. Juan Carlos González Amestoy (rvm@retrovirtualmachine.org)
+==================================================================================
+CPCtelera Android Exporter Beta: User license Agreement.
+==================================================================================
+    The authors of CPCtelera Android Exporter Beta and RVMEngine grant you 
+permission to use this software, provided that you accept the following license 
+terms:
+
+    (1) You are only allowed to generate and distribute APK packages for Amstrad
+CPC software snapshots (SNA) of your own. You MUST always possess CopyRights of 
+the software you will distribute using these tools.
+
+    (2) You are NOT allowed to modify or redistribute RVMEngine by any means. You 
+are ONLY permitted to use it together with CPCtelera Android Exporter, and ONLY 
+to distribute software whose rights you own.
+
+    (3) You are permitted to distribute APK packages generated with CPCtelera 
+Android Exporter Beta only for NON-COMMERTIAL PURPOSES. In order to sell your 
+generated APKs you will need special permission from the authors. 
+
+    (4) You are not allowed to remove the CPCtelera and RVMEngine logos from the 
+splash screen of your generated APKs, unless you are given special permission from
+the authors. 
+
+    (5) THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE  
+==================================================================================
+In order to use this software you have to previously agree with this license.
+If your CPCtelera instalation contains a file named '.CPCTRVMEngineEndUserLicenseAccepted'
+it is understood that you have already accepted this license.
+==================================================================================
