@@ -307,8 +307,8 @@ $(_AND_RULENAME): $(AND_SNAFILE)
 	@# DECODE APK
 	@printf "$(COLOR_CYAN) (2/4): Generating APK...\n$(COLOR_NORMAL)"
 	@printf "  -a: Decoding..."
-	@date &> $(AND_OBJLOG)
 	@$(MKDIR) $(AND_OBJDIR)
+	@date &> $(AND_OBJLOG)
 	@printf "\n[[COMMAND]]: $(APKTOOL) decode $(AND_DEFAULT_APK) -f -o $(AND_OBJAPKDIR)\n\n" &>> $(AND_OBJLOG)
 	@$(APKTOOL) decode "$(AND_DEFAULT_APK)" -f -o "$(AND_OBJAPKDIR)" &>> $(AND_OBJLOG)
 	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
