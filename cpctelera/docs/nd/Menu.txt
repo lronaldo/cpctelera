@@ -44,6 +44,7 @@ File: Authors  (no auto-title, authors.txt)
 File: License  (no auto-title, license.txt)
 Text: ______________________________________________________________________
 File: Aliases for builtin types  (types.h)
+File: Android Exporter  (no auto-title, buildsys/android_exporter.txt)
 File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
 File: Visual Studio Code  (buildsys/vscode_integration.txt)
 
@@ -104,7 +105,7 @@ Group: Commandline  {
 
       Group: Sdcc-3.8.5-r10892  {
 
-         File: int     getlnm&lparen;&rparen;  (commandline/kk/sdcc-3.8.5-r10892/src/sdas/asxxsrc/aslex.c)
+         File: int getlnm&lparen;&rparen;  (no auto-title, commandline/kk/sdcc-3.8.5-r10892/src/sdas/asxxsrc/aslex.c)
          File: promote to int  (commandline/kk/sdcc-3.8.5-r10892/src/src/SDCCast.c)
          File: sdas/asxxsrc/assubr.c  (commandline/kk/sdcc-3.8.5-r10892/src/sdas/asxxsrc/assubr.c)
 
@@ -138,7 +139,7 @@ Group: Commandline  {
 
       Group: Sdcc-3.9.0-r11321  {
 
-         File: int     getlnm&lparen;&rparen;  (commandline/kk/sdcc-3.9.0-r11321/src/sdas/asxxsrc/aslex.c)
+         File: int getlnm&lparen;&rparen;  (no auto-title, commandline/kk/sdcc-3.9.0-r11321/src/sdas/asxxsrc/aslex.c)
          File: promote to int  (commandline/kk/sdcc-3.9.0-r11321/src/src/SDCCast.c)
          File: sdas/asxxsrc/assubr.c  (commandline/kk/sdcc-3.9.0-r11321/src/sdas/asxxsrc/assubr.c)
 
@@ -382,6 +383,13 @@ Group: Video  {
 
 Text: ______________________________________________________________________
 File: License  (gpl-license.txt)
+
+Group: Buildsys  {
+
+   File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
+   File: CPCtelera Android Exporter Beta  (buildsys/android_exporter.txt)
+   File: Visual Studio Code  (buildsys/vscode_integration.txt)
+   }  # Group: Buildsys
 
 Group: Index  {
 

@@ -44,8 +44,10 @@ File: Authors  (no auto-title, authors.txt)
 File: License  (no auto-title, license.txt)
 Text: ______________________________________________________________________
 File: Aliases for builtin types  (types.h)
+File: Android Exporter  (buildsys/android_exporter.txt)
 File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
 File: Visual Studio Code  (buildsys/vscode_integration.txt)
+
 
 Group: Audio  {
 
