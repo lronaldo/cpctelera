@@ -1,0 +1,123 @@
+File: CPCtelera Android Exporter Beta
+
+(see cpct_rvmengine_logo.png)
+
+*BEWARE. This documentation is currently under construction.*
+
+CPCtelera Android Exporter Beta is a module of the build system that lets you export 
+your Amstrad CPC creations to Android. Once you have your Amstrad CPC game ready,
+you can launch the Android Exporter with the command *make apk* and an Android 
+APK package will be generated. This APK will contain your game in snapshot format 
+along with RVMEngine, an embeded versión of Retro Virtual Machine 2 emulator.
+
+
+Next sections will show you how to configure and use CPCtelera Android Exporter Beta.
+
+Section: Functionalities
+
+   CPCtelera Android Exporter Beta and RVM Engine give you these functionalities,
+     * Fully working Amstrad CPC games on Android 4.4+ with RVMEngine embedded emulator
+     * Configurable Splash Screen
+     * Configurable Icons for your Android App
+     * Configurable Control layouts and keymapping
+     * Savestates on Android
+     * Use of Android virtual keyboard to insert any character
+     * Use of bluetooth game controllers and keyboard controllers
+     * Outstanding performance thanks to RVMEngine: works on Android devices from 2013
+
+   And this list will keep on growing as we produce new versions.
+
+Section: Requisites
+   
+   In order for your game and android device to work with CPCtelera Android Exporter, 
+these requisites must be met,
+   * Only 64K shapnshots from Amstrad CPC 464 are allowed.
+   * The game cannot read from tape or disk, nor it can include custom ROMs.
+   * Android device must have API 19+ (Android 4.4 KitKat or higher).
+   * Currently, the exporter works only on Linux or Windows (Cygwin). It does not work on MacOS X.
+   * The game must start from an snapshot: if the game uses firmware, it might 
+require to properly configure it at the start.
+
+   Keep in mind that this is a beta release with minimum functionalities. Future releases 
+will increse capabilities and remove some current requisites. 
+   
+Section: How does it work
+
+   You type in *make apk* and everything just works :)
+   
+   *TODO*
+
+Section: Examples
+
+   Some examples on how to use it
+
+   *TODO*
+
+Topic: Reference documentation
+
+   Keyboard values and other JSON things
+
+   *TODO*
+
+Section: Authors and License
+
+CPCtelera Android Exporter Beta:
+   * (C)opyright 2019. <José Luís Luri Bolinski at mailto:jose.luis.luri@gmail.com>
+   * (C)opyright 2020. <Francisco J. Gallego-Durán at mailto:ronaldo@cheesetea.com> (<@FranGallegoBR at http://twitter.com/FranGallegoBR>)
+
+RVMEngine:
+   * (C)opyright 2020. <Juan Carlos González Amestoy at mailto:rvm@retrovirtualmachine.org> (<@retroVM at http://twitter.com/retroVM>)
+
+CPCtelera Android Exporter Beta: User license Agreement:
+    The authors of CPCtelera Android Exporter Beta and RVMEngine grant you 
+permission to use this software, provided that you accept the following license 
+terms:
+
+   * (1) You are only allowed to generate and distribute APK packages for Amstrad
+CPC software snapshots (SNA) of your own. You MUST always possess CopyRights of 
+the software you will distribute using these tools.
+   * (2) You are NOT allowed to modify or redistribute RVMEngine by any means. You 
+are ONLY permitted to use it together with CPCtelera Android Exporter, and ONLY 
+to distribute software whose rights you own.
+   * (3) You are permitted to distribute APK packages generated with CPCtelera 
+Android Exporter Beta only for NON-COMMERTIAL PURPOSES. In order to sell your 
+generated APKs you will need special permission from the authors. 
+   * (4) You are not allowed to remove the CPCtelera and RVMEngine logos from the 
+splash screen of your generated APKs, unless you are given special permission from
+the authors. 
+   * (5) THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE  
+
+In order to use this software you have to previously agree with this license.
+If your CPCtelera instalation contains a file named '.CPCTRVMEngineEndUserLicenseAccepted'
+it is understood that you have already accepted this license.
+
+Section: Files
+
+   These are the project files used to configure CPCtelera Android Exporter Beta,
+   * exp/android/assets/config.json
+   * exp/android/res/drawable-xxxhdpi/splash.png
+   * exp/android/res/mipmap-xxxhdpi/ic_launcher.png
+   * exp/android/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+   *TODO*
+
+Section: Screenshots
+
+   *TODO*
+
+   Some screenshots of the CPCtelera Android Exporter in action on android devices:
+
+(see cpct_android_s0.png)
+(see cpct_android_s1.png)
+(see cpct_android_s2.png)
+(see cpct_android_s3.png)
+(see cpct_android_s4.png)
+(see cpct_android_s5.png)
+(see cpct_android_s6.png)
+(see cpct_android_s7.png)
+(see cpct_android_s8.png)
