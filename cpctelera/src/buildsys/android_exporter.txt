@@ -112,12 +112,12 @@ Section: Screenshots
 
    Some screenshots of the CPCtelera Android Exporter in action on android devices:
 
-(see cpct_android_s0.png)
-(see cpct_android_s1.png)
-(see cpct_android_s2.png)
-(see cpct_android_s3.png)
-(see cpct_android_s4.png)
-(see cpct_android_s5.png)
-(see cpct_android_s6.png)
-(see cpct_android_s7.png)
-(see cpct_android_s8.png)
+(see cpct_android_s0.jpg)
+(see cpct_android_s1.jpg)
+(see cpct_android_s2.jpg)
+(see cpct_android_s3.jpg)
+(see cpct_android_s4.jpg)
+(see cpct_android_s5.jpg)
+(see cpct_android_s6.jpg)
+(see cpct_android_s7.jpg)
+(see cpct_android_s8.jpg)
