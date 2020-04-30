@@ -53,9 +53,64 @@ Section: Examples
 
    *TODO*
 
-Topic: Reference documentation
+Section: Reference documentation
 
-   Keyboard values and other JSON things
+Topic: JSON Constant values
+
+  Layout type: 
+  gamepad, onetouch, twobuttons.
+
+  Orientation:
+  auto, landscape, portrait.
+
+  Keys to be assigned to touch screen buttons:
+(start code)
+  |=====================================================================
+  | JSON CODE | CPCT_KeyID        || JSON CODE     | CPCT_KeyID       ||
+  |=====================================================================
+  | disabled  | No-Key            || key_1         | Key_1            ||
+  | key_a     | Key_A             || key_2         | Key_2            ||
+  | key_b     | Key_B             || key_3         | Key_3            ||
+  | key_c     | Key_C             || key_4         | Key_4            ||
+  | key_d     | Key_D             || key_5         | Key_5, Joy1_Down ||
+  | key_e     | Key_E             || key_6         | Key_6, Joy1_Up   ||
+  | key_f     | Key_F, Joy1_Fire2 || key_7         | Key_7            ||
+  | key_g     | Key_G, Joy1_Fire1 || key_8         | Key_8            ||
+  | key_h     | Key_H             || key_9         | Key_9            ||
+  | key_i     | Key_I             || key_0         | Key_0            ||
+  | key_j     | Key_J             || return        | Key_Return       ||
+  | key_k     | Key_K             || escape        | Key_Esc          ||
+  | key_l     | Key_L             || delete        | Key_Del          ||
+  | key_m     | Key_M             || tab           | Key_Tab          ||
+  | key_n     | Key_N             || space         | Key_Space        ||
+  | key_o     | Key_O             || minus         | Key_Hyphen       ||
+  | key_p     | Key_P             || caret         | Key_Caret        ||
+  | key_q     | Key_Q             || at            | Key_At           ||
+  | key_r     | Key_R, Joy1_Left  || left_bracket  | Key_OpenBracket  ||
+  | key_s     | Key_S             || right_bracket | Key_CloseBracket ||
+  | key_t     | Key_T, Joy1_Right || semicolon     | Key_SemiColon    ||
+  | key_u     | Key_U             || colon         | Key_Colon        || 
+  | key_v     | Key_V             || backslash     | Key_BackSlash    ||
+  | key_w     | Key_W             || comma         | Key_Comma        ||
+  | key_x     | Key_X             || period        | Key_Dot          ||
+  | key_y     | Key_Y             || slash         | Key_Slash        ||
+  | key_z     | Key_Z             || caps_lock     | Key_CapsLock     ||
+  | f1        | Key_F1            || clr           | Key_Clr          ||
+  | f2        | Key_F2            || cursor_right  | Key_CursorRight  ||
+  | f3        | Key_F3            || cursor_left   | Key_CursorLeft   ||
+  | f4        | Key_F4            || cursor_down   | Key_CursorDown   ||
+  | f5        | Key_F5            || cursor_up     | Key_CursorUp     ||
+  | f6        | Key_F6            || enter_num     | Key_Enter        ||
+  | f7        | Key_F7            || f_dot         | Key_FDot         ||
+  | f8        | Key_F8            || ctrl          | Key_Control      ||
+  | f9        | Key_F9            || shift         | Key_Shift        ||
+  | f0        | Key_F0            || copy          | Key_Copy         ||
+  | joy_up    | Joy0_Up           || joy_fire1     | Joy0_Fire1       ||
+  | joy_down  | Joy0_Down         || joy_fire2     | Joy0_Fire2       ||
+  | joy_left  | Joy0_Left         ||               |                  ||
+  | joy_right | Joy0_Right        ||               |                  ||
+  |=====================================================================  
+(end code)
 
    *TODO*
 
