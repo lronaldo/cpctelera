@@ -83,6 +83,7 @@ $(DSK): $(BINFILE) $(BINADDRLOG)
 	@$(call GETALLADDRESSES,$<)
 	@$(call PRINT,$(PROJNAME),"Creating Disk File '$@'")
 	@$(call CREATEEMPTYDSK,$@)
+	@$(RM) $(DSKINCOBJFILES)	
 	@$(call ADDCODEFILETODSK,$@,$<,$(LOADADDR),$(RUNADDR),$(<:%=%.$(DSKINC_EXT)))
 	@$(call PRINT,$(PROJNAME),"Successfully created '$@'")
 
