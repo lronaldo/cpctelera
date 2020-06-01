@@ -1,0 +1,5 @@
+core.autocrlf=false
+*.png binary
+*.exe binary
+*.jpg binary
+
