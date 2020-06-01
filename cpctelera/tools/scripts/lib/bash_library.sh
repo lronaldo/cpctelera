@@ -952,9 +952,9 @@ function versionGreaterOREqualThan() {
       VTH=${VTH:${#VTH_DIGIT}+1}
 
       ## Check numbers
-      if [[ "$VTH_DIGIT" > "$V_DIGIT" ]]; then
+      if (( "$VTH_DIGIT" > "$V_DIGIT" )); then
          return 1
-      elif [[ "$VTH_DIGIT" < "$V_DIGIT" ]]; then
+      elif (( "$VTH_DIGIT" < "$V_DIGIT" )); then
          return 0
       fi
    done
