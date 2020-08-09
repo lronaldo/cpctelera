@@ -118,6 +118,7 @@ Section: Code & fixes contributors
    * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
    * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
    * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
+   * <Federico J. Álvarez at https://twitter.com/falvarez>
 
 Section: Testers & Bug Reporters 
 
