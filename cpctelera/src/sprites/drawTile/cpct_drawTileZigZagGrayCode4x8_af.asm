@@ -62,6 +62,7 @@
 ;; results, erratic program behaviour, hangs and crashes).
 ;;
 ;; Known limitations:
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;     * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
@@ -77,6 +78,9 @@
 ;; it does not take into account video memory wrap-around (0x?7FF or 0x?FFF 
 ;; addresses, the end of character pixel lines).It will produce a "step" 
 ;; in the middle of tiles when drawing near wrap-around.
+;;    * This function temporarily disables interrupts while drawing, because
+;; it uses SP register and Push/Pop instructions. It may cause delays or
+;; loses of interrupts.
 ;;
 ;; Details:
 ;;    This function does the same as <cpct_drawTileAligned4x8_f>, but using

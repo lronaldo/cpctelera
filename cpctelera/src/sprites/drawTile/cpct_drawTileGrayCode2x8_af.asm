@@ -30,15 +30,15 @@
 ;;    void <cpct_drawTileGrayCode2x8_af> (void* *pvideomem*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
-;;  (2B HL) sprite end - Pointer to the end of the sprite array (Sprite in Gray Code format)
+;;  (2B HL) sprite - Source Sprite Pointer (16-byte array with 8-bit pixel data in Gray Code row order)
 ;;  (2B DE) pvideomem  - Pointer (aligned) to the first byte in video memory where the sprite will be copied.
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawTileGrayCode2x8_af_asm
 ;;
 ;; Parameter Restrictions:
-;;    * *sprite* must be a pointer to the last byte of an array containing sprite's
-;; pixels data in screen pixel format, and in graycode line order. Sprite must be 
+;;    * *sprite* must be a pointer to an array containing sprite's pixels data 
+;; in screen pixel format, and in graycode line order. Sprite must be 
 ;; rectangular. Total amount of bytes in pixel array should be *16*. You may 
 ;; check screen pixel format for mode 0 (<cpct_px2byteM0>) and mode 1 
 ;; (<cpct_px2byteM1>) as for mode 2 is linear (1 bit = 1 pixel). Line order
@@ -59,6 +59,7 @@
 ;; results, erratic program behaviour, hangs and crashes).
 ;;
 ;; Known limitations:
+;;     * This function *will not work from ROM*, as it uses self-modifying code.
 ;;     * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 
 ;; if might potentially overwrite memory locations beyond boundaries. This 
@@ -74,6 +75,9 @@
 ;; it does not take into account video memory wrap-around (0x?7FF or 0x?FFF 
 ;; addresses, the end of character pixel lines).It will produce a "step" 
 ;; in the middle of tiles when drawing near wrap-around.
+;;    * This function temporarily disables interrupts while drawing, because
+;; it uses SP register and Push/Pop instructions. It may cause delays or
+;; loses of interrupts.
 ;;
 ;; Details:
 ;;    This function does the same as <cpct_drawTileAligned2x8_f>, but using
