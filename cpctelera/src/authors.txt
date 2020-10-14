@@ -145,6 +145,8 @@ Section: Testers & Bug Reporters
  * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
  * Iván Fernández Álvarez (<SpDizzy at http://twitter.com/dizzy_sp>)
  * Carlos Pérez Peregrín (<cperezprg at https://www.youtube.com/user/cperezprg/> / <cperezgrin at https://www.readyandplay.com/author/cperezgrin/>)
+ * Cayetano Manchón Pernis (<cmp102 at https://github.com/cmp102>)
+ * <juritobi at https://github.com/juritobi>
 
 Section: Assets 
 
