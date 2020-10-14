@@ -5,7 +5,7 @@
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
-;;  (at your option) any later version.
+;;  (at your option) any later version
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,7 @@
 ;; Macro: cpctm_ld_spbloff
 ;;
 ;;    Macro that calculates the offset to add to a sprite pointer to point 
-;; to its bottom left pixel.
+;; to it sbottom left pixel.
 ;;
 ;; ASM Definition:
 ;;    .macro <cpctm_ld_spbloff> *REG*, *W*, *H*
@@ -60,7 +60,7 @@
 ;; of a given sprite (i.e. its bottom-left byte), with respect to its first
 ;; byte (top-left corner). This value can easily be added to any sprite 
 ;; pointer to get a pointer to the bottom-left byte. This pointer is required
-;; byte many flipping functions (like <cpct_vflipSprite>). Values for width
+;; byte many flipping functions (like <cpct_vflipSpriteM0>). Values for width
 ;; and height of the sprite must be constant immediate values. Otherwise, this
 ;; macro will generate incorrect code that will fail to compile. 
 ;;    The macro calculates *W* * (*H*-1) at compile-time and loads it into
