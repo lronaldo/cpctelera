@@ -33,7 +33,7 @@
 ;;  (2B DE) pvideomem  - Pointer (aligned) to the first byte in video memory where the sprite will be copied.
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_drawTileGrayCode4x8_af_asm
+;;    > call cpct_drawTileZigZagGrayCode4x8_af_asm
 ;;
 ;; Parameter Restrictions:
 ;;    * *sprite* must be a pointer to the first byte of an array containing sprite's

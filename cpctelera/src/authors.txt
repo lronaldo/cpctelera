@@ -147,6 +147,7 @@ Section: Testers & Bug Reporters
  * Carlos Pérez Peregrín (<cperezprg at https://www.youtube.com/user/cperezprg/> / <cperezgrin at https://www.readyandplay.com/author/cperezgrin/>)
  * Cayetano Manchón Pernis (<cmp102 at https://github.com/cmp102>)
  * <juritobi at https://github.com/juritobi>
+ * Tamara Torrecillas (<tamaraatm at https://github.com/tamaraatm>)
 
 Section: Assets 
 
