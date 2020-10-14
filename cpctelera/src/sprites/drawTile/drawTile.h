@@ -29,13 +29,24 @@
 #ifndef CPCT_DRAWTILE_H
 #define CPCT_DRAWTILE_H
 
-// Tile drawing functions
+// Standard tile drawing functions
 extern void cpct_drawTileAligned2x8    (void *sprite, void* memory) __z88dk_callee;
 extern void cpct_drawTileAligned4x8    (void *sprite, void* memory) __z88dk_callee;
 extern void cpct_drawTileAligned2x4_f  (void *sprite, void* memory) __z88dk_callee;
 extern void cpct_drawTileAligned2x8_f  (void *sprite, void* memory) __z88dk_callee;
-extern void cpct_drawTileGrayCode2x8_af(void *sprite, void* memory) __z88dk_callee;
 extern void cpct_drawTileAligned4x4_f  (void *sprite, void* memory) __z88dk_callee;
 extern void cpct_drawTileAligned4x8_f  (void *sprite, void* memory) __z88dk_callee;
+
+// Gray-code and Zig-Zag  tile drawing functions
+extern void cpct_drawTileGrayCode2x8_af      (void *memory, void* sprite) __z88dk_callee;
+extern void cpct_drawTileZigZagGrayCode4x8_af(void* memory, void* sprite) __z88dk_callee;
+
+// Macros for standard names with suffix
+#define cpct_drawTile2x8_a(SP, MEM)  cpct_drawTileAligned2x8  ((SP), (MEM))
+#define cpct_drawTile2x8_af(SP, MEM) cpct_drawTileAligned2x8_f((SP), (MEM))
+#define cpct_drawTile4x8_a(SP, MEM)  cpct_drawTileAligned4x8  ((SP), (MEM))
+#define cpct_drawTile4x8_af(SP, MEM) cpct_drawTileAligned4x8_f((SP), (MEM))
+#define cpct_drawTile2x4_af(SP, MEM) cpct_drawTileAligned4x4_f((SP), (MEM))
+#define cpct_drawTile4x4_af(SP, MEM) cpct_drawTileAligned4x4_f((SP), (MEM))
 
 #endif
