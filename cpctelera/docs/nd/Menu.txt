@@ -214,7 +214,6 @@ Group: Sprites  {
       File: cpct_drawTileAligned4x8  (sprites/drawTile/cpct_drawTileAligned4x8.asm)
       File: cpct_drawTileAligned4x8_f  (sprites/drawTile/cpct_drawTileAligned4x8_f.asm)
       File: cpct_drawTileGrayCode2x8_af  (sprites/drawTile/cpct_drawTileGrayCode2x8_af.asm)
-      File: cpct_drawTileGrayCode2x8_af  (sprites/drawTile/cpct_drawTileGrayCode4x8_af.asm)
       File: cpct_drawTileZigZagGrayCode4x8_af  (sprites/drawTile/cpct_drawTileZigZagGrayCode4x8_af.asm)
       }  # Group: DrawTile
 
