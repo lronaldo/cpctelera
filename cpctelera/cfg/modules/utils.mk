@@ -57,6 +57,7 @@
 ##   * REMOVEFILEIFEXISTS
 ##   * REPLACETAG_RT
 ##   * REPLACETAGGEDLINE
+##   * REPLACETAGGEDLINE_RT
 ##   * SET_ONE_OF_MANY_VALID
 ##   * STRLEN
 ##   * SYSPATH
@@ -188,6 +189,31 @@ define REPLACETAGGEDLINE
 		if cat "$(_RTL_3)" | sed "s$(_RTL_4).*$(_RTL_1).*$(_RTL_4)$(_RTL_2)$(_RTL_4)g" > $(_RTL_TMP); then \
 			mv "$(_RTL_TMP)" "$(_RTL_3)"; \
 		fi)
+endef
+
+########################
+## REPLACETAGGEDLINE_RT
+## Replaces a complete line in a file which contains a given tag. This
+## macro expands a piece of shell code that needs to be executed inside a rule
+## in RealTime (after all preprocessing)
+## $1: Tag to be searched
+## $2: New line to replace the one that contains the tag
+## $3: File to modify
+## $4: sed deliminer (optional)
+##
+define REPLACETAGGEDLINE_RT
+	@# Strip parameters
+	$(eval _RTL_1 :=$(1))
+	@#(eval _RTL_2 :=$(2)) << Doing this eliminates trailing spaces that are required
+	$(eval _RTL_3 :=$(strip $(3)))
+	@# Set up sed delimiter
+	$(eval _RTL_4 := $(if $(strip $(4)),$(strip $(4)),/))
+	@# Create temporary file
+	$(eval _RTL_TMP := $(call CREATETMPFILENAME))
+	@# Replace tagged line with new line
+	@if cat "$(_RTL_3)" | sed "s$(_RTL_4).*$(_RTL_1).*$(_RTL_4)$(2)$(_RTL_4)g" > $(_RTL_TMP); then \
+		mv "$(_RTL_TMP)" "$(_RTL_3)"; \
+	fi
 endef
 
 ########################
