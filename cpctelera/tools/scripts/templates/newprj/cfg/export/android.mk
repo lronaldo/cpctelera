@@ -41,6 +41,16 @@ $(eval $(call APKMAN, SET_APPID         , $(GAME_ID) ))
 # Google Play or your mobile phone recognize your APP. It is only the string displayed as APP Name.
 $(eval $(call APKMAN, SET_APPNAME       , $(GAME_ID) ))
 
+# This is the actual version number of your application. It must be an integer value and you MUST
+# increment it whenever you wanted to upload a new version to the market store. Applications on devices
+# will not let you overwrite their installed version with previous versions, according to this value.
+$(eval $(call APKMAN, SET_VERSIONCODE   , 1 ))
+
+# This is the name of your current version that will be shown in the properties of your application
+# on your mobile platform. It is a string that can be anything. The actual version is controlled by 
+# your VersionCode, not by this string. You may use this value as information for your users.
+$(eval $(call APKMAN, SET_VERSIONNAME   , 1.0-beta ))
+
 # These are the folders were you store the assets that will be used to produce your APP. 
 #  - assets folder must contain the file 'conf.json' with the configuration of the emulation and keymap
 #  - res folder must contain all the resources (icons, splashes, etc) in their different resolutions
