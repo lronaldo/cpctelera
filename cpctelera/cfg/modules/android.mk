@@ -369,7 +369,7 @@ $(_AND_RULENAME): $(AND_SNAFILE)
 	@$(APKTOOL) build "$(AND_OBJAPKDIR)" -o "$(AND_TMPAPK)" &>> $(AND_OBJLOG)
 	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
 	@printf "\n[[COMMAND]]: $(RM) -r \"./$(AND_OBJAPKDIR)\"\n\n" &>> $(AND_OBJLOG)
-	#@$(RM) -r "./$(AND_OBJAPKDIR)" &>> $(AND_OBJLOG)
+	@$(RM) -r "./$(AND_OBJAPKDIR)" &>> $(AND_OBJLOG)
 	@# SIGN APK
 	@printf "$(COLOR_CYAN) (3/4): Signing APK...\n$(COLOR_NORMAL)"
 	@printf "\n[[COMMAND]]: $(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $(AND_KEYSTORE) $(AND_TMPAPK) $(AND_KEYALIAS)\n\n" &>> $(AND_OBJLOG)
