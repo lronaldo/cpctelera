@@ -46,15 +46,16 @@ AND_DEFAULT_APK   := $(call SYSPATH,$(ANDROID_PATH)rvmengine/defaultRVMapp.apk)
 AND_KEYSTORE_DIR  := $(ANDROID_PATH)certs
 AND_LICENSE_FILE  := $(ANDROID_PATH)LICENSE
 AND_LICENSE_ACC   := $(AND_KEYSTORE_DIR)/.CPCTRVMEngineEndUserLicenseAccepted
-AND_TMPAPK        := $(AND_OBJDIR)/$(AND_APK).tmp
 ZIPALIGN_LINUX    := $(ANDROID_PATH)bin/zipalign/linux/zipalign32
 ZIPALIGN_WIN      := $(ANDROID_PATH)bin/zipalign/win/32/zipalign.exe
 ZIPALIGN          := $(if $(call CHECKSYSTEMCYGWIN),$(ZIPALIGN_WIN),$(ZIPALIGN_LINUX))
 KEYTOOL_JAR       := $(call SYSPATH,$(ANDROID_PATH)bin/sun/keytool.jar)
 JARSIGNER_JAR     := $(call SYSPATH,$(ANDROID_PATH)bin/sun/jarsigner.jar)
 APKTOOL_JAR       := $(call SYSPATH,$(ANDROID_PATH)bin/apktool/apktool_2.4.0.jar)
+APKSIGNER_JAR     := $(call SYSPATH,$(ANDROID_PATH)bin/sun/apksigner.jar)
 KEYTOOL           := $(JAVA) -jar "$(KEYTOOL_JAR)"
 JARSIGNER         := $(JAVA) -jar "$(JARSIGNER_JAR)"
+APKSIGNER			:= $(JAVA) -jar "$(APKSIGNER_JAR)"
 APKTOOL           := $(JAVA) -jar "$(APKTOOL_JAR)"
 
 ## User configurable values
@@ -72,6 +73,10 @@ AND_KEYVALID    :=10000
 AND_KEYSIZE     :=2048
 AND_KEYALG      :=RSA
 AND_STORETYPE   :=pkcs12
+
+## Values depending on user config
+AND_TMPAPK        := $(AND_OBJDIR)/$(AND_APK).tmp
+AND_TMPAPKALIGNED := $(AND_OBJDIR)/$(AND_APK).aligned.tmp
 
 ## JAVA Version
 #AND_JAVA_VER     := $(shell java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\.\(.*\)_.*"/\1\2\3/p;')
@@ -370,17 +375,20 @@ $(_AND_RULENAME): $(AND_SNAFILE)
 	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
 	@printf "\n[[COMMAND]]: $(RM) -r \"./$(AND_OBJAPKDIR)\"\n\n" &>> $(AND_OBJLOG)
 	@$(RM) -r "./$(AND_OBJAPKDIR)" &>> $(AND_OBJLOG)
-	@# SIGN APK
-	@printf "$(COLOR_CYAN) (3/4): Signing APK...\n$(COLOR_NORMAL)"
-	@printf "\n[[COMMAND]]: $(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $(AND_KEYSTORE) $(AND_TMPAPK) $(AND_KEYALIAS)\n\n" &>> $(AND_OBJLOG)
-	@$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$(AND_KEYSTORE)" "$(AND_TMPAPK)" $(AND_KEYALIAS)
 	@# ALIGN APK
-	@printf "$(COLOR_CYAN) (4/4): Aligning...$(COLOR_NORMAL)"
-	@printf "\n[[COMMAND]]: $(ZIPALIGN) -f -v 4 $(AND_TMPAPK) $(AND_APK)\n\n" &>> $(AND_OBJLOG)
-	@$(ZIPALIGN) -f -v 4 "$(AND_TMPAPK)" "$(AND_APK)" &>> $(AND_OBJLOG)
-	@printf "\n[[COMMAND]]: $(RM) ./$(AND_TMPAPK)\n\n" &>> $(AND_OBJLOG)
-	@$(RM) "./$(AND_TMPAPK)" &>> $(AND_OBJLOG)
+	@printf "$(COLOR_CYAN) (3/4): Aligning...$(COLOR_NORMAL)"
+	@printf "\n[[COMMAND]]: $(ZIPALIGN) -f -v 4 $(AND_TMPAPK) $(AND_TMPAPKALIGNED)\n\n" &>> $(AND_OBJLOG)
+	@$(ZIPALIGN) -f -v 4 "$(AND_TMPAPK)" "$(AND_TMPAPKALIGNED)" &>> $(AND_OBJLOG)
 	@printf "$(COLOR_GREEN)OK$(COLOR_NORMAL)\n"
+	@# SIGN APK
+	@printf "$(COLOR_CYAN) (4/4): Signing APK...\n$(COLOR_NORMAL)"
+	@printf "\n[[COMMAND]]: $(APKSIGNER) sign --ks $(AND_KEYSTORE) --out $(AND_APK) $(AND_TMPAPKALIGNED)\n\n" &>> $(AND_OBJLOG)
+	@$(APKSIGNER) sign --ks "$(AND_KEYSTORE)" --out "$(AND_APK)" "$(AND_TMPAPKALIGNED)"
+	@#printf "\n[[COMMAND]]: $(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $(AND_KEYSTORE) $(AND_TMPAPK) $(AND_KEYALIAS)\n\n" &>> $(AND_OBJLOG)
+	@#$(JARSIGNER) -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore "$(AND_KEYSTORE)" "$(AND_TMPAPK)" $(AND_KEYALIAS)
+	@printf "\n[[COMMAND]]: $(RM) ./$(AND_TMPAPK) ./$(AND_TMPAPKALIGNED)\n\n" &>> $(AND_OBJLOG)
+	@$(RM) "./$(AND_TMPAPK)" "./$(AND_TMPAPKALIGNED)" &>> $(AND_OBJLOG)
+	@printf "$(COLOR_GREEN)Signed with APK Signature Scheme v2$(COLOR_NORMAL)\n"
 
 	@# APK Successfully generated
 	$(call PRINT,$(PROJNAME),"Successfully created '$(AND_APK)'")
