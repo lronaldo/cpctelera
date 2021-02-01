@@ -24,7 +24,7 @@
 ;;
 ;; C bindings for <cpct_drawSolidBox>
 ;;
-;;   17 us, 6 bytes
+;;   16 us, 5 bytes
 ;;
 _cpct_drawSolidBox::
    ;; GET Parameters from the stack 
@@ -33,6 +33,5 @@ _cpct_drawSolidBox::
    pop   hl          ;; [3] L = Colour Pattern
    pop   bc          ;; [3] B = Height, C = Width
    push  af          ;; [4] Leave return address in the stack to fullfill __z88dk_callee convention
-   ld     a, l       ;; [1] A = Colour Pattern
-
+  
 .include /cpct_drawSolidBox.asm/
