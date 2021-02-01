@@ -90,8 +90,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 170 bytes
-;;  ASM-bindings - 164 bytes
+;;    C-bindings - 167 bytes
+;;  ASM-bindings - 163 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -105,7 +105,7 @@
 ;;  W=4,H=16  |         543 /  554       |     2172 / 2216
 ;;  W=4,H=32  |        1093 / 1104       |     4372 / 4416
 ;; ---------------------------------------------------------------------
-;; Asm saving |         -17              |        -68
+;; Asm saving |         -15              |        -60
 ;; ---------------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
@@ -123,7 +123,6 @@
 .endm
 
 ;; DrawSolidBox code starts here (immediately after getting parameters from stack)
-   ld     l, a             ;; [1] L=A (Colour pattern)
    
    ;; Modify code using width to jump to ensure
    ;; that only width bytes are copied each line 
