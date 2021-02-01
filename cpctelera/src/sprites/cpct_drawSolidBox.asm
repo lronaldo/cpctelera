@@ -123,9 +123,7 @@
 .endm
 
 ;; DrawSolidBox code starts here (immediately after getting parameters from stack)
-   ld     h, d             ;; [1] / HL = DE  
-   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
-   ld     e, a             ;; [1] E=A (Colour pattern)
+   ld     l, a             ;; [1] L=A (Colour pattern)
    
    ;; Modify code using width to jump to ensure
    ;; that only width bytes are copied each line 
@@ -134,8 +132,9 @@
    sub    c                ;; [1]
    ld (_jr_offset), a      ;; [4] Modify JR data to create the jump we need
    
-   ld     c, e             ;; [1] C=E (Colour pattern)
-   ld     e, l             ;; [1] Restore DE = HL
+   ld     c, l             ;; [1] C=L (Colour pattern)
+   ld     h, d             ;; [1] / HL = DE
+   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
 
 _next_line:
 _jr_offset = .+1
@@ -150,7 +149,7 @@ _jr_offset = .+1
    COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 64 times }
 .endm
  
-   dec    b                ;; [1] Another line finished: we discount it from D
+   dec    b                ;; [1] Another line finished: we discount it from B
    ret    z                ;; [2/4] If that was the last line, we safely return
 
    ;; Jump destination pointer to the start of the next line in video memory
