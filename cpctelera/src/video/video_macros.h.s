@@ -275,7 +275,7 @@ cpct_page00_asm = 0x00
 ;;    Macro to simplify clearing the screen.
 ;;
 ;; ASM Definition:
-;;   .macro <cpct_clearScreen_asm> COL
+;;   .macro <cpctm_clearScreen_asm> COL
 ;;
 ;; Input Parameters (1 byte):
 ;;   (1B) COL - Colour pattern to be used for screen clearing. 
