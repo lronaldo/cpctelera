@@ -754,7 +754,7 @@ function checkSystem {
          "win10linux")
             if [[ "$SYS" =~ "Linux" ]]; then
                # Use /proc/version for better compatibilty 
-               if grep -qE "(Microsoft|WSL)" /proc/version &> /dev/null; then
+               if grep -qE "(icrosoft|WSL)" /proc/version &> /dev/null; then
                   return 0;
                fi
             fi
