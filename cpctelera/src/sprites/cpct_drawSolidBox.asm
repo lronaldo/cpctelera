@@ -90,22 +90,22 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 170 bytes
-;;  ASM-bindings - 164 bytes
+;;    C-bindings - 167 bytes
+;;  ASM-bindings - 163 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |      microSecs (us)      |      CPU Cycles
 ;; ---------------------------------------------------------------------
-;;  Best      |  4 + (17 + 4W)H + 11HH   | 16 + (68 + 16W)H  + 44HH
+;;  Best      |  18 + (17 + 4W)H + 11HH  | 72 + (68 + 16W)H  + 44HH
 ;;  Worst     |         Best + 11        |      Best + 44
 ;; ---------------------------------------------------------------------
-;;  W=2,H=8   |         204 /  215       |      816 /  860
-;;  W=2,H=16  |         415 /  426       |     1660 / 1704
-;;  W=4,H=16  |         543 /  554       |     2172 / 2216
-;;  W=4,H=32  |        1093 / 1104       |     4372 / 4416
+;;  W=2,H=8   |         218 /  229       |      872 /  916
+;;  W=2,H=16  |         429 /  440       |     1716 / 1760
+;;  W=4,H=16  |         557 /  568       |     2228 / 2272
+;;  W=4,H=32  |        1107 / 1118       |     4428 / 4472
 ;; ---------------------------------------------------------------------
-;; Asm saving |         -17              |        -68
+;; Asm saving |         -15              |        -60
 ;; ---------------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
@@ -123,9 +123,6 @@
 .endm
 
 ;; DrawSolidBox code starts here (immediately after getting parameters from stack)
-   ld     h, d             ;; [1] / HL = DE  
-   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
-   ld     e, a             ;; [1] E=A (Colour pattern)
    
    ;; Modify code using width to jump to ensure
    ;; that only width bytes are copied each line 
@@ -134,8 +131,9 @@
    sub    c                ;; [1]
    ld (_jr_offset), a      ;; [4] Modify JR data to create the jump we need
    
-   ld     c, e             ;; [1] C=E (Colour pattern)
-   ld     e, l             ;; [1] Restore DE = HL
+   ld     c, l             ;; [1] C=L (Colour pattern)
+   ld     h, d             ;; [1] / HL = DE
+   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
 
 _next_line:
 _jr_offset = .+1
@@ -150,7 +148,7 @@ _jr_offset = .+1
    COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 64 times }
 .endm
  
-   dec    b                ;; [1] Another line finished: we discount it from D
+   dec    b                ;; [1] Another line finished: we discount it from B
    ret    z                ;; [2/4] If that was the last line, we safely return
 
    ;; Jump destination pointer to the start of the next line in video memory

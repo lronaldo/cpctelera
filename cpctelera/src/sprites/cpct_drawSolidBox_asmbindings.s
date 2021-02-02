@@ -24,8 +24,10 @@
 ;;
 ;; AS; bindings for <cpct_drawSolidBox>
 ;;
-;;   0 us, 0 bytes
+;;   1 us, 1 bytes
 ;;
-cpct_drawSolidBox_asm::    
+cpct_drawSolidBox_asm:: 
+
+   ld     l, a             ;; [1] L=A (Colour pattern)
 
 .include /cpct_drawSolidBox.asm/
