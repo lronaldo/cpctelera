@@ -52,7 +52,7 @@
 ##    -i   | --include-header [file]     - Include a header file at the top of the generated output
 ##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
 ##    -czx7b | --compressor-zx7b         - Use ZX7B compressor (Default).
-##    -cz0   | --compressor-zx0          - Use ZX0 compressor.
+##    -czx0  | --compressor-zx0          - Use ZX0 compressor.
 ##
 
 
