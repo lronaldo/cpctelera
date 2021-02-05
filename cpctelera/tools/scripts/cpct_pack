@@ -51,6 +51,8 @@
 ##    -h   | --help                      - Shows help information on the terminal.
 ##    -i   | --include-header [file]     - Include a header file at the top of the generated output
 ##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
+##    -czx7b | --compressor-zx7b         - Use ZX7B compressor (Default).
+##    -cz0   | --compressor-zx0          - Use ZX0 compressor.
 ##
 
 
@@ -104,6 +106,12 @@ OPTIONS \
    ${COLOR_LIGHT_BLUE}
    -org | --origin-asm ${COLOR_NORMAL}<address> ${COLOR_CYAN}
       Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
+   ${COLOR_LIGHT_BLUE}
+   -czx7b | --compressor-zx7b ${COLOR_CYAN}
+      Use ZX7B compressor (Default).\
+   ${COLOR_LIGHT_BLUE}
+   -czx0  | --compressor-zx0 ${COLOR_CYAN}
+      Use ZX0 compressor.
 
 ${COLOR_NORMAL}
 UsageHereDoc
@@ -154,6 +162,7 @@ ASMCNST='=='
 
 ## COMPRESSORS
 ZX7B=${CPCT_PATH}/tools/zx7b/bin/zx7b
+ZX0=${CPCT_PATH}/tools/zx0/bin/zx0
 
 if (( $# < 1 )); then
    usage
@@ -222,6 +231,14 @@ while (( $# >= 1 )); do
 
          shift
       ;;
+      ## Select zx7b compressor
+      "-czx7b" | "--compressor-zx7b")
+         COMPRESSOR=zx7b
+      ;;
+      ## Select zx0 compressor
+      "-czx0" | "--compressor-zx0")
+         COMPRESSOR=zx0
+      ;;
       ## Get outfile and other files
       *)
          if isCommandLineOption "$1"; then
@@ -287,6 +304,11 @@ case $COMPRESSOR in
    'zx7b')
       echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}" 
       ${ZX7B} "$TMPFILE" "$TMPPACK" > /dev/null
+   ;;
+   'zx0')
+     echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}"
+     # rm "$TMPFILE"
+     ${ZX0} -f "$TMPFILE" "$TMPPACK"> /dev/null
    ;;
    *)
       paramError "Unknown compressor algorithm '$COMPRESSOR'." 8
