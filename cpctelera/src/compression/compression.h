@@ -26,4 +26,7 @@ extern void cpct_zx7b_decrunch_f0 (void* dest_end, const void* source_end) __z88
 extern void cpct_zx7b_decrunch_f1 (void* dest_end, const void* source_end) __z88dk_callee;
 extern void cpct_zx7b_decrunch_f2 (void* dest_end, const void* source_end) __z88dk_callee;
 
+// ZX0 Decrunching functions
+extern void cpct_zx0_decrunch_s  (void* dest_start, const void* source_start) __z88dk_callee;
+
 #endif
