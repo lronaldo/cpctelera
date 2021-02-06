@@ -7,7 +7,7 @@ SRC  = src
 BIN  = bin
 
 
-CFLAGS  =
+CFLAGS  = -O3 -fsigned-char -Wall -DUNIX -pedantic
 
 TARGET = $(BIN)/zx0
 FILES  = zx0 optimize memory compress
