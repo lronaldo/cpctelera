@@ -101,22 +101,12 @@
 ;; Time Measures:
 ;;      Time taken by this routine is highly dependent on data passed, and not only on its size.
 ;; If you need to know the exact time it will take to decompress a given array of data, the best
-;; way to do it is using an emulator with timing measurements, like WinAPE. Following measures
-;; were taking as benchmark to give a comparison idea between different versions of this 
-;; same routine.
+;; way to do it is using an emulator with timing measurements, like WinAPE.
 ;;
 ;; Credits:
-;;    * <Original code at https://github.com/einar-saukas/ZX0> by Einar Saukas. 
+;;    * <Original code at https://github.com/einar-saukas/ZX0> ZX0 decoder ("Standard" version) by Einar Saukas. 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; -----------------------------------------------------------------------------
-; ZX0 decoder by Einar Saukas
-; "Standard" version (69 bytes only)
-; -----------------------------------------------------------------------------
-; Parameters:
-;   HL: source address (compressed data)
-;   DE: destination address (decompressing)
-; -----------------------------------------------------------------------------
 
 dzx0_standard:
         ld      bc, #0xffff               ; preserve default offset 1
@@ -171,4 +161,3 @@ dzx0s_elias_backtrack:
         rl      c
         rl      b
         jr      dzx0s_elias_loop
-; -----------------------------------------------------------------------------
