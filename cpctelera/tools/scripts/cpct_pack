@@ -307,7 +307,6 @@ case $COMPRESSOR in
    ;;
    'zx0')
      echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}"
-     # rm "$TMPFILE"
      ${ZX0} -f "$TMPFILE" "$TMPPACK"> /dev/null
    ;;
    *)
