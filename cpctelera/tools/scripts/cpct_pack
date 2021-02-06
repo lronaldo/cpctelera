@@ -105,10 +105,10 @@ OPTIONS \
       Include a header file at the top of the generated output. \
    ${COLOR_LIGHT_BLUE}
    -org | --origin-asm ${COLOR_NORMAL}<address> ${COLOR_CYAN}
-      Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
+      Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated. \
    ${COLOR_LIGHT_BLUE}
    -czx7b | --compressor-zx7b ${COLOR_CYAN}
-      Use ZX7B compressor (Default).\
+      Use ZX7 Backwards compressor (Default). \
    ${COLOR_LIGHT_BLUE}
    -czx0  | --compressor-zx0 ${COLOR_CYAN}
       Use ZX0 compressor.
