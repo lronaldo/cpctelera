@@ -51,7 +51,7 @@
 ##    -h   | --help                      - Shows help information on the terminal.
 ##    -i   | --include-header [file]     - Include a header file at the top of the generated output
 ##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
-##    -czx7b | --compressor-zx7b         - Use ZX7B compressor (Default).
+##    -czx7b | --compressor-zx7b         - Use ZX7 Backwards compressor (Default).
 ##    -czx0  | --compressor-zx0          - Use ZX0 compressor.
 ##
 
@@ -132,7 +132,7 @@ function generateCommentInfoHeader() {
    ## Generate info Header
    cat > "${OUTFILE}" <<CommentInfoHeader
 $CPREF File '${OUTFILE}' generated using cpct_pack
-$CPREF Compresor used:   $COMPRESSOR
+$CPREF Compressor used:  $COMPRESSOR
 $CPREF Files compressed: [$(for F in "${INFILES[@]}"; do printf " '%s'" $F; done) ]
 $CPREF Uncompressed:     $UNCOMPRESSED_BYTES bytes
 $CPREF Compressed:       $COMPRESSED_BYTES bytes
