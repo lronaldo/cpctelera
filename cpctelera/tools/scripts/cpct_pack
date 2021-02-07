@@ -53,6 +53,7 @@
 ##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
 ##    -czx7b | --compressor-zx7b         - Use ZX7 Backwards compressor (Default).
 ##    -czx0  | --compressor-zx0          - Use ZX0 compressor.
+##    -czx0b | --compressor-zx0b         - Use ZX0 Backwards compressor.
 ##
 
 
@@ -111,7 +112,10 @@ OPTIONS \
       Use ZX7 Backwards compressor (Default). \
    ${COLOR_LIGHT_BLUE}
    -czx0  | --compressor-zx0 ${COLOR_CYAN}
-      Use ZX0 compressor.
+      Use ZX0 compressor. \
+   ${COLOR_LIGHT_BLUE}
+   -czx0b | --compressor-zx0b ${COLOR_CYAN}
+      Use ZX0 Backwards compressor.
 
 ${COLOR_NORMAL}
 UsageHereDoc
@@ -239,6 +243,10 @@ while (( $# >= 1 )); do
       "-czx0" | "--compressor-zx0")
          COMPRESSOR=zx0
       ;;
+      ## Select zx0b compressor
+      "-czx0b" | "--compressor-zx0b")
+         COMPRESSOR=zx0b
+      ;;
       ## Get outfile and other files
       *)
          if isCommandLineOption "$1"; then
@@ -308,6 +316,10 @@ case $COMPRESSOR in
    'zx0')
      echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}"
      ${ZX0} -f "$TMPFILE" "$TMPPACK"> /dev/null
+   ;;
+   'zx0b')
+     echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}"
+     ${ZX0} -f -b "$TMPFILE" "$TMPPACK"> /dev/null
    ;;
    *)
       paramError "Unknown compressor algorithm '$COMPRESSOR'." 8
