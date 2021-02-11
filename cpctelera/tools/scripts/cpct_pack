@@ -302,11 +302,11 @@ case $COMPRESSOR in
    ;;
    'zx0')
      echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}"
-     ${ZX0} -f "$TMPFILE" "$TMPPACK"> /dev/null
+     ${ZX0} -f "$TMPFILE" "$TMPPACK"
    ;;
    'zx0b')
      echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}"
-     ${ZX0} -f -b "$TMPFILE" "$TMPPACK"> /dev/null
+     ${ZX0} -f -b "$TMPFILE" "$TMPPACK"
    ;;
    *)
       paramError "Unknown compressor algorithm '$COMPRESSOR'." 8
