@@ -38,4 +38,4 @@
 ;;
 ;; External values
 ;;
-.globl _cpct_mode_rom_status       ;; defined in firmware_ed.s
+.globl _cpct_mode_rom_status       ;; defined in cpc_mode_rom_status.s
