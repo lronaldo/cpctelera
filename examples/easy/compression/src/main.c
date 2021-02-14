@@ -82,7 +82,7 @@ void main(void) {
     // to use as parameters for cpct_zx7b_decrunch_s the end of the
     // destination area and the end of the compressed data
     cpct_zx7b_decrunch_s (VIDEO_MEMORY_END, data_zx7b_end);
-    // Draw a string with the decruncher function used
+    // Draw a string with the name of the decruncher function used
     cpct_drawStringM0("cpct_zx7b_decrunch_s", pvmem);
     // Wait for a keyboard press
     do {cpct_scanKeyboard();} while (!cpct_isAnyKeyPressed());
@@ -93,7 +93,7 @@ void main(void) {
     // use as parameters for cpct_zx0_decrunch the start of the
     // destination area and the start of the compressed data
     cpct_zx0_decrunch (CPCT_VMEM_START, data_zx0);
-    // Draw a string with the decruncher function used
+    // Draw a string with the name of the decruncher function used
     cpct_drawStringM0("cpct_zx0_decrunch", pvmem);
     // Wait for a keyboard press
     do {cpct_scanKeyboard();} while (!cpct_isAnyKeyPressed());
@@ -104,7 +104,7 @@ void main(void) {
     // to use as parameters for cpct_zx0b_decrunch the end of the
     // destination area and the end of the compressed data
     cpct_zx0b_decrunch (VIDEO_MEMORY_END, data_zx0b_end);
-    // Draw a string with the decruncher function used
+    // Draw a string with the name of the decruncher function used
     cpct_drawStringM0("cpct_zx0b_decrunch", pvmem);
     // Wait for a keyboard press
     do {cpct_scanKeyboard();} while (!cpct_isAnyKeyPressed());
