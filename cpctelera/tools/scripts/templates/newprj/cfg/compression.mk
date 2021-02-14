@@ -47,17 +47,23 @@
 ##                                                                        ##
 ## Macros used for compression are ADD2PACK and PACKZX7B:                 ##
 ##                                                                        ##
-##	ADD2PACK: Adds files to packed (compressed) groups. Each call to this ##
-##  		  macro will add a file to a named compressed group.          ##
-##  PACKZX7B: Compresses all files in a group into a single binary and    ##
-##            generates a C-array and a header to comfortably use it from ##
-##            inside your code.                                           ##
+##  ADD2PACK: Adds files to packed (compressed) groups. Each call to this ##
+##            macro will add a file to a named compressed group.          ##
+##  PACKZX7B: Compresses, using ZX7B algorithm, all files in a group into ##
+##            a single binary and generates a C-array and a header to     ##
+##            comfortably use it from inside your code.                   ##
+##  PACKZX0:  Compresses, using ZX0 algorithm, all files in a group into  ##
+##            a single binary and generates a C-array and a header to     ##
+##            comfortably use it from inside your code.                   ##
+##  PACKZX0B: Compresses, using ZX0B algorithm, all files in a group into ##
+##            a single binary and generates a C-array and a header to     ##
+##            comfortably use it from inside your code.                   ##
 ##                                                                        ##
 ##------------------------------------------------------------------------##
 ##                                                                        ##
 ##  $(eval $(call ADD2PACK,<packname>,<file>))                            ##
 ##                                                                        ##
-##		Sequentially adds <file> to compressed group <packname>. Each     ##
+##      Sequentially adds <file> to compressed group <packname>. Each     ##
 ## call to this macro adds a new <file> after the latest one added.       ##
 ## packname could be any valid C identifier.                              ##
 ##                                                                        ##
@@ -69,7 +75,33 @@
 ##                                                                        ##
 ##  $(eval $(call PACKZX7B,<packname>,<dest_path>))                       ##
 ##                                                                        ##
-##		Compresses all files in the <packname> group using ZX7B algorithm ##
+##      Compresses all files in the <packname> group using ZX7B algorithm ##
+## and generates 2 files: <packname>.c and <packname>.h that contain a    ##
+## C-array with the compressed data and a header file for declarations.   ##
+## Generated files are moved to the folder <dest_path>.                   ##
+##                                                                        ##
+##  Parameters:                                                           ##
+##  (packname) : Name of the compressed group to use for packing          ##
+##  (dest_path): Destination path for generated output files              ##
+##                                                                        ##
+##------------------------------------------------------------------------##
+##                                                                        ##
+##  $(eval $(call PACKZX0,<packname>,<dest_path>))                        ##
+##                                                                        ##
+##     Compresses all files in the <packname> group using ZX0 algorithm   ##
+## and generates 2 files: <packname>.c and <packname>.h that contain a    ##
+## C-array with the compressed data and a header file for declarations.   ##
+## Generated files are moved to the folder <dest_path>.                   ##
+##                                                                        ##
+##  Parameters:                                                           ##
+##  (packname) : Name of the compressed group to use for packing          ##
+##  (dest_path): Destination path for generated output files              ##
+##                                                                        ##
+##------------------------------------------------------------------------##
+##                                                                        ##
+##  $(eval $(call PACKZX0B,<packname>,<dest_path>))                       ##
+##                                                                        ##
+##      Compresses all files in the <packname> group using ZX0B algorithm ##
 ## and generates 2 files: <packname>.c and <packname>.h that contain a    ##
 ## C-array with the compressed data and a header file for declarations.   ##
 ## Generated files are moved to the folder <dest_path>.                   ##
