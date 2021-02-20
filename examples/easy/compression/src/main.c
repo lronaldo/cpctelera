@@ -41,7 +41,7 @@
 // end of compressed data is reached and the end of the uncompressed data
 // is written to memory.
 // On the other hand, ZX7B and ZX0B methods start decompression reading
-// compressed data from its end, and starts writing at the end of the
+// compressed data from its end, and start writing at the end of the
 // uncompressed destination area. Then decompression continues backwards until
 // the start of compressed data is reached and the start of uncompressed data
 // is written. Therefore we'll need to provide cpct_zx7b_decrunch_s and
@@ -60,7 +60,7 @@
 #include "data_zx7b.h"
 
 // By default, video memory starts at adcress 0xC000 and ends at address 0xFFFF.
-// CPCT_VMEM_START is already defined in CPCTelera.
+// CPCT_VMEM_START is already defined in CPCtelera.
 #define VIDEO_MEMORY_END   (void*)(0xFFFF)
 
 void main(void) {
