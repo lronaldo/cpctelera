@@ -40,6 +40,7 @@
 // uncompressed data starts. From there it continues decompressing until the
 // end of compressed data is reached and the end of the uncompressed data
 // is written to memory.
+//
 // On the other hand, ZX7B and ZX0B methods start decompression reading
 // compressed data from its end, and start writing at the end of the
 // uncompressed destination area. Then decompression continues backwards until
@@ -47,6 +48,7 @@
 // is written. Therefore we'll need to provide cpct_zx7b_decrunch_s and
 // cpct_zx0b_decrunch functions the end of uncompressed destination area and
 // the end of compressed data.
+//
 // As in this example we are uncompressing the whole video memory area, the
 // start of the uncompressed destination area is 0xC000, and the end of the
 // uncompressed destination area is 0xFFFF.
