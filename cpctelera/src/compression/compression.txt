@@ -1,0 +1,49 @@
+Title: Compression in CPCtelera
+
+About compression:
+
+When programming for old computers, one of the biggest constraints is the limited memory size. For example, in an Amstrad CPC 464, if we want to store a full screeen image it will take 16000 bytes of memory. That's a huge part of all the available memory for our code, so it's not an option to store it this way.
+When dealing with a lot of data that is not needed to be accessed constantly, we need to store it in a way that consumes less memory than data itself (compression), but also can be restored to its original form when needed (decompression).
+
+There are many compression algorithms that work on different ways, so deppending what is the data to compress it will be better to use one or another. Of course, for each different compression method used, a different decompressor will be needed.
+
+Compression Algorithms in CPCtelera:
+
+CPCtelera provides easy built-in support for three different compression methods: ZX0, ZX0b (ZX0 backwards), and ZX7b (ZX7 backwards).
+
+ZX0 algorithm begins decompression reading the start of the compressed data, and writing at the start of the uncompressed data memory destination area. From there it continues decompressing until the end of compressed data is reached and the end of the uncompressed data is written to memory.
+On the other hand, backwards methods ZX7B and ZX0B start decompression reading compressed data from its end, and start writing at the end of the uncompressed destination area. Then decompression continues backwards until the start of compressed data is reached and the start of uncompressed data is written.
+
+How to use compression with CPCtelera:
+
+Compression of data can be easily achieved with CPCtelera in two different ways
+  - using command-line script *cpct_pack*
+  - automating the process configuring file *cfg/compression.mk* of your project
+
+Decompression:
+
+For decompressing data you must use the proper decrunch function according to compression algorithm used
+ 	- *cpct_zx0_decrunch* for ZX0 method
+ 	- *cpct_zx0b_decrunch* for ZX0 Backwards method
+ 	- *cpct_zx7b_decrunch_s* for ZX7 Backwards method
+
+Comparison table:
+
+Next table compares CPCtelera's different compression methods. It was made using one specific data set. As compression routines are highly deppendant on data passed, the exact compression ratio and decompression time will change with different input data, not only with its size. Some data may be better compressed using backwards methods or different algorithms.
+(start code)
+-----------------------------------------------------------------------------------
+|  uncompressed data  |  compressed size (bytes) | decompression time (microsecs) |
+|---------------------|--------------------------|--------------------------------|
+|    type    | bytes  |   ZX0  |  ZX0b  |  ZX7b  |     ZX0  |    ZX0b  |    ZX7b  |
+|------------|--------|--------|--------|--------|----------|----------|----------|
+| sprites 1k |  1024  |   457  |   460  |   490  |   24116  |   24204  |   26939  |
+| sprites 2k |  2048  |   951  |   960  |  1026  |   48967  |   50152  |   55705  |
+| sprites 4k |  4096  |  1991  |  2017  |  2179  |  101345  |  103092  |  120783  |
+| sprites 8k |  8192  |  3707  |  3727  |  4005  |  200824  |  204868  |  239034  |
+| screen 16k | 16384  |  6584  |  6564  |  6929  |  393043  |  395562  |  499237  |
+-----------------------------------------------------------------------------------
+(end)
+
+Credits:
+	- <ZX0, ZX0b at https://github.com/einar-saukas/ZX0> by Einar Saukas
+	- <ZX7b at https://github.com/antoniovillena/zx7b> by Antonio Villena and Einar Saukas
