@@ -51,6 +51,8 @@ Arkos player original code:
 Compression and decompression tools and functions:
    * ZX7  - <Einar Saukas at https://www.ime.usp.br/~einar/>
    * ZX7B - <Antonio Villena at https://github.com/antoniovillena>
+   * ZX0  - <Einar Saukas at https://github.com/einar-saukas>
+   * ZX7B - <Einar Saukas at https://github.com/einar-saukas>
 
 Random number generation:
    * George Marsaglia
@@ -117,7 +119,7 @@ Section: Code & fixes contributors
    * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
    * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
    * Jose Manuel Ladrón de Guevara García (<@jmlg97 / Github at https://github.com/jmlg97>)
-   * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+   * <Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
    * <Nestornillo at https://github.com/nestornillo>
    * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
    * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
@@ -127,10 +129,10 @@ Section: Testers & Bug Reporters
 
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
  * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
- * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+ * <Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
  * <gryken2014 at https://github.com/gryken2014> / <Github at https://github.com>
  * Roald Strauss (<mr_lou / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=96>)
- * Toni Ramírez (<@amstradgamer at http://twitter.com/amstradgamer)
+ * Toni Ramírez (<@amstradgamer at http://twitter.com/amstradgamer>)
  * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
  * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / <CPCWiki at http://www.cpcwiki.eu>
  * Carlos (<@neophox at http://twitter.com/neophox>)
@@ -141,9 +143,9 @@ Section: Testers & Bug Reporters
  * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
  * <Paulo Garcia at https://github.com/pedgarcia> / <VintageIsTheNewOld at https://www.vintageisthenewold.com/>
  * <Alexis Roda at https://github.com/patxoca> / <Github at https://github.com> 
- * <rgiot https://github.com/rgiot> / <Github at https://github.com>
+ * <rgiot at https://github.com/rgiot> / <Github at https://github.com>
  * <David Asta at mailto:davidasta@gmail.com>
- * Álvaro Amador Ruiz (@SararyCow at http://twitter.com/SararyCow)
+ * Álvaro Amador Ruiz (<@SararyCow at http://twitter.com/SararyCow>)
  * <John Lobo at https://github.com/johnlobo> / <Github at https://github.com> 
  * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
  * Iván Fernández Álvarez (<SpDizzy at http://twitter.com/dizzy_sp>)
