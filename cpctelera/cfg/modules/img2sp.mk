@@ -276,7 +276,6 @@ define IMG2SP_CONVERT_BIN
 
 # Variables that need to be updated to ensure they are erased on clean
 IMGBINFILES := $(I2S_B2) $(IMGBINFILES)
-IMGASMFILES := $(I2S_S2) $(IMGASMFILES)
 OBJS2CLEAN  := $(I2S_CSB) $(OBJS2CLEAN)
 endef
 
