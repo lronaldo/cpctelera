@@ -244,7 +244,7 @@ endef
 # $(5): C-identifier for the array containing generated palette (if required)
 # $(6): C-identifier for the array containing generated tileset (ignored: no tileset produced on binary output)
 #
-# Updates IMGCFILES, IMGASMFILES and OBJS2CLEAN adding new C files that result from the pack generation.
+# Updates IMGCFILES and OBJS2CLEAN adding new C files that result from the pack generation.
 #
 define IMG2SP_CONVERT_BIN
 	# Set up C and H files and paths
