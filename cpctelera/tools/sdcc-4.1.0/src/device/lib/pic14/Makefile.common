@@ -1,0 +1,171 @@
+## Process this file with Automake to create Makefile.in
+
+ARCH  ?= @ARCH@
+EARCH ?= @EARCH@
+
+############################################################
+# common source files for all variants of the sdcc library
+############################################################
+
+LIBSDCC_SOURCES_COMMON =
+LIBSDCC_SOURCES_COMMON += ../_divschar.c
+LIBSDCC_SOURCES_COMMON += ../_divsint.c
+LIBSDCC_SOURCES_COMMON += ../_divslong.c
+LIBSDCC_SOURCES_COMMON += ../_divuchar.c
+LIBSDCC_SOURCES_COMMON += ../_divuint.c
+LIBSDCC_SOURCES_COMMON += ../_divulong.c
+LIBSDCC_SOURCES_COMMON += ../_modschar.c
+LIBSDCC_SOURCES_COMMON += ../_modsint.c
+LIBSDCC_SOURCES_COMMON += ../_modslong.c
+LIBSDCC_SOURCES_COMMON += ../_moduchar.c
+LIBSDCC_SOURCES_COMMON += ../_moduint.c
+LIBSDCC_SOURCES_COMMON += ../_modulong.c
+LIBSDCC_SOURCES_COMMON += ../_mulschar.c
+LIBSDCC_SOURCES_COMMON += ../_muluchar.c
+LIBSDCC_SOURCES_COMMON += ../_mulint.c
+LIBSDCC_SOURCES_COMMON += ../_mullong.c
+LIBSDCC_SOURCES_COMMON += ../_fs2schar.c
+LIBSDCC_SOURCES_COMMON += ../_fs2sint.c
+LIBSDCC_SOURCES_COMMON += ../_fs2slong.c
+LIBSDCC_SOURCES_COMMON += ../_fs2uchar.c
+LIBSDCC_SOURCES_COMMON += ../_fs2uint.c
+LIBSDCC_SOURCES_COMMON += ../_fs2ulong.c
+LIBSDCC_SOURCES_COMMON += ../_fsadd.c
+LIBSDCC_SOURCES_COMMON += ../_fsdiv.c
+LIBSDCC_SOURCES_COMMON += ../_fseq.c
+LIBSDCC_SOURCES_COMMON += ../_fslt.c
+LIBSDCC_SOURCES_COMMON += ../_fsmul.c
+LIBSDCC_SOURCES_COMMON += ../_fsneq.c
+LIBSDCC_SOURCES_COMMON += ../_fssub.c
+LIBSDCC_SOURCES_COMMON += ../_schar2fs.c
+LIBSDCC_SOURCES_COMMON += ../_sint2fs.c
+LIBSDCC_SOURCES_COMMON += ../_slong2fs.c
+LIBSDCC_SOURCES_COMMON += ../_uchar2fs.c
+LIBSDCC_SOURCES_COMMON += ../_uint2fs.c
+LIBSDCC_SOURCES_COMMON += ../_ulong2fs.c
+LIBSDCC_SOURCES_COMMON += ../idata.c
+
+############################################################
+# Directories when building from the sdcc sources
+############################################################
+
+# the directory where sdcc device files can be found
+DEVICE_TOP_DIR = $(top_srcdir)/../..
+
+# the directory where generic device lib sources can be found
+GENERIC_SRC_DIR = $(DEVICE_TOP_DIR)/lib
+
+# If compiling from the installed device sources, use these directories
+#DEVICE_TOP_DIR = $(top_srcdir)/../../..
+#GENERIC_SRC_DIR = $(DEVICE_TOP_DIR)/lib/src
+
+GENERIC_SRC_DIR_ABS = $(abspath $(GENERIC_SRC_DIR))
+
+############################################################
+# C preprocessor flags
+############################################################
+
+AM_CPPFLAGS =
+AM_CPPFLAGS += -I.
+AM_CPPFLAGS += -I$(top_srcdir)
+AM_CPPFLAGS += -I$(DEVICE_TOP_DIR)/include/pic14 -I$(DEVICE_TOP_DIR)/non-free/include/pic14 -I$(DEVICE_TOP_DIR)/include
+
+############################################################
+# C compiler flags
+############################################################
+
+SDCC_FLAGS =
+SDCC_FLAGS += -mpic14 --less-pedantic --no-warn-non-free --i-code-in-asm --fverbose-asm
+SDCC_FLAGS += --std-c11
+
+# extra flags for enhanced cores
+SDCC_FLAGS_ENHANCED =
+if !ENABLE_EXTENDED_INSTRUCTIONS
+SDCC_FLAGS_ENHANCED += --no-extended-instructions
+endif !ENABLE_EXTENDED_INSTRUCTIONS
+
+# extra flags to disable optimizations
+SDCC_FLAGS_NOOPT = --no-pcode-opt --no-peep
+
+# extra flags to enable experimental support
+SDCC_FLAGS_EXP = --experimental-pcall-all --experimental-pcall-enhanced --experimental-variadics --experimental-ralloc
+
+# extra flags when DEBUG is enabled
+if ENABLE_DEBUG
+SDCC_FLAGS += --debug --debug-xtra --debug-ralloc  --debug-glue
+SDCC_FLAGS_EXP += --debug-variadics
+endif
+
+AM_CFLAGS    = -p$(ARCH) $(SDCC_FLAGS)
+AM_CFLAGS_O  = -p$(ARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_NOOPT)
+AM_CFLAGS_X  = -p$(ARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_EXP)
+AM_CFLAGS_OX = -p$(ARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_NOOPT) $(SDCC_FLAGS_EXP)
+
+AM_CFLAGS_E   = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED)
+AM_CFLAGS_EO  = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED) $(SDCC_FLAGS_NOOPT)
+AM_CFLAGS_EX  = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED) $(SDCC_FLAGS_EXP)
+AM_CFLAGS_EOX = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED) $(SDCC_FLAGS_NOOPT) $(SDCC_FLAGS_EXP)
+
+############################################################
+# Assembler flags
+############################################################
+
+AM_CCASFLAGS =
+AM_CCASFLAGS += -p$(ARCH)
+AM_CCASFLAGS += -I$(srcdir)
+AM_CCASFLAGS += -I$(DEVICE_TOP_DIR)/include/pic14 -I$(DEVICE_TOP_DIR)/non-free/include/pic14
+
+############################################################
+# Common actions
+############################################################
+
+# link missing source files to the generic sdcc ones
+# NOTE: last empty line required because foreach concatenates several copies of this text
+define link-generic-files
+$(1)/%.c: $$(GENERIC_SRC_DIR_ABS)/%.c
+	test -e $$(srcdir)/$$@ || ln -s $$< $$@
+
+endef
+
+# create links to generic source files in the source directories
+$(foreach SOURCE_DIR,$(SOURCE_DIRS),$(eval $(call link-generic-files,$(SOURCE_DIR))))
+
+# remove links to generic source files
+# NOTE: last semicolon required because foreach concatenates several copies of this text
+define remove-generic-links
+	list='$(wildcard $(SOURCE_DIR)/*.c)' ; \
+	for file in $$list ; do \
+	  if test -L $$file ; then rm $$file ; fi \
+	done ;
+endef
+
+# extensions generated by the build process
+CLEAN_EXTENSIONS = .asm .lst .sym .d .p .g .v .adb
+
+# remove intermediate files generated by the build process
+# NOTE: last semicolon required because foreach concatenates several copies of this text
+define remove-intermediate-files
+	list='$(wildcard $(addprefix $(SOURCE_DIR)/*,$(CLEAN_EXTENSIONS)))' ; \
+	if test -n "$$list" ; then rm -rf $$list ; fi ;
+endef
+
+# clean-up (remove intermediate files and links to missing source files)
+clean-local:
+	$(foreach SOURCE_DIR,$(SOURCE_DIRS),$(remove-generic-links))
+	$(foreach SOURCE_DIR,$(SOURCE_DIRS),$(remove-intermediate-files))
+
+if ENABLE_DEBUG
+# do not remove intermediate files when DEBUG is enabled
+clean-intermediate:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $@ in $$subdir"; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
+	done
+else
+clean-intermediate: clean-local
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $@ in $$subdir"; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
+	done
+endif
+

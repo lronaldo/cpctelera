@@ -1,0 +1,151 @@
+// peeph-z80.def - Z80 peephole rules
+//
+// Some of these peepholes could be potentially moved to peeph.def, but a
+// GBZ80 expert should have a look at them before.
+//
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2015
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+replace restart {
+	ld	%1, %7
+	ld	%5 (%6), %4
+	ld	%2 (%3), %1
+} by {
+	ld	%5 (%6), %4
+	; peephole 13 loaded %7 into %2 (%3) directly instead of going through %1.
+	ld	%2 (%3), %7
+} if canAssign(%2 %3 %7), notVolatile(%1), notUsed(%1), notSame(%1 %4 %1 'hl')
+
+replace restart {
+	ld	iy, #%1+1
+	ld	a, 1 (iy)
+	or	a, 0 (iy)
+} by {
+	ld	hl, #%1
+	ld	a, (hl)
+	dec	hl
+	or	a, (hl)
+	; peephole 52 used hl instead of iy.
+} if notUsed('iy'), notUsed('hl')
+
+replace restart {
+	add	hl, hl
+	ld	e, l
+	ld	d, h
+	inc	de
+	inc	de
+} by {
+	inc	hl
+	; peephole 59 incremented once in hl instead of incrementing in de twice.
+	add	hl, hl
+	ld	e, l
+	ld	d, h
+} if notUsed('hl')
+
+replace restart {
+	add	hl, hl
+	inc	hl
+	inc	hl
+} by {
+	inc	hl
+	; peephole 60 incremented once in hl instead of incrementing in hl twice.
+	add	hl, hl
+}
+
+replace restart {
+	add	a, a
+	add	a, a
+	add	a, #0x04
+} by {
+	inc	a
+	; peephole 61 incremented a once instead of adding #0x04 to a.
+	add	a, a
+	add	a, a
+}
+
+replace restart {
+	add	hl, hl
+	pop	de
+	inc	hl
+	inc	hl
+} by {
+	inc	hl
+	; peephole 62 incremented once in hl instead of incrementing in hl twice.
+	add	hl, hl
+	pop	de
+}
+
+replace {
+	ld	e,#0x%1
+	ld	d,#0x%2
+} by {
+	ld	de,#0x%2%1
+	; peephole 78 combined constant loads into register pair.
+}
+
+replace {
+	ld	d,#0x%1
+	ld	e,#0x%2
+} by {
+	ld	de,#0x%1%2
+	; peephole 79 combined constant loads into register pair.
+}
+
+replace {
+	ld	l,#0x%1
+	ld	h,#0x%2
+} by {
+	ld	hl,#0x%2%1
+	; peephole 80 combined constant loads into register pair.
+}
+
+replace {
+	ld	h,#0x%1
+	ld	l,#0x%2
+} by {
+	ld	hl,#0x%1%2
+	; peephole 81 combined constant loads into register pair.
+}
+
+replace {
+	ld	c,#0x%1
+	ld	b,#0x%2
+} by {
+	ld	bc,#0x%2%1
+	; peephole 82 combined constant loads into register pair.
+}
+
+replace {
+	ld	b,#0x%1
+	ld	c,#0x%2
+} by {
+	ld	bc,#0x%1%2
+	; peephole 83 combined constant loads into register pair.
+}
+
+replace restart {
+	ld	%1, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	ld	%5, a
+	ld	%6, %1
+} by {
+	ld	%6, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	ld	%5, a
+	; peephole 110 loaded %6 from a directly instead of going through %1.
+} if notUsed(%1), notSame(%5 %1), notSame(%5 '(hl)' '(de)' '(bc)'), notSame(%5 %6), notSame(%6 '(hl)' '(de)' '(bc)'), notSame(%5 'a'), notSame(%6 'a')

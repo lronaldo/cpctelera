@@ -1,0 +1,198 @@
+// peeph.def - GBZ80 peephole rules
+//
+//
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2007
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+replace{
+	ld	hl, #%1
+	ld	a, (hl)
+} by {
+	; gbz80 peephole 0 used ldh instead of ld a, (hl).
+	ldh	a, (#%1)
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2), notUsed('hl')
+
+replace{
+	ld	a, (#%1)
+} by {
+	; gbz80 peephole 0b used ldh instead of ld.
+	ldh	a, (#%1)
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2)
+
+replace{
+	ld	hl, #%1
+	ld	(hl), a
+} by {
+	; gbz80 peephole 1 used ldh instead of ld (hl), a.
+	ldh	(#%1), a
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2), notUsed('hl')
+
+replace{
+	(#%1), a
+} by {
+	; gbz80 peephole 1b used ldh instead of ld.
+	ldh	(#%1), a
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2)
+
+replace {
+	ld	a, (hl)
+	inc	hl
+} by {
+	ld	a, (hl+)
+	; gbz80 peephole 2 used ldi to increment hl after load
+}
+
+replace {
+	ld	%1, (hl)
+	inc	hl
+} by {
+	ld	a, (hl+)
+	ld	%1, a
+	; gbz80 peephole 2b used ldi to increment hl after load
+} if notUsed('a')
+
+replace {
+	ld	%1, (hl)
+	dec	hl
+} by {
+	ld	a, (hl-)
+	ld	%1, a
+	; gbz80 peephole 3 used ldd to decrement hl after load
+} if notUsed('a')
+
+replace {
+	ld	a, (hl)
+	dec	hl
+} by {
+	ld	a, (hl-)
+	; gbz80 peephole 3b used ldd to decrement hl after load
+}
+
+replace {
+	ld	(hl), a
+	inc	hl
+} by {
+	ld	(hl+), a
+	; gbz80 peephole 4 used ldi to increment hl after load
+}
+
+replace {
+	ld	(hl), %1
+	inc	hl
+} by {
+	ld	a, %1
+	ld	(hl+), a
+	; gbz80 peephole 4b used ldi to increment hl after load
+} if notUsed('a')
+
+replace {
+	ld	(hl), a
+	dec	hl
+} by {
+	ld	(hl-), a
+	; gbz80 peephole 5 used ldd to decrement hl after load
+}
+
+replace {
+	ld	(hl), %1
+	dec	hl
+} by {
+	ld	a, %1
+	ld	(hl-), a
+	; gbz80 peephole 5b used ldd to decrement hl after load
+} if notUsed('a')
+
+replace {
+	inc hl
+	dec hl
+} by {
+	; gbz80 peephole 6 removed inc hl / dec hl pair
+}
+
+replace {
+	ld	(hl), a
+	inc	de
+	ld	a, (de)
+	inc	hl
+} by {
+	ld	(hl+), a
+	; gbz80 peephole 7 used ldi to increment hl
+	inc	de
+	ld	a, (de)
+}
+
+replace {
+	ld	a, (hl)
+	ld	(bc), a
+	inc	bc
+	inc	hl
+} by {
+	ld	a, (hl+)
+	; gbz80 peephole 8 used ldi to increment hl
+	ld	(bc), a
+	inc	bc
+}
+
+replace restart {
+	ldhl	sp,#%1
+	dec	hl
+} by {
+	; gbz80 peephole 7 combined ld and dec.
+	ldhl	sp,#%2
+} if immdInRange(-128 127 '-' %1 1 %2)
+
+replace {
+	pop	%1
+	push	%1
+} by {
+	; peephole sp1 removed not needed push
+	pop	%1
+} if notUsed('sp')
+
+replace {
+	pop	%1
+	pop	%2
+	push	%2
+	push	%1
+} by {
+	; peephole sp2 removed not needed push
+	pop	%1
+	pop	%2
+} if notUsed('sp'), notSame(%1 %2)
+
+replace {
+	add	sp, %1
+} by {
+	; peephole sp3 removed not needed add sp
+} if notUsed('sp')
+
+replace {
+	inc	sp
+} by {
+	; peephole sp4 removed not needed inc sp
+} if notUsed('sp')
+
+replace {
+	dec	sp
+} by {
+	; peephole sp5 removed not needed dec sp
+} if notUsed('sp')
+
+replace {
+	pop	%1
+} by {
+	; peephole sp6 removed not needed pop
+} if notUsed(%1), notUsed('sp')
