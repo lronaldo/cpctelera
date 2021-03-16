@@ -41,8 +41,8 @@
 ##       - outfile.h file with the exported symbols to be included in other c files. 
 ##
 ## Command line options:
+##    -alc | --asm-local-constants       - Makes generated assembly constants local instead of global.
 ##    -an  | --array-name [name]         - Sets the C identifier that will be used. <OUTFILE> is used by default.
-##    -alc | --asm-local-constants       - Makes generated assembly constants local instead of global
 ##    -b   | --bytes-per-line [numbytes] - Establishes the number of bytes to write at each array line in C. 16 by default
 ##    -c   | --compressor [method]       - Sets the compression method. Possible values: zx7b zx0 zx0b (Default: zx7b)
 ##    -gb  | --generate-bin              - Generates a binary file with compressed data (Default: no). Using this switch overrides generation defaults.
@@ -50,7 +50,7 @@
 ##    -ghs | --generate-asm-header       - Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults.
 ##    -gs  | --generate-asm              - Generates an assembly file with compressed data (Default: yes). Using this switch overrides generation defaults.
 ##    -h   | --help                      - Shows help information on the terminal.
-##    -i   | --include-header [file]     - Include a header file at the top of the generated output
+##    -i   | --include-header [file]     - Include a header file at the top of the generated output.
 ##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
 ##
 
@@ -76,11 +76,11 @@ Default output produces two files:
 ${COLOR_LIGHT_YELLOW}
 OPTIONS \
    ${COLOR_LIGHT_BLUE}
-   -an  | --array-name ${COLOR_NORMAL}<identifier> ${COLOR_CYAN}
-      Sets the C identifier that will be used. G_<OUTFILE> is used by default. \
-   ${COLOR_LIGHT_BLUE}
    -alc | --asm-local-constants ${COLOR_CYAN}
       Makes generated assembly constants local instead of global. \
+   ${COLOR_LIGHT_BLUE}
+   -an  | --array-name ${COLOR_NORMAL}<identifier> ${COLOR_CYAN}
+      Sets the C identifier that will be used. G_<OUTFILE> is used by default. \
    ${COLOR_LIGHT_BLUE}
    -b   | --bytes-per-line ${COLOR_NORMAL}<numbytes> ${COLOR_CYAN}
       Establishes the number of bytes to write at each array line in C. 16 by default. \
