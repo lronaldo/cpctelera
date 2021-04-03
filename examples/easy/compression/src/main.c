@@ -22,18 +22,19 @@
 // This program decompresses an image directly into video memory, using three
 // different compression methods.
 //------------------------------------------------------------------------------
-// Folder img contains a binary file previously generated with cpct_img2tileset.
-// This file is a 160x200 pixels 16 color (mode 0) image stored in screen
-// format. It was created from a bitmap image file using comand:
-// 'cpct_img2tileset -m 0 -of bin -scr -nt -th 200 -tw 160 cpcretrodev.bmp'
-// (Note: this example uses standard palette, you may consider using
-// cpct_img2tileset parameter '-pf' for your project to specify a palette).
+// Folder 'img/' contains file 'savage_colors.png'. This image has a resolution
+// of 160x200 pixels and 16 colours, as it will be displayed as a full screen
+// mode 0 image.
 //
-// With the configuration file cfg/compression.mk this binary file is compressed
+// Using configuration file 'cfg/image_conversion.mk', this image is
+// converted to screen format, and stored as a binary file in folder
+// 'img/screenformat/'.
+//
+// With the configuration file 'cfg/compression.mk' this binary file is compressed
 // using three different compression methods: ZX0, ZX0B (ZX0 backwards), and
-// ZX7B (ZX7 backwards). This compression generates in src folder a .c and .h
-// file for each compression algorithm. Of course, for each different
-// compression method used we'll need a different decompressor.
+// ZX7B (ZX7 backwards). This compression generates in 'src/compressed' folder
+// a '.c' and '.h' file for each compression algorithm. Of course, for each
+// different compression method used we'll need a different decompressor.
 //
 // For ZX0 decompression, we need to provide cpct_zx0_decrunch function the
 // memory adress where compressed data starts and the memory address where
@@ -54,16 +55,21 @@
 // uncompressed destination area is 0xFFFF.
 //------------------------------------------------------------------------------
 
+// include CPCtelera's constants and definitions
 #include <cpctelera.h>
 
 // include files generated with cfg/compression.mk
-#include "data_zx0.h"
-#include "data_zx0b.h"
-#include "data_zx7b.h"
+#include "compressed/data_zx0.h"
+#include "compressed/data_zx0b.h"
+#include "compressed/data_zx7b.h"
+
+// include palette generated with cfg/image_conversion.mk
+#include "savagecolors_palette.h"
 
 // By default, video memory starts at adcress 0xC000 and ends at address 0xFFFF.
 // CPCT_VMEM_START is already defined in CPCtelera.
 #define VIDEO_MEMORY_END   (void*)(0xFFFF)
+
 
 void main(void) {
   // Pointer to video memory
@@ -72,9 +78,11 @@ void main(void) {
   cpct_disableFirmware();
   // Change to Mode 0 (160x200, 16 colours)
   cpct_setVideoMode(0);
-  // Make pvmem point to the byte in video memory where we want
-  // to print our string (coordinates (0, 46) in bytes)
-  pvmem = cpct_getScreenPtr(CPCT_VMEM_START, 0, 46);
+  // Set up the palette using hardware colour values
+  cpct_setPalette(savagecolors_palette,16);
+  // Make pvmem point to the byte in video memory where we want to
+  // print our string (top left corner is at the start of video memory)
+  pvmem = CPCT_VMEM_START;
 
    // Repeat next part forever
   while (1) {
