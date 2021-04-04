@@ -167,6 +167,7 @@ Section: Assets
  * <SCI-FI Background at http://opengameart.org/content/sci-fi-background> by <hassekf at http://opengameart.org/users/hassekf>
  * <Pixel Art Dungeon Items at http://opengameart.org/content/pixel-art-dungeon-items> by <SpinachChicken at http://opengameart.org/users/spinachchicken>
  * <Little Candele Monsters at http://opengameart.org/content/little-candle-monsters> by <C-TOY at http://c-toy.blogspot.com.es>
+ * <Savage Colors at https://www.reddit.com/r/PixelArt/comments/leqmch/savage_colors_amstrad_cpc_mode_0_160x200_pixels> by <TITAN (Eric Cubizolle) at https://www.reddit.com/user/TITAN_Eric_Cubizolle>
  
 Section: Special Thanks
 

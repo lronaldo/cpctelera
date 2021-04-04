@@ -15,6 +15,38 @@
 ##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
+
+
+
+##-------------------------------------------------------------------------
+##                      COMPRESSION EXAMPLE
+##-------------------------------------------------------------------------
+## With the following calls an image is converted to mode 0 screen format,
+## and stored as a binary file in 'img/screenformat/' folder. Also,
+## image palette is converted to a C array, creating in 'src/' directory
+## corresponding '.c' and '.h' files.
+##-------------------------------------------------------------------------
+
+## Firmware palette definition for this example
+PALETTE=0 26 18 8 1 15 11 4 23 24 7 3 2 6 17 5
+
+## Set conversion options
+$(eval $(call IMG2SP,SET_FOLDER,img/screenformat/))
+$(eval $(call IMG2SP,SET_IMG_FORMAT,screen))
+$(eval $(call IMG2SP,SET_OUTPUT,bin))
+$(eval $(call IMG2SP,SET_PALETTE_FW,$(PALETTE)))
+
+## Convert image
+$(eval $(call IMG2SP,CONVERT,img/savage_colors.png, 160, 200,convertedimage))
+
+## Generate hardware palette, in 'src/' folder, for cpct_setPalette call in 'main.c'
+$(eval $(call IMG2SP,SET_FOLDER,src/))
+$(eval $(call IMG2SP,CONVERT_PALETTE,$(PALETTE),savagecolors_palette))
+
+
+
+
+
 ############################################################################
 ##                        CPCTELERA ENGINE                                ##
 ##                 Automatic image conversion file                        ##
