@@ -62,8 +62,10 @@ directive. It also reindexes tile ids starting from 0 (as in tmx files tile ids 
       << C_CYAN         << "\n    This script will only work with tmx files saved as CSV format. Output format must be \
 selected as CSV in tilemap properties."
       << C_LIGHT_YELLOW << "\n\nOPTIONS:"
-      << C_LIGHT_BLUE   << "\n\n   -alc | --asm-local-constants"
-      << C_CYAN         << "\n          Make assembly generated constants local instead of global (Default: no)"
+      << C_LIGHT_BLUE   << "\n\n   -agc | --asm-global-constants"
+      << C_CYAN         << "\n          Make assembly generated constants global instead of local (Default: no)"
+      << C_LIGHT_BLUE   << "\n   -ang | --asm-not-generate-globals"
+      << C_CYAN         << "\n          Assembly output will not generate .globl directives for global labels in the header (Default: yes)"
       << C_LIGHT_BLUE   << "\n   -au  | --add-underscore-s-vars"
       << C_CYAN         << "\n          Adds an underscore in front of all variable name generated into assembly files to make them C-compatible (Default: no)"
       << C_LIGHT_BLUE   << "\n   -ba  | --bitarray <bits>"
@@ -107,8 +109,12 @@ void parseArguments(const TArgs& args) {
       const auto& a = args[i];
 
       //------------------------ MAKE ASSEMBLY CONSTANTS LOCAL
-      if (a == "-alc" || a == "--asm-local-constants") {
-         g_theTilemap.setASMConstantsLocal(true) ; // Sets generated constants to be local
+      if (a == "-agc" || a == "--asm-global-constants") {
+         g_theTilemap.setASMConstantsLocal(false) ; // Sets generated constants to be global
+
+      //------------------------ PREVENT GENERATION OF .GLOBL DIRECTIVES FOR LABELS
+      } else if (a == "-ang" || a == "--asm-not-generate-globals") {
+         g_theTilemap.setASMGenerateGlobal(false) ; // Prevents generation of .global directives
 
       //------------------------ SET UNDERSCORE PREFIX 
       } else if (a == "-au" || a == "--add-underscore-s-vars") {

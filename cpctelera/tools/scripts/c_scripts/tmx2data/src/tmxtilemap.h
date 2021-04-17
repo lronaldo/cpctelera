@@ -44,11 +44,12 @@ public:
    void  loadMap(const char* tmxfilename);
    void  setBitsPerItem(uint8_t bits);
    void  setCID(std::string cid);
-   void  setOutputNumberFormat(TNumberFormat f) { m_bitarray.setOutFormat(f);       }
-   void  setInitialTileID(uint8_t id)           { m_initialTileID = id;             }
-   void  setUseCPCTMacros(bool use)             { m_bitarray.setUseCPCTMacros(use); }
-   void  setASMVariablesPrefix(char p)          { m_asmVarsPrefix = p;              }
-   void  setASMConstantsLocal(bool b)           { m_asmConstantsLocal = b;          }
+   void  setOutputNumberFormat(TNumberFormat f) noexcept { m_bitarray.setOutFormat(f);       }
+   void  setInitialTileID(uint8_t id)           noexcept { m_initialTileID = id;             }
+   void  setUseCPCTMacros(bool use)             noexcept { m_bitarray.setUseCPCTMacros(use); }
+   void  setASMVariablesPrefix(char p)          noexcept { m_asmVarsPrefix = p;              }
+   void  setASMConstantsLocal(bool b)           noexcept { m_asmConstantsLocal = b;          }
+   void  setASMGenerateGlobal(bool g)           noexcept { m_asmGenerateGlobal = g;          }
 
    // Output operators
    void  output_basic_H  (std::ostream& out) const;
@@ -73,7 +74,8 @@ private:
    uint32_t       m_total_bytes;                // Total bytes for a given output array
    std::string    m_theTime;                    // Current time string
    char           m_asmVarsPrefix = 0;          // Prefix for assembly variable names (Default: none)
-   bool           m_asmConstantsLocal = false;  // Decide if assembly generated constants have to be local or global
+   bool           m_asmConstantsLocal = true;   // Decide if assembly generated constants have to be local or global
+   bool           m_asmGenerateGlobal = true;   // Decide if generated assembly header contains a .globl declaration for each label in the source file
 
    // Useful methods
    void           output_asmVar(std::ostream& out, const std::string& var) const;
