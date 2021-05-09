@@ -194,3 +194,35 @@
    ld__iyh_a
    ;;------------
 .endm
+
+;; Macro: ld__ix_iy
+;;    Copy IY to IX, using 4 instructions. 
+;;    Modifies A Register
+;;    ( ld a, iyl : ld ixl, a : ld a, iyh : ld ixh, a )
+;; Cost: 8 us (32 CPU Cycles)
+;; 
+.macro ld__ix_iy
+   ;; LD IX, IY
+   ;;------------
+   ld__a_iyl
+   ld__ixl_a
+   ld__a_iyh
+   ld__ixh_a
+   ;;------------
+.endm
+
+;; Macro: ld__iy_ix
+;;    Copy IX to IY, using 4 instructions. 
+;;    Modifies A Register
+;;    ( ld a, ixl : ld iyl, a : ld a, ixh : ld iyh, a )
+;; Cost: 8 us (32 CPU Cycles)
+;; 
+.macro ld__iy_ix
+   ;; LD IY, IX
+   ;;------------
+   ld__a_ixl
+   ld__iyl_a
+   ld__a_ixh
+   ld__iyh_a
+   ;;------------
+.endm
