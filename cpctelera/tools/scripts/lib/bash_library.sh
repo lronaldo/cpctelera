@@ -4,16 +4,16 @@
 ##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -172,12 +172,12 @@ function EnsureExists {
       directory)
          MOD="-d" ;;
       *)
-         Error "Filetype '$1' unrecognized while testing file '$2'."
+         Error "Filetype '$1' unrecognized while testing file '$2'." 121
    esac
    if [ ! $MOD "$2" ]; then
-      Error "$1 '$2' does not exist, and it is required for CPCTelera framework to work propperly. $3"
+      Error "$1 '$2' does not exist, and it is required for CPCTelera framework to work propperly. $3" 121
    elif [ ! -r "$2" ]; then
-      Error "$1 '$2' exists, but it is not readable (check for permissions). $3"
+      Error "$1 '$2' exists, but it is not readable (check for permissions). $3" 121
    fi
 }
 
@@ -270,7 +270,7 @@ function isCommandAvailable {
 function EnsureCommandAvailable {
    isCommandAvailable "$1"
    if [[ "$?" != "0" ]]; then
-      Error "$2"
+      Error "$2" 127
    fi
 }
 
@@ -288,7 +288,7 @@ function EnsureCPPHeaderAvailable {
    if [ -s "$ERRTMP" ]; then
       # File has warnings or errors. We ignore warnings.
       if grep "error" "$ERRTMP"; then
-         Error "$2"
+         Error "$2" 126
       fi
    fi
 }
@@ -391,7 +391,7 @@ Generalized initializers. ${MSG_UPGRADE}"
       if checkSystem osx; then 
          ERROR_MSG="${ERROR_MSG}${MSG_OSXUPGRADE}";
       fi
-      Error "$ERROR_MSG"
+      Error "$ERROR_MSG" 125
    fi
 }
 
@@ -489,7 +489,10 @@ function contains {
 ## $1: value to be tested
 ##
 function isInt {
-   return $(test "$1" -eq "$1" > /dev/null 2>&1);
+   if [[ $1 =~ ^[-+]?[0-9]+$ ]]; then
+      return 0
+   fi
+   return 1
 }
 
 ## Check if a given value is an hexadecimal value or not
@@ -501,6 +504,104 @@ function isHex {
    fi
    return 1
 }
+
+## Check if a given value is a binary value or not
+## $1: value to be tested
+##
+function isBin {
+   if [[ $1 =~ ^[0-1]+$ ]]; then
+      return 0
+   fi
+   return 1
+}
+
+## Check if a given value is a C-hexadecimal value or not
+## $1: Value to be tested
+##
+function isCHex {
+   if [[ $1 =~ ^0[x|X][0-9A-Fa-f]+$ ]]; then
+      return 0
+   fi
+   return 1  
+}
+
+## Check if a given value is a C-binary value or not
+## $1: Value to be tested
+##
+function isCBin {
+   if [[ $1 =~ ^0[b|B][0-1]+$ ]]; then
+      return 0
+   fi
+   return 1  
+}
+
+## Converts a binary number to a decimal one. The
+## number may have 0b/0B prefix or not.
+## $1: binary number
+##
+function bin2Dec {
+   local B="$1"
+   if [ ${B:0:2} = "0b" ] || [ ${B:0:2} = "0B" ]; then
+     B="${B:2}"
+   fi
+   echo $((2#$B))
+}
+
+## Converts a hexadecimal number to a decimal one. The number
+## may have 0x/0X prefix or no prefix at all
+## $1: hexadecimal number
+##
+function hex2Dec {
+   local H="$1"
+   if [ "${H:0:2}" != "0x" ] && [ "${H:0:2}" != "0X" ]; then
+     H="0x${H}"
+   fi
+   printf "%d" "$H"
+}
+
+## Converts and integer decimal number to binary base.
+## $1: integer decimal number
+##
+function dec2Bin {
+   echo "obase=2;$1" | bc
+}
+
+## Converts and integer decimal number to hexadecimal base
+## $1: integer decimal number
+##
+function dec2Hex {
+   printf "%x" "$1"
+}
+
+## Converts a number to decimal, be it a Binary or an hexadecimal one
+## $1: number to convert to decimal
+##
+function any2Dec {
+   local N="$1"
+   if isInt "$N"; then
+      echo "$N"
+   elif isBin "$N" || isCBin "$N"; then 
+      echo $(bin2Dec "$N")
+   elif isHex "$N" || isCHex "$N"; then
+      echo $(hex2Dec "$N")
+   fi
+}
+
+## Check if a given value is a valid C integer value 
+## either in decimal, hexadecimal or binary
+## $1: Value to be tested
+##
+function isCIntValue {
+   if isInt "$1"; then 
+      return 0
+   elif isCHex "$1"; then
+      return 0
+   elif isCBin "$1"; then
+      return 0
+   fi
+   return 1
+}
+
 
 ## Check if a given value is empty
 ## $1: Value to check
@@ -527,6 +628,27 @@ function isCommandLineOption {
 ##
 function isFileReadable {
    if [ -f "$1" ] && [ -r "$1" ]; then
+      return 0
+   fi
+   return 1
+}
+
+## Checks if a given value is a valid C idenfitier or not
+## $1: Value to check as identifier
+##
+function isValidCIdentifier { 
+   local REX='^[a-zA-Z_][a-zA-Z0-9_]*$'
+   if [[ $1 =~ $REX ]]; then
+      return 0
+   fi
+   return 1
+}
+
+## Check if a folder exists and is readable (only folders, not files)
+## $1: Folder to check 
+##
+function isFolderReadable {
+   if [ -d "$1" ] && [ -r "$1" ]; then
       return 0
    fi
    return 1
@@ -599,7 +721,7 @@ function replaceTag {
 ## 
 function createTempFile {
   if checkSystem "osx"; then
-    mktemp -t tmp
+    mktemp -t tmp.XXXXX
   else
     mktemp 
   fi
@@ -629,9 +751,33 @@ function checkSystem {
                return 0
             fi
          ;;
+         "win10linux")
+            if [[ "$SYS" =~ "Linux" ]]; then
+               # Use /proc/version for better compatibilty 
+               if grep -qE "(icrosoft|WSL)" /proc/version &> /dev/null; then
+                  return 0;
+               fi
+            fi
+         ;;
          "linux") 
             if [[ "$SYS" =~ "Linux" ]] || [[ "$SYS" =~ "GNU" ]]; then
                return 0
+            fi
+         ;;
+         "linux64")
+            if [[ "$SYS" =~ "Linux" ]] || [[ "$SYS" =~ "GNU" ]]; then
+               SYS=$(uname -m)
+               if [[ "$SYS" =~ "64" ]]; then
+                  return 0
+               fi
+            fi
+         ;;
+         "linux32")
+            if [[ "$SYS" =~ "Linux" ]] || [[ "$SYS" =~ "GNU" ]]; then
+               SYS=$(uname -m)
+               if [[ ! "$SYS" =~ "64" ]]; then
+                  return 0
+               fi
             fi
          ;;
          "cygwin") 
@@ -642,7 +788,7 @@ function checkSystem {
          "cygwin32") 
             if [[ "$SYS" =~ "CYGWIN" ]]; then
                SYS=$(uname -a)
-               if [[ ! "$SYS" =~ "x86_64" ]]; then
+               if [[ ! "$SYS" =~ "64" ]]; then
                   return 0
                fi
             fi
@@ -650,7 +796,7 @@ function checkSystem {
          "cygwin64") 
             if [[ "$SYS" =~ "CYGWIN" ]]; then
                SYS=$(uname -a)
-               if [[ "$SYS" =~ "x86_64" ]]; then
+               if [[ "$SYS" =~ "64" ]]; then
                   return 0
                fi
             fi
@@ -692,7 +838,7 @@ function bashProfileFilename {
 ##
 function EnsureFilenameHasNoSpaces {
    case "$1" in
-      *" "*) Error "$2 ('$1')";; 
+      *" "*) Error "$2 ('$1')" 124;; 
    esac
 }
 
@@ -711,7 +857,8 @@ function containsSubstring {
 }
 
 ## Checks if a string contains any given character from other string. 
-## It echoes the character found if any
+## It echoes the character found if any. Be careful with characters ']' and '\',
+## they should be escaped.
 ##  $1 String to check
 ##  $2 String with characters to look for
 ##
@@ -720,9 +867,10 @@ function containsChars {
    local CHARS="$2"
    local POS
    ## Look for any character and get its position in STR
-   POS=$(($(expr index "$STR" "$CHARS")-1))
+   POS=${STR%%[${CHARS}]*};
+   POS=${#POS}
 
-   if (( POS > 0 )); then
+   if (( POS < ${#STR} )); then
       echo "${STR:POS:1}"
    fi
 }
@@ -757,6 +905,25 @@ function checkValidCIdentifier() {
    return 1
 }
 
+## Gets the index of a substring inside a string. Indexes go from 1 onwards.
+##   $1: String
+##   $2: Search substring
+##
+## Echoes the index where substring starts, 0 when substring has not been 
+## found in the string.
+##
+function getIndexOf() {
+  local STRING="$1"
+  local SEARCH="$2"
+  local PREV=${STRING%%${SEARCH}*}
+
+  if [ "$PREV" = "$STRING" ]; then
+    echo 0
+  else
+    echo $(( ${#PREV} + 1 ))
+  fi
+}
+
 ## Gets the first token from a string. Token is a group of characters, 
 ## starting from string character 0, and ending before the first appearance
 ## of a given SPACE character or string (whitespace, $2).
@@ -770,7 +937,8 @@ function getStringToken() {
    local SPACE="$2"
    local IDX
    
-   IDX=$(expr index "$STRING" "$SPACE"); 
+#   IDX=$(expr index "$STRING" "$SPACE"); 
+   IDX=$(getIndexOf "$STRING" "$SPACE")
    if (( $IDX != 0 )); then
       echo ${STRING:0:${IDX}-1}
    else
@@ -808,9 +976,9 @@ function versionGreaterOREqualThan() {
       VTH=${VTH:${#VTH_DIGIT}+1}
 
       ## Check numbers
-      if [[ "$VTH_DIGIT" > "$V_DIGIT" ]]; then
+      if (( "$VTH_DIGIT" > "$V_DIGIT" )); then
          return 1
-      elif [[ "$VTH_DIGIT" < "$V_DIGIT" ]]; then
+      elif (( "$VTH_DIGIT" < "$V_DIGIT" )); then
          return 0
       fi
    done
@@ -866,7 +1034,165 @@ function makeWithProgressSupervision {
 
    ## Supervise the Making Process
    if ! superviseBackgroundProcess "$!" "$MAKELOG" "$LOGTOTALBYTES" "$PBARSIZE" "$CHECKDELAY"; then
-      Error "${ERRORMSG}. Please, check '${MAKELOG}' for details. Aborting. "
+      Error "${ERRORMSG}. Please, check '${MAKELOG}' for details. Aborting. " 123
    fi
    drawOK
+}
+
+## Extracts the value of a variable from a given config file. The config file should
+## have variables in the format VAR=value, being each variable in a single line.
+## If variable is not found in the config file, it issues a non-recoverable error.
+##    $1: Name of the variable
+##    $2: Config file
+##
+## Returns value of the variable via echo
+##
+function extractVarValueFromConfigFile {
+   local VARNAME="$1"
+   local CFILE="$2"
+   local VALUE
+
+   ## Get the value of the variable and check it is not empty
+   VALUE=$(cat $CFILE | grep -m 1 "^ *${VARNAME}.*=" | grep -o "=.*$")
+   if (( ${#VALUE} == 0 )); then
+      Error "Variable '$VARNAME' not found in config file '$CFILE'. This may be due to config \
+file not existing or not being readable, or to some kind of data corruption inside this config \
+file. Please, check the file ('$CFILE') and verify that variable '$VARNAME' is correctly defined." 11  
+   fi
+
+   ## Return the value of the variable by printing it
+   echo "${VALUE:1}"
+}
+
+## Updates the value of a variable in a config file, by changing the line of the
+## file that defines the value of the variable. Variables in the config file should
+## be in the format VAR=value, one single variable per line. If it does not find 
+## the file or the variable, it issues a non-recoverable error.
+##    $1: Name of the variable
+##    $2: New value 
+##    $3: Config file
+##
+function updateVarValueInConfigFile() {
+   local VARNAME="$1"
+   local NEWVALUE="$2"
+   local CFILE="$3"
+   local LINE
+   local TMP
+
+   ## Get the line where variable is located
+   LINE=$(cat $CFILE | grep -m 1 -n "^ *${VARNAME}.*=" | grep -o "^[0-9]*")
+   if ! isInt $LINE; then
+      Error "Variable '$VARNAME' not found in config file '$CFILE'. This may be due to config \
+file not existing or not being readable, or to some kind of data corruption inside this config \
+file. Please, check the file ('$CFILE') and verify that variable '$VARNAME' is correctly defined." 11  
+   fi
+
+   ## Update the line with its new contents
+   TMP=$(createTempFile)
+   (
+      head -$((LINE-1)) "$CFILE"
+      echo "${VARNAME}=${NEWVALUE}"
+      tail -n +$((LINE+1)) "$CFILE"
+   ) > $TMP && mv "$TMP" "$CFILE"
+}
+
+## Checks that a given Executable exists and has execution permissions
+## If it does not have execution permission, asks the user for setting them.
+##  $1: Executable file
+##
+function checkExecutableExists {
+  ERRCPSTR="This file is required for this script to work properly. Please, \
+check CPCtelera installation is okay and this file is in its place and has \
+required user permissions."
+  if   [ ! -e "$1" ]; then
+     Error "'$1' does not exist. $ERRCPSTR" 122
+  elif [ ! -f "$1" ]; then
+     Error "'$1' is not a regular file and it should be. $ERRCPSTR" 122
+  elif [ ! -r "$1" ]; then 
+     Error "'$1' is not readable. $ERRCPSTR" 122
+  elif [ ! -x "$1" ]; then
+     echo "${COLOR_LIGHT_YELLOW}WARNING:${COLOR_CYAN}"
+     echo "   '${COLOR_WHITE}$1${COLOR_CYAN}' is not executable. Execution \
+permission is required for this script to work.${COLOR_LIGHT_CYAN}"
+     echo
+     askSimpleQuestion y n "Do you want this script to try to make it \
+executable? (y/n)" ANSWER
+     echo "${COLOR_NORMAL}"
+     echo
+     if [[ "$ANSWER" == "n" ]]; then
+        paramError "'$1' has not been modified. This script cannot continue. Aborting. " 121
+     fi
+     echo "${COLOR_CYAN}Changing '${COLOR_WHITE}$1${COLOR_CYAN}' execution permission... "
+     if ! chmod +x "$1"; then
+        Error "Your user has not got enough privileges to change '$1' execution permission. \
+Please, change it manually and run this script again." 122
+     fi
+     echo "${COLOR_LIGHT_GREEN}Success!${COLOR_NORMAL}"
+  fi
+}
+
+## Ensures that a file of a given type exists and is readable and executable by the user. 
+## Otherwise, it throws an unrecoverable error. If the file is readable but not executable,
+## the script tries to make it executable with chmod.
+##
+## $1: Type of file (file, directory)
+## $2: File/Directory to check for existance
+## $3: Aditional error message, used when file does not exist or is not readable
+##
+function ensureExistsAndIsExecutable {
+   EnsureExists "$1" "$2" "$3"
+   ## Check file is executable and, if not, try to make it so
+   if [ ! -x "$2" ]; then
+     if ! chmod +x "$2"; then
+        Error "File '$2' is required to be executable and it is not. This script tried to change \
+it to executable, but your user has not got enough privileges to do so. Please, change it manually \
+and run this script again." 120
+     fi      
+   fi
+}
+
+## Converts a given string to lowercase
+##
+## $1: String to convert to lowercase
+##
+function toLower {
+   echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+## Converts a given string to uppercase
+##
+## $1: String to convert to uppercase
+##
+function toUpper {
+   echo "$1" | tr '[:lower:]' '[:upper:]'
+}
+
+## Gets a number of bytes from a given file, reading the
+## file as binary data and outputting the read bytes as an
+## ascii-hexadecimal lowercase string
+##
+## $1: File 
+## $2: Number of binary bytes to get
+## 
+function getFileInitialBytes {
+   od -An -t x1 -N "$2" -v "$1" | tr -d " "
+}
+
+## Checks if a given file does start by a given binary string data.
+## Binary string data must be given in ascii-hexadecimal lowercase form.
+## It returns 0 (true) if the file starts by the given binary data, or
+## 1 (false) otherwise.
+## Warning: Length of $2 string must be even. Otherwise, check will always
+## return 1 (false).
+##
+## $1: File to check
+## $2: Starting hexadecimal bytes (text string)
+## 
+function binaryFileStartsWith {
+   local D=$(( ${#2} / 2 ))
+   local B=$(getFileInitialBytes "$1" "$D")
+   if [ "$2" = "$B" ]; then
+      return 0
+   fi
+   return 1
 }

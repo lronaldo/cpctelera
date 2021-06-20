@@ -1,0 +1,251 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>Memory manipulation commands of &#181;Csim</title>
+  </head>
+  <body bgcolor="white">
+    <h2>Memory manipulation commands of &#181;Csim</h2>
+    Every command which changes content of ROM area such as <b><a href="#dl">dl</a></b>
+    or <b><a href="cmd_set#set_memory">set
+        memory</a></b> deletes result of <a href="analyzer.html">code
+      analyser</a> and causes to re-analyse the code.
+    <hr>
+    <a name="file">
+      <h3>file,load <i>"FILE"</i></h3>
+    </a>
+    Loads file named FILE into the simulated code memory. File must
+    contain data in Intel HEX format.
+    <pre>&gt; <font color="#118811">file "../../remo.hex"</font>
+55470 words read from ../../remo.hex
+&gt; 
+</pre>
+    Don't forget to enclose file name in quotes to make the parameter to
+    be a string.
+    <hr>
+    <a name="dl">
+      <h3>download,dl</h3>
+    </a>
+    Download command. It is same as <a href="#l">load</a> above but it
+    reads information from command console which is standard input by
+    default. This command stops read records when it detects an "END"
+    record which is normally the last record. This command has two
+    equivalent forms <b>download</b> and <b>dl</b>.
+    <pre>$ <font color="#118811">s51 -V</font>
+ucsim 0.2.24, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; <font color="#118811">do
+:03000000020003F8
+:1000030075812078207600D8FC900000AE83AF8203
+:100013009000001200416005E4F0A380F690009F79
+:1000230012004A9000A312004A9000A712006890A1
+:1000330000AD12006875D0001200B50200B3EF6581
+:10004300827003EE658322E493F8740193F97402DA
+:1000530093FE740393F5828E83E869700122E4931F
+:10006300F6A30880F4E493FC740193FD740293FEF9
+:10007300740393FF740493F8740593F582888312D1
+:100083000041700122E493A3A883A9828C838D820B
+:10009300F0A3AC83AD828883898280E3212100B5FC
+:1000A300212100B5000000B500B5000000B500B582
+:0200B30080FECD
+:1000B5007520117501AA850120750102850120228F
+:00000001FF</font>
+197 bytes loaded
+&gt; </pre>
+    <hr>
+    <a name="fill">
+      <h3>fill <i>memory_type start end data</i></h3>
+    </a>
+    Fill memory region with specified data. First parameter specifies
+    memory. Name of the memory must be used, it can be checked using <a href="cmd_general.html#info_memory">info
+      memory</a> command which
+    lists size and name of all available memories.
+    <p><b>start</b> and <b>end</b> parameters specify first and last
+      address of the memory region to be filled.
+    </p>
+    <p><b>data</b> parameter specifies the data which is used to fill the
+      memory region.
+    </p>
+    <pre>$ <font color="#118811">s51</font> 
+ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; <font color="#118811">fill xram 12 0x12 0x56</font>
+&gt; <font color="#118811">dump xram 0 0x20</font>
+0x0000 00 00 00 00 00 00 00 00 ........
+0x0008 00 00 00 00 56 56 56 56 ....VVVV
+0x0010 56 56 56 00 00 00 00 00 VVV.....
+0x0018 00 00 00 00 00 00 00 00 ........
+0x0020 00                      .
+&gt; </pre>
+    <hr>
+    <a name="where">
+      <h3>where,Where <i>memory_type data...</i></h3>
+    </a>
+    Searching for some data in memory. First parameter specifies
+    memory. Name of the memory must be used, it can be checked using <a href="cmd_general.html#info_memory">info
+      memory</a> command which
+    lists size and name of all available memories.
+    <p>Other parameters can be mixed list of strings (characters between "
+      and ") and numbers. Strings can contain escape sequencies. &#181;Csim
+      merges all parameters together and will search for merged list of
+      values in specified memory.
+    </p>
+    <p><b>where</b> command do case unsensitive search while <b>Where</b>
+      command is for case sensitive search.
+    </p>
+    <p>Search is done in whole memory and all matches are dumped out.
+    </p>
+    <pre>$ <font color="#118811">/s51</font>
+ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+&gt; <font color="#118811">set mem xram 20 "Dani d ani D ani dani Dani"</font>
+0x0014 44 61 6e 69 20 64 20 61 Dani d a
+0x001c 6e 69 20 44 20 61 6e 69 ni D ani
+0x0024 20 64 61 6e 69 20 44 61  dani Da
+0x002c 6e 69                   ni
+&gt; <font color="#118811">where xram "dani"</font>
+0x0014 44 61 6e 69             Dani
+0x0025 64 61 6e 69             dani
+0x002a 44 61 6e 69             Dani
+&gt; <font color="#118811">Where xram "d ani"</font>
+0x0019 64 20 61 6e 69          d ani
+&gt; </pre>
+    <hr>
+    <a name="memory">
+      <h3>memory</h3>
+    </a>
+    This set of commands can be used to manipulate <a href="memory.html">memory
+      system</a> including <a href="memory.html#chip">chips</a>, <a href="memory.html#address_space">address
+      spaces</a> and <a href="memory.html#address_decoder">address decoders</a>.
+    <p>Subcommands are:
+    </p>
+    <p>memory <a href="#memory_createchip">createchip</a>
+      <br>
+      memory <a href="#memory_createaddressspace">createaddressspace</a>
+      <br>
+      memory <a href="#memory_createaddressdecoder">createaddressdecoder</a>
+      <br>
+      memory <a href="#memory_info">info</a>
+    </p>
+    <blockquote>
+      <a name="memory_createchip">
+        <h4>memory createchip|cchip <i>id size
+            cellsize</i></h4>
+      </a>
+      This command creates a chip (array of storage elements). <b>id</b>
+      must be a unique name which will be used to identify the chip in other
+      commands. <b>size</b> is number of storage elements, <b>cellsize</b>
+      is number of bits stored in one element.
+      <hr>
+      <a name="memory_createaddressspace">
+        <h4>memory
+createaddressspace|caddressspace|caddrspace|caspace|createaddrspace|createaspace
+          <i>id startaddr size</i></h4>
+      </a>
+      This command should never be used. It defines an address space, names
+      it as <b>id</b> sets its starting address and size. Simulator programs
+      (<b>s51</b>, <b>savr</b>, etc.) define necessary address spaces for
+      themself, so this command is not needed.
+      <hr>
+      <a name="memory_createaddressdecoder">
+        <h4>memory
+createaddressdecoder|caddrdecoder|caddressdecoder|cadecoder|createaddrdecoder|createadecoder
+          <i>addressspace begin end chip begin</i></h4>
+      </a>
+      Address decoder maps a part of the address space to a chip
+      area. <b>addressspace</b> parameter is name of the address space,
+      <b>begin</b> and <b>end</b> specify address range of the address space
+      to be mapped. <b>chip</b> parameter is name of the memory chip and
+      the second <b>begin</b> parameter is the (start of the) chip address
+      where the area is mapped to.
+      <p>Address space will be split if a "middle" are is mapped:
+      </p>
+      <pre>$ <font color="#118811">s51</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">i m</font>
+Memory chips:
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+Address decoders:
+ 0 rom 0x0000 0xffff -&gt; rom_chip 0x0000 activated
+ 0 iram 0x00 0x7f -&gt; iram_chip 0x00 activated
+ 0 sfr 0x80 0xff -&gt; sfr_chip 0x00 activated
+ 0 xram 0x0000 0xffff -&gt; xram_chip 0x0000 activated
+0&gt; <font color="#118811">mem cchip myram 0x1000 8</font>
+0&gt; <font color="#118811">mem createaddressdecoder xram 1234 2000 myram 15</font>
+0&gt; <font color="#118811">i m</font>
+Memory chips:
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+  0x000000-0x000fff     4096 myram (8,%02x,0x%03x)
+Address spaces:
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+Address decoders:
+ 0 rom 0x0000 0xffff -&gt; rom_chip 0x0000 activated
+ 0 iram 0x00 0x7f -&gt; iram_chip 0x00 activated
+ 0 sfr 0x80 0xff -&gt; sfr_chip 0x00 activated
+ 0 xram 0x0000 0x04d1 -&gt; xram_chip 0x0000 activated
+ 1 xram 0x04d2 0x07d0 -&gt; myram 0x00f activated
+ 2 xram 0x07d1 0xffff -&gt; xram_chip 0x07d1 activated
+0&gt; 
+</pre>
+      It is easy to share chip area between address spaces:
+      <pre>$ <font color="#118811">s51</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; <font color="#118811">mem createaddressdecoder rom 0 0xfff xram_chip 0xf000</font>
+0&gt; <font color="#118811">i m</font>
+Memory chips:
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+Address decoders:
+ 0 rom 0x0000 0x0fff -&gt; xram_chip 0xf000 activated
+ 1 rom 0x1000 0xffff -&gt; rom_chip 0x1000 activated
+ 0 iram 0x00 0x7f -&gt; iram_chip 0x00 activated
+ 0 sfr 0x80 0xff -&gt; sfr_chip 0x00 activated
+ 0 xram 0x0000 0xffff -&gt; xram_chip 0x0000 activated
+0&gt; <font color="#118811">rom[0]=0xab</font>
+171
+0&gt; <font color="#118811">xram[0xf000]</font>
+171
+0&gt; 
+</pre>
+      <hr>
+    </blockquote>
+    <a name="memory_info">
+      <h4>memory info</h4>
+    </a>
+    This command is same as <a href="cmd_general.html#info_memory">info
+      memory</a>.
+    <hr>
+  </body>
+</html>

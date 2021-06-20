@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
@@ -24,7 +24,7 @@
 ;;    Draws a complete tilemap made of 2x4-bytes tiles.
 ;;
 ;; C Definition:
-;;    void <cpct_etm_drawlTilemap2x4_f> (<u8> *map_width*, <u8> *map_height*, 
+;;    void <cpct_etm_drawTilemap2x4_f> (<u8> *map_width*, <u8> *map_height*, 
 ;; <u8>* *pvideomem*, <u8>* *ptilemap*) __z88dk_callee;
 ;;
 ;; Input Parameters (6 bytes):
@@ -144,7 +144,7 @@ drawtiles_height:
 set_HLp_nextRow:
    ld    b, #00        ;; [2] B = map_width (it must be restored for each new row to be drawn, #00 is a placeholder)
 
-   ;; HL' = DE (HL' is the pointer to video memory which 
+   ;; DE' = DE (DE' is the pointer to video memory which 
    ;; ... we are changing, so put the result in there
    ld   a, e           ;; [1] A = E
    exx                 ;; [1] Change to alternate register set

@@ -4,16 +4,16 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ void initializeCPC() {
 
    // Draw Sky and Fremos Logo
    c0 = cpct_px2byteM0(4, 4);   // c0 = 2 consecutive pixels of firmware colour 4 (blue)
-   cpct_drawSolidBox((void*)0xC000, c0, 40, 60); // Boxes cannot be wider than 64 bytes,
+   cpct_drawSolidBox(CPCT_VMEM_START, c0, 40, 60); // Boxes cannot be wider than 64 bytes,
    cpct_drawSolidBox((void*)0xC028, c0, 40, 60); // ... so we use 2 boxes of 40 bytes wide.
    cpct_drawSprite(gc_LogoFremos, (void*)0xC0FC, 55, 20);
 

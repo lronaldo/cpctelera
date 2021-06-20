@@ -1,19 +1,19 @@
 #!/bin/bash
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -27,47 +27,61 @@
 ## run a file from a DSK at will. 
 ##
 ## Usage:
-##    <cpct_winape> [options] [DSKFile]
+##    <cpct_winape> [options] [DSKFile/SNAFile]
 ##
 ## Description:
 ##    This script automatically launches WinAPE either directly or using wine, 
 ## depending on the system where it is executed (OSX and Linux will use wine, 
 ## Windows/Cygwin will execute directly). The script also lets the user give a
-## DSK file as parameter to be automatically loaded into WinAPE's FD1. It also
-## automatically RUNs the main program inside the DSK file.
+## DSK/SNA file as parameter to be automatically loaded into WinAPE. When loading
+## a DSK file, it will be loaded into WinAPE's FD1 and the main file from the DSK
+## will be automatically runned (with a RUN command). SNA files will be automatically
+## restored into memory and execution will continue from their PC location. 
+## Corresponding NoICE symbols file for debugging will automatically be loaded in
+## both cases. NoICE symbols are grabbed either from the same folder where DSK/SNA 
+## lies, or from obj/ subfolder, if they exist.
 ##    
 ##    If WinAPE is not installed on the system or not propperly configured to
 ## be used with this script, the script prompts the user and helps to configure
 ## and/or to install WinAPE. Users can either give the script the path of their own
 ## WinAPE installations or ask the script to automatically download and install
 ## it inside CPCtelera's tool folder. For this last operation, wget and unzip 
-## commands are required (the should be installed in the system).
+## commands are required (they should be installed in the system).
 ##
 ## Command line options:
-##    -n | --no-execute              - Lauches WinAPE but does not automatically RUN any
-## DSK program.
-##    -h | --help                    - Shows help information on the terminal.
+##    -a  | --any-dsk                  - Lauches WinAPE and loads first DSK file to match *.dsk
+##    -as | --any-sna                  - Lauches WinAPE and loads first SNA file to match *.sna
+##    -d  | --disable-symbols-autoload - Prevents this script from trying to autoload a symbols 
+## file for debugging, when no symbols file is provided
+##    -f  | --foreground               - Lauches WinAPE as a foreground command (Default: background)
+##    -h  | --help                     - Shows help information on the terminal.
+##    -n  | --no-execute               - Lauches WinAPE but does not automatically RUN any DSK program.
+##    -s  | --symbols <symbols_file>   - Loads a symbols file for debugging (NoICE format .noi).
 ##
 
 ##
 ## Global configuration
 ##
 
-# WinAPE Full Path
-WAPE=/path/to/WinApe
-
 # Script configuration
-CPCT_TOOLS_FOLDER=$(dirname $0)/..
-WWW_WINAPE=http://winape.net/download/WinAPE20A18.zip
+CPCT_SCRIPTS_FOLDER=$(dirname $0)
+CPCT_TOOLS_FOLDER=${CPCT_SCRIPTS_FOLDER}/..
+WWW_WINAPE=http://winape.net/download/WinAPE20B2.zip
 WINAPE_EXE=WinApe.exe
 WINAPE_INI=WinAPE.ini
 WINAPE_ZIP=${CPCT_TOOLS_FOLDER}/winape.zip
 WINAPE_DIR=${CPCT_TOOLS_FOLDER}/winape
+WINAPE_DEFAULT_INI=${CPCT_SCRIPTS_FOLDER}/templates/winape/WinAPE.ini
 WINE=wine
+WAPE=/path/to/WinAPE ## Should be read from config file
+CONFIG_FILE=${CPCT_SCRIPTS_FOLDER}/.cpct_winape.config
+BACKGROUND=true
 
 # Command line parameter variables
 FILE=""
 MODIFIER="/A"
+SYMS=""
+AUTOLOADSYMS=true
 
 ## Bash Include files
 source $(dirname $0)/lib/bash_library.sh
@@ -76,33 +90,46 @@ source $(dirname $0)/lib/bash_library.sh
 ##
 function usage() {
    echo "${COLOR_LIGHT_YELLOW}USAGE"
-   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK File]"
+   echo "  ${COLOR_LIGHT_BLUE}$(basename $0) ${COLOR_LIGHT_CYAN}[options] [DSK/SNA File]"
    echo
    echo "${COLOR_CYAN}  Lets the user execute winape from command line and automatically \
 run a file from a DSK at will."
+   echo
+   echo "${COLOR_CYAN}     This script automatically launches WinAPE either directly or using wine, \
+depending on the system where it is executed (OSX and Linux will use wine, \
+Windows/Cygwin will execute directly). The script also lets the user give a \
+DSK/SNA file as parameter to be automatically loaded into WinAPE. When loading \
+a DSK file, it will be loaded into WinAPE's FD1 and the main file from the DSK \
+will be automatically runned (with a RUN command). SNA files will be automatically \
+restored into memory and execution will continue from their PC location. \
+Corresponding NoICE symbols file for debugging will automatically be loaded in \
+both cases. NoICE symbols are grabbed either from the same folder where DSK/SNA \
+lies, or from obj/ subfolder, if they exist."
+   echo
+   echo "${COLOR_CYAN}  If WinAPE is not installed on the system or not propperly configured \
+to be used with this script, the script prompts the user and helps to configure and/or to \
+install WinAPE. Users can either give the script the path of their own WinAPE installations \
+or ask the script to automatically download and install it inside CPCtelera's tool folder. \
+For this last operation, wget and unzip commands are required (they should be installed in \
+the system)."
 
-   echo "${COLOR_CYAN}  Creates a fresh new project that uses CPCtelera engine. The script creates \
-a new folder named <project_folder_name> in the current folder. Then, the new project is created \
-inside <project_folder_name>. So, <project_folder_name> must not previously exist inside the \
-current folder."
-   echo
-   echo "${COLOR_CYAN}  This script automatically launches WinAPE either directly or using wine, \
-depending on the system where it is executed (OSX and Linux will use wine, Windows/Cygwin will \
-execute directly). The script also lets the user give a DSK file as parameter to be automatically \
-loaded into WinAPE's FD1. It also automatically RUNs the main program inside the DSK file."
-   echo
-   echo "${COLOR_CYAN}  If WinAPE is not installed on the system or not propperly configured to \
-be used with this script, the script prompts the user and helps to configure and/or to install \
-WinAPE. Users can either give the script the path of their own WinAPE installations or ask the \
-script to automatically download and install it inside CPCtelera's tool folder. For this last \
-operation, wget and unzip commands are required (the should be installed in the system)."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
-   echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
-   echo "${COLOR_CYAN}       Lauches WinAPE but does not automatically RUN any DSK program."
-   echo 
+   echo "${COLOR_LIGHT_BLUE}  -a | --any-dsk"
+   echo "${COLOR_CYAN}       Lauches WinAPE and loads first DSK file to match *.dsk."
+   echo "${COLOR_LIGHT_BLUE}  -as| --any-sna"
+   echo "${COLOR_CYAN}       Lauches WinAPE and loads first SNA file to match *.sna."
+   echo "${COLOR_LIGHT_BLUE}  -d | --disable-symbols-autoload"
+   echo "${COLOR_CYAN}       Prevents this script from trying to autoload a symbols file \
+for debugging, when no symbols file is provided"
+   echo "${COLOR_LIGHT_BLUE}  -f | --foreground"
+   echo "${COLOR_CYAN}       Lauches WinAPE as a foreground command (Default: background)"
    echo "${COLOR_LIGHT_BLUE}  -h | --help"
    echo "${COLOR_CYAN}       Shows this help information"
+   echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
+   echo "${COLOR_CYAN}       Lauches WinAPE but does not automatically RUN any DSK program."
+   echo "${COLOR_LIGHT_BLUE}  -s | --symbols <symbols_file>"
+   echo "${COLOR_CYAN}       Loads a symbols file for debugging (NoICE format .noi)."
    echo ${COLOR_NORMAL}
    exit 1
 }
@@ -115,7 +142,12 @@ function ensureExecutionPrerequisitesAreInstalled {
       ## Do CYGWIN required stuff
       EnsureCommandAvailable cygpath "cygpath has not been found on the system, and it's required for \
 running this script. Please, check cygwin installation and run this script again."
+   elif checkSystem win10linux; then
+      ## Do Linux under Windows 10 stuff
+      EnsureCommandAvailable wslpath "wslpath has not been found on the system, and it's required \
+for running this script."
    else
+
       ## Do Linux/MacOSX required stuff (wine configuration)
       EnsureCommandAvailable wine "wine has not been found on the system, and it's required for \
 running this script. Please, install wine or check the installation and run this script again."
@@ -134,6 +166,9 @@ function getMySystemPath {
    if checkSystem cygwin; then
       ## Do CYGWIN required stuff
       echo "$(cygpath -a -w ${1} 2> /dev/null)" 
+   elif checkSystem win10linux; then
+      ## Do Linux under Windows 10 stuff
+      echo "$(wslpath -w $(pwd)/${1} 2> /dev/null)"
    else
       ## Do Linux/MacOSX required stuff (wine configuration)
       echo "$(winepath -w ${1} 2> /dev/null)" 
@@ -144,13 +179,9 @@ function getMySystemPath {
 ##  $1: New path to WinAPE.exe
 ##
 function setWinapePath {
-   local TAG="^WAPE="
    local WPATH="$1"
 
-   echo "${COLOR_LIGHT_YELLOW}Setting New Path for WinAPE to \
-'${COLOR_WHITE}${1}${COLOR_LIGHT_YELLOW}'...${COLOR_NORMAL}"
-   replaceTag "${TAG}.*$" "${TAG:1}${WPATH}" "$0" "#"
-   chmod +x "$0"
+   updateVarValueInConfigFile "WAPE" "$WPATH" $CONFIG_FILE
    WAPE="${1}"
 }
 
@@ -229,13 +260,11 @@ ${COLOR_CYAN} under your ${COLOR_LIGHT_CYAN}CPCtelera${COLOR_CYAN} tools folder 
       rm "$WINAPE_ZIP"
       setWinapePath "${WINAPE_DIR}/${WINAPE_EXE}"
 
-      ## If system is not Cygwin, turn off DirectX Stretch feature from WinAPE, 
-      ## as it does not work well under wine
-      if ! checkSystem cygwin; then
-         echo "${COLOR_CYAN}Disabling DirectX Stretch WinAPE feature...${COLOR_NORMAL}"
-         replaceTag "^\[Configuration\]" \
-                    "\[Configuration\]\nDirectX Stretch=false\n" "${WINAPE_DIR}/${WINAPE_INI}"
-      fi
+      ## Put a personal default WinAPE configuration, to ensure proper ROMS are loaded
+      ## sound is well configured and everything works as expected
+      echo "${COLOR_CYAN}Setting CPCTelera default WinAPE.ini file...${COLOR_NORMAL}"
+      cp "${WINAPE_DEFAULT_INI}" "${WINAPE_DIR}/${WINAPE_INI}"
+
       echo "${COLOR_LIGHT_CYAN}WinAPE${COLOR_LIGHT_BLUE} is now configured and installed in '${COLOR_WHITE}\
 ${WINAPE_DIR}${COLOR_LIGHT_BLUE}'${COLOR_NORMAL}"
       echo
@@ -275,11 +304,61 @@ have WinAPE installed (${COLOR_WHITE}y/n${COLOR_LIGHT_BLUE})?${COLOR_NORMAL}" AN
    fi
 }
 
+## Generate a blank config file
+##
+function generateNewConfigFile() {
+##-------------- HERE DOCUMENT FOR CONFIG FILE ------------#
+cat > $CONFIG_FILE <<CPCT_WINAPE_CONFIG_FILE
+# cpct_winape config file
+#################################
+
+# WinAPE's Full path
+WAPE=/path/to/WinAPE
+CPCT_WINAPE_CONFIG_FILE
+##-------------- HERE DOCUMENT FOR CONFIG FILE ------------#
+}
+
+## Read config file or create it if it does not not exist
+##
+function readConfigFile {
+   ## Generate configfile whenever it does not exist
+   if ! isFileReadable $CONFIG_FILE; then
+      generateNewConfigFile
+   fi
+
+   ## Get value of WAPE variable
+   WAPE=$(extractVarValueFromConfigFile "WAPE" $CONFIG_FILE)
+}
+
+# First of all, read the config file
+readConfigFile
+
 # Proccess command line parameters
-while [ "$#" -gt "0" ]; do
+while (( $# > 0 )); do
    case "$1" in
+      "-f" | "--foreground")
+         BACKGROUND=false
+      ;;
       "-n" | "--no-execute")
-        MODIFIER=""
+         MODIFIER=""
+      ;;
+      "-s" | "--symbols")
+         if (( $# < 2 )); then 
+            paramError "-s / --symbols must be followed by a symbol file." 9
+         elif ! isFileReadable $2; then
+            paramError "symbol file '$2' does not exist or is not readable." 10
+         fi
+         SYMS="/SYM:${2}"
+         shift
+      ;;
+      "-d" | "--disable-symbols-autoload")
+         AUTOLOADSYMS=false
+      ;;
+      "-a" | "--any-dsk")
+         FILE="*.[dD][sS][kK]"
+      ;;
+      "-as" | "--any-sna")
+         FILE="*.[sS][nN][aA]"
       ;;
       "-h" | "--help")
         usage
@@ -289,11 +368,11 @@ while [ "$#" -gt "0" ]; do
             paramError "Unrecognized command line option '$1'" 7
          elif [[ "$FILE" == "" ]]; then
             if [ ! -f "$1" ]; then
-               paramError "'$1' is not a valid readable file (a DSK file was expected)." 8
+               paramError "'$1' is not a valid readable file (a DSK/SNA file was expected)." 8
             fi
             FILE="${1}"
          else
-            paramError "'${1}' unexpected parameter. Are you trying to provide more than one DSK file?"
+            paramError "'${1}' unexpected parameter. Are you trying to provide more than one DSK/SNA file?"
          fi
       ;; 
    esac
@@ -303,14 +382,44 @@ done
 # First, check WinAPE installation
 checkWinapeInstallation "$WAPE"
 
-# On CygWin, there is no need for wine, but WinAPE.exe 
-# must be executable by Cygwin
-if checkSystem cygwin; then
+# Remove the need for wine on Windows systems
+if checkSystem win10linux; then
+   # On win10linux there is no need for wine
+   WINE=""
+elif checkSystem cygwin; then
+   # On CygWin, there is no need for wine, but WinAPE.exe 
+   # must be executable by Cygwin
    WINE=""
    chmod +x "$WAPE"
 fi
 
-# Launch Winape with appropriate path for DSK file
+# Add automatic symbol loading when symbols are found on obj/ folder
+if "$AUTOLOADSYMS" && [[ "$SYMS" == "" ]]; then
+   SFILES=(*.noi obj/*.noi)
+   for f in ${SFILES[@]}; do
+      SFILE=$(printf "%s" $f)
+      if isFileReadable $SFILE; then
+         SYMS="/SYM:$SFILE"
+         echo "Autoloading symbols file $SFILE"
+         break
+      fi
+   done
+fi
+
+# Check prerrequisites and calculated appropriate FILE Path depending on the system
 ensureExecutionPrerequisitesAreInstalled
 FILEPATH=$(getMySystemPath "$FILE")
-${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" &> /dev/null &
+
+# Check if launch is for SNA file
+EXT=$(echo ${FILEPATH:${#FILEPATH}-3:${#FILEPATH}} | tr /a-z/ /A-Z/)
+if [ "$EXT" = "SNA" ]; then
+   FILEPATH="/SN:$FILEPATH"
+   MODIFIER=""
+fi
+
+# Launch Winape with appropriate path for DSK/SNA file
+if $BACKGROUND; then
+   ${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" "$SYMS" &> /dev/null &
+else 
+   ${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" "$SYMS" &> /dev/null
+fi 

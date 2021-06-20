@@ -4,16 +4,16 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -41,24 +41,26 @@ void initializeGameScreen(u16 hiscore) {
    c = cpct_px2byteM0(8,8);  // Colour pattern 8-8 (black-black)
    
    // Draw black background for scoreboard
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 54,   0);  
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 54,   0);  
    cpct_drawSolidBox(pscr, c, 26, 200);
 
    // Draw "HI" string 
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  16);   
-   cpct_drawStringM0("HI", pscr, 3, 8);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60,  16);   
+   cpct_setDrawCharM0(3, 8);
+   cpct_drawStringM0("HI", pscr);
 
    // Draw HI-Score
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60,  24);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60,  24);
    sprintf(str, "%5u", hiscore);
-   cpct_drawStringM0(str, pscr, 15, 8);
+   cpct_setDrawCharM0(15, 8);
+   cpct_drawStringM0(str, pscr);
 
    // Draw Credits
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 60, 172);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 60, 172);
    cpct_drawSprite(G_credits, pscr, 20, 27);
 
    // Draw tiled frame around playing area
-   drawFrame(g_SCR_VMEM, 0);
+   drawFrame(CPCT_VMEM_START, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,21 +143,25 @@ void showGameEnd(u16 score) {
    u8  str[6]; // String array to draw numbers on screen
 
    // Draw GAME OVER string
-   pscr = cpct_getScreenPtr(g_SCR_VMEM,  8, 24);
-   cpct_drawStringM0("GAME  OVER", pscr, 6, 0);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START,  8, 24);
+   cpct_setDrawCharM0(6, 0);
+   cpct_drawStringM0("GAME  OVER", pscr);
 
    // Draw SCORE string
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 16, 48);
-   cpct_drawStringM0(  "SCORE", pscr, 9, 0);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 16, 48);
+   cpct_setDrawCharM0(9, 0);
+   cpct_drawStringM0(  "SCORE", pscr);
 
    // Draw the score got in this game
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 16, 56);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 16, 56);
    sprintf(str, "%5u", score);
-   cpct_drawStringM0(str, pscr, 14, 0);
+   cpct_setDrawCharM0(14, 0);
+   cpct_drawStringM0(str, pscr);
 
    // Draw PRESS SPACE string
-   pscr = cpct_getScreenPtr(g_SCR_VMEM, 6, 112);
-   cpct_drawStringM0("PRESS SPACE", pscr, 11, 0);
+   pscr = cpct_getScreenPtr(CPCT_VMEM_START, 6, 112);
+   cpct_setDrawCharM0(11, 0);
+   cpct_drawStringM0("PRESS SPACE", pscr);
 
    // Wait for SPACE being pressed before continuing
    wait4Key(Key_Space);

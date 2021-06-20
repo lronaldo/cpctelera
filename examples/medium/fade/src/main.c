@@ -5,16 +5,16 @@
 //  Copyright (C) 2015 Dardalorth / Fremos / Carlio
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -22,9 +22,6 @@
 #include "modules/sprites.h" // Pixel data definitions of the sprites and TSprite structure
 #include "modules/palette.h" // Palette functions: fade-in, fade-out and RGB-HW colour conversions
 #include "modules/utils.h"   // Function wait_frames 
-
-// Default video memory location at CPC's start up
-#define SCR_VMEM  (u8*)0xC000
 
 //
 // MAIN: Palette Effects Example
@@ -54,7 +51,7 @@ void main(void) {
       cpct_clearScreen(0x00);   // Clear the screen filling it up with 0's
       
       // Calculate video memory location for next sprite and draw it
-      pvmem = cpct_getScreenPtr(SCR_VMEM, img[i].x, img[i].y);
+      pvmem = cpct_getScreenPtr(CPCT_VMEM_START, img[i].x, img[i].y);
       cpct_drawSprite(img[i].sprite, pvmem, img[i].w, img[i].h);
 
       wait_frames(50);                    // Wait 1 second  ( 50 VSYNCs)

@@ -4,24 +4,21 @@
 //  Copyright (C) 2015 Stefano Beltran / ByteRealms (stefanobb at gmail dot com)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
 #include "sprites.h"
-
-// Pointer to the memory location where screen video memory starts by default
-#define SCR_VMEM  (u8*)0xC000
 
 // Size of the sprite (in bytes)
 //  Logo         = (160x191 pixels in Mode 1 => 40x191 bytes)
@@ -67,7 +64,7 @@ void drawLogo() {
     // to control it. Left scrolling at this position only requires to move the Video Screen
     // pointer forward, which makes pixels "move to the left" as start of video memory becomes
     // nearer to them.
-    pvideo = cpct_getScreenPtr(SCR_VMEM, 40, 4);
+    pvideo = cpct_getScreenPtr(CPCT_VMEM_START, 40, 4);
     cpct_drawSprite(G_CPCt_logo, pvideo, LOGO_W, LOGO_H);
 }
 

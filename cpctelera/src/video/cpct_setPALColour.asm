@@ -1,18 +1,18 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2014-2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 ;#####################################################################
@@ -39,7 +39,7 @@
 ;;    > call cpct_setPALColour_asm
 ;;
 ;; Parameter Restrictions:
-;;    - *pen* must be <= 16. Values [0-15] are normal palette colours, whilest index 16
+;;    - *pen* must be <= 16. Values [0-15] are normal palette colours, while index 16
 ;; refers to the Screen Border. Giving pen > 16 may yield unexpected behaviour.
 ;;    - *hw_ink* must be <= 31.
 ;;
@@ -64,7 +64,7 @@
 ;; command).
 ;;
 ;; Destroyed Register values:
-;;    F, BC, HL
+;;    AF, B
 ;;
 ;; Required memory:
 ;;     C-bindings - 12 bytes
@@ -89,11 +89,11 @@
 
   ;or  #PAL_PENR           ;; [2] (CCCnnnnn) Mix 3 bits for PENR command (C) and 5 for PEN number (n). 
                            ;; .... As PENR command is 000, nothing to be done here.
-   ld     b, #GA_port_byte ;; [2] B = Gate Array Port (0x7F). C has the command that GA will execute.
-   out  (c), l             ;; [4] GA command: Select PENR. C = Command + Parameter (PENR + PEN number to select)
+   ld     b, #GA_port_byte ;; [2] B = Gate Array Port (0x7F). L has the command that GA will execute.
+   out  (c), l             ;; [4] GA command: Select PENR. L = Command + Parameter (PENR + PEN number to select)
 
-   ld     a, #PAL_INKR     ;; [2] (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for INKR number (n). 
-   or     h                ;; [1]
+   ld     a, #PAL_INKR     ;; [2] | (CCCnnnnn) Mix 3 bits for INKR command (C) and 5 for INKR number (n). 
+   or     h                ;; [1] \
    out  (c), a             ;; [4] GA command: Set INKR. A = Command + Parameter 
                            ;; .... (INKR + INK to be set for selected PEN number)
    ret                     ;; [3] Return

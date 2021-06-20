@@ -1,0 +1,170 @@
+#
+# uCsim z80.src/Makefile
+#
+# (c) Drotos Daniel, Talker Bt. 1997
+#
+
+STARTYEAR	= 1997
+
+SHELL		= /bin/sh
+CXX		= @CXX@
+CPP		= @CPP@
+CXXCPP		= @CXXCPP@
+RANLIB		= @RANLIB@
+INSTALL		= @INSTALL@
+STRIP		= @STRIP@
+MAKEDEP         = @MAKEDEP@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+transform	= @program_transform_name@
+
+DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
+		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
+		  -I$(top_srcdir)/gui.src
+CFLAGS          = @CFLAGS@ @WALL_FLAG@
+CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
+LDFLAGS         = @LDFLAGS@
+PICOPT		= @PICOPT@
+SHAREDLIB	= @SHAREDLIB@
+EXEEXT		= @EXEEXT@
+
+LIBS		= -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim @LIBS@
+DL		= @DL@
+dl_ok		= @dl_ok@
+
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
+datadir         = @datadir@
+datarootdir     = @datarootdir@
+includedir      = @includedir@
+mandir          = @mandir@
+man1dir         = $(mandir)/man1
+man2dir         = $(mandir)/man2
+infodir         = @infodir@
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+
+OBJECTS_SHARED	= glob.o \
+		  inst.o \
+		  inst_cb.o \
+		  inst_dd.o \
+		  inst_ed.o \
+		  inst_fd.o \
+		  inst_ddcb.o \
+		  inst_fdcb.o \
+		  glob_r2k.o inst_r2k.o inst_ed_r2k.o r2k.o \
+		  glob_lr35902.o inst_lr35902.o lr35902.o \
+		  simz80.o z80.o
+OBJECTS_EXE	= sz80.o
+OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+Z80ASM		= 
+
+enable_dlso	= @enable_dlso@
+dlso_ok		= @dlso_ok@
+
+#TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
+#		  test_arith.hex
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: checkconf otherlibs z80.src tests
+
+tests: $(TEST_OBJ)
+
+
+# Compiling and installing everything and runing test
+# ---------------------------------------------------
+install: all installdirs
+	$(INSTALL) sz80$(EXEEXT) $(DESTDIR)$(bindir)/`echo sz80|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sz80|sed '$(transform)'`$(EXEEXT)
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/`echo sz80|sed '$(transform)'`$(EXEEXT)
+
+
+# Performing self-test
+# --------------------
+check: test
+
+test:
+
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	test -d $(DESTDIR)$(bindir) || $(INSTALL) -d $(DESTDIR)$(bindir)
+
+
+# Creating dependencies
+# ---------------------
+dep: Makefile.dep
+
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
+
+-include Makefile.dep
+include $(srcdir)/clean.mk
+
+# My rules
+# --------
+.SUFFIXES: .asm .hex
+
+z80.src: sz80$(EXEEXT) shared_lib
+
+sz80$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
+
+ifeq ($(dlso_ok),yes)
+shared_lib: $(top_builddir)/sz80.so
+else
+shared_lib:
+	@$(top_srcdir)/mkecho $(top_builddir) "No z80 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+endif
+
+$(top_builddir)/sz80.so: $(OBJECTS_SHARED)
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/sz80.so
+
+otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+
+$(top_builddir)/libcmd.a:
+	$(MAKE) -C $(top_builddir)/cmd.src all
+
+$(top_builddir)/libguiucsim.a:
+	$(MAKE) -C $(top_builddir)/gui.src checkconf ucsim_lib
+
+$(top_builddir)/libsim.a:
+	$(MAKE) -C $(top_builddir)/sim.src all
+
+$(top_builddir)/libucsimutil.a:
+	$(MAKE) -C $(top_builddir) -f main.mk
+
+.cc.o:
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+
+.asm.hex:
+	$(Z80ASM) -l $< -o $@ -e $<.lst
+
+
+# Remaking configuration
+# ----------------------
+checkconf:
+	@if [ -f $(top_builddir)/devel ]; then\
+	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+	fi
+
+# End of z80.src/Makefile.in

@@ -75,5 +75,6 @@ int	TZX_GetBlockHeaderSize(unsigned char ID);
 BOOL TZX_BlockHasData(unsigned char ID);
 TZX_BLOCK *TZX_CreateBlock(unsigned char ID);
 void	TZX_SetupPauseBlock(TZX_BLOCK *pBlock,unsigned long PauseInMilliseconds);
+void	TZX_AppendFile(TZX_FILE *pTZXFile, unsigned char *pFilename);
 #endif
 

@@ -1,0 +1,459 @@
+#!/bin/bash
+
+##-----------------------------LICENSE NOTICE------------------------------------
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU Lesser General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU Lesser General Public License for more details.
+##
+##  You should have received a copy of the GNU Lesser General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##------------------------------------------------------------------------------
+
+###########################################################################
+## CPCTELERA ENGINE
+###########################################################################
+
+##
+## File: cpct_pack
+##    Script for generating packed files by compressing groups of file
+## into a single one.
+##
+## Usage:
+##    <cpct_pack> [options] [outfile] [file1,[file2,...]]
+##
+## Description:
+##    This script gets a list of files, packs them into a single continuous file
+## and then compresses this latest file. It generates a unique compressed file
+## that holds the contents of all passed files sequentially, in the order
+## they are passed.
+##
+##    Default output produces two files: 
+##       - outfile.s file with an array holding all compressed file data 
+##       - outfile.h file with the exported symbols to be included in other c files. 
+##
+## Command line options:
+##    -an  | --array-name [name]         - Sets the C identifier that will be used. <OUTFILE> is used by default.
+##    -alc | --asm-local-constants       - Makes generated assembly constants local instead of global
+##    -b   | --bytes-per-line [numbytes] - Establishes the number of bytes to write at each array line in C. 16 by default
+##    -gb  | --generate-bin              - Generates a binary file with compressed data (Default: no). Using this switch overrides generation defaults.
+##    -gh  | --generate-header           - Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults.
+##    -ghs | --generate-asm-header       - Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults.
+##    -gs  | --generate-asm              - Generates an assembly file with compressed data (Default: yes). Using this switch overrides generation defaults.
+##    -h   | --help                      - Shows help information on the terminal.
+##    -i   | --include-header [file]     - Include a header file at the top of the generated output
+##    -org | --origin-asm [address]      - Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
+##
+
+
+## Bash Include files
+source $(dirname $0)/lib/bash_library.sh
+
+## Show how this script is to be used and exit
+##
+function usage() {
+cat <<UsageHereDoc
+${COLOR_LIGHT_YELLOW}USAGE${COLOR_LIGHT_BLUE}
+   $(basename $0) ${COLOR_LIGHT_CYAN}[options] <OUTFILE> <FILE1> [FILE2, [FILE3...]]
+${COLOR_CYAN}
+   This script gets a list of files, packs them into a single continuous file \
+and then compresses this latest file. It generates a unique compressed file \
+that holds the contents of all passed files sequentially, in the order \
+they are passed.
+
+Default output produces two files:
+   - <OUTFILE>.s file with an array holding all compressed file data 
+   - <OUTFILE>.h file with the exported symbols to be included in other c files. 
+${COLOR_LIGHT_YELLOW}
+OPTIONS \
+   ${COLOR_LIGHT_BLUE}
+   -an  | --array-name ${COLOR_NORMAL}<identifier> ${COLOR_CYAN}
+      Sets the C identifier that will be used. G_<OUTFILE> is used by default. \
+   ${COLOR_LIGHT_BLUE}
+   -alc  | --asm-local-constants ${COLOR_CYAN}
+      Makes generated assembly constants local instead of global. \
+   ${COLOR_LIGHT_BLUE}
+   -b   | --bytes-per-line ${COLOR_NORMAL}<numbytes> ${COLOR_CYAN}
+      Establishes the number of bytes to write at each array line in C. 16 by default. \
+   ${COLOR_LIGHT_BLUE}
+   -gb  | --generate-bin ${COLOR_CYAN}
+         Generates a binary file with compressed data (Default: no). Using this switch overrides generation defaults. \
+   ${COLOR_LIGHT_BLUE}
+   -gh  | --generate-header ${COLOR_CYAN}
+         Generates a header file (.h) with C declarations (Default: yes). Using this switch overrides generation defaults. \
+   ${COLOR_LIGHT_BLUE}
+   -ghs | --generate-asm-header ${COLOR_CYAN}
+         Generates a header file (.h.s) with asm declarations (Default: no). Using this switch overrides generation defaults. \
+   ${COLOR_LIGHT_BLUE}
+   -gs  | --generate-asm ${COLOR_CYAN}
+         Generates an assembly file with compressed data (Default: yes). Using this switch overrides generation defaults. \
+   ${COLOR_LIGHT_BLUE}
+   -h   | --help ${COLOR_CYAN}
+      Shows this help information. \
+   ${COLOR_LIGHT_BLUE}
+   -i   | --include-header ${COLOR_NORMAL}<file> ${COLOR_CYAN}
+      Include a header file at the top of the generated output. \
+   ${COLOR_LIGHT_BLUE}
+   -org | --origin-asm ${COLOR_NORMAL}<address> ${COLOR_CYAN}
+      Memory address where generated data should be placed (origin address). Only works when assembly output is to be generated.
+
+${COLOR_NORMAL}
+UsageHereDoc
+   exit 1
+}
+
+##############################################################
+###############################################################
+## Output commented information header for generated files.
+## Beware! Uses global variables from the script that contain
+## the information that should be output to the file.
+## $1: Comment prefix (";;", "//", etc)
+## $2: Ouput file
+##
+function generateCommentInfoHeader() {
+   local CPREF="$1"
+   local OUTFILE="$2"
+   ## Generate info Header
+   cat > "${OUTFILE}" <<CommentInfoHeader
+$CPREF File '${OUTFILE}' generated using cpct_pack
+$CPREF Compresor used:   $COMPRESSOR
+$CPREF Files compressed: [$(for F in "${INFILES[@]}"; do printf " '%s'" $F; done) ]
+$CPREF Uncompressed:     $UNCOMPRESSED_BYTES bytes
+$CPREF Compressed:       $COMPRESSED_BYTES bytes
+$CPREF Space saved:      $SAVED_BYTES bytes
+$CPREF
+
+CommentInfoHeader
+}
+
+##############################################################
+###############################################################
+## Check command line parameters
+##
+OUTFILE=
+INFILES=()
+OFFSETS=()
+ARRAYNAME=
+INCLUDE=()
+COMPRESSOR=zx7b
+BYTESPERLINE=16
+GENERATE_S=0
+GENERATE_H=0
+GENERATE_H_S=0
+GENERATE_B=0
+ORGADDRESS=
+ASMCNST='=='
+
+## COMPRESSORS
+ZX7B=${CPCT_PATH}/tools/zx7b/bin/zx7b
+
+if (( $# < 1 )); then
+   usage
+fi
+
+while (( $# >= 1 )); do
+   case $1 in
+      ## Get a name for the generated array
+      "-an" | "--array-name")
+         if ! checkValidCIdentifier "$2"; then
+            paramError "Modifier -an (--array-name) requires a valid C identifier as name for the array."
+         fi
+         ARRAYNAME="$2"
+         shift
+      ;;    
+      ## Make assembly generated constants local
+      "-alc" | "--asm-local-constants")
+         ASMCNST='='
+      ;;    
+      ## Get number of bytes
+      "-b" | "--bytes-per-line")
+         if ! isInt "$2"; then
+            paramError "Parameter -b must be followed by an integer representing the number of bytes to write at each C line."
+         fi
+         BYTESPERLINE=$((10#$2))
+         shift
+      ;;
+      ## Show Help
+      "-h" | "--help")
+         usage
+      ;;
+      ## Add an include header file in the output
+      "-i" | "--include-header")
+         if (( $# < 2 )); then
+            paramError "Modifier -h (--include-header) requires OUTFILE as include file parameter."
+         fi
+         INCLUDE+=("$2")
+         shift
+      ;;
+      ## Select generation of C-header file
+      "-gh" | "--generate-header")
+         GENERATE_H=1
+      ;;
+      ## Select generation of C-header file
+      "-ghs" | "--generate-asm-header")
+         GENERATE_H_S=1
+      ;;
+      ## Select generation of assembly file
+      "-gs" | "--generate-asm")
+         GENERATE_S=1
+      ;;
+      ## Select generation of binary file
+      "-gb" | "--generate-bin")
+         GENERATE_B=1
+      ;;
+      ## Assembly origin address
+      "-org" | "--origin-asm")
+         if ! isCIntValue "$2"; then
+            paramError "'$2' is not a valid value for -org. It must be followed by a valid 16-bits address."
+         fi
+         ORGADDRESS=$(any2Dec "$2")
+         if (( ORGADDRESS < 0 || ORGADDRESS > 65535 )); then
+            paramError "'$2' is an out-of-range address for -org. If must be in the range [0-65535]." 
+         fi
+         ORGADDRESS=0x$(dec2Hex "$ORGADDRESS")
+
+         shift
+      ;;
+      ## Get outfile and other files
+      *)
+         if isCommandLineOption "$1"; then
+            paramError "Unrecognized command line option '$1'" 7
+         else
+            if isEmpty "$OUTFILE"; then
+               OUTFILE="$1"
+            else
+               EnsureExists file "$1"
+               INFILES+=("$1")
+            fi
+         fi
+      ;;
+   esac
+   shift
+done
+
+## If no file generation has been selected, resort to defaults (.h and .s)
+if (( GENERATE_S == 0 && GENERATE_H == 0 && GENERATE_H_S == 0 && GENERATE_B == 0 )); then
+   GENERATE_S=1
+   GENERATE_H=1
+fi
+
+## Check that there is at least one OUTFILE and INFILE
+NINFILES=${#INFILES[*]}
+if isEmpty "$OUTFILE"; then
+   paramError "Parameter OUTFILE is required and has not been given."
+elif (( NINFILES < 1 )); then
+   paramError "At least one file to be packed is required and none has been provided."
+fi
+
+###############################################################
+###############################################################
+## Read and convert file
+##
+
+## Create a temporary file to store binary conversion previous to output
+TMPFILE=$(createTempFile)
+TMPPACK=$(createTempFile)
+
+## Extract the name of the file without extension as identifier for C, if no arrayname was provided
+if (( ${#ARRAYNAME} < 1 )); then
+   ARRAYNAME=$(basename "$OUTFILE") 
+   ARRAYNAME=${ARRAYNAME%.*}
+fi
+
+## Concatenate all files in a single, temporary packfile
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Creating single pack file (${COLOR_CYAN}${OUTFILE}${COLOR_YELLOW}) \
+with all these files: ${COLOR_CYAN}${INFILES[*]}${COLOR_NORMAL}" 
+## Use Index sequence to access file to prevent problems with spaced-names (@jmlg97 fix)
+## Could also use "${INFILES[@]}" quoted expansion
+for I in $( seq 0 $(($NINFILES-1)) ); do
+   F="${INFILES[$I]}"
+   cat "$F" >> "$TMPFILE"
+   OFFSETS+=( $(wc -c < "$F") )
+done
+
+## Calculate the total amount of bytes to be converted (in the binary file)
+UNCOMPRESSED_BYTES=$(wc -c < "$TMPFILE")
+
+## Compress Pack file using selected compressor
+case $COMPRESSOR in
+   'zx7b')
+      echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} Compressing pack file...${COLOR_NORMAL}" 
+      ${ZX7B} "$TMPFILE" "$TMPPACK" > /dev/null
+   ;;
+   *)
+      paramError "Unknown compressor algorithm '$COMPRESSOR'." 8
+   ;;
+esac
+
+COMPRESSED_BYTES=$(wc -c < "$TMPPACK")
+SAVED_BYTES=$(( UNCOMPRESSED_BYTES - COMPRESSED_BYTES ))
+
+###############################################################
+###############################################################
+## Output H file
+##
+if (( GENERATE_H )); then 
+
+   OFILE="${OUTFILE}.h"
+   generateCommentInfoHeader "//" "${OFILE}"
+   cat >> "${OFILE}" <<TheHFile
+#ifndef ${ARRAYNAME}_${COMPRESSED_BYTES}_H
+#define ${ARRAYNAME}_${COMPRESSED_BYTES}_H
+
+TheHFile
+
+   ## Output include files in case
+   if (( ${#INCLUDE[@]} > 0 )); then
+      for I in ${INCLUDE[*]}; do
+         echo "#include <${INCLUDE}>" >> "${OFILE}"
+      done
+   fi 
+
+   cat >> "${OFILE}" <<TheHFile
+
+// Declaration of the compressed array
+extern const unsigned char $ARRAYNAME[$COMPRESSED_BYTES];
+
+// Address of the latest byte of the compressed array (for unpacking purposes)
+#define ${ARRAYNAME}_end      ($ARRAYNAME + $COMPRESSED_BYTES - 1)
+
+// Compressed and uncompressed sizes
+#define ${ARRAYNAME}_size_z   $COMPRESSED_BYTES
+#define ${ARRAYNAME}_size     $UNCOMPRESSED_BYTES
+
+TheHFile
+
+
+   ## Output file offset constants if there is more than one file compressed
+   if (( NINFILES > 1 )); then
+      echo >> "${OFILE}"
+      echo "// Define constants for starting offsets of files in the uncompressed array" >> "${OFILE}"
+      OFF=0
+      for((I=0;I<NINFILES;I++)); do
+         printf "#define %s%03d   %6s   // Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "${OFF}" "${INFILES[$I]}" >> "${OFILE}"
+         OFF=$(( OFF + ${OFFSETS[$I]} ))
+      done
+   fi
+
+   printf "\n#endif\n" >> "${OFILE}"
+
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
+fi
+
+
+###############################################################
+###############################################################
+## Output H.S. file
+##
+if (( GENERATE_H_S )); then 
+
+   OFILE="${OUTFILE}.h.s"
+   generateCommentInfoHeader ";;" "${OFILE}"
+   cat >> "${OFILE}" <<TheHFile
+;; Declaration of the compressed array and
+;; the address of the latest byte of the compressed array (for unpacking purposes)
+.globl _$ARRAYNAME
+.globl _${ARRAYNAME}_end
+
+;; Compressed and uncompressed sizes
+_${ARRAYNAME}_size_z $ASMCNST $COMPRESSED_BYTES
+_${ARRAYNAME}_size   $ASMCNST $UNCOMPRESSED_BYTES
+
+TheHFile
+
+   ## Output file offset constants if there is more than one file compressed
+   if (( NINFILES > 1 )); then
+      echo >> "${OFILE}"
+      echo ";; Define constants for starting offsets of files in the uncompressed array" >> "${OFILE}"
+      OFF=0
+      for((I=0;I<NINFILES;I++)); do
+         printf "_%s%03d %s %6s   ;; Starting offset for %s\n" "${ARRAYNAME}_OFF_" "${I}" "$ASMCNST" "${OFF}" "${INFILES[$I]}" >> "${OFILE}"
+         OFF=$(( OFF + ${OFFSETS[$I]} ))
+      done
+   fi
+
+   echo >> "${OFILE}"
+
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
+fi
+
+###############################################################
+###############################################################
+## Output S file
+##
+if (( GENERATE_S )); then
+
+   OFILE="${OUTFILE}.s"
+   generateCommentInfoHeader ";;" "${OFILE}"
+
+   # If there is an ORG ADDRESS, we have to position the code
+   if [ ! -z "$ORGADDRESS" ]; then
+
+   cat > "${OFILE}" <<TheSFile
+;; Absolute data location: '$ORGADDRESS'
+.area _${ARRAYNAME}_area_ (ABS)
+.org $ORGADDRESS
+
+TheSFile
+
+   fi
+
+   echo ";; Data array definition" >> "${OFILE}"
+   echo "_$ARRAYNAME::" >> "${OFILE}"
+
+
+   ## Convert binary file to bytes in hexadecimal and store in a temporary file
+   od -An -t x1 -v "$TMPPACK" > $TMPFILE
+
+   ## Convert binary to S Array and output to OUTFILE.s
+   i=1
+   SEP="   .db "
+   while read LINE; do
+      BYTES=( $LINE )
+      for B in ${BYTES[@]}; do
+         printf "$SEP"
+         if (( i >= BYTESPERLINE )); then
+            SEP="\n   .db "
+            i=0
+         else
+            SEP=","
+         fi
+         printf " 0x%s" $B
+         i=$((i+1))
+      done
+   done < $TMPFILE >> "${OFILE}"
+
+   ## Generate constant pointer to the end of the array
+   echo >> "${OFILE}"
+   echo ";; Address of the latest byte of the compressed array (for unpacking purposes)" >> "${OFILE}"
+   echo "_${ARRAYNAME}_end == . - 1" >> "${OFILE}"
+
+   ## Output a line ending
+   echo >> "${OFILE}"
+
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}"${OFILE}"${COLOR_NORMAL} Generated."
+fi
+
+###############################################################
+###############################################################
+## Output Bin file
+##
+if (( GENERATE_B )); then
+   ## Moves the binary file generated by compressor to the output location
+   OFILE="${OUTFILE}.bin"
+   cp "$TMPPACK" "${OFILE}"
+   echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_YELLOW} ${COLOR_CYAN}'${OFILE}'${COLOR_NORMAL} Generated."
+fi
+
+## Success message
+echo "${COLOR_LIGHT_YELLOW}[cpct_pack]${COLOR_LIGHT_GREEN} Success! ${COLOR_YELLOW}Files compressed \
+from ${COLOR_CYAN}${UNCOMPRESSED_BYTES}${COLOR_YELLOW} to ${COLOR_CYAN}${COMPRESSED_BYTES}${COLOR_YELLOW} bytes \
+(Saved ${COLOR_CYAN}${SAVED_BYTES}${COLOR_YELLOW} bytes)${COLOR_NORMAL}" 

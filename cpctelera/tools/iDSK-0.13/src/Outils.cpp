@@ -138,8 +138,9 @@ char * GetNomAmsdos(char * AmsName )
 			* p++ = * AmsName++;*/
 	}
 
-    while( * AmsName != '.' && * AmsName )
+   while( * AmsName != '.' && * AmsName ) {
         AmsName++;
+   }
 
 	AmsName++;
 	

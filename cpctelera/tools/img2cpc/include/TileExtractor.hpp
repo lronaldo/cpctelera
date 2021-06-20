@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <iomanip>
 #include <FreeImage.h>
 #include "Palette.hpp"
 #include "ConversionOptions.hpp"
@@ -14,9 +15,16 @@
 using namespace std;
 
 class TileExtractor {
-	Tile getTile(FIBITMAP* bmp);
-	ColorAndMaskValues getColorAndMask(FIBITMAP* bmp, int x, int y, bool flip);
-	vector<unsigned char> extractPixels(FIBITMAP* bmp, int x, int y, bool flip);
+	Tile* getTile(FIBITMAP* bmp);
+	
+	void fillTileByRows(Tile* tile, FIBITMAP* bmp);
+	void fillTileByCols(Tile* tile, FIBITMAP* bmp);
+	void fillTileRLE(Tile* tile, FIBITMAP* bmp);
+	void fillTileSCR(Tile* tile, FIBITMAP* bmp);
+	void getByteAt(Tile* tile, FIBITMAP* bmp, int col, int row, bool flip, bool halfFlip);
+
+	ColorAndMaskValues getColorAndMask(FIBITMAP* bmp, int x, int y, bool flip, bool halfFlip);
+	vector<unsigned char> extractPixels(FIBITMAP* bmp, int x, int y, bool flip, bool halfFlip);
 	vector<unsigned char> extractTransPixels(vector<unsigned char> colors);
 	unsigned int getModeIncrement();
 	string removeExtension(const string &fileName);
@@ -29,7 +37,7 @@ class TileExtractor {
 
 public:
 	ConversionOptions Options;
-	vector<Tile> GetTiles(const string &fileName);
+	vector<Tile*> GetTiles(const string &fileName);
 };
 
 #endif

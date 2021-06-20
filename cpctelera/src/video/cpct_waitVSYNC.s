@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_video
@@ -65,10 +65,12 @@
 ;;
 ;; Time Measures:
 ;; (start code)
-;; Case  | Cycles    | microSecs (us)
-;; ----------------------------------
-;; Best  | 40        |  10,00
-;; Any   | 17 + 28*L |  3,00 + 7,00*L
+;; Case  | microSecs (us) | CPU Cycles
+;; ----------------------------------------
+;; Best  |      12        |      48
+;; ----------------------------------------
+;; Any   |    6 + 7*L     |   24 + 28*L
+;; ----------------------------------------
 ;; (end code)
 ;;    L=Number of times loop is executed
 ;;
@@ -80,11 +82,11 @@
 
 _cpct_waitVSYNC::
 cpct_waitVSYNC_asm::	;; Assembly entry point
-   ld  b, #PPI_PORT_B;; [ 7] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
+   ld  b, #PPI_PORT_B;; [2] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
 
 wvs_wait:
-   in  a,(c)         ;; [12] A = Status register got from PPI port B
-   rra               ;; [ 4] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
-   jr  nc, wvs_wait  ;; [12/7] No Carry means No VSYNC, so loop While No Carry
+   in  a,(c)         ;; [4] A = Status register got from PPI port B
+   rra               ;; [1] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
+   jr  nc, wvs_wait  ;; [2/3] No Carry means No VSYNC, so loop While No Carry
 
-   ret               ;; [10] Carry Set, VSYNC Active, Return
+   ret               ;; [3] Carry Set, VSYNC Active, Return

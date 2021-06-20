@@ -5,16 +5,22 @@ COMP    = g++
 TARGET  = $(BINDIR)/iDSK
 SRCFILES= $(wildcard $(SRCDIR)/*.cpp)
 OBJFILES= $(foreach F, $(SRCFILES), $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(F:%.cpp=%.o)))
-CPFLAGS = -O3 -Wall -pedantic -fsigned-char
+CPFLAGS = -std=c++98 -O3 -Wall -pedantic -fsigned-char
+LDLIBS  = 
 
-# Compile
-all: objectdir $(OBJFILES) Makefile
-	$(COMP) $(CPFLAGS) -o $(TARGET) $(OBJFILES)
+.PHONY: clean cleanall
+
+# Compile (Add -static-libstdc++ only on Cygwin)
+$(TARGET): $(OBJFILES) Makefile
+	$(eval LDLIBS+=$(shell if [[ "$$(uname)" =~ "CYGWIN" ]]; then echo '-static-libstdc++'; fi))
+	$(COMP) $(CPFLAGS) $(LDLIBS) -o $(TARGET) $(OBJFILES)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(COMP) -c $(CPFLAGS) $< -o $@
 
-objectdir:
+$(SRCDIR)/%.cpp: $(OBJDIR)
+	
+$(OBJDIR): 
 	@echo "Creating directory $(OBJDIR)..."
 	@mkdir -p $(OBJDIR)
 

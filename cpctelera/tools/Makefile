@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 # INCLUDES
 include ../cfg/global_functions.mk
 
-TOOLS=2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.5.0 img2cpc dskgen
+TOOLS=2cdt cpc2cdt hex2bin-2.0 iDSK-0.13 sdcc-3.6.8-r9946 img2cpc dskgen zx7b scripts/c_scripts
 TOOLSYSTEM=ToolMaker
 
 # TOOLS CONFIG
@@ -46,11 +46,24 @@ define MAKETOOL
 
 endef
 
+# Set optimization only for non-arm devices to prevent Raspberry Pi's to hang due to SD i/o block
+define SETCOMPILATIONOPTIMIZATIONS
+	$(eval MAKE=$(shell if uname -a | grep arm > /dev/null 2>&1; then \
+	 echo make;\
+	else\
+	 echo make -f;\
+	fi))
+endef
+
 # TARGETS
 .PHONY: all clean cleanall $(TOOLS)
 
 # MAIN TARGET
-all: $(TOOLS)
+all: setOptim $(TOOLS)
+
+# Set up compilation optimizations
+setOptim:
+	$(call SETCOMPILATIONOPTIMIZATIONS)
 
 ## RULES TO MAKE ALL THE TOOLS
 $(foreach T, $(TOOLS), $(eval $(call MAKERULE, $(T))))

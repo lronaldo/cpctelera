@@ -226,7 +226,7 @@ void	TZX_AppendFile(TZX_FILE *pTZXFile, unsigned char *pFilename)
 
 	if (fh!=NULL)
 	{
-		TZX_BLOCK *pBlock;
+		//TZX_BLOCK *pBlock;
 
         fseek(fh, 0, SEEK_END);
 
@@ -247,7 +247,7 @@ void	TZX_WriteFile(TZX_FILE *pTZXFile, unsigned char *pFilename)
 
 	if (fh!=NULL)
 	{
-		TZX_BLOCK *pBlock;
+		//TZX_BLOCK *pBlock;
 
 		/* write header */
 		fwrite(TZX_FileHeader, 8, sizeof(unsigned char), fh);

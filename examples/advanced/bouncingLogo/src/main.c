@@ -5,16 +5,16 @@
 //  Copyright (C) 2015 Dardalorth / Fremos / Carlio
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -60,12 +60,12 @@ void checkUserInput (f32 *ax, f32 *ay) {
 void main(void) {
    // Set up Logo entity
    TEntity logo = {
-      gc_LogoFremos, (void*)0xC000,  // Sprite and video memory location
+      gc_LogoFremos, CPCT_VMEM_START,  // Sprite and video memory location
       0, 0, 55, 20,                  // X, Y, Width and Height (bytes)
       { 0.5, 0.2, 0, 0, 1, 1 }       // Velocity values (vx, vy, acum_x,acum_y, max_x, max_y)
    };
    // Set up global message
-   g_message.videopos = (u8*)0xC000;
+   g_message.videopos = CPCT_VMEM_START;
    g_message.str[0]   = '\0';
    g_message.time     = 0;
 

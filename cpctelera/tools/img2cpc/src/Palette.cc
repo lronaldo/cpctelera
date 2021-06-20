@@ -2,6 +2,25 @@
 #include <limits>
 #include <algorithm>
 
+TPalette::TPalette() {
+	UpdateMaxEntries(0, false);
+}
+
+void TPalette::UpdateMaxEntries(int mode, bool usesMasks) {
+	switch(mode) {
+		case 0:
+			_maxEntries = 16;
+			break;
+		case 1:
+			_maxEntries = 4;
+			break;
+		case 2:
+			_maxEntries = 2;
+			break;
+	}
+	if(usesMasks) { _maxEntries++; };
+}
+
 int TPalette::getNearestIndex(Color &color) {
 	int paletteIdx = -1;
 	double currentDistance = numeric_limits<double>::max();
@@ -52,9 +71,9 @@ vector<int> TPalette::GetPaletteAsHW() {
 
 int TPalette::ParseFW(vector<string> &fwIndices) {
 	int fwIndicesSize = fwIndices.size();
-	if (fwIndicesSize < 1 || fwIndicesSize > 16) {
+	if (fwIndicesSize < 1 || fwIndicesSize > _maxEntries) {
 		cout << "Error." << endl
-			<< "There must be at least one palette value and 16 palette values maximum." << endl;
+			<< "There must be at least one palette value and " << _maxEntries << " palette values maximum." << endl;
 		return -2;
 	}
 	int fwPalSize = TPalette::Firmware.size();
@@ -74,9 +93,9 @@ int TPalette::ParseFW(vector<string> &fwIndices) {
 
 int TPalette::ParseHW(vector<string> &hwIndices) {
 	int hwIndicesSize = hwIndices.size();
-	if (hwIndicesSize < 1 || hwIndicesSize > 16) {
+	if (hwIndicesSize < 1 || hwIndicesSize > _maxEntries) {
 		cout << "Error." << endl
-			<< "There must be at least one palette value and 16 palette values maximum." << endl;
+			<< "There must be at least one palette value and " << _maxEntries << " palette values maximum." << endl;
 		return -2;
 	}
 	map<int, Color&> &hwPalette = TPalette::Hardware;
@@ -100,9 +119,9 @@ int TPalette::ParseRGB(vector<string> &rgbValues) {
 	//cout << "RGB!!";
 
 	int rgbValuesSize = rgbValues.size();
-	if (rgbValuesSize < 1 || rgbValuesSize > 16) {
+	if (rgbValuesSize < 1 || rgbValuesSize > _maxEntries) {
 		cout << "Error." << endl
-			<< "There must be at least one palette value and 16 palette values maximum." << endl;
+			<< "There must be at least one palette value and " << _maxEntries << " palette values maximum." << endl;
 		return -2;
 	}
 	for (string val : rgbValues) {

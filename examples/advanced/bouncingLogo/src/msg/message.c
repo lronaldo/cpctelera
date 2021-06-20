@@ -3,16 +3,16 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -27,11 +27,13 @@ void drawMessage() {
    // Draw message only if there is time to draw it
    if (g_message.time > 1) {
       // Draw the message
-      cpct_drawStringM0(g_message.str, g_message.videopos, 1, 0);
+      cpct_setDrawCharM0(1, 0);
+      cpct_drawStringM0(g_message.str, g_message.videopos);
       g_message.time--;
    } else if (g_message.time > 0) {
       // Clean the message
-      cpct_drawStringM0(g_message.str, g_message.videopos, 0, 0);
+      cpct_setDrawCharM0(0, 0);
+      cpct_drawStringM0(g_message.str, g_message.videopos);
       g_message.time=0;
    }
 }

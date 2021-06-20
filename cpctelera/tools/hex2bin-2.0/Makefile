@@ -13,14 +13,16 @@ M_OBJFILES= $(foreach F, mot2bin.o common.o libcrc.o binary.o, $(OBJDIR)/$(F))
 TGT_FILES = $(foreach F, hex2bin mot2bin, $(TGTDIR)/$(F))
 #TGT_FILES = $(foreach F, hex2bin mot2bin hex2bin.1, $(TGTDIR)/$(F))
 
-CPFLAGS = -std=gnu99 -O3 -fsigned-char -Wall -pedantic
+CPFLAGS = -std=gnu99 -O3 -fsigned-char -Wall -pedantic -fcommon
 # Compile
-all: objectdir $(TGT_FILES)
+all: $(TGT_FILES)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	gcc -c $(CPFLAGS) $< -o $@
 
-objectdir:
+$(SRCDIR)/%.c: $(OBJDIR)
+	
+$(OBJDIR):
 	@echo "Creating directory $(OBJDIR)..."
 	mkdir -p $(OBJDIR)
 

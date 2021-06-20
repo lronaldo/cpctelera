@@ -1,23 +1,22 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
 ###########################################################################
-##     CPCTELERA ENGINE: Example of use of arkos tracker player routines ##
 ##              General Utility functions for the Makefile               ##
 ##-----------------------------------------------------------------------##
 ## This file contines general function definitions that are useful to    ##
@@ -26,24 +25,17 @@
 ## you should change the build_config.mk                                 ##
 ###########################################################################
 
-# ANSI Sequences for terminal colored printing
-COLOR_RED=\033[1;31;49m
-COLOR_YELLOW=\033[1;33;49m
-COLOR_NORMAL=\033[0;39;49m
+# Get directory path of this file at the moment of including it
+THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
-#################
-# PRINT: Print a nice and colorful message
-#
-# $(1): Subsystem that shows the message
-# $(2): Message to print
-#
-define PRINT
-	@printf "$(COLOR_RED)["
-	@printf $(1)
-	@printf "]$(COLOR_YELLOW) "
-	@printf $(2)
-	@printf "$(COLOR_NORMAL)\n"
-endef
+# Get the other makefiles
+include $(THIS_DIR)/modules/utils.mk
+include $(THIS_DIR)/modules/pack.mk
+include $(THIS_DIR)/modules/img2sp.mk
+include $(THIS_DIR)/modules/tmx2data.mk
+include $(THIS_DIR)/modules/cdtman.mk
+include $(THIS_DIR)/modules/aks2data.mk
+include $(THIS_DIR)/modules/android.mk
 
 #################
 # GETLOADADDRESS: Get load address from a created binary file (parsing hex2bin's log)
@@ -62,23 +54,23 @@ endef
 # $(2): File.map that has been compiled (and has .bin.log and .map files associated)
 #
 define GETRUNADDRESS
-  $(eval $(1)   = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' < $(2);))
-  $(eval $(1)_1 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *init  *.*$$/\1/p'            < $(2);))
-  $(eval $(1)_2 = $(shell sed -n 's/^ *0000\([0-9A-F]*\) *_main  *.*$$/\1/p'           < $(2);))
-  $(eval $(1)   = $(shell if [ -z "$($(1))" ]; then echo "$($(1)_1)"; fi; ) )
-  $(eval $(1)   = $(shell if [ -z "$($(1))" ]; then echo "$($(1)_2)"; fi; ) )
+  $(eval $(1)   := $(shell sed -n 's/^ *0000\([0-9A-F]*\) *cpc_run_address  *.*$$/\1/p' < $(2);))
+  $(eval $(1)_1 := $(shell sed -n 's/^ *0000\([0-9A-F]*\) *init  *.*$$/\1/p'            < $(2);))
+  $(eval $(1)_2 := $(shell sed -n 's/^ *0000\([0-9A-F]*\) *_main  *.*$$/\1/p'           < $(2);))
+  $(eval $(1)   := $(shell if [ -z "$($(1))" ]; then echo "$($(1)_1)"; fi; ) )
+  $(eval $(1)   := $(shell if [ -z "$($(1))" ]; then echo "$($(1)_2)"; fi; ) )
 endef
 
 #################
-# CHECKVARIABLEISSET: Checks if a given variable is set. If not, it prints out an error message and aborts generation
+# GETALLADDRESSES: Gets Load and Run Addresses and checks they are OK
 #
-# $(1): Variable to check 
+# $(1): Binary file generated (from which to get addresses)
 #
-define CHECKVARIABLEISSET
-  if [ "$($(1))" = "" ]; then \
-    echo "**!!ERROR!!**: $(1) is not set. Aborting."; \
-    exit 1; \
-  fi
+define GETALLADDRESSES 
+	@$(call GETLOADADDRESS,LOADADDR,$1.log)
+	@$(call GETRUNADDRESS,RUNADDR,$(1:.bin=.map))
+	@$(call CHECKVARIABLEISSET,LOADADDR)
+	@$(call CHECKVARIABLEISSET,RUNADDR)
 endef
 
 #################
@@ -101,14 +93,17 @@ endef
 # $(1): DSK file name to be created
 #
 define CREATEEMPTYDSK
-	if [ ! -e $(1) ]; then \
-  		$(IDSK) $(1) -n; \
-  	fi
+	@if [ -e "$(1)" ]; then \
+        rm -f "$(1)"; \
+        echo "Removed preexisting $(1) to generate a new one"; \
+ 	fi 
+	@$(IDSK) $(1) -n; 
 endef
 
 #################
-# ADDCODEFILETODSK: General rule to include a compiled binary file of a program into a 
-#    DSK automatically. It takes into account memory load point and entry point for the binary
+# ADDCODEFILETODSK: Commands to use inside the body of a rule to include a 
+#    compiled binary file of a program into a DSK automatically. It takes 
+#    into account memory load point and entry point for the binary
 #
 # $(1): DSK file where the binary will be included
 # $(2): Binary file to be included 
@@ -119,35 +114,70 @@ endef
 define ADDCODEFILETODSK
 	@$(IDSK) $(1) -i $(2) -e $(4) -c $(3) -t 1 -f &> /dev/null
 	@touch $(5)
-	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
+	@$(call PRINT,$(1),"Added BIN file '$(2:$(DSKFILESDIR)/%=%)'")
 endef
 
 #################
-# ADDBINFILETODSK: General rule to include a binary file into a DSK automatically
+# ADDBINFILETODSK: Commands to use inside the body of a rule to include 
+#     a binary file into a DSK automatically
 #
 # $(1): DSK file where the binary will be included
 # $(2): Binary file to be included 
 # $(3): Blank object file generated to flag that this inclusion is already done (not to repeat it)
 #
 define ADDBINFILETODSK
-$(3): $(2)
 	@$(IDSK) $(1) -i $(2) -t 1 -f &> /dev/null
 	@touch $(3)
-	@$(call PRINT,$(1),"Added '$(2:$(DSKFILESDIR)/%=%)'")
+	@$(call PRINT,$(1),"Added BIN file '$(2:$(DSKFILESDIR)/%=%)'")
 
 endef
 
 #################
-# CREATECDT: Create a CDT file with the BINARY added to it and converted to AMSDOS BINARY
+# ADDTXTFILETODSK: Commands to use inside the body of a rule to include 
+#     an ASCII file into a DSK automatically
 #
-# $(1): Binary file to be inserted in the CDT
-# $(2): Name (up to 16 chars) that the file will have inside the CDT (displayed when loading)
-# $(3): CDT file to be created
-# $(4): Memory address where binary will be loaded (LOAD ADDRESS)
-# $(5): Memory address where main program starts (RUN ADDRESS)
+# $(1): DSK file where the binary will be included
+# $(2): ASCII file to be included 
+# $(3): Blank object file generated to flag that this inclusion is already done (not to repeat it)
 #
-define CREATECDT
-  @$(2CDT) -n -X 0x$(5) -L 0x$(4) -r $(2) $(1) $(3) > /dev/null
+define ADDTXTFILETODSK
+	@$(IDSK) $(1) -i $(2) -t 0 -f &> /dev/null
+	@touch $(3)
+	@$(call PRINT,$(1),"Added ASCII file '$(2:$(DSKFILESDIR)/%=%)'")
+
+endef
+
+#################
+# ADDFILETODSK: General rule to include a file (binary or ASCII) into a DSK 
+# automatically. The rule detects the type of the file before proceeding
+#
+# $(1): DSK file where the binary will be included
+# $(2): File to be included 
+# $(3): Blank object file generated to flag that this inclusion is already done (not to repeat it)
+#
+define ADDFILETODSK
+$(3): $(2)
+	$(eval _D=$(strip $(1)))
+	$(eval _F=$(strip $(2)))
+	$(eval _O=$(strip $(3)))
+	$(eval _T=$(shell file "$(_F)" | grep ASCII))
+	$(if $(_T)\
+      ,$(call ADDTXTFILETODSK,$(_D),$(_F),$(_O))\
+      ,$(call ADDBINFILETODSK,$(_D),$(_F),$(_O))\
+	)
+
+endef
+
+#################
+# CREATESNA: Create a SNA file with the BINARY added to it 
+#
+# $(1): Binary file to be inserted in the SNA
+# $(2): SNA file to be created
+# $(3): Memory address where binary will be loaded (LOAD ADDRESS)
+# $(4): Memory address where main program starts (RUN ADDRESS)
+#
+define CREATESNA
+  @$(BIN2SNA) -pc 0x$(4) $(1) 0x$(3) > $(2)
 endef
 
 #################
@@ -180,5 +210,5 @@ endef
 #
 define BINFILE2C
 $(1): $(2)
-	$(BIN2C) $(2) -h "cpctelera.h" > $(1)
+	$(BIN2C) $(2) -i "cpctelera.h" > $(1)
 endef

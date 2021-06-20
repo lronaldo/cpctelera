@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
@@ -29,8 +29,8 @@
 ;; Input Parameters (6 bytes):
 ;;  (2B HL) sprite - Source Sprite Pointer (array with pixel data)
 ;;  (2B DE) memory - Destination video memory pointer
-;;  (1B B ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
-;;  (1B C ) height - Sprite Height in bytes (>0)
+;;  (1B C ) width  - Sprite Width in *bytes* [1-63] (Beware, *not* in pixels!)
+;;  (1B B ) height - Sprite Height in bytes (>0)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSprite_asm
@@ -71,6 +71,10 @@
 ;; their sizes must be a multiple of a byte (2 in mode 0, 4 in mode 1 and
 ;; 8 in mode 2).
 ;;     * This function *will not work from ROM*, as it uses self-modifying code.
+;;     * Although this function can be used under hardware-scrolling conditions,
+;; it does not take into account video memory wrap-around (0x?7FF or 0x?FFF 
+;; addresses, the end of character pixel lines).It  will produce a "step" 
+;; in the middle of sprites when drawing near wrap-around.
 ;;
 ;; Details:
 ;;    This function copies a generic WxH bytes sprite from memory to a 
@@ -171,13 +175,6 @@
 ;; <video memory locations table at 
 ;; http://www.cpcmania.com/Docs/Programming/Painting_pixels_introduction_to_video_memory.htm>.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;
-;; Macro to introduce a JR 0 more clearly
-;;
-.macro jr__0
-   .DW #0x0018    ;; JR #00 (Normally used as a modifiable jump, as jr 0 is an infinite loop)
-.endm
 
    ;; Modify code using width to jump in drawSpriteWidth
    ld    a, #126           ;; [2] We need to jump 126 bytes (63 LDIs*2 bytes) minus the width of the sprite * 2 (2B)

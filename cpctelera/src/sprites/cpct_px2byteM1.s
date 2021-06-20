@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
@@ -26,25 +26,25 @@
 ;; C Definition:
 ;;    <u8> <cpct_px2byteM1> (<u8> *px0*, <u8> *px1*, <u8> *px2*, <u8> *px3*);
 ;;
-;; Input Parameters (2 Bytes):
-;;    (1B _) px0 - Firmware colour value for left         pixel (pixel 0) [0-3]
-;;    (1B _) px1 - Firmware colour value for center-left  pixel (pixel 1) [0-3]
-;;    (1B _) px2 - Firmware colour value for center-right pixel (pixel 2) [0-3]
-;;    (1B _) px3 - Firmware colour value for right        pixel (pixel 3) [0-3]
+;; Input Parameters (4 Bytes - All received in the stack):
+;;    (1B) px0 - Firmware colour value for left         pixel (pixel 0) [0-3]
+;;    (1B) px1 - Firmware colour value for center-left  pixel (pixel 1) [0-3]
+;;    (1B) px2 - Firmware colour value for center-right pixel (pixel 2) [0-3]
+;;    (1B) px3 - Firmware colour value for right        pixel (pixel 3) [0-3]
 ;;
 ;; Returns:
 ;;    u8 - byte with *px0*, *px1*, *px2* and *px3* colour information in screen pixel format.
 ;;
 ;; Assembly call:
-;;    This function does not have assembly entry point. You should use C entry
-;; point and put parameters on the stack, this way:
-;;    > ld   bc, #0x0103      ;; B = *px1* = 1, C = *px0* = 3 (Firmware colours)
-;;    > ld   de, #0x0200      ;; D = *px3* = 2, E = *px2* = 0 (Firmware colours)
-;;    > push de               ;; Put parameters on the stack (in reverse order, always)
-;;    > push bc               ;; 
-;;    > call _cpct_px2byteM1  ;; Call the function on the C entry point
-;;    > pop  bc               ;; Recover parameters from stack to leave it at its previous state
-;;    > pop  de               ;; 
+;;    All parameters must be passed on the stack and recovered 
+;; afterwards. This is an example call:
+;;    > ld   bc, #0x0103         ;; B = *px1* = 1, C = *px0* = 3 (Firmware colours)
+;;    > ld   de, #0x0200         ;; D = *px3* = 2, E = *px2* = 0 (Firmware colours)
+;;    > push de                  ;; Put parameters on the stack (in reverse order, always)
+;;    > push bc                  ;; 
+;;    > call cpct_px2byteM1_asm  ;; Call the function on the C entry point
+;;    > pop  bc                  ;; Recover parameters from stack to leave it at its previous state
+;;    > pop  de                  ;; 
 ;;
 ;; Parameter Restrictions:
 ;;    * *px0*, *px1*, *px2* and *px3* must be firmware colour values in the range 
@@ -94,9 +94,10 @@
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Pixel colour table defined in cpct_drawCharM1
-.globl dc_mode1_ct
+;; Include required macro files
+.include "macros/cpct_maths.h.s"
 
+cpct_px2byteM1_asm::
 _cpct_px2byteM1::
    ;; Point HL to the start of the first parameter in the stack
    ld   hl, #2           ;; [3] HL Points to SP+2 (first 2 bytes are return address)
@@ -108,23 +109,27 @@ _cpct_px2byteM1::
    ;;
    ld    b, #4           ;; [2] We have 4 pixels to mix into 1 byte, so set loop counter to 4
 px1_repeat:
-   ld   de, #dc_mode1_ct ;; [3] DE points to the start of the colour table
+   ld   de, #pen2mode1px ;; [3] DE points to the start of the colour table
    ld    a, (hl)         ;; [2] A = Firmware colour for next pixel (to be added to DE, 
                          ;; .... as it is the index of the colour value to retrieve)
-   ;; Compute DE += Pixel 0 (A)
-   add   e               ;; [1] | E += A
-   ld    e, a            ;; [1] |
-   sub   a               ;; [1] A = 0 (preserving Carry Flag)
-   adc   d               ;; [1] | D += Carry
-   ld    d, a            ;; [1] |
-
+   add_de_a              ;; [5] DE += A (A contains next color translation to Pixel 0 bitpattern)
+   
    ld    a, (de)         ;; [2] A = Screen format for Firmware colour for Pixel
    or    c               ;; [1] Mix (OR) pixel format with accumulated previous pixel format conversions
    rlca                  ;; [1] Rotate A left, to left space for next pixel at the same 2 bits (7 and 3)
-   ld    c, a            ;; [1] B = Acumulated screen pixels format
+   ld    c, a            ;; [1] C = Acumulated screen pixels format
    inc  hl               ;; [2] HL points to next pixel in firmware colour (next parameter)
    djnz px1_repeat       ;; [3/4] Repeat until B=0 (until 4 pixels have been converted)
 
    ld    l, c            ;; [1] L = B, put return value into L
 
    ret                   ;; [3] return
+
+;;
+;;    Mode 1 Color conversion table (PEN to Screen pixel format)
+;;
+;;    This table converts PEN values (palette indexes from 0 to 4) into screen pixel format values in mode 1. 
+;; In mode 1, each byte has 4 pixels (P0, P1, P2, P3). This table converts to Pixel 0 (P0) format. Getting values for
+;; other pixels require shifting this byte to the right 1 to 3 times (depending on which pixel is required).
+;;
+pen2mode1px: .db 0x00, 0x08, 0x80, 0x88

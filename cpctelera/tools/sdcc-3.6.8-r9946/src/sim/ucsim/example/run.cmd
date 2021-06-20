@@ -1,0 +1,3 @@
+run
+state
+quit

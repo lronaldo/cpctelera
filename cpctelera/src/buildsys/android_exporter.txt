@@ -1,0 +1,178 @@
+File: CPCtelera Android Exporter Beta
+
+(see cpct_rvmengine_logo.png)
+
+*BEWARE. This documentation is currently under construction.*
+
+CPCtelera Android Exporter Beta is a module of the build system that lets you export 
+your Amstrad CPC creations to Android. Once you have your Amstrad CPC game ready,
+you can launch the Android Exporter with the command *make apk* and an Android 
+APK package will be generated. This APK will contain your game in snapshot format 
+along with RVMEngine, an embeded versión of Retro Virtual Machine 2 emulator.
+
+
+Next sections will show you how to configure and use CPCtelera Android Exporter Beta.
+
+Section: Functionalities
+
+   CPCtelera Android Exporter Beta and RVM Engine give you these functionalities,
+     * Fully working Amstrad CPC games on Android 4.4+ with RVMEngine embedded emulator
+     * Configurable Splash Screen
+     * Configurable Icons for your Android App
+     * Configurable Control layouts and keymapping
+     * Savestates on Android
+     * Use of Android virtual keyboard to insert any character
+     * Use of bluetooth game controllers and keyboard controllers
+     * Outstanding performance thanks to RVMEngine: works on Android devices from 2013
+
+   And this list will keep on growing as we produce new versions.
+
+Section: Requisites
+   
+   In order for your game and android device to work with CPCtelera Android Exporter, 
+these requisites must be met,
+   * Only 64K shapnshots from Amstrad CPC 464 are allowed.
+   * The game cannot read from tape or disk, nor it can include custom ROMs.
+   * Android device must have API 19+ (Android 4.4 KitKat or higher).
+   * Currently, the exporter works only on Linux or Windows (Cygwin). It does not work on MacOS X.
+   * The game must start from an snapshot: if the game uses firmware, it might 
+require to properly configure it at the start.
+
+   Keep in mind that this is a beta release with minimum functionalities. Future releases 
+will increse capabilities and remove some current requisites. 
+   
+Section: How does it work
+
+   You type in *make apk* and everything just works :)
+   
+   *TODO*
+
+Section: Examples
+
+   Some examples on how to use it
+
+   *TODO*
+
+Section: Reference documentation
+
+Topic: JSON Constant values
+
+  Layout type: 
+  gamepad, onetouch, twobuttons.
+
+  Orientation:
+  auto, landscape, portrait.
+
+  Keys to be assigned to touch screen buttons:
+(start code)
+  |=====================================================================
+  | JSON CODE | CPCT_KeyID        || JSON CODE     | CPCT_KeyID       ||
+  |=====================================================================
+  | disabled  | No-Key            || key_1         | Key_1            ||
+  | key_a     | Key_A             || key_2         | Key_2            ||
+  | key_b     | Key_B             || key_3         | Key_3            ||
+  | key_c     | Key_C             || key_4         | Key_4            ||
+  | key_d     | Key_D             || key_5         | Key_5, Joy1_Down ||
+  | key_e     | Key_E             || key_6         | Key_6, Joy1_Up   ||
+  | key_f     | Key_F, Joy1_Fire2 || key_7         | Key_7            ||
+  | key_g     | Key_G, Joy1_Fire1 || key_8         | Key_8            ||
+  | key_h     | Key_H             || key_9         | Key_9            ||
+  | key_i     | Key_I             || key_0         | Key_0            ||
+  | key_j     | Key_J             || return        | Key_Return       ||
+  | key_k     | Key_K             || escape        | Key_Esc          ||
+  | key_l     | Key_L             || delete        | Key_Del          ||
+  | key_m     | Key_M             || tab           | Key_Tab          ||
+  | key_n     | Key_N             || space         | Key_Space        ||
+  | key_o     | Key_O             || minus         | Key_Hyphen       ||
+  | key_p     | Key_P             || caret         | Key_Caret        ||
+  | key_q     | Key_Q             || at            | Key_At           ||
+  | key_r     | Key_R, Joy1_Left  || left_bracket  | Key_OpenBracket  ||
+  | key_s     | Key_S             || right_bracket | Key_CloseBracket ||
+  | key_t     | Key_T, Joy1_Right || semicolon     | Key_SemiColon    ||
+  | key_u     | Key_U             || colon         | Key_Colon        || 
+  | key_v     | Key_V             || backslash     | Key_BackSlash    ||
+  | key_w     | Key_W             || comma         | Key_Comma        ||
+  | key_x     | Key_X             || period        | Key_Dot          ||
+  | key_y     | Key_Y             || slash         | Key_Slash        ||
+  | key_z     | Key_Z             || caps_lock     | Key_CapsLock     ||
+  | f1        | Key_F1            || clr           | Key_Clr          ||
+  | f2        | Key_F2            || cursor_right  | Key_CursorRight  ||
+  | f3        | Key_F3            || cursor_left   | Key_CursorLeft   ||
+  | f4        | Key_F4            || cursor_down   | Key_CursorDown   ||
+  | f5        | Key_F5            || cursor_up     | Key_CursorUp     ||
+  | f6        | Key_F6            || enter_num     | Key_Enter        ||
+  | f7        | Key_F7            || f_dot         | Key_FDot         ||
+  | f8        | Key_F8            || ctrl          | Key_Control      ||
+  | f9        | Key_F9            || shift         | Key_Shift        ||
+  | f0        | Key_F0            || copy          | Key_Copy         ||
+  | joy_up    | Joy0_Up           || joy_fire1     | Joy0_Fire1       ||
+  | joy_down  | Joy0_Down         || joy_fire2     | Joy0_Fire2       ||
+  | joy_left  | Joy0_Left         ||               |                  ||
+  | joy_right | Joy0_Right        ||               |                  ||
+  |=====================================================================  
+(end code)
+
+   *TODO*
+
+Section: Authors and License
+
+CPCtelera Android Exporter Beta:
+   * (C)opyright 2019. <José Luís Luri Bolinski at mailto:jose.luis.luri@gmail.com>
+   * (C)opyright 2020. <Francisco J. Gallego-Durán at mailto:ronaldo@cheesetea.com> (<@FranGallegoBR at http://twitter.com/FranGallegoBR>)
+
+RVMEngine:
+   * (C)opyright 2020. <Juan Carlos González Amestoy at mailto:rvm@retrovirtualmachine.org> (<@retroVM at http://twitter.com/retroVM>)
+
+CPCtelera Android Exporter Beta: User license Agreement:
+    The authors of CPCtelera Android Exporter Beta and RVMEngine grant you 
+permission to use this software, provided that you accept the following license 
+terms:
+
+   * (1) You are only allowed to generate and distribute APK packages for Amstrad
+CPC software snapshots (SNA) of your own. You MUST always possess CopyRights of 
+the software you will distribute using these tools.
+   * (2) You are NOT allowed to modify or redistribute RVMEngine by any means. You 
+are ONLY permitted to use it together with CPCtelera Android Exporter, and ONLY 
+to distribute software whose rights you own.
+   * (3) You are permitted to distribute APK packages generated with CPCtelera 
+Android Exporter Beta only for NON-COMMERTIAL PURPOSES. In order to sell your 
+generated APKs you will need special permission from the authors. 
+   * (4) You are not allowed to remove the CPCtelera and RVMEngine logos from the 
+splash screen of your generated APKs, unless you are given special permission from
+the authors. 
+   * (5) THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN 
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE  
+
+In order to use this software you have to previously agree with this license.
+If your CPCtelera instalation contains a file named '.CPCTRVMEngineEndUserLicenseAccepted'
+it is understood that you have already accepted this license.
+
+Section: Files
+
+   These are the project files used to configure CPCtelera Android Exporter Beta,
+   * exp/android/assets/config.json
+   * exp/android/res/drawable-xxxhdpi/splash.png
+   * exp/android/res/mipmap-xxxhdpi/ic_launcher.png
+   * exp/android/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+   *TODO*
+
+Section: Screenshots
+
+   *TODO*
+
+   Some screenshots of the CPCtelera Android Exporter in action on android devices:
+
+(see cpct_android_s0.jpg)
+(see cpct_android_s1.jpg)
+(see cpct_android_s2.jpg)
+(see cpct_android_s3.jpg)
+(see cpct_android_s4.jpg)
+(see cpct_android_s5.jpg)
+(see cpct_android_s6.jpg)
+(see cpct_android_s7.jpg)
+(see cpct_android_s8.jpg)

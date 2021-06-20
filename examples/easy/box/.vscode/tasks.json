@@ -1,0 +1,58 @@
+//-----------------------------LICENSE NOTICE------------------------------------
+//  This file is part of CPCtelera: An Amstrad CPC Game Engine
+//  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//------------------------------------------------------------------------------{
+// See https://go.microsoft.com/fwlink/?LinkId=733558
+// for the documentation about the tasks.json format
+{
+      "version": "0.1.0"
+   ,  "command": "make"
+   ,  "isShellCommand": true
+   ,  "args": []
+   ,  "showOutput": "always"
+   ,  "suppressTaskName": true
+   ,  "tasks": [ 
+         {
+               "taskName": "make"
+            ,  "args": []
+            ,  "isBuildCommand": true
+            ,  "problemMatcher": {
+                     "owner": "base"
+                  ,  "fileLocation": ["relative", "${workspaceRoot}"]
+                  ,  "pattern": {
+                        "regexp": "^(.*):(\\d+):\\s+(warning|error|syntax error)[^:]*:\\s+(.*)$"
+                     ,  "file": 1
+                     ,  "line": 2
+                     ,  "severity": 3
+                     ,  "message": 4
+                     }
+                 }
+         }
+      ,  {
+               "taskName": "clean"
+            ,  "args": ["clean"]
+         }
+      ,  {
+               "taskName": "cleanall"
+            ,  "args": ["cleanall"]
+         }
+      ,  {
+               "taskName": "run"
+            ,  "command": "cpct_winape"
+            ,  "args": [ "-as" ] 
+         }
+      ]
+}

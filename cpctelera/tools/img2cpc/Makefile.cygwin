@@ -8,7 +8,7 @@ MKDIR=mkdir
 CC=gcc
 CXX=g++
 CXXFLAGS=-std=c++0x -O3 -Wall -fsigned-char
-LDLIBS=-L$(LIBDIR) -lfreeimage
+LDLIBS=-L$(LIBDIR) -lfreeimage -static-libstdc++
 
 vpath %.hpp $(INCDIR)
 vpath %.cpp $(SRCDIR)

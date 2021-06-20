@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>Memory simulation in &#181;Csim</title>
+  </head>
+  <body>
+    <h1>Memory simulation in <i>&#181;Csim</i></h1>
+    Typical microprocessor system can look like this:
+    <p><img src="cpu-mem.svg" alt="[CPU-memory connection]" border="0"></p>
+    <h3><a name="address_space">Address space</a></h3>
+    In our terminology "<b>address space</b>" means a set of:
+    <ul>
+      <li>address bus lines </li>
+      <li>data bus lines </li>
+      <li>control (read/write) lines</li>
+    </ul>
+    Bus lines can be shared by address spaces, in this case number of control
+    line sets specifies the address spaces.
+    <p>Microcontrollers usually have more address spaces. Some is used inside
+      only, some can be used for external memories. </p>
+    <p>Address space does not store any value. It just specifies range of
+      addresses by <i>start address</i> (which is not necessarily zero) and <i>size</i>
+      which the CPU can provide when it tries to access a memory location.</p>
+    <h3><a name="chip">Memory chip</a></h3>
+    "<b>Memory chip</b>" is a circuit which can hold values in cells. Cells are
+    indexed from 0 up to size-1. Each cell stores some (usually 8) bits.
+    <p><img src="chip.svg" alt="[Memory chip]" border="0"></p>
+    <h3><a name="address_decoder">Address decoder</a></h3>
+    Addresses coming from an address space via address bus must be routed to
+    memory and translated to cell indexes. This is done by the "<b>address
+      decoder</b>". It listens addresses on the bus and control lines and
+    enables exactly one memory chip. This way cells of the memory chip appear in
+    the address space.
+    <p><img src="decoded.svg" boder="0" alt="[Decoded addresses]"> </p>
+    <p>It is possible that some addresses are not decoded. Writing to such an
+      address results data to be lost. Reading of a non-decoded address results
+      random value. Pullup or pulldown resistors can be applied to data bus
+      lines to provide a specific value for read operations. </p>
+    <p>As it shown above, it is also possible that some cells of a chip is not
+      mapped to any address. </p>
+    <h3><a name="shared_chips">Mixed address spaces (shared chips)</a></h3>
+    Decoder connects an address of an address space to a cell of a memory chip.
+    Only one cell can be connected to each addresses but same cell can be
+    connected to more than one address spaces. This is done by routing different
+    control lines to the same chip through logic <b>L</b>:
+    <p><img src="share-chip.svg" alt="[Sharing memchip]" border="0"> </p>
+    <p>Because each cell of a memory chip uses same read/write control, in real
+      world it is not possible to share individual cells of a chip between
+      address spaces. In &#181;Csim simulator we can define as many address decoders
+      as we want so it is possible to map any cell to any address. </p>
+    <h3><a name="banking">Memory banking</a></h3>
+    <p>Banking...</p>
+    <h3><a name="banding">Bit banding</a></h3>
+    <p>Banding...</p>
+    <hr>
+  </body>
+</html>

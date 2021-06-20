@@ -1,0 +1,170 @@
+#
+# uCsim s51.src/Makefile
+#
+# (c) Drotos Daniel, Talker Bt. 1997
+#
+
+STARTYEAR	= 1997
+
+SHELL		= /bin/sh
+CXX		= @CXX@
+CPP		= @CPP@
+CXXCPP		= @CXXCPP@
+RANLIB		= @RANLIB@
+INSTALL		= @INSTALL@
+STRIP		= @STRIP@
+MAKEDEP         = @MAKEDEP@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+transform	= @program_transform_name@
+
+DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
+CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
+		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
+		  -I$(top_srcdir)/gui.src
+CFLAGS          = @CFLAGS@ @WALL_FLAG@
+CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
+LDFLAGS         = @LDFLAGS@
+PICOPT		= @PICOPT@
+SHAREDLIB	= @SHAREDLIB@
+
+SDCC		= sdcc
+SDCFLAGS	= --debug --stack-after-data --model-small
+SDCPPFLAGS	= 
+
+LIBS		= -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim @LIBS@
+DL		= @DL@
+dl_ok		= @dl_ok@
+
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+libdir          = @libdir@
+datadir         = @datadir@
+datarootdir     = @datarootdir@
+includedir      = @includedir@
+mandir          = @mandir@
+man1dir         = $(mandir)/man1
+man2dir         = $(mandir)/man2
+infodir         = @infodir@
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+
+EXEEXT		= @EXEEXT@
+
+OBJECTS_SHARED	= glob.o sim51.o \
+		  inc.o jmp.o mov.o logic.o arith.o bit.o \
+		  timer0.o timer1.o timer2.o serial.o port.o interrupt.o \
+		  wdt.o pca.o mdu.o \
+		  uc51.o uc52.o uc51r.o uc89c51r.o uc251.o uc517.o \
+		  uc390.o uc390hw.o uc521.o uc88x.o uc380.o
+OBJECTS_EXE	= s51.o 
+OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+
+enable_dlso	= @enable_dlso@
+dlso_ok		= @dlso_ok@
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: checkconf otherlibs s51.src
+
+
+# Compiling and installing everything and runing test
+# ---------------------------------------------------
+install: all installdirs
+	$(INSTALL) s51$(EXEEXT) $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
+
+
+# Performing self-test
+# --------------------
+check: test
+
+test: test_ser.ihx
+
+test_ser.ihx: test_ser.rel
+	$(SDCC) $(SDCFLAGS) $<
+
+# Performing installation test
+# ----------------------------
+installcheck:
+
+
+# Creating installation directories
+# ---------------------------------
+installdirs:
+	test -d $(DESTDIR)$(bindir) || $(INSTALL) -d $(DESTDIR)$(bindir)
+
+
+# Creating dependencies
+# ---------------------
+dep: Makefile.dep
+
+Makefile.dep: $(srcdir)/*.cc $(srcdir)/*.h
+	$(MAKEDEP) $(CPPFLAGS) $(filter %.cc,$^) >Makefile.dep
+
+-include Makefile.dep
+include $(srcdir)/clean.mk
+
+#parser.cc: parser.y
+
+#plex.cc: plex.l
+
+# My rules
+# --------
+.SUFFIXES: .rel
+
+s51.src: s51$(EXEEXT) shared_lib
+
+s51$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
+
+ifeq ($(dlso_ok),yes)
+shared_lib: $(top_builddir)/s51.so
+else
+shared_lib:
+	@$(top_srcdir)/mkecho $(top_builddir) "No 51 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
+endif
+
+$(top_builddir)/s51.so: $(OBJECTS_SHARED)
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
+
+otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+
+$(top_builddir)/libcmd.a:
+	$(MAKE) -C $(top_builddir)/cmd.src all
+
+$(top_builddir)/libguiucsim.a:
+	$(MAKE) -C $(top_builddir)/gui.src checkconf ucsim_lib
+
+$(top_builddir)/libsim.a:
+	$(MAKE) -C $(top_builddir)/sim.src all
+
+$(top_builddir)/libucsimutil.a:
+	$(MAKE) -C $(top_builddir) -f main.mk
+
+.cc.o:
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) -c $< -o $@
+
+.c.rel:
+	$(SDCC) $(SDCFLAGS) $(SDCPPFLAGS) -c $<
+
+
+# Remaking configuration
+# ----------------------
+checkconf:
+	@if [ -f $(top_builddir)/devel ]; then\
+	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+	fi
+
+# End of s51.src/Makefile.in

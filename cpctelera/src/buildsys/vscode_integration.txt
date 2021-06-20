@@ -1,0 +1,129 @@
+File: Visual Studio Code
+
+CPCtelera integrates with <Visual Studio Code IDE at https://code.visualstudio.com/> since version 1.4.2. <Visual Studio Code at https://code.visualstudio.com/> is a free, fast and reliable IDE from Microsoft, pretty similar to <Sublime Text at https://www.sublimetext.com/> and easily available on most Operative Systems. It offers plugins with sintax highlighting for C/C++ and Z80 Assembly code, intellisense and integration of the workflow (fix -> compile -> execute -> test) directly from the IDE. 
+
+Section: Basic integration
+
+CPCtelera offers trasnparent basic integration with Visual Studio Code. All examples and projects that your create using *cpct_mkproject* command line tool will have *.vscode/* subfolder included, with a *tasks.json* predefined file. This file will let you compile your code just by pressing [Ctrl]+[Shift]+[B] and it will parse all errors and warnings so that you can find them in the Problems tab, and navigate them with direct clics.
+
+In order to use this integration you have to do nothing special. Just open your <Visual Studio Code IDE at https://code.visualstudio.com/> and open your CPCtelera project folder inside it. On *Nix systems you may easily do it from the command line just by writting
+  > code myproject/
+
+Beyond that, the file also defines tasks for cleaning previously compiled objects (tasks *clean* and *cleanall*) and a task for launching WinAPE and automatically execute your game (task *run*). You can easily run this tasks by launching command palette ([Ctrl]+[Shift]+[P]) and typing in there "task clean", "task cleanall" or "task run" (Beware: these commands must not be preceded by the search symbol ">").
+
+You may also modify this file to suit your needs.
+
+Section: Using Keyboard Shortcuts
+
+Most of the time, you will prefer using keyboard shortcuts for usual tasks like *clean* or *run* instead of commands. If this is your case, you need to define new keyboard shortcuts in your environment in order to run these tasks. Just follow these simple steps if this is your case,
+
+  1. - Launch command palette ([Ctrl]+[Shift]+[P])
+  2. - Look for "Open Keyboard Shortcuts File"
+  3. - Edit the file keybindings.json (the user-specific one) and add these lines
+
+  > [
+  >    {
+  >       "key": "ctrl+shift+r",
+  >       "command": "workbench.action.tasks.runTask",
+  >       "args": "run"
+  >    }
+  > ,  {
+  >       "key": "ctrl+shift+c",
+  >       "command": "workbench.action.tasks.runTask",
+  >       "args": "clean"
+  >    }
+  > ,  {
+  >       "key": "ctrl+shift+alt+c",
+  >       "command": "workbench.action.tasks.runTask",
+  >       "args": "cleanall"
+  >    }
+  > ]
+
+These will give you three shortcuts for these basic tasks,
+
+  * [Ctrl]+[Shift]+[R]: Run your game in WinAPE
+  * [Ctrl]+[Shift]+[C]: Clean your previously compiled objects
+  * [Ctrl]+[Shift]+[Alt]+[C]: Clean your previously compiled objects and your previously generated game and content. It cleans all generated stuff.
+
+The file is quite self-explanatory, so that it will be really easy for you to add new shortcuts for your specific needs.
+
+Section: Getting the most of intellisense
+
+<Visual Studio Code at https://code.visualstudio.com/> has great and fast intellisense plugins that you probably will want to use. And you will also probably want intellisense to autocomplete CPCtelera function, macro and variable names. For that to work with CPCtelera, just follow these steps,
+
+  1. - Create the file *.vscode/c_cpp_properties.json* inside your CPCtelera project folder.
+  2. - Add these lines to the file
+
+  > {
+  >     "configurations": [
+  >         {
+  >             "name": "Mac",
+  >             "includePath": [
+  >                 "${workspaceRoot}",
+  >                 "/usr/include",
+  >                 "/usr/local/include"
+  >                 "/INSERT/YOUR/PATH/TO/cpctelera/cpctelera/src"
+  >             ],
+  >             "defines": [],
+  >             "browse": {
+  >                 "path": [
+  >                     "/usr/include",
+  >                     "/usr/local/include"
+  >                     "/INSERT/YOUR/PATH/TO/cpctelera/cpctelera/src"
+  >                 ],
+  >                 "limitSymbolsToIncludedHeaders": true,
+  >                 "databaseFilename": ""
+  >             },
+  >             "intelliSenseMode": "clang-x64"
+  >         },
+  >         {
+  >             "name": "Linux",
+  >             "includePath": [
+  >                 "${workspaceRoot}",
+  >                 "/usr/include/c++/7.1.1",
+  >                 "/usr/include/c++/7.1.1/x86_64-pc-linux-gnu",
+  >                 "/usr/local/include",
+  >                 "/usr/lib/clang/4.0.0/include",
+  >                 "/usr/include",
+  >                 "/INSERT/YOUR/PATH/TO/cpctelera/cpctelera/src"
+  >             ],
+  >             "defines": [],
+  >             "browse": {
+  >                 "path": [
+  >                     "/INSERT/YOUR/PATH/TO/cpctelera/cpctelera/src",
+  >                     "/usr/include/c++/7.1.1",
+  >                     "/usr/include/c++/7.1.1/x86_64-pc-linux-gnu",
+  >                     "/usr/local/include",
+  >                     "/usr/lib/clang/4.0.0/include",
+  >                     "/usr/include"
+  >                 ],
+  >                 "limitSymbolsToIncludedHeaders": true,
+  >                 "databaseFilename": ""
+  >             },
+  >             "intelliSenseMode": "clang-x64"
+  >         },
+  >         {
+  >             "name": "Win32",
+  >             "includePath": [
+  >                 "${workspaceRoot}",
+  >                 "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include"
+  >             ],
+  >             "defines": [
+  >                 "_DEBUG",
+  >                 "UNICODE"
+  >             ],
+  >             "browse": {
+  >                 "path": [
+  >                     "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*"
+  >                 ],
+  >                 "limitSymbolsToIncludedHeaders": true,
+  >                 "databaseFilename": ""
+  >             },
+  >             "intelliSenseMode": "msvc-x64"
+  >         }
+  >     ]
+  > }
+
+  3. - Change the two lines labelled "/INSERT/YOUR/PATH/TO/cpctelera/cpctelera/src" to reflect the actual full path in your system. If you are on Mac OSX, change the two under the configuration "name": "Mac", otherwise change the two under configuration "name": "Linux" (On Windows you will be using either Cygwin or the native ubuntu/bash integration of Windows 10).
+
+And that's it. With that, intellisense will help you autocomplete CPCtelera names of functions, macros and variables, hopefully making your life easier.

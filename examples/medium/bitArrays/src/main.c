@@ -3,16 +3,16 @@
 //  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 #include <cpctelera.h>
@@ -62,7 +62,7 @@ void printArray(u8* pvideomem, void *array, u8 nItems, TFunc thefunction) {
 
       // Draw the character and point to the next byte in memory (next location
       // to draw a character, as 1 byte = 8 pixels in mode 2)
-      cpct_drawCharM2(pvideomem, 1, c);
+      cpct_drawCharM2(pvideomem, c);
       pvideomem++;
     }
 }
@@ -72,9 +72,9 @@ void printArray(u8* pvideomem, void *array, u8 nItems, TFunc thefunction) {
 //
 void main (void) {
   u8 i, j;       // Counters for loops
-  u8 array1[10]; // Array of 10 bytes, 80 bits, to be used bit by bit
-  u8 array2[20]; // Array of 20 bytes, 160 bits, 80 groups of 2 bits.
-  u8 array4[40]; // Array of 40 bytes, 320 bits, 80 groups of 4 bits.
+  CPCT_1BITARRAY(array1, 80); // Array of 80 1-bit elements (10 bytes)
+  CPCT_2BITARRAY(array2, 80); // Array of 80 2-bit elements (20 bytes)
+  CPCT_4BITARRAY(array4, 80); // Array of 80 4-bit elements (40 bytes)
 
   // Disable firmware to prevent it from restoring video mode or
   // interfering with our drawChar functions
@@ -82,6 +82,7 @@ void main (void) {
 
   // Set mode 2 for visual clarity on arrays printed
   cpct_setVideoMode(2);
+  cpct_setDrawCharM2(1, 0); // Draw characters in Foreground colour
 
   // 
   // Main Loop: loop forever showing arrays
@@ -98,13 +99,13 @@ void main (void) {
     //
     for (i = 0; i < 80; ++i) {
       // Set Bit i to 1
-      cpct_setBit(array1, i, 1);
+      cpct_setBit(array1, 1, i);
 
       // Print the complete array at the top of the screen
-      printArray((u8*)0xC000, array1, 80, f_getbit); 
+      printArray(CPCT_VMEM_START, array1, 80, f_getbit); 
       
       // Reset again the bit to 0 an iterate
-      cpct_setBit(array1, i, 0);
+      cpct_setBit(array1, 0, i);
     }
 
     //
@@ -114,13 +115,13 @@ void main (void) {
     for (j = 3; j > 0; --j) { 
       for (i = 0; i < 80; ++i) {
         // Set the index i to the value j (1 to 3)
-        cpct_set2Bits(array2, i, j);
+        cpct_set2Bits(array2, j, i);
 
         // Print the complete array
         printArray((u8*)0xC0A0, array2, 80, f_get2bits);
 
         // Reset the value of the item to 0 again
-        cpct_set2Bits(array2, i, 0);
+        cpct_set2Bits(array2, 0, i);
       }
     }
 
@@ -135,7 +136,7 @@ void main (void) {
         u8 value = (i + j) & 0x0F;
 
         // Set next 4-bits element (i) to the calculated value and print the array
-        cpct_set4Bits(array4, i, value);
+        cpct_set4Bits(array4, value, i);
         printArray((u8*)0xC140, array4, 80, f_get4bits);
       }
     }
@@ -145,10 +146,10 @@ void main (void) {
     //
     for (i = 0; i < 80; ++i) {
       // Set next bit i to 1  
-      cpct_setBit(array1, i, 1);
+      cpct_setBit(array1, 1, i);
 
       // Print the complete array1 again
-      printArray((u8*)0xC000, array1, 80, f_getbit); 
+      printArray(CPCT_VMEM_START, array1, 80, f_getbit); 
     }
 
     //
@@ -157,7 +158,7 @@ void main (void) {
     for (j = 3; j > 0; --j) { 
       for (i = 0; i < 80; ++i) {
         // Set next bit i to j (3, 2, 1)  
-        cpct_set2Bits(array2, i, j);
+        cpct_set2Bits(array2, j, i);
 
         // Print the complete array again
         printArray((u8*)0xC0A0, array2, 80, f_get2bits); 

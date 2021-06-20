@@ -53,7 +53,7 @@ public:
     }
     if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif)) {
       FIBITMAP *dib = FreeImage_Load(fif, lpszFileName, 0);
-      result = FreeImage_ConvertTo24Bits(dib);
+      result = FreeImage_ConvertTo32Bits(dib);
       FreeImage_Unload(dib);
     }
     return result;

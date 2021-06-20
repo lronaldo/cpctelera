@@ -4,16 +4,16 @@
 //  Created in collaboration with Roald Strauss (aka mr_lou / CPCWiki)
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Lesser General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 
@@ -25,7 +25,6 @@
 //  * Size in bytes of a complete screen video pixel line
 //  * Offset from the start of a pixel line to the start of the next (inside same group of 8 pixel lines)
 //  * Screen character line to be used for scrolling (0-24)
-#define SCR_MEMORY_START  (u8*)0xC000
 #define PIXEL_LINE_SIZE   0x0050
 #define PIXEL_LINE_OFFSET 0x0800
 #define CHARLINE          12
@@ -60,7 +59,7 @@ void scrollLine(u8* pCharline, u16 lineSize) {
    // Scroll 8 pixel lines. This loop is executed 8 times: when pCharline is incremented
    // the 9th time, it will overflow (will be greater than 0xFFFF, cycling through 0x0000)
    // and will be lower than 0xC000.
-   for (; pCharline > SCR_MEMORY_START; pCharline += PIXEL_LINE_OFFSET)
+   for (; pCharline > CPCT_VMEM_START; pCharline += PIXEL_LINE_OFFSET)
       cpct_memcpy(pCharline, pCharline+1, lineSize);
 }
 
@@ -76,7 +75,7 @@ void main(void) {
    // (8 pixel lines) to be scrolled. First 25 pixel lines of screen
    // video memory are the 25 pixel 0 lines of each screen character line
    // (group of 8 pixel lines), hence this calculation.
-   u8* pCharline_start = SCR_MEMORY_START + (PIXEL_LINE_SIZE * CHARLINE);
+   u8* pCharline_start = CPCT_VMEM_START + (PIXEL_LINE_SIZE * CHARLINE);
 
    // Pointer to the first byte of the last screen character of the
    // character line (last 2 bytes of the 8 pixel lines)
@@ -87,7 +86,9 @@ void main(void) {
    u8 penColour=1;                 // Pen colour for the characters
 
    // Infinite scrolling loop
-   cpct_drawStringM1("Hold any key to pause scroll", SCR_MEMORY_START, 1, 3);
+   cpct_setDrawCharM1(1, 3);
+   cpct_drawStringM1("Hold any key to pause scroll", CPCT_VMEM_START);
+   cpct_setDrawCharM1(penColour, 0);
    while (1) {
       // When holding a key, wait for release (Loop scanning the keyboard
       // until no single key is pressed)
@@ -95,7 +96,7 @@ void main(void) {
 
       // Draw next character at the rightmost character location of the
       // character line being scrolled
-      cpct_drawCharM1_f(pNextCharLocation, penColour, 0, text[nextChar]);
+      cpct_drawCharM1(pNextCharLocation, text[nextChar]);
 
       // nextChar will hold the index of the next Character, returning to
       // the first one when there are no more characters left, and changing
@@ -103,11 +104,12 @@ void main(void) {
       if (++nextChar == textlen) {
          nextChar = 0;
          if (++penColour > 3) penColour = 1;
+         cpct_setDrawCharM1(penColour, 0);
       }
 
       // Scroll character line 2 times, as each scroll call will move
       // the pixels 1 byte = 4 pixels. So, 2 times = 8 pixels = 1 Character
-      // Sinchronyze with VSYNC previous to each call to make it smooth
+      // Synchronize with VSYNC previous to each call to make it smooth
       wait_n_VSYNCs(2);
       scrollLine(pCharline_start, PIXEL_LINE_SIZE);
       wait_n_VSYNCs(2);

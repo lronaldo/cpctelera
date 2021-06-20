@@ -9,6 +9,13 @@ Section: Donnors
    25/06/2015 - Ervin Pajor
    13/07/2015 - Roald Strauss
    23/09/2015 - Arnaud Bouche
+   24/11/2015 - Toni Ramirez
+   21/04/2016 - Oscar Martínez Gómez
+   29/05/2016 - Oliver Lenz
+   13/01/2018 - Rafael Castillo García
+   31/03/2018 - Augusto Ruíz García
+   16/11/2018 - Carlos Pérez Peregrín
+   12/12/2019 - Carlos Pérez Peregrín
 
 Section: Project authors
    
@@ -18,25 +25,35 @@ Project owner:
    * <ronaldo at http://twitter.com/frangallegobr> / (<Cheesetea at http://www.cheesetea.com>, <Fremos at http://fremos.cheesetea.com>, <ByteRealms at http://www.byterealms.com>)
  
 Awesome collaborators:
-   * <Dardalorth at http://lalunadedardalorth.blogspot.com.es/> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
-   * SunWay / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>   
-   * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
-   * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
-   * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
+   * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+   * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
+   * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
+   * <Diego Freniche at http://blog.freniche.com> (<@dfreniche at https://twitter.com/dfreniche>)
+   * <Emilio Molina at http://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://carlio.es>
+   * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
+   * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
+   * <Syx at http://www.cpcwiki.eu/forum/profile/?u=324>
  
 Bitarrays idea and original implementation:
-   * Alberto García García (Blitzman, albertgg93@gmail.com, <@algertgarcia93 at http://twitter.com/algertgarcia93>)
+   * Alberto García García (Blitzman, albertgg93@gmail.com, <@albertgarcia93 at http://twitter.com/albertgarcia93>)
    * Pablo Martínez González (pablo2093@gmail.com, <@pablo_2093 at http://twitter.com/pablo_2093>)
  
 Some original code and ideas for sprite drawing and firmware enabling/disabling:
    * Raúl Simarro (Artaburu / ESP Soft)
  
-Some makefile code and ideas:
-   * <Cpcitor at http://github.com/cpcitor>
+Some makefile code, reviews and many great ideas:
+   * Stéphane Gourichon <cpcitor at http://github.com/cpcitor>
  
 Arkos player original code:
    * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos>
+
+Compression and decompression tools and functions:
+   * ZX7  - <Einar Saukas at https://www.ime.usp.br/~einar/>
+   * ZX7B - <Antonio Villena at https://github.com/antoniovillena>
+
+Random number generation:
+   * George Marsaglia
 
 (see logos_composite_long.png)
 
@@ -69,38 +86,94 @@ Section: 3rdparty software authors
  <Hex2bin at http://sourceforge.net/projects/hex2bin/>:
    * <Jaques Pelletier at https://www.linkedin.com/pub/jacques-pelletier/a/668/309>
  
+ CPC2CDT:
+   * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
+
  <2CDT at http://www.cpcwiki.eu/forum/applications/2cdt/>:
    * <Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
  
  <Retro Game Asset Studio (RGAS) at http://www.cpcwiki.eu/index.php/Retro_Game_Asset_Studio>:
    * <Lachlan Keown at http://www.twitter.com/lachlankeown> (lachlankeown@gmail.com)
 
- <Img2CPC at http://www.cpcwiki.eu/index.php/Img2CPC>: 
+ <Img2CPC at https://github.com/AugustoRuiz/Img2CPC>, <DSKGen at https://github.com/AugustoRuiz/dskgen>: 
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> (augusto.ruiz@gmail.com)
 
  <libfreeimage at http://freeimage.sourceforge.net/>:
    * <Hervé Drolon at mailto:drolon@infonie.fr>
-   * <Floris van den Berg at flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
+   * <Floris van den Berg at mailto:flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
 
-Section: Testers & Bug Reporters
+ <WinApe emulator at http://winape.net>: 
+   * <Richard Wilson at mailto:rich@bitwise-systems.com>
 
- * <Martin C. Doege at https://github.com/mdoege> 
+ <RetroVirtualMachine emulator at http://www.retrovirtualmachine.org/es/>: 
+    * <Juan Carlos Gonzalez Amestoi at https://twitter.com/retrovm>
+
+Section: Code & fixes contributors
+
+   * <Alex Macia Fiteni at https://github.com/AlexMaciaFiteni>
+   * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
+   * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+   * <Carlos Garrido Marín at https://github.com/cgm164>
+   * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
+   * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
+   * Jose Manuel Ladrón de Guevara García (<@jmlg97 / Github at https://github.com/jmlg97>)
+   * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+   * <Nestornillo at https://github.com/nestornillo>
+   * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
+   * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
+   * <Federico J. Álvarez at https://twitter.com/falvarez>
+
+Section: Testers & Bug Reporters 
+
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>)
- * <Ervin / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=82> 
+ * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
  * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
- * <gryken2014 at https://github.com/gryken2014>
+ * <gryken2014 at https://github.com/gryken2014> / <Github at https://github.com>
  * Roald Strauss (<mr_lou / CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=96>)
- * Toni Ramírez
- * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / CPCWiki
- * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / CPCWiki
+ * Toni Ramírez (<@amstradgamer at http://twitter.com/amstradgamer)
+ * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+ * <EgoTrip at http://www.cpcwiki.eu/forum/profile/?u=337> / <CPCWiki at http://www.cpcwiki.eu>
+ * Carlos (<@neophox at http://twitter.com/neophox>)
+ * <gryken2014 at https://github.com/gryken2014> / <Github at https://github.com>
+ * <Tim Riemann / Octoate at http://www.octoate.de>
+ * <Martin C. Doege at https://github.com/mdoege>
+ * <Trewdbal at https://github.com/Trewdbal> / <Github at https://github.com> 
+ * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
+ * <Paulo Garcia at https://github.com/pedgarcia> / <VintageIsTheNewOld at https://www.vintageisthenewold.com/>
+ * <Alexis Roda at https://github.com/patxoca> / <Github at https://github.com> 
+ * <rgiot https://github.com/rgiot> / <Github at https://github.com>
+ * <David Asta at mailto:davidasta@gmail.com>
+ * Álvaro Amador Ruiz (@SararyCow at http://twitter.com/SararyCow)
+ * <John Lobo at https://github.com/johnlobo> / <Github at https://github.com> 
+ * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
+ * Iván Fernández Álvarez (<SpDizzy at http://twitter.com/dizzy_sp>)
+ * Carlos Pérez Peregrín (<cperezprg at https://www.youtube.com/user/cperezprg/> / <cperezgrin at https://www.readyandplay.com/author/cperezgrin/>)
+ * Cayetano Manchón Pernis (<cmp102 at https://github.com/cmp102>)
+ * <juritobi at https://github.com/juritobi>
+ * Tamara Torrecillas (<tamaraatm at https://github.com/tamaraatm>)
+ * <MoteroV4 / Amstrad.es at https://www.amstrad.es/forum/memberlist.php?mode=viewprofile&u=4383> (aka <@enrib4 / github at https://github.com/enrib4>
 
+Section: Assets 
+
+ * SpritesEMR, Persea, Fremos Logo, Frame Tile Sprite, Death with an oil lamp, Background and others by Emilio Molina Reig (<Dardalorth at https://twitter.com/EmilioMolinaR> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
+ * GNG Like tiles by <José Manuel Íñiguez at https://twitter.com/akaoni_jose> / <Akaoni Studio at http://www.akaonistudio.com/>
+ * Court, Building, Frames and tilesets for software Scroll example by <Miguel Sánchez aka PixelArtM at https://twitter.com/PixelArtM>
+ * Goku, No13, Vegeta by <SunWay at mailto:oferrer@carlio.es> / <Fremos at http://fremos.cheesetea.com> / <Carlio at http://www.carlio.es>)
+ * <Hand Painted Texture at http://opengameart.org/content/hand-painted-texture-sandstone> by <The Chayed - KIIRA at http://opengameart.org/users/the-chayed-kiira>
+ * <The Knight - Free Sprite at http://opengameart.org/content/the-knight-free-sprite> by <pzUH at http://opengameart.org/users/pzuh>
+ * <Mini Knight Expansion 1 at http://opengameart.org/content/mini-knight-expansion-1-0> by <Master484 at http://opengameart.org/users/master484>
+ * <Animated Runner Character at http://opengameart.org/content/animated-runner-character> by <irmirx at https://www.behance.net/irmirx>
+ * <SCI-FI Background at http://opengameart.org/content/sci-fi-background> by <hassekf at http://opengameart.org/users/hassekf>
+ * <Pixel Art Dungeon Items at http://opengameart.org/content/pixel-art-dungeon-items> by <SpinachChicken at http://opengameart.org/users/spinachchicken>
+ * <Little Candele Monsters at http://opengameart.org/content/little-candle-monsters> by <C-TOY at http://c-toy.blogspot.com.es>
+ 
 Section: Special Thanks
 
    Developers, collaborators and others that helped a great deal
 
  * <Lachlan Keown at http://www.twitter.com/lachlankeown> (For being incredibly kind and helpful, and adding every required modification to better integrate RGAS with *CPCtelera*)
  * <Tim Riemann / Octoate at http://www.octoate.de> (For supporting CPCtelera and spreading news amount the community with a big smile)
- * <Cpcitor at http://github.com/cpcitor> (for his great help and advice, and for developing <cpc-dev-tool-chain at http://github.com/cpcitor/cpc-dev-tool-chain>)
+ * <Stéphane Gourichon / cpcitor at http://github.com/cpcitor> (for his great help and advice, and for developing <cpc-dev-tool-chain at http://github.com/cpcitor/cpc-dev-tool-chain>)
  * <CPCWiki at http://cpcwiki.eu> & <Grimware at http://grimware.org/> (for providing great technical documentations and examples)
  * Raúl Simarro (for developing <CPCRSLib at http://sourceforge.net/projects/cpcrslib/> game creation library)
  * <Targhan at http://www.julien-nevo.com/> / <Arkos at http://www.cpcwiki.eu/index.php/Arkos> (for developing Arkos Traker&Player and giving great support on adding it to *CPCtelera*. Also for giving general advice during development of *CPCtelera*)
@@ -108,5 +181,5 @@ Section: Special Thanks
  * Mochilote / <CPCMania at http://cpcmania.com> (for creating great tutorials and useful documentation in his site)
  * José Ángel Rodriguez (<@rvjose at http://twitter.com/rvjose>) (for early testing, bug reporting and giving great ideas)
  * <Prodatron at http://www.prodatron.net/> / Symbiosis for producting such a great deal of incredible software for the Amstrad CPC and for being always helpful and kind.
- * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs)
- 
+ * <Alcoholics Anonimous/CPCWiki at http://www.cpcwiki.eu/forum/profile/?u=1116> (For his great help and insights in fixing SDCC bugs, Z80 programming and random number generators)
+ * <Z88DK at http://www.z88dk.org/forum/> developers for sharing their really nice Z80 codebase.

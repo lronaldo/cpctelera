@@ -1,0 +1,8 @@
+bin/apktool/apktool_2.4.0.jar binary
+bin/sun/keytool.jar  binary
+bin/zipalign/win/32/libwinpthread-1.dll   binary
+bin/zipalign/win/32/zipalign.exe binary
+rvmengine/defaultRVMapp.apk binary
+rvmengine/android/res/drawable-xxxhdpi/splash.png  binary
+rvmengine/android/res/mipmap-xxxhdpi/ic_launcher.png  binary
+rvmengine/android/res/mipmap-xxxhdpi/ic_launcher_round.png  binary

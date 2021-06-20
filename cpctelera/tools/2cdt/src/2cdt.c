@@ -23,6 +23,7 @@ on the PC */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "defs.h"
 #include "tzxfile.h"
 #include "getopt.h"
@@ -185,7 +186,7 @@ unsigned int CRCupdate(unsigned int CRC, unsigned char new)
 
  for(i=0; i<8; i++)
    if (aux & 0x8000)
-       aux = (aux <<= 1) ^ kCRCpoly;
+       aux = (aux << 1) ^ kCRCpoly;
      else
        aux <<= 1;
 
@@ -895,7 +896,7 @@ int		main(int argc, char *argv[])
 
                 case 'r':
                 {
-                    pTapeFilename = optarg;
+                    pTapeFilename = (unsigned char*)optarg;
                 }
                 break;
 
@@ -997,15 +998,15 @@ int		main(int argc, char *argv[])
             exit(1);
         }
 
-        pSourceFilename = argv[optind];
-        pDestFilename = argv[optind+1];
+        pSourceFilename = (unsigned char*)argv[optind];
+        pDestFilename   = (unsigned char*)argv[optind+1];
 
 		/* create TZX file */
 		pTZXFile = TZX_CreateFile(TZX_VERSION_MAJOR,TZX_VERSION_MINOR);
 
 		if (pTZXFile!=NULL)
 		{
-			int nFile;
+			//int nFile;
 
 
 			if (BlankBeforeUse)
@@ -1037,12 +1038,12 @@ int		main(int argc, char *argv[])
 			}
 
 
-            if (Host_LoadFile(pSourceFilename, &pData, &DataLength))
+            if (Host_LoadFile( (char*)pSourceFilename, &pData, &DataLength))
             {
                 int FileOffset;
                 int FileLengthRemaining;
-                int TapeBlockSize;
-                BOOL FirstBlock,LastBlock;
+                int TapeBlockSize = 0;
+                BOOL FirstBlock,LastBlock = FALSE;
                 int BlockIndex;
                 unsigned short BlockLocation;
 
@@ -1134,7 +1135,7 @@ int		main(int argc, char *argv[])
                 if (pTapeFilename!=NULL)
                 {
                     int i;
-                    int nLength = strlen(pTapeFilename);
+                    int nLength = strlen( (char*)pTapeFilename);
                     if (nLength>16)
                         nLength = 16;
                     for (i=0; i<nLength; i++)

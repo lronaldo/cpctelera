@@ -3,16 +3,16 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_easytilemaps
@@ -26,16 +26,16 @@
 ;;
 ;; C Definition:
 ;;    void <cpct_etm_drawTileBox2x4> (<u8> *x*, <u8> *y*, <u8> *w*, <u8> *h*, <u8> *map_width*,
-;;                                    void* *pvideomem*, const void* *ptilemap*, ) __z88dk_callee;
+;;                                    void* *pvideomem*, const void* *ptilemap* ) __z88dk_callee;
 ;;
 ;; Input Parameters (9 bytes):
-;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
 ;;    (1B  C) x         - x tile-coordinate of the starting tile inside the tilemap
 ;;    (1B  B) y         - y tile-coordinate of the starting tile inside the tilemap
-;;    (1B  L) w         - width in tiles of the tile-box to be redrawn
-;;    (1B  H) h         - height in tiles of the tile-box to be redrawn
+;;    (1B  E) w         - width in tiles of the tile-box to be redrawn
+;;    (1B  D) h         - height in tiles of the tile-box to be redrawn
+;;    (1B  A) map_width - Width in tiles of a complete row of the tilemap
 ;;    * Always received on the stack
-;;    (2B) pvideomem    - Pointer to the place on video memory (or backbuffer) where to draw the tilebox
+;;    (2B) pvideomem    - Pointer to upper left corner of the *tilemap* in video memory.
 ;;    (2B) ptilemap     - Pointer to the start of the tilemap
 ;;
 ;; Assembly call (Input parameters on registers):
@@ -53,8 +53,8 @@
 ;;    ld    a, #map_width  ;; A = map_width
 ;;    ld    b, #y          ;; B = x tile-coordinate
 ;;    ld    c, #x          ;; C = y tile-coordinate
-;;    ld    h, #h          ;; H = height in tiles of the tile-box
-;;    ld    l, #w          ;; L =  width in tiles of the tile-box
+;;    ld    d, #h          ;; H = height in tiles of the tile-box
+;;    ld    e, #w          ;; L =  width in tiles of the tile-box
 ;;    call  cpct_etm_drawTileBox2x4_asm ;; Call the function
 ;; (end code)
 ;;
@@ -81,6 +81,9 @@
 ;; kind of data, the result is undefined (most likely a crash or rubbish on the screen).
 ;;
 ;; Known limitations:
+;;     * This function cannot be called using tail-recursion optimization. It *must*
+;; be called using a CALL instruction. If you call it using JP, parameters passed on
+;; the stack will be used as return address making your program execute arbitrary code.
 ;;     * This function does not do any kind of checking over the tilemap, its
 ;; contents or size. If you give a wrong pointer, your tilemap has different
 ;; dimensions than required or has less / more tiles than will be used later,
@@ -128,7 +131,7 @@
 ;;
 ;; Required memory:
 ;;      C-bindings - 143 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
-;;    ASM-bindings - 139 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
+;;    ASM-bindings - 140 bytes (Plus <cpct_etm_drawTileRow2x4> & <cpct_drawTileAligned2x4_f>)
 ;;
 ;; Time Measures:
 ;; (start code)
@@ -136,7 +139,7 @@
 ;; --------------------------------------------------------------------------------------------
 ;;    Any      | 98 + PX + MY + 7PPY + (37 + 103W)H | 392 + 4PX + 4MY + 28PPY + (148 + 412W)H |
 ;; --------------------------------------------------------------------------------------------
-;;  ASM-Saving |            - 11                    |               - 44                      |
+;;  ASM-Saving |            - 10                    |               - 40                      |
 ;; --------------------------------------------------------------------------------------------
 ;;  W=2, H=3   |         [ 845 - 937 ]              |           [ 3380 - 3748 ]               |
 ;; --------------------------------------------------------------------------------------------

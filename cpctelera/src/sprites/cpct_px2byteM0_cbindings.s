@@ -3,141 +3,29 @@
 ;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
+;;  it under the terms of the GNU Lesser General Public License as published by
 ;;  the Free Software Foundation, either version 3 of the License, or
 ;;  (at your option) any later version.
 ;;
 ;;  This program is distributed in the hope that it will be useful,
 ;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;  GNU General Public License for more details.
+;;  GNU Lesser General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
+;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Function: cpct_px2byteM0
 ;;
-;;    Transforms 2 pixel colour values [0-15] into a byte value in the video memory
-;; pixel format for Mode 0.
+;; C bindings for <cpct_px2byteM0>
 ;;
-;; C Definition:
-;;    <u8> <cpct_px2byteM0> (<u8> *px0*, <u8> *px1*);
+;;   9 us, 2 bytes
 ;;
-;; Input Parameters (2 Bytes):
-;;    (1B H) px0 - Firmware colour value for left  pixel (pixel 0) [0-15]
-;;    (1B L) px1 - Firmware colour value for right pixel (pixel 1) [0-15]
-;;
-;; Returns:
-;;    u8 - byte with *px0* and *px1* colour information in screen pixel format.
-;;
-;; Assembly call:
-;;    > call cpct_px2byteM0_asm
-;;
-;; Parameter Restrictions:
-;;    * *px0* and *px1* must be firmware colour values in the range [0-15]. If
-;; any of them is greater than 15, unexpected colours may appear on screen. *px0*
-;; and *px1* are used as indexes in a colour conversion table, and values greater
-;; than 15 would point outside the table, getting random memory values, which will
-;; lead to random colours on screen.
-;;
-;; Details:
-;;    Converts 2 firmware colour values for 2 consecutive pixels into a byte value
-;; in the video memory pixel format for Mode 0. This video memory pixel format 
-;; is the way pixel colour values are encoded in video memory. Concretely, in 
-;; Mode 0, each byte contains 2 consecutive pixels formatted as follows:
-;; (start code)
-;;  ______________________________________________________________________
-;;                        <---- 1  byte ---->
-;;  Screen         => [...[pixelX ][ pixelY ]...] (2 pixels, consecutive)
-;;  ======================================================================
-;;  Video Memory   => [...[ X Y X Y X Y X Y ]...] (1  byte, 8 bits)
-;;  Pixel X (3210) => [...[ 0 · 2 · 1 · 3 · ]...] (4  bits)
-;;  Pixel Y (dcba) => [...[ · a · c · b · d ]...] (4  bits)
-;;  ----------------------------------------------------------------------
-;;        Scheme 1. Screen pixel format and video memory
-;; (end)
-;;   
-;;    This function uses a 16-byte conversion table to get screen formatted values
-;; for each one of the two pixels given. These formatted values are then OR'ed to 
-;; get the final byte that you may use to draw on screen.
-;;
-;; Destroyed Register values:
-;;    AF, BC, DE, HL
-;;
-;; Required memory:
-;;    C-bindings  - 47 bytes (31 bytes code, 16 bytes colour conversion table)
-;;   ASM-bindings - 42 bytes (26 bytes code, 16 bytes colour conversion table)
-;;
-;;   Note - Colour conversion table is shared with <cpct_drawCharM0>. If you use both
-;; functions, only one copy of the colour table is loaded into memory.
-;;
-;; Time Measures:
-;; (start code)
-;; Case       | microSecs (us) |  CPU Cycles
-;; ------------------------------------------
-;; Any        |      40        |     160
-;; ------------------------------------------
-;; ASM-saving |     -11        |     -44
-;; ------------------------------------------
-;; (end code)
-;;    NC=Number of colours to convert
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Pixel colour table defined in cpct_drawCharM0
-.globl dc_mode0_ct
-
-;;
-;; Macro that computes A = *(DE + A)
-;;  to access vales stored in tables pointed by DE
-;;
-.macro A_eq__DEplusA__
-   ;; Compute DE += A
-   add   e               ;; [1] | E += A
-   ld    e, a            ;; [1] |
-   sub   a               ;; [1] A = 0 (preserving Carry Flag)
-   adc   d               ;; [1] | D += Carry
-   ld    d, a            ;; [1] |
-
-   ;; A = *(DE + A)
-   ld    a, (de)         ;; [2] A = Value stored at the table pointed by DE 
-.endm
-
-
 _cpct_px2byteM0::
-   ;; Point HL to the start of the first parameter in the stack
-   ld  hl, #2            ;; [3] HL Points to SP+2 (first 2 bytes are return address)
-   add hl, sp            ;; [3]    , to use it for getting parameters from stack
-
-   ;;
-   ;; Transform pixel 0 into Screen Pixel Format
-   ;;
-   ld   de, #dc_mode0_ct ;; [3] DE points to the start of the colour table
-   ld    a, (hl)         ;; [2] A = Firmware colour for pixel 0 (to be added to DE, 
-                         ;; .... as it is the index of the colour value to retrieve)
-
-   ;; Get screen format bit values for Pixel 0
-   A_eq__DEplusA__       ;; [7] A = *(DE + A)
-
-   sla   a               ;; [2] A <<= 1, as Screen formats in table are in Pixel Y disposition 
-                         ;; .... (see Scheme 1 in this function's documentation)
-   ld    b, a            ;; [1] B = Transformed value for pixel 0
-
-   ;;
-   ;; Transform pixel 1 into Screen Pixel Format
-   ;;
-   ld   de, #dc_mode0_ct ;; [3] DE points to the start of the colour table
-   inc  hl               ;; [2] HL points to next parameter (Pixel 1)
-   ld    a, (hl)         ;; [2] A = Firmware colour for pixel 1 (to be added to DE, 
-                         ;; .... as it is the index of the colour value to retrieve)
-
-   ;; Get screen format bit values for Pixel 1
-   A_eq__DEplusA__       ;; [7] A = *(DE + A)
-
-   ;; Merge both values and return result
-   or    b               ;; [1] A = Merged value of transformed pixel values (px1 | px2)
-   ld    l, a            ;; [1] L = A, put return value into L
-
-   ret                   ;; [3] return
+   ;; Recover parameters from the stack
+   pop hl           ;; [3] HL = Return Address
+   ex (sp), hl      ;; [6] HL => L = Pixel, H = Pixel 1, 1st and 2nd 8-bit parameter
+                    ;; ... also putting again Return Address where SP is located now
+                    ;; ... as this function is using __z88dk_callee convention
+.include /cpct_px2byteM0.asm/

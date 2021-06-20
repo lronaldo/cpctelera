@@ -1,19 +1,19 @@
 #!/bin/bash
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2015-2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
+##  it under the terms of the GNU Lesser General Public License as published by
 ##  the Free Software Foundation, either version 3 of the License, or
 ##  (at your option) any later version.
 ##
 ##  This program is distributed in the hope that it will be useful,
 ##  but WITHOUT ANY WARRANTY; without even the implied warranty of
 ##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
+##  GNU Lesser General Public License for more details.
 ##
-##  You should have received a copy of the GNU General Public License
+##  You should have received a copy of the GNU Lesser General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##------------------------------------------------------------------------------
 
@@ -39,12 +39,15 @@
 ## required by your project.
 ##
 ## Command line options:
-##    -n | --project-name [projname] - Lets you name your project in a different
-## way than the project folder.
+##    -a | --asm                     - Generates an assembler-based project
+##    -c | --cpcrslib                - Generates a CPCRSLib enabled project
+##    -h | --help                    - Shows help information on the terminal.
 ##    -l | --load-address [loadaddr] - Lets you establish the memory address where
 ## the binary of your project should be loaded into CPC memory. Default value is 0x4000.
 ## You always can change this value by editing cfg/build_config.mk
-##    -h | --help                      - Shows help information on the terminal.
+##    -n | --project-name [projname] - Lets you name your project in a different
+## way than the project folder.
+##    -s | --no-vs-code              - Prevents creation of .vscode/ subfolder
 ##
 
 ## Bash Include files
@@ -54,15 +57,31 @@ source $(dirname $0)/lib/bash_library.sh
 PROJECTNAME=
 PROJECTDIR=
 LOADADDRESS=4000
+CPCRSLIB=false
+VSCODE=true
+ASMPROJ=false
+ANDROID=true
 
 ## Required template files
 getFullPath $0 SCRIPT_FULL_PATH
-TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates
+TEMPLATE_DIRECTORY=${SCRIPT_FULL_PATH}/templates/newprj
+TEMPLATE_EXPORT_DIRECTORY=${TEMPLATE_DIRECTORY}/cfg/export
+TEMPLATE_DIRECTORY_RSLIB=${SCRIPT_FULL_PATH}/templates
 CPCTELERA_DIRECTORY=$(dirname $(dirname "$SCRIPT_FULL_PATH"))
-SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/main.c
+SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/src/main.c
 MAKE_TEMPLATE=${TEMPLATE_DIRECTORY}/Makefile
-CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/build_config.mk
-ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE})
+IMGCON_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/image_conversion.mk
+TMXCON_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/tilemap_conversion.mk
+MUSCON_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/music_conversion.mk
+PACKIN_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/compression.mk
+CDTMAN_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/cdt_manager.mk
+CFG_TEMPLATE=${TEMPLATE_DIRECTORY}/cfg/build_config.mk
+ANDROID_EXPORT_TEMPLATE=${TEMPLATE_EXPORT_DIRECTORY}/android.mk
+VSCODE_TEMPLATE_DIR=${TEMPLATE_DIRECTORY}/vscode/
+ANDROID_FILES_DIR=${CPCTELERA_DIRECTORY}/tools/android/rvmengine/android
+ALL_TEMPLATE_FILES=(${SRC_TEMPLATE} ${MAKE_TEMPLATE} ${CFG_TEMPLATE} \
+                    ${IMGCON_TEMPLATE} ${TMXCON_TEMPLATE} ${MUSCON_TEMPLATE}\
+                    ${PACKIN_TEMPLATE} ${CDTMAN_TEMPLATE} ${ANDROID_EXPORT_TEMPLATE})
 
 ## Replacement tags
 TAG_PROJECTNAME="%%%PROJECT_NAME%%%"
@@ -70,7 +89,7 @@ TAG_LOADADDRESS="%%%CODE_LOAD_ADDRESS%%%"
 TAG_CPCTELERAPATH="%%%CPCTELERA_PATH%%%"
 
 ## Characters not valid for project name
-UNSUPPORTED_CHARACTERS='_|?*@.%;:<>,="()[]/\'
+UNSUPPORTED_CHARACTERS='_|?*@.%;:<>,=()[\]/\\'
 
 ## Show how this script is to be used and exit
 ##
@@ -84,16 +103,20 @@ inside <project_folder_name>. So, <project_folder_name> must not previously exis
 current folder."
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
-   echo "${COLOR_LIGHT_BLUE}  -n | --project-name  ${COLOR_LIGHT_CYAN}<name>"
-   echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder_name> name. <name> \
-must not contain spaces."
-   echo
+   echo "${COLOR_LIGHT_BLUE}  -a | --asm"
+   echo "${COLOR_CYAN}       Generates an assembler-based project."
+   echo "${COLOR_LIGHT_BLUE}  -c | --cpcrslib"
+   echo "${COLOR_CYAN}       Generates a CPCRSLib enabled project."
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
    echo "${COLOR_LIGHT_BLUE}  -l | --load-address ${COLOR_LIGHT_CYAN}<hexadecimal address>"
    echo "${COLOR_CYAN}       Establishes the hexadecimal address where the binary of the project will be loaded \
 inside Amstrad CPC's memory."
-   echo 
-   echo "${COLOR_LIGHT_BLUE}  -h | --help"
-   echo "${COLOR_CYAN}       Shows this help information"
+   echo "${COLOR_LIGHT_BLUE}  -n | --project-name  ${COLOR_LIGHT_CYAN}<name>"
+   echo "${COLOR_CYAN}       Gives a name to the project that is distinct from the <project_folder_name> name. <name> \
+must not contain spaces."
+   echo "${COLOR_LIGHT_BLUE}  -s | --no-vs-code"
+   echo "${COLOR_CYAN}       Prevents creation of .vscode/ subfolder."
    echo ${COLOR_NORMAL}
    exit 1
 }
@@ -119,15 +142,22 @@ fi
 
 while (( $# >= 1 )); do
    case $1 in
-      ## Get an specific project name
-      "-n" | "--project-name")
-         if isEmpty "$2"; then
-            paramError "'-n'/'--project-name' options require a valid project name afterwards." 2
-         elif isCommandLineOption "$2"; then
-            paramError "A valid one-word project name should follow '-n'/'--project-name'" 3
-         fi
-         PROJECTNAME="$2"
-         shift
+      ## Generate a CPCRSLib enabled project
+      "-a" | "--asm")
+         SRC_TEMPLATE=${TEMPLATE_DIRECTORY}/src/main.s
+         ASMPROJ=true
+         CPCRSLIB=false
+      ;;      
+      ## Generate a CPCRSLib enabled project
+      "-c" | "--cpcrslib")
+         CFG_TEMPLATE=${TEMPLATE_DIRECTORY_RSLIB}/cpcrslib/build_config.mk
+         SRC_TEMPLATE=${TEMPLATE_DIRECTORY_RSLIB}/cpcrslib/main.c
+         ASMPROJ=false
+         CPCRSLIB=true
+      ;;
+      ## Show Help
+      "-h" | "--help")
+         usage
       ;;
       ## Get Load Address
       "-l" | "--load-address")
@@ -139,9 +169,18 @@ while (( $# >= 1 )); do
          LOADADDRESS="$2"
          shift
       ;;
-      ## Show Help
-      "-h" | "--help")
-         usage
+      ## Get an specific project name
+      "-n" | "--project-name")
+         if isEmpty "$2"; then
+            paramError "'-n'/'--project-name' options require a valid project name afterwards." 2
+         elif isCommandLineOption "$2"; then
+            paramError "A valid one-word project name should follow '-n'/'--project-name'" 3
+         fi
+         PROJECTNAME="$2"
+         shift
+      ;;
+      "-s" | "--no-vs-code")
+         VSCODE=false
       ;;
       ## Get main parameter (ProjectDir)
       *)
@@ -164,6 +203,9 @@ done
 ###############################################################
 ## Some checks
 ##
+if isEmpty "$PROJECTDIR"; then
+   paramError "No name was given to create project main folder."
+fi
 if isEmpty "$PROJECTNAME"; then
    PROJECTNAME="$PROJECTDIR"
 fi
@@ -179,18 +221,40 @@ fi
 
 ## Objective directory structure
 SOURCE_DIR=${PROJECTDIR}/src
+DSKINC_DIR=${PROJECTDIR}/dsk
 CONFIG_DIR=${PROJECTDIR}/cfg
-NEW_MAIN=${SOURCE_DIR}/main.c
-NEW_BUILD=${CONFIG_DIR}/build_config.mk
-NEW_MAKE=${PROJECTDIR}/Makefile
+EXPORTER_DIR=${PROJECTDIR}/exp
+EXP_ANDROID_DIR=${EXPORTER_DIR}/android
+CONFIG_EXPORT_DIR=${PROJECTDIR}/cfg/export
+NEW_VSCODE=${PROJECTDIR}/.vscode
+NEW_MAIN=${SOURCE_DIR}/$(basename ${SRC_TEMPLATE})
+NEW_BUILD=${CONFIG_DIR}/$(basename ${CFG_TEMPLATE})
+NEW_IMGCON=${CONFIG_DIR}/$(basename ${IMGCON_TEMPLATE})
+NEW_TMXCON=${CONFIG_DIR}/$(basename ${TMXCON_TEMPLATE})
+NEW_MUSCON=${CONFIG_DIR}/$(basename ${MUSCON_TEMPLATE})
+NEW_PACKIN=${CONFIG_DIR}/$(basename ${PACKIN_TEMPLATE})
+NEW_CDTMAN=${CONFIG_DIR}/$(basename ${CDTMAN_TEMPLATE})
+NEW_EXPORT_ANDROID=${CONFIG_EXPORT_DIR}/$(basename ${ANDROID_EXPORT_TEMPLATE})
+NEW_MAKE=${PROJECTDIR}/$(basename ${MAKE_TEMPLATE})
 
 # Welcome message
 stageMessage "CPCtelera" "Creating new project in ${COLOR_WHITE}${PROJECTDIR}/"
+
+## ASM-project or CPCRSLib enabled
+if $ASMPROJ; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Setting up ${COLOR_WHITE}assembler-based${COLOR_CYAN} defaults..."
+   drawOK  
+elif $CPCRSLIB; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Enabling ${COLOR_WHITE}CPCRSLib${COLOR_CYAN} linking..."
+   drawOK
+fi
 
 ## Create directory structure
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Creating project folder structure..."
 mkdir -p ${SOURCE_DIR}
 mkdir -p ${CONFIG_DIR}
+mkdir -p ${DSKINC_DIR}
+mkdir -p ${CONFIG_EXPORT_DIR}
 drawOK
 
 ## Copy templates substituting tags
@@ -198,7 +262,28 @@ coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Copying files from project templates
 cp ${SRC_TEMPLATE} ${NEW_MAIN}
 cp ${CFG_TEMPLATE} ${NEW_BUILD}
 cp ${MAKE_TEMPLATE} ${NEW_MAKE}
+cp ${IMGCON_TEMPLATE} ${NEW_IMGCON}
+cp ${TMXCON_TEMPLATE} ${NEW_TMXCON}
+cp ${MUSCON_TEMPLATE} ${NEW_MUSCON}
+cp ${PACKIN_TEMPLATE} ${NEW_PACKIN}
+cp ${CDTMAN_TEMPLATE} ${NEW_CDTMAN}
+cp ${ANDROID_EXPORT_TEMPLATE} ${NEW_EXPORT_ANDROID}
 drawOK
+
+## Copy VSCode config directory template
+if $VSCODE; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Copying basic VS Code project configuration..."
+   cp -r ${VSCODE_TEMPLATE_DIR} ${NEW_VSCODE}
+   drawOK
+fi
+
+## Generate ANDROID exporter and files
+if $ANDROID; then
+   coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring Android APK exporter..."
+   mkdir -p ${EXP_ANDROID_DIR}
+   cp -r "${ANDROID_FILES_DIR}"/* "${EXP_ANDROID_DIR}"
+   drawOK
+fi
 
 # Configuring project values into CFG_TEMPLATE
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Configuring project name to: ${COLOR_WHITE}${PROJECTNAME}"
