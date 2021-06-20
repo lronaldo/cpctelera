@@ -152,6 +152,7 @@ Group: Macros  {
 
    File: allmacros.h  (macros/allmacros.h)
    File: allmacros.h.s  (macros/allmacros.h.s)
+   File: Combined operations  (macros/cpct_combinedOperations.h.s)
    File: Math Macros  (macros/cpct_maths.h.s)
    File: Opcodes  (macros/cpct_opcodeConstants.h.s)
    File: Push - Pop Macros  (macros/cpct_pushpop.h.s)
