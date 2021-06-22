@@ -53,7 +53,7 @@
 ;; (end)
 ;; So, checking the bit 0 of a byte comming from PPI Port B tells us if
 ;; VSYNC is active or not.
-;; This function is optimized for size (instead of space) as it is a wait loop
+;; This function is optimized for size (instead of speed) as it is a wait loop
 ;; and does not make sense making it faster. It will stop when VSYNC is detected
 ;; no matter how fast the loop is.
 ;;
@@ -69,7 +69,7 @@
 ;; ----------------------------------------
 ;; Best  |      12        |      48
 ;; ----------------------------------------
-;; Any   |    6 + 7*L     |   24 + 28*L
+;; Any   |    4 + 8*L     |   16 + 32*L
 ;; ----------------------------------------
 ;; (end code)
 ;;    L=Number of times loop is executed
