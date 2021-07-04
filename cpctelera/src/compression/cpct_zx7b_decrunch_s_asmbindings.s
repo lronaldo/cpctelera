@@ -21,7 +21,7 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; ASM bindings for <cpct_etm_redrawTileBox>
+;; ASM bindings for <cpct_zx7b_decrunch>
 ;;
 ;;   0 microSecs, 0 bytes
 ;;
