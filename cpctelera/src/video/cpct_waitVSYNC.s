@@ -38,7 +38,7 @@
 ;; 50Hz drawing display.
 ;; 
 ;; To detect VSYNC signal status, function reads bytes from PPI Port B. 
-;; Every byte read the port has this information:
+;; Every byte read from the port has this information:
 ;; (start code)
 ;; BIT  NAME     DESCRIPTION
 ;; ---------------------------------------------------------------- 
@@ -51,7 +51,7 @@
 ;; 1    LK1        Brand Names for details.
 ;; 0    CRTC     Vertical Sync ("1"=VSYNC active, "0"=inactive)
 ;; (end)
-;; So, checking the bit 0 of a byte comming from PPI Port B tells us if
+;; So, checking the bit 0 of a byte coming from PPI Port B tells us if
 ;; VSYNC is active or not.
 ;; This function is optimized for size (instead of speed) as it is a wait loop
 ;; and does not make sense making it faster. It will stop when VSYNC is detected
