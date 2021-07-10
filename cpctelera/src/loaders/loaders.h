@@ -24,5 +24,8 @@
 // Cassette loader in miniload format
 u8 cpct_miniload(void* mem_load, u16 size) __z88dk_callee;
 
+// Binary file loader using firmware
+extern u8 cpct_loadBinaryFile(void *loadAddr, const char* fileName) __z88dk_callee;
+
 #endif
 
