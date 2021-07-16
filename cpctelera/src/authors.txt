@@ -151,6 +151,7 @@ Section: Testers & Bug Reporters
  * Cayetano Manchón Pernis (<cmp102 at https://github.com/cmp102>)
  * <juritobi at https://github.com/juritobi>
  * Tamara Torrecillas (<tamaraatm at https://github.com/tamaraatm>)
+ * <MoteroV4 / Amstrad.es at https://www.amstrad.es/forum/memberlist.php?mode=viewprofile&u=4383> (aka <@enrib4 / github at https://github.com/enrib4>
 
 Section: Assets 
 

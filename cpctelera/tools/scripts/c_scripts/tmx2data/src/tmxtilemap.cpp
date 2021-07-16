@@ -209,6 +209,9 @@ CPCT_TMX_Tilemap::output_basic_HS(std::ostream& out) const {
    out << "\n;;   Visible layers: " << m_visibleLayers;
    out << "\n;;";
    if (m_visibleLayers == 1) {
+      if (m_asmGenerateGlobal) {
+         out << "\n.globl "; output_asmVar(out, m_cid); 
+      }
       out << '\n'; output_asmVar(out, m_cid); out << "_SIZE " << equal << " " << m_total_bytes;
    } else {
       out << '\n'; output_asmVar(out, m_cid); out << "_LAYERS     " << equal << " " << m_visibleLayers;
@@ -220,6 +223,9 @@ CPCT_TMX_Tilemap::output_basic_HS(std::ostream& out) const {
       out << "\n;; Offsets of the different layers with respect to the start of the data";
       for (const auto& l : m_map.getLayers()) {
          if ( l->getVisible() ) {
+            if (m_asmGenerateGlobal) {
+               out << "\n.globl "; output_asmVar(out, m_cid); out << "_l" << nvisl;
+            }
             out << '\n'; output_asmVar(out, m_cid); out << "_layer_" << nvisl << "_OFF " << equal << " " << nvisl * m_total_bytes;
             ++nvisl;
          }

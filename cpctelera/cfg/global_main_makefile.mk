@@ -30,7 +30,7 @@
 BINADDRLOG   := $(OBJDIR)/binaryAddresses.log
 PREBUILD_OBJ := $(OBJDIR)/prebuildstep.objectfile
 
-.PHONY: all clean cleanall
+.PHONY: all clean cleanall cleancode recode
 
 # OBJSUBDIR folder files
 OBJSUBDIRS_FOLDER_FILES := $(foreach F,$(OBJSUBDIRS),$(F)/.folder)
@@ -117,11 +117,27 @@ endef
 $(foreach D,$(OBJSUBDIRS_FOLDER_FILES),$(eval $(call MKSUBDIR,$(D))))
 
 
-# CLEANING TARGETS
+## CLEANING TARGETS
+#
+
+# Clean Everything, including target DSK, SNA and CDT
 cleanall: clean
 	@$(call PRINT,$(PROJNAME),"Deleting $(TARGET)")
 	$(RM) $(TARGET)
 
+# Clean only code-produced objects (not assets or generated files)
+cleancode:
+	@$(call PRINT,$(PROJNAME),"Deleting C-OBJ   Relfiles")
+	$(foreach file, $(C_OBJFILES), $(RM) ./$(file))
+	@$(call PRINT,$(PROJNAME),"Deleting ASM-OBJ Relfiles")
+	$(foreach file, $(ASM_OBJFILES), $(RM) ./$(file))
+	@$(call PRINT,$(PROJNAME),"Code cleaned")
+
+# Clean only code an remake the project
+recode: cleancode
+	$(MAKE) 
+
+# Clean all object files, but not targets (DSK, SNA, CDT)
 clean: 
 	@$(call PRINT,$(PROJNAME),"Deleting folder: $(OBJDIR)/")
 	$(RM) -r ./$(OBJDIR)

@@ -22,6 +22,6 @@
 ;;
 ;; ASM bindings for <cpct_fw2hw>
 ;;
-cpct_fw2hw_asm:             ;; Assembly entry point 
+cpct_fw2hw_asm::            ;; Assembly entry point 
 
 .include /cpct_fw2hw.asm/

@@ -112,7 +112,7 @@ cpct_disableLowerROM_asm::
 
 _cpct_enableUpperROM::
 cpct_enableUpperROM_asm::
-   ld   hl, #0xF7E6          ;; [3] HL = Machine Code. E6 F7 = OR #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
+   ld   hl, #0xF7E6          ;; [3] HL = Machine Code. E6 F7 = AND #0b11110111 = Reset Bit 4 (Enable Upper ROM, 0 = enabled)
    jr mrs_modifyROMstatus    ;; [3] Jump to ROM-Modification Code
 
 _cpct_disableUpperROM::
