@@ -21,7 +21,6 @@
 ;; Function: cpct_getScreenPtr
 ;;
 ;;    Returns a byte-pointer to a screen memory location, given its X, Y coordinates.
-;; (in *bytes*, NOT in pixels!)
 ;;
 ;; C Definition:
 ;;    <u8>* <cpct_getScreenPtr> (void* *screen_start*, <u8> *x*, <u8> *y*)
@@ -29,8 +28,8 @@
 ;; Input Parameters (4 Bytes):
 ;;    (2B DE) screen_start - Pointer to the start of the screen (or a backbuffer)
 ;;    (1B C ) x            - [0-79]  Byte-aligned column starting from 0 (x coordinate, 
-;;    (1B B ) y            - [0-199] row starting from 0 (y coordinate)
-;; *in bytes*)
+;;                           *in bytes*)
+;;    (1B B ) y            - [0-199] row starting from 0 (y coordinate, *in pixels*)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_getScreenPtr_asm
@@ -86,8 +85,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindints - 32 bytes
-;;  ASM-bindints - 28 bytes
+;;    C-bindings - 32 bytes
+;;  ASM-bindings - 28 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
