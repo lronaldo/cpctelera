@@ -85,68 +85,54 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 26 bytes
-;;  ASM-bindings - 22 bytes
+;;    C-bindings - 32 bytes
+;;  ASM-bindings - 28 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
 ;;     Case   | microSecs (us) | CPU Cycles
 ;; -----------------------------------------
-;;     Any    |      34        |     126
+;;     Any    |      53        |     212
 ;; -----------------------------------------
-;; Asm saving |     -13        |     -41
+;; Asm saving |     -13        |     -52
 ;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; input
-;;   reg B  := Y [0-199]
-;;   reg C  := X [0-79]
-;;   reg DE := screen_start [$0000-$FFFF] (&C000 typical)
-;;
-;; screen layout
-;;   lines := [0-24]
-;;   rows  := [0-7]
-;;
-;;   1 lines == 8 rows, so Y is %[L|L|L|L|L|R|R|R]
-;;       rows  := Y % 8
-;;       lines := Y / 8
-;;
-;; output
-;;   reg HL := byte pointer into screen memory
-;;
+   ;; Add up X coordinate to screen_memory, so that DE = (screen_start + x)
+   ;; (DE += C, as DE = screen_memory, and C = x coordinate) 
+   ld    a, e     ;; [1] / E = E + x   (As C = x)
+   add   c        ;; [1] |   ( If E + x > 0xFF, Carry is set. We must Add it to D )
+   ld    e, a     ;; [1] |
+   adc   d        ;; [1] | D = D + (C + A) + Carry   (E = C + A)
+   sub   e        ;; [1] | D = D + Carry
+   ld    d, a     ;; [1] |   (If E + x did set carry, this will do D += 1, else D += 0)
 
-    ;; Extract rows from Y coordinate
-    ld   a, b		;;[1B  4T  1u]; H = B & $07
-    and  %00000111	;;[2B  7T  2u]; |
-    ld   h, a		;;[1B  4T  1u]; | H := Y % 8 = rows
+   ;; Let y' = [ y / 8 ] = int(y / 8) (Integer division by 8)
+   ;; Calculate 80y' = (64 + 16)y' (0x50 * y')
+   ld    a, b     ;; [1] A = y coordinate (which is stored in b)
+   and   #0xF8    ;; [2] A = 8y'   ( and 0xF8 is the same as 8 * int(y / 8) = 8y' )
+   ld    l, a     ;; [1] | HL = 8y'  (H = 0, L = 8y')
+   ld    h, #0    ;; [2] |
+   ld    a, b     ;; [1] A = y coordinate (Save for later use, freeing BC)
+   add  hl, hl    ;; [3] HL = 8y' + 8y' = 16y'
+   ld    b, h     ;; [1] | BC = 16y'
+   ld    c, l     ;; [1] |
+   add  hl, hl    ;; [3] HL = 16y' + 16y' = 32y'
+   add  hl, hl    ;; [3] HL = 32y' + 32y' = 64y'
+   add  hl, bc    ;; [3] HL = 64y' + 16y' = 80y'
 
-    ;; Extract lines from Y coordinate
-    ld   a, b		;;[1B  4T  1u]; L = B & $F8
-    and  %11111000	;;[2B  7T  2u]; |
-    ld   l, a		;;[1B  4T  1u]; | L := 8 * int(Y/8) = 8 * lines
+   ;; Calculate 2048 * (y % 8)  (0x800 * (y % 8))
+   and   #0x07    ;; [2]  A = y % 8  (A had y coordinate)
+   rlca           ;; [1]  A = 2 (y % 8)
+   rlca           ;; [1]  A = 4 (y % 8)
+   rlca           ;; [1]  A = 8 (y % 8)
+   ;; Now [A 0x00] (Using a as HSB) would be 0x100 * A = 0x100 * 8 (y % 8 )
+   ;; So, we only have to add A to H in order to have HL += 0x100 * 8 (y % 8)
+   add   h        ;; [1]  | HL += 0x100 * 8 (y % 8)
+   ld    h, a     ;; [1]  |
 
-    ;; Calculate 8*(256*rows+10*lines) = 2048*rows+80*lines
-    srl  a		;;[2B  8T  2u]; A = L / 4
-    srl  a		;;[2B  8T  2u]; | A := 2 * lines
+   ;; Add up everything and return
+   add  hl, de    ;; [3] HL = 80 * [y / 8] + 2048 * (y % 8) + (screen_start + x)
 
-    add  a, l		;;[1B  4T  1u]; L = A + L
-    ld   l, a		;;[1B  4T  1u]; | L := (2+8) * lines = 10 * lines
-
-    add  hl, hl		;;[1B 11T  3u]; HL = HL * 8
-    add  hl, hl		;;[1B 11T  3u]; |
-    add  hl, hl		;;[1B 11T  3u]; | HL := 2048 * rows + 80 * lines
-
-    ;; Add X coordinate
-    ld   b, 0		;;[2B  7T  2u]; BC = X
-    add  hl, bc		;;[1B 11T  3u]; | HL := HL + X
-
-    ;; Add screen start address
-    add  hl, de		;;[1B 11T  3u]; HL := HL + screen_start
-
-    ;; Return
-    ret			;;[1B 10T  3u]
-
-;; Total: 22 Bytes, 126 CPU cycles, 34 us
-
+   ret            ;; [3] Return
