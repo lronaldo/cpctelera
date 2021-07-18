@@ -86,8 +86,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindints - 32 bytes
-;;  ASM-bindints - 28 bytes
+;;    C-bindings - 26 bytes
+;;  ASM-bindings - 22 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
@@ -99,44 +99,6 @@
 ;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;   ;; Add up X coordinate to screen_memory, so that DE = (screen_start + x)
-;;   ;; (DE += C, as DE = screen_memory, and C = x coordinate) 
-;;   ld    a, e     ;; [1] / E = E + x   (As C = x)
-;;   add   c        ;; [1] |   ( If E + x > 0xFF, Carry is set. We must Add it to D )
-;;   ld    e, a     ;; [1] |
-;;   adc   d        ;; [1] | D = D + (C + A) + Carry   (E = C + A)
-;;   sub   e        ;; [1] | D = D + Carry
-;;   ld    d, a     ;; [1] |   (If E + x did set carry, this will do D += 1, else D += 0)
-;;
-;;   ;; Let y' = [ y / 8 ] = int(y / 8) (Integer division by 8)
-;;   ;; Calculate 80y' = (64 + 16)y' (0x50 * y')
-;;   ld    a, b     ;; [1] A = y coordinate (which is stored in b)
-;;   and   #0xF8    ;; [2] A = 8y'   ( and 0xF8 is the same as 8 * int(y / 8) = 8y' )
-;;   ld    l, a     ;; [1] | HL = 8y'  (H = 0, L = 8y')
-;;   ld    h, #0    ;; [2] |
-;;   ld    a, b     ;; [1] A = y coordinate (Save for later use, freeing BC)
-;;   add  hl, hl    ;; [3] HL = 8y' + 8y' = 16y'
-;;   ld    b, h     ;; [1] | BC = 16y'
-;;   ld    c, l     ;; [1] |
-;;   add  hl, hl    ;; [3] HL = 16y' + 16y' = 32y'
-;;   add  hl, hl    ;; [3] HL = 32y' + 32y' = 64y'
-;;   add  hl, bc    ;; [3] HL = 64y' + 16y' = 80y'
-;;
-;;   ;; Calculate 2048 * (y % 8)  (0x800 * (y % 8))
-;;   and   #0x07    ;; [2]  A = y % 8  (A had y coordinate)
-;;   rlca           ;; [1]  A = 2 (y % 8)
-;;   rlca           ;; [1]  A = 4 (y % 8)
-;;   rlca           ;; [1]  A = 8 (y % 8)
-;;   ;; Now [A 0x00] (Using a as HSB) would be 0x100 * A = 0x100 * 8 (y % 8 )
-;;   ;; So, we only have to add A to H in order to have HL += 0x100 * 8 (y % 8)
-;;   add   h        ;; [1]  | HL += 0x100 * 8 (y % 8)
-;;   ld    h, a     ;; [1]  |
-;;
-;;   ;; Add up everything and return
-;;   add  hl, de    ;; [3] HL = 80 * [y / 8] + 2048 * (y % 8) + (screen_start + x)
-;;
-;;   ret            ;; [3] Return
 
    ;; Extract rows from Y coordinate
    ld    a, b     ;; [1] H = B and $07
