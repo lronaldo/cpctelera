@@ -86,8 +86,8 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindints - 32 bytes
-;;  ASM-bindints - 28 bytes
+;;    C-bindings - 32 bytes
+;;  ASM-bindings - 28 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
