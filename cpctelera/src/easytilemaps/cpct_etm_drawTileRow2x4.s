@@ -33,17 +33,17 @@
 ;;    (2B  HL) ptilemap_row - Pointer to the first tile from the tilemap that we want to draw
 ;;
 ;; Assembly call (Input parameters on registers):
-;;    > call cpct_etm_drawTileRow_asm
+;;    > call cpct_etm_drawTileRow2x4_asm
 ;;    This function requires parameters divided into the 2 sets of registers of the Z80. 2
 ;; parameters must be on the alternate register set, while 1 has to be on the main register
 ;; set. An example call to this function will be:
 ;; (start code)
-;;   ld hl, #ptilemap_row          ;; HL points to the first tile from the tilemap we want to draw
-;;   exx                           ;; Change to the alternate register set
-;;   ld  b, #row_width             ;; B' holds the number of tiles to draw from the tilemap
-;;   ld de, #pvideomem             ;; DE points to the place on video memory where we are going to draw
-;;   exx                           ;; Return to the main register set (Very important to do this!)
-;;   call cpct_etm_drawTileRow_asm ;; Finally, call the function
+;;   ld hl, #ptilemap_row             ;; HL points to the first tile from the tilemap we want to draw
+;;   exx                              ;; Change to the alternate register set
+;;   ld  b, #row_width                ;; B' holds the number of tiles to draw from the tilemap
+;;   ld de, #pvideomem                ;; DE points to the place on video memory where we are going to draw
+;;   exx                              ;; Return to the main register set (Very important to do this!)
+;;   call cpct_etm_drawTileRow2x4_asm ;; Finally, call the function
 ;; (end code)
 ;;
 ;; Parameter Restrictions:
@@ -109,7 +109,7 @@
 ;; Declare tile drawing function we are going to use
 .globl cpct_drawTileAligned2x4_f_asm
 
-;; C bindings for <cpct_etm_drawTileRow>
+;; C bindings for <cpct_etm_drawTileRow2x4>
 ;;   --> Included here not to duplicate dtr_restore_ptileset
 ;;
 ;;    19 microSecs, 7 bytes
@@ -118,13 +118,13 @@ _cpct_etm_drawTileRow2x4::
    ;; Recover parameters from the stack
    pop hl           ;; [3] HL = Return Address
    dec sp           ;; [2] As B is 1-byte value, we move SP to get B and something irrelevant in C
-   pop bc           ;; [3]  B = Number of tiles in this row
+   pop bc           ;; [3] B = Number of tiles in this row
    exx              ;; [1] Change to alternate Register Set
    pop de           ;; [3] DE' = Pointer to video memory where to draw the tiles
 
    exx              ;; [1] Return to normal register set
    ex (sp), hl      ;; [6] HL = Pointer to the start of the tilemap row
-                    ;; ... also puttin again Return Address where SP is located now
+                    ;; ... also putting again Return Address where SP is located now
                     ;; ... as this function is using __z88dk_callee convention
 
 cpct_etm_drawTileRow2x4_asm:: ;; Assembly entry point
