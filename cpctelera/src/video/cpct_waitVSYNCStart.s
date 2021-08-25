@@ -1,6 +1,8 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2014-2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2001? Kevin Thacker / Arnoldemu (http://www.cpctech.org.uk/)
+;;  Copyright (C) 2021  Nestornillo (https://github.com/nestornillo)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -38,7 +40,8 @@
 ;; 50Hz drawing display.
 ;; 
 ;;    To detect VSYNC signal status, function reads bytes from PPI Port B. 
-;; Every byte read from the port has this information:
+;; Every byte read from the port has this information,
+;;
 ;; (start code)
 ;; BIT  NAME     DESCRIPTION
 ;; ---------------------------------------------------------------- 
@@ -51,6 +54,7 @@
 ;; 1    LK1        Brand Names for details.
 ;; 0    CRTC     Vertical Sync ("1"=VSYNC active, "0"=inactive)
 ;; (end)
+;;
 ;;    So, checking the bit 0 of a byte coming from PPI Port B tells us if VSYNC
 ;; is active or not. That signal is active during a small period of time, but 
 ;; for synchronization purposes it is normally very important to detect exactly
@@ -72,30 +76,42 @@
 ;; (start code)
 ;; Case  | microSecs (us) | CPU Cycles
 ;; -------------------------------------
-;; Best  |         19     |       76
+;; Best  |         18     |       72
 ;; -------------------------------------
 ;; Worst |      19984     |    79936
 ;; -------------------------------------
 ;; (end code)
 ;; 
 ;; NOTE:
-;;  As this function is an active wait, it does not actually mind
-;;  at all the time needed to process. It will vary depending on
-;;  how much time has passed since the last VSYNC start.
+;;  The function will take a time between Best and Worst cases depending on
+;;  how far appart the raster is from VSYNC active region when called. Moreover,
+;;  if CRTC is modified and VSYNC is shortened, the worst case could be expanded.
+;;  However, this is usually unimportant, as the use of this function is 
+;;  exactly to wait until the start of VSYNC for syncrhonization purposes and
+;;  normally it should not frecuently be called. <cpct_waitVSYNC> may be used
+;;  instead for normal waiting, or even synchronized interrupts.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-_cpct_waitVSYNCStart::         ;; C entry point
-cpct_waitVSYNCStart_asm::      ;; Assembly entry point
-   ld  b, #PPI_PORT_B          ;; [2] B = F5h ==> B has the address of PPI Port B, where we get information from VSYNC
-
-wait_for_vs_inactive:
-   in  a,(c)                   ;; [4] A = Status register got from PPI port B
-   rra                         ;; [1] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
-   jr  c, wait_for_vs_inactive ;; [2/3]  Carry means VSYNC is active, so loop While Carry
+;; C/Assembly entry points
+_cpct_waitVSYNCStart::        
+cpct_waitVSYNCStart_asm::     
    
-wait_for_vs_active: 
-   in  a,(c)                   ;; [4] A = Status register got from PPI port B
-   rra                         ;; [1] Move bit 0 of A to Carry (bit 0 contains VSYNC status)
-   jr  nc, wait_for_vs_active  ;; [2/3] No Carry means No VSYNC, so loop While No Carry
+   ld     b, #PPI_PORT_B   ;; [2] B = F5h ==> B has the address of PPI Port B,
+                           ;;     where we get information from VSYNC
 
-   ret                         ;; [3] Start of VSYNC, Return
+;; First we look at VSYNC to see if it is active. If it is, we wait while
+;; VSYNC continues to be active, so as to be sure that we are outside
+;; VSYNC active region before continuing
+while_active:
+   in     a, (c)           ;; [4]   A = Status register got from PPI port B
+   rra                     ;; [1]   Move bit 0 of A (VSYNC Status) to Carry
+   jr     c, while_active  ;; [2/3] Loop While Carry On (VSYNC is active)
+
+;; When execution reaches this point, we are out of VSYNC active region
+;; Now we shall wait until we detect VSYNC active again, and that will
+;; effectively be the start point of VSYNC active region.
+while_inactive: 
+   in     a, (c)           ;; [4]   A = Status register got from PPI port B
+   rra                     ;; [1]   Move bit 0 of A (VSYNC Status) to Carry
+   ret    c                ;; [2/4] If (Carry == 1) VSYNC is active, return immediately
+   jr while_inactive       ;; [3] VSYNC is still inactive, wait for it to activate
