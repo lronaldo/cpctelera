@@ -120,20 +120,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;; DE= B(Pattern 1), C(Pattern 2) Pattern(0-3)
-;; 19 bytes, 23 us
-.globl cpct_pen2fourPixelM1_table
-cpct_2pens2pxPatternsM1_asm::
-   ld    hl, #cpct_pen2fourPixelM1_table ;; [3]
-   ld     b, #0                     ;; [2]
-   ld     c, d                      ;; [1]
-   add   hl, bc                     ;; [3]
-   ld     d, (hl)                   ;; [2]
-   ld    hl, #cpct_pen2fourPixelM1_table ;; [3]
-   ld     c, e                      ;; [1]
-   add   hl, bc                     ;; [3]
-   ld     e, (hl)                   ;; [2]
-   ret                              ;; [3] = 23 us
 
    
 .include "macros/cpct_undocumentedOpcodes.h.s"

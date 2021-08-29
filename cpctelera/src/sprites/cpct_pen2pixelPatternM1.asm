@@ -48,7 +48,7 @@
 ;;    * Parameter boundaries are not checked. Providing parameters out of range 
 ;; will result in undefined behaviour.
 ;;    * This function is to be used with variable parameters. For constant 
-;; parameters it is better to use the macro version <CPCTM_PEN2PIXELPATTERN> 
+;; parameters it is better to use the macro version <CPCTM_PEN2PIXELPATTERN_M1> 
 ;; to save CPU time and bytes.
 ;;
 ;; Details:
