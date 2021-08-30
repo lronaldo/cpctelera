@@ -30,7 +30,7 @@
 ;;    void <cpct_spriteColourizeM1> (<u16> *rplcPat*, <u16> *size*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
-;;  (1B DE) rplcPat - Replace Pattern => 1st byte=Pattern to Find, 2nd byte=Pattern to insert instead
+;;  (1B DE) rplcPat - Replace Pattern => 1st byte(D)=Pattern to Find, 2nd byte(E)=Pattern to insert instead
 ;;  (2B BC) size    - Size of the Array/Sprite in bytes (if it is a sprite, width*height)
 ;;  (2B HL) sprite  - Array/Sprite Pointer (array of bytes with Mode 1 pixel data)
 ;;

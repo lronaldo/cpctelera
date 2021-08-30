@@ -60,7 +60,8 @@
 ;;    This function works similar to <cpct_pen2pixelPatternM1> but it is faster 
 ;; for calculating a pair of patterns, which is usually required for functions like
 ;; <cpct_spriteColourizeM1>. The value it returns can be used directly by
-;; <cpct_spriteColourizeM1>. 
+;; <cpct_spriteColourizeM1>. In this case, be aware that the output pattern will
+;; seek for replacing *PEN2* with *PEN1* (*OldPen*=*PEN2*, *NewPen*=*PEN1*).
 ;;
 ;;    For more details on how this function performs, please read the documentation
 ;; of the function <cpct_pen2pixelPatternM1>.

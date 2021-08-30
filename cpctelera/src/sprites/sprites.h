@@ -29,6 +29,7 @@
 
 #include <types.h>
 #include "sprite_types.h"
+#include "sprite_macros.h"
 #include "transparency_table_macros.h"
 #include "drawToSpriteBuffer/drawToSpriteBuffer.h"
 #include "screenToSprite/screenToSprite.h"
