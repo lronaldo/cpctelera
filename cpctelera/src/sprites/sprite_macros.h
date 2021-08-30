@@ -20,7 +20,7 @@
 #define _SPRITE_MACROS_H
 
 //----------------------------------------------------------------------------------------
-// Title: Sprite Macros
+// Title: Sprite Macros (C)
 //----------------------------------------------------------------------------------------
 
 #include <types.h>
@@ -45,6 +45,9 @@
 // calculations. If you use it with variables, it will generate poor & slow code. Moreover, 
 // generated code will be repeated if the macro is used multiple times, bloating your binary.
 // Use <cpct_pen2pixelPatternM1> function for variables instead.
+//    * *Beware!* In some versions of SDCC compiler it could even generate bugged assembly code
+// if you use this macro with variables. It works without problem with constants in compile-time
+// though. (Failed under SDCC 3.6.8).
 //
 // Details:
 //    This macro does the same operations the function <cpct_pen2pixelPatternM1> does, but
@@ -87,20 +90,19 @@
    ((((PEN) & 1) << 7) | (((PEN) & 1) << 6) | (((PEN) & 1) << 5) | (((PEN) & 1) << 4) | \
     (((PEN) & 2) << 2) | (((PEN) & 2) << 1) | (((PEN) & 2)     ) | (((PEN) & 2) >> 1))
 
-
 //
 // Macro: CPCTM_PENS2PIXELPATTERNPAIR_M1
 //
 //    Similarly to the function <cpct_pens2pixelPatternPairM1>, creates a 16 bits 
 // value in Mode 1 screen pixel format, containing two pattern with all 4 pixels in 
-// the same pen colour as given by the arguments *PEN1* and *PEN2*. 
+// the same pen colour as given by the arguments *OldPen* and *NewPen*. 
 //
 // C Definition:
-//    #define <CPCTM_PENS2PIXELPATTERNPAIR_M1> (*PEN1*, *PEN2*)
+//    #define <CPCTM_PENS2PIXELPATTERNPAIR_M1> (*OldPen*, *NewPen*)
 //
 // Parameters:
-//    PEN1 - ([0-3], unsigned) First  Pen Colour (NewPen when used for <cpct_spriteColourizeM1>)
-//    PEN2 - ([0-3], unsigned) Second Pen Colour (OldPen when used for <cpct_spriteColourizeM1>)
+//    OldPen - ([0-3], unsigned) First  Pen Colour (NewPen when used for <cpct_spriteColourizeM1>)
+//    NewPen - ([0-3], unsigned) Second Pen Colour (OldPen when used for <cpct_spriteColourizeM1>)
 // 
 // Known limitations:
 //    * It does not perform any kind of checking. Values other than unsigned integers [0-3]
@@ -109,6 +111,9 @@
 // calculations. If you use it with variables, it will generate poor & slow code. Moreover, 
 // generated code will be repeated if the macro is used multiple times, bloating your binary.
 // Use <cpct_pen2pixelPatternM1> function for variables instead.
+//    * *Beware!* In some versions of SDCC compiler it could even generate bugged assembly code
+// if you use this macro with variables. It works without problem with constants in compile-time
+// though. (Failed under SDCC 3.6.8).
 //
 // Details:
 //    This macro does the same operations the function <cpct_pens2pixelPatternPairM1> does, 
@@ -135,7 +140,7 @@
 //    void replaceSpriteColourConstant(Entity_t* e) {
 //       // Create 16-bit Replace Pattern required as parameter
 //       //    FindPat = 3, InsrPat = 1 (Replace Pen 3 with Pen 1)
-//       u16 const rplcPat = CPCTM_PENS2PIXELPATTERNPAIR_M1(1, 3);
+//       u16 const rplcPat = CPCTM_PENS2PIXELPATTERNPAIR_M1(3, 1);
 //    
 //       // Calculate complete size of the sprite array
 //       u8  const size    = e->width * e->height;
@@ -146,8 +151,8 @@
 //    }
 // (end code)
 //
-#define CPCTM_PENS2PIXELPATTERNPAIR_M1(PEN1, PEN2) \
-   (((u16)CPCTM_PEN2PIXELPATTERN_M1(PEN2)) << 8) | ((u16)CPCTM_PEN2PIXELPATTERN_M1(PEN1))
+#define CPCTM_PENS2PIXELPATTERNPAIR_M1(OldPen, NewPen) \
+   (((u16)CPCTM_PEN2PIXELPATTERN_M1(OldPen)) << 8) | ((u16)CPCTM_PEN2PIXELPATTERN_M1(NewPen))
 
 
 #endif

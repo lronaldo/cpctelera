@@ -20,3 +20,4 @@
 .include "macros/allmacros.h.s"
 .include "keyboard/keyboard.h.s"
 .include "video/videomode.h.s"
+.include "sprites/sprites.h.s"

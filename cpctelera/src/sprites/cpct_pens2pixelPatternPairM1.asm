@@ -19,30 +19,33 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: 
+;; Function: cpct_pens2pixelPatternPairM1
 ;;
 ;;    Returns 16 bits in Mode 1 screen pixel format, containing two pattern with
-;; all 4 pixels in the same pen colour as given by the arguments *PEN1* and *PEN2*.
+;; all 4 pixels in the same pen colour as given by the arguments *OldPen* and *NewPen*.
 ;;
 ;; C Definition:
-;;    <u16> <cpct_pens2pixelPatternPairM1> (<u8> *PEN1*, <u8> *PEN2*) __z88dk_callee
+;;    #define <cpct_pens2pixelPatternPairM1> (*OldPen*, *NewPen*)
+;;    <u16> cpct_pens2pixelPatternPairM1_real (<u8> *NewPen*, <u8> *OldPen*) __z88dk_callee
+;;    Note - To make arguments clearer and easier to use, <cpct_pens2pixelPatternPairM1> is
+;; defined as a macro. The actual function has suffix '_real' and its arguments are inverted.
 ;;
 ;; Assembly Call (Input parameters on Registers)
 ;;    > call cpct_pens2pixelPatternPairM1_asm
 ;;
 ;; Input Parameters (2 bytes):
-;;    (1B E) PEN1 - Pen colour number 1
-;;    (1B D) PEN2 - Pen colour number 2
+;;    (1B E) NewPen - Pen colour to be inserted when used for <cpct_spriteColourizeM1>.
+;;    (1B D) OldPen - Pen colour to be found and replaced when used for <cpct_spriteColourizeM1>.
 ;;
 ;; Return value:
 ;;    A 16-bits unsigned containing 2 bytes, each one with a 4-pixel-byte pattern in 
-;; mode 1 screen pixel format, with its 4 pixels coloured same as *PEN* parameter (
-;; *PEN1* for higher byte, *PEN2* for lower byte)
+;; mode 1 screen pixel format, with its 4 pixels coloured same as the parameters 
+;; (*OldPen* for higher byte, *NewPen* for lower byte)
 ;;    C-bindings   - 2 bytes (in HL)
 ;;    ASM-bindings - 2 bytes (in DE)
 ;;
 ;; Parameter Restrictions:
-;;    * *PEN1*/*PEN2* ([0-3], 8 bits, unsigned). Values outside the [0-3] range 
+;;    * *OldPen*/*NewPen* ([0-3], 8 bits, unsigned). Values outside the [0-3] range 
 ;; will produce undefined behaviour. 
 ;; 
 ;; Known limitations:
@@ -60,8 +63,7 @@
 ;;    This function works similar to <cpct_pen2pixelPatternM1> but it is faster 
 ;; for calculating a pair of patterns, which is usually required for functions like
 ;; <cpct_spriteColourizeM1>. The value it returns can be used directly by
-;; <cpct_spriteColourizeM1>. In this case, be aware that the output pattern will
-;; seek for replacing *PEN2* with *PEN1* (*OldPen*=*PEN2*, *NewPen*=*PEN1*).
+;; <cpct_spriteColourizeM1>. 
 ;;
 ;;    For more details on how this function performs, please read the documentation
 ;; of the function <cpct_pen2pixelPatternM1>.
@@ -93,18 +95,18 @@
 ;; (end code)
 ;;
 ;; Destroyed Register values:
-;;    AF, BC, DE, HL
+;;    F, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings   - 19 bytes
-;;    ASM-bindings - 15 bytes 
+;;    C-bindings   - 18 bytes
+;;    ASM-bindings - 14 bytes 
 ;;
 ;; Time Measures: 
 ;; (start code)
 ;;  --------------------------------------------
 ;;  |    Case    | microSecs (us) | CPU Cycles |
 ;;  --------------------------------------------
-;;  | Any        |       33       |    129     |
+;;  | Any        |       32       |    128     |
 ;;  --------------------------------------------
 ;;  | ASM-Saving |      -11       |    -44     |
 ;;  --------------------------------------------
@@ -114,18 +116,16 @@
 
 .globl cpct_pen2fourPixelM1_table
 
-   ;; Get Pixel Pattern for PEN1 (E) -> Put it temporarily in A
+   ;; Get Pixel Pattern for NewPen (E) -> Put it temporarily in A
    ld    bc, #cpct_pen2fourPixelM1_table  ;; [3] BC Points to the start of the Replace Colours Pattern Conversion Array
-   ld     h, #0                           ;; [2] / HL = E = PEN1 (H = 0, L = E)
+   ld     h, #0                           ;; [2] / HL = E = NewPen (H = 0, L = E)
    ld     l, e                            ;; [1] \
-   add   hl, bc                           ;; [3] HL += BC // HL now points to the Colour Pattern for the PEN1
-   ld     a, (hl)                         ;; [1] A = Pixel Pattern for PEN1
-   ;; Get Pixel Pattern for PEN2 (E) -> Put it in E
-   ;; Also move Pattern for PEN1 from A to D
-   ld     h, #0      ;; [2] / HL = D = PEN2 (H = 0, L = D)
+   add   hl, bc                           ;; [3] HL += BC // HL now points to the Colour Pattern for the NewPen
+   ld     e, (hl)                         ;; [1] E = Pixel Pattern for NewPen
+   ;; Get Pixel Pattern for OldPen (E) -> Put it in E
+   ld     h, #0      ;; [2] / HL = D = OldPen (H = 0, L = D)
    ld     l, d       ;; [1] \ 
-   add   hl, bc      ;; [3] ;; [3] HL += BC // HL now points to the Colour Pattern for the PEN2
-   ld     e, (hl)    ;; [2] E = Pixel Pattern for PEN2
-   ld     d, a       ;; [1] D = Pixel Pattern for PEN1
+   add   hl, bc      ;; [3] ;; [3] HL += BC // HL now points to the Colour Pattern for the OldPen
+   ld     d, (hl)    ;; [2] D = Pixel Pattern for OldPen
 
    ;; Return managed at binding code
