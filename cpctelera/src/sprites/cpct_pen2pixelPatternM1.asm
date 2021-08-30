@@ -106,28 +106,28 @@
 ;; performance and clarity,
 ;; (start code)
 ;;    // Entity struct declaration
-;;    struct Entity_t {
+;;    typedef struct {
 ;;       u8* sprite;
 ;;       u8 width, height;
 ;;       // .....
-;;    };
-;;
+;;    } Entity_t;
+;;    
 ;;    // ......
-;;
+;;    
 ;;    // This function replaces all pixels of a given colour (OldPen) inside the
 ;;    // sprite of an entity by another given colour (NewPen)
 ;;    void replaceSpriteColour(Entity_t* e, u16 OldPen, u16 NewPen) {
 ;;       // Get 4-pixels-byte patterns for OldPen and NewPen
-;;       u8 const old_px  = cpct_pen2pixelPatternM1(OldPen);
-;;       u8 const new_px  = cpct_pen2pixelPatternM1(NewPen);
+;;       u8  const old_px  = cpct_pen2pixelPatternM1(OldPen);
+;;       u8  const new_px  = cpct_pen2pixelPatternM1(NewPen);
 ;;       // Create 16-bit Replace Pattern required as parameter
 ;;       //  > Higher 8-bits = old_px, Lower 8-bits = new_px
-;;       u8 const rplcPat = (old_px << 8) | new_px;   // Equivalent to 256*old_px + new_px
+;;       u16 const rplcPat = (old_px << 8) | new_px;   // Equivalent to 256*old_px + new_px
 ;;       // Calculate complete size of the sprite array
-;;       u8 const size    = e->width * e->height;
+;;       u8  const size    = e->width * e->height;
 ;;       // Replace colour OldPen with colour NewPen in 
 ;;       // all the pixels of the sprite of entity e
-;;       cpct_spriteColourizeM1(rplcPat, size, e->sprite)
+;;       cpct_spriteColourizeM1(rplcPat, size, e->sprite);
 ;;    }
 ;; (end code)
 ;;

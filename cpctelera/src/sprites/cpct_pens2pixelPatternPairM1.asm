@@ -95,15 +95,15 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings   - 21 bytes
-;;    ASM-bindings - 17 bytes 
+;;    C-bindings   - 19 bytes
+;;    ASM-bindings - 15 bytes 
 ;;
 ;; Time Measures: 
 ;; (start code)
 ;;  --------------------------------------------
 ;;  |    Case    | microSecs (us) | CPU Cycles |
 ;;  --------------------------------------------
-;;  | Any        |       34       |    132     |
+;;  | Any        |       33       |    129     |
 ;;  --------------------------------------------
 ;;  | ASM-Saving |      -11       |    -44     |
 ;;  --------------------------------------------
@@ -113,25 +113,18 @@
 
 .globl cpct_pen2fourPixelM1_table
 
-   ;; Get Pixel Pattern for PEN1 (E) -> Put it in D
+   ;; Get Pixel Pattern for PEN1 (E) -> Put it temporarily in A
    ld    bc, #cpct_pen2fourPixelM1_table  ;; [3] BC Points to the start of the Replace Colours Pattern Conversion Array
-   ld     h, #0                           ;; [2] / HL = PEN1 (H = 0)
+   ld     h, #0                           ;; [2] / HL = E = PEN1 (H = 0, L = E)
    ld     l, e                            ;; [1] \
-   add   hl, bc                           ;; [3] HL += BC // HL now points to the Colour Pattern for the PEN1 given in BC
-   ;; Get the pattern in D, but first free D putting its value in A   
-   ld     a, d                            ;; [1] A = PEN2 (D) (Free D, and use A later on for offset calculations)
-   ld     d, (hl)                         ;; [2] D = Pixel Pattern for PEN1
-
-   ;; Get Pixel Pattern for PEN2 (D) -> Put it in E
-   ;; To calculate the memory pointer in HL, we add PEN2 (D)
-   ;; and sub PEN1 (E) to HL
-   sub    e          ;; [1] / 
-   add    l          ;; [1] | HL = HL - PEN1(E) + PEN2(D)
-   ld     l, a       ;; [1] |  A was previous loaded with PEN2(D)
-   adc    h          ;; [1] |
-   sub    l          ;; [1] |
-   ld     h, a       ;; [1] \
+   add   hl, bc                           ;; [3] HL += BC // HL now points to the Colour Pattern for the PEN1
+   ld     a, (hl)                         ;; [1] A = Pixel Pattern for PEN1
+   ;; Get Pixel Pattern for PEN2 (E) -> Put it in E
+   ;; Also move Pattern for PEN1 from A to D
+   ld     h, #0      ;; [2] / HL = D = PEN2 (H = 0, L = D)
+   ld     l, d       ;; [1] \ 
+   add   hl, bc      ;; [3] ;; [3] HL += BC // HL now points to the Colour Pattern for the PEN2
    ld     e, (hl)    ;; [2] E = Pixel Pattern for PEN2
+   ld     d, a       ;; [1] D = Pixel Pattern for PEN1
 
    ;; Return managed at binding code
-

@@ -23,14 +23,16 @@
 ;;
 ;; C bindings for <cpct_spriteColourizeM1>
 ;;
-;;   12 us, 3 bytes
+;;   15 us, 4 bytes
 ;;
 _cpct_spriteColourizeM1::
    ;; GET Parameters from the stack 
-   pop   hl                     ;; [3] HL = Return Address  
-   pop   bc                     ;; [3] B = Width, C = Height 
-   ex   (sp), hl                ;; [6] HL = Pointer to the sprite
-                                ;; ... and leave Return Address at (SP) as we don't need to restore
-                                ;; ... stack status because callin convention is __z88dk_callee
-
-.include /cpct_spriteColourizeM1.asm/
+   pop   hl                      ;; [3] HL = Return Address  
+   pop   de                      ;; [3] DE = Replace Pattern (D=Find Pattern [OldPen], E=Insert Pattern (NewPen))
+   pop   bc                      ;; [3] BC = Size of the array/sprite (width*height)
+   ex   (sp), hl                 ;; [6] HL = Pointer to the sprite
+                                 ;; ... and leave Return Address at (SP) as we don't need to restore
+                                 ;; ... stack status because callin convention is __z88dk_callee
+   
+   ;; Include Common code
+   .include /cpct_spriteColourizeM1.asm/

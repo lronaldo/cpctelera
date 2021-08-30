@@ -25,4 +25,5 @@
 ;;
 cpct_spriteColourizeM1_asm:: ;; Assembly entry point
 
-.include /cpct_spriteColourizeM1.asm/
+   ;; Include common code
+   .include /cpct_spriteColourizeM1.asm/
