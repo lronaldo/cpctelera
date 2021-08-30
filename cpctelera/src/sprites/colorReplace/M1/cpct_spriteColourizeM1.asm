@@ -248,10 +248,10 @@ loop:
    ;; as each pixels has 2 bits, we just need to OR both of them. Pixels selected have
    ;; both of them equal to 0, and non-selected have at least a 1. We rotate the
    ;; byte to align both pair of bits in each pixel, then we or them together.
-   rrca           ;; [1] / RoR = Rotate Right
+   rrca           ;; [1] /    RoR = Rotate Right
+   rrca           ;; [1] | 
    rrca           ;; [1] | A = RoR(SpriteByte ^ FindPat, 4) | (SpriteByte ^ FindPat)
    rrca           ;; [1] |   => MASK (SelectedPixels==00, OtherPixels==11)
-   rrca           ;; [1] |
    or     d       ;; [1] \
    ;; We revert the MASK (producing ~MASK), making selected pixels be 11, and Others 00
    cpl            ;; [1] A = ~MASK (SelectedPixels==11, OtherPixels==00)
