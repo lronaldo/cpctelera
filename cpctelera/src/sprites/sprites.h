@@ -36,6 +36,12 @@
 #include "drawTile/drawTile.h"
 #include "flipping/flipping.h"
 #include "blending/blending.h"
+#include "colorReplace/colorReplace.h"
+
+// Functions to transform PEN colours into 4-pixel screen format values
+#define cpct_pens2pixelPatternPairM1(OldPen, NewPen) cpct_pens2pixelPatternPairM1_real((NewPen), (OldPen))
+extern  u16 cpct_pens2pixelPatternPairM1_real   (u8 NewPen, u8 OldPen)  __z88dk_callee;
+extern   u8 cpct_pen2pixelPatternM1             (u16 pen)               __z88dk_fastcall;
 
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;

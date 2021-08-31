@@ -1,5 +1,5 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,15 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module cpct_sprites
 
-;;#####################################################################
-;;### MODULE: Sprites
-;;#####################################################################
-;;### Functions, macros and definitions used for managing sprites
-;;### in assembler code
-;;#####################################################################
-
-.include "sprites/flipping/flipping_macros.h.s"
-.include "sprites/pixel_macros.h.s"
+;;
+;; Array: cpct_pen2fourPixelM1_table 
+;;
+;;    Mode 1 PEN to 4-pixels-byte in screen mode format conversion table
+;;
+;;    This table associates the value of a Mode 1 PEN ([0-3]) with a byte encoding
+;; 4-mode-1-pixels all of the PEN colour associated. For instance, for PEN 1, 
+;; it associates 0xF0, which means 4-mode-1-pixels of PEN 1.
+;;
+cpct_pen2fourPixelM1_table:: .db 0x00, 0xF0, 0x0F, 0xFF

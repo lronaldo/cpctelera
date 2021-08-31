@@ -1,5 +1,5 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,19 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module cpct_sprites
 
-;;#####################################################################
-;;### MODULE: Sprites
-;;#####################################################################
-;;### Functions, macros and definitions used for managing sprites
-;;### in assembler code
-;;#####################################################################
+;;
+;; C bindings for <cpct_pen2pixelPatternM1>
+;;
+;;    5 microSecs, 2 bytes
+;;
+_cpct_pen2pixelPatternM1::    ;; C-Entry Point
+   
+   ;; Function is flagged __z88dk_fastcall. Parameter is given directly in HL
 
-.include "sprites/flipping/flipping_macros.h.s"
-.include "sprites/pixel_macros.h.s"
+   ;; Include common code
+   .include /cpct_pen2pixelPatternM1.asm/
+   
+   ld     l, (hl)    ;; [2] L = 4-pixels-mode-1-byte with all pixels in Pen colour
+   ret               ;; [3] Return

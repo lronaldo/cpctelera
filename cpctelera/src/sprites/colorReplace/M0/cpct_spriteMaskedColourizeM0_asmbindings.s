@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
-;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -15,13 +16,11 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module cpct_sprites
 
-;;#####################################################################
-;;### MODULE: Sprites
-;;#####################################################################
-;;### Functions, macros and definitions used for managing sprites
-;;### in assembler code
-;;#####################################################################
+;;
+;; ASM bindings for <cpct_spriteMaskedColourizeM0>
+;;
+cpct_spriteMaskedColourizeM0_asm:: ;; Assembly entry point
 
-.include "sprites/flipping/flipping_macros.h.s"
-.include "sprites/pixel_macros.h.s"
+.include /cpct_spriteMaskedColourizeM0.asm/

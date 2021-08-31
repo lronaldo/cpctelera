@@ -22,6 +22,7 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 .include "macros/cpct_combinedOperations.h.s"
 .include "macros/cpct_pushpop.h.s"
+.include "macros/cpct_luts.h.s"
 
 ;;//////////////////////////////////////////////////////////////////////
 ;; Group: General Useful Macros

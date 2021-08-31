@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
-;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -15,13 +16,19 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module cpct_sprites
 
-;;#####################################################################
-;;### MODULE: Sprites
-;;#####################################################################
-;;### Functions, macros and definitions used for managing sprites
-;;### in assembler code
-;;#####################################################################
+;;
+;; C bindings for <cpct_spriteMaskedColourizeM0>
+;;
+;;   12 us, 3 bytes
+;;
+_cpct_spriteMaskedColourizeM0::
+   ;; GET Parameters from the stack 
+   pop   hl                     ;; [3] HL = Return Address  
+   pop   bc                     ;; [3] B = Width, C = Height 
+   ex   (sp), hl                ;; [6] HL = Pointer to the sprite
+                                ;; ... and leave Return Address at (SP) as we don't need to restore
+                                ;; ... stack status because callin convention is __z88dk_callee
 
-.include "sprites/flipping/flipping_macros.h.s"
-.include "sprites/pixel_macros.h.s"
+.include /cpct_spriteMaskedColourizeM0.asm/

@@ -1,5 +1,5 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -15,13 +15,15 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module cpct_sprites
 
-;;#####################################################################
-;;### MODULE: Sprites
-;;#####################################################################
-;;### Functions, macros and definitions used for managing sprites
-;;### in assembler code
-;;#####################################################################
+;;
+;; ASM bindings for <cpct_pens2pixelPatternPairM1>
+;;
+;;    3 microSecs, 1 byte
+;;
+cpct_pens2pixelPatternPairM1_asm::    ;; Assembly entry point
+   ;; Include common code
+   .include /cpct_pens2pixelPatternPairM1.asm/
 
-.include "sprites/flipping/flipping_macros.h.s"
-.include "sprites/pixel_macros.h.s"
+   ret               ;; [3] Return
