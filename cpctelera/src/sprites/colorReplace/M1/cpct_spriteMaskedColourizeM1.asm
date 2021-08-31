@@ -139,8 +139,8 @@
 ;; | Asm saving  |        -15         |          -60         |
 ;; |----------------------------------------------------------
 ;; (end code)
-;;    *S*  - Size of the array/Sprite y bytes
-;;    *SS* - 1 + [S / 256]      // [x] = Integral part of x
+;;    S  - Size of the array/Sprite in bytes
+;;    SS - 1 + [ *S* / 256 ] · · · · ( *[x]* = Integral part of x )
 ;;
 ;; Credits:
 ;;    Original routine optimized by @Docent and discussed in CPCWiki :

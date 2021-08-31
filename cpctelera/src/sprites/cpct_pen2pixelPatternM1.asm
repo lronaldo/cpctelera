@@ -19,7 +19,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: 
+;; Function: cpct_pen2pixelPatternM1
 ;;
 ;;    Returns 1 byte in Mode 1 screen pixel format containing a pattern with
 ;; all 4 pixels in the same pen colour as given by the argument *PEN*.
@@ -27,7 +27,7 @@
 ;; C Definition:
 ;;    <u8> <cpct_pen2pixelPatternM1> (<u16> *PEN*)
 ;;
-;; Assembly Call (Input parameters on Registers)
+;; Assembly Call (Input parameters on Registers):
 ;;    > call cpct_pen2pixelPatternM1_asm
 ;;
 ;; Input Parameters (2 bytes):
@@ -36,6 +36,7 @@
 ;; Return value:
 ;;    A 4-pixel-byte pattern in mode 1 screen pixel format, with its 
 ;; 4 pixels coloured same as *PEN* parameter.
+;;
 ;;    C-bindings   - 1 byte (in L)
 ;;    ASM-bindings - 1 byte (in A)
 ;;

@@ -16,11 +16,10 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-;;----------------------------------------------------------------------------------------
+;;-------------------------------------------------------------------------------
 ;; Title: Pixel Macros (ASM)
-;;----------------------------------------------------------------------------------------
+;;-------------------------------------------------------------------------------
 
-;;
 ;; Macro: CPCTM_PEN2PIXELPATTERN_M1_ASM
 ;;
 ;;    Similarly to the function <cpct_pen2pixelPatternM1>, creates 1 byte in Mode 1 
@@ -49,27 +48,27 @@
 ;;
 ;; Use example:
 ;; (start code)
-;; ;; Simple function that changes the Skin Colour 
-;; ;; of a given Alien Sprite into Cyan (Alien Skin is yellow normally)  
-;; ;; HL = Pointer to Alien Sprite
-;; ;; BC = Size of Alien Sprite
-;; changeAlienSkinColourToCyan:
-;;    CPCTM_PEN2PIXELPATTERN_M1_ASM OldPen, 1 ;; Produces 'OldPen = 0xF0'
-;;    CPCTM_PEN2PIXELPATTERN_M1_ASM NewPen, 2 ;; Produces 'NewPen = 0x0F'
-;;    ld    de, #(OldPen << 8) | NewPen
-;;    call  cpct_spriteColourizeM1_asm
-;;    ret
-;:
-;; ;; Simple function that restores the Skin Colour 
-;; ;; of a given Alien Sprite to yellow (after being changed to Cyan)  
-;; ;; HL = Pointer to Alien Sprite
-;; ;; BC = Size of Alien Sprite
-;; restoreAlienSkinColourToYellow:
-;;    CPCTM_PEN2PIXELPATTERN_M1_ASM OldPen, 2 ;; Produces 'OldPen = 0x0F'
-;;    CPCTM_PEN2PIXELPATTERN_M1_ASM NewPen, 1 ;; Produces 'NewPen = 0xF0'
-;;    ld    de, #(OldPen << 8) | NewPen
-;;    call  cpct_spriteColourizeM1_asm
-;;    ret
+;;    ;// Simple function that changes the Skin Colour 
+;;    ;// of a given Alien Sprite into Cyan (Alien Skin is yellow normally)  
+;;    ;// HL = Pointer to Alien Sprite
+;;    ;// BC = Size of Alien Sprite
+;;    changeAlienSkinColourToCyan:
+;;       CPCTM_PEN2PIXELPATTERN_M1_ASM OldPen, 1 ;// Produces 'OldPen = 0xF0'
+;;       CPCTM_PEN2PIXELPATTERN_M1_ASM NewPen, 2 ;// Produces 'NewPen = 0x0F'
+;;       ld    de, #(OldPen << 8) | NewPen
+;;       call  cpct_spriteColourizeM1_asm
+;;       ret
+;;    
+;;    ;// Simple function that restores the Skin Colour 
+;;    ;// of a given Alien Sprite to yellow (after being changed to Cyan)  
+;;    ;// HL = Pointer to Alien Sprite
+;;    ;// BC = Size of Alien Sprite
+;;    restoreAlienSkinColourToYellow:
+;;       CPCTM_PEN2PIXELPATTERN_M1_ASM OldPen, 2 ;// Produces 'OldPen = 0x0F'
+;;       CPCTM_PEN2PIXELPATTERN_M1_ASM NewPen, 1 ;// Produces 'NewPen = 0xF0'
+;;       ld    de, #(OldPen << 8) | NewPen
+;;       call  cpct_spriteColourizeM1_asm
+;;       ret
 ;; (end code)
 ;;
 .mdelete CPCTM_PEN2PIXELPATTERN_M1_ASM
@@ -109,23 +108,23 @@
 ;;
 ;; Use example:
 ;; (start code)
-;; ;; Simple function that changes the Skin Colour 
-;; ;; of a given Alien Sprite into Cyan (2) (Alien Skin is yellow (1) normally)  
-;; ;; HL = Pointer to Alien Sprite
-;; ;; BC = Size of Alien Sprite
+;; ;// Simple function that changes the Skin Colour 
+;; ;// of a given Alien Sprite into Cyan (2) (Alien Skin is yellow (1) normally)  
+;; ;// HL = Pointer to Alien Sprite
+;; ;// BC = Size of Alien Sprite
 ;; changeAlienSkinColourToCyan:
-;;    CPCTM_PENS2PIXELPATTERNPAIR_M1_ASM rplcPat, 1, 2   ;; Change Pen 1 into Pen 2
-;;    ld    de, #rplcPat                                 ;; rplcPat = 0xF00F
+;;    CPCTM_PENS2PIXELPATTERNPAIR_M1_ASM rplcPat, 1, 2   ;// Change Pen 1 into Pen 2
+;;    ld    de, #rplcPat                                 ;// rplcPat = 0xF00F
 ;;    call  cpct_spriteColourizeM1_asm
 ;;    ret
-;:
-;; ;; Simple function that restores the Skin Colour 
-;; ;; of a given Alien Sprite to yellow (1) (after being changed to Cyan (2) )
-;; ;; HL = Pointer to Alien Sprite
-;; ;; BC = Size of Alien Sprite
+;;
+;; ;// Simple function that restores the Skin Colour 
+;; ;// of a given Alien Sprite to yellow (1) (after being changed to Cyan (2) )
+;; ;// HL = Pointer to Alien Sprite
+;; ;// BC = Size of Alien Sprite
 ;; restoreAlienSkinColourToYellow:
-;;    CPCTM_PENS2PIXELPATTERNPAIR_M1_ASM rplcPat, 2, 1   ;; Change Pen 2 into Pen 1
-;;    ld    de, #rplcPat                                 ;; rplcPat = 0x0FF0
+;;    CPCTM_PENS2PIXELPATTERNPAIR_M1_ASM rplcPat, 2, 1   ;// Change Pen 2 into Pen 1
+;;    ld    de, #rplcPat                                 ;// rplcPat = 0x0FF0
 ;;    call  cpct_spriteColourizeM1_asm
 ;;    ret
 ;; (end code)

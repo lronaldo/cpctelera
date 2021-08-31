@@ -26,11 +26,13 @@
 ;;
 ;; C Definition:
 ;;    #define <cpct_pens2pixelPatternPairM1> (*OldPen*, *NewPen*)
+;;
 ;;    <u16> cpct_pens2pixelPatternPairM1_real (<u8> *NewPen*, <u8> *OldPen*) __z88dk_callee
+;;
 ;;    Note - To make arguments clearer and easier to use, <cpct_pens2pixelPatternPairM1> is
 ;; defined as a macro. The actual function has suffix '_real' and its arguments are inverted.
 ;;
-;; Assembly Call (Input parameters on Registers)
+;; Assembly Call (Input parameters on Registers):
 ;;    > call cpct_pens2pixelPatternPairM1_asm
 ;;
 ;; Input Parameters (2 bytes):
@@ -41,6 +43,7 @@
 ;;    A 16-bits unsigned containing 2 bytes, each one with a 4-pixel-byte pattern in 
 ;; mode 1 screen pixel format, with its 4 pixels coloured same as the parameters 
 ;; (*OldPen* for higher byte, *NewPen* for lower byte)
+;;
 ;;    C-bindings   - 2 bytes (in HL)
 ;;    ASM-bindings - 2 bytes (in DE)
 ;;
