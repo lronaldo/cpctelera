@@ -1,0 +1,19 @@
+Crash Message:
+
+   The version string 2.0.2 isn't in a recognized format.
+
+Natural Docs version 1.52
+Perl version 5.32.0 on linux
+
+Command Line:
+
+   -i src/ -o HTML docs/ -p docs/nd -img docs/images/ -s Default title -r
+
+Stack Trace:
+
+   NaturalDocs::Error::CatchDeath, called from
+   NaturalDocs::Version::FromString, line 82, called from
+   NaturalDocs::ConfigFile::Open, line 171, called from
+   NaturalDocs::Languages::LoadFile, line 336, called from
+   NaturalDocs::Languages::Load, line 274, called from
+   (eval), line 283 of /usr/bin/naturaldocs
