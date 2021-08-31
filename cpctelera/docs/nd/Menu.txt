@@ -274,8 +274,8 @@ Group: Sprites  {
          File: cpct_drawSpriteColorizeM1  (sprites/colorReplace/M1/cpct_drawSpriteColorizeM1.asm)
          File: cpct_drawSpriteMaskedAlignedColorizeM1  (sprites/colorReplace/M1/cpct_drawSpriteMaskedAlignedColorizeM1.asm)
          File: cpct_drawSpriteMaskedColorizeM1  (sprites/colorReplace/M1/cpct_drawSpriteMaskedColorizeM1.asm)
-         File: cpct_spriteColourizeM1  (sprites/colorReplace/M1/cpct_spriteMaskedColourizeM1.asm)
          File: cpct_spriteColourizeM1  (sprites/colorReplace/M1/cpct_spriteColourizeM1.asm)
+         File: cpct_spriteMaskedColourizeM1  (sprites/colorReplace/M1/cpct_spriteMaskedColourizeM1.asm)
          }  # Group: M1
 
       }  # Group: ColorReplace

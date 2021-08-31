@@ -20,7 +20,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Function: cpct_spriteColourizeM1
+;; Function: cpct_spriteMaskedColourizeM1
 ;;
 ;;    Replaces a colour pattern (Find Pattern) by a new one (Insert Pattern) in 
 ;; an array/sprite with interleaved mask bytes. Typical use is to replace pixels 
