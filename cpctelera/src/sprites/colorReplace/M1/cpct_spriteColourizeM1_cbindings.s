@@ -36,3 +36,8 @@ _cpct_spriteColourizeM1::
    
    ;; Include Common code
    .include /cpct_spriteColourizeM1.asm/
+   
+   ;; Generate the code with just 1 increment of HL at the end of every loop pass
+   ;; as the array/sprite is to be composed of consecutive bytes 
+   cpctm_generate_spriteColourizeM1 1
+

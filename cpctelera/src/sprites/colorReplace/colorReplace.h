@@ -36,8 +36,7 @@ extern void cpct_spriteMaskedColourizeM0   (u8 width, u8 height, void* sprite) _
 
 // Functions to replace a color in sprite M1
 extern void cpct_spriteColourizeM1         (u16 rplcPat, u16 size, void* sprite) __z88dk_callee;
-extern void cpct_setSpriteMaskedColourizeM1(u8 oldColor, u8 newColor)            __z88dk_callee;
-extern void cpct_spriteMaskedColorizeM1    (u8 width, u8 height, void* sprite)   __z88dk_callee; 
+extern void cpct_spriteMaskedColourizeM1   (u16 rplcPat, u16 size, void* sprite) __z88dk_callee;
 
 // Functions to draw a sprite M0 with a color replaced 
 extern void cpct_drawSpriteColorizeM0(u8* sprite, u8* destMem, u8 width, u8 height, u8 oldColor, u8 newColor) __z88dk_callee;

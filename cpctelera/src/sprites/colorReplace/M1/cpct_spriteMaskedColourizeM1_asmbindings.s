@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -25,4 +25,9 @@
 ;;
 cpct_spriteMaskedColourizeM1_asm:: ;; Assembly entry point
 
-.include /cpct_spriteMaskedColourizeM1.asm/
+   ;; Include common code
+   .include /cpct_spriteMaskedColourizeM1.asm/
+
+   ;; Generate the code with just 1 increment of HL at the end of every loop pass
+   ;; as the array/sprite is to be composed of consecutive bytes 
+   cpctm_generate_spriteMaskedColourizeM1 2

@@ -219,6 +219,7 @@
    .DW  #0x6ADD  ;; ld ixl, d
 .endm
 
+.macro cpctm_generate_spriteColourizeM1 _NumIncsHL
    ;; Calculante E = (FindPat ^ InsrPat). This will be used at the end of the routine
    ;; to insert InsrPat in the byte by XORing again, as the final operation will
    ;; be performed only on the bits of the SelectedPixels (those coinciding with
@@ -270,11 +271,15 @@ loop:
    
    ld    (hl), a  ;; [2] Save modified byte
    
-   ;; Make HL point to next byt in the array and
-   ;;  decrement BC, repeating while not 0
-   inc   hl       ;; [2] ++HL
+   ;; Make HL point to next byte in the array and decrement BC, repeating while not 0
+   ;; HL will be incremented 1 in consecutive arrays, 2 or more if there are interleaved
+   ;; mask bytes. This is configurable by the macro parameter _NumIncsHL
+   .rept _NumIncsHL
+      inc   hl       ;; [2] ++HL
+   .endm
    dec    c       ;; [1] --C
    jr    nz, loop ;; [2/3] if (C > 0) then BC != 0, continue with the loop
    djnz  loop     ;; [3/4] if (--B > 0) then BC != 0, continue with the loop
    
    ret            ;; [3] Finished colourizing the sprite
+.endm
