@@ -213,12 +213,7 @@
 ;; Thanks to all who participated in the discussion for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Shall be removed when merging with development branch
-;; as it is already present in "macros/cpct_undocumentedOpcodes.h.s"
-.macro ld__ixl_d
-   .DW  #0x6ADD  ;; ld ixl, d
-.endm
-
+.mdelete cpctm_generate_spriteColourizeM1
 .macro cpctm_generate_spriteColourizeM1 _NumIncsHL
    ;; Calculante E = (FindPat ^ InsrPat). This will be used at the end of the routine
    ;; to insert InsrPat in the byte by XORing again, as the final operation will

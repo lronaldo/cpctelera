@@ -149,6 +149,7 @@
 ;; Thanks to all who participated in the discussion for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+.mdelete cpctm_generate_spriteMaskedColourizeM1
 .macro cpctm_generate_spriteMaskedColourizeM1 _NumIncsHL
    ;; Code for this function is exactly the same as cpct_spriteColourizeM1
    ;; but incrementing HL 2 times in each loop iteration to jump over
