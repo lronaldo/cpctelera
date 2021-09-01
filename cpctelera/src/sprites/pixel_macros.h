@@ -31,8 +31,8 @@
 // Title: Pixel Macros (C)
 //----------------------------------------------------------------------------------------
 
-//#ifndef PIXEL_MACROS_H
-//#define PIXEL_MACROS_H
+#ifndef PIXEL_MACROS_H
+#define PIXEL_MACROS_H
 
 //
 // Macro: CPCTM_PEN2PIXELPATTERN_M0
@@ -382,4 +382,4 @@
                                           (((C) & 0x01) << 4 |  ((C) & 0x02) >> 1) << 1 | \
                                           (((D) & 0x01) << 4 |  ((D) & 0x02) >> 1) )
 
-//#endif
+#endif
