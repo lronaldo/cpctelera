@@ -139,7 +139,7 @@ void ensureOnly1CharBack(std::string& str, char endc) {
 // Remove extensions from a filename
 //
 std::string basename(const std::string& str) {
-   auto i = str.find('.');
+   auto i = str.find_last_of('.');
    if (i != std::string::npos)
       return str.substr(0, i);
    return str;

@@ -27,20 +27,25 @@
 ##   * ADD2INTS
 ##   * ADD2SET
 ##   * ADD_N_ITEMS
+##   * CHECKSYSTEMOSX
+##   * CHECKSYSTEMCYGWIN
 ##   * CHECKVARIABLEISSET
 ##   * CONTAINED_IN
 ##   * CONVERTVALUE
 ##   * CONVERT_FW2HW_PALETTE
+##   * CREATETMPFILENAME
 ##   * DEC2HEX
 ##   * EQUALS
 ##   * ENSURE_ADDRESS_VALID
 ##   * ENSURE_VALID_C_ID
 ##   * ENSURE_SINGLE_VALUE
+##   * ENSUREFOLDERISREADABLE
 ##   * ENSUREVALID
 ##   * ENSUREFILEEXISTS
-##	  * FILEEXISTS
-##	  * FOLDEREXISTS
-##	  * FOLDERISWRITABLE
+##   * FILEEXISTS
+##   * FOLDEREXISTS
+##   * FOLDERISREADABLE
+##   * FOLDERISWRITABLE
 ##   * GET_IMG_SIZE
 ##   * GREATER_THAN
 ##   * HEX2DEC
@@ -50,8 +55,12 @@
 ##   * JOINFOLDER2BASENAME
 ##   * PRINT 
 ##   * REMOVEFILEIFEXISTS
+##   * REPLACETAG_RT
+##   * REPLACETAGGEDLINE
+##   * REPLACETAGGEDLINE_RT
 ##   * SET_ONE_OF_MANY_VALID
 ##   * STRLEN
+##   * SYSPATH
 ##   * VERIFY_FW_PALETTE
 ##
 
@@ -108,6 +117,128 @@ define JOINFOLDER2BASENAME
 		else \
 			echo "$(_J2B_3)"; \
 		fi))
+endef
+
+########################
+## SYSPATH
+##   Returns System-Dependent valid path for a unix-style path
+## input. This path is only changed (into a Windows-style path)
+## when detected system is cygwin. Then, cygpath is used to 
+## return the windows-style path.
+##   $(1): Unix-style path
+##
+define SYSPATH
+$(strip \
+	$(if $(call CHECKSYSTEMCYGWIN)\
+		,$(shell cygpath -w $(strip $(1)))\
+		,$(strip $(1))\
+	)\
+)
+endef
+
+########################
+## CHECKSYSTEMOSX
+##   Returns "OSX" if system is OSX, empty otherwise.
+## This is designed to be used in makefile if macros
+##
+define CHECKSYSTEMOSX
+$(shell if [[ `uname` =~ "Darwin" ]]; then echo "OSX"; fi)
+endef
+
+########################
+## CHECKSYSTEMCYGWIN
+##   Returns "CYGWIN" if system is Cygwin, empty otherwise.
+## This is designed to be used in makefile if macros
+##
+define CHECKSYSTEMCYGWIN
+$(shell if [[ `uname` =~ "CYGWIN" ]]; then echo "CYGWIN"; fi)
+endef
+
+########################
+## CREATETMPFILENAME
+## Creates a temporary filename and returns it
+##
+define CREATETMPFILENAME
+$(if $(call CHECKSYSTEMOSX)\
+	,$(shell mktemp -t tmp.XXXXX)\
+	,$(shell mktemp)
+)
+endef
+
+########################
+## REPLACETAGGEDLINE
+## Replaces a complete line in a file which contains a given tag 
+## $1: Tag to be searched
+## $2: New line to replace the one that contains the tag
+## $3: File to modify
+## $4: sed deliminer (optional)
+##
+define REPLACETAGGEDLINE
+	# Strip parameters
+	$(eval _RTL_1 :=$(1))
+	$(eval _RTL_2 :=$(2))
+	$(eval _RTL_3 :=$(strip $(3)))
+	# Check file exists
+	$(call ENSUREFILEEXISTS,$(_RTL_3),[REPLACETAGGEDLINE]: <<ERROR>> File '$(_RTL_3)' not found when trying to replace tag '$(_RTL_1)' in it)
+	# Set up sed delimiter
+	$(eval _RTL_4 := $(if $(strip $(4)),$(strip $(4)),/))
+	# Create temporary file
+	$(eval _RTL_TMP := $(call CREATETMPFILENAME))
+	# Replace tagged line with new line
+	$(shell \
+		if cat "$(_RTL_3)" | sed "s$(_RTL_4).*$(_RTL_1).*$(_RTL_4)$(_RTL_2)$(_RTL_4)g" > $(_RTL_TMP); then \
+			mv "$(_RTL_TMP)" "$(_RTL_3)"; \
+		fi)
+endef
+
+########################
+## REPLACETAGGEDLINE_RT
+## Replaces a complete line in a file which contains a given tag. This
+## macro expands a piece of shell code that needs to be executed inside a rule
+## in RealTime (after all preprocessing)
+## $1: Tag to be searched
+## $2: New line to replace the one that contains the tag
+## $3: File to modify
+## $4: sed deliminer (optional)
+##
+define REPLACETAGGEDLINE_RT
+	@# Strip parameters
+	$(eval _RTL_1 :=$(1))
+	@#(eval _RTL_2 :=$(2)) << Doing this eliminates trailing spaces that are required
+	$(eval _RTL_3 :=$(strip $(3)))
+	@# Set up sed delimiter
+	$(eval _RTL_4 := $(if $(strip $(4)),$(strip $(4)),/))
+	@# Create temporary file
+	$(eval _RTL_TMP := $(call CREATETMPFILENAME))
+	@# Replace tagged line with new line
+	@if cat "$(_RTL_3)" | sed "s$(_RTL_4).*$(_RTL_1).*$(_RTL_4)$(2)$(_RTL_4)g" > $(_RTL_TMP); then \
+		mv "$(_RTL_TMP)" "$(_RTL_3)"; \
+	fi
+endef
+
+########################
+## REPLACETAG_RT
+## Replaces all occurrences of tag inside a file with a given string. 
+## This macro expands a piece of shell code that needs to be executed
+## later on, inside a rule.
+## $1: Tag to be searched
+## $2: String to replace the tag
+## $3: File to modify
+## $4: sed delimiter (optional)
+##
+define REPLACETAG_RT
+	@# Strip parameters
+	$(eval _RTL_1 :=$(1))
+	$(eval _RTL_2 :=$(2))
+	$(eval _RTL_3 :=$(strip $(3)))
+	@# Set up sed delimiter
+	$(eval _RTL_4 := $(if $(strip $(4)),$(strip $(4)),/))
+	@# Create temporary file
+	$(eval _RTL_TMP := $(call CREATETMPFILENAME))
+	@# Replace tagged line with new line
+	@if cat "$(_RTL_3)" | sed "s$(_RTL_4)$(_RTL_1)$(_RTL_4)$(_RTL_2)$(_RTL_4)g" > $(_RTL_TMP); then \
+		mv "$(_RTL_TMP)" "$(_RTL_3)"; \
+	fi
 endef
 
 #################
@@ -224,7 +355,8 @@ define ENSURE_VALID_C_ID
 endef
 
 #################
-# ENSUREFILEEXISTS: Checks if a given file exists and, if not, raises an error
+# ENSUREFILEEXISTS: Checks if a given file exists and, if not, raises an error.
+# As this is a makefile macro, it is expanded and executed previous to rule execution.
 #
 # $(1): file
 # $(2): Error Message if it does not exist
@@ -234,6 +366,20 @@ define ENSUREFILEEXISTS
 	$(if $(filter-out $(wildcard $(EFE_THEFILE)),$(EFE_THEFILE))\
 		,$(error $(strip $(2)))\
 		,)
+endef
+
+#################
+# ENSUREFOLDERISREADABLE: Checks if a given folder exists and is readable and
+# if not, raises an error.
+#
+# $(1): folder
+# $(2): Error Message if it does not exist
+#
+define ENSUREFOLDERISREADABLE
+	$(if $(call FOLDERISREADABLE,$(strip $(1)))\
+		,\
+		,$(error $(strip $(2)))\
+	)
 endef
 
 
@@ -441,6 +587,18 @@ endef
 #
 define FOLDERISWRITABLE
 $(shell if [[ -d "$(strip $(1))" && -w "$(strip $(1))" && -x "$(strip $(1))" ]]; then echo true; fi)
+endef
+
+#################
+# FOLDERISREADABLE: Checks if a given folder exists and is readable
+# or not. Returns "true" when the file exists and empty-string 
+# otherwise. It is thought to be used in makefile if functions. 
+# Parameter is striped before being tested.
+#
+# $(1): folder (must not be a file)
+#
+define FOLDERISREADABLE
+$(shell if [[ -d "$(strip $(1))" && -r "$(strip $(1))" && -x "$(strip $(1))" ]]; then echo true; fi)
 endef
 
 #################

@@ -754,7 +754,7 @@ function checkSystem {
          "win10linux")
             if [[ "$SYS" =~ "Linux" ]]; then
                # Use /proc/version for better compatibilty 
-               if grep -qE "(Microsoft|WSL)" /proc/version &> /dev/null; then
+               if grep -qE "(icrosoft|WSL)" /proc/version &> /dev/null; then
                   return 0;
                fi
             fi
@@ -976,9 +976,9 @@ function versionGreaterOREqualThan() {
       VTH=${VTH:${#VTH_DIGIT}+1}
 
       ## Check numbers
-      if [[ "$VTH_DIGIT" > "$V_DIGIT" ]]; then
+      if (( "$VTH_DIGIT" > "$V_DIGIT" )); then
          return 1
-      elif [[ "$VTH_DIGIT" < "$V_DIGIT" ]]; then
+      elif (( "$VTH_DIGIT" < "$V_DIGIT" )); then
          return 0
       fi
    done

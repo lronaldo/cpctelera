@@ -58,13 +58,13 @@
 #define cpct_page00 0x00
 
 //
-// Macro: cpct_memPage6
+// Macro: cpctm_memPage6
 //
 //    Macro that encodes a video memory page in the 6 Least Significant bits (LSb)
 // of a byte, required as parameter for <cpct_setVideoMemoryPage>
 //
 // C Definition:
-// #define <cpct_memPage6> (*PAGE*)
+// #define <cpctm_memPage6> (*PAGE*)
 //
 // Parameters (1 byte):
 // (1B) PAGE - Video memory page wanted 
@@ -77,6 +77,9 @@
 // with just 6 significant bits. For more information, check functions
 // <cpct_setVideoMemoryPage> and <cpct_setVideoMemoryOffset>.
 //
+#define cpctm_memPage6(PAGE) ((PAGE) >> 2)
+
+// Deprecated, but maintained for compatibility
 #define cpct_memPage6(PAGE) ((PAGE) >> 2)
 
 //

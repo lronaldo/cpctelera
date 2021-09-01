@@ -51,11 +51,12 @@
 ## Command line options:
 ##    -a  | --any-dsk                  - Lauches WinAPE and loads first DSK file to match *.dsk
 ##    -as | --any-sna                  - Lauches WinAPE and loads first SNA file to match *.sna
-##    -n  | --no-execute               - Lauches WinAPE but does not automatically RUN any DSK program.
-##    -s  | --symbols <symbols_file>   - Loads a symbols file for debugging (NoICE format .noi).
 ##    -d  | --disable-symbols-autoload - Prevents this script from trying to autoload a symbols 
 ## file for debugging, when no symbols file is provided
+##    -f  | --foreground               - Lauches WinAPE as a foreground command (Default: background)
 ##    -h  | --help                     - Shows help information on the terminal.
+##    -n  | --no-execute               - Lauches WinAPE but does not automatically RUN any DSK program.
+##    -s  | --symbols <symbols_file>   - Loads a symbols file for debugging (NoICE format .noi).
 ##
 
 ##
@@ -74,6 +75,7 @@ WINAPE_DEFAULT_INI=${CPCT_SCRIPTS_FOLDER}/templates/winape/WinAPE.ini
 WINE=wine
 WAPE=/path/to/WinAPE ## Should be read from config file
 CONFIG_FILE=${CPCT_SCRIPTS_FOLDER}/.cpct_winape.config
+BACKGROUND=true
 
 # Command line parameter variables
 FILE=""
@@ -110,21 +112,24 @@ install WinAPE. Users can either give the script the path of their own WinAPE in
 or ask the script to automatically download and install it inside CPCtelera's tool folder. \
 For this last operation, wget and unzip commands are required (they should be installed in \
 the system)."
+
    echo
    echo "${COLOR_LIGHT_YELLOW}OPTIONS"
    echo "${COLOR_LIGHT_BLUE}  -a | --any-dsk"
    echo "${COLOR_CYAN}       Lauches WinAPE and loads first DSK file to match *.dsk."
    echo "${COLOR_LIGHT_BLUE}  -as| --any-sna"
    echo "${COLOR_CYAN}       Lauches WinAPE and loads first SNA file to match *.sna."
+   echo "${COLOR_LIGHT_BLUE}  -d | --disable-symbols-autoload"
+   echo "${COLOR_CYAN}       Prevents this script from trying to autoload a symbols file \
+for debugging, when no symbols file is provided"
+   echo "${COLOR_LIGHT_BLUE}  -f | --foreground"
+   echo "${COLOR_CYAN}       Lauches WinAPE as a foreground command (Default: background)"
+   echo "${COLOR_LIGHT_BLUE}  -h | --help"
+   echo "${COLOR_CYAN}       Shows this help information"
    echo "${COLOR_LIGHT_BLUE}  -n | --no-execute"
    echo "${COLOR_CYAN}       Lauches WinAPE but does not automatically RUN any DSK program."
    echo "${COLOR_LIGHT_BLUE}  -s | --symbols <symbols_file>"
    echo "${COLOR_CYAN}       Loads a symbols file for debugging (NoICE format .noi)."
-   echo "${COLOR_LIGHT_BLUE}  -d | --disable-symbols-autoload"
-   echo "${COLOR_CYAN}       Prevents this script from trying to autoload a symbols file \
-for debugging, when no symbols file is provided"
-   echo "${COLOR_LIGHT_BLUE}  -h | --help"
-   echo "${COLOR_CYAN}       Shows this help information"
    echo ${COLOR_NORMAL}
    exit 1
 }
@@ -331,6 +336,9 @@ readConfigFile
 # Proccess command line parameters
 while (( $# > 0 )); do
    case "$1" in
+      "-f" | "--foreground")
+         BACKGROUND=false
+      ;;
       "-n" | "--no-execute")
          MODIFIER=""
       ;;
@@ -410,4 +418,8 @@ if [ "$EXT" = "SNA" ]; then
 fi
 
 # Launch Winape with appropriate path for DSK/SNA file
-${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" "$SYMS" &> /dev/null &
+if $BACKGROUND; then
+   ${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" "$SYMS" &> /dev/null &
+else 
+   ${WINE} "${WAPE}" "$FILEPATH" "$MODIFIER" "$SYMS" &> /dev/null
+fi 

@@ -15,6 +15,8 @@ Section: Donnors
    13/01/2018 - Rafael Castillo García
    31/03/2018 - Augusto Ruíz García
    16/11/2018 - Carlos Pérez Peregrín
+   12/12/2019 - Carlos Pérez Peregrín
+   06/08/2021 - Pablo Álvarez Doval
 
 Section: Project authors
    
@@ -33,6 +35,7 @@ Awesome collaborators:
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
    * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
    * <Syx at http://www.cpcwiki.eu/forum/profile/?u=324>
+   * <Nestornillo at https://github.com/nestornillo>
  
 Bitarrays idea and original implementation:
    * Alberto García García (Blitzman, albertgg93@gmail.com, <@albertgarcia93 at http://twitter.com/albertgarcia93>)
@@ -109,14 +112,19 @@ Section: 3rdparty software authors
 
 Section: Code & fixes contributors
 
+   * <Alex Macia Fiteni at https://github.com/AlexMaciaFiteni>
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> 
    * <Arnaud Bouche at http://www.cpcwiki.eu/forum/profile/?u=1424> / <CPCWiki at http://www.cpcwiki.eu>
+   * <Carlos Garrido Marín at https://github.com/cgm164>
    * <César Nicolás González at https://twitter.com/cngsoft> / <CNGSoft at http://cngsoft.no-ip.org/index.htm>
    * <Ervin at http://www.cpcwiki.eu/forum/profile/?u=82> / <CPCWiki at http://www.cpcwiki.eu>
    * Jose Manuel Ladrón de Guevara García (<@jmlg97 / Github at https://github.com/jmlg97>)
    * Kevin Thacker at http://www.cpctech.org.uk/about.html> / <CPCTech at http://www.cpctech.org.uk/>
+   * <Nestornillo at https://github.com/nestornillo>
    * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
    * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
+   * <Federico J. Álvarez at https://twitter.com/falvarez>
+   * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
 
 Section: Testers & Bug Reporters 
 
@@ -142,6 +150,11 @@ Section: Testers & Bug Reporters
  * <John Lobo at https://github.com/johnlobo> / <Github at https://github.com> 
  * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
  * Iván Fernández Álvarez (<SpDizzy at http://twitter.com/dizzy_sp>)
+ * Carlos Pérez Peregrín (<cperezprg at https://www.youtube.com/user/cperezprg/> / <cperezgrin at https://www.readyandplay.com/author/cperezgrin/>)
+ * Cayetano Manchón Pernis (<cmp102 at https://github.com/cmp102>)
+ * <juritobi at https://github.com/juritobi>
+ * Tamara Torrecillas (<tamaraatm at https://github.com/tamaraatm>)
+ * <MoteroV4 / Amstrad.es at https://www.amstrad.es/forum/memberlist.php?mode=viewprofile&u=4383> (aka <@enrib4 / github at https://github.com/enrib4>
 
 Section: Assets 
 

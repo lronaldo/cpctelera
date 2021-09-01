@@ -30,11 +30,14 @@
 BINADDRLOG   := $(OBJDIR)/binaryAddresses.log
 PREBUILD_OBJ := $(OBJDIR)/prebuildstep.objectfile
 
-.PHONY: all clean cleanall
+.PHONY: all clean cleanall cleancode recode
+
+# OBJSUBDIR folder files
+OBJSUBDIRS_FOLDER_FILES := $(foreach F,$(OBJSUBDIRS),$(F)/.folder)
 
 # MAIN TARGET
 .DEFAULT_GOAL := all
-all: $(OBJSUBDIRS) $(PREBUILD_OBJ) $(TARGET)
+all: $(TARGET)
 
 ## COMPILING SOURCEFILES AND SAVE OBJFILES IN THEIR CORRESPONDENT SUBDIRS
 $(foreach OF, $(BIN_OBJFILES), $(eval $(call BINFILE2C, $(OF), $(OF:%.$(C_EXT)=%.$(BIN_EXT)))))
@@ -50,7 +53,8 @@ $(TOUCHIFNOTEXIST):
 	@$(TOUCH) $(TOUCHIFNOTEXIST)
 
 # PREVIOUS BUILDING STEP (CONVERSION TOOLS NORMALLY)
-$(PREBUILD_OBJ): $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES) $(PREBUILDOBJS)
+$(PREBUILD_OBJ): $(OBJSUBDIRS_FOLDER_FILES) $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES) $(PREBUILDOBJS)
+	$(info preobjs: '$(OBJSUBDIRS_FOLDER_FILES)')
 	@$(call PRINT,$(PROJNAME),"")
 	@$(call PRINT,$(PROJNAME),"=== PREBUILD PROCCESSING DONE!")
 	@$(call PRINT,$(PROJNAME),"============================================================")
@@ -58,7 +62,7 @@ $(PREBUILD_OBJ): $(IMGCFILES) $(IMGASMFILES) $(IMGBINFILES) $(PREBUILDOBJS)
 	@touch $(PREBUILD_OBJ)
 
 # LINK RELOCATABLE MACHINE CODE FILES (.REL) INTO A INTEL HEX BINARY (.IHX)
-$(IHXFILE): $(NONLINKGENFILES) $(GENOBJFILES) $(OBJFILES)
+$(IHXFILE): $(PREBUILD_OBJ) $(NONLINKGENFILES) $(GENOBJFILES) $(OBJFILES)
 	@$(call PRINT,$(PROJNAME),"Linking binary file")
 	$(Z80CC) $(Z80CCLINKARGS) $(GENOBJFILES) $(OBJFILES) -o "$@"
 
@@ -79,6 +83,7 @@ $(DSK): $(BINFILE) $(BINADDRLOG)
 	@$(call GETALLADDRESSES,$<)
 	@$(call PRINT,$(PROJNAME),"Creating Disk File '$@'")
 	@$(call CREATEEMPTYDSK,$@)
+	@$(RM) $(DSKINCOBJFILES)	
 	@$(call ADDCODEFILETODSK,$@,$<,$(LOADADDR),$(RUNADDR),$(<:%=%.$(DSKINC_EXT)))
 	@$(call PRINT,$(PROJNAME),"Successfully created '$@'")
 
@@ -101,14 +106,38 @@ $(DSKINC): $(DSK) $(DSKINCOBJFILES)
 	@touch $(DSKINC)
 
 # CREATE OBJDIR & SUBDIRS IF THEY DO NOT EXIST
-$(OBJSUBDIRS): 
-	@$(MKDIR) $@
+define MKSUBDIR
+$(eval __S:=$(strip $(1)))
+$(eval __D:=$(__S:%.folder=%))
+$(__S):
+	@$(MKDIR) $(__D)
+	@touch $(__S)
 
-# CLEANING TARGETS
+endef
+$(foreach D,$(OBJSUBDIRS_FOLDER_FILES),$(eval $(call MKSUBDIR,$(D))))
+
+
+## CLEANING TARGETS
+#
+
+# Clean Everything, including target DSK, SNA and CDT
 cleanall: clean
 	@$(call PRINT,$(PROJNAME),"Deleting $(TARGET)")
 	$(RM) $(TARGET)
 
+# Clean only code-produced objects (not assets or generated files)
+cleancode:
+	@$(call PRINT,$(PROJNAME),"Deleting C-OBJ   Relfiles")
+	$(foreach file, $(C_OBJFILES), $(RM) ./$(file))
+	@$(call PRINT,$(PROJNAME),"Deleting ASM-OBJ Relfiles")
+	$(foreach file, $(ASM_OBJFILES), $(RM) ./$(file))
+	@$(call PRINT,$(PROJNAME),"Code cleaned")
+
+# Clean only code an remake the project
+recode: cleancode
+	$(MAKE) 
+
+# Clean all object files, but not targets (DSK, SNA, CDT)
 clean: 
 	@$(call PRINT,$(PROJNAME),"Deleting folder: $(OBJDIR)/")
 	$(RM) -r ./$(OBJDIR)

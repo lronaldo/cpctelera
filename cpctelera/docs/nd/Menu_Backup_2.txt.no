@@ -1,0 +1,405 @@
+Format: 1.52
+
+
+Title: . .
+SubTitle: 
+
+Footer: (C)opyright 2018 CPCtelera authors. Distributed under GNU GPL License.
+Timestamp: Last updated yyyy/mm/dd
+#   m     - One or two digit month.  January is "1"
+#   mm    - Always two digit month.  January is "01"
+#   mon   - Short month word.  January is "Jan"
+#   month - Long month word.  January is "January"
+#   d     - One or two digit day.  1 is "1"
+#   dd    - Always two digit day.  1 is "01"
+#   day   - Day with letter extension.  1 is "1st"
+#   yy    - Two digit year.  2006 is "06"
+#   yyyy  - Four digit year.  2006 is "2006"
+#   year  - Four digit year.  2006 is "2006"
+
+
+# --------------------------------------------------------------------------
+# 
+# Cut and paste the lines below to change the order in which your files
+# appear on the menu.  Don't worry about adding or removing files, Natural
+# Docs will take care of that.
+# 
+# You can further organize the menu by grouping the entries.  Add a
+# "Group: [name] {" line to start a group, and add a "}" to end it.
+# 
+# You can add text and web links to the menu by adding "Text: [text]" and
+# "Link: [name] ([URL])" lines, respectively.
+# 
+# The formatting and comments are auto-generated, so don't worry about
+# neatness when editing the file.  Natural Docs will clean it up the next
+# time it is run.  When working with groups, just deal with the braces and
+# forget about the indentation and comments.
+# 
+# --------------------------------------------------------------------------
+
+
+Link: CPCtelera at Github  (https://github.com/lronaldo/cpctelera)
+File: CPCtelera Reference Manual  (no auto-title, readme.txt)
+File: Authors  (no auto-title, authors.txt)
+File: License  (no auto-title, license.txt)
+Text: ______________________________________________________________________
+File: Aliases for builtin types  (types.h)
+File: Android Exporter  (no auto-title, buildsys/android_exporter.txt)
+File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
+File: Visual Studio Code  (buildsys/vscode_integration.txt)
+
+Group: Audio  {
+
+   File: Arkos Player Functions  (audio/arkostracker.s)
+   File: Arkos Player Manual  (audio/arkosplayer.txt)
+   File: Audio Constants&amp;Variables  (audio/audio.h)
+   Link: cpct_akp_musicPlay  (arkostracker-s.html&amp;#x23;cpct_akp_musicPlay)
+   Link: cpct_akp_musicInit  (arkostracker-s.html&amp;#x23;cpct_akp_musicInit)
+   Link: cpct_akp_stop  (arkostracker-s.html&amp;#x23;cpct_akp_stop)
+   Link: cpct_akp_SFXGetInstrument  (arkostracker-s.html&amp;#x23;cpct_akp_SFXGetInstrument)
+   Link: cpct_akp_SFXInit  (arkostracker-s.html&amp;#x23;cpct_akp_SFXInit)
+   Link: cpct_akp_SFXStopAll  (arkostracker-s.html&amp;#x23;cpct_akp_SFXStopAll)
+   Link: cpct_akp_SFXPlay  (arkostracker-s.html&amp;#x23;cpct_akp_SFXPlay)
+   Link: cpct_akp_SFXStop  (arkostracker-s.html&amp;#x23;cpct_akp_stop)
+   Link: cpct_akp_setFadeVolume  (arkostracker-s.html&amp;#x23;cpct_akp_setFadeVolume)
+   }  # Group: Audio
+
+Group: Bitarray  {
+
+   File: cpct_bitWeights  (bitarray/cpct_bitWeightsVector.s)
+   File: cpct_get2Bits  (bitarray/cpct_get2Bits.asm)
+   File: cpct_get4Bits  (bitarray/cpct_get4Bits.asm)
+   File: cpct_get6Bits  (bitarray/cpct_get6Bits.asm)
+   File: cpct_getBit  (bitarray/cpct_getBit.asm)
+   File: cpct_set2Bits  (bitarray/cpct_set2Bits.asm)
+   File: cpct_set4Bits  (bitarray/cpct_set4Bits.asm)
+   File: cpct_set6Bits  (bitarray/cpct_set6Bits.asm)
+   File: cpct_setBit  (bitarray/cpct_setBit.asm)
+   File: Useful macros  (bitarray/bitarray_macros.h)
+   }  # Group: Bitarray
+
+Group: Commandline  {
+
+   Group: C_scripts  {
+
+      File: cpct_bin2sna  (commandline/c_scripts/bin2sna/src/main.h)
+      File: cpct_binpatch  (commandline/c_scripts/binpatch/src/main.h)
+      File: cpct_tmx2data  (commandline/c_scripts/tmx2data/src/main.h)
+      }  # Group: C_scripts
+
+   File: cpct_aks2c  (commandline/cpct_aks2c)
+   File: cpct_bin2c  (commandline/cpct_bin2c)
+   File: cpct_img2tileset  (commandline/cpct_img2tileset)
+   File: cpct_installrslib  (commandline/cpct_installrslib)
+   File: cpct_mkproject  (commandline/cpct_mkproject)
+   File: cpct_pack  (commandline/cpct_pack)
+   File: cpct_png2chars  (commandline/c_scripts/png2udg/src/main.h)
+   File: cpct_png2chars  (commandline/c_scripts/png2chars/src/main.h)
+   File: cpct_rgas2c  (commandline/cpct_rgas2c)
+   File: cpct_rvm  (commandline/cpct_rvm)
+   File: cpct_sp2tile  (commandline/cpct_sp2tiles)
+   File: cpct_tmx2csv  (commandline/cpct_tmx2csv)
+   File: cpct_winape  (commandline/cpct_winape)
+
+   Group: Kk  {
+
+      Group: Sdcc-3.8.5-r10892  {
+
+         File: int getlnm&lparen;&rparen;  (no auto-title, commandline/kk/sdcc-3.8.5-r10892/src/sdas/asxxsrc/aslex.c)
+         File: promote to int  (commandline/kk/sdcc-3.8.5-r10892/src/src/SDCCast.c)
+         File: sdas/asxxsrc/assubr.c  (commandline/kk/sdcc-3.8.5-r10892/src/sdas/asxxsrc/assubr.c)
+
+         Group: Support  {
+
+            Group: Scripts  {
+
+               File: cinc2h.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/cinc2h.pl)
+               File: gen_known_bugs.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/gen_known_bugs.pl)
+               File: mcs51-disasm.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/mcs51-disasm.pl)
+               File: optimize_pic16devices.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/optimize_pic16devices.pl)
+               File: pic14-header-parser.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/pic14-header-parser.pl)
+               File: pic16-header-parser.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/pic16-header-parser.pl)
+               File: pic16fam-h-gen.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/pic16fam-h-gen.pl)
+               File: pic18fam-h-gen.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/pic18fam-h-gen.pl)
+               File: z80-disasm.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/scripts/z80-disasm.pl)
+               }  # Group: Scripts
+
+            Group: Sdbinutils  {
+
+               File: elfcore_write_note  (commandline/kk/sdcc-3.8.5-r10892/src/support/sdbinutils/bfd/elf.c)
+               File: mep-relocs.pl  (commandline/kk/sdcc-3.8.5-r10892/src/support/sdbinutils/bfd/mep-relocs.pl)
+               File: Returns true if the bfd is a PE executable as opposed to a  (commandline/kk/sdcc-3.8.5-r10892/src/support/sdbinutils/bfd/libcoff.h)
+               }  # Group: Sdbinutils
+
+            File: simple assignment  (commandline/kk/sdcc-3.8.5-r10892/src/support/regression/tests/structassign.c)
+            File: util_xor_arrays.c  (commandline/kk/sdcc-3.8.5-r10892/src/support/regression/tests/bug3304184.c)
+            }  # Group: Support
+
+         }  # Group: Sdcc-3.8.5-r10892
+
+      Group: Sdcc-3.9.0-r11321  {
+
+         File: int getlnm&lparen;&rparen;  (no auto-title, commandline/kk/sdcc-3.9.0-r11321/src/sdas/asxxsrc/aslex.c)
+         File: promote to int  (commandline/kk/sdcc-3.9.0-r11321/src/src/SDCCast.c)
+         File: sdas/asxxsrc/assubr.c  (commandline/kk/sdcc-3.9.0-r11321/src/sdas/asxxsrc/assubr.c)
+
+         Group: Support  {
+
+            Group: Scripts  {
+
+               File: cinc2h.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/cinc2h.pl)
+               File: gen_known_bugs.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/gen_known_bugs.pl)
+               File: mcs51-disasm.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/mcs51-disasm.pl)
+               File: optimize_pic16devices.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/optimize_pic16devices.pl)
+               File: pic14-header-parser.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/pic14-header-parser.pl)
+               File: pic16-header-parser.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/pic16-header-parser.pl)
+               File: pic16fam-h-gen.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/pic16fam-h-gen.pl)
+               File: pic18fam-h-gen.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/pic18fam-h-gen.pl)
+               File: z80-disasm.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/scripts/z80-disasm.pl)
+               }  # Group: Scripts
+
+            Group: Sdbinutils  {
+
+               File: elfcore_write_note  (commandline/kk/sdcc-3.9.0-r11321/src/support/sdbinutils/bfd/elf.c)
+               File: mep-relocs.pl  (commandline/kk/sdcc-3.9.0-r11321/src/support/sdbinutils/bfd/mep-relocs.pl)
+               File: Returns true if the bfd is a PE executable as opposed to a  (commandline/kk/sdcc-3.9.0-r11321/src/support/sdbinutils/bfd/libcoff.h)
+               }  # Group: Sdbinutils
+
+            File: simple assignment  (commandline/kk/sdcc-3.9.0-r11321/src/support/regression/tests/structassign.c)
+            File: util_xor_arrays.c  (commandline/kk/sdcc-3.9.0-r11321/src/support/regression/tests/bug3304184.c)
+            }  # Group: Support
+
+         }  # Group: Sdcc-3.9.0-r11321
+
+      }  # Group: Kk
+
+   }  # Group: Commandline
+
+Group: Compression  {
+
+   File: cpct_zx7b_decrunch_s  (compression/cpct_zx7b_decrunch_s.asm)
+   }  # Group: Compression
+
+Group: Easytilemaps  {
+
+   File: cpct_etm_drawTileBox2x4  (easytilemaps/cpct_etm_drawTileBox2x4.asm)
+   File: cpct_etm_drawTilemap2x4_f  (easytilemaps/cpct_etm_drawTilemap2x4_f.asm)
+   File: cpct_etm_drawTilemap4x8_ag  (easytilemaps/cpct_etm_drawTilemap4x8_ag.asm)
+   File: cpct_etm_drawTilemap4x8_agf  (easytilemaps/cpct_etm_drawTilemap4x8_agf.asm)
+   File: cpct_etm_drawTileRow2x4  (easytilemaps/cpct_etm_drawTileRow2x4.s)
+   File: cpct_etm_setDrawTilemap4x8_ag  (easytilemaps/cpct_etm_setDrawTilemap4x8_ag.asm)
+   File: cpct_etm_setDrawTilemap4x8_agf  (easytilemaps/cpct_etm_setDrawTilemap4x8_agf.asm)
+   File: cpct_etm_setTileset2x4  (easytilemaps/cpct_etm_setTileset2x4.s)
+   File: EasyTilemaps  (easytilemaps/easytilemaps.h)
+   }  # Group: Easytilemaps
+
+Group: Firmware  {
+
+   File: cpct_mode_rom_status  (firmware/cpc_mode_rom_status.s)
+   File: cpct_reenableFirmware  (firmware/cpct_reenableFirmware.s)
+   File: cpct_removeInterruptHandler.s  (firmware/cpct_removeInterruptHandler.s)
+   File: cpct_setInterruptHandler  (firmware/cpct_setInterruptHandler.s)
+   File: Enabling / disabling ROMs  (firmware/cpct_enableDisableROMs.s)
+   File: Firmware&amp;ROM constants  (firmware/firmware.s)
+   }  # Group: Firmware
+
+Group: Keyboard  {
+
+   File: cpct_isAnyKeyPressed  (keyboard/cpct_isAnyKeyPressed.s)
+   File: cpct_isAnyKeyPressed_f  (keyboard/cpct_isAnyKeyPressed_f.s)
+   File: cpct_isKeyPressed  (keyboard/cpct_isKeyPressed.s)
+   File: cpct_scanKeyboard  (keyboard/cpct_scanKeyboard.s)
+   File: cpct_scanKeyboard_f  (keyboard/cpct_scanKeyboard_f.s)
+   File: cpct_scanKeyboard_i  (keyboard/cpct_scanKeyboard_i.s)
+   File: cpct_scanKeyboard_if  (keyboard/cpct_scanKeyboard_if.s)
+   File: Key Definitions &lparen;asm&rparen;  (keyboard/keyboard.h.s)
+   File: Keyboard Mappings&amp;Constants  (keyboard/keyboard.h)
+   File: Keyboard Technicals  (keyboard/keyboard.txt)
+   }  # Group: Keyboard
+
+Group: Loaders  {
+
+   File: cpct_miniload  (loaders/cpct_miniload.asm)
+   }  # Group: Loaders
+
+Group: Macros  {
+
+   File: allmacros.h  (macros/allmacros.h)
+   File: allmacros.h.s  (macros/allmacros.h.s)
+   File: Math Macros  (macros/cpct_maths.h.s)
+   File: Opcodes  (macros/cpct_opcodeConstants.h.s)
+   File: Reverse Bits  (macros/cpct_reverseBits.h.s)
+   File: Undocumented Opcodes  (macros/cpct_undocumentedOpcodes.h.s)
+   }  # Group: Macros
+
+Group: Memutils  {
+
+   File: cpct_memcpy  (memutils/cpct_memcpy.asm)
+   File: cpct_memset  (memutils/cpct_memset.asm)
+   File: cpct_memset_f64  (memutils/cpct_memset_f64.asm)
+   File: cpct_memset_f64_i  (memutils/cpct_memset_f64_i.asm)
+   File: cpct_memset_f8  (memutils/cpct_memset_f8.asm)
+   File: cpct_pageMemory  (memutils/cpct_pageMemory.asm)
+   File: cpct_setStackLocation  (memutils/cpct_setStackLocation.s)
+   File: cpct_waitHalts  (memutils/cpct_waitHalts.asm)
+   File: Memory Pagination Macros  (memutils/banks.h)
+   File: Memory Relocation Utilities  (memutils/relocation.h)
+   }  # Group: Memutils
+
+Group: Random  {
+
+   File: cpct_getRandom_glfsr16  (random/cpct_getRandom_glfsr.s)
+   File: cpct_getRandom_lcg_u8  (random/cpct_getRandom_lcg_u8.s)
+   File: cpct_getRandom_mxor_u16  (random/cpct_getRandom_mxor_u16.s)
+   File: cpct_getRandom_mxor_u32  (random/cpct_getRandom_mxor_u32.s)
+   File: cpct_getRandom_mxor_u8  (random/cpct_getRandom_mxor_u8.s)
+   File: cpct_getRandom_xsp40_u8  (random/cpct_getRandom_xsp40_u8.s)
+   File: cpct_mxor32_seed  (random/cpct_mxor32_seed.s)
+   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u32.s)
+   File: cpct_nextRandom_mxor_u32  (random/cpct_nextRandom_mxor_u16.s)
+   File: cpct_nextRandom_mxor_u8  (random/cpct_nextRandom_mxor_u8.s)
+   File: cpct_nextRandom_mxor532_u8  (random/cpct_nextRandom_mxor532_u8.s)
+   File: cpct_nextRandom_mxorplus_u32  (random/cpct_nextRandom_mxorplus_u64.s)
+   File: cpct_restoreState_mxor_u16  (random/cpct_restoreState_mxor_u16.s)
+   File: cpct_restoreState_mxor_u8  (random/cpct_restoreState_mxor_u8.s)
+   File: cpct_setSeed_glfsr16  (random/cpct_setSeed_glfsr.s)
+   File: cpct_setSeed_lcg_u8  (random/cpct_setSeed_lcg_u8.s)
+   File: cpct_setSeed_mxor  (random/cpct_setSeed_mxor.s)
+   File: cpct_setSeed_xsp40_u8  (random/cpct_setSeed_xsp40_u8.asm)
+   File: cpct_setTaps_glfsr16  (random/cpct_setTaps_glfsr.s)
+   File: Defined Types  (random/random_types.h)
+   File: Random  (random/random.h)
+   }  # Group: Random
+
+Group: Sprites  {
+
+   Group: Blending  {
+
+      File: Blended-Sprites Structs  (sprites/blending/sprite_types.h)
+      File: cpct_drawSpriteBlended  (sprites/blending/cpct_drawSpriteBlended.asm)
+      File: cpct_setBlendMode  (sprites/blending/cpct_setBlendMode.s)
+      }  # Group: Blending
+
+   Group: DrawTile  {
+
+      File: cpct_drawTileAligned2x4_f  (sprites/drawTile/cpct_drawTileAligned2x4_f.asm)
+      File: cpct_drawTileAligned2x8  (sprites/drawTile/cpct_drawTileAligned2x8.asm)
+      File: cpct_drawTileAligned2x8_f  (sprites/drawTile/cpct_drawTileAligned2x8_f.asm)
+      File: cpct_drawTileAligned4x4_f  (sprites/drawTile/cpct_drawTileAligned4x4_f.asm)
+      File: cpct_drawTileAligned4x8  (sprites/drawTile/cpct_drawTileAligned4x8.asm)
+      File: cpct_drawTileAligned4x8_f  (sprites/drawTile/cpct_drawTileAligned4x8_f.asm)
+      File: cpct_drawTileGrayCode2x8_af  (sprites/drawTile/cpct_drawTileGrayCode2x8_af.asm)
+      File: cpct_drawTileZigZagGrayCode4x8_af  (sprites/drawTile/cpct_drawTileZigZagGrayCode4x8_af.asm)
+      }  # Group: DrawTile
+
+   Group: DrawToSpriteBuffer  {
+
+      File: cpct_drawToSpriteBuffer  (sprites/drawToSpriteBuffer/cpct_drawToSpriteBuffer.asm)
+      File: cpct_drawToSpriteBufferMasked  (sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMasked.asm)
+      File: cpct_drawToSpriteBufferMaskedAlignedTable  (sprites/drawToSpriteBuffer/cpct_drawToSpriteBufferMaskedAlignedTable.asm)
+      File: Macros &lparen;asm&rparen;  (sprites/drawToSpriteBuffer/drawToSpriteBuffer.h.s)
+      File: Macros &lparen;C&rparen;  (sprites/drawToSpriteBuffer/drawToSpriteBuffer.h)
+      }  # Group: DrawToSpriteBuffer
+
+   Group: Flipping  {
+
+      File: cpct_drawSpriteHFlip_at  (sprites/flipping/cpct_drawSpriteHFlip_at.asm)
+      File: cpct_drawSpriteHFlipMasked_at  (sprites/flipping/cpct_drawSpriteHFlipMasked_at.asm)
+      File: cpct_drawSpriteVFlip  (sprites/flipping/cpct_drawSpriteVFlip.asm)
+      File: cpct_drawSpriteVFlip_f  (sprites/flipping/cpct_drawSpriteVFlip_f.asm)
+      File: cpct_drawSpriteVFlipMasked  (sprites/flipping/cpct_drawSpriteVFlipMasked.asm)
+      File: cpct_drawSpriteVFlipMasked_at  (sprites/flipping/cpct_drawSpriteVFlipMasked_at.asm)
+      File: cpct_getBottomLeftPtr  (sprites/flipping/cpct_getBottomLeftPtr.asm)
+      File: cpct_hflipSpriteM0  (sprites/flipping/cpct_hflipSpriteM0.asm)
+      File: cpct_hflipSpriteM0_r  (sprites/flipping/cpct_hflipSpriteM0_r.asm)
+      File: cpct_hflipSpriteM1  (sprites/flipping/cpct_hflipSpriteM1.asm)
+      File: cpct_hflipSpriteM1_r  (sprites/flipping/cpct_hflipSpriteM1_r.asm)
+      File: cpct_hflipSpriteM2  (sprites/flipping/cpct_hflipSpriteM2.asm)
+      File: cpct_hflipSpriteM2_r  (sprites/flipping/cpct_hflipSpriteM2_r.asm)
+      File: cpct_hflipSpriteMaskedM0  (sprites/flipping/cpct_hflipSpriteMaskedM0.asm)
+      File: cpct_hflipSpriteMaskedM1  (sprites/flipping/cpct_hflipSpriteMaskedM1.asm)
+      File: cpct_hflipSpriteMaskedM2  (sprites/flipping/cpct_hflipSpriteMaskedM2.asm)
+      File: cpct_vflipSprite  (sprites/flipping/cpct_vflipSprite.asm)
+      File: cpctm_ld_spbloff  (sprites/flipping/flipping_macros.h.s)
+      File: flipping_macros.h  (sprites/flipping/flipping_macros.h)
+      File: Pixel Horizontally Flipping Macros  (sprites/flipping/flipping_table_macros.h)
+      File: Pixel Horizontally Flipping Tables  (sprites/flipping/flipping_tables.h)
+      }  # Group: Flipping
+
+   File: cpct_drawSolidBox  (sprites/cpct_drawSolidBox.asm)
+   File: cpct_drawSprite  (sprites/cpct_drawSprite.asm)
+   File: cpct_drawSpriteMasked  (sprites/cpct_drawSpriteMasked.asm)
+   File: cpct_drawSpriteMaskedAlignedTable  (sprites/cpct_drawSpriteMaskedAlignedTable.asm)
+   File: cpct_getScreenToSprite  (sprites/screenToSprite/cpct_getScreenToSprite.asm)
+   File: cpct_px2byteM0  (sprites/cpct_px2byteM0.asm)
+   File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
+   File: pixel_macros.h  (sprites/pixel_macros.h)
+   File: Transparency Macros  (sprites/transparency_table_macros.h)
+   File: Transparency Tables for Mode 0  (sprites/transparency_tables_m0.h)
+   File: Transparency Tables for Mode 1  (sprites/transparency_tables_m1.h)
+   }  # Group: Sprites
+
+Group: Strings  {
+
+   File: cpct_drawCharM0  (strings/cpct_drawCharM0.asm)
+   File: cpct_drawCharM0_inner_asm  (strings/cpct_drawCharM0_inner.s)
+   File: cpct_drawCharM1  (strings/cpct_drawCharM1.asm)
+   File: cpct_drawCharM1_f  (strings/cpct_drawCharM1_f.s)
+   File: cpct_drawCharM1_inner_asm  (strings/cpct_drawCharM1_inner.s)
+   File: cpct_drawCharM2  (strings/cpct_drawCharM2.asm)
+   File: cpct_drawCharM2_inner_asm  (strings/cpct_drawCharM2_inner.s)
+   File: cpct_drawStringM0  (strings/cpct_drawStringM0.asm)
+   File: cpct_drawStringM1  (strings/cpct_drawStringM1.asm)
+   File: cpct_drawStringM1_f  (strings/cpct_drawStringM1_f.s)
+   File: cpct_drawStringM2  (strings/cpct_drawStringM2.asm)
+   File: cpct_setDrawCharM0  (strings/cpct_setDrawCharM0.asm)
+   File: cpct_setDrawCharM1  (strings/cpct_setDrawCharM1.asm)
+   File: cpct_setDrawCharM2  (strings/cpct_setDrawCharM2.asm)
+   File: dc_mode0_ct  (strings/cpct_dc_mode0_ct.s)
+   File: dc_mode1_ct  (strings/cpct_dc_mode1_ct.s)
+   File: getchar  (strings/cpct_getchar.s)
+   File: putchar  (strings/cpct_putChar.s)
+   }  # Group: Strings
+
+Group: Video  {
+
+   File: Colours &lparen;asm&rparen;  (video/colours.h.s)
+   File: Colours &lparen;C&rparen;  (video/colours.h)
+   File: cpct_count2VSYNC  (video/cpct_count2VSYNC.s)
+   File: cpct_firmware2hw_colour  (video/cpct_firmware2hw_colour_table.s)
+   File: cpct_fw2hw  (video/cpct_fw2hw.asm)
+   File: cpct_getHWColour  (video/cpct_getHWColour.s)
+   File: cpct_getScreenPtr  (video/cpct_getScreenPtr.asm)
+   File: cpct_setCRTCReg  (video/cpct_setCRTCReg.asm)
+   File: cpct_setPALColour  (video/cpct_setPALColour.asm)
+   File: cpct_setPalette  (video/cpct_setPalette.asm)
+   File: cpct_setVideoMemoryOffset  (video/cpct_setVideoMemoryOffset.s)
+   File: cpct_setVideoMemoryPage  (video/cpct_setVideoMemoryPage.s)
+   File: cpct_setVideoMode  (video/cpct_setVideoMode.asm)
+   File: cpct_waitVSYNC  (video/cpct_waitVSYNC.s)
+   File: Macros &lparen;asm&rparen;  (video/video_macros.h.s)
+   File: Macros &lparen;C&rparen;  (video/video_macros.h)
+   }  # Group: Video
+
+Text: ______________________________________________________________________
+File: License  (gpl-license.txt)
+
+Group: Buildsys  {
+
+   File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
+   File: CPCtelera Android Exporter Beta  (buildsys/android_exporter.txt)
+   File: Visual Studio Code  (buildsys/vscode_integration.txt)
+   }  # Group: Buildsys
+
+Group: Index  {
+
+   Class Index: Classes
+   Constant Index: Constants
+   Index: Everything
+   File Index: Files
+   Function Index: Functions
+   Macro Index: Macros
+   Type Index: Types
+   Variable Index: Variables
+   }  # Group: Index
+

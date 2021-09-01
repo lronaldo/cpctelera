@@ -159,6 +159,69 @@ cpct_page00_asm = 0x00
 .endm
 
 ;;
+;; Macro: cpctm_screenPtrSym_asm
+;;
+;;    Macro that calculates the video memory location (byte pointer) of a 
+;; given pair of coordinates (*X*, *Y*). Value resulting from calculation 
+;; will be assigned to the given ASZ80 local symbol.
+;;
+;; ASM Definition:
+;;    .macro <cpctm_screenPtr_asm> *SYM*, *VMEM*, *X*, *Y*
+;;
+;; Parameters:
+;;    (__) SYM   - ASZ80 local symbol to assign the result from the calculation to
+;;    (2B) VMEM  - Start of video memory buffer where (*X*, *Y*) coordinates will be calculated
+;;    (1B) X     - X Coordinate of the video memory location *in bytes* (*BEWARE! NOT in pixels!*)
+;;    (1B) Y     - Y Coordinate of the video memory location in pixels / bytes (they are same amount)
+;;
+;; Parameter Restrictions:
+;;    * *SYM* need to be a valid symbol according to ASZ80 rules for symbols
+;;    * *VMEM* will normally be the start of the video memory buffer where you want to 
+;; draw something. It could theoretically be any 16-bits value. 
+;;    * *X* must be in the range [0-79] for normal screen sizes (modes 0,1,2). Screen is
+;; always 80 bytes wide in these modes and this function is byte-aligned, so you have to 
+;; give it a byte coordinate (*NOT a pixel one!*).
+;;    * *Y* must be in the range [0-199] for normal screen sizes (modes 0,1,2). Screen is 
+;; always 200 pixels high in these modes. Pixels and bytes always coincide in vertical
+;; resolution, so this coordinate is the same in bytes that in pixels.
+;;    * If you give incorrect values to this function, the returned pointer could
+;; point anywhere in memory. This function will not cause any damage by itself, 
+;; but you may destroy important parts of your memory if you use its result to 
+;; write to memory, and you gave incorrect parameters by mistake. Take always
+;; care.
+;;
+;; Known issues:
+;;   * This macro can only be used from assembler code. It is not accessible from 
+;; C scope. For C programs, please refer to <cpct_getScreenPtr>
+;;   * This macro will work *only* with constant values, as calculations need to be 
+;; performed at assembler time.
+;;
+;; Destroyed Registers:
+;;    none
+;;
+;; Size of generated code:
+;;    none (symbols are compile-time, do not generate code)
+;;
+;; Time Measures:
+;;    - not applicable -
+;;
+;; Details:
+;;    This macro does the same calculation than the function <cpct_getScreenPtr>. However,
+;; as it is a macro, and as its parameters (*VMEM*, *X*, *Y*) must be constants, the calculation
+;; will be performed at compile-time. This will free the binary from code or data, just putting in
+;; the result of this calculation (2 bytes with the resulting address). It is highly 
+;; recommended to use this macro instead of the function <cpct_getScreenPtr> when values
+;; involved are all constant. 
+;;
+;; Recommendations:
+;;    All constant values - Use this macro <cpctm_screenPtrSym_asm> or <cpctm_screenPtr_asm> 
+;;    Any variable value  - Use the function <cpct_getScreenPtr>
+;;
+.macro cpctm_screenPtrSym_asm SYM, VMEM, X, Y 
+   SYM = #VMEM + 80 * (Y / 8) + 2048 * (Y & 7) + X 
+.endm
+
+;;
 ;; Macro: cpctm_setCRTCReg
 ;;
 ;;    Macro that sets a new value for a given CRTC register.
@@ -275,7 +338,7 @@ cpct_page00_asm = 0x00
 ;;    Macro to simplify clearing the screen.
 ;;
 ;; ASM Definition:
-;;   .macro <cpct_clearScreen_asm> COL
+;;   .macro <cpctm_clearScreen_asm> COL
 ;;
 ;; Input Parameters (1 byte):
 ;;   (1B) COL - Colour pattern to be used for screen clearing. 

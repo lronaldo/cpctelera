@@ -27,7 +27,7 @@ _cpct_memcpy::
    pop  af   ;; [3] AF = Return Address
    pop  de   ;; [3] DE = Destination address
    pop  hl   ;; [3] HL = Source Address
-   pop  bc   ;; [3] BC = Height/Width (B = Height, C = Width)
+   pop  bc   ;; [3] BC = size - Number of bytes to be set (>= 1)
 
    push af   ;; [4] Put returning address in the stack again
              ;;      as this function uses __z88dk_callee convention

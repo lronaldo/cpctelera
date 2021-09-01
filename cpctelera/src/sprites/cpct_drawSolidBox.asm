@@ -90,22 +90,22 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 169 bytes
-;;  ASM-bindings - 162 bytes
+;;    C-bindings - 167 bytes
+;;  ASM-bindings - 163 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;  Case      |      microSecs (us)      |      CPU Cycles
 ;; ---------------------------------------------------------------------
-;;  Best      |  4 + (17 + 4W)H + 11HH   | 16 + (68 + 16W)H  + 44HH
+;;  Best      |  18 + (17 + 4W)H + 11HH  | 72 + (68 + 16W)H  + 44HH
 ;;  Worst     |         Best + 11        |      Best + 44
 ;; ---------------------------------------------------------------------
-;;  W=2,H=8   |         204 /  215       |      816 /  860
-;;  W=2,H=16  |         415 /  426       |     1660 / 1704
-;;  W=4,H=16  |         543 /  554       |     2172 / 2216
-;;  W=4,H=32  |        1093 / 1104       |     4372 / 4416
+;;  W=2,H=8   |         218 /  229       |      872 /  916
+;;  W=2,H=16  |         429 /  440       |     1716 / 1760
+;;  W=4,H=16  |         557 /  568       |     2228 / 2272
+;;  W=4,H=32  |        1107 / 1118       |     4428 / 4472
 ;; ---------------------------------------------------------------------
-;; Asm saving |         -19              |        -76
+;; Asm saving |         -15              |        -60
 ;; ---------------------------------------------------------------------
 ;; (end code)
 ;;    W = *width* in bytes, H = *height* in bytes, HH = [(H-1)/8]
@@ -123,34 +123,32 @@
 .endm
 
 ;; DrawSolidBox code starts here (immediately after getting parameters from stack)
-   ld     h, d             ;; [1] / HL = DE  
-   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
-   ld     e, a             ;; [1] E=A (Colour pattern)
    
    ;; Modify code using width to jump to ensure
    ;; that only width bytes are copied each line 
-   ld     a, #126          ;; [2] We need to jump 126 bytes (63 COPY2HL_n_INC*2 bytes) minus the width of the sprite * 2 (2B)
+   ld     a, #128          ;; [2] We need to jump 128 bytes (64 COPY2HL_n_INC*2 bytes) minus the width of the sprite * 2 (2B)
    sub    c                ;; [1]  to do as much COPY2HL_n_INC as bytes the Sprite is wide
    sub    c                ;; [1]
    ld (_jr_offset), a      ;; [4] Modify JR data to create the jump we need
    
-   ld     c, e             ;; [1] C=E (Colour pattern)
-   ld     e, l             ;; [1] Restore DE = HL
+   ld     c, l             ;; [1] C=L (Colour pattern)
+   ld     h, d             ;; [1] / HL = DE
+   ld     l, e             ;; [1] \ HL Points to Video Memory, and DE holds a copy which won't be modified
 
 _next_line:
 _jr_offset = .+1
    jr__0                   ;; [3] Self modifying instruction: the '00' will be substituted by the required jump forward. 
                            ;; ... (Note: Writting JR 0 compiles but later it gives odd linking errors)  
-;; 63 COPY2HL_n_INC c, which are able to copy up to 63 bytes each time.
-;; That means that each Sprite line should be 63 bytes width at most.
+;; 64 COPY2HL_n_INC c, which are able to copy up to 64 bytes each time.
+;; That means that each Sprite line should be 64 bytes width at most.
 ;; The JR instruction at the start makes us ignore the COPY2HL_n_INC we don't need 
 ;; (jumping over them) That ensures we will be doing only as much COPY2HL_n_INC 
 ;; as bytes our sprite is wide.
-.rept 63
-   COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 63 times }
+.rept 64
+   COPY2HL_n_INC c         ;; [4] (HL) = c, ++HL { Repeated 64 times }
 .endm
  
-   dec    b                ;; [1] Another line finished: we discount it from D
+   dec    b                ;; [1] Another line finished: we discount it from B
    ret    z                ;; [2/4] If that was the last line, we safely return
 
    ;; Jump destination pointer to the start of the next line in video memory

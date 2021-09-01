@@ -1,0 +1,57 @@
+#!/bin/bash
+REPLACEFILE=docs/files/readme-txt.html
+
+##
+## Compile documentation
+##
+naturaldocs -i src/ -o HTML docs/ -p docs/nd -img docs/images/ -s Default title -r 
+if (( $? != 0 )); then
+   echo "Error compiling documentation"
+   exit 1
+fi
+
+
+##
+## Insert donation buttons into documentation
+##
+
+
+###
+### CODE PARTS TO BE INSERTED
+###
+P_IN="<div style=\\\"width: 100%; height: 50px; \\\"><div style=\\\"float: right; display:block; \\\">"
+
+TABLE_H="<table><tr><td style=\\\"vertical-align: top;\\\">"
+
+TABLE_TD="<\/td><td style=\\\"vertical-align: middle;\\\">"
+
+TABLE_END="<\/td><\/tr><\/table>"
+
+BTCSCRIPT="<br\/><script src=\\\"http:\/\/coinwidget.com\/widget\/coin.js\\\"><\/script>"
+
+BTCSCRIPT2="<script> CoinWidgetCom.go({ wallet_address: \\\"14QmiHoAfosnuybbrnWEEKBQoaAARtXWis\\\", currency: \\\"bitcoin\\\", counter: \\\"count\\\", alignment: \\\"bl\\\", qrcode: true, auto_show: false, lbl_button: \\\"Support CPCtelera!\\\", lbl_address: \\\"CPCtelera's Bitcoin Address\\\", lbl_count: \\\"Awesome Supporters\\\", lbl_amount: \\\"BTC\\\"});<\/script>"
+P_OUT="<\/div><\/div>"
+
+PAYPAL="<form action=\\\"https:\/\/www.paypal.com\/cgi-bin\/webscr\\\" method=\\\"post\\\" target=\\\"_top\\\"><input type=\\\"hidden\\\" name=\\\"cmd\\\" value=\\\"_s-xclick\\\"><input type=\\\"hidden\\\" name=\\\"encrypted\\\" value=\\\"-----BEGIN PKCS7-----MIIHPwYJKoZIhvcNAQcEoIIHMDCCBywCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYC4A48uux9H\/G3GIkZu7RwnSf79N9Y5irOd91m47+3RPahXkxAXxCy\/LjgiN6IMj7CZadQfDbnvxP55leqtY5UdEiX366gbaQ4V9mtWYt28v4yKs1yhRvC9whWCBSk9+Tz9EEpo6NkG\/TPrPwf+lYSMkyFaVSp308yNo7T5707cczELMAkGBSsOAwIaBQAwgbwGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIV9EGfrjdb1mAgZg0yiLJQpjltSULSLseILVcjc4epaf8Ht8TnBi1bX5xLucYu44LklWAi9ttTEvPX2dJet4kEf+GAeCEMcuCWf2ziWevOHobjtdr1Xvlv3ZhlCmFZBstV4Z6VTi4dZ66WyM3IE+Wg+dV49TbhMzhhFiv\/tfaB05Z+X8UrTbRO\/PpFK+ChE1SIeLtRju7b9KZB8f7enyo2uNg9KCCA4cwggODMIIC7KADAgECAgEAMA0GCSqGSIb3DQEBBQUAMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbTAeFw0wNDAyMTMxMDEzMTVaFw0zNTAyMTMxMDEzMTVaMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAwUdO3fxEzEtcnI7ZKZL412XvZPugoni7i7D7prCe0AtaHTc97CYgm7NsAtJyxNLixmhLV8pyIEaiHXWAh8fPKW+R017+EmXrr9EaquPmsVvTywAAE1PMNOKqo2kl4Gxiz9zZqIajOm1fZGWcGS0f5JQ2kBqNbvbg2\/Za+GJ\/qwUCAwEAAaOB7jCB6zAdBgNVHQ4EFgQUlp98u8ZvF71ZP1LXChvsENZklGswgbsGA1UdIwSBszCBsIAUlp98u8ZvF71ZP1LXChvsENZklGuhgZSkgZEwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tggEAMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAgV86VpqAWuXvX6Oro4qJ1tYVIT5DgWpE692Ag422H7yRIr\/9j\/iKG4Thia\/Oflx4TdL+IFJBAyPK9v6zZNZtBgPBynXb048hsP16l2vi0k5Q2JKiPDsEfBhGI+HnxLXEaUWAcVfCsQFvd2A1sxRr67ip5y2wwBelUecP3AjJ+YcxggGaMIIBlgIBATCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE1MDUwOTIyMDY1MVowIwYJKoZIhvcNAQkEMRYEFKykZJdmkgnCOihJnsmTkGhVxaL3MA0GCSqGSIb3DQEBAQUABIGAn\/mxF5dUQPyF2H8r0VfaDUUe+zrnufm3YK39FtLaQZAfmIl0HbSWk9o3\/AKdQVbI7Ye7sWMK+5rMKsJOrodtFaQFHCQHnj\/ug1A1cKme5WCTTMlxKEiCMqq8OYVZAjoyU6L8ur9zcIPL0yZCRpSvYvUbsL\/dRX+IDYrqHcC2eIA=-----END PKCS7-----\\\"><input type=\\\"image\\\" src=\\\"..\/images\/paypaldonations.jpg\\\" border=\\\"0\\\" name=\\\"submit\\\" alt=\\\"PayPal – The safer, easier way to pay online.\\\"> <img alt=\\\"\\\" border=\\\"0\\\" src=\\\"https:\/\/www.paypalobjects.com\/es_ES\/i\/scr\/pixel.gif\\\" width=\\\"1\\\" height=\\\"1\\\"><\/form>"
+
+##
+## Composition of the code that will be inserted
+##
+DATA="${P_IN}${TABLE_H}${BTCSCRIPT}${BTCSCRIPT2}${TABLE_TD}${PAYPAL}${TABLE_END}${P_OUT}"
+
+##
+## Substitution command
+##
+sed -ri "s/<img[^<]*paypaldonations.jpg[^>]*>/${DATA}/" $REPLACEFILE
+
+
+#<a href=\"\"><img src="../images/bitcoindonations.png" width="168" height="64"></a>
+#(see bitcoindonations.png)
+#<donate with bitcoin at http://www.byterealms.com>
+#(see paypaldonations.jpg)
+#<donate with paypal at http://www.byterealms.com>
+#PAYPAL="<a href=\\\"http:\/\/www.byterealms.com\\\"><img src=\\\"..\/images\/paypaldonations.jpg\\\" width=\\\"217\\\" height=\\\"50\\\"><\/a>"
+#DATA="${BTCSCRIPT}${BTCSCRIPT2}${PAYPAL}"
+#https:\/\/www.paypalobjects.com\/en_GB\/i\/btn\/btn_donate_SM.gif
+#sed "s/aaadonationsaaa/${DATA}/" "$1"
+#echo $DATA

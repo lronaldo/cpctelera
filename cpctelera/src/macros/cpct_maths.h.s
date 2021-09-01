@@ -208,7 +208,11 @@
 ;; 
 ;; Input Registers: 
 ;;    RH:RL - 16-value used as left-operand and final storage for the subtraction
-;;    A     - Second subtraction operand
+;;    A     - Second subtraction operand (A > 0)
+;;
+;; Preconditions:
+;;    A > 0 - Value in register A is considered to be unsigned and must be greater
+;;            than 0 for this macro to work properly.
 ;;
 ;; Return Value:
 ;;    RH:RL - Holds the result of RH:RL - A
