@@ -20,7 +20,7 @@
 ##                  Compression and Packing functions                    ##
 ##-----------------------------------------------------------------------##
 ## This file contains functions for creating and managing compressed     ##
-## files and packs  												     ##
+## files and packs                                                       ##
 ###########################################################################
 
 # Ensure that compression.mk exists for compatibility with older CPCtelera projects
@@ -91,7 +91,7 @@ endef
 #
 define PACKZX0
 	# First, check that a PACK name has been passed
-	$(if $(1),,$(error <<ERROR>> PACKZX7B requires a PACK filename as first parameter))
+	$(if $(1),,$(error <<ERROR>> PACKZX0 requires a PACK filename as first parameter))
 	# Now, check that $(1) is non-empty to ensure that some files have been previously added to variable
 	$(if $(PACK_$(1)),,$(error <<ERROR>> PACK filename '$(1)' does not contain any file to be packed. Is the PACK filename correctly spelled?))
 	# Check if there is a valid origin absolute address
