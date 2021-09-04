@@ -1,7 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2018 Bouche Arnaud (@Arnaud6128)
-//  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2021 Bouche Arnaud (@Arnaud6128)
+//  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -60,7 +60,7 @@ void FlipBuffers() {
 //    Gets a pointer to a (x,y) location in the current video memory
 //
 u8* GetScreenPtr(u8 xPos, u8 yPos) {
-   u8*   screenStart;
+   u8* screenStart;
 
    // Screen video memory start depends on which hardware
    // buffer is currently being used as video memory
@@ -76,7 +76,7 @@ u8* GetScreenPtr(u8 xPos, u8 yPos) {
 //    Gets a pointer to a (x,y) location in the present hardware back buffer
 //
 u8* GetBackBufferPtr(u8 xPos, u8 yPos) {
-   u8*   backBufferStart;
+   u8* backBufferStart;
 
    // Hardware back buffer memory start depends on which hardware
    // buffer is currently being used as video memory

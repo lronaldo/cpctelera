@@ -1,7 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2017 Arnaud BOUCHE (@Arnaud6128)
-//  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2021 Bouche Arnaud (@Arnaud6128)
+//  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
