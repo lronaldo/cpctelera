@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -18,17 +18,31 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
+.include "macros/cpct_undocumentedOpcodes.h.s"
+
 ;;
 ;; C bindings for <cpct_spriteColourizeM0>
 ;;
-;;   12 us, 3 bytes
+;;   15 us, 4 bytes
 ;;
 _cpct_spriteColourizeM0::
-   ;; GET Parameters from the stack 
-   pop   hl                     ;; [3] HL = Return Address  
-   pop   bc                     ;; [3] B = Width, C = Height 
-   ex   (sp), hl                ;; [6] HL = Pointer to the sprite
-                                ;; ... and leave Return Address at (SP) as we don't need to restore
-                                ;; ... stack status because callin convention is __z88dk_callee
+   ld (sprite_colourize_restoreIX), ix  ;; [6] Save IX to restore it before returning
 
-.include /cpct_spriteColourizeM0.asm/
+   ;; GET Parameters from the stack 
+   pop   hl                      ;; [3] HL = Return Address  
+   pop   de                      ;; [3] DE = Replace Pattern (D=Find Pattern [OldPen], E=Insert Pattern (NewPen))
+   pop   bc                      ;; [3] BC = Size of the array/sprite (width*height)
+   ex   (sp), hl                 ;; [6] HL = Pointer to the sprite
+                                 ;; ... and leave Return Address at (SP) as we don't need to restore
+                                 ;; ... stack status because callin convention is __z88dk_callee
+   
+   ;; Include Common code
+   .include /cpct_spriteColourizeM0.asm/
+   
+   ;; Generate the code with just 1 increment of HL at the end of every loop pass
+   ;; as the array/sprite is to be composed of consecutive bytes 
+   cpctm_generate_spriteColourizeM0 1
+   
+sprite_colourize_restoreIX = .+2
+   ld    ix, #0000              ;; [4] Restore IX before returning
+   ret                          ;; [3] Return to caller

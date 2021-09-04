@@ -21,27 +21,13 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; C bindings for <cpct_spriteMaskedColourizeM0>
+;; ASM bindings for <cpct_spriteMaskedColourizeM0>
 ;;
-;;   15 us, 4 bytes
-;;
-_cpct_spriteMaskedColourizeM0::
-   ;; GET Parameters from the stack 
-   pop   hl          ;; [3] HL = Return Address  
-   pop   de          ;; [3] DE = Replace Pattern (D=Find Pattern [OldPen], E=Insert Pattern (NewPen))
-   pop   bc          ;; [3] BC = Size of the array/sprite (width*height)
-   ex   (sp), hl     ;; [6] HL = Pointer to the sprite
-                     ;; ... and leave Return Address at (SP) as we don't need to restore
-                     ;; ... stack status because callin convention is __z88dk_callee
-   
-   push  ix          ;; [5] Save IX to let this function use and restore them before returning
+cpct_spriteMaskedColourizeM0_asm:: ;; Assembly entry point
 
-   ;; Include Common code
+   ;; Include common code
    .include /cpct_spriteMaskedColourizeM0.asm/
-   
+
    ;; Generate the code with just 2 increment of HL at the end of every loop pass
    ;; as the array/sprite is to be composed of consecutive bytes 
    cpctm_generate_spriteMaskedColourizeM0 2
-
-   pop   ix          ;; [4] Restore IX
-   ret               ;; [3] Return to caller

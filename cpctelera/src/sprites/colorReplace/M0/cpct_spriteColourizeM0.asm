@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -22,151 +22,263 @@
 ;;
 ;; Function: cpct_spriteColourizeM0
 ;;
-;;    Replace one concrete colour of a sprite by a different one. This function
-;; does the replacement, use <cpct_setSpriteColourizeM0> to pick up colours.
+;;    Replaces a colour pattern (Find Pattern) by a new one (Insert Pattern) in 
+;; an array/sprite. Typical use is to replace pixels of a given PEN Colour (OldPen)
+;; into pixels of a new PEN Colour (NewPen).
 ;;
 ;; C Definition:
-;;    void <cpct_spriteColourizeM0> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
+;;    void <cpct_spriteColourizeM0> (<u16> *rplcPat*, <u16> *size*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
-;;  (2B HL) sprite - Source Sprite Pointer (array of pixel data)
-;;  (1B C ) height - Sprite Height in bytes
-;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
+;;  (1B DE) rplcPat - Replace Pattern => 1st byte(D)=Pattern to Find, 2nd byte(E)=Pattern to insert instead
+;;  (2B BC) size    - Size of the Array/Sprite in bytes (if it is a sprite, width*height)
+;;  (2B HL) sprite  - Array/Sprite Pointer (array of bytes with Mode 0 pixel data)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_spriteColourizeM0_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *sprite* must be a pointer to the start of an array containing sprite's pixels data 
-;; in screen pixel format. Sprite must be rectangular and all bytes in the array must be 
-;; consecutive pixels, starting from top-left corner and going left-to-right, top-to-bottom 
-;; down to the bottom-right corner. Total amount of bytes in pixel array 
-;; should be *width* x *height*.
-;;  * *width* (1-256) must be the width of the sprite *in bytes*. Always remember that 
-;; the width must be expressed in bytes and *not* in pixels.
-;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
-;; bytes and pixels is the same value.
-;;  * *Beware!* A 0 value either for *width* or *height* will be treated as 256, and 
-;; will probably lead this function to overwrite memory values outside your sprite array.
+;;  * *rplcPat* ([0000-FFFF], 16bits, unsigned) should contain 2 8-bit colour pixel 
+;; patterns in Mode 0 screen pixel format (see below for an explanation of patterns).
+;; Any value is valid, but values different of what you actually want will probably
+;; result in estrange colours in the final array/sprite.
+;;  * *size*    ([0001-65535], 16bits, unsigned) must be the exact size in bytes of the
+;; given array/sprite. A value of *0* will be treated as 65536, probably resulting on all 
+;; memory being overwritten and your program crashing.
+;;  * *sprite*  ([0000-FFFF], 16bits, pointer) must be a pointer to the start of an array 
+;; containing sprite's pixels data in Mode 1 screen pixel format. Total amount of bytes
+;; in the array should be equal to *size*.
 ;;
 ;; Details:
-;;    This function modifies a *sprite* replacing pixels of a given colour by 
-;; another colour. Both searched and replacement colour are previously 
-;; selected using <cpct_setSpriteColourizeM0>. This function only performs 
-;; the replacement of the previously selected colours.
-;;    Selected colours are inserted directly as immediate values into the code
-;; of this function. After a call to <cpct_setSpriteColourizeM0>, machine code
-;; that does the replacement gets modified permanently unless <cpct_setSpriteColourizeM0>
-;; is called again. Therefore, you may perform one single call to <cpct_setSpriteColourizeM0>
-;; to configure this function for many uses, resulting in a great performance gain.
-;;    If no call is performed to <cpct_setSpriteColourizeM0> before calling
-;; this function, no color replacement will be done at all. Effectively, it will
-;; replaced color 0 with color 0, to no effect at all.
-;; Example,
+;;    This function replaces pixels of a given colour pattern (Find Pattern *FindPat*)
+;; by pixels of another colour pattern  (Insert Pattern *InsrPat*) inside an array/sprite. 
+;; Typically, these colour patterns consists of a single Pen Colour repeated on all 
+;; 2 pixels of a byte in Mode 0 screen pixel format. In this common case, the function 
+;; changes all pixels of the Pen Colour in *FindPat* (*OldPen*) into the Pen Colour in 
+;; *InsrPat* (*NewPen*). Summarized, it changes pixels of desired colours into desired
+;; new colours inside an array/sprite.
+;;
+;;    The parameter *rplcPat* (Replace Pattern) should be composed of both *FindPath* 
+;; and *InsrPat* as follows,
+;; (start code) 
+;; |       rplcPat       | 16-bits
+;; -----------------------
+;; | FindPat  | InsrPat  | 8-bits | 8-bits
+;; -----------------------
+;; | 10101010 | 01010101 | 8-bits | 8-bits (exact bits shown are just an example)
+;; -----------------------
+;; (end code)
+;; therefore, *rplcPat* is a 16-bit value with its highest 8-bits equal to *FindPat* and
+;; its lowest 8-bits equal to *InsrPat*. To easily obtain these patterns for desired
+;; pen colours (giving an *OldPen* and a *NewPen* to be found and replaced) you may
+;; want to use the functions <cpct_pen2pixelPatternM0> and <cpct_pens2pixelPatternPairM0>
+;; or its counterpart macros for compile-time constant calculations
+;; <CPCTM_PEN2PIXELPATTERN_M0> and <CPCTM_PENS2PIXELPATTERNPAIR_M0>.
+;;
+;;    To perform the replacing, the function uses *FindPat* to identify the pixels that
+;; will be changed in colour. It performs an XOR operation between *FindPat* and each 
+;; byte in the array/sprite. As a result of these operation, pixels coinciding with
+;; *FindPath* will be zeroed (their two bits will turn into 0). Afterwards, all zeroed
+;; pixels (those selected by *FindPat*) will be replaced with their corresponding values
+;; in *InsrPath*. In some sense, we could say that *FindPat* acts as a selector mask, 
+;; selecting the pixels to be changed, and *InsrPat* holds the new values to be inserted.
+;;
+;;    Let's see this operation with an example. Imagine we have a sprite with an stripped
+;; pattern like this,
 ;; (start code)
-;; void SetEnemyTShirtsNewColour(u8 colour) {
-;;    static u8 oldcolour;
-;;    u8 i;
+;; Addr |   Bytes     |               | Bit Encoding for | 
+;; --------------------               |    Mode 0   RC   |
+;; C000 |  RC  |  RC  |   (R)ed       -------------------- R = 0011 (3, Red  )
+;; C800 |  RC  |  RC  |   (C)yan      | 0 0 0 0  1 1 1 0 | c = 0010 (2, Cyan )
+;; D000 |  RC  |  RC  |               | R c R c  R c R c | 
+;;      | .... | .... |               --------------------
+;; (end code)
+;; we will see 8 vertical lines of (Red-Cyan)*2 colours. Each byte in video 
+;; memory encoding this Pattern of 2-pixels will be represented by the binary number 
+;; 00001110 (0x07 hexadecimal). Lets suppose we wanted to change the second Red column
+;; of pixels (the one between Cyan and Yellow) by a Blue value. Default pen colours are
+;; Red = Pen 3 (11 in binary) and Blue = Pen 0 (00 in binary). We can construct a
+;; *FindPat* to select the Red pixels in the 3rd column of each byte (not affecting 
+;; red pixels in 1st column) like this,
+;; (start code)
+;;  | Bit Encoding for | 
+;;  |    Mode 0   Rb   |
+;;  -------------------- R = 11 (3, Red )
+;;  | 0 0 0 0  1 0 1 0 | b = 00 (0, Blue)
+;;  | R b R b  R b R b | (0x05 Hexadecimal) 
+;;  --------------------
+;; (end code)
+;; this *FindPat* will be valid for selecting blue pixels in column 2, and 
+;; red pixels in column 1. As our original pattern does not have blue colours, it will
+;; only detect pixels in column 1. Now, to replace those pixels with Blue, we could 
+;; use a *InsrPat* with all 2 pixels blue, like this one,
+;; (start code)
+;;  | Bit Encoding for | 
+;;  |    Mode 0   Bb   |
+;;  -------------------- 
+;;  | 0 0 0 0  0 0 0 0  | Bb = 00 (0, Blue)
+;;  | B b B b  B b B rb | (0x00 hexadecimal)
+;;  --------------------
+;; (end code)
+;; this will ensure that pixels in column 2 will be left untouched either the
+;; case (if we found a Blue and replace by another Blue, they will be left equal) and
+;; only red pixels in the 1rd column will be changed into Blue. Pixels of colours other
+;; than Red in 1rd column won't be selected and, therefore, will remain unchanged.
 ;;
-;;    // Enemy t-shirts oldcolour will be replaced with new colour
-;;    cpct_setSpriteColourizeM0(oldcolour, colour);
+;;   Following is a code sample doing the exact operation we have described of replacing
+;; only red pixels in 3rd column by blue pixels,
+;; (start code)
+;;    // This function replaces all Red pixels (Pen 3) found in the 3rd 
+;;    // column of each byte (group of 2-pixels) by Blue (Pen 0)
+;;    void replaceRedsIn1rdColumnWithBlue(u8* sprite, u16 size) {
+;;       // Replace Pattern (*rplcPat*) should find red pixels (Pen 3)
+;;       // in 1rd column (*FindPat* = 0b00001010 = 0x05) and insert
+;;       // Blue pixels (Pen 0, *InsrPat* = 0b00000000 = 0x00)
+;;       u16 const rplcPat = 0x2200; // *FindPat*=0x05, *InsrPat*=0x00
+;;       
+;;       // Perform pixel colour replace in the sprite
+;;       cpct_spriteColourizeM0(rplcPat, size, sprite);
+;;    }
+;; (end code)
 ;;
-;;    // Replace t-shirts colours from all enemy sprites. All enemy sprites
-;;    // will be modified replacing oldcolour with colour.
-;;    for(i=0; i < ENEMIES; ++i)
-;;       cpct_spriteColourizeM0(G_ENEMY_W, G_ENEMY_H, gEnemy[i]->sprite);
+;;   Typically, this function will be used to change all pixels of a given colour (*OldPen*)
+;; into another colour (*NewPen*). That is easily performed using corresponding *FindPat* 
+;; and *InsrPat* with all pixels set to *OldPen* and *NewPen* respectively. This can be
+;; easily done by using <cpct_pens2pixelPatternPairM0> function, with takes *OldPen* and
+;; *NewPen* as parameters and returns the 16-bits *rplcPat* containing *FindPat* and
+;; *InsrPat*. Following example shows how to do it,
+;; Example,
+;; (start code) 
+;;    // Alien Struct Declaration
+;;    typedef struct {
+;;       u8 skinColour;
+;;       u8 width, height;
+;;       u8* sprite;
+;;       // ....
+;;    } Alien_t;
+;;    
+;;    //....
 ;;
-;;    // After replacement, colour becomes oldcolour
-;;    oldcolour = colour;
-;;  }
+;;    // Changes the skin colour of an alien by changing all the pixels in its
+;;    // sprite from its old skinColour to te given NewColour
+;;    void setAliensSkinColour(Alien_t* alien, u8 const newColour) {
+;;       // Calculate Replace Pattern to change Alien Skin Colour from
+;;       // its current value to the new desired colour (newColour)
+;;       u8 const rplcPat = cpct_pens2pixelPatternPairM0(alien->skinColour, newColour);
+;;       // Now, change skin colour of our Alien
+;;       u8 const size    = alien->width * alien->height;
+;;       cpct_spriteColourizeM0(rplcPat, size, alien->sprite);
+;;     
+;;       // Acknowledge the change in colour in our Alien Data Structure
+;;       alien->skinColour = newColour;
+;;    }
 ;; (end code)
 ;;
 ;; Known limitations:
-;;    * This function *will not work from ROM*, as it uses self-modifying code.
-;;    * <cpct_setSpriteColourizeM0> should have been called at least once before
-;; properly using this function. Otherwise, this function will produce no effect.
-;;    * This function does not check for parameters being valid. Incorrect values
-;; will probably produce changes in memory places outside your sprite, leading
-;; to undefined behaviour.
+;;    * This function does not check for parameter boundaries or their validity.
+;; Incorrect our out-of-bounds values will cause undefined behaviour, potentially
+;; overwritting memory outside the array/sprite.
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, BC, DE, HL, IXl
 ;;
 ;; Required memory:
-;;     C-bindings - 38 bytes
-;;   ASM-bindings - 35 bytes
+;;     C-bindings - 30 bytes
+;;   ASM-bindings - 26 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;  Case      |   microSecs (us)       |        CPU Cycles
-;; ----------------------------------------------------------------
-;; Best  Case |   21 + (5 + 27W)H      |   84 + (20 + 108W)H
-;; Worst Case |   21 + (5 + 29W)H      |   84 + (20 + 116W)H
-;; ----------------------------------------------------------------
-;;  W=2,H=16  |      965 / 1029        |       3860 /  4116
-;;  W=4,H=32  |     3637 / 3893        |      14548 / 15572
-;; ----------------------------------------------------------------
-;; Asm saving |         -12            |          -48
-;; ----------------------------------------------------------------
+;; |----------------------------------------------------------
+;; |  Case       |    microSecs (us)  |      CPU Cycles      |
+;; |----------------------------------------------------------
+;; | Any (i.e.)  | 23 + 22(S) + 3(SS) |  92 + 88(S) + 12(SS) |
+;; |----------------------------------------------------------
+;; | S=16 (2x 8) |        378         |         1512         |
+;; | S=32 (4x 8) |        730         |         2920         |
+;; | S=64 (4x16) |       1434         |         5736         |
+;; | S=128(8x16) |       2842         |        11368         |
+;; | S=256(8x32) |       5661         |        22644         |
+;; | S=512(8x64) |      11296         |        45184         |
+;; |----------------------------------------------------------
+;; | Asm saving  |        -15         |          -60         |
+;; |----------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes
+;;    S  - Size of the array/Sprite in bytes
+;;    SS - 1 + [ *S* / 256 ] · · · · ( *[x]* = Integral part of x )
 ;;
 ;; Credits:
 ;;    Original routine optimized by @Docent and discussed in CPCWiki :
 ;; http://www.cpcwiki.eu/forum/programming/cpctelera-colorize-sprite/
 ;;
-;; Thanks to all of them for their help and support.
+;; Thanks to all who participated in the discussion for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Save width value to restore it after each line 
-ld     a, b          ;; [1] A = width
-ld    (w_restore), a ;; [4] Save width into its restore place
+.mdelete cpctm_generate_spriteColourizeM0
+.macro cpctm_generate_spriteColourizeM0 _NumIncsHL
+   ;; Calculante E = (FindPat ^ InsrPat). This will be used at the end of the routine
+   ;; to insert InsrPat in the byte by XORing again, as the final operation will
+   ;; be performed only on the bits of the SelectedPixels (those coinciding with
+   ;; FindPat). This final operation will then be (1) XOR against FindPat (Zeroing bits,
+   ;; because they are equal) and (2) XOR againts InsrPat (Inserting InsrPat bits, 
+   ;; because its an XOR against zeros). That way, we will perform 2 operations on 1.
+   ld     a, e    ;; [1] / 
+   xor    d       ;; [1] | E = (InsrPat ^ FindPat)
+   ld     e, a    ;; [1] \ 
+   ld__ixl_d      ;; [2] IXL = D (FindPat) Save for later use
+   ;; BC holds the counter, but will be decreased by bytes (--C till 0, then --B).
+   ;; Because of this, B needs to be at least 1, to become zero on first decrease
+   ;; (Effectively, B + 1 will count B times, as Zero is not counted)
+   inc    b       ;; [1] ++B  
 
-;; As E register is free, use it as a cache for Pixel 1 Pattern of the colour to be replaced
-px1_oldval = .+1
-ld     e, #00        ;; [2] E = Pixel 1 4-bit Pattern of the colour to be replaced (x0x2x1x3)
-
-;; Loop through all the bytes of the sprite, replacing colours that have the same
-;; 4-bit pattern of the colour we want to replace. 
+   ;; Loop for all the bytes of the Array/Sprite
+   ;; Then Modify pixels of each byte using Patterns
 loop:
-   ;; Check and replace Pixel 1
-   ld     a, (hl)    ;; [2] A = Byte with 2 Mode 0 Pixels to be replaced
-   and   #0b01010101 ;; [2] A ^= 0x55. Left out only the 4 bits of the Pixel 1 (x0x2x1x3)
-   ld     d, a       ;; [1] D = holds a copy of Pixel 1 bits, just in case we don't have to replace it
-   cp     e          ;; [1] A == E? Check if A is equal to the Pixel 1 Pattern of the colour we want to replace
-   jr    nz, notpx1  ;; [2/3] If it is not equal, just continue to check pixel 0
-      px1_newval = .+1
-      ld     d, #00  ;; [2] Perform replacement of Pixel 1. D holds the 4 bits of the new colour. #00 is a placeholder
-   notpx1:
+   ;; First, perfom an XOR between the FindPat and the SpriteByte to modify
+   ;; This XOR will convert to zero all bits of pixels coinciding with FindPat
+   ;; But will left at least a bit with a 1 in the others (not coinciding with FindPat)
+   ld__a_ixl      ;; [2] / *HL = SpriteByte, IXl = FindPat
+   xor   (hl)     ;; [2] | A = D = (SpriteByte ^ FindPat)
+   ld     d, a    ;; [1] \   => SelectedPixels=00, OtherPixels!=00 
+   ;; Now we want to create a MASK byte with 0's in all the bits corresponding to
+   ;; selected pixels (coinciding with FindPat) and 1's in all other bits. To do this,
+   ;; as each pixels has 2 bits, we just need to OR both of them. Pixels selected have
+   ;; both of them equal to 0, and non-selected have at least a 1. We rotate the
+   ;; byte to align both pair of bits in each pixel, then we or them together.
+   rrca        ;; [1] / E   = [  A  1  B  2  C  3  D  4 ]
+   rrca        ;; [1] | A   = [  D  4  A  1  B  2  C  3 ]
+   or     d    ;; [1] \ A|D = [ AD 14 AB 12 BC 23 CD 34 ]
+   ld     d, a ;; [1] D = A
+   rrca        ;; [1] /   
+   rrca        ;; [1] |  
+   rrca        ;; [1] | D   = [   AD   14   AB   12   BC   23   CD   34 ]
+   rrca        ;; [1] | A   = [   BC   23   CD   34   AD   14   AB   12 ]
+   or     d    ;; [1] \ A|D = [ ABCD 1234 ABCD 1234 ABCD 1234 ABCD 1234 ]
+   ;; We revert the MASK (producing ~MASK), making selected pixels be 11, and Others 00
+   cpl            ;; [1] A = ~MASK (SelectedPixels==11, OtherPixels==00)
 
-   ;; Check and replace Pixel 0
-   ld     a, (hl)    ;; [2] A = Restore the value of the byte with the 2 Mode 0 pixels to be replaced
-   and   #0b10101010 ;; [2] A ^= 0xAA. Left out only the 4 bits of the Pixel 0 (0x2x1x3x)
-   px0_oldval = .+1
-   cp    #00         ;; [2] Check if A is equal to the Pixel 0 Pattern of the colour we want to replace. #00 is a placeholder
-   jr    nz, notpx0  ;; [2/3] If it is not equal, just continue to mix both output values
-      px0_newval = .+1
-      ld     a, #00  ;; [2] Perform replacement of Pixel 0. A holds the 4 bits of the new colour. #00 is a placeholder
-   notpx0:
+   ;; Now we are ready to insert InsrPath. First we multiply (AND) our negated mask (~MASK)
+   ;; with E=(InsrPath ^ FindPat). This does the effect of Masquerading (InsrPat ^ FindPat), 
+   ;; leaving 0's on all pixels that do not have to be modified, and leaving the others 
+   ;; untouched. Those others will be XORed with the original SpriteByte, producing 2 
+   ;; operations (SpriteByte ^ FindPat) ^ InsrPat, but only on the bits of SelectedPixels
+   ;; (because of the previous Masquerading operation). Those 2 operations are (1) Zeroing
+   ;; bits, (2) inserting InsrPat (because we XOR against zeros). Result is FindPat removed
+   ;; and InsrPat inserted, but only on the bits of the SelectedPixels (as others are 0's 
+   ;; after Masquerading).
+   and    e       ;; [1] A = ~MASK & (InsrPat ^ FindPat)
+   xor   (hl)     ;; [2] A = (~MASK & (InsrPat ^ FindPat)) ^ SpriteByte
+   
+   ld    (hl), a  ;; [2] Save modified byte
+   
+   ;; Make HL point to next byte in the array and decrement BC, repeating while not 0
+   ;; HL will be incremented 1 in consecutive arrays, 2 or more if there are interleaved
+   ;; mask bytes. This is configurable by the macro parameter _NumIncsHL
+   .rept _NumIncsHL
+      inc   hl       ;; [2] ++HL
+   .endm
+   dec   c        ;; [1] --C
+   jr    nz, loop ;; [2/3] if (C > 0) then BC != 0, continue with the loop
+   djnz  loop     ;; [3/4] if (--B > 0) then BC != 0, continue with the loop
 
-   ;; Mix both replacements and save
-   or     d          ;; [1] A |= C. A and C hold replacements for pixels 0 and 1. This mixes them into A.
-   ld   (hl), a      ;; [2] Write byte with colours replaced
-   inc   hl          ;; [2] HL++ Move to next byte of the sprite
-
- djnz  loop          ;; [3/4] B--. Continue looping if there are more bytes left in this sprite line (B!=0)
-
-   w_restore=.+1
-   ld    b, #00      ;; [2] B = width (restore value). #00 is a placeholder
-   dec   c           ;; [1] C-- (One less line of the sprite to process)
- jr    nz, loop      ;; [2/3] Continue looping if there are more lines left
-
- ret                 ;; [3] Return to caller
-
-;;
-;; Global symbols to be used by external functions to set placeholders
-;;
-cpct_spriteColourizeM0_px0_oldval == px0_oldval
-cpct_spriteColourizeM0_px1_oldval == px1_oldval
-cpct_spriteColourizeM0_px0_newval == px0_newval
-cpct_spriteColourizeM0_px1_newval == px1_newval
+   ;; Return in binding
+.endm
