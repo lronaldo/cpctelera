@@ -25,9 +25,7 @@
 ;;
 ;;   15 us, 4 bytes
 ;;
-_cpct_spriteColourizeM0::
-   ld (sprite_colourize_restoreIX), ix  ;; [6] Save IX to restore it before returning
-
+_cpct_spriteColourizeM0::   
    ;; GET Parameters from the stack 
    pop   hl                      ;; [3] HL = Return Address  
    pop   de                      ;; [3] DE = Replace Pattern (D=Find Pattern [OldPen], E=Insert Pattern (NewPen))
@@ -36,6 +34,8 @@ _cpct_spriteColourizeM0::
                                  ;; ... and leave Return Address at (SP) as we don't need to restore
                                  ;; ... stack status because callin convention is __z88dk_callee
    
+   push  ix                      ;; [5] Save IX to let this function use and restore them before returning
+   
    ;; Include Common code
    .include /cpct_spriteColourizeM0.asm/
    
@@ -43,6 +43,5 @@ _cpct_spriteColourizeM0::
    ;; as the array/sprite is to be composed of consecutive bytes 
    cpctm_generate_spriteColourizeM0 1
    
-sprite_colourize_restoreIX = .+2
-   ld    ix, #0000              ;; [4] Restore IX before returning
-   ret                          ;; [3] Return to caller
+   pop  ix                       ;; [4] Restore IX before returning
+   ret                           ;; [3] Return to caller
