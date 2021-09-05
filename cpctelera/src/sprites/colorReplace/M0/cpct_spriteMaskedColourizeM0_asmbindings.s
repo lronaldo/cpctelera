@@ -23,6 +23,8 @@
 ;;
 ;; ASM bindings for <cpct_spriteMaskedColourizeM0>
 ;;
+;;   3 us, 1 bytes
+;;
 cpct_spriteMaskedColourizeM0_asm:: ;; Assembly entry point
 
    ;; Include common code
@@ -31,3 +33,5 @@ cpct_spriteMaskedColourizeM0_asm:: ;; Assembly entry point
    ;; Generate the code with just 2 increment of HL at the end of every loop pass
    ;; as the array/sprite is to be composed of consecutive bytes 
    cpctm_generate_spriteMaskedColourizeM0 2
+   
+   ret               ;; [3] Return to caller

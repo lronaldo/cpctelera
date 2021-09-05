@@ -23,7 +23,7 @@
 ;;
 ;; C bindings for <cpct_spriteMaskedColourizeM0>
 ;;
-;;   15 us, 4 bytes
+;;   27 us, 7 bytes
 ;;
 _cpct_spriteMaskedColourizeM0::
    ;; GET Parameters from the stack 
