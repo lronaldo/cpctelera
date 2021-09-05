@@ -20,17 +20,6 @@
 
 #include "declarations.h"
 
-// TO REMOVE !! 
-// Functions to transform PEN colours into 4-pixel screen format values
-#define cpct_pens2pixelPatternPairM0(OldPen, NewPen) cpct_pens2pixelPatternPairM0_real((NewPen), (OldPen))
-extern  u16 cpct_pens2pixelPatternPairM0_real   (u8 NewPen, u8 OldPen)  __z88dk_callee;
-extern   u8 cpct_pen2pixelPatternM0             (u16 pen)               __z88dk_fastcall;
-
-#include "pattern/pixel_macros.h"
-#include "colorReplace.h"
-
-// END REMOVE
-
 /////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 u8 gSpriteColorized[G_BALOON_W*G_BALOON_H]; // Array for sprite to color
