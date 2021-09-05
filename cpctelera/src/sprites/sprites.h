@@ -43,6 +43,11 @@
 extern  u16 cpct_pens2pixelPatternPairM1_real   (u8 NewPen, u8 OldPen)  __z88dk_callee;
 extern   u8 cpct_pen2pixelPatternM1             (u16 pen)               __z88dk_fastcall;
 
+// Functions to transform PEN colours into 2-pixel screen format values
+#define cpct_pens2pixelPatternPairM0(OldPen, NewPen) cpct_pens2pixelPatternPairM0_real((NewPen), (OldPen))
+extern  u16 cpct_pens2pixelPatternPairM0_real   (u8 NewPen, u8 OldPen)  __z88dk_callee;
+extern   u8 cpct_pen2pixelPatternM0             (u16 pen)               __z88dk_fastcall;
+
 // Functions to transform firmware colours for a group of pixels into a byte in screen pixel format
 extern   u8 cpct_px2byteM0 (u8 px0, u8 px1) __z88dk_callee;
 extern   u8 cpct_px2byteM1 (u8 px0, u8 px1, u8 px2, u8 px3);
