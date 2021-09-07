@@ -26,6 +26,7 @@
 #define CPCT_FIRMWARE_ED_H
 
 #include <types.h>
+#include "firmware_macros.h"
 
 // Enabling and disabling Firmware
 extern void cpct_reenableFirmware(u16 firmware_ROM_code) __z88dk_fastcall;
