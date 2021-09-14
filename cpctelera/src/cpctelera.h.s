@@ -21,3 +21,4 @@
 .include "keyboard/keyboard.h.s"
 .include "video/videomode.h.s"
 .include "sprites/sprites.h.s"
+.include "firmware/firmware.s"
