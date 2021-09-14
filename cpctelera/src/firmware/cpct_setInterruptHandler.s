@@ -72,7 +72,7 @@
 ;; (start code)
 ;; Case | microSecs (us) | CPU Cycles
 ;; -------------------------------------
-;; Any  |      24        |    96
+;; Any  |      24        |    96 
 ;; -------------------------------------
 ;; (end code)
 ;;  * This second measure is the time overhead required for safely calling
@@ -107,7 +107,7 @@ cpct_setInterruptHandler_asm::
 ;; will be called at the start of the interrupt, and this code
 ;; will call user defined function, after saving registers. It
 ;; also returns using reti for user comfortability.
-;;  Overhead: 48 microsecs
+;;  Overhead: 57 microsecs
 ;;
 cpct_safeInterruptHandlerHook::
    di          ;; [1] Disable interrupts
