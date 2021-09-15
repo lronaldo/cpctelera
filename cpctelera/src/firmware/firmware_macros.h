@@ -136,9 +136,9 @@
 // (start code)
 // Case                     | Size
 // ------------------------------------
-// No registers saved       |  7 bytes
-// Standard registers saved | 23 bytes
-// All registers saved      | 35 bytes
+// No registers saved       |  6 bytes
+// Standard registers saved | 22 bytes
+// All registers saved      | 34 bytes
 // ------------------------------------
 // (end code)
 //
@@ -153,9 +153,9 @@
 // (start code)
 // Case                     | microSecs (us) | CPU Cycles
 // -------------------------------------------------------
-// No registers saved       |      11        |     44
-// Standard registers saved |      57        |    228
-// All registers saved      |      89        |    356
+// No registers saved       |      10        |     40
+// Standard registers saved |      56        |    224
+// All registers saved      |      88        |    352
 // -------------------------------------------------------
 // (end code)
 //
@@ -315,7 +315,6 @@
        __asm \
      .endm \
      WrapperName:: \
-     di \
      cpct_createIntWrapperCmacro __VA_ARGS__ \
      ei \
      reti \
