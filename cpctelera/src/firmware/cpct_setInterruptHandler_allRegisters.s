@@ -102,7 +102,7 @@ cpct_setInterruptHandler_allRegisters_asm::
 ;; will be called at the start of the interrupt, and this code
 ;; will call user defined function, after saving registers. It
 ;; also returns using reti for user comfortability.
-;;  Overhead: 89 microsecs
+;;  Overhead: 88 microsecs
 ;;
 cpct_safeInterruptHandlerHookAllRegs::
    push af     ;; [4] Save all standard registers on the stack
