@@ -58,7 +58,7 @@
 ;;    A, HL
 ;;
 ;; Required memory:
-;;    52 bytes (17 bytes function + 35 bytes for safe interrupt wrapper code)
+;;    51 bytes (17 bytes function + 34 bytes for safe interrupt wrapper code)
 ;;
 ;; Time Measures:
 ;;  * This first measure is the time required for cpct_setInterruptHandler_allRegisters to
@@ -78,7 +78,7 @@
 ;; (start code)
 ;; Case      | microSecs (us) | CPU Cycles
 ;; ------------------------------------------
-;; Overhead  |      89        |    356
+;; Overhead  |      88        |    352
 ;; ------------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,7 +105,6 @@ cpct_setInterruptHandler_allRegisters_asm::
 ;;  Overhead: 89 microsecs
 ;;
 cpct_safeInterruptHandlerHookAllRegs::
-   di          ;; [1] Disable interrupts
    push af     ;; [4] Save all standard registers on the stack
    push bc     ;; [4]
    push de     ;; [4]
