@@ -110,7 +110,7 @@ cpct_safeInterruptHandlerHookAllRegs::
    push de     ;; [4]
    push hl     ;; [4]
    push ix     ;; [5]
-   push iy     ;; [4]
+   push iy     ;; [5]
    ex af,af'   ;; [1] Swap af/af'
    exx         ;; [1] Swap bc/bc' de/de' and hl/hl'
    push af     ;; [4] Save all alternate registers on the stack
