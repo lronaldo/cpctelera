@@ -115,7 +115,7 @@ cpct_safeInterruptHandlerHook::
    push de     ;; [4]
    push hl     ;; [4]
    push ix     ;; [5]
-   push iy     ;; [4]
+   push iy     ;; [5]
 
 cpct_safeInterruptHandlerCall:
    call #0000  ;; [5] Call Interrupt Handler
