@@ -20,7 +20,9 @@
 .include "macros/cpct_opcodeConstants.h.s"
 .include "macros/cpct_reverseBits.h.s"
 .include "macros/cpct_undocumentedOpcodes.h.s"
+.include "macros/cpct_combinedOperations.h.s"
 .include "macros/cpct_pushpop.h.s"
+.include "macros/cpct_luts.h.s"
 
 ;;//////////////////////////////////////////////////////////////////////
 ;; Group: General Useful Macros
@@ -67,6 +69,7 @@
 ;; <cpct_waitHalts> instead.
 ;;
 ;;
+.mdelete cpctm_produceHalts
 .macro cpctm_produceHalts N
    .rept N
       halt

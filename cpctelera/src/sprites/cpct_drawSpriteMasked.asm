@@ -125,7 +125,7 @@
 ;;
 ;; Required memory:
 ;;    C-bindings - 47 bytes
-;;  ASM-bindints - 42 bytes
+;;  ASM-bindings - 42 bytes
 ;;
 ;; Time Measures:
 ;; (start code)

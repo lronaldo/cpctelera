@@ -16,6 +16,7 @@ Section: Donnors
    31/03/2018 - Augusto Ruíz García
    16/11/2018 - Carlos Pérez Peregrín
    12/12/2019 - Carlos Pérez Peregrín
+   06/08/2021 - Pablo Álvarez Doval
 
 Section: Project authors
    
@@ -34,6 +35,7 @@ Awesome collaborators:
    * <Fran Fernández at https://twitter.com/ronsonmaria> / <Pensando como Pollos at http://www.pensandocomopollos.com/> (<@ronsonmaria at https://twitter.com/ronsonmaria>)
    * Stefano Beltran / <ByteRealms at http://www.byterealms.com>
    * <Syx at http://www.cpcwiki.eu/forum/profile/?u=324>
+   * <Nestornillo at https://github.com/nestornillo>
  
 Bitarrays idea and original implementation:
    * Alberto García García (Blitzman, albertgg93@gmail.com, <@albertgarcia93 at http://twitter.com/albertgarcia93>)
@@ -122,6 +124,7 @@ Section: Code & fixes contributors
    * <SRS at http://www.cpcwiki.eu/forum/profile/?u=805> / <CPCWiki at http://www.cpcwiki.eu>
    * Stéphane Gourichon (<cpcitor at http://github.com/cpcitor>)
    * <Federico J. Álvarez at https://twitter.com/falvarez>
+   * <Joaquin Ferrero at https://github.com/joaquinferrero> / <Github at https://github.com> 
 
 Section: Testers & Bug Reporters 
 
@@ -151,6 +154,7 @@ Section: Testers & Bug Reporters
  * Cayetano Manchón Pernis (<cmp102 at https://github.com/cmp102>)
  * <juritobi at https://github.com/juritobi>
  * Tamara Torrecillas (<tamaraatm at https://github.com/tamaraatm>)
+ * <MoteroV4 / Amstrad.es at https://www.amstrad.es/forum/memberlist.php?mode=viewprofile&u=4383> (aka <@enrib4 / github at https://github.com/enrib4>
 
 Section: Assets 
 
