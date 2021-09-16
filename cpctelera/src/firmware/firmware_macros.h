@@ -160,167 +160,15 @@
 // (end code)
 //
 
-#define  cpctm_createInterruptHandlerWrapper(WrapperName,...) \
-  void WrapperName()  __naked { \
+#define  cpctm_createInterruptHandlerWrapper(IntWrapperName,IntHandlerName,...) \
+  void dummy_##IntWrapperName()  __naked { \
      __asm \
-     .mdelete cpct_checkReg_ \
-     .macro cpct_checkReg_ \
-     .endm \
-     .mdelete cpct_checkReg_alt \
-     .macro cpct_checkReg_alt \
-       .equ cpct_altDetected, 1 \
-     .endm \
-     .mdelete cpct_checkReg_af \
-     .macro cpct_checkReg_af \
-       .if cpct_altDetected \
-         .equ cpct_altAFdetected, 1 \
-       .endif \
-     .endm \
-     .mdelete cpct_checkReg_bc \
-     .macro cpct_checkReg_bc \
-       .if cpct_altDetected \
-         .equ cpct_altBCDEHLdetected, 1 \
-       .endif \
-     .endm \
-     .mdelete cpct_checkReg_de \
-     .macro cpct_checkReg_de \
-       .if cpct_altDetected \
-         .equ cpct_altBCDEHLdetected, 1 \
-       .endif \
-     .endm \
-     .mdelete cpct_checkReg_hl \
-     .macro cpct_checkReg_hl \
-       .if cpct_altDetected \
-         .equ cpct_altBCDEHLdetected, 1 \
-       .endif \
-     .endm \
-     .mdelete cpct_checkReg_ix \
-     .macro cpct_checkReg_ix \
-     .endm \
-     .mdelete cpct_checkReg_iy \
-     .macro cpct_checkReg_iy \
-     .endm \
-     .mdelete cpct_saveReg_ \
-     .macro cpct_saveReg_ \
-     .endm \
-     .mdelete cpct_saveReg_alt \
-     .macro cpct_saveReg_alt \
-        .if cpct_altAFdetected \
-          .db 8 \
-        .endif \
-        .if cpct_altBCDEHLdetected \
-          exx \
-        .endif \
-     .endm \
-     .mdelete cpct_saveReg_af \
-     .macro cpct_saveReg_af \
-        push af \
-     .endm \
-     .mdelete cpct_saveReg_bc \
-     .macro cpct_saveReg_bc \
-        push bc \
-     .endm \
-     .mdelete cpct_saveReg_de \
-     .macro cpct_saveReg_de \
-        push de \
-     .endm \
-     .mdelete cpct_saveReg_hl \
-     .macro cpct_saveReg_hl \
-        push hl \
-     .endm \
-     .mdelete cpct_saveReg_ix \
-     .macro cpct_saveReg_ix \
-        push ix \
-     .endm \
-     .mdelete cpct_saveReg_iy \
-     .macro cpct_saveReg_iy \
-        push iy \
-     .endm \
-     .mdelete cpct_restoreReg_ \
-     .macro cpct_restoreReg_ \
-     .endm \
-     .mdelete cpct_restoreReg_alt \
-     .macro cpct_restoreReg_alt \
-       .if cpct_altBCDEHLdetected \
-         exx \
-       .endif \
-       .if cpct_altAFdetected \
-         .db 8 \
-       .endif \
-     .endm \
-     .mdelete cpct_restoreReg_af \
-     .macro cpct_restoreReg_af \
-        pop af \
-     .endm \
-     .mdelete cpct_restoreReg_bc \
-     .macro cpct_restoreReg_bc \
-        pop bc \
-     .endm \
-     .mdelete cpct_restoreReg_de \
-     .macro cpct_restoreReg_de \
-        pop de \
-     .endm \
-     .mdelete cpct_restoreReg_hl \
-     .macro cpct_restoreReg_hl \
-        pop hl \
-     .endm \
-     .mdelete cpct_restoreReg_ix \
-     .macro cpct_restoreReg_ix \
-        pop ix \
-     .endm \
-     .mdelete cpct_restoreReg_iy \
-     .macro cpct_restoreReg_iy \
-        pop iy \
-     .endm \
-     .mdelete cpct_createIntWrapperCmacro \
-     .macro cpct_createIntWrapperCmacro userHandlerFunction, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11 \
-       .equ cpct_altAFdetected, 0 \
-       .equ cpct_altBCDEHLdetected, 0 \
-       .equ cpct_altDetected, 0 \
-       __endasm; \
-       __asm__("cpct_checkReg_'R1"); \
-       __asm__("cpct_checkReg_'R2"); \
-       __asm__("cpct_checkReg_'R3"); \
-       __asm__("cpct_checkReg_'R4"); \
-       __asm__("cpct_checkReg_'R5"); \
-       __asm__("cpct_checkReg_'R6"); \
-       __asm__("cpct_checkReg_'R7"); \
-       __asm__("cpct_checkReg_'R8"); \
-       __asm__("cpct_checkReg_'R9"); \
-       __asm__("cpct_checkReg_'R10"); \
-       __asm__("cpct_checkReg_'R11"); \
-       __asm__("cpct_saveReg_'R1"); \
-       __asm__("cpct_saveReg_'R2"); \
-       __asm__("cpct_saveReg_'R3"); \
-       __asm__("cpct_saveReg_'R4"); \
-       __asm__("cpct_saveReg_'R5"); \
-       __asm__("cpct_saveReg_'R6"); \
-       __asm__("cpct_saveReg_'R7"); \
-       __asm__("cpct_saveReg_'R8"); \
-       __asm__("cpct_saveReg_'R9"); \
-       __asm__("cpct_saveReg_'R10"); \
-       __asm__("cpct_saveReg_'R11"); \
-       __asm__("call _'userHandlerFunction"); \
-       __asm__("cpct_restoreReg_'R11"); \
-       __asm__("cpct_restoreReg_'R10"); \
-       __asm__("cpct_restoreReg_'R9"); \
-       __asm__("cpct_restoreReg_'R8"); \
-       __asm__("cpct_restoreReg_'R7"); \
-       __asm__("cpct_restoreReg_'R6"); \
-       __asm__("cpct_restoreReg_'R5"); \
-       __asm__("cpct_restoreReg_'R4"); \
-       __asm__("cpct_restoreReg_'R3"); \
-       __asm__("cpct_restoreReg_'R2"); \
-       __asm__("cpct_restoreReg_'R1"); \
-       __asm \
-     .endm \
-     WrapperName:: \
-     cpct_createIntWrapperCmacro __VA_ARGS__ \
-     ei \
-     reti \
+     .mdelete cpctm_createInterruptHandlerWrapper_asm \
+     .include "firmware/cpctm_createInterruptHandlerWrapper.asm" \
+     cpctm_createInterruptHandlerWrapper_asm IntWrapperName, _ ## IntHandlerName, __VA_ARGS__ \
      __endasm; \
   } \
-  extern void WrapperName (void) __naked
+  extern void IntWrapperName (void)
 
 
 //
@@ -383,7 +231,7 @@
 //
 
 #define cpctm_declareInterruptHandlerWrapper(customIHWName) \
-extern void customIHWName (void)__naked
+extern void customIHWName (void)
 
 
  #endif
