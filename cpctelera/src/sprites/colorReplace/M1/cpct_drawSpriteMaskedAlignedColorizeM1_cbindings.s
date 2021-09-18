@@ -23,31 +23,28 @@
 ;;
 ;; C bindings for <cpct_drawSpriteMaskedAlignedColorizeM1>
 ;;
-;;   39 us, 16 bytes
+;;   41 us, 19 bytes
 ;;
 _cpct_drawSpriteMaskedAlignedColorizeM1::
-
    ;; GET Parameters from the stack 
-   ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
+   ld (colour_sprite_restore_ix), ix  ;; [6] Save IX to restore it before returning
+   ld (colour_sprite_restore_iy), iy  ;; [6] Save IX to restore it before returning
    
-   exx                          ;; [1] Switch to Alternate registers
-   pop   hl                     ;; [3] HL' = Source address (Sprite)
-   pop   de                     ;; [3] DE' = Destination Memory
-   pop   bc                     ;; [5] BC' = (B = Sprite Height, C = Width)
-   
-   exx                          ;; [1] Switch to Default registers
-   pop   de                     ;; [3] DE = (D = newColor, E = oldColor)
-   
-   ex   (sp), hl                ;; [6] HL = Table Mask address
-                                ;; ... and leave Return Address at (SP) as we don't need to restore
-                                ;; ... stack status because callin convention is __z88dk_callee
-                                
-   ex de, hl                    ;; [1] HL <-> DE
-    
-                
+   ;; GET Parameters from the stack 
+   pop   hl          ;; [3] HL = Return Address
+   pop   af          ;; [3] AF = Source Sprite Pointer
+   pop   de          ;; [3] DE = Destination video memory pointer
+   pop   bc          ;; [3] BC = (B = Sprite Height, C = Width)
+   pop   ix          ;; [4] IX = Pointer to an Aligned Mask Table for transparencies with palette index 0
+   ex   (sp), hl     ;; [6] HL = Replace Pattern (H=Find Pattern [OldPen], L=Insert Pattern (NewPen))
+                     ;; ... and leave Return Address at (SP) as we don't need to restore
+                     ;; ... stack status because callin convention is __z88dk_callee
+
 .include /cpct_drawSpriteMaskedAlignedColorizeM1.asm/
 
-dms_restore_ix:
-   ld   ix, #0000               ;; [4] Restore IX before returning
+colour_sprite_restore_ix = .+2
+   ld   ix, #0000               ;; [4] Restore IX before returning 
+   
+colour_sprite_restore_iy = .+2
+   ld   iy, #0000               ;; [4] Restore IX before returning    
    ret                          ;; [3] Return to caller

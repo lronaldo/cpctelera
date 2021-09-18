@@ -25,15 +25,14 @@
 ;;    Directly replace a color and draw a sprite Masked to video memory.
 ;;
 ;; C Definition:
-;;    void <cpct_drawSpriteMaskedColorizeM1> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*, <u8> *oldColor*, <u8> *newColor*) __z88dk_callee;
+;;    void <cpct_drawSpriteColorizeM1> (void* *sprite*, void* *memory*, <u8> *width*, <u8> *height*, <u16> *rplcPat*) __z88dk_callee;
 ;;
 ;; Input Parameters (8 bytes):
-;;  (2B HL') sprite      - Source Sprite Pointer (array of pixel data)
-;;  (2B DE') memory      - Destination video memory pointer
-;;  (1B C' ) height      - Sprite Height in bytes (>0)
-;;  (1B B' ) width       - Sprite Width in *bytes* (Beware, *not* in pixels!)
-;;  (1B L )  oldColor    - Color to replace
-;;  (1B H )  newColor    - New color
+;;  (2B HL) sprite      - Source Sprite Pointer (array of pixel data)
+;;  (2B AF) memory      - Destination video memory pointer
+;;  (1B C ) height      - Sprite Height in bytes (>0)
+;;  (1B B ) width       - Sprite Width in *bytes* (Beware, *not* in pixels!)
+;;  (2B DE) rplcPat     - Replace Pattern => 1st byte(D)=Pattern to Find, 2nd byte(E)=Pattern to insert instead
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_drawSpriteMaskedColorizeM1_asm
@@ -59,8 +58,10 @@
 ;; There is no practical upper limit to this value. Height of a sprite in
 ;; bytes and pixels is the same value, as bytes only group consecutive pixels in
 ;; the horizontal space.
-;;  * *oldColor* must be the index of color (0 to 3) to replace
-;;  * *newColor* must be the index of the new color (0 to 3)
+;;  * *rplcPat* ([0000-FFFF], 16bits, unsigned) should contain 4 8-bit colour pixel 
+;; patterns in Mode 1 screen pixel format (see below for an explanation of patterns).
+;; Any value is valid, but values different of what you actually want will probably
+;; result in estrange colours in the final array/sprite.
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of boundary check or clipping. If you 
@@ -78,7 +79,7 @@
 ;;     * This function requires the CPC firmware to be DISABLED. Otherwise, random crashes might happen due to side effects.
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL, BC', DE', HL', IX
+;;    AF, BC, DE, HL, IX, IY
 ;;
 ;; Required memory:
 ;;     C-bindings - 142 bytes
@@ -105,142 +106,96 @@
 ;; Thanks to all of them for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.globl dc_mode1_ct
+  push  af        ;; [4] Save AF (Source Sprite Pointer) in Stack
 
-;; Macro to convert color to pixel Mode1 : Axxx Axxx
-.macro convertPixel        ;; From cpct_px2byteM1                   
-    ld   bc, #dc_mode1_ct  ;; [3] BC points to conversion table (dc_mode1_ct)
-    
-    ;; Compute BC += A
-    add  c                 ;; [1] | C += A
-    ld   c, a              ;; [1] |
-    sub  a                 ;; [1] A = 0 (preserving Carry Flag)
-    adc  b                 ;; [1] | B += Carry
-    ld   b, a              ;; [1] |
+   ;; Compute E = (FindPat ^ InsrPat). This will be used at the end of the routine
+   ;; to insert InsrPat in the byte by XORing again, as the final operation will
+   ;; be performed only on the bits of the SelectedPixels (those coinciding with
+   ;; FindPat). This final operation will then be (1) XOR against FindPat (Zeroing bits,
+   ;; because they are equal) and (2) XOR againts InsrPat (Inserting InsrPat bits, 
+   ;; because its an XOR against zeros). That way, we will perform 2 operations on 1.
+   ld    a, l      ;; [1] / IYL = (InsrPat ^ FindPat)
+   xor   h         ;; [1] |
+   ld__iyl_a       ;; [2] \ 
 
-    ;; A = *(BC + A)
-    ld   a, (bc)           ;; [2] A = Value stored at the table pointed by BC 
-.endm
-          
-    ;; Convert newColor to pixel format (E)
-    ld a, h                ;; [1]  A = H new color index
-    convertPixel           ;; [10] | Convert into A
-    ld e, a                ;; [1]  | E = A new color : Axxx Axxx
+   ld    a, h      ;; [1] / IXL = H (FindPat) Save for later use
+   ld__ixl_a       ;; [2] \
 
-    ;; Convert oldColor to pixel format (D)
-    ld a, l                ;; [1]  A = L old color index
-    convertPixel           ;; [10] | Convert into A
-    ld d, a                ;; [1]  | D = A old color : Axxx Axxx
-    
-    ld c, #0x88            ;; [2] C = First Mask to get pixel A  : Axxx Axxx
-    exx                    ;; [1] Switch to Alternate registers
-    
-    ld__ixl_c              ;; [1] IXL = C (Width)
-    ld c, b                ;; [1] C = B (Height)
-    
-convertLoop:    
-    ld (startLine), de     ;; [6] Store DE start line (DestMem)
-    ld__b_ixl              ;; [2] B = IXL (Sprite Width)
-        
-lineLoop:
-    inc hl                 ;; [2] Next byte sprite Color source 
-    ld    a, (hl)            ;; [2] A = (HL) current Byte of sprite Color
-    dec hl                 ;; [2] Previous byte sprite Mask source 
-    
-    exx                    ;; [1] Switch to Default registers
-    
-    ld  l, a               ;; [1] L = A current Byte of sprite : ABCD ABCD
-    
-    and c                  ;; [2] A |= C (C = 0x88)   : Axxx Axxx
-    
-    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-    jr  nz, readPixelA     ;; [2/3] If not equal go to next pixel 
-        ld  a, e           ;; [1] else A = new colour to set (E)
-    
-readPixelA:
-    ld  h, a               ;; [1] H = A (current colorized sprite) : Axxx Axxx
-    
-    sla l                  ;; [2] L (current byte of sprite) << 1 : ABCD ABCD -> BCDx BCDx
-    ld  a, l               ;; [1] A = L  : BCDx BCDx
-    and c                  ;; [2] A |= Mask (0x88) : Bxxx Bxxx
-    
-    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-    jr  nz, readPixelB     ;; [2/3] If not equal go to next pixel 
-        ld  a, e           ;; [1] else A = new colour to set (E)
-        
-readPixelB:
-    rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
-    or h                   ;; [1] A |= H (color byte) : Axxx Axxx
-    ld  h, a               ;; [1] H = A               : ABxx ABxx
-    
-    sla l                  ;; [2] L ( BCDx BCDx) << 1 : CDxx CDxx  
-    ld  a, l               ;; [1] A = L               : CDxx CDxx  
-    and c                  ;; [1] A |= C (C = 0x88)   : Cxxx Cxxx
-    
-    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-    jr  nz, readPixelC     ;; [2/3] If not equal go to next pixel 
-        ld  a, e           ;; [1] else A = new colour to set (E)
-    
-readPixelC:
-    rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
-    rrca                   ;; [1] A = xxCx xxCx << 1  : xxCx xxCx
-    or  h                  ;; [1] A |= H (ABxx ABxx)  : ABCx ABCx
-    ld  h, a               ;; [1] H = A               : ABCx ABCx
+   ld__iyh_c       ;; [2] IYH = C (Sprite Width) Save for later use
+   pop   hl        ;; [3] HL = Recover from Stack (Source Sprite Pointer)
 
-    sla l                  ;; [2] L (BCDx BCDx) << 1  : Dxxx Dxxx  
-    ld  a, l               ;; [1] A = L               : Dxxx Dxxx   
-    and c                  ;; [1] A |= C (C = 0x88)   : Dxxx Dxxx
-    
-    cp  d                  ;; [1] Test if pixel (A) is the old colour to be replaced (D)
-    jr  nz, readPixelD     ;; [2/3] If not equal go to next pixel 
-        ld  a, e           ;; [1] else A = new colour to set (E)
-    
-readPixelD:    
-    rrca                   ;; [1] A = Axxx Axxx >> 1  : xBxx xBxx
-    rrca                   ;; [1] A = xBxx xBxx >> 1  : xxCx xxCx
-    rrca                   ;; [1] A = xxCx xxxx >> 1  : xxxD xxxD
-    or  h                  ;; [1] A |= H (ABCx ABCx)  : ABCD ABCD
-  
-    exx                    ;; [1] Switch to Alternate registers
+   ;; Loop for all the bytes of the Sprite then Modify pixels of each byte using Patterns
+height_loop:
+   push  de        ;; [4] Save DE for later use (jump to next screen line)       
 
-drawByte:
-    ld (sprite_color), a   ;; [4] sprite_color = A (Sprite Byte)                   
-                           
-    ld   a, (de)           ;; [2] Get next background byte into A
-    and  (hl)              ;; [2] Erase background part that is to be overwritten (Mask step 1)
-    inc  hl                ;; [3] HL += 1 => Point HL to Sprite Colour information
-sprite_color = .+1         ;; Placeholder for the Sprite Color computed
-    or  #00                ;; [2] Add up background and sprite information in one byte (Mask step 2)
-    ld  (de), a            ;; [2] Save modified background + sprite data information into memory
-    
-    inc  hl                ;; [2] Next byte sprite source
-    inc  de                ;; [2] Next byte Dest Memory
-    djnz lineLoop          ;; [3] Decrement B (Width) if B != 0 goto lineLoop
-    
-    dec c                  ;; [1] Decrement C (Height) 
-    jr  z, end             ;; [2/3] If C == O goto end
+width_loop:
+   push  bc        ;; [4] Save BC because need BC registers for computation
+   ld    a ,(de)   ;; [2] Get background byte into A
+   and  (hl)       ;; [2] Erase background part that is to be overwritten (Mask step 1)
+   ld    b, a      ;; [1] B = A = Erased background part
+   inc   hl        ;; [2] ++HL => Point HL to Sprite Colour information
+   
+   ;; First, perfom an XOR between the FindPat and the SpriteByte to modify
+   ;; This XOR will convert to zero all bits of pixels coinciding with FindPat
+   ;; But will left at least a bit with a 1 in the others (not coinciding with FindPat)
+   ld__a_ixl       ;; [2] / *HL = SpriteByte, IXL = FindPat
+   xor  (hl)       ;; [2] | C = A = (SpriteByte ^ FindPat)
+   ld    c, a      ;; [1] \   => SelectedPixels=00, OtherPixels!=00 
+   
+   ;; Now we want to create a MASK byte with 0's in all the bits corresponding to
+   ;; selected pixels (coinciding with FindPat) and 1's in all other bits. To do this,
+   ;; as each pixels has 2 bits, we just need to OR both of them. Pixels selected have
+   ;; both of them equal to 0, and non-selected have at least a 1. We rotate the
+   ;; byte to align both pair of bits in each pixel, then we or them together.
+   rrca            ;; [1] /    RoR = Rotate Right
+   rrca            ;; [1] | 
+   rrca            ;; [1] | A = RoR(SpriteByte ^ FindPat, 4) | (SpriteByte ^ FindPat)
+   rrca            ;; [1] |   => MASK (SelectedPixels==00, OtherPixels==11)
+   or__ixh         ;; [2] \ A|IXH = [ ABCD 1234 ABCD 1234 ABCD 1234 ABCD 1234 ]
+   ;; We revert the MASK (producing ~MASK), making selected pixels be 11, and Others 00
+   cpl             ;; [1] A = ~MASK (SelectedPixels==11, OtherPixels==00)
 
-startLine = .+1            ;; Placeholder for the Start line adress
-    ld de, #0000           ;; [3] DE = Start Line
+   ;; Now we are ready to insert InsrPath. First we multiply (AND) our negated mask (~MASK)
+   ;; with E=(InsrPath ^ FindPat). This does the effect of Masquerading (InsrPat ^ FindPat), 
+   ;; leaving 0's on all pixels that do not have to be modified, and leaving the others 
+   ;; untouched. Those others will be XORed with the original SpriteByte, producing 2 
+   ;; operations (SpriteByte ^ FindPat) ^ InsrPat, but only on the bits of SelectedPixels
+   ;; (because of the previous Masquerading operation). Those 2 operations are (1) Zeroing
+   ;; bits, (2) inserting InsrPat (because we XOR against zeros). Result is FindPat removed
+   ;; and InsrPat inserted, but only on the bits of the SelectedPixels (as others are 0's 
+   ;; after Masquerading).
+   and__iyl        ;; [2] A = ~MASK & (InsrPat ^ FindPat)
+   xor  (hl)       ;; [2] A = (~MASK & (InsrPat ^ FindPat)) ^ SpriteByte
+   
+   or    b         ;; [2] Add up background and sprite information in one byte (Mask step 2)
+   ld   (de), a    ;; [2] Save modified background + sprite data information into memory
+   inc   de        ;; [2] / Next bytes (sprite and memory)
+   inc   hl        ;; [2] \
+   
+   pop   bc        ;; [3] Restore BC counters
+   
+   dec   c         ;; [1] --C holds sprite width, we decrease it to count pixels in this line.
+   jp    nz, width_loop   ;; [2/3] While not 0, we are still painting this sprite line 
+   
+   pop   de        ;; [3] Restore DE start line (DestMem)   
+   dec   b         ;; [1] --B holds sprite height. We decrease it to count another pixel line finished
+   jp    z, end_sprite_colourize ;; [2/3] If 0, we have finished the last sprite line.
+   
+   ld__c_iyh       ;; [2] C = IYH (Sprite Width)
+   ld    a, d      ;; [1] Start of next pixel line normally is 0x0800 bytes away.
+   add   #0x08     ;; [2] so we add it to DE (just by adding 0x08 to D)
+   ld    d, a      ;; [1]
+   and   #0x38     ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)
+   jp    nz, height_loop  ;; [2/3] .. by checking the 4 bits that identify present memory line. 
 
-    ld   a, d              ;; [1] Start of next pixel line normally is 0x0800 bytes away.
-    add  #0x08             ;; [2]    so we add it to DE (just by adding 0x08 to D)
-    ld   d, a              ;; [1]
-    and  #0x38             ;; [2] We check if we have crossed memory boundary (every 8 pixel lines)..    
-    
-    jr   nz, convertLoop   ;; [2/3]  .. by checking the 4 bits that identify present memory line. 
-                           ;; ....  If 0, we have crossed boundaries
+   ld    a, e      ;; [1] If 0, we have crossed boundaries then DE = DE + 0xC050h
+   add   #0x50     ;; [2] -- Relocate DE pointer to the start of the next pixel line:
+   ld    e, a      ;; [1] -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
+   ld    a, d      ;; [1] -- which effectively is the same as moving it 1 bank backwards and then
+   adc   #0xC0     ;; [2] -- 50 bytes forwards (which is what we want to move it to the next pixel line)
+   ld    d, a      ;; [1] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
+   jp    height_loop      ;; [3] Jump to continue with next pixel line 
 
-dms_sprite_8bit_boundary_crossed:
-    ld   a, e              ;; [1] DE = DE + 0xC050h
-    add  #0x50             ;; [2] -- Relocate DE pointer to the start of the next pixel line:
-    ld   e, a              ;; [1] -- DE is moved forward 3 memory banks plus 50 bytes (4000h * 3) 
-    ld   a, d              ;; [1] -- which effectively is the same as moving it 1 bank backwards and then
-    adc  #0xC0             ;; [2] -- 50 bytes forwards (which is what we want to move it to the next pixel line)
-    ld   d, a              ;; [1] -- Calculations are made with 8 bit maths as it is faster than other alternatives here
-    
-    jr   convertLoop       ;; [3] Jump to continue with next pixel line    
-
-end:
-    ;; Return is included in bindings
+end_sprite_colourize:
+                   ;; return in binding
     

@@ -23,8 +23,9 @@
 ;;
 ;; ASM bindings for <cpct_drawSpriteMaskedAlignedColorizeM1>
 ;;
+;;    16 microSec, 8 bytes
+;;
 cpct_drawSpriteMaskedAlignedColorizeM1_asm:: ;; Assembly entry point
-
    ;; GET Parameters from the stack 
    ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
    pop   hl                     ;; [3] HL = Return Address
