@@ -41,4 +41,7 @@ extern void cpct_disableLowerROM();
 extern void cpct_enableUpperROM();
 extern void cpct_disableUpperROM();
 
+// Background ROMs control
+extern void cpct_enableBackgroundROMs();
+
 #endif
