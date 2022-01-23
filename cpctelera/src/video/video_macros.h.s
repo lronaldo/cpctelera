@@ -369,7 +369,7 @@ cpct_page00_asm = 0x00
 .macro cpctm_clearScreen_asm COL
    ld    hl, #0xC000    ;; [3] HL Points to Start of Video Memory
    ld    de, #0xC001    ;; [3] DE Points to the next byte
-   ld    bc, #0x4000    ;; [3] BC = 16384 bytes to be copied
+   ld    bc, #(0x4000-1);; [3] BC = 16383 bytes to be copied
    ld   (hl), #COL      ;; [3] First Byte = given Colour
    ldir                 ;; [98297] Perform the copy
 .endm
