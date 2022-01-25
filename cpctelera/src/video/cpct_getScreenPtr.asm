@@ -95,16 +95,16 @@
 ;;    AF, BC, DE, HL
 ;;
 ;; Required memory:
-;;    C-bindings - 24 bytes
-;;  ASM-bindings - 20 bytes
+;;    C-bindings - 22 bytes
+;;  ASM-bindings - 18 bytes
 ;;
 ;; Time Measures: 
 ;; (start code)
 ;;     Case   | microSecs (us) | CPU Cycles
 ;; -----------------------------------------
-;;     Any    |      45        |     159
+;;     Any    |      43        |     172
 ;; -----------------------------------------
-;; Asm saving |     -13        |     -41
+;; Asm saving |     -13        |     -52
 ;; -----------------------------------------
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -134,8 +134,7 @@
                   ;;     Therefore, this is like doing HL += 256*L
 
    ;; Now extract Screen Character Row (R) from Y-Coordinate
-   ld    a, b     ;; [1] rA = Y-Coordinate
-   and   #0xF8    ;; [2] /
+   xor   b        ;; [1] / rA = ( rB and #0x07 ) xor rB  =  rB and #0xF8
    ld    l, a     ;; [1] \ rL = 8*int(Y/8) ;; << L contains Screen Character Row multiplied by 8
                                            ;;    as bits are shifted 3-bits to the left because
                                            ;;    the 3-least-significant-bits had the line number (L)
