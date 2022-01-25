@@ -30,10 +30,10 @@
 ;;                                     <u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (7 bytes):
-;;    (1B B)  buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
+;;    (1B A)  buffer_width - Width in bytes of the Sprite used as Buffer (>0, >=width)
 ;;    (2B DE) inbuffer_ptr - Destination pointer (pointing inside sprite buffer)
 ;;    (1B C)  width        - Sprite Width in bytes (>0)
-;;    (1B A)  height       - Sprite Height in bytes (>0)
+;;    (1B B)  height       - Sprite Height in bytes (>0)
 ;;    (2B HL) sprite       - Source Sprite Pointer (array with pixel data)
 ;;
 ;; Assembly Call (Input parameters on Registers)
