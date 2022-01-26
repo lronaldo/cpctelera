@@ -163,7 +163,6 @@
 #define  cpctm_createInterruptHandlerWrapper(IntWrapperName,IntHandlerName,...) \
   void dummy_##IntWrapperName()  __naked { \
      __asm \
-     .mdelete cpctm_createInterruptHandlerWrapper_asm \
      .include "firmware/cpctm_createInterruptHandlerWrapper.asm" \
      cpctm_createInterruptHandlerWrapper_asm IntWrapperName, _ ## IntHandlerName, __VA_ARGS__ \
      __endasm; \
