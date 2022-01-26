@@ -23,6 +23,7 @@
 ;#####################################################################
 ;
 .module cpct_firmware
+.include "firmware/firmware_macros.h.s"
 
 ;;
 ;; Title: Firmware&ROM constants
