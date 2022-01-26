@@ -34,6 +34,8 @@ extern  u16 cpct_disableFirmware();
 
 // Setting a user defined interrupt handler routine
 extern void cpct_setInterruptHandler( void(*intHandler)(void) ) __z88dk_fastcall;
+extern void cpct_setInterruptHandler_allRegisters( void(*intHandler)(void) ) __z88dk_fastcall;
+extern void cpct_setInterruptHandler_naked( void(*intHandler)(void) ) __z88dk_fastcall;
 extern  u16 cpct_removeInterruptHandler();
 
 // Upper and Lower ROM control
