@@ -123,12 +123,12 @@ include $(CPCT_PATH)/cfg/global_paths.mk
 ##   Flags used to configure the compilation of your code. They are usually 
 ##   fine for most of the projects, but you may change them for special uses.
 #####
-Z80CCFLAGS    :=
+Z80CCFLAGS    := -Wa -I$(CPCT_SRC),-I$(SRCDIR)
 Z80ASMFLAGS   := -l -o -s
 Z80CCINCLUDE  := -I$(CPCT_SRC) -I$(SRCDIR) 
 Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
                  --code-loc $(Z80CODELOC) \
-                 --data-loc 0 -l$(CPCT_LIB) -Wa -I$(CPCT_SRC),-I$(SRCDIR)
+                 --data-loc 0 -l$(CPCT_LIB) 
 ####
 ## SECTION 4: CALCULATED FOLDERS, SUBFOLDERS AND FILES
 ##

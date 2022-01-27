@@ -21,7 +21,7 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; ASM bindings for <cpct_zx7b_decrunch>
+;; ASM bindings for <cpct_zx7b_decrunch_s>
 ;;
 ;;   0 microSecs, 0 bytes
 ;;
