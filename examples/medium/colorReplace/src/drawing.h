@@ -24,8 +24,8 @@
 // PUBLIC FUNCTION DECLARATIONS
 //
 void InitializeDrawing();
-void UpdateBaloons();
-void DrawSceneBaloons();
+void UpdateBalloons();
+void DrawSceneBalloons();
 void DrawStars();
 
 #endif

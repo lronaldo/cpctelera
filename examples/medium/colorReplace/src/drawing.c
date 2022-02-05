@@ -22,34 +22,34 @@
 
 /////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
-u8 gSpriteColorized[G_BALOON_W*G_BALOON_H]; // Array for sprite to color
-u8 gBackGroundColor;                        // Background color
-u8 gBaloonColor;                            // Current color baloon
-u8 gPosCloud;                               // Position of cloud
+u8 gSpriteColorized[G_BALLOON_W*G_BALLOON_H];   // Array for sprite to color
+u8 gBackGroundColor;                            // Background color
+u8 gBalloonColor;                                // Current color balloon
+u8 gPosCloud;                                   // Position of cloud
 
 /////////////////////////////////////////////////////////////////////////////////
 // STRUCTURES DEFINITION
-typedef struct TBaloon                      // Baloon structure
+typedef struct TBalloon                     // Balloon structure
 {
-    i16 posY;                               // Absolute Baloon PosY (can be outside screen)
-    u8 posX;                                // Absolute Baloon PosX
+    i16 posY;                               // Absolute Balloon PosY (can be outside screen)
+    u8 posX;                                // Absolute Balloon PosX
     
-    u8 drawPosY;                            // In screen Baloon PosY
-    u8 drawCY;                              // In screen Baloon Height
+    u8 drawPosY;                            // In screen Balloon PosY
+    u8 drawCY;                              // In screen Balloon Height
     
-    u8 speed;                               // Baloon speed
-    u8 color;                               // Baloon color drawn
+    u8 speed;                               // Balloon speed
+    u8 color;                               // Balloon color drawn
     
-    u8 status;                              // Baloon status ACTIVE / INACTIVE
-} SBaloon;
+    u8 status;                              // Balloon status ACTIVE / INACTIVE
+} SBalloon;
 
-typedef struct TBaloons                     // All baloons structure
+typedef struct TBalloons                    // All balloons structure
 {
-    u8 nb;                                  // Nb baloons in screen
-    SBaloon baloons[NB_BALOONS];            // Array of baloon
-} SBaloons;
+    u8 nb;                                  // Nb balloons in screen
+    SBalloon balloons[NB_BALLOONS];         // Array of balloon
+} SBalloons;
 
-SBaloons gBaloons;                          // Baloons to draw
+SBalloons gBalloons;                        // Balloons to draw
 
 typedef struct TStar                        // Lighting star structure
 {
@@ -75,7 +75,7 @@ u8 GetRand(u8 max)
 }
 
 ///////////////////////////////////////////////////////
-///    CHANGE TWO COLORS OF BALOON SPRITE
+///    CHANGE TWO COLORS OF BALLOON SPRITE
 ///
 u8* ColorSprite(u8 color)
 {
@@ -83,167 +83,167 @@ u8* ColorSprite(u8 color)
     u16 replacePatColor1 = CPCTM_PENS2PIXELPATTERNPAIR_M0(1, color); // Just for example use cpct_pens2pixelPatternPairM0 with variables
     u16 replacePatColor2 = cpct_pens2pixelPatternPairM0(2, color + 1);
     
-    // Create a copy of the original g_baloon sprite before changing it
-    cpct_memcpy(gSpriteColorized, g_baloon, G_BALOON_W*G_BALOON_H);
+    // Create a copy of the original g_balloon sprite before changing it
+    cpct_memcpy(gSpriteColorized, g_balloon, G_BALLOON_W*G_BALLOON_H);
 
-    // Replace the two colors 1 and 2 of sprite baloon
-    cpct_spriteColourizeM0(replacePatColor1, G_BALOON_W*G_BALOON_H, gSpriteColorized); // Colors are consecutives
-    cpct_spriteColourizeM0(replacePatColor2, G_BALOON_W*G_BALOON_H, gSpriteColorized);
+    // Replace the two colors 1 and 2 of sprite balloon
+    cpct_spriteColourizeM0(replacePatColor1, G_BALLOON_W*G_BALLOON_H, gSpriteColorized); // Colors are consecutives
+    cpct_spriteColourizeM0(replacePatColor2, G_BALLOON_W*G_BALLOON_H, gSpriteColorized);
 	
 	return gSpriteColorized;
 }
 
 ///////////////////////////////////////////////////////
-///    CLEAR BALOON BACKGROUND
+///    CLEAR BALLOON BACKGROUND
 ///
-void ClearBaloon(SBaloon* baloon)
+void ClearBalloon(SBalloon* balloon)
 {
-    // If baloon in visible part of view
-    if (baloon->drawPosY < VIEW_DOWN)
+    // If balloon in visible part of view
+    if (balloon->drawPosY < VIEW_DOWN)
     {
         u8* pvmem; 
         
         // Compute size to be filled with background color
-        u8 clearCY = baloon->drawCY + BALOON_TRAIL;
+        u8 clearCY = balloon->drawCY + BALLOON_TRAIL;
         
         // Compute position to clear
-        u8 posDownClearY = baloon->drawPosY + clearCY;
+        u8 posDownClearY = balloon->drawPosY + clearCY;
         if (posDownClearY > VIEW_DOWN)
-            clearCY = VIEW_DOWN - baloon->drawPosY;
+            clearCY = VIEW_DOWN - balloon->drawPosY;
         
         // Draw the box with background color to clear
-        pvmem = GetBackBufferPtr(baloon->posX, baloon->drawPosY);
-        cpct_drawSolidBox(pvmem, gBackGroundColor, G_BALOON_W, clearCY);    
+        pvmem = GetBackBufferPtr(balloon->posX, balloon->drawPosY);
+        cpct_drawSolidBox(pvmem, gBackGroundColor, G_BALLOON_W, clearCY);    
     }
 }
 
 ///////////////////////////////////////////////////////
-///    DELETE BALOON
+///    DELETE BALLOON
 ///
-void DeleteBaloons(SBaloon* baloons, SBaloon* baloonToDel, u8* nb)
+void DeleteBalloons(SBalloon* balloons, SBalloon* balloonToDel, u8* nb)
 {              
-    // Get last baloon in array
-    // Decrement number of remaining baloons in array
-    const SBaloon* lastBaloon = &baloons[--*nb];
+    // Get last balloon in array
+    // Decrement number of remaining balloons in array
+    const SBalloon* lastBalloon = &balloons[--*nb];
     
-    // Replace baloon to be deleted with last baloon (if they are not the same)
-    if (baloonToDel != lastBaloon)
-        cpct_memcpy(baloonToDel, lastBaloon, sizeof(SBaloon));
+    // Replace balloon to be deleted with last balloon (if they are not the same)
+    if (balloonToDel != lastBalloon)
+        cpct_memcpy(balloonToDel, lastBalloon, sizeof(SBalloon));
 }
 
 ///////////////////////////////////////////////////////
-/// UPDATE BALOONS
+/// UPDATE BALLOONS
 ///
-void UpdateBaloons()
+void UpdateBalloons()
 {
-    SBaloon* itBaloon = gBaloons.baloons;
+    SBalloon* itBalloon = gBalloons.balloons;
     u8 i;
     
-    // Test if we can add a new baloon
-    if (gBaloons.nb < NB_BALOONS)
+    // Test if we can add a new balloon
+    if (gBalloons.nb < NB_BALLOONS)
     {
-        // Add new baloon at end of array
-        // Increment number of baloons in array
-        SBaloon* newBaloon = &gBaloons.baloons[gBaloons.nb++];
+        // Add new balloon at end of array
+        // Increment number of balloons in array
+        SBalloon* newBalloon = &gBalloons.balloons[gBalloons.nb++];
     
         // Get random positions X and Y
-        newBaloon->posX = GetRand(SCREEN_CX - G_BALOON_W);
-        newBaloon->posY = SCREEN_CY - GetRand(40);
+        newBalloon->posX = GetRand(SCREEN_CX - G_BALLOON_W);
+        newBalloon->posY = SCREEN_CY - GetRand(40);
         
         // Get random speed
-        newBaloon->speed = GetRand(3) + 2;
+        newBalloon->speed = GetRand(3) + 2;
         
         // Get circular next color 2 by 2 until 12
-        gBaloonColor = (gBaloonColor + 2) % 12;
-        newBaloon->color = gBaloonColor + 1;
+        gBalloonColor = (gBalloonColor + 2) % 12;
+        newBalloon->color = gBalloonColor + 1;
         
-        // Set baloon ACTIVE
-        newBaloon->status = BALOON_ACTIVE;
+        // Set balloon ACTIVE
+        newBalloon->status = BALLOON_ACTIVE;
     }
     
-    // Update all baloons
-    for (i = 0; i < gBaloons.nb; i++)
+    // Update all balloons
+    for (i = 0; i < gBalloons.nb; i++)
     {
-        // If baloon active move and draw it
-        if (itBaloon->status == BALOON_ACTIVE)
+        // If balloon active move and draw it
+        if (itBalloon->status == BALLOON_ACTIVE)
         {
-            // Test if whole baloon outside view
-            if (itBaloon->posY + G_BALOON_H < VIEW_TOP)
+            // Test if whole balloon outside view
+            if (itBalloon->posY + G_BALLOON_H < VIEW_TOP)
             {
-                // Set baloon inactive
-                itBaloon->status = BALOON_INACTIVE;
-                // Clear baloon background
-                ClearBaloon(itBaloon);
+                // Set balloon inactive
+                itBalloon->status = BALLOON_INACTIVE;
+                // Clear balloon background
+                ClearBalloon(itBalloon);
             }
             else
             {
-                // Move baloon to up according its speed
-                i16 posY = itBaloon->posY - itBaloon->speed;
-                itBaloon->posY = posY;
+                // Move balloon to up according its speed
+                i16 posY = itBalloon->posY - itBalloon->speed;
+                itBalloon->posY = posY;
 
-                // Baloon outside view by top
+                // Balloon outside view by top
                 if (posY < VIEW_TOP)
                 {
-                    itBaloon->drawPosY = 0;
-                    itBaloon->drawCY = G_BALOON_H + posY;
+                    itBalloon->drawPosY = 0;
+                    itBalloon->drawCY = G_BALLOON_H + posY;
                 }
                 else 
-                //  Baloon outside view by down
-                if (posY + G_BALOON_H > VIEW_DOWN)
+                //  Balloon outside view by down
+                if (posY + G_BALLOON_H > VIEW_DOWN)
                 {
-                    itBaloon->drawPosY = posY;
-                    itBaloon->drawCY = VIEW_DOWN - posY;
+                    itBalloon->drawPosY = posY;
+                    itBalloon->drawCY = VIEW_DOWN - posY;
                 }
-                // Baloon all in view
+                // Balloon all in view
                 else
                 {
-                    itBaloon->drawPosY = posY;
-                    itBaloon->drawCY = G_BALOON_H;
+                    itBalloon->drawPosY = posY;
+                    itBalloon->drawCY = G_BALLOON_H;
                 }    
             }
         }
-        // If inactive delete baloon
+        // If inactive delete balloon
         else
         {
-            // Clear baloon background
-            ClearBaloon(itBaloon);
+            // Clear balloon background
+            ClearBalloon(itBalloon);
             
-            // Delete baloon from list
-            DeleteBaloons(gBaloons.baloons, itBaloon, &gBaloons.nb);
+            // Delete balloon from list
+            DeleteBalloons(gBalloons.balloons, itBalloon, &gBalloons.nb);
         }
         
-        // Get next baloon pointer
-        itBaloon++;
+        // Get next balloon pointer
+        itBalloon++;
     }
 }
 
 ///////////////////////////////////////////////////////
-/// DRAW BALOON
+/// DRAW BALLOON
 ///
-void DrawBaloon(SBaloon* baloon, u8* spriteBaloon)
+void DrawBalloon(SBalloon* balloon, u8* spriteBalloon)
 {
-    i16 posY = baloon->posY;
+    i16 posY = balloon->posY;
     
-    // If baloon in view
-    if (posY + G_BALOON_H > VIEW_TOP && posY < VIEW_DOWN)
+    // If balloon in view
+    if (posY + G_BALLOON_H > VIEW_TOP && posY < VIEW_DOWN)
     {
-        // Get VMem pointer of current baloon position
-        u8* pvmem = GetBackBufferPtr(baloon->posX, baloon->drawPosY);
-        u8* sprite = (u8*)spriteBaloon;
+        // Get VMem pointer of current balloon position
+        u8* pvmem = GetBackBufferPtr(balloon->posX, balloon->drawPosY);
+        u8* sprite = (u8*)spriteBalloon;
         
-        u16 replacePatColor1 = cpct_pens2pixelPatternPairM0(1, baloon->color);
+        u16 replacePatColor1 = cpct_pens2pixelPatternPairM0(1, balloon->color);
     
-        // Baloon partialy outside view by top
+        // Balloon partialy outside view by top
         if (posY < VIEW_TOP)
         {
             // Compute Y position
             u8 y = -posY;
             
             // Compute sprite offset
-            sprite = (u8*)spriteBaloon + G_BALOON_W * y;
+            sprite = (u8*)spriteBalloon + G_BALLOON_W * y;
         }
        
-        cpct_drawSpriteMaskedAlignedColorizeM0(sprite, pvmem, G_BALOON_W, baloon->drawCY, gMaskTable, replacePatColor1);
+        cpct_drawSpriteMaskedAlignedColorizeM0(sprite, pvmem, G_BALLOON_W, balloon->drawCY, gMaskTable, replacePatColor1);
     }
 }
 
@@ -304,35 +304,35 @@ void DrawCloud()
 }
 
 ///////////////////////////////////////////////////////
-/// DRAW SCENE WITH ALL BALOONS
+/// DRAW SCENE WITH ALL BALLOONS
 ///
-void DrawSceneBaloons()
+void DrawSceneBalloons()
 {
-    // Clear background for all baloons
-    SBaloon* itBaloon = gBaloons.baloons; // Get first baloon pointer
-    for (u8 i = 0; i < gBaloons.nb; i++)
+    // Clear background for all balloons
+    SBalloon* itBalloon = gBalloons.balloons; // Get first balloon pointer
+    for (u8 i = 0; i < gBalloons.nb; i++)
     {
-        ClearBaloon(itBaloon);
-        itBaloon++;
+        ClearBalloon(itBalloon);
+        itBalloon++;
     }
     
     // Draw sprite cloud
     DrawCloud();
     
-    // Draw all baloons
-    itBaloon = gBaloons.baloons; // Get first baloon pointer
-    for (u8 i = 0; i < gBaloons.nb; i++)
+    // Draw all balloons
+    itBalloon = gBalloons.balloons; // Get first balloon pointer
+    for (u8 i = 0; i < gBalloons.nb; i++)
     {
         // Test if sprite have colors to change 
-        if (itBaloon->color > 1) // Color 0 and 1 are default color baloon
+        if (itBalloon->color > 1) // Color 0 and 1 are default color balloon
         {        
-            u8* sprite = ColorSprite(itBaloon->color); // Change colors of baloon
-			DrawBaloon(itBaloon, sprite);              // And draw colored baloon
+            u8* sprite = ColorSprite(itBalloon->color); // Change colors of balloon
+			DrawBalloon(itBalloon, sprite);              // And draw colored balloon
         }
 		else
-			 DrawBaloon(itBaloon, g_baloon);           // Draw default baloon sprite (blue)
+			 DrawBalloon(itBalloon, g_balloon);           // Draw default balloon sprite (blue)
     
-        itBaloon++; // Get next baloon
+        itBalloon++; // Get next balloon
     }
 }
 
@@ -366,6 +366,6 @@ void DrawBackground()
 void InitializeDrawing()
 {
     gBackGroundColor = cpctm_px2byteM0(14, 14);             // Get byte color of background for M0
-    gBaloons.nb = 0;                                        // No baloon to draw at start
+    gBalloons.nb = 0;                                       // No balloon to draw at start
     DrawBackground();                                       // Set background on both buffers
 }

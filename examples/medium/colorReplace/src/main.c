@@ -58,8 +58,8 @@ void main(void)
     // Main Loop
     while (TRUE)
     {
-        UpdateBaloons();
-        DrawSceneBaloons();
+        UpdateBalloons();
+        DrawSceneBalloons();
         DrawStars();
         
         // Flip buffers to display the present back buffer
