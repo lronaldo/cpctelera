@@ -1,7 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +17,13 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
-
 ;;
-;; ASM bindings for <cpct_drawSpriteMaskedAlignedColorizeM1>
+;; Array: cpct_pen2twoPixelM0_table 
 ;;
-;;    16 microSec, 8 bytes
+;;    Mode 0 PEN to 2-pixels-byte in screen mode format conversion table
 ;;
-cpct_drawSpriteMaskedAlignedColorizeM1_asm:: ;; Assembly entry point
-   ;; GET Parameters from the stack 
-   ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
-
-.include /cpct_drawSpriteMaskedAlignedColorizeM1.asm/
-
-dms_restore_ix:
-   ld   ix, #0000               ;; [4] Restore IX before returning
-   ret                          ;; [3] Return to caller
+;;    This table associates the value of a Mode 0 PEN ([0-15]) with a byte encoding
+;; 2-mode-0-pixels all of the PEN colour associated. For instance, for PEN 1, 
+;; it associates 0xC0, which means 2-mode-0-pixels of PEN 1.
+;;
+cpct_pen2twoPixelM0_table:: .db 0x00, 0xC0, 0x0C, 0xCC, 0x030, 0xF0, 0x3C, 0xFC, 0x03, 0xC3, 0x0F, 0xCF, 0x33, 0xF3, 0x3F, 0xFF

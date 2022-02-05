@@ -276,5 +276,5 @@ loop:
    jr    nz, loop ;; [2/3] if (C > 0) then BC != 0, continue with the loop
    djnz  loop     ;; [3/4] if (--B > 0) then BC != 0, continue with the loop
    
-   ret            ;; [3] Finished colourizing the sprite
+   ;; Finished colourizing the sprite return binding
 .endm

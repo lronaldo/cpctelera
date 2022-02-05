@@ -23,13 +23,10 @@
 ;;
 ;; ASM bindings for <cpct_drawSpriteColorizeM1>
 ;;
+;;    3 microSec, 1 byte
+;;
 cpct_drawSpriteColorizeM1_asm:: ;; Assembly entry point
-
-;; GET Parameters from the stack 
-ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
 
 .include /cpct_drawSpriteColorizeM1.asm/
 
-dms_restore_ix:
-   ld   ix, #0000               ;; [4] Restore IX before returning
-   ret     
+   ret                          ;; [3] Return to caller

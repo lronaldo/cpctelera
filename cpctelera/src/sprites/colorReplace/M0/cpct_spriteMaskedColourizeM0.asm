@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 Arnaud Bouche (@Arnaud6128)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -22,156 +22,141 @@
 ;;
 ;; Function: cpct_spriteMaskedColourizeM0
 ;;
-;;    Replace one concrete colour of a masked sprite by a different one. This function
-;; does the replacement, use <cpct_setSpriteMaskedColourizeM0> to pick up colours.
+;;    Replaces a colour pattern (Find Pattern) by a new one (Insert Pattern) in 
+;; an array/sprite with interleaved mask bytes. Typical use is to replace pixels 
+;; of a given PEN Colour (OldPen) into pixels of a new PEN Colour (NewPen).
 ;;
 ;; C Definition:
-;;    void <cpct_spriteMaskedColourizeM0> (<u8> *width*, <u8> *height*, void* *sprite*) __z88dk_callee;
+;;    void <cpct_spriteMaskedColourizeM0> (<u16> *rplcPat*, <u16> *size*, void* *sprite*) __z88dk_callee;
 ;;
 ;; Input Parameters (4 bytes):
-;;  (2B HL) sprite - Source Sprite Pointer (array of pixel data)
-;;  (1B C ) height - Sprite Height in bytes 
-;;  (1B B ) width  - Sprite Width in *bytes* (Beware, *not* in pixels!)
+;;  (1B DE) rplcPat - Replace Pattern => 1st byte(D)=Pattern to Find, 2nd byte(E)=Pattern to insert instead
+;;  (2B BC) size    - Size of the Array/Sprite in bytes (if it is a sprite, width*height)
+;;  (2B HL) sprite  - Array/Sprite Pointer (array of bytes with Mode 0 pixel data)
 ;;
 ;; Assembly call (Input parameters on registers):
 ;;    > call cpct_spriteMaskedColourizeM0_asm
 ;;
 ;; Parameter Restrictions:
-;;  * *sprite* must be an array containing sprite's pixels data in screen pixel format
-;; along with mask data. Each mask data byte must precede its associated colour data byte.
-;; Sprite must be rectangular and all bytes in the array must be consecutive pixels, 
-;; starting from top-left corner and going left-to-right, top-to-bottom down to the
-;; bottom-right corner. Total amount of bytes in pixel array should be 
-;; 2 x *width* x *height* (mask data doubles array size). 
-;;  * *width* (1-256) must be the width of the sprite *in bytes* (not taking into account
-;; mask bytes). Always remember that the width must be expressed in bytes and *not* in pixels.
-;;  * *height* (1-256) must be the height of the sprite in bytes. Height of a sprite in
-;; bytes and pixels is the same value.
-;;  * *Beware!* A 0 value either for *width* or *height* will be treated as 256, and 
-;; will probably lead this function to overwrite memory values outside your sprite array.
+;;  * *rplcPat* ([0000-FFFF], 16bits, unsigned) should contain 2 8-bit colour pixel 
+;; patterns in Mode 0 screen pixel format (see below for an explanation of patterns).
+;; Any value is valid, but values different of what you actually want will probably
+;; result in estrange colours in the final array/sprite.
+;;  * *size*    ([0001-32768], 16bits, unsigned) must be the exact size in bytes of the
+;; given array/sprite. A value of *0* will be treated as 65536, probably resulting on all 
+;; memory being overwritten and your program crashing.
+;;  * *sprite*  ([0000-FFFF], 16bits, pointer) must be a pointer to the start of an array 
+;; containing sprite's pixels data in Mode 0 screen pixel format. Total amount of bytes
+;; in the array should be equal to *size*.
 ;;
 ;; Details:
-;;    This function modifies a masked *sprite* replacing pixels of a given colour by 
-;; other colour. The *sprite* must contain an interlaced transparency mask (check 
-;; <cpct_drawMaskedSprite> for reference). Replacement ignores mask values: transparent 
-;; pixels will continue to be invisible. Both searched colour and replacement colour 
-;; are previously selected using <cpct_setSpriteMaskedColourizeM0>. This function only
-;; does the replacement of the previously selected colours. Transparency mask is not 
-;; affected by color replacement.
-;;    Selected colours are inserted directly as immediate values into the code
-;; of this function. After a call to <cpct_setSpriteMaskedColourizeM0>, machine code
-;; that does the replacement gets modified permanently unless <cpct_setSpriteMaskedColourizeM0>
-;; is called again. Therefore, you may perform one single call <cpct_setSpriteMaskedColourizeM0>
-;; to configure this function for many uses, resulting in a great performance gain.
-;;    If no call is performed to <cpct_setSpriteMaskedColourizeM0> before calling
-;; this function, no color replacement will be done at all. Effectively, it will
-;; replaced color 0 with color 0, to no effect at all.
-;; Example,
+;;    This function does exactly the same operation as <cpct_spriteColourizeM0> but 
+;; taking into account that the given array/sprite contains interleaved mask bytes.
+;; The interleaved mask bytes must be in the following format,
 ;; (start code)
-;; void SetEnemyTShirtsNewColour(u8 colour) {
-;;    static u8 oldcolour;
-;;    u8 i;
+;; Array storage format:  <-byte 1-> <-byte 2-> <-byte 3-> <-byte 4->
+;;                        <- mask -> <-colour-> <- mask -> <-colour->
+;; ------------------------------------------------------------------------------
+;;      void* sprite =  {    0xFF,     0x00,       0x00,     0xC2,   .... };
+;; ------------------------------------------------------------------------------
+;; Video memory output:   <- 1st Screen byte -> <- 2nd Screen byte -> 
+;; ______________________________________________________________________________
+;;         Example 1: Definition of a masked sprite and byte format
+;; (end)
+;; first byte of the array/sprite must be the mask byte to be used with the second 
+;; byte, which is the first screen pixel mode 0 format byte, with the colours of the 
+;; first 2-pixels. Next bytes follow same order: mask, colour, mask, colour....
 ;;
-;;    // Enemy t-shirts oldcolour will be replaced with new colour
-;;    cpct_setSpriteMaskedColourizeM0(oldcolour, colour);
+;;    This function ignores mask bytes and replaces pixel colours in the colour bytes.
+;; *Beware!* This means that your mask will not be modified. Therefore, if you change
+;; colours of pixels outside the mask, those pixels will be ORed with the corresponding
+;; background pixels, which won't be removed for them. This could led to undesired 
+;; effects.
 ;;
-;;    // Replace t-shirts colours from all enemy sprites. All enemy sprites
-;;    // will be modified replacing oldcolour with colour.
-;;    for(i=0; i < ENEMIES; ++i)
-;;       cpct_spriteMaskedColourizeM0(G_ENEMY_W, G_ENEMY_H, gEnemy[i]->sprite);
+;;    Read <cpct_spriteColourizeM0> for more details on how colour replacing works.
 ;;
-;;    // After replacement, colour becomes oldcolour
-;;    oldcolour = colour;
-;;  }
+;;    The following code example shows a typical use of this function,
+;; (start code) 
+;;    // Enemy Struct Declaration
+;;    typedef struct {
+;;       u8 tsPattern;        // T-Shirt Pixel Pattern
+;;       u8 width, height;
+;;       u8* maskedSprite;
+;;       // ....
+;;    } Enemy_t;
+;;    
+;;    //....
+;;    
+;;    // Changes the T-Shirt Pattern of our enemies. It
+;;    // searches the pixels in the current T-Shirt Pattern
+;;    // and replaces them with a new one
+;;    void changeTShirt(Enemy_t* ene, u8 const newPattern) {
+;;       // Create a replace pattern looking for current tspattern
+;;       // and replacing it with the new pattern.
+;;       //  Higher 8-bits = FindPat, Lower 8-bits = InsrPat
+;;       u16 const rplcPat = ((u16)ene->tsPattern << 8) | newPattern;
+;;       
+;;       // Calculate size of our enemy sprite and replace T-Shirt Pattern
+;;       u8  const size    = ene->width * ene->height;
+;;       cpct_spriteColourizeM0(rplcPat, size, ene->maskedSprite);
+;;     
+;;       // Remember the new T-shirt Pattern for later changes
+;;       ene->tsPattern = newPattern;
+;;    }
 ;; (end code)
 ;;
 ;; Known limitations:
-;;    * <cpct_setSpriteMaskedColourizeM0> should have been called at least once before
-;; properly using this function. Otherwise, this function will produce no effect.
-;;    * This function *will not work from ROM*, as it uses self-modifying code.
-;;    * This function does not check for parameters being valid. Incorrect values
-;; will probably produce changes in memory places outside your sprite, leading
-;; to undefined behaviour.
+;;    * Beware! The function does not change mask bytes. Therefore, no matter what pixels
+;; you change the colour of in your sprite, same pixels will be removed from background
+;; each time you draw the sprite. If you change colours of pixels outside your mask
+;; boundaries, those pixels will be ORed with the correspoding background ones, potentially
+;; leading to undesired glitches.
+;;    * This function does not check for parameter boundaries or their validity.
+;; Incorrect our out-of-bounds values will cause undefined behaviour, potentially
+;; overwritting memory outside the array/sprite.
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, BC, DE, HL, IXl
 ;;
 ;; Required memory:
-;;     C-bindings - 39 bytes
-;;   ASM-bindings - 36 bytes
+;;     C-bindings - 32 bytes
+;;   ASM-bindings - 28 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
-;;  Case      |   microSecs (us)       |        CPU Cycles
-;; ----------------------------------------------------------------
-;; Best  Case |   21 + (5 + 29W)H      |   84 + (20 + 116W)H
-;; Worst Case |   21 + (5 + 31W)H      |   84 + (20 + 124W)H
-;; ----------------------------------------------------------------
-;;  W=2,H=16  |     1029 / 1093        |       4116 /  4372
-;;  W=4,H=32  |     3893 / 4149        |      15572 / 16596
-;; ----------------------------------------------------------------
-;; Asm saving |         -12            |          -48
-;; ----------------------------------------------------------------
+;; |----------------------------------------------------------
+;; |  Case       |    microSecs (us)  |      CPU Cycles      |
+;; |----------------------------------------------------------
+;; | Any (i.e.)  | 25 + 24(S) + 3(SS) | 100 + 92(S) + 12(SS) |
+;; |----------------------------------------------------------
+;; | S=16 (2x 8) |        412         |         1648         |
+;; | S=32 (4x 8) |        796         |         3184         |
+;; | S=64 (4x16) |       1564         |         6256         |
+;; | S=128(8x16) |       3100         |        12400         |
+;; | S=256(8x32) |       6175         |        24700         |
+;; | S=512(8x64) |      12322         |        49288         |
+;; |----------------------------------------------------------
+;; | Asm saving  |        -15         |          -60         |
+;; |----------------------------------------------------------
 ;; (end code)
-;;    W = *width* in bytes, H = *height* in bytes
+;;    S  - Size of the array/Sprite in bytes
+;;    SS - 1 + [ *S* / 256 ] · · · · ( *[x]* = Integral part of x )
 ;;
 ;; Credits:
 ;;    Original routine optimized by @Docent and discussed in CPCWiki :
 ;; http://www.cpcwiki.eu/forum/programming/cpctelera-colorize-sprite/
 ;;
-;; Thanks to all of them for their help and support.
+;; Thanks to all who participated in the discussion for their help and support.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Save width value to restore it after each line 
-ld     a, b          ;; [1] A = width
-ld    (w_restore), a ;; [4] Save width into its restore place
+.mdelete cpctm_generate_spriteMaskedColourizeM0
+.macro cpctm_generate_spriteMaskedColourizeM0 _NumIncsHL
+   ;; Code for this function is exactly the same as cpct_spriteColourizeM0
+   ;; but incrementing HL 2 times in each loop iteration to jump over
+   ;; the interleaved mask byte
+   .include /cpct_spriteColourizeM0.asm/
 
-;; As E register is free, use it as a cache for Pixel 1 Pattern of the colour to be replaced
-px1_oldval = .+1
-ld     e, #00        ;; [2] E = Pixel 1 4-bit Pattern of the colour to be replaced (x0x2x1x3)
-
-;; Loop through all the bytes of the sprite, replacing colours that have the same
-;; 4-bit pattern of the colour we want to replace. 
-loop:
-   ;; Check and replace Pixel 1
-   ld     a, (hl)    ;; [2] A = Byte with 2 Mode 0 Pixels to be replaced
-   and   #0b01010101 ;; [2] A ^= 0x55. Left out only the 4 bits of the Pixel 1 (x0x2x1x3)
-   ld     d, a       ;; [1] D = holds a copy of Pixel 1 bits, just in case we don't have to replace it
-   cp     e          ;; [1] A == E? Check if A is equal to the Pixel 1 Pattern of the colour we want to replace
-   jr    nz, notpx1  ;; [2/3] If it is not equal, just continue to check pixel 0
-      px1_newval = .+1
-      ld     d, #00  ;; [2] Perform replacement of Pixel 1. D holds the 4 bits of the new colour. #00 is a placeholder
-   notpx1:
-
-   ;; Check and replace Pixel 0
-   ld     a, (hl)    ;; [2] A = Restore the value of the byte with the 2 Mode 0 pixels to be replaced
-   and   #0b10101010 ;; [2] A ^= 0xAA. Left out only the 4 bits of the Pixel 0 (0x2x1x3x)
-   px0_oldval = .+1
-   cp    #00         ;; [2] Check if A is equal to the Pixel 0 Pattern of the colour we want to replace. #00 is a placeholder
-   jr    nz, notpx0  ;; [2/3] If it is not equal, just continue to mix both output values
-      px0_newval = .+1
-      ld     a, #00  ;; [2] Perform replacement of Pixel 0. A holds the 4 bits of the new colour. #00 is a placeholder
-   notpx0:
-
-   ;; Mix both replacements and save
-   or     d          ;; [1] A |= C. A and C hold replacements for pixels 0 and 1. This mixes them into A.
-   ld   (hl), a      ;; [2] Write byte with colours replaced
-   inc   hl          ;; [2] HL++ Jump to the next byte (mask byte)
-   inc   hl          ;; [2] HL++ Move to next byte of the sprite
-
- djnz  loop          ;; [3/4] B--. Continue looping if there are more bytes left in this sprite line (B!=0)
-
-   w_restore=.+1
-   ld    b, #00      ;; [2] B = width (restore value). #00 is a placeholder
-   dec   c           ;; [1] C-- (One less line of the sprite to process)
- jr    nz, loop      ;; [2/3] Continue looping if there are more lines left
-
- ret                 ;; [3] Return to caller
-
-;;
-;; Global symbols to be used by external functions to set placeholders
-;;
-cpct_spriteMaskedColourizeM0_px0_oldval == px0_oldval
-cpct_spriteMaskedColourizeM0_px1_oldval == px1_oldval
-cpct_spriteMaskedColourizeM0_px0_newval == px0_newval
-cpct_spriteMaskedColourizeM0_px1_newval == px1_newval
+   ;; Generate the code with the given number of NumIncs (2)
+   inc   hl                      ;; [2] Jump over the first mask byte
+   cpctm_generate_spriteColourizeM0 _NumIncsHL
+.endm

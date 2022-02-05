@@ -18,7 +18,7 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "../../../macros/cpct_undocumentedOpcodes.h.s"
+.include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
 ;; C bindings for <cpct_drawSpriteColorizeM0>
@@ -26,23 +26,20 @@
 ;;   33 us, 10 bytes
 ;;
 _cpct_drawSpriteColorizeM0::
-
-  ;; GET Parameters from the stack 
-   ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
-   
-   exx 
-   pop   hl                     ;; [3] HL' = Source address (Sprite)
-   pop   de                     ;; [3] DE' = Destination Memory
-   pop   bc                     ;; [5] BC' = (B = Sprite Height, C = Width)
-   exx
-   
-   ex   (sp), hl                ;; [6] HL = (H = newColor, L = oldColor)
-                                ;; ... and leave Return Address at (SP) as we don't need to restore
-                                ;; ... stack status because callin convention is __z88dk_callee
-                                
+   ;; GET Parameters from the stack 
+   pop   hl          ;; [3] HL = Return Address
+   pop   af          ;; [3] AF = Source Sprite Pointer
+   pop   de          ;; [3] DE = Destination video memory pointer
+   pop   bc          ;; [3] BC = (B = Sprite Height, C = Width)
+   ex   (sp), hl     ;; [6] HL = Replace Pattern (H=Find Pattern [OldPen], L=Insert Pattern (NewPen))
+                     ;; ... and leave Return Address at (SP) as we don't need to restore
+                     ;; ... stack status because callin convention is __z88dk_callee
+					 
+   push  ix          ;; [5] Save IX and IY to let this function...
+   push  iy          ;; [5] ...use and restore them before returning                                
+								
 .include /cpct_drawSpriteColorizeM0.asm/
 
-dms_restore_ix:
-   ld   ix, #0000               ;; [4] Restore IX before returning
-   ret                          ;; [3] Return to caller
+   pop   iy          ;; [4] / Restore IY, IX
+   pop   ix          ;; [4] \
+   ret               ;; [3] Return to caller

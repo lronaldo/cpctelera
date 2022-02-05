@@ -1,7 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +17,13 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
-
 ;;
-;; ASM bindings for <cpct_drawSpriteMaskedAlignedColorizeM1>
+;; ASM bindings for <cpct_pens2pixelPatternPairM0>
 ;;
-;;    16 microSec, 8 bytes
+;;    3 microSecs, 1 byte
 ;;
-cpct_drawSpriteMaskedAlignedColorizeM1_asm:: ;; Assembly entry point
-   ;; GET Parameters from the stack 
-   ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
+cpct_pens2pixelPatternPairM0_asm::    ;; Assembly entry point
+   ;; Include common code
+   .include /cpct_pens2pixelPatternPairM0.asm/
 
-.include /cpct_drawSpriteMaskedAlignedColorizeM1.asm/
-
-dms_restore_ix:
-   ld   ix, #0000               ;; [4] Restore IX before returning
-   ret                          ;; [3] Return to caller
+   ret               ;; [3] Return

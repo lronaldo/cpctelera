@@ -1,6 +1,6 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
 ##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-##  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+##  Copyright (C) 2020 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU Lesser General Public License as published by
@@ -28,11 +28,15 @@
 ###########################################################################
 
 ## CPCTELERA MAIN PATH
-##   Sets CPCTelera main path for accessing tools and configuration. If you
-##   change folder structure, change CPCT_PATH value for its absolute path.
+##   Sets CPCTelera main path for accessing tools and configuration. This 
+##   variable must point to the folder where source and tools are contained.
+##   Setup creates and environment variable that will be generally used.
+##   However, when environment variable is not available, this variable 
+##   should have the correct value for the project to compile.
+##   If you change folder structure, CPCT_PATH should reflect this change.
+##   This variable should always have the absolute path value.
 ##
-THIS_FILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-CPCT_PATH      := $(THIS_FILE_PATH)../../../../cpctelera/
+#>> Uses environment variable $(CPCT_PATH)
 
 ####
 ## SECTION 1: Project configuration 
@@ -44,7 +48,7 @@ CPCT_PATH      := $(THIS_FILE_PATH)../../../../cpctelera/
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := color
+PROJNAME   := colors
 Z80CODELOC := 0x40
 
 ##
@@ -55,7 +59,7 @@ Z80CODELOC := 0x40
 ## OBJDIR      = Object files generated on compilation
 ##
 SRCDIR      := src
-DSKFILESDIR := dsk_files
+DSKFILESDIR := dsk
 OBJDIR      := obj
 
 ##
@@ -86,6 +90,7 @@ IHXFILE := $(OBJDIR)/$(PROJNAME).ihx
 BINFILE := $(OBJDIR)/$(PROJNAME).bin
 CDT     := $(PROJNAME).cdt
 DSK     := $(PROJNAME).dsk
+SNA     := $(PROJNAME).sna
 DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 
 ##
@@ -93,9 +98,10 @@ DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 ##
 ##  $(CDT):    Generates the CDT file with main binary
 ##  $(DSK):    Generates the DSK file with main binary
+##  $(SNA):    Generates the SNA file with main binary
 ##  $(DSKINC): Includes all files from DSKFILESDIR into DSK as binaries 
 ##
-TARGET := $(CDT) $(DSK) $(DSKINC)
+TARGET := $(CDT) $(DSK) $(DSKINC) $(SNA)
 
 ##
 ## OBJS2CLEAN: Additional objects to be removed when running "make clean"
@@ -133,10 +139,8 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
 
-# Convert images and tilemaps
+# Convert images, tilemaps and music
 include cfg/image_conversion.mk
-include cfg/tilemap_conversion.mk
-include cfg/music_conversion.mk
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
@@ -149,6 +153,7 @@ CFILES         := $(filter-out $(IMGCFILES), $(CFILES))
 ASMFILES       := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(ASM_EXT)))
 ASMFILES       := $(filter-out $(IMGASMFILES), $(ASMFILES))
 BIN2CFILES     := $(foreach DIR, $(SUBDIRS), $(wildcard $(DIR)/*.$(BIN_EXT)))
+BIN2CFILES     := $(filter-out $(IMGBINFILES), $(BIN2CFILES))
 DSKINCSRCFILES := $(wildcard $(DSKFILESDIR)/*)
 
 # Calculate all object files
@@ -161,3 +166,4 @@ ASM_OBJFILES   := $(patsubst $(SRCDIR)%, $(OBJDIR)%, $(patsubst %.$(ASM_EXT), %.
 DSKINCOBJFILES := $(foreach FILE, $(DSKINCSRCFILES), $(patsubst $(DSKFILESDIR)/%, $(OBJDSKINCSDIR)/%, $(FILE)).$(DSKINC_EXT))
 OBJFILES       := $(C_OBJFILES) $(ASM_OBJFILES)
 GENOBJFILES    := $(GENC_OBJFILES) $(GENASM_OBJFILES)
+NONLINKGENFILES:= $(IMGBINFILES)

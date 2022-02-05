@@ -23,7 +23,7 @@
 ;;
 ;; C bindings for <cpct_spriteMaskedColourizeM1>
 ;;
-;;   15 us, 4 bytes
+;;   27 us, 7 bytes
 ;;
 _cpct_spriteMaskedColourizeM1::
    ;; GET Parameters from the stack 
@@ -34,10 +34,15 @@ _cpct_spriteMaskedColourizeM1::
                                  ;; ... and leave Return Address at (SP) as we don't need to restore
                                  ;; ... stack status because callin convention is __z88dk_callee
 
+   push  ix                      ;; [5] Save IX to let this function use and restore them before returning
+
    ;; Include Common code
    .include /cpct_spriteMaskedColourizeM1.asm/
    
    ;; Generate the code with just 1 increment of HL at the end of every loop pass
    ;; as the array/sprite is to be composed of consecutive bytes 
    cpctm_generate_spriteMaskedColourizeM1 2
+   
+   pop   ix                      ;; [4] Restore IX
+   ret                           ;; [3] Return to caller
 

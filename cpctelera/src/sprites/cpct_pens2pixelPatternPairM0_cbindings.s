@@ -1,7 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +17,20 @@
 ;;-------------------------------------------------------------------------------
 .module cpct_sprites
 
-.include "macros/cpct_undocumentedOpcodes.h.s"
-
 ;;
-;; ASM bindings for <cpct_drawSpriteMaskedAlignedColorizeM1>
+;; C bindings for <cpct_pens2pixelPatternPairM0>
 ;;
-;;    16 microSec, 8 bytes
+;;    14 microSecs, 5 bytes
 ;;
-cpct_drawSpriteMaskedAlignedColorizeM1_asm:: ;; Assembly entry point
-   ;; GET Parameters from the stack 
-   ld (dms_restore_ix + 2), ix  ;; [6] Save IX to restore it before returning
-   pop   hl                     ;; [3] HL = Return Address
-
-.include /cpct_drawSpriteMaskedAlignedColorizeM1.asm/
-
-dms_restore_ix:
-   ld   ix, #0000               ;; [4] Restore IX before returning
-   ret                          ;; [3] Return to caller
+_cpct_pens2pixelPatternPairM0_real::    ;; C-Entry Point
+   
+   pop   bc       ;; [3] BC = Return Address
+   pop   de       ;; [3] E = NewPen, D = OldPen
+   push  bc       ;; [4] Leave Return Address in the stack
+                  ;;     and fulfill z88dk_callee requirement
+   
+   ;; Include common code
+   .include /cpct_pens2pixelPatternPairM0.asm/
+   
+   ex    de, hl   ;; [1] HL = Return value in C (H=Pattern for Pen 1, L=Pattern for Pen 2)
+   ret            ;; [3] Return

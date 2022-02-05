@@ -25,7 +25,7 @@
 u8 gSpriteColorized[G_BALOON_W*G_BALOON_H]; // Array for sprite to color
 u8 gBackGroundColor;                        // Background color
 u8 gBaloonColor;                            // Current color baloon
-u8 gPosCloud;                               // Position of cloude
+u8 gPosCloud;                               // Position of cloud
 
 /////////////////////////////////////////////////////////////////////////////////
 // STRUCTURES DEFINITION
@@ -77,16 +77,20 @@ u8 GetRand(u8 max)
 ///////////////////////////////////////////////////////
 ///    CHANGE TWO COLORS OF BALOON SPRITE
 ///
-void ColorSprite(u8 color)
+u8* ColorSprite(u8 color)
 {
+    // Set pixel pattern pair for colors 1 and 2
+    u16 replacePatColor1 = CPCTM_PENS2PIXELPATTERNPAIR_M0(1, color); // Just for example use cpct_pens2pixelPatternPairM0 with variables
+    u16 replacePatColor2 = cpct_pens2pixelPatternPairM0(2, color + 1);
+    
     // Create a copy of the original g_baloon sprite before changing it
     cpct_memcpy(gSpriteColorized, g_baloon, G_BALOON_W*G_BALOON_H);
 
     // Replace the two colors 1 and 2 of sprite baloon
-    cpct_setSpriteColourizeM0(1, color);
-    cpct_spriteColourizeM0(G_BALOON_W, G_BALOON_H, gSpriteColorized); // Colors are consecutives
-    cpct_setSpriteColourizeM0(2, color + 1);
-    cpct_spriteColourizeM0(G_BALOON_W, G_BALOON_H, gSpriteColorized);
+    cpct_spriteColourizeM0(replacePatColor1, G_BALOON_W*G_BALOON_H, gSpriteColorized); // Colors are consecutives
+    cpct_spriteColourizeM0(replacePatColor2, G_BALOON_W*G_BALOON_H, gSpriteColorized);
+	
+	return gSpriteColorized;
 }
 
 ///////////////////////////////////////////////////////
@@ -175,12 +179,12 @@ void UpdateBaloons()
             {
                 // Move baloon to up according its speed
                 i16 posY = itBaloon->posY - itBaloon->speed;
-                itBaloon->posY = posY;        
+                itBaloon->posY = posY;
 
                 // Baloon outside view by top
                 if (posY < VIEW_TOP)
                 {
-                    itBaloon->drawPosY = 0;    
+                    itBaloon->drawPosY = 0;
                     itBaloon->drawCY = G_BALOON_H + posY;
                 }
                 else 
@@ -188,13 +192,13 @@ void UpdateBaloons()
                 if (posY + G_BALOON_H > VIEW_DOWN)
                 {
                     itBaloon->drawPosY = posY;
-                    itBaloon->drawCY = VIEW_DOWN - posY;        
+                    itBaloon->drawCY = VIEW_DOWN - posY;
                 }
                 // Baloon all in view
                 else
                 {
                     itBaloon->drawPosY = posY;
-                    itBaloon->drawCY = G_BALOON_H;        
+                    itBaloon->drawCY = G_BALOON_H;
                 }    
             }
         }
@@ -216,7 +220,7 @@ void UpdateBaloons()
 ///////////////////////////////////////////////////////
 /// DRAW BALOON
 ///
-void DrawBaloon(SBaloon* baloon, const u8* spriteBaloon)
+void DrawBaloon(SBaloon* baloon, u8* spriteBaloon)
 {
     i16 posY = baloon->posY;
     
@@ -225,7 +229,9 @@ void DrawBaloon(SBaloon* baloon, const u8* spriteBaloon)
     {
         // Get VMem pointer of current baloon position
         u8* pvmem = GetBackBufferPtr(baloon->posX, baloon->drawPosY);
-        const u8* sprite = (u8*)spriteBaloon;
+        u8* sprite = (u8*)spriteBaloon;
+        
+        u16 replacePatColor1 = cpct_pens2pixelPatternPairM0(1, baloon->color);
     
         // Baloon partialy outside view by top
         if (posY < VIEW_TOP)
@@ -236,8 +242,8 @@ void DrawBaloon(SBaloon* baloon, const u8* spriteBaloon)
             // Compute sprite offset
             sprite = (u8*)spriteBaloon + G_BALOON_W * y;
         }
-        
-        cpct_drawSpriteMaskedAlignedTable(sprite, pvmem, G_BALOON_W, baloon->drawCY, gMaskTable);
+       
+        cpct_drawSpriteMaskedAlignedColorizeM0(sprite, pvmem, G_BALOON_W, baloon->drawCY, gMaskTable, replacePatColor1);
     }
 }
 
@@ -245,43 +251,45 @@ void DrawBaloon(SBaloon* baloon, const u8* spriteBaloon)
 /// DRAW STARS
 ///
 void DrawStars()
-{
-    // Static stars color
-    const static u8 sColorStar[NB_COLORS_STAR]  = { 2, 4, 7, 8, 10, 11, 12 };
-    static u8 color = 0;
+{  
+    // Colors of stars
+    const static u8 sColorStar[NB_COLORS_STAR]  = { 2, 4, 7, 8, 10, 11, 12 };	
+
+    // Color animation
+    static u8 sColorAnim = 0;
     
-    u8 i;
-    for (i = 0; i < NB_STARS; i++)
+    for (u8 i = 0; i < NB_STARS; i++)
     {
         // Get video pointer of each star to be drawn
-        u8* pvmem = GetBackBufferPtr(gStars.stars[i].posX, gStars.stars[i].posY);
-		u8 color = gStars.stars[i].color++;
-        
-        // Use different drawing color methods
-        if (i < NB_STARS/3)
+        u8* pvmem = GetBackBufferPtr(SCREEN_CX / NB_STARS * i + 5, i + 175);
+
+        // Color to replace animated
+        u8 colorPaletteStar = (i + sColorAnim++) % NB_COLORS_STAR;
+
+        // Set pixel pattern pair for color 15
+        u16 replacePatColor = cpct_pens2pixelPatternPairM0(15, sColorStar[colorPaletteStar]);
+
+        if ((i%3) == 0)
         {
-            // Color and draw masked sprite in video memory
-            cpct_drawSpriteMaskedColorizeM0(g_star_trans, pvmem, G_STAR_TRANS_W, G_STAR_TRANS_H, 15, sColorStar[color]);
+            // Copy masked Sprite to temporary array
+            cpct_memcpy(gSpriteColorized, g_circle_trans, G_CIRCLE_TRANS_W * G_CIRCLE_TRANS_H * 2);
+            
+            // Replace color in masked sprite
+            cpct_spriteMaskedColourizeM0(replacePatColor, G_CIRCLE_TRANS_W * G_CIRCLE_TRANS_H, gSpriteColorized);
+
+            // Draw masked sprite
+            cpct_drawSpriteMasked(gSpriteColorized, pvmem, G_CIRCLE_TRANS_W, G_CIRCLE_TRANS_H);
         }
-        else if (i > NB_STARS/3 && i < 2*NB_STARS/3)
+        else if ((i%3) == 1)
         {
-            // Color and draw masked aligned sprite in video memory
-            cpct_drawSpriteMaskedAlignedColorizeM0(g_square, pvmem, G_SQUARE_W, G_SQUARE_H, 15, sColorStar[color], gMaskTable);
+            // Color and draw sprite
+            cpct_drawSpriteColorizeM0(g_square, pvmem, G_SQUARE_W, G_SQUARE_H, replacePatColor);
         }
         else
         {
-            // Color and copy masked sprite in temporary array
-            u8 circleColor[G_CIRCLE_TRANS_W * G_CIRCLE_TRANS_H * 2];
-            
-            // Draw masked Sprite from temporary array
-            cpct_memcpy(circleColor, g_circle_trans, G_CIRCLE_TRANS_W * G_CIRCLE_TRANS_H * 2);
-            cpct_setSpriteMaskedColourizeM0(15, sColorStar[color]);
-            cpct_spriteMaskedColourizeM0   (G_CIRCLE_TRANS_W, G_CIRCLE_TRANS_H, circleColor);
+            // Color and draw masked sprite
+            cpct_drawSpriteMaskedColorizeM0(g_star_trans, pvmem, G_STAR_TRANS_W, G_STAR_TRANS_H, replacePatColor);
         }
-        
-        // If all colors palette used restart from 0
-        if (color == NB_COLORS_STAR - 1)
-            gStars.stars[i].color = 0;
     }
 }
 
@@ -300,11 +308,9 @@ void DrawCloud()
 ///
 void DrawSceneBaloons()
 {
-    u8 i;
-    
     // Clear background for all baloons
-    SBaloon* itBaloon = gBaloons.baloons;    // Get first baloon pointer
-    for (i = 0; i < gBaloons.nb; i++)
+    SBaloon* itBaloon = gBaloons.baloons; // Get first baloon pointer
+    for (u8 i = 0; i < gBaloons.nb; i++)
     {
         ClearBaloon(itBaloon);
         itBaloon++;
@@ -314,20 +320,19 @@ void DrawSceneBaloons()
     DrawCloud();
     
     // Draw all baloons
-    itBaloon = gBaloons.baloons;            // Get first baloon pointer
-    for (i = 0; i < gBaloons.nb; i++)
+    itBaloon = gBaloons.baloons; // Get first baloon pointer
+    for (u8 i = 0; i < gBaloons.nb; i++)
     {
-        const u8* sprite = g_baloon;        // Default baloon sprite (blue)
-
         // Test if sprite have colors to change 
-        if (itBaloon->color > 1)             // Color 0 (white) is transparent color
+        if (itBaloon->color > 1) // Color 0 and 1 are default color baloon
         {        
-            ColorSprite(itBaloon->color);    // Change colors of ballon
-            sprite = gSpriteColorized;       // Sprite to draw is colorized baloon    
+            u8* sprite = ColorSprite(itBaloon->color); // Change colors of baloon
+			DrawBaloon(itBaloon, sprite);              // And draw colored baloon
         }
+		else
+			 DrawBaloon(itBaloon, g_baloon);           // Draw default baloon sprite (blue)
     
-        DrawBaloon(itBaloon, sprite);        // Draw baloon sprite
-        itBaloon++;                          // Get next baloon
+        itBaloon++; // Get next baloon
     }
 }
 
@@ -342,7 +347,7 @@ void DrawBackground()
     cpct_memset((u8*)SCREEN_BUFF, gBackGroundColor, VMEM_SIZE);
     
     // Draw left part of Roof
-    pvmem = GetBackBufferPtr(0, SCREEN_CY-G_ROOF_H);
+    pvmem = GetBackBufferPtr(0, SCREEN_CY - G_ROOF_H);
     cpct_drawSprite(g_roof, pvmem, G_ROOF_W, G_ROOF_H);
     
     // Draw right part of Roof
@@ -360,18 +365,7 @@ void DrawBackground()
 /// 
 void InitializeDrawing()
 {
-    u8 dx = SCREEN_CX / NB_STARS;                           // Compute space between stars
-    
-    u8 i;
-    for (i = 0; i < NB_STARS; i++)
-    {
-        gStars.stars[i].posX = dx * i + 5;                  // Constant space beetween stars
-        gStars.stars[i].posY = GetRand(10) + 175;           // Random Y position from 175 to 184
-        gStars.stars[i].color = GetRand(NB_COLORS_STAR);    // Random color from 0 to NB_COLORS_STAR-1
-    }
-    
-    gBackGroundColor = cpct_px2byteM0(14, 14);              // Get byte color of background for M0
+    gBackGroundColor = cpctm_px2byteM0(14, 14);             // Get byte color of background for M0
     gBaloons.nb = 0;                                        // No baloon to draw at start
-    
     DrawBackground();                                       // Set background on both buffers
 }
