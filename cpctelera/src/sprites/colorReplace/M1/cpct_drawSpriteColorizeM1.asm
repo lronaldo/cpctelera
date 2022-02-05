@@ -58,6 +58,18 @@
 ;; Any value is valid, but values different of what you actually want will probably
 ;; result in estrange colours in the final array/sprite.
 ;;
+;;  Following is a code sample for replacing a color directly in draw process
+;; (start code)
+;;    // This function directly draw a star with a new color without modify the sprite
+;;    void drawSpriteStar(u8* vmem, u8 newColor) {
+;;       // Set pixel pattern pair for color 3 to be replaced
+;;       u16 replacePatColor = cpct_pens2pixelPatternPairM1(3, newColor);
+;;       
+;;       // Color and draw sprite
+;;       cpct_drawSpriteColorizeM1(g_star, vmem, G_STAR_W, G_STAR_H, replacePatColor);
+;;    }
+;; (end code)
+;;
 ;; Known limitations:
 ;;     * This function does not do any kind of boundary check or clipping. If you 
 ;; try to draw sprites on the frontier of your video memory or screen buffer 

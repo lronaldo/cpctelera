@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2018 Arnaud Bouche (@Arnaud6128)
-;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2022 Arnaud Bouche (@Arnaud6128)
+;;  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -58,6 +58,18 @@
 ;; patterns in Mode 1 screen pixel format (see below for an explanation of patterns).
 ;; Any value is valid, but values different of what you actually want will probably
 ;; result in estrange colours in the final array/sprite.
+;;
+;;  Following is a code sample for replacing a color directly in draw process
+;; (start code)
+;;    // This function directly draw a star with a new color without modify the sprite
+;;    void drawSpriteStar(u8* vmem, u8 newColor) {
+;;       // Set pixel pattern pair for color 3 to be replaced
+;;       u16 replacePatColor = cpct_pens2pixelPatternPairM0(3, newColor);
+;;       
+;;       // Color and draw sprite with transparency
+;;       cpct_drawSpriteMaskedAlignedColorizeM1(g_star, vmem, G_STAR_W, G_STAR_H, gMaskTable, replacePatColor);
+;;    }
+;; (end code)
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of boundary check or clipping. If you 
