@@ -126,8 +126,12 @@ Group: Firmware  {
    File: cpct_reenableFirmware  (firmware/cpct_reenableFirmware.s)
    File: cpct_removeInterruptHandler.s  (firmware/cpct_removeInterruptHandler.s)
    File: cpct_setInterruptHandler  (firmware/cpct_setInterruptHandler.s)
+   File: cpct_setInterruptHandler_allRegisters  (firmware/cpct_setInterruptHandler_allRegisters.s)
+   File: cpct_setInterruptHandler_naked  (firmware/cpct_setInterruptHandler_naked.s)
    File: Enabling / disabling ROMs  (firmware/cpct_enableDisableROMs.s)
    File: Firmware&amp;ROM constants  (firmware/firmware.s)
+   File: Macros &lparen;asm&rparen;  (firmware/firmware_macros.h.s)
+   File: Macros &lparen;C&rparen;  (firmware/firmware_macros.h)
    }  # Group: Firmware
 
 Group: Keyboard  {
@@ -261,12 +265,12 @@ Group: Sprites  {
       Group: M0  {
 
          File: cpct_drawSpriteColorizeM0  (sprites/colorReplace/M0/cpct_drawSpriteColorizeM0.asm)
-         File: cpct_drawSpriteMaskedAlignedColorizeM0  (sprites/colorReplace/M0/cpct_drawSpriteMaskedAlignedColorizeM0.asm)
-         File: cpct_drawSpriteMaskedColorizeM0  (sprites/colorReplace/M0/cpct_drawSpriteMaskedColorizeM0.asm)
+         File: cpct_drawSpriteColorizeM0  (sprites/colorReplace/M0/cpct_drawSpriteMaskedColorizeM0.asm)
          File: cpct_setSpriteColourizeM0  (sprites/colorReplace/M0/cpct_setSpriteColourizeM0.asm)
          File: cpct_setSpriteMaskedColourizeM0  (sprites/colorReplace/M0/cpct_setSpriteMaskedColourizeM0.asm)
          File: cpct_spriteColourizeM0  (sprites/colorReplace/M0/cpct_spriteColourizeM0.asm)
          File: cpct_spriteMaskedColourizeM0  (sprites/colorReplace/M0/cpct_spriteMaskedColourizeM0.asm)
+         File: drawSpriteMaskedAlignedColorizeM0  (sprites/colorReplace/M0/cpct_drawSpriteMaskedAlignedColorizeM0.asm)
          }  # Group: M0
 
       Group: M1  {
@@ -286,7 +290,10 @@ Group: Sprites  {
    File: cpct_drawSpriteMaskedAlignedTable  (sprites/cpct_drawSpriteMaskedAlignedTable.asm)
    File: cpct_getScreenToSprite  (sprites/screenToSprite/cpct_getScreenToSprite.asm)
    File: cpct_pen2fourPixelM1_table  (sprites/cpct_pen2fourPixelM1_table.s)
+   File: cpct_pen2pixelPatternM0  (sprites/cpct_pen2pixelPatternM0.asm)
    File: cpct_pen2pixelPatternM1  (sprites/cpct_pen2pixelPatternM1.asm)
+   File: cpct_pen2twoPixelM0_table  (sprites/cpct_pen2twoPixelM0_table.s)
+   File: cpct_pens2pixelPatternPairM0  (sprites/cpct_pens2pixelPatternPairM0.asm)
    File: cpct_pens2pixelPatternPairM1  (sprites/cpct_pens2pixelPatternPairM1.asm)
    File: cpct_px2byteM0  (sprites/cpct_px2byteM0.asm)
    File: cpct_px2byteM1  (sprites/cpct_px2byteM1.s)
