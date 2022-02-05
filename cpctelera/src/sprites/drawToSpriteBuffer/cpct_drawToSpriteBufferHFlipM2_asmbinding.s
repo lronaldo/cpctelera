@@ -21,8 +21,9 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 .include "macros/cpct_reverseBits.h.s"
 .include "macros/cpct_maths.h.s"
+
 ;;
-;; C bindings for <cpct_drawToSpriteBufferHFlipM2>
+;; ASM bindings for <cpct_drawToSpriteBufferHFlipM2>
 ;;
 ;;   3 us, 1 bytes
 ;;
