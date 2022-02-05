@@ -1,7 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //  Copyright (C) 2022 Nestornillo (https://github.com/nestornillo)
+//  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -25,13 +25,9 @@
 // of the border each time it is called.
 //
 void myInterruptHandler() {
-   static u8 i;   // Static variable to be preserved from call to call
-
-   // Set the color of the border differently for each interrupt
-   cpct_setBorder(i+1);
-
-   // Count one more interrupt. There are 6 interrupts in total (0-5)
-   if (++i > 5) i=0;
+   static u8 i;            // Static variable to be preserved from call to call
+   cpct_setBorder(i+1);    // Set the color of the border differently for each interrupt  
+   if (++i > 5) i=0;       // Count one more interrupt. There are 6 interrupts in total (0-5)
 }
 
 // INTERRUPT HANDLER WRAPPER

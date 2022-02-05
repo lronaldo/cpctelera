@@ -1,7 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //  Copyright (C) 2022 Nestornillo (https://github.com/nestornillo)
+//  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -18,14 +18,7 @@
 //------------------------------------------------------------------------------
 
 #include <cpctelera.h>
-
-// INTERRUPT HANDLER WRAPPER DECLARATION
-//    Declare an interrupt handler wrapper function named 'MyInterruptWrapper'.
-// This function is defined in file 'interrupts.c'. This declaration would
-// not be necessary if 'MyInterruptWrapper' were defined in this file using
-// cpctm_createInterruptHandlerWrapper.
-//
-cpctm_declareInterruptHandlerWrapper(MyInterruptWrapper);
+#include "interrupts.h" // include MyInterruptWrapper declaration
 
 // MAIN FUNCTION
 //    Code starts here
@@ -39,13 +32,15 @@ void main(void) {
    // using CPCtelera's cpctm_createInterruptHandlerWrapper.
    cpct_setInterruptHandler_naked(MyInterruptWrapper);
 
-   //    Set Mode 1 Character&String drawing functions to use colours
-   // 1 (yellow) for foreground and 0 (blue) for background
+   // a. Set Mode 1 Character&String drawing functions to use colours
+   //     1 (yellow) for foreground and 0 (blue) for background
+   // b. Draw a string at coordinates (6, 96) in bytes, (24, 96) in pixels,
+   //     as each byte is 4 pixels wide in mode 1
    cpct_setDrawCharM1(1, 0);
-
-   //    Draw a string at coordinates (6, 96) in bytes, (24, 96) in pixels,
-   // as each byte is 4 pixels wide in mode 1
-   cpct_drawStringM1("Interrupt Handler Wrapper Example", cpctm_screenPtr(CPCT_VMEM_START, 6, 96));
+   { 
+      u8 * const location = cpctm_screenPtr(CPCT_VMEM_START, 6, 96);
+      cpct_drawStringM1("Interrupt Handler Wrapper Example", location);
+   }
 
    // Loop forever. This code does nothing. However, interrupts happen and they
    // automatically call MyInterruptWrapper, which changes border color.

@@ -1,5 +1,5 @@
 ##-----------------------------LICENSE NOTICE------------------------------------
-##  This file is part of CPCtelera: An Amstrad CPC Game Engine
+##  This file is part of CPCtelera: An Amstrad CPC Game Engine 
 ##  Copyright (C) 2020 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ##
 ##  This program is free software: you can redistribute it and/or modify
@@ -28,10 +28,10 @@
 ###########################################################################
 
 ## CPCTELERA MAIN PATH
-##   Sets CPCTelera main path for accessing tools and configuration. This
+##   Sets CPCTelera main path for accessing tools and configuration. This 
 ##   variable must point to the folder where source and tools are contained.
 ##   Setup creates and environment variable that will be generally used.
-##   However, when environment variable is not available, this variable
+##   However, when environment variable is not available, this variable 
 ##   should have the correct value for the project to compile.
 ##   If you change folder structure, CPCT_PATH should reflect this change.
 ##   This variable should always have the absolute path value.
@@ -39,7 +39,7 @@
 #>> Uses environment variable $(CPCT_PATH)
 
 ####
-## SECTION 1: Project configuration
+## SECTION 1: Project configuration 
 ##
 ## This section establishes source and object subfolders and the binary objects to
 ## be built. Normally, you want to change the OBJ files you want to be built, selecting
@@ -48,11 +48,11 @@
 
 # Name of the project (without spaces, as it will be used as filename)
 #   and Z80 memory location where code will start in the generated binary
-PROJNAME   := IntHWrap
+PROJNAME   := intHWrap
 Z80CODELOC := 0x4000
 
 ##
-## Folders
+## Folders 
 ##
 ## SRCDIR      = Source files for the project
 ## DSKFILESDIR = Input files to be added to the final DSK production
@@ -99,7 +99,7 @@ DSKINC  := $(OBJDIR)/$(DSK).$(DSKINC_EXT)
 ##  $(CDT):    Generates the CDT file with main binary
 ##  $(DSK):    Generates the DSK file with main binary
 ##  $(SNA):    Generates the SNA file with main binary
-##  $(DSKINC): Includes all files from DSKFILESDIR into DSK as binaries
+##  $(DSKINC): Includes all files from DSKFILESDIR into DSK as binaries 
 ##
 TARGET := $(CDT) $(DSK) $(DSKINC) $(SNA)
 
@@ -111,8 +111,8 @@ OBJS2CLEAN :=
 ####
 ## SECTION 2: TOOL PATH CONFIGURATION
 ##
-## Paths are configured in the global_paths.mk configuration file included
-## here. You may overwrite the values of path variables after the include
+## Paths are configured in the global_paths.mk configuration file included 
+## here. You may overwrite the values of path variables after the include 
 ## if you wanted specific configuration for this project.
 ####
 include $(CPCT_PATH)/cfg/global_paths.mk
@@ -120,15 +120,15 @@ include $(CPCT_PATH)/cfg/global_paths.mk
 ####
 ## SECTION 3: COMPILATION CONFIGURATION
 ##
-##   Flags used to configure the compilation of your code. They are usually
+##   Flags used to configure the compilation of your code. They are usually 
 ##   fine for most of the projects, but you may change them for special uses.
 #####
 Z80CCFLAGS    := -Wa -I$(CPCT_SRC),-I$(SRCDIR)
 Z80ASMFLAGS   := -l -o -s
-Z80CCINCLUDE  := -I$(CPCT_SRC) -I$(SRCDIR)
+Z80CCINCLUDE  := -I$(CPCT_SRC) -I$(SRCDIR) 
 Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
                  --code-loc $(Z80CODELOC) \
-                 --data-loc 0 -l$(CPCT_LIB)
+                 --data-loc 0 -l$(CPCT_LIB) 
 ####
 ## SECTION 4: CALCULATED FOLDERS, SUBFOLDERS AND FILES
 ##
@@ -139,7 +139,8 @@ Z80CCLINKARGS := -mz80 --no-std-crt0 -Wl-u \
 ####
 include $(CPCT_PATH)/cfg/global_functions.mk
 
-# Removed conversions for this example
+# Removed conversions for this example as they are unrequired
+
 # # Convert images, tilemaps and music
 # include cfg/image_conversion.mk
 # # include cfg/tilemap_conversion.mk
@@ -149,6 +150,7 @@ include $(CPCT_PATH)/cfg/global_functions.mk
 # include cfg/cdt_manager.mk
 # # Exporters to other platforms
 # include cfg/export/android.mk
+
 
 # Calculate all subdirectories
 SUBDIRS       := $(filter-out ., $(shell find $(SRCDIR) -type d -print))
