@@ -60,8 +60,8 @@ void Dsk::advanceSectors(u8 sectors) {
 
 void Dsk::updateCurrentBlock(void) {
     this->_currentBlock = (
-        (this->_currentTrack * this->_specs.sectorsPerTrack + (this->_currentSector - this->_specs.firstSectorNumber)) *  
-        this->_specs.sectSizeInRecords * DSK_RECORD_SIZE) 
+        (this->_currentTrack * this->_specs.sectorsPerTrack + (this->_currentSector - this->_specs.firstSectorNumber)) *
+        this->_specs.sectSizeInRecords * DSK_RECORD_SIZE)
         / this->_blockSize;
 }
 
@@ -83,7 +83,7 @@ void Dsk::initDskHeader(void) {
 
     this->_dskHeader.Sides = this->_numSides;
     this->_dskHeader.Tracks = this->_numTracks;
-    
+
     u16 trackSize = (((u16)this->_specs.sectorsPerTrack * this->_specs.sectSizeInRecords) / 2) + 1;
 
     this->_dskHeader.Unused = trackSize << 8;
@@ -136,12 +136,12 @@ int Dsk::AddFile(FileToProcess &file) {
         f.read((char*)fileData, (streamsize)file.Length);
         f.close();
 
-        if(file.Header == HDR_AMSDOS) {
-            if(!checkAmsdosHeader(fileData)) {
+        if((file.Header == HDR_AMSDOS)||(file.Header == HDR_CREATE_AMSDOS)) {
+            if((!checkAmsdosHeader(fileData))||(file.Header == HDR_CREATE_AMSDOS)) {
                 u8 headerSize = sizeof(struct AmsdosHeader);
                 u32 newLength = file.Length + headerSize;
                 u8* newData = new u8[newLength];
-                
+
                 memcpy(newData + headerSize, fileData, file.Length);
                 u8* oldData = fileData;
                 delete oldData;
@@ -223,8 +223,8 @@ bool Dsk::checkAmsdosHeader(u8* buffer) {
     for (u8 i=0; i<67; ++i) {
         checksum += (*bufPtr);
         ++bufPtr;
-    }    
-    return checkSumInHeader == checksum;
+    }
+    return ((checkSumInHeader == checksum)&&(checksum!=0));
 }
 
 void Dsk::fillAmsdosHeader(struct AmsdosHeader* header, const FileToProcess& file) {
@@ -244,7 +244,7 @@ void Dsk::fillAmsdosHeader(struct AmsdosHeader* header, const FileToProcess& fil
         checksum += *(ptr);
         ++ptr;
     }
-    
+
     header->CheckSum = checksum;
 }
 
@@ -288,7 +288,7 @@ void Dsk::Save(string &path) {
             DskTrack *track = &this->_dskTracks[t];
             f.write((const char*)track, 24);
             int sIdx = 0;
-            
+
             int s = 0;
             for (s = 0; s < this->_specs.sectorsPerTrack; ++s) {
                 DskSector *sector = &track->Sectors[sIdx];
