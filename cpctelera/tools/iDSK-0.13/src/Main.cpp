@@ -288,7 +288,7 @@ void help(void)
   cout << " -e : hex Execute address of file           ... -e C000 -t 1" << endl;
   cout << " -c : hex loading address of file           ... -e C000 -c 4000 -t 1" << endl;
   cout << " -f : Force overwriting if file exists      ... -f" << endl
-       << " -m : Force amsdos header creation          ... -o" << endl
+       << " -m : Force amsdos header creation          ... -m" << endl
        << " -o : insert a read-Only file               ... -o" << endl
        << " -s : insert a System file                  ... -s" << endl
        << " -u : insert file with User number          ... -u 3" << endl;
