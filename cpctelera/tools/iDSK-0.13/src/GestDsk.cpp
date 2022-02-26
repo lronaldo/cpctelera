@@ -855,7 +855,7 @@ bool DSK::GetFileInDsk( char* path, int Indice ){
 	return true;
 }
 
-bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int exeAdress, bool GenerateHeader ) {
+bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int exeAdress, bool SkipHeaderCheck ) {
 	static unsigned char Buff[ 0x20000 ];
 	static char *cFileName;
 	unsigned long Lg;
@@ -886,7 +886,7 @@ bool DSK::PutFileInDsk( string Masque ,int TypeModeImport ,int loadAdress, int e
 		return false;
 	}
 		
-        if (GenerateHeader) {
+        if (SkipHeaderCheck) {
                 IsAmsdos = false;
         }
         else {
