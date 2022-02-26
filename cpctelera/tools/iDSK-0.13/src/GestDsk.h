@@ -148,7 +148,7 @@ public:
 	char * GetEntryNameInCatalogue ( int num , char* Nom );
 	char * GetEntrySizeInCatalogue ( int num , char* Size );
 	bool GetFileInDsk( char* path, int Indice );
-	bool PutFileInDsk( std::string Masque ,int TypeModeImport ,int loadAdress, int exeAdress, bool GenerateHeader );
+	bool PutFileInDsk( std::string Masque ,int TypeModeImport ,int loadAdress, int exeAdress, bool SkipHeaderCheck );
 	bool OnViewFic(int nItem);
 	bool Hexdecimal();
 	void RemoveFile ( int item );

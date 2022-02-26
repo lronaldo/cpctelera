@@ -24,12 +24,12 @@ int main(int argc, char** argv) {
        ModeRemoveFile,
        ModeDisaFile, ModeListBasic, 
        ModeListDams,ModeListHex, 
-       ModeGetFile, ModeNewDsk, Force_Overwrite, ForceHeaderCreation;
+       ModeGetFile, ModeNewDsk, Force_Overwrite, SkipHeaderDetection;
        
   ModeListDsk =  ModeImportFile =
   ModeRemoveFile  = ModeDisaFile = 
   ModeListBasic = ModeListDams = ModeListHex = ModeNewDsk =
-  ModeGetFile = IsDskLoc = IsDskSet = Force_Overwrite = ForceHeaderCreation = false ;
+  ModeGetFile = IsDskLoc = IsDskSet = Force_Overwrite = SkipHeaderDetection = false ;
   
   string DskFile, AmsdosFile;
   vector<string> AmsdosFileList;
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 
 	>> OptionPresent('f',"force",Force_Overwrite)
 
-	>> OptionPresent('m',"createheader",ForceHeaderCreation)
+	>> OptionPresent('m',"skipheadercheck",SkipHeaderDetection)
 	;
 
 	if(opts.options_remain())
@@ -196,7 +196,7 @@ int main(int argc, char** argv) {
 	
     		cerr << "Fichier Amsdos : "<< nomBase << endl;
 	
-		   MyDsk.PutFileInDsk(*iter,AmsdosType,loadAdress,exeAdress,ForceHeaderCreation);
+		   MyDsk.PutFileInDsk(*iter,AmsdosType,loadAdress,exeAdress,SkipHeaderDetection);
     	}
 	if ( MyDsk.WriteDsk (DskFile) )
 		cout << MyDsk.ReadDskDir(); 
@@ -288,7 +288,7 @@ void help(void)
   cout << " -e : hex Execute address of file           ... -e C000 -t 1" << endl;
   cout << " -c : hex loading address of file           ... -e C000 -c 4000 -t 1" << endl;
   cout << " -f : Force overwriting if file exists      ... -f" << endl
-       << " -m : Force amsdos header creation          ... -m" << endl
+       << " -m : Skip Amsdos header detection          ... -m" << endl
        << " -o : insert a read-Only file               ... -o" << endl
        << " -s : insert a System file                  ... -s" << endl
        << " -u : insert file with User number          ... -u 3" << endl;
