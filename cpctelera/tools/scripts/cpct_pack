@@ -24,7 +24,7 @@
 
 ##
 ## File: cpct_pack
-##    Script for generating packed files by compressing groups of file
+##    Script for generating packed files by compressing a group of files
 ## into a single one.
 ##
 ## Usage:
