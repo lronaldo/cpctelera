@@ -1,7 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2021 Einar Saukas (https://github.com/einar-saukas/ZX0)
-;;  Copyright (C) 2021 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
+;;  Copyright (C) 2021 Einar Saukas (https://github.com/einar-saukas/ZX0) & Urusergi
+;;  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -40,7 +40,7 @@
 ;; data will be written. It could point anywhere in memory. Data will be written from that
 ;; byte onwards until all compressed data has been decompressed. No runtime checks
 ;; are performed. By specially careful to ensure that this pointer is correct; otherwise
-;; undesired parts of memory could be overwritten, causing undefined behaviour. 
+;; undesired parts of memory could be overwritten, causing undefined behaviour.
 ;;    * *source_start* should be a 16-bit pointer to the first byte of the array where compressed
 ;; data is held. ZX0 algorithm will read the array from this byte onwards till its end.
 ;; No runtime checks are performed: if this value is incorrect, undefined behaviour will follow.
@@ -49,22 +49,22 @@
 ;;
 ;; Known limitations:
 ;;     * This function does not do any kind of checking over pointers or data passed. If any of the
-;; pointers is badly calculated or incorrect, or compressed data is corrupted, undefined behaviour 
+;; pointers is badly calculated or incorrect, or compressed data is corrupted, undefined behaviour
 ;; will follow.
 ;;
 ;; Details:
 ;;      This function decompresses an array of data previously compressed using ZX0 algorithm
-;; by Einar Saukas. In order to perform this decompression, two in-memory arrays are required:
-;; a *source* array containing compressed data and a *destination* array where decompressed data
-;; will be written. *source* array is only read and never changed, so it might be placed either
-;; on RAM or on ROM memory. *destination* array is required to be in RAM, as decompressed data
-;; will be written there.
+;; by Einar Saukas (version 2.2). In order to perform this decompression, two in-memory arrays
+;; are required: a *source* array containing compressed data and a *destination* array where
+;; decompressed data will be written. *source* array is only read and never changed, so it
+;; might be placed either on RAM or on ROM memory. *destination* array is required to be
+;; in RAM, as decompressed data will be written there.
 ;;
-;;      Decompression is performed starting from the start of both arrays, and progressing 
+;;      Decompression is performed starting from the start of both arrays, and progressing
 ;; onwards until their end, as figure 1 shows,
 ;; (start code)
 ;;    ---------------------------------------------------------------------------
-;;                                  M E M O R Y 
+;;                                  M E M O R Y
 ;;    ---------------------------------------------------------------------------
 ;;     Address |                     Contents                                  |
 ;;    ---------------------------------------------------------------------------
@@ -77,36 +77,48 @@
 ;;
 ;;    Figure 1. Example memory disposition of a source and a destination array
 ;; (end code)
-;;    The example in figure 1 shows a *source* array that takes 5 bytes from 0x0123 to 0x0127 in 
-;; memory, and a 10-bytes destination array from 0x0102 to 0x010B in memory. In this example, 
+;;    The example in figure 1 shows a *source* array that takes 5 bytes from 0x0123 to 0x0127 in
+;; memory, and a 10-bytes destination array from 0x0102 to 0x010B in memory. In this example,
 ;; *source_start* equals 0x0123 whereas *dest_start* equals 0x0102. Decompression starts reading byte
 ;; at *source_start* (0x0123 = A) and writing decompressed data from *dest_start* (0x0102 = 0) onkwards.
 ;; Once first byte is decompressed, next one at *source_start + 1* (0x0124) follows. Decompression
-;; continues reading *source* array onwards and writing at *destination* array onwards too, 
+;; continues reading *source* array onwards and writing at *destination* array onwards too,
 ;; until the end of compressed data (0x0127 = E) is reached.
 ;;
-;;    There is no need to specify array sizes. Decompression routine ends when the end marker of 
-;; compressed data is found. That end marker is placed at the end of the *source* array 
+;;    There is no need to specify array sizes. Decompression routine ends when the end marker of
+;; compressed data is found. That end marker is placed at the end of the *source* array
 ;; (0x0127 in the example). This means that corrupted compressed data or an error in the *source_start*
-;; pointer will potentially lead this routine to continue decompressing in an undefined-end loop, 
+;; pointer will potentially lead this routine to continue decompressing in an undefined-end loop,
 ;; probably overwriting other places in memory, previous to the beginning of *destination* array.
 ;;
-;; Destroyed Register values: 
-;;      AF,  AF',  BC,  DE,  HL
+;; Destroyed Register values:
+;;      AF,  BC,  DE,  HL
 ;;
 ;; Required memory:
-;;      C-bindings - 72 bytes 
-;;    ASM-bindings - 69 bytes 
+;;      C-bindings - 71 bytes
+;;    ASM-bindings - 68 bytes
 ;;
 ;; Time Measures:
 ;;      Time taken by this routine is highly dependent on data passed, and not only on its size.
 ;; If you need to know the exact time it will take to decompress a given array of data, the best
-;; way to do it is using an emulator with timing measurements, like WinAPE.
+;; way to do it is using an emulator with timing measurements, like WinAPE. Following measures
+;; were taking using one specific data set, and are shown just for reference.
+;;
+;; (start code)
+;;  uncompressed | decompression time
+;;   data type   |  (microseconds)
+;; --------------|--------------------
+;;  sprites 1 KB |      23850
+;;  sprites 2 KB |      48457
+;;  sprites 4 KB |     100388
+;;  sprites 8 KB |     198824
+;;  screen 16 KB |     397928
+;; (end code)
 ;;
 ;; Credits:
-;;    * <Original code at https://github.com/einar-saukas/ZX0> ZX0 decoder ("Standard" version) by Einar Saukas. 
+;;    * <Original code at https://github.com/einar-saukas/ZX0> ZX0 decompressor ("Standard"
+;; version) by Einar Saukas & Urusergi.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 dzx0_standard:
         ld      bc, #0xffff         ;; [3] preserve default offset 1
@@ -129,14 +141,12 @@ dzx0s_copy:
         add     a, a                ;; [1] copy from literals or new offset?
         jr      nc, dzx0s_literals  ;; [2/3]
 dzx0s_new_offset:
-        call    dzx0s_elias         ;; [5] obtain offset MSB
-        ex      af, af'             ;; [1]
-        pop     af                  ;; [3] discard last offset
-        xor     a                   ;; [1] adjust for negative offset
-        sub     c                   ;; [1]
+        pop     bc                  ;; [3] discard last offset
+        ld      c, #0xfe            ;; [2] prepare negative offset
+        call    dzx0s_elias_loop    ;; [5] obtain offset MSB
+        inc     c                   ;; [1]
         ret     z                   ;; [2/4] check end marker
-        ld      b, a                ;; [1]
-        ex      af, af'             ;; [1]
+        ld      b, c                ;; [1]
         ld      c, (hl)             ;; [2] obtain offset LSB
         inc     hl                  ;; [2]
         rr      b                   ;; [2] last offset bit becomes first length bit
@@ -150,7 +160,7 @@ dzx0s_elias:
         inc     c                   ;; [1] interlaced Elias gamma coding
 dzx0s_elias_loop:
         add     a, a                ;; [1]
-        jr      nz, dzx0s_elias_skip;; [2/3]
+        jr      nz, dzx0s_elias_skip ;; [2/3]
         ld      a, (hl)             ;; [2] load another group of 8 bits
         inc     hl                  ;; [2]
         rla                         ;; [1]
