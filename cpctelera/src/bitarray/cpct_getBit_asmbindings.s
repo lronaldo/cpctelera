@@ -1,6 +1,6 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -20,3 +20,8 @@
 cpct_getBit_asm::
 
 .include /cpct_getBit.asm/
+
+   ;; After testing the target bit, return true or false
+   ret   nz       ;; [2/4] Return A>0 and Flag Z=0 (NZ) when bit was Non-Zero.
+   xor   a        ;; [1] A = 0
+   ret            ;; [3] Return A=0 and Flat Z=1 (Z) otherwise

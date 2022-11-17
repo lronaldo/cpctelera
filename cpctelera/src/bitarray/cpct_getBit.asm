@@ -1,8 +1,8 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;  Copyright (C) 2015 Alberto García García
 ;;  Copyright (C) 2015 Pablo Martínez González
+;;  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -32,6 +32,9 @@
 ;;    (2B DE) array - Pointer to the first byte of the array
 ;;    (2B HL) index - Position of the bit in the array to be retrieved
 ;;
+;; Assembly call (Input parameters on Registers):
+;;    > call cpct_getBit_asm
+;;
 ;; Parameter Restrictions:
 ;;    * *array* must be the memory location of the first byte of the array.
 ;; However, this function will accept any given 16-value, without performing
@@ -47,6 +50,10 @@
 ;; *true* (> 0) when the bit value is 1. Take into account that >0 means any
 ;; value different than 0, and not necessarily 1.
 ;;
+;; Assembly return values:
+;;    A - Status of bit. (A=0) bit=0, (A>0) bit=1
+;;    Flag Z - Value of bit. (Z) bit=0, (NZ) bit=1
+;;
 ;; Known limitations:
 ;;    * Maximum of 65536 bits, 8192 bytes per *array*.      
 ;;
@@ -58,56 +65,64 @@
 ;; multiplied by 8).
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, HL
 ;;
 ;; Required memory:
-;;      C-bindings - 31 bytes
-;;    ASM-bindings - 28 bytes
-;;      bitWeights - +8 bytes vector required by both bindings. Take into 
-;; account that this vector is included only once if you use different 
-;; functions referencing to it.
+;;      C-bindings - 34 bytes
+;;    ASM-bindings - 29 bytes
 ;;
 ;; Time Measures:
 ;; (start code)
 ;;    Case    | microsec (ms) | Cycles
 ;; --------------------------------------
-;;    Any     |      44       |   176
+;;             C - bindings
 ;; --------------------------------------
-;; ASM-Saving |     -12       |   -48
+;;  Bit = 1   |      46       |   184
+;;  Bit = 0   |      49       |   196
+;; --------------------------------------
+;;           ASM - bindings
+;; --------------------------------------
+;;  Bit = 1   |      33       |   162
+;;  Bit = 0   |      35       |   170
 ;; --------------------------------------
 ;; (end)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.globl cpct_bitWeights
 
-   ;; We only access bytes at once in memory. We need to calculate which
-   ;; bit will we have to test in the target byte of our array. That will be
-   ;; the remainder of INDEX/8, as INDEX/8 represents the byte to access.
-   ld    bc, #cpct_bitWeights ;; [3] BC = Pointer to the start of the bitWeights array
-   ld    a, l        ;; [1]
-   and   #0x07       ;; [2] A = L % 8       (bit number to be tested from the target byte of the array) 
-   add   c           ;; [1] A += C          (bit number is used as index, to increment BC, and 
-                     ;; ....                  make BC point to its corresponding bit weight in the table)
-   ld    c, a        ;; [1] BC = BC + L % 8 (Most of the time BC now points to the corresponding bitweight 
-                     ;; ....                  in the table, except when A += C generates carry)
-   sub   a           ;; [1] A  = 0          (preserving the carry, because we have to add it to B)
-   adc   b           ;; [1] A  = B + Carry  (Add carry to B)
-   ld    b, a        ;; [1] B += Carry      (Move result to B, to ensure BC now points to the bitweight)
-   ld    a, (bc)     ;; [2] A  = BC [L % 8]  (bit weight to be tested in the target byte of the array)
+   ;; We need to know how many bytes do we have to jump into the array, 
+   ;; to move HL to that point.  We advance 1 byte for each 8 index 
+   ;; positions (8 bits). So, first, we calculate INDEX/8 (HL/8) to 
+   ;; know the target byte. At the same time, we get the index of the bit
+   ;; to be tested inside the target byte. That bitnumber is INDEX%8, so
+   ;; the number formed by the 3 least significant bits. We obtain that
+   ;; 3 bits and insert them in the middle of the instruction bit 0, (hl)
+   ;; to modify the '0' and put our bitnumber. bit 0, (hl) is 0xCB46.
+   ;; However, bit ?, (hl) numbers bits in descending order (7..0) but
+   ;; we count them in reverse (ascending order, 0..7) as they are placed
+   ;; in memory. So, we need to insert the 3 bits that identify the bitnumber
+   ;; and then calculate the complement (cpl) to reverse the order.
+   ld    a, #0x37 ;; [2] A = 0x37 = 0b00110111 => cpl(0x46) rotated right 3 bits (0x46 is part of bit 0,(hl) instruction, 0xCB46)
+   srl   h        ;; [2] / HL /= 2
+   rr    l        ;; [2] \ -- least significant bit goes to carry
+   rra            ;; [1] A = 0bC0011011 (Rotate 1 bit right and insert carry)
+   srl   h        ;; [2] / HL /= 2
+   rr    l        ;; [2] \ -- least significant bit goes to carry
+   rra            ;; [1] A = 0bCC001101 (Rotate 1 bit right and insert carry)
+   srl   h        ;; [2] / HL /= 2
+   rr    l        ;; [2] \ -- least significant bit goes to carry
+   rra            ;; [1] A = 0bCCC00110 (Rotate 1 bit right and insert carry)
 
-   ;; We need to know how many bytes do we have to 
-   ;; jump into the array, to move HL to that point.
-   ;; We advance 1 byte for each 8 index positions (8 bits)
-   ;; So, first, we calculate INDEX/8 (HL/8) to know the target byte.
-   srl   h           ;; [2]
-   rr    l           ;; [2]
-   srl   h           ;; [2]
-   rr    l           ;; [2]
-   srl   h           ;; [2]
-   rr    l           ;; [2] HL = HL / 8 (Target byte index into the array pointed by DE)
+   ;; Now HL contains INDEX / 8 => Number of bytes to add to Array Base to 
+   ;; point to the byte where our bit to be tested is.
 
-   ;; Reach the target byte and test the bit using the bit weight stored in A
-   add  hl, de       ;; [3] HL += DE => HL points to the target byte in the array 
-   and  (hl)         ;; [2] Test the selected bit in the target byte in the array
-   ld   l, a         ;; [1] Return value (0 if bit is not set, !=0 if bit is set)
+   rrca           ;; [1] / A = 0b0CCC0011
+   rrca           ;; [1] | A = 0b10CCC001 
+   cpl            ;; [1] \ A = 0b01ccc110 = (0x46 | 0b00ccc000); 
+                  ;;     CCC = bit number to be tested, ccc = 1's complement of bit number (reverse order)
 
-   ret               ;; [3] Return to caller
+   ld (bit_instr), a ;; [4] Modify bit instruction to test our target bit
+
+   add   hl, de   ;; [3] HL += DE ==> Offset + Base ==> HL points to the target byte
+bit_instr=.+1
+   bit   0, (hl)  ;; [2] Test the required bit (This instruction is automodified)
+   
+   ;; Different returns after bit-testing, depending on C or ASM bindings
