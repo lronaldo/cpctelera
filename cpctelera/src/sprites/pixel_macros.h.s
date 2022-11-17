@@ -74,8 +74,8 @@
 ;;
 .mdelete CPCTM_PEN2PIXELPATTERN_M0_ASM
 .macro CPCTM_PEN2PIXELPATTERN_M0_ASM _Sym, _Pen
-   _Sym = (((((_Pen) & 1) << 6) | (((_Pen) & 2) << 1) | (((_Pen) & 4) << 2) | (((_Pen) & 8) >> 3) << 1) | ((((_Pen) & 1) << 6) | (((_Pen) & 2) << 1) | (((_Pen) & 4) << 2) | (((_Pen) & 8) >> 3)))
-.endm  
+   _Sym = ( ( ((((_Pen) & 1) << 6) | (((_Pen) & 2) << 1) | (((_Pen) & 4) << 2) | (((_Pen) & 8) >> 3) ) << 1 ) | ( (((_Pen) & 1) << 6) | (((_Pen) & 2) << 1) | (((_Pen) & 4) << 2) | (((_Pen) & 8) >> 3) ) )
+.endm
 
 ;;
 ;; Macro: CPCTM_PENS2PIXELPATTERNPAIR_M0_ASM
