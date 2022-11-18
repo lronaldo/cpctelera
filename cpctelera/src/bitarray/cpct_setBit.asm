@@ -1,8 +1,8 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;  Copyright (C) 2015 Alberto García García
 ;;  Copyright (C) 2015 Pablo Martínez González
+;;  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -64,69 +64,80 @@
 ;; are treated as 1, even vales as 0).
 ;;
 ;; Destroyed Register values: 
-;;    AF, BC, DE, HL
+;;    AF, HL
 ;;
 ;; Required memory: 
-;;      C-bindings - 39 bytes
-;;    ASM-bindings - 35 bytes 
-;;      bitWeights - +8 bytes vector required by both bindings. Take into 
-;; account that this vector is included only once if you use different 
-;; functions referencing to it.
+;;      C-bindings - 36 bytes
+;;    ASM-bindings - 32 bytes 
 ;;
 ;; Time Measures:
 ;; (start code)
 ;; Case       | microSecs(us) | CPU Cycles
 ;; -------------------------------------------
-;; Best  (1)  |       55      |    220
-;; -------------------------------------------
-;; Worst (0)  |       57      |    228
+;;  Any       |       52      |    208
 ;; -------------------------------------------
 ;; Asm saving |      -15      |    -60
 ;; -------------------------------------------
 ;; (end) 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-.globl cpct_bitWeights
+   ;; We need to know how many bytes do we have to jump into the array, 
+   ;; to move HL to that point.  We advance 1 byte for each 8 index 
+   ;; positions (8 bits). So, first, we calculate INDEX / 8 (HL/8) to 
+   ;; know the target byte. At the same time, we get the index of the bit
+   ;; to be tested inside the target byte. That bitnumber is INDEX % 8 (HL % 8),
+   ;; so the number formed by the 3 least significant bits of HL. We obtain those
+   ;; 3 bits that we will later insert in the middle of the instruction 
+   ;; set 0, (HL), which is encoded as 0xCBC6. 0xCB is the prefix (it won't change)
+   ;; but 0xC6 == 0b11000110 is encoded as follows:
+   ;;    0b1____110 -> Encodes that the instruction is a bit modification to (hl)
+   ;;    0b_S______ -> Encodes set(S=1) or reset(S=0). In other words, the bit that will be inserted
+   ;;    0b__BBB___ -> The number of the bit to be modified [7-0]. Bit 0 is least significant one (right-most)
+   ;;
+   ;; So, we will start with 0xC6 and then insert the bit the caller wants to modify
+   ;; (3 least significant bits of HL) in BBB. Before that, we will also insert 1 or 0
+   ;; in the S bit, depending on the caller wanting Set or Reset operation (insert a 1 or a 0).
+   ;; As we start with 0xC6, that would be a SET operation (S=1), so we will change it
+   ;; only of the caller wants a RESET (S=0).
+   ;; However, we have to take into account that the array considers bits in the reverse 
+   ;; order: meaning that bits [0-7] are left-most to right-most, as in the order they appear
+   ;; in memory (it is an array). Therefore, we have to convert [0-7] (caller request) to [7-0]
+   ;; (instruction encoding). That requires inverting these 3 bits, which is done with CPL instruction.
+   ;; Therefore, for better performance, we start with all the bits of the instruction inverted (cpl'd),
+   ;; we then insert S and BBB bits as per caller's request, and then we invert all with CPL. 
+   ;; So, that means starting with cpl(0xC6) = 0x39. However, as the BBB and S bits are to be inserted
+   ;; in the middle of the opcode, we prerotate the instruction 3 bits, to be able to insert
+   ;; the bits using right rotations and the Carry. So, cpl(0xC6) = 0x39; rr(0x39, 3) = 0x27.
+   ;;
+   ld    a, #0x27 ;; [2] A = 0x27 = 0b00100111 => cpl(0xC6) rotated right 3 bits (0xC6 is part of set 0,(hl) instruction, 0xCBC6)
+   srl   h        ;; [2] / HL /= 2
+   rr    l        ;; [2] \ -- least significant bit goes to carry
+   rra            ;; [1] A = 0bB0010011 (Rotate 1 bit right and insert carry)
+   srl   h        ;; [2] / HL /= 2
+   rr    l        ;; [2] \ -- least significant bit goes to carry
+   rra            ;; [1] A = 0bBB001001 (Rotate 1 bit right and insert carry)
+   srl   h        ;; [2] / HL /= 2
+   rr    l        ;; [2] \ -- least significant bit goes to carry
+   rra            ;; [1] A = 0bBBB00100 (Rotate 1 bit right and insert carry)
 
-   ld    a, l              ;; [1] Save L into A for later use (Knowing which bit to access into the target byte => L % 8)
+   ;; Bit 0 of A means set-0/reset-1 (it's reversed). We change it accordingly 
+   ;; to what the caller wants (bit 0 of register C. 0=reset, 1=set)
+   bit    0, c       ;; [2] Is C odd? (It is expected to be 1 or 0, but only testing the least significant bit)
+   jr    nz, set_bit ;; [2/3] If (bit_0_of_C != 0) caller wants to set the bit. Otherwise, wants to reset
+reset_bit:
+      inc a          ;; [1] Bit 0 of A = 1 ==> Change instruction to reset B, (hl) (reversed)
+set_bit:             ;;     A = 0bBBB0010S ==> BBB = bit to set/reset, S = selected set or reset (reversed)
 
-   ;; We need to know how many bytes do we have to 
-   ;; jump into the array, to move HL to that point.
-   ;; We advance 1 byte for each 8 index positions (8 bits)
-   ;; So, first, we calculate INDEX/8 (HL/8) to know the target byte.
-   srl   h                 ;; [2]
-   rr    l                 ;; [2]
-   srl   h                 ;; [2]
-   rr    l                 ;; [2]
-   srl   h                 ;; [2]
-   rr    l                 ;; [2] HL = HL / 8 (Target byte index into the array pointed by DE)
-   add  hl, de             ;; [3] HL += DE => HL points to the target byte in the array 
+   ;; Now HL contains INDEX / 8 => Number of bytes to add to Array Base to 
+   ;; point to the byte where our bit to be tested is.
+   rrca           ;; [1] / A = 0bSBBB0010
+   rrca           ;; [1] | A = 0b0SBBB001 
+   cpl            ;; [1] \ A = 0b1sbbb110 = (0x86 | 0b0sbbb000);
+                  ;;     bbb = bit number to be set/reset, s = 1(set) / 0(reset)
 
-   ;; Calculate which bit will we have to test in the target byte. That will be
-   ;; the remainder of INDEX/8, as INDEX/8 represents the byte to access. 
-   ;; Knowing which bit to access, we transform it into 2^bitnum, to have its bit weight:
-   ;;   a byte with only bitnum bit on, and the rest off. cpct_bitWeights table contains this.
-   ld   de, #cpct_bitWeights ;; [3] DE = Pointer to the start of the bitWeights array
-   and   #0x07               ;; [2] A = L % 8       (bit number to be tested from the target byte of the array) 
-   add   e                   ;; [1] A += E          (Use bit number as index in cpct_bitweights table, adding it to E) 
-                             ;; ....                 (adding to DE starts by adding to E)
-   ld    e, a                ;; [1] DE = DE + L % 8 (If carry is 0, this already points to the weight of 
-                             ;; ....                 the bit number that is to be tested in the target byte of the array)
-   sub   a                   ;; [1] A = 0           (Preserving carry flag that must be added to D, if it is 1)
-   adc   d                   ;; [1] A = D + Carry   (Add Carry to D)
-   ld    d, a                ;; [1] D += Carry      (Move result to D, to ensure DE points to the bitweight)
-   ld    a, (de)             ;; [2] A = DE [L % 8]  (bit weight to be tested in the target byte of the array)
+   ld (bit_instr), a ;; [4] Modify bit instruction to set/reset our target bit
 
-   ;; Set/reset the bit of the target byte, using the bit weight stored in A
-   bit   0, c              ;; [2]  Test bit 0 to know if we are setting (1) or resetting (0)
-   jr   nz, sb_setBit      ;; [2/3] If Bit=1, We have to set the bit with OR, else we have to reset it with AND
-sb_resetBit:   
-   cpl                     ;; [1] A = !A (All bits to 1 except the bit we want to reset)
-   and (hl)                ;; [2] Reset the bit making and AND with only the selected bit to 0
-   .db #0x38   ; JR C, xx  ;; [2] Fake jumping over OR(HL). Carry is never set after and AND.
-sb_setBit:                 ;;     So, this jump is never executed, effectively "jumping over" or(hl)
-   or (hl)                 ;; [2] Setting the bit with an OR.
-
-   ld (hl), a              ;; [2] Saving the new byte in memory, with the bit setted/resetted
-
-   ret                     ;; [3] Return to caller 
+   add   hl, de   ;; [3] HL += DE ==> Offset + Base ==> HL points to the target byte
+bit_instr=.+1
+   set   0, (hl)  ;; [2] Set/Reset the required bit (This instruction is automodified)  
+   ret            ;; [3] Return 0 otherwise
