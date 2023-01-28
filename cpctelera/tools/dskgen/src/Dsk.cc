@@ -143,8 +143,9 @@ int Dsk::AddFile(FileToProcess &file) {
                 u8* newData = new u8[newLength];
                 
                 memcpy(newData + headerSize, fileData, file.Length);
-                u8* oldData = fileData;
-                delete oldData;
+                delete [] fileData; // fix: delete should use [], as it is an array
+                //u8* oldData = fileData;
+                //delete oldData;
 
                 fillAmsdosHeader((struct AmsdosHeader*)newData, file);
                 file.Length += headerSize;
