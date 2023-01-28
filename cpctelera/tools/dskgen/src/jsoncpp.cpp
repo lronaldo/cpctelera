@@ -72,8 +72,8 @@ license you like.
 
 
 
-
-#include "json/json.h"
+// Fix: It was previously including system header, due to bad relative route
+#include "../include/json/json.h"
 
 #ifndef JSON_IS_AMALGAMATION
 #error "Compile with -I PATH_TO_JSON_DIRECTORY"
@@ -379,7 +379,7 @@ bool Reader::readValue() {
     break;
   case tokenNull:
     {
-    Value v;
+    Value v{};
     currentValue().swapPayload(v);
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
@@ -392,7 +392,7 @@ bool Reader::readValue() {
       // "Un-read" the current token and mark the current value as a null
       // token.
       current_--;
-      Value v;
+      Value v{};
       currentValue().swapPayload(v);
       currentValue().setOffsetStart(current_ - begin_ - 1);
       currentValue().setOffsetLimit(current_ - begin_);
@@ -1315,7 +1315,7 @@ bool OurReader::readValue() {
     break;
   case tokenNull:
     {
-    Value v;
+    Value v{};
     currentValue().swapPayload(v);
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
@@ -1328,7 +1328,7 @@ bool OurReader::readValue() {
       // "Un-read" the current token and mark the current value as a null
       // token.
       current_--;
-      Value v;
+      Value v{};
       currentValue().swapPayload(v);
       currentValue().setOffsetStart(current_ - begin_ - 1);
       currentValue().setOffsetLimit(current_ - begin_);
@@ -2655,7 +2655,10 @@ Value::Value(ValueType vtype) {
   initBasic(vtype);
   switch (vtype) {
   case nullValue:
-    break;
+    // Fix: Removing this break causes int initialization for nullValues.
+    //      As type is null, the value doesn't matters. However, having no value initialized
+    //      launches compiler warnings on "use without initialization", which is fair.
+    //break;
   case intValue:
   case uintValue:
     value_.int_ = 0;
