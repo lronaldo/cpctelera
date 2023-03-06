@@ -95,7 +95,7 @@ Section: Supporting CPCtelera
 
 Section: Installing CPCtelera
 
-   CPCtelera works under Windows, Linux and OSX. It has been tested in Windows XP, 7, 8 and 10, and in Ubuntu / Debian, Arch, Manjaro, Elementary OS and Raspbian Linux distributions. It works either on Intel architectures or on ARM's.
+   CPCtelera works under Windows, Linux and macOS. It has been tested in Windows XP, 7, 8 and 10, and in Ubuntu / Debian, Arch, Manjaro, Elementary OS and Raspbian Linux distributions. It works either on Intel architectures or on ARM's.
 
 Topic: Downloading CPCtelera
 
@@ -133,19 +133,24 @@ _Under Windows_:
 
    Additionally, Windows 8/10 may ask you to install *.NET framework* during examples building. This is required to run Arkos Tracker and its command line tools. Proceed to install it when prompted.
 
-_Under OSX_:
+_Under macOS_:
 
-   Under OSX <XCode at https://itunes.apple.com/es/app/xcode/id497799835?mt=12>  and <Homebrew at http://brew.sh/> are required for installing CPCtelera. Follow these steps,
+   Under macOS <XCode at https://itunes.apple.com/es/app/xcode/id497799835?mt=12>  and <Homebrew at http://brew.sh/> are required for installing CPCtelera. Follow these steps,
  
    1. - Install <XCode at https://itunes.apple.com/es/app/xcode/id497799835?mt=12> if you didn't have it.
    2. - Install <Homebrew at http://brew.sh/> if you didn't have it.
    3. - Open a terminal and install XCode Command Line tools with this command,
    > xcode-select --install
-   4. - Install required packages from homebrew with these commands,
+   4. - Install required packages from homebrew with these commands:
    > brew install boost freeimage mono wine wget
+   Note: If you're not going to use WinAPE you can just install:
+   > brew install boost freeimage wget
 
-Some things to take into account on OSX,
-   * Some previous OSX systems may not understand the xcode-select --install command. On those systems, there usually are menu options from the XCode GUI to install Command Line Tools. If you need more advice, there is a <nice explanation on stack overflow about the XCode Command Line Tools at http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools>. 
+Some things to take into account on macOS,
+   * Some previous macOS systems may not understand the xcode-select --install command. On those systems, there usually are menu options from the XCode GUI to install Command Line Tools. If you need more advice, there is a <nice explanation on stack overflow about the XCode Command Line Tools at http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools>. 
+   * In macOS Big Sur (Version 11.5.x) *setup.sh* fails because can't find the header files, and the binaries for the libraries installed with Homebrew (*boost* and *freeimage*). So before running *setup.sh* we need to tell the system where those files are. Type this before calling *setup.sh* (or put in your shell startup file)
+   > export CPLUS_INCLUDE_PATH=`brew --prefix boost`/include:`brew --prefix freeimage`/include
+   > export LIBRARY_PATH=`brew --prefix boost`/lib:`brew --prefix freeimage`/lib
 
 Topic: Installing CPCtelera in your system
 
