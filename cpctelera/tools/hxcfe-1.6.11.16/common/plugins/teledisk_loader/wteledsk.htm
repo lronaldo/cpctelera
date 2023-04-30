@@ -1,0 +1,923 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<title>Teledisk File Format</title>
+<!-- Teledisk *.tdo file decompression 
+     created 9/25/01
+     10/13/02 fix sydex url, change ones to my page to full so
+     it works as wotsit submission, note old my akia sample
+     link no longer works!
+     http://www.abel.co.uk/~maxim/akai/akaimain.htm
+     replaced above with new one I found which may be
+     the new home of these files, they look the same!
+     Later in Oct update with latest version 1.01 source changes.
+     11/16/02 add Late breaking news section with old manual text
+     12/08/02 add Sergey's algorithm at end of Late news
+     07/14/04 have moved to fpns site over a year ago, forgot to 
+              change earthlink URLs
+
+following is gone already! http://www.abondonware.nu>tdsk215.zip</a>
+disappeared in a week, came and went.  Odd!
+
+-->
+<meta name="description" content="Teledisk File Format">
+<meta name="keywords" content="Teledisk,file format,decompression,TD0,RX50">
+</head><body>
+<h2>Teledisk File Format</h2>
+09/25/01 Created<br>
+12/08/02 Updated<p>
+
+<a href="#overview">Historic Overview</a><br>
+<a href="#struct">Structures and My Algorithm</a><br>
+<a href="#example">Examples and Problems</a><br>
+<a href="#newstuff">Late Breaking News, ie Sergey's Algorithm</a>
+</p><p>
+
+<a name="overview">
+First a little history, Teledisk was a popular disk archival
+tool around 1990.  My interest comes from the fact that there
+are a number of archives, 
+ie </a><a href="ftp://ftp.update.uu.se/pub/">Update</a> and 
+<a href="ftp://metalab.unc.edu/pub/academic/computer-science/history/">Metalab</a>, 
+that contain teledisk
+images of DEC RX50 disks for Rainbows, Decmates, and Pro3xxs.
+You can find some discussion regarding Teledisk in <a href="ftp://ftp.update.uu.se/pub/pdp8/pdp-8/docs/rx50faq.doc">RX50faq.doc</a>.</p><p>
+
+Teledisk was originally released as a shareware program by Sydex.
+Its still available as a disk archival tool in a number of MSDOS
+program archives.  The copy I found, 
+<a href="ftp://ftp.update.uu.se/pub/ibmpc/util/teledisk.lzh">
+version 2.12</a>, contained files dated
+12/12/1990.  As near as I can tell Sydex still has a
+<a href="http://www.sydex.com/">web site</a> but the Teledisk
+product was purchased by New Technologies, Inc in 2000. They have a 
+<a href="http://www.forensics-intl.com/teledisk.html">
+Teledisk</a> web page, but are not even marketing the current version,
+2.22, to the general public. It is definately no longer a shareware 
+program!</p><p>
+
+I sent email to both Sydex and New Technologies, Inc regarding
+the status of Teledisk and the archived images.  I got a 
+prompt reply from Miriam W. St.Clair for Sydex, Inc.
+She confirms all rights were sold to New Technologies, Inc and
+further that "TeleDisk was removed by Sydex from
+shareware distribution and support in April 1991".
+This is consistent with the comment in the rx50faq.doc above
+that teledisk V2.12 was the last shareware version and
+it has been discontinued from support.</p><p>
+
+
+Some people I have talked to still say they can use it reliably,
+but my experience is that V2.12, which seems to have been used to create the RX50 
+images I am interested in, does not appear to reliably recreate these images 
+on current machines. One theory is that Teledisk has internal timing loops 
+which depend on machine speed so it might reproduce these images on 
+a vintage 1990 machine, but not on most of the systems normally 
+in use today.  My original motivation was to be able to recreate disks 
+from the archived images. I'm the proud owner of several IBM AT and
+XT systems with 5.25" disk drives, however I have not been able
+to recreate RX50 disks using Teledisk on these machines.  I'd be 
+<b>fascinated</b> if anyone still has a machine running where Teledisk 
+is reliable with an RX50, please describe it to me!  I'm very interested
+in how it is different from the machines I've used for testing.  Note
+that its only the 10 sector RX50 that causes problems, and it may be
+I did not follow the formating suggestions in RX50faq.doc.
+</p><p>
+
+
+I am not interested in reverse engineering Teledisk,
+I just want to extract the compressed data to a sector by sector
+image of the disk with which I can work.  My personal solution
+to recreating physical disks when I want them has been to use a DEC Rainbow 
+to write the image back to disk using a real RX50.  John Wilson's
+<a href="ftp://ftp.dbit.com/putr/">PUTR</a> is an MSDOS program
+which can write RX50 images to 1.2 Mb 5.25" disk drives in
+a modern PC compatible.  This is a good alternate approach if
+you want RX50s.  One can also directly write sectors to 
+conventional PC disks with the BIOS Int 0x13 however I have
+had problems with some machines when attempting to write the
+10 sector disks required for an RX50. If you need help
+writing image files back to disk with MSDOS on a PC or Rainbow,
+I can make a disk utility program I wrote available. See the contact 
+info at the end of this document.  However I think PUTR is probably
+your best bet.  If using PUTR with an RX50, mount the physical drive 
+as /RX50 /FOREIGN and then use COPY /FILE/DEVICE/BINARY with the
+source file created by Wteledsk to create the RX50. (see the 
+examples section of this file)</p><p>
+
+Since starting this project, I've talked to a couple people who were
+interested in extracting the data from Teledisk image files to
+disk image files suitable for use with one of the PDP11 emulators.
+The code and algorithm presented below allow one to do this.  
+The wteledsk program creates a physical disk image (sector order), 
+not a logical image! (again see examples section of this file)</p><p>
+
+A year ago there was a significant amount of
+control information in the *.td0 files that I just didn't understand.
+I recently discovered that Sydex released a validation program.
+This appears to be available in a number of places on the net.
+There were at least two versions, you want TDCHECK V1.10 which
+I found in <a href="ftp://archives.thebbs.org/archive_processors_and_doors/tdchk110.zip">
+tdchk110.zip</a>.
+I was able to modify key sections of some sample images and
+use the tdcheck error messages to determine the function of each
+region of the header data.  However I'd still
+be pleased to have others review this and maybe pick up things
+I've missed.  I'll try to point these areas out in the description
+below.  For example most of the sample *.td0 images I found are
+for 512 byte sector RX50 disks.  I did eventually find some 1024 byte
+sector Akai images which allowed me to determine how the 
+sector size is encoded; however these have some 'phantom' sectors that
+I don't understand!  My program seems to correctly decode V2.12 images 
+of DEC PRO, Rainbow and DecMate disks.  It also appears to work with V2.16 images created
+for <a href="http://www.geocities.com/SunsetStrip/Studio/7012/">
+Akai</a> samplers when I ignore the phantom sectors. <br>
+Also of interest is a 
+<a href="http://members.tripod.com/%7Eerokhin/tdcvt.html"> Conversion
+Utility</a> I found recently, unfortunately the limited documentation is not
+in a language I can read.  This apparently converts teledisk images
+of ZX-Spectrum game disks to an emulator format.  
+I have had a brief email conversation with
+the author, and he was able to put me on the right track regarding
+the new advanced compression algorithm.
+</p><p>
+
+<a name="struct">
+The algorithm below seems to work
+for *.td0 images which were created with "Normal" compression.
+It turns out the "New Advanced" compression just
+overlays a secondary compression algorithm on top of a "normal" 
+compression file.  Sergey Erokhin, the author of tdcvt, 
+pointed out that the teledisk documentation says it
+uses LZSS-Huffman compression.  On Sergey's recommendation I
+did a search for public domain source code and found 
+</a><a href="http://www.simtel.net/pub/pd/40094.html">lzhuf.c</a> 
+which can be modified to decompress
+these teledsk images.  I've included the source code and an MSDOS 
+program to convert teledisk files from 'New Advanced' back to Normal 
+compression.  Although Wteledsk.exe will decompress on the fly,
+I only describe the Normal compression algorithm.  I'm not qualified
+to <a href="http://sochi.net.ru/%7Emaxime/doc/lzhforma.txt">explain LZSS</a> 
+decompression, I just lifted the code!</p><p>
+
+In the discussion below I will refer to the following
+C structures from the source code, wteledsk.c:
+</p><p>
+
+</p><pre>struct file_head {
+char sig[3];  // signature "TD", nul terminated string
+BYTE  unkwn,  // doesn't seem to be used?
+      ver,    // for v2.11 through v2.16 seems to be 0x15
+      data1,  // 0x00 (except for akai)
+      type,   // see bios drive type 1-4,
+      flag,   // among other things can indicate comment field
+      data2,  // often 0x00
+      sides;  // 0x01 (always with rx50 or 0x02 with most MSDOS disks)
+WORD  crc;  //   crc of 1st 0xA bytes in record
+};
+</pre>
+The first three bytes are the upper case string "TD" if the
+file was created using "Normal" compression and lower case
+"td" if it was created using "Advanced" compression.  The next
+byte is a mystery, one can change it and TDCHECK doesn't care.
+As indicated above the ver field has been 0x15 in all the samples
+I've found.  If one reduces this value to anywhere in the
+range 0xA - 0x13 TDCHECK says the image was created with
+the "Old Advanced" compression which says to me this is a
+version field.  It appears to map to the first two decimal digits in the 
+version number of the Teledisk.exe program.  Type is the bios drive
+type used to create the image.  Flag appears to be a bitmap.
+The low order bit(s) appear to map to the physical drive number
+used when the image was created.  The high bit is set if there
+is a comment block.  The data1 and data2 fields are a mystery.
+Sides appears to be the upper limit for the head field.  It
+is set to 1 if the disk is single sided or just side one
+is checked on a two sided disk.  It is set to 2 for a two
+sided disk when both sides are check and when only the 2nd
+side is checked.  The last word is a 16 bit CRC.  It appears to be a table
+driven algorithm.  Note that this initial file header always
+occurs and is never encoded.  However with advanced compression
+the remainder of the file is encoded.  I see nothing in the
+file_head to indicate the number of tracks nor sectors per track.  
+Apparently these are generated on the fly by the values in the individual 
+track and sector records.  It appears that the Teledisk format allows 
+a different size (as a power of 128) for each individual sector.  
+
+<p>
+</p><pre>struct com_head {
+WORD crc, //  checksum of 8 bytes from &amp;len to end of record
+     len;     // length of string data region following date
+BYTE yr,mon,day,
+     hr,min,sec; // date and time info....
+};
+</pre>
+The structure above immediately follows the main file
+header if and only if there is a comment block, ie the
+high order bit is set in the flag field.  The len field
+indicates the number of descriptive string bytes following
+this structure.  Each of the descriptive strings is NUL
+terminated.  The remaining six bytes are a time stamp, where
+the year is relative to 1900.
+<p>
+Following this point the file loops through all the sectors
+for each track alternating between heads if both sides
+are being checked.  The following track_rec preceeds 
+each block of track/head data:
+</p><pre>struct track_rec {
+BYTE nsec,  // number of sectors on track
+     trk,   // track number, 0 based
+     head,  // head number, 0 based
+     crc;
+};
+</pre>
+A 16 bit crc is calculated for the first 3 bytes in
+each track_rec.  However only the low order 8 bits are
+saved for validation in the crc field.
+<p>
+The following sec_rec preceeds each block of sector data.
+secsz has been 2 in all RX50 images (512 bytes) and 3 for Akai
+(1024) byte sectors.  I believe its a power of two which
+is then multiplied by 128 to get the sector size.  
+Normally the sec_rec is the full 9 bytes long, however
+when cntrl is 0x10 the record has a different structure
+and the last 3 bytes are not included in the file.  This requires
+one to read this structure in two steps. 
+</p><pre> 
+struct sec_rec {
+BYTE trk,head,sec; // trk,head,sector following dat is for
+BYTE secsz,        // bytes in sec = 128 * (2 ** secsz)
+     cntrl,
+     crc, // if there is sector data, this is low byte of crc for entire sector
+          // its NOT crc of 1st 5 bytes, see DSCRC
+     unknwn[2],    // please tell me if you have a guess! (see eof)
+     flag;         // controls extra bytes and use
+
+}; 
+
+I've identified three methods of filling in the sector data:
+if sec_rec.flag == 0
+   read the full sector directly from the file
+else if (sec_rec.cntrl = 0x10)
+   the sector is empty, I fill it with zeros but who knows?
+   Note only 6 bytes of sec_rec were in the file in this case
+else if sec_rec.flag == 1
+   read next 4 bytes and treat as a rep_rec
+   fill sector with rep_rec.count repeats of rep_rec.pat[]
+   I believe this implies count is always half the sector size.
+else if sec_rec.flag == 2
+   repeat until sector buffer is full:
+       read 2 bytes and treat as start of pat_rec
+       flag value and count determine action.
+       I call this a fragmented read as multiple
+       pat_rec reads are required to fill the buffer.
+
+struct rep_rec {
+     WORD count;
+     BYTE pat[2];
+};
+
+struct pat_rec {
+BYTE flag,count,pat[]; //if flag &gt; 0, repeat pat count times
+};
+</pre>
+In a fragmented read pat_rec.flag and pat_rec.count
+are always read, and they control the way additional
+data is optained from the file and written to the sector
+buffer.  Since the pat_rec.count is
+a BYTE, the maximum value is 0xff.  As indicated below if the 
+flag == 0 only the first two bytes are used and the following count bytes 
+in the file are raw sector data which should be appended to the current sector buffer.  
+If flag &gt;= 1 it determines the number of bytes of pat[] to
+be read from the file and copied count times to the sector buffer.
+To date I've only seen flag values of 0 and 1 from Teledisk V2.12, 
+however Teledisk V2.16 uses pat_rec.flag as a power of two for the number
+of bytes in the pattern, ie 1 =&gt; 2 bytes, 2 =&gt; 4 bytes etc.
+<p>
+</p><pre>The following algorithm seems to create a physical disk image,
+its the logic in main() for V2.12: (ignore AKAI V2.16 stuff)
+Open the output file in binary mode
+Open the input file in binary mode
+Read struct file_head
+   Optionally validate the sig[] field.
+Test file_head.flag, if high bit set there is comment data
+   read the com_head
+   read com_head.len bytes of descriptive strings
+   optionally display this data, its not part of the output image
+While not at the end of the file read struct trk_rec
+   if trk_rec.nsec == 0xff  STOP  you are done
+   for each sector, trk_rec.nsec, 
+	process one sector per algorithm below and write to output
+
+
+The following is the logic for the routine do_sector() which
+is called to process each sector, one at a time.  It returns
+a completely filled in sector buffer to the caller:
+
+Read first 6 bytes of struct sec_rec, its variable length
+if sec_rec.cntrl == 0x10, alternate 6 byte record
+    set sec_rec,flag =1 (fudge it to a full record)
+else read last 3 bytes of struct sec_rec from input
+At this point I've seen 4 possibilities for the sector data:
+if sec_rec.cntrl == 0x10
+    there is no sector data in the file, Nul out sector buffer
+else if(sec_rec.flag == 0)
+    read a full sector directly from input file
+else if(sec_rec.flag == 1) 
+    read 4 bytes from input, treat as rep_rec
+else if(sec_rec.flag == 2)  
+    do a fragmented read as described above to fill sector
+    buffer.  The basic algorithm for this do_read() routine 
+    is shown below:
+  set count of bytes in sector, sec_cnt, to 0
+
+  BLK_SZ = 128 * (2 ** secsz)
+  while sec_cnt &lt; BLK_SZ
+    read struct data_rec  
+    if data_rec.flag == 0   the data's in the input file
+	append data_rec.count bytes from input to sector buffer
+	increment sec_cnt by # of bytes appended (max is 0xff)
+    else if data_rec.flag &gt;= 1 a byte pattern is in input file
+	with length = patlen = 2 * (2 ** data_rec.flag)
+	treat it as a pat_rec and read patlen bytes into pat[]
+	repeat  the following data_rec.count times
+            append the patlen pat[] bytes to sector buffer
+	    increment sec_cnt by patlen 
+</pre>
+
+WARNING: since originally writing the section above, I extended the algorithm
+to deal with some new wrinkles I found in V2.16 AKAI samples.
+These are indicated in the source code, but not above.  If you
+comment out the line "#define AKAI 1" near the begining of the
+program it follows the logic above.  Otherwise it attempts to deal
+with what seem to be phantom sectors with (sec_rec.sec &amp; 0x60) &gt; 0.
+This frequently occurs in the V2.16 images, but it appears that
+ignoring this "phantom" data works just fine.  Naturally I do not 
+feel real comfortable with this solution, but it seems to work.
+To decode most of the V2.16 images I have looked at one must use the "-s"
+command line option to allow skipped sectors which V2.16 seems to do
+fairly often.  I'm not clear if these are unreadable sectors, or
+what.  This hasn't been an issue in most of the DEC images I am actually 
+interested in so I have not persued the issue.
+<p>
+Also note that there was an option for MSDOS disks to skip sectors
+not allocated in the FAT table.  No attempt has been made to
+pad these skipped sectors in the current program because this
+case doesn't occur in the DEC images that interested me.
+</p><p>
+
+The program I wrote,<a href="http://www.fpns.net/willy/wteledsk.lzh"> wteledsk.c V1.01</a>, 
+is offered as an <a href="ftp://ftp.update.uu.se/pub/ibmpc/util/lha213.exe">LHA</a> 
+archive under the <a href="http://www.gnu.org/licenses/gpl.html">
+GNU General Public License</a>.  It should compile under
+Linux via gcc and MSDOS with one of the Microsoft C compilers.
+I encourage people to look at it and improve it.  Please give 
+me some credit if you do, and more importantly let me know if 
+you make it better!  The archive contains this file, the C source
+code, and the MSDOS executables for creating raw images from
+*.td0 wteledsk files, as well as a tdconv.exe
+which converts an NEW ADVANCED compression *.td0 file back to 
+NORMAL compression.</p><p>
+
+The program is conditionally compiled, and there are more conditionals
+than I'd like (sorry).  It looks for MSDOS
+which the Microsoft compilers define.  If defined 
+an MSDOS environment is assumed, otherwise a GNU/Linux environment
+is assumed with gcc.  I also have a DUMP define, when defined the
+header and block dump options are enabled for debugging.
+In this case the user must provide and link with their own dump()
+routine, see the prototype in the source.  There is also a
+DISK conditional, which should NOT be defined, which enables
+absolute floppy disk routines not provided with this distribution.
+The DCRC and DCOMP defines control whether CRC checks and/or
+advanced compression are supported.  The supplimental source files
+tdcrc.c and tdlzhuf.c are provided for those that want to turn
+these options on.  Finally there is an AKAI define to enable 
+V2.16 compatiblity.
+</p><p>
+
+<a name="example">
+This version "1.01 AC" of Wteledsk was created with the conditional DUMP
+and AKAI defined to enable the debug options that
+I used to test the system.  Additionally DCOMP and DCRC are
+defined so it handles compressed images.  You can ignore most of the usage
+flags below unless you are having a problem with an image and
+want to get more information, see discussion at the end of this file.</a></p><p>
+
+</p><pre><a name="example">usage: wteledsk &lt;filename&gt; [-o&lt;outputfile&gt;] [-n#] [-dh] [-db] [-s] [-r]
+       -d to dump headers and/or restrutured block data
+       -n limit scan to first n sectors
+       -o output restructured blocks to a file
+       -p display phantom sec_rec.nsec values
+       -s warn instead of fatal error on skipped or repeated sectors
+	  this ignores any data in repeated sectors
+       -r similar to above, but write repeated sectors to disk
+
+The input &lt;filename&gt; is required
+Use the -o option to generate an output file
+   You can omit it for debugging, or just to test file compatibility.
+   Note there is no white space between the "-o" and &lt;outputfile&gt;
+-n limits the number of sectors processed
+-dh dumps the header control blocks encountered
+-db dumps the sector buffer data after it is restructured
+    (the -d options are only available when conditional DUMP defined)
+</a></pre>
+
+<p><a name="example">  
+I'd be pleased to have people </a><a href="http://www.fpns.net/willy/contact.htm">contact</a> me
+to report success or failure.  If you have problems I'm interested
+cause you probably have an image I don't.  However please DO NOT just email
+it to me, I've got an old slow internet connection at the end of 
+a dirt road!  
+</p><p>
+Enhancements with Version 1.01 AC<br>
+It now correctly handles the case where there is no comment data<br>
+It displays the time stamp in the comment field (most of the
+time it does this correctly but a couple files come out oddly).<br>
+It now pads the sector with a fixed pattern when sec_rec.flag ==1
+whereas previously it just skipped over the sector.<br>
+It correctly handles the "new" ADVANCED compression.
+</p><p>
+Most of the validation done used John Wilson's 
+<a href="ftp://ftp.dbit.com/putr/">PUTR</a> in one
+way or another as described below.  Most source files mentioned
+came from <a href="ftp://ftp.update.uu.se/pub/">Update</a>.
+In general they are also available from 
+<a href="ftp://sunsite.unc.edu/pub/academic/computer-science/history/">Sunsite</a>
+in both *.td0 and logical *.dsk format.  I just noticed this, and it would
+be a good validation method, but its not the one I used!
+</p><p>
+Note the rx50faq.doc at Update and Sunsite contains a fair
+amount of discussion regarding interleave optimization based
+on the target system.  I have NO IDEA how to control this.
+It could be that this information is in the two unknwn[]
+bytes in the struct sec_rec, however I can't figure it out.
+One may end up with non-optimal disks using PUTR as described
+below, but they boot!  What Wteledisk produces is a raw/physical
+sector by sector image of the disk.  A number of the test
+images from the /PRO directory at Update were for the DEC PRO series and 
+are in FILES11 format.  In PUTR one can use the following mount command
+where &lt;file&gt; is the path/name of the output file from Wteledsk:<br>
+MOUNT du0: &lt;file&gt; /files11 /nointer</p><p>
+
+Once mounted RSX style directory and type commands work.  Although it probably
+doesn't matter, I believe PUTR determines its an RX50 from the file length.  The fact
+that I can access the text files on the following reconstructed images suggests
+that the images are valid:
+</p><pre>source file       text file viewed via PUTR's type command
+f77.td0           du0:[install]install.cmd;1
+decusc1.td0       du0:[userfiles]readme.txt;1 
+181.td0           du0:[util]k11hlp.hlp;1
+
+Then I dug out some bootable disks, and tried them on
+an appropriate target machine.  I created an image file with
+Wteledsk, then used PUTR with the following commands:
+   mount b: /rx50 /foreign
+   format b:
+   copy /files/device/binary &lt;image file&gt; b:
+
+source of &lt;image file&gt;
+cpm80sys.td0      tried to boot on a Decmate III, it knows its
+		  supposed to be a CPM disk, but I had no CPM card.
+		  Not a great test!
+wpsystem.td0      booted on Decmate III
+dos310b.td0       booted on a Rainbow
+179-1.td0         booted on a PRO 350  (PRO disk maintainence diskette)
+vnx2xfer.td0      booted on a PRO 350  (Venix install disk from Venix2.zip)
+
+The results above suggest I have a fairly robust decoder.  All the samples
+above decode without the -s or -r options.  There are 80 sequential 
+tracks each with 10 sequential sectors in the images.  There is also a 
+wps?.td0 collection for the PRO at update.  Like the Venix2 distribution 
+these are in the ADVANCED compression format, but they all contain skipped 
+and/or repeated sectors.  I suspect this means that when they were created 
+the source machine was having a hard time reading the target disks and 
+tried more than once on several of the tracks.  When my code detects a 
+skipped sector it inserts a test message in the image file, 
+   "Skip %2d blocks".
+Even with the -r option which allows it to overwrite with repeated
+sectors these images end up 20 - 30 skipped blocks out of the total 800.
+
+I do not understand what wps1.td0 is supposed to be, probably an empty
+disk.  wps6.td0 is in DECVMSEXCHNG format and I have no good way
+to validate it.  The others can be mounted and read using PUTR, but
+casual examination of some of the text files reveals several have
+holes in them where a block was skipped.  Using the -r options helps,
+but does not eliminate the problem for script.com.  
+My guess is these are not usable images, but it could indicate a 
+problem with Wteledsk.
+
+source file       text file viewed via PUTR's type command
+wps2.td0          du0:[001054]script.com;1
+wps3.td0          du0:[zzsys]sir.msg;1
+                  du0:[zzsys]setup.msg;1
+wps4.td0          du0:[zzsys]futl.hlp;1
+
+wps5.td0 has a different problem.  The second trk_rec read is 
+#1 which is expected, but then the next sec_rec is for track #2
+rather than track #1.  Never seen an image like this, and my code
+currently aborts on this condition.
+
+In closing I give a sample header dump using the "-dh" command
+line option from blank.td0.  This was posted on the vmsnet.pdp-11
+newsgroup by Kevin McQuiggin on 02/07/1999 as a sample of a blank
+RX50 formated for a PDP11.  I present an abridged version of
+the initial screen output resulting form "wteledsk blank.td0 -dh":
+------------------------------------------------------
+0000: 54 44 00 57  15 00 02 80  00 01 EE F3              |TD.W........    
+000C: 3F DA 3D 00  61 02 08 08  2D 2F                    |?.=.a...-/      
+
+This is DEC blank RX50 for testing Part # BL-N402A-BK
+
+
+created Mar 08, 1997  08:45:47
+string len 0x3d  start variable 0x53 = 0x3d with 8 NULs
+file length 0x2a38 = 10808
+
+
+10 sectors for head 0 physical track  0 (decimal)
+0053: 0A 00 00 88                                        |....            
+0057: 00 00 01 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+0064: 00 00 02 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+0071: 00 00 03 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+007E: 00 00 04 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+008B: 00 00 05 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+0098: 00 00 06 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+00A5: 00 00 07 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+00B2: 00 00 08 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+00BF: 00 00 09 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+00CC: 00 00 0A 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+
+10 sectors for head 0 physical track  1 (decimal)
+00D9: 0A 01 00 01                                        |....            
+00DD: 01 00 01 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+00EA: 01 00 02 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+00F7: 01 00 03 02  00 A8 05 00  01 00 01 E5  E5          |.............   
+
+........ this repeats through all tracks with 10 sectors
+per track.  Note tracks are zero based and sectors are
+one based in this format.  The 7th and 8th bytes in the 
+sec_rec are unknwn[]  = {05 00} for all sectors.  This 
+makes me think it has nothing to do with the hardware
+sector ids, but what do I know!
+
+If an output image is produced from blank.td0 its just
+a 409,600 byte file where each byte has the value 0xE5.
+</pre>
+
+<a name="newstuff">
+</a><h3><a name="newstuff">Late Breaking News</a></h3>
+<a name="newstuff">The following information is only in this file, not the
+archived version, nor is it reflected in Wteledsk.c.</a><p>
+
+<a name="newstuff">A net neighbor from the UK sent me the following segment from the
+user manual for Teledisk Version 1.04 dated August 1988.  It
+describes the file format in use at that time.  Note that the
+advanced data compression method is different and I suspect some
+other fields have changed but it is very similar to what I have seen.  
+I was unaware that one could have a sequence of teledisk files, ie
+I always thought the 3rd byte was zero and even with the text
+below I don't know how to predict the fourth byte!<br>
+I have not been sure what the two fields in the file_head structure 
+named "data" represent.  From this document it appears they may be
+the source density and track density.<br>
+I have defined a sec_rec.cntrl field in Wteledisk.c and identified
+the case where this has the value 0x10 which occurs in RX50 disk images.
+The text below suggests a number of other bit values for this field
+and says 0x10 implies an unallocated sector on a DOS disk.  This
+is unlikely on DEC PDP-11 RX50 so the later versions of Teledisk may 
+have
+slightly different flag usage, but this is very instructive.
+I also note the document below describes a 2 byte CRC which includes
+the header and sector data, my experience is the current sector record 
+format only uses a one byte CRC, and it does not include the header 
+fields.
+This document suggests the track and sector ids in the control 
+structures are
+those that are actually found on the disk in its "id address field".  
+From this I am not clear if they are saved to the image in the order in 
+which they occur on the disk or not (probably not). The text from the 
+Version 1.04 manual follows:
+<i>
+</i></a></p><pre><a name="newstuff"><i>STRUCTURE OF THE TELEDISK TDn FILES
+
+ The first file of a TELEDISK series has,  as its file name exten-
+ sion, TD0.  A subsequent file will have the extension TD1, and so
+ on.
+
+ Every TELEDISK data file has a header of the following form:
+
+      File Identification, 2 bytes, with a value of 'TD' if normal
+      data  compression was used to write it,  or 'td' if advanced
+      data compression was used.
+
+      Volume Sequence, 1 byte, the first volume is volume 0.
+
+      Check Signature, 1 byte.	 This is a unique signature common
+      to all files in a sequence.  That is, the headers for a TD0,
+      TD1,  TD2	 sequence would all have this same check signature
+      byte.
+
+      Version number, 1 byte.	Version of TELEDISK used to create
+      this file.  A decimal value of 10 would signify version 1.0,
+      11 would signify version 1.1 and so on...
+
+      Source Density,  1 byte.	Recording density of source drive;
+      0 = 250K bps,  1 = 300K bps,  2 = 500K bps.   If this was	 a
+      single-density FM diskette, this number is biased by 128.
+
+      Drive Type,  1 byte.   Type of source drive.   1 = 360K, 2 =
+      1.2M, 3 = 720K, 4 = 1.44M.   Note that the actual media size
+      is  not  recorded;  thus	type 3 may be either 5.25" or 3.5"
+      media.
+
+      Track Density,  1 byte.	Track density of source	 drive	in
+      relation to source media.	  0 = source density matches media
+      density.	1 = double density media in quad density drive.	 2
+      = quad density media in double density drive.
+
+      DOS Mode,	 1 byte.   Nonzero if source diskette was analyzed
+      according to DOS allocation.
+
+      Media  surfaces,	1  byte.    1  =  single-sided media,  2 =
+      double-sided media.
+
+      Header CRC, 2 bytes.  A 16 bit CRC for this header.
+
+ After the header,  the diskette structure information and  sector
+ data  follows.	  If advanced data compression was used to produce
+ this file, the information appears in 6,144 byte blocks of 12 bit
+ Lempel-Zev code.   Each block is preceded by a 2 byte CRC and a 2
+ byte code packet count (one packet = 12 bits).
+
+ The  information  for	each  track  (or surface) is prefixed by a
+ header of the following format:
+
+      Sector count, 1 byte.  How many sectors are contained on the
+      current track.   If this is the end of the data  file,  this
+      field is set to 255.
+
+      Physical	cylinder,  1  byte.   The physical position of the
+      source drive head when this track was read.
+
+      Physical side, 1 byte.	The actual surface (0 or 1) of the
+      diskette on which this track occurred.
+
+      CRC check byte,  1 byte. A CRC checksum of the preceding 3
+      bytes.
+
+ After each track header,  there follows a list of sector headers.
+ Each sector header is of the following format:
+
+      Cylinder,	 1 byte.  The cylinder number of this sector as it
+      appeared in the ID address field.
+
+      Side,  1 byte.   The side code of this sector as it appeared
+      in the ID address field.
+
+      Sector number,  1 byte.  The sector number of this sector as
+      it appeared in the ID address field.
+
+      Sector length code, 1 byte.  The length code (0 = 128 bytes,
+      1 = 256 bytes, etc.) of this sector as it appeared in the ID
+      address field.
+
+      Syndrome flags, 1 byte.  Flags indicating various conditions
+      of the sector data field, namely,
+
+	   1  - This sector number occurred more than once on this
+	   track.
+
+	   2  - A data CRC error occurred when this sector  was
+	   read.
+
+	   4	- A deleted data control mark was present for this
+	   sector.
+
+	   16 - A DOS sector copy was requested;  this sector was
+	   not allocated.   In this case,  no sector data follows
+	   this header.
+
+	   32 - This sector's data field is missing;  no sector
+	   data follows this header.
+
+	   64  -  No ID address field was present for this sector,
+	   but there is a data field.	The sector information in
+	   the header represents fabricated information.
+
+      Sector  CRC,  2 bytes.   A CRC checksum of the sector header
+      information as well as the sector data which follows.
+
+ If present,  (see the syndrome flags above) the data for the cur-
+ rent sector follows the header.   Note that this data is also in-
+ cluded in the CRC checksum in the header.
+</i></a></pre>
+<a name="newstuff"><i></i>
+</a><p>
+</p><h3><a name="newstuff"> Sergey's Algorithm </a></h3>
+<a name="newstuff">I discovered a reference to 
+</a><a href="http://members.tripod.com/%7Eerokhin/tdcvt.html"> TDCVT </a>
+as I was finishing my version 1.01 work.  As mentioned above this
+web page for Teledisk conversion is in Russian (?), but I have had
+a couple very useful emails from the author, Sergey Erokhin.
+<p>
+Eventually Sergey sent me the following structures and pseudoalgorithm 
+as
+well as another copy of the Teledisk manual above on which these 
+structures
+appear to be based.  His _HDR, _CMT, _TRK, and _SEC structures map
+to my file_head, com_head, track_rec, and sec_rec.  The most important
+difference is in Sergey's RLEExpander() routine and his interpretation
+of the _SEC data.  He indicates that my sec_rec.unknwn[] fields are the 
+number of bytes to be decoded by RLEExpander() for the next sector.
+</p><p>
+Sergey gave me permission to publish his algorithm here, and to
+include his public email address: <b>greatmao@yahoo.com 
+</b>.  He says he lives in Solar system, Earth, Europe, Ukraine, Kharkov ...<br> and for more information on the Ukraine he recommended the
+<a href="http://www.odci.gov/cia/publications/factbook/geos/up.html">
+CIA factbook</a>.  
+
+</p><pre>struct _HDR
+{
+ byte TXT[2];
+ byte SeqVal;
+ byte ChkSig;
+ byte TDVer;
+ byte Dens;
+ byte DrvType;
+ byte TrkDens;
+ byte DosMode;
+ byte Surface;
+ word CRC;
+} __attribute__ ((packed));
+
+struct _TRK
+{
+ byte SecPerTrk;
+ byte PhisCyl;
+ byte PhisSide;
+ byte CRC;
+} __attribute__ ((packed));
+
+struct _SEC
+{
+ byte Cyl;
+ byte Side;
+ byte SNum;
+ byte SLen;
+ byte Syndrome;
+ byte CRC;
+} __attribute__ ((packed));
+
+struct _CMT
+{
+ word CRC;
+ word Len;
+ byte YMD[3];
+ byte HMS[3];
+} __attribute__ ((packed));
+
+pseudoalgorithm
+
+ fread(hdr)
+ if (calcCRC(HDR)!=hdr.crc) Exit(BadCRC)
+
+ if ( (hdr[0]=='T') &amp;&amp; (hdr[1]=='D') ) Compress=0;goto Step2
+ if ( (hdr[0]=='t') &amp;&amp; (hdr[1]=='d') ) Compress=1;goto Step2
+ exit(SecCorrupt)
+
+Step2:
+
+ if ( Version&amp;gt21 or Version&amp;lt10  ) exit ( WrongVersion )
+ if ( Version&amp;gt20 )  NewComp=1
+
+ if ( Compress )
+   if ( NewComp ) print(NewAdvComp)
+   else print(AdvComp)
+ else
+   print (NormalDataComp)
+
+ if ( Compr )
+   if ( NewComp )  PrepNewAdv()
+   else PrepOldAdv()
+
+ CheckSignature=hdr.chksig;
+
+ if ( hdr.SeqValue !=0 ) exit(BadFileHdr);
+
+ if ( hdr.DosMode )  print( DosAllocSector )
+ else print(All Sectorr)
+
+ if ( hdr.Surface==1 )  print( One Side )
+ else print(Both Side)
+
+ PutSourceType();
+
+ if ( hdr.TrkDens &amp; 0x80 == 0x80  )
+ {
+  ReadComment()
+  PutComment()
+ }
+ else print(No Comments)
+
+ Read(TrkHdr)
+ while (Trk.SecCount != 0xff )
+ {
+   for ( i=0;i &lt; trk.SecCount;i++ )
+   {
+    Read(SectHdr);
+    tmp=CalcCRC(0,SecHdr,5);
+
+    if  ( (SecHdr.Syndrom &amp; 0x30) == 0 &amp;&amp; (SectHdr.SLen &amp; 0xf8) == 0 )
+    {
+      int DataLen;
+      ReadData(&amp;DataLen,2);
+      ReadData(DataBuf+2,DataLen);
+      DataBuf[0]=DataLen;
+      NewLEN=RLEEXpand(DataBuf,BUFFER,&amp;DataLen);
+      tmp=CalcCRC(tmp,BUFFER,NewLen);
+    }
+    if ( SecHdr.CRC!=tmp ) Error(BAD DATA)
+   }
+   Read(TrkHdr)
+ }
+
+ print( Check Ok )
+
+// --------------
+ src=[dw len][db Type][db (n) data]
+
+int RLEExpander(src,dst,int *len)
+{
+  char *s1,*s2,d1,d2;
+  int len,rlen,data;
+  s2=dst;
+
+  switch ( src.type )
+  {
+    case 0:
+    {
+      rlen=len=src.len-1;
+      s1=src.data;
+      while ( len-- )  *s2++=*s1++;
+      break;
+    }
+    case 1:
+    {
+      len=src.data[1]&lt;&amp;lt8 || src.data[0];
+      rlen=len&amp;lt1;
+      d1=src.data[2];d2=src.data[3];
+      while (len--) {*s2++=d1;*s2++=d2;}
+      break;
+    }
+    case 2:
+    {
+      len2=src.len-1;
+      s1=src.data;
+l2:
+      switch ( *s1++;len2-- )
+      {
+        case 0:
+        {
+          len=*s1++;len2--;
+          while ( len-- ) *s2++=*s1++;
+          break;
+        }
+        case 1:
+        {
+          len=*s1++;len2--;
+          d1=*s1++;len2--;d2=*s1++;len2--;
+          while (len--) {*s2++=d1;*s2++=d2;}
+          break;
+        }
+      }
+      if ( len2!=0 ) goto l2
+      rlen=s2-to;
+    }
+    default:
+    {
+      rlen=-1;
+    }
+  }
+  *len=*len-(s1-src);
+  return rlen;
+}
+</pre>
+I also downloaded Sergey's tdcvt011.zip package and played with it a bit.
+Some expairmentation was required on my part as the documentation is not 
+in English, but the usage messages from the programs and the batch files
+are quite readable, even if you only have my limited language skills.
+Sergey supplies Sydex's TDcheck version 1.10 and his TDunp and TDcvt.
+TDunp is a file verification program similar to TDcheck, but it will
+also create a normal compression file from one which uses Teledisk's
+advanced compression.  It must be run before TDcvt if the original image 
+uses advanced compression.  TDcvt
+can create two emulator formats of ZX-Spectrum game disks (?) depending on
+a command line argument.  TDcvt fails with a Teledisk image of a DEC RX50 
+when the -T option is used, but successfully creates a *.FDI image when
+the -F option is used.  If one then strips off the first 7105 bytes of
+emulator data from this image you get a raw RX50 image identical to the
+one created by Wteledsk.exe.  Its a little depressing to have gone to 
+all that work only to find out Sergey had done it better and before me,
+but I guess its not all that surprising.
+
+</body></html>

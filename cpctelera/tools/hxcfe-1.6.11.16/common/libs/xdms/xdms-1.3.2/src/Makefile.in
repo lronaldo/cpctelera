@@ -1,0 +1,38 @@
+
+
+#  xDMS  Makefile
+
+
+# If you use another compiler change the following line:
+CC = {CC}
+
+OBJS= u_heavy.o xdms.o u_deep.o u_init.o u_quick.o u_medium.o u_rle.o \
+      tables.o pfile.o maketbl.o getbits.o crc_csum.o
+
+CFLAGS = -O2 -Wall {ARCHFLAGS} -DVERSION=\"{VERSION}\"
+LFLAGS = {ARCHLIBS}
+
+.SUFFIXES: .c .o
+
+.c.o:	
+	$(CC) $(CFLAGS) -c $<
+
+xdms:	$(OBJS)
+	$(CC) $(LFLAGS) $(OBJS) -o $@
+
+getbits.o: getbits.c cdata.h getbits.h
+tables.o: tables.c cdata.h
+maketbl.o: maketbl.c cdata.h maketbl.h
+crc_csum.o: crc_csum.c cdata.h crc_csum.h
+u_rle.o: u_rle.c cdata.h u_rle.h
+u_quick.o: u_quick.c cdata.h u_quick.h getbits.h
+u_medium.o: u_medium.c cdata.h u_medium.h getbits.h tables.h cdata.h
+u_deep.o: u_deep.c cdata.h u_deep.h getbits.h
+u_heavy.o: u_heavy.c cdata.h u_heavy.h getbits.h maketbl.h
+u_init.o: u_init.c cdata.h u_init.h u_quick.h u_medium.h u_deep.h u_heavy.h
+xdms.o: xdms.c cdata.h pfile.h crc_csum.h
+pfile.o: pfile.c cdata.h u_rle.h u_quick.h u_medium.h u_deep.h \
+         u_heavy.h u_init.h crc_csum.h pfile.h
+
+clean:	
+	rm -f *.o xdms

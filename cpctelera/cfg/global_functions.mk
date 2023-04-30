@@ -140,6 +140,16 @@ $(3): $(2)
 endef
 
 #################
+# CONVERTHFE: Convert Dsk to Hfe file for Gotek USB driver
+#
+# $(1): DSK file where the binary will be included
+#
+define CONVERTHFE
+	@$(HFE) $(1) -HFE &> /dev/null	 
+	@$(call PRINT,$(1),"Convert DSK file $(1) to HFE")
+endef
+
+#################
 # CREATECDT: Create a CDT file with the BINARY added to it and converted to AMSDOS BINARY
 #
 # $(1): Binary file to be inserted in the CDT
