@@ -162,14 +162,17 @@ void checkUserInput(TEntity *e) {
 //
 void main(void) {
    // Create and initialize the character entity
-   TEntity e = { 
+   // Making it static is same as being global, but only visible to main.
+   // As any global, we need it to be const in order to initialize it only once
+   static TEntity const ec = { 
       32, 88,              // Present pixel location
       32, 88,              // Next pixel location
       SPRITE_WIDTH_BYTES,  // | Sprite Size in bytes
       SPRITE_HEIGHT_BYTES, // |
-      (u8*)&g_character,   // Pointer to sprite definition
+      (void*)g_character,  // Pointer to sprite definition
       ON_EVEN_PIXEL        // Pixel location is Even (32)
    };
+   TEntity* e = (void*)&ec;// And then we create a non-const pointer to modify the data
 
    // Initialization
    cpct_disableFirmware();          // Firmware must be disabled
@@ -180,7 +183,7 @@ void main(void) {
 
    // Loop forever
    while (1) {
-      checkUserInput(&e);  // Get user input and perform actions
-      drawEntity(&e);      // Draw the entity at its new location on screen
+      checkUserInput(e);  // Get user input and perform actions
+      drawEntity(e);      // Draw the entity at its new location on screen
    }
 }
