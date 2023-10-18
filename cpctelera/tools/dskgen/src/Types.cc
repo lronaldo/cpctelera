@@ -7,7 +7,7 @@ CatalogType ParseCatalogType(const string &catStr) {
     if(tmpStr == "none") {
         result = CAT_NONE;
     } else if(tmpStr == "raw") {
-        result = CAT_RAW;    
+        result = CAT_RAW;
     } else if(tmpStr == "cpm") {
         result = CAT_CPM;
     } else {
@@ -47,9 +47,11 @@ HeaderType ParseHeaderType(const string &hdrStr) {
         result = HDR_NONE;
     } else if(tmpStr == "amsdos") {
         result = HDR_AMSDOS;
+    } else if(tmpStr == "createamsdos") {
+        result = HDR_CREATE_AMSDOS;
     } else {
         stringstream ss;
-        ss << "Header type not recognized: " << hdrStr << "\n.Valid values are: AMSDOS or NONE.\n";
+        ss << "Header type not recognized: " << hdrStr << "\n.Valid values are: AMSDOS, CREATEAMSDOS or NONE.\n";
         throw ss.str();
     }
     return result;
