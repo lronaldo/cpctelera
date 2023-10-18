@@ -11,26 +11,26 @@ extern unsigned char BufFile[ 0x10000 ];
 
 extern int TailleFic, CurLigne;
 
-#pragma pack(push,1) //�vite le padding des structures qui sont utilis�es dans des memcpy par la suite
+#pragma pack(push,1) //évite le padding des structures qui sont utilisées dans des memcpy par la suite
 
 //
-// Structure d'une entr�e AMSDOS
+// Structure d'une entrï¿½e AMSDOS
 //
 typedef struct
     {
     unsigned char    UserNumber;             // 00 User
     unsigned char    FileName[ 15 ];         // 01-0F Nom + extension
-    unsigned char    BlockNum;               // 10    Num�ro du bloc (disquette)
+    unsigned char    BlockNum;               // 10    Numï¿½ro du bloc (disquette)
     unsigned char    LastBlock;              // 11    Flag "dernier bloc" bloc (disquette)
     unsigned char    FileType;               // 12    Type de fichier
     unsigned short  Length;                  // 13-14 Longueur
     unsigned short  Adress;                  // 15-16 Adresse
     unsigned char    FirstBlock;             // 17    Flag premier bloc de fichier (disquette)
     unsigned short  LogicalLength;           // 18-19 Longueur logique
-    unsigned short  EntryAdress;             // 1A-1B Point d'entr�e
+    unsigned short  EntryAdress;             // 1A-1B Point d'entrï¿½e
     unsigned char    Unused[ 0x24 ];
-    unsigned short  RealLength;              // 40-42 Longueur r�elle
-    unsigned char    BigLength;              //       Longueur r�elle (3 octets)
+    unsigned short  RealLength;              // 40-42 Longueur rï¿½elle
+    unsigned char    BigLength;              //       Longueur rï¿½elle (3 octets)
     unsigned short  CheckSum;                // 43-44 CheckSum Amsdos
     unsigned char    Unused2[ 0x3B ];
     } StAmsdos;
@@ -148,7 +148,7 @@ public:
 	char * GetEntryNameInCatalogue ( int num , char* Nom );
 	char * GetEntrySizeInCatalogue ( int num , char* Size );
 	bool GetFileInDsk( char* path, int Indice );
-	bool PutFileInDsk( std::string Masque ,int TypeModeImport ,int loadAdress, int exeAdress );
+	bool PutFileInDsk( std::string Masque ,int TypeModeImport ,int loadAdress, int exeAdress, bool SkipHeaderCheck );
 	bool OnViewFic(int nItem);
 	bool Hexdecimal();
 	void RemoveFile ( int item );
