@@ -1,5 +1,5 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
 ;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 .module cpct_sprites
 
 ;;
-;; ASM bindings for <cpct_vflipSprite_asm>
+;; ASM bindings for <cpct_vflipSprite>
 ;;
 ;;   0 us, 0 bytes
 ;;
