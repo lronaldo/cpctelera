@@ -4,3 +4,4 @@ src/sprites/map.c
 src/sprites/map.h
 src/sprites/tiles.c
 src/sprites/tiles.h
+*.json.old

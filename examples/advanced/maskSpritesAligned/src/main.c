@@ -81,7 +81,7 @@ void waitNVSYNCs(u8 n) {
 void main(void) {
    // One alien that will move bouncing through the screen
    static const TAlien sa = {0, 0, 1, 1};
-   TAlien* a = (TAlien*)&sa;
+   TAlien* a = (void*)&sa;
 
    // Initialize screen, palette and background
    initialization();
