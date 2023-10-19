@@ -49,6 +49,7 @@ extern void cpct_scanKeyboard_if  ();
 extern   u8 cpct_isKeyPressed     (cpct_keyID key) __z88dk_fastcall;
 extern   u8 cpct_isAnyKeyPressed  ();
 extern   u8 cpct_isAnyKeyPressed_f();
+extern   u8 cpct_getKeypressedAsASCII();
 
 //
 // Array: cpct_keyboardStatusBuffer
@@ -62,6 +63,17 @@ extern   u8 cpct_isAnyKeyPressed_f();
 // and <cpct_scanKeyboard> 
 //
 extern u8 cpct_keyboardStatusBuffer[10];
+
+//
+// Array: cpct_keyID_to_ASCII_table
+//
+//    80-keys table for converting each <cpct_keyID> to ASCII value. These are only
+// 80 bytes, which are 80 ASCII values, each one for each key, ordered by 8-byte
+// lines (10 total lines) and 8 columns (keys) per line. This is the same order
+// in which <cpct_scanKeyboard> scans the keyboard and fills-in the 
+// <cpct_keyboardStatusBuffer>.
+//
+extern u8 cpct_keyID_to_ASCII_table[80];
 
 //
 // Enum: cpct_keyID
