@@ -44,9 +44,6 @@ File: Authors  (no auto-title, authors.txt)
 File: License  (no auto-title, license.txt)
 Text: ______________________________________________________________________
 File: Aliases for builtin types  (types.h)
-File: Android Exporter  (no auto-title, buildsys/android_exporter.txt)
-File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
-File: Visual Studio Code  (buildsys/vscode_integration.txt)
 
 Group: Audio  {
 
@@ -135,6 +132,7 @@ Group: Firmware  {
 
 Group: Keyboard  {
 
+   File: cpct_getKeypressedAsASCII  (keyboard/cpct_getKeypressedAsASCII.asm)
    File: cpct_isAnyKeyPressed  (keyboard/cpct_isAnyKeyPressed.s)
    File: cpct_isAnyKeyPressed_f  (keyboard/cpct_isAnyKeyPressed_f.s)
    File: cpct_isKeyPressed  (keyboard/cpct_isKeyPressed.s)
@@ -354,6 +352,13 @@ Group: Buildsys  {
 
    File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
    File: CPCtelera Android Exporter Beta  (buildsys/android_exporter.txt)
+   File: Visual Studio Code  (buildsys/vscode_integration.txt)
+   }  # Group: Buildsys
+
+Group: Buildsys  {
+
+   File: Android Exporter  (no auto-title, buildsys/android_exporter.txt)
+   File: Asset Conversion Utilities  (buildsys/asset_conversion.txt)
    File: Visual Studio Code  (buildsys/vscode_integration.txt)
    }  # Group: Buildsys
 
