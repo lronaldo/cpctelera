@@ -75,3 +75,14 @@
       halt
    .endm
 .endm
+
+;;
+;; macro: cpctm_WINAPE_BRK
+;;
+;;    Used to insert the values 0xED 0xFF in the binary code, that 
+;; represent a Break Instruction in WinAPE. This is useful to
+;; easily include Breakpoints in the code for debugging purposes.
+;;
+.macro cpctm_WINAPE_BRK
+   .db 0xED, 0xFF    ;; WinAPE Breakpoint Instruction
+.endm
