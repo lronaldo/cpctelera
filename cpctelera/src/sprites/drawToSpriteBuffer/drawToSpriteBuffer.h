@@ -1,7 +1,7 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2017 Bouche Arnaud
-//  Copyright (C) 2017 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2022 Bouche Arnaud
+//  Copyright (C) 2022 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -31,13 +31,12 @@
 #define CPCT_DRAWTOSPRITEBUFFER_H
 
 // Sprite to Sprite-Buffer Drawing Functions
-extern void cpct_drawToSpriteBuffer                   (u16 buffer_width, void* buffer, u8 width, u8 height, 
-                                                      void* sprite) __z88dk_callee;
-extern void cpct_drawToSpriteBufferMasked             (u16 buffer_width, void* buffer, u8 width, u8 height, 
-                                                      void* sprite) __z88dk_callee;
-extern void cpct_drawToSpriteBufferMaskedAlignedTable (u16 buffer_width, void* buffer, u8 width, u8 height,
-                                                       void* sprite, u8* mask_table) __z88dk_callee;
-
+extern void cpct_drawToSpriteBuffer                   (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_drawToSpriteBufferMasked             (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_drawToSpriteBufferMaskedAlignedTable (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite, u8* mask_table) __z88dk_callee;
+extern void cpct_drawToSpriteBufferHFlipM0            (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_drawToSpriteBufferHFlipM1            (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite) __z88dk_callee;
+extern void cpct_drawToSpriteBufferHFlipM2            (u16 buffer_width, void* buffer, u8 width, u8 height, void* sprite) __z88dk_callee;
 //
 // Title: Macros (C)
 //
