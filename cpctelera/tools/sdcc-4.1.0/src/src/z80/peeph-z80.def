@@ -1,0 +1,28 @@
+// peeph-z80.def - Z80 peephole rules
+//
+// Some of these peepholes could be potentially moved to peeph.def, but a
+// GBZ80 expert should have a look at them before.
+//
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2020
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+replace restart {
+	xor	a, a
+	ld	%1 (%2), a
+} by {
+	ld	%1 (%2), #0
+	; peephole 178 direct load zero constant to memory addressed by index register
+} if notUsed('a'), canAssign(%1 %2 '#0')
