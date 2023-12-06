@@ -1,0 +1,165 @@
+Title: Compression in CPCtelera
+
+Group: About compression
+
+When programming for old computers, one of the biggest constraints is the limited
+memory size. For example, an Amstrad CPC 464 has 64KB of memory and 16KB of them
+are used for video memory. If we want to store a full screeen image just by
+storing a copy of video memory, it will take another 16KB of space. That's a huge
+part of all the available memory for our code, so it's not an option to store it
+this way. When dealing with a lot of data that is not needed to be accessed
+constantly, we need to store it in a way that consumes less memory than data
+itself (compression), but also can be restored to its original form when needed
+(decompression).
+
+There are many compression algorithms that work on different ways, so deppending
+what is the data to compress it will be better to use one or another. Of course,
+for each different compression method used, a different decompressor will be
+needed.
+
+Group: Compression Algorithms in CPCtelera
+
+CPCtelera provides easy built-in support for three different compression
+methods: ZX0, ZX0b (ZX0 backwards), and ZX7b (ZX7 backwards).
+
+ZX0 algorithm begins decompression reading the start of the compressed data, and
+writing at the start of the uncompressed data memory destination area. From there
+it continues decompressing until the end of compressed data is reached and the
+end of the uncompressed data is written to memory.
+
+On the other hand, backwards methods ZX7B and ZX0B start decompression reading
+compressed data from its end, and start writing at the end of the uncompressed
+destination area. Then decompression continues backwards until the start of
+compressed data is reached and the start of uncompressed data is written.
+
+Compression of data can be easily achieved with CPCtelera in two different ways
+  - automating the process configuring file *cfg/compression.mk* of your project
+  - using command-line script *cpct_pack*
+
+Topic: Automatic compression
+
+CPCtelera helps you automating the process of compressing your data. If you add
+some of your assets (in binary format) to configuration file *cfg/compression.mk*
+of your project, CPCtelera will compress them when you run *make*, but only if
+your uncompressed data has changed. This way you don't have to manually compress
+your data every time it changes.
+
+You can compress each asset into a different compressed binary file, or you can
+create a pack of assets and compress them into a single file. Also, you can have
+several packages of compressed data.
+
+First, you need an *ADD2PACK* macro call for each file want to add to a pack.
+And then you can use *PACKZX0*, *PACKZX7B* or *PACKZX0B* macros to compress that
+pack with the compression method you choose.
+
+You can combine *cfg/image_conversion.mk* macros to convert an image file to
+binary format, with *cfg/compression.mk* macros to compress that binary file and
+add it to your code. You can find an example on this in
+*cpctelera/examples/easy/compression/* folder.
+
+Next are some examples of automatic compression with CPCtelera
+
+Compressing one file:
+
+If we want to compress a file using ZX7b method, we only need to add to
+*cfg/compression.mk* the following calls
+>$(eval $(call ADD2PACK,pack01,asset/data.bin))
+>$(eval $(call PACKZX7B,pack01,src/compressed/))
+First line just adds file *asset/data.bin* (data in binary format) into pack
+*pack01*. Second line compresses this pack using ZX7b algorithm and places its
+output in *src/compressed/* folder. The output of this macro consists on three
+files: *pack01.s* (Here is where the compressed data is stored), *pack01.h*
+(Include file for C projects), and *pack01.h.s* (Include file for Assembler
+projects).
+
+Compressing several files:
+
+If we want to create a compressed pack containing more than one file, we only
+have to place some *ADD2PACK* macro calls before the *PACK* macro call. This is
+useful, for example, if you have different levels in your game, and each level
+has its own set of assets. This way you could decompress only the data that is
+needed for the current level, and keep the data for the other levels stored in
+memory in a compressed form.
+>$(eval $(call ADD2PACK,level1,assets/wall_lvl1.bin))
+>$(eval $(call ADD2PACK,level1,assets/floor_lvl1.bin))
+>$(eval $(call ADD2PACK,level1,assets/door_lvl1.bin))
+>$(eval $(call PACKZX0,level1,src/leveldata/))
+>$(eval $(call ADD2PACK,level2,assets/wall_lvl2.bin))
+>$(eval $(call ADD2PACK,level2,assets/floor_lvl2.bin))
+>$(eval $(call ADD2PACK,level2,assets/door_lvl2.bin))
+>$(eval $(call PACKZX0,level2,src/leveldata/))
+Previous lines will create, in *src/leveldata* folder, two sets of compressed
+data (level1 and level2) using ZX0 compression algorithm. Offset constants are
+defined in the generated header files, so you can access from your code to the
+different assets that compose the uncompressed data.
+
+Topic: Commandline compression
+
+You can compress your data manually using <cpct_pack> commandline script.
+>cpct_pack [options] <OUTFILE> <FILE1> [FILE2, [FILE3...]]
+With its parameters, you can choose wich files are compressed, the compression
+method used, or the output format. See <cpct_pack> help for full list of options.
+
+cpct_pack examples:
+
+This command will add files *data/tree.bin* and *data/plant.bin* to a pack and
+will compress it using zx0 method, generating files *spriteslevel1.s* and
+*spriteslevel1.h* in *src/* folder. The include file contains offset constants
+declarations for accessing *tree* and *plant* data.
+> cpct_pack -c zx0 src/spriteslevel1 data/tree.bin data/plant.bin
+
+Next command will compress binary file *data/mapgame.bin* using ZX7 backwards
+method, and it will output file *src/map.s* without any include file.
+>cpct_pack -gs -c zx7b src/map data/mapgame.bin
+
+Group: Decompression of data
+
+For decompressing data you must use the proper decrunch function according to
+compression algorithm used
+ 	- <cpct_zx0_decrunch> for ZX0 method.
+ 	- <cpct_zx0b_decrunch> for ZX0 Backwards method
+ 	- <cpct_zx7b_decrunch_s> for ZX7 Backwards method
+
+For ZX0 decompression, we need to provide *cpct_zx0_decrunch* function the memory
+adress where compressed data starts and the memory address where uncompressed
+data starts. From there it continues decompressing until the end of compressed
+data is reached and the end of the uncompressed data is written to memory.
+
+On the other hand, ZX7B and ZX0B methods start decompression reading compressed
+data from its end, and start writing at the end of the uncompressed destination
+area. Then decompression continues backwards until the start of compressed data
+is reached and the start of uncompressed data is written. Therefore we'll need
+to provide *cpct_zx7b_decrunch_s* and *cpct_zx0b_decrunch* functions the end of
+uncompressed destination area and the end of compressed data.
+
+Group: Comparison between algorithms
+
+Next table and charts compare CPCtelera's different compression methods. This
+tests were made using one specific data set. As compression routines are highly
+deppendant on data passed, the compression ratio and decompression time will
+change with different input data, not only with its size. Some data may be better
+compressed using backwards methods or different algorithms. When compressing big
+files, also take into account that zx0 and zx0b methods, although are fast
+decompressing on CPC, can take a while to generate compressed data on a slow PC.
+(start code)
+-----------------------------------------------------------------------------------
+|  uncompressed data  |  compressed size (bytes) | decompression time (microsecs) |
+|---------------------|--------------------------|--------------------------------|
+|    type    | bytes  |   ZX0  |  ZX0b  |  ZX7b  |     ZX0  |    ZX0b  |    ZX7b  |
+|------------|--------|--------|--------|--------|----------|----------|----------|
+| sprites 1k |  1024  |   457  |   460  |   490  |   23850  |   23932  |   26941  |
+| sprites 2k |  2048  |   951  |   960  |  1026  |   48457  |   49686  |   55698  |
+| sprites 4k |  4096  |  1991  |  2017  |  2179  |  100388  |  102018  |  120779  |
+| sprites 8k |  8192  |  3707  |  3727  |  4005  |  198824  |  202174  |  239035  |
+| screen 16k | 16384  |  7345  |  7337  |  8145  |  397928  |  393477  |  581446  |
+-----------------------------------------------------------------------------------
+Table 1. Comparison between different compression methods
+(end)
+(see compressionchart.png)
+
+Group: Credits
+
+	- <ZX0 at https://github.com/einar-saukas/ZX0> by Einar Saukas and Urusergi
+	- <ZX0b at https://github.com/einar-saukas/ZX0> by Einar Saukas
+	- <ZX7b at https://github.com/antoniovillena/zx7b> by Antonio Villena and Einar
+  Saukas

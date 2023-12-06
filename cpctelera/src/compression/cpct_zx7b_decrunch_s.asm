@@ -71,9 +71,9 @@
 ;;    ---------------------------------------------------------------------------
 ;;     0x0100  |   |   [_9_|_8_|_7_|_6_|_5_|_4_|_3_|_2_|_1_|_0_]   |   |   |   | << [Destination Array]
 ;;     0x0110  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-;;     0x0120  |   |   |   {稥穦稤穦稢穦稡穦稟穧   |   |   |   |   |   |   |   | << {Source Array}
+;;     0x0120  |   |   |   {路E路|路D路|路C路|路B路|路A路}   |   |   |   |   |   |   |   | << {Source Array}
 ;;    ---------------------------------------------------------------------------
-;;                  0x0123 {^贩Source Array贩穅} 0x0127
+;;                  0x0123 {^路路Source Array路路路^} 0x0127
 ;;              0x0102 [^__________Destination Array__________^] 0x010B
 ;;
 ;;    Figure 1. Example memory disposition of a source and a destination array
@@ -97,7 +97,7 @@
 ;;    // It takes the compressed image of the background and directly 
 ;;    // decompresses it to video memory
 ;;    //
-;;    void decruch_background_to_screen(u8 screen_num) {
+;;    void decrunch_background_to_screen(u8 screen_num) {
 ;;       // Get a pointer to the end of the array that contains 
 ;;       // crunched screen data. That is: beginning + size - 1
 ;;       void *scr_crunched_data_end = game_screens[screen_num].crunched_data + game_screens[screen_num].size - 1;

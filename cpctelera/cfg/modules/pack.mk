@@ -20,7 +20,7 @@
 ##                  Compression and Packing functions                    ##
 ##-----------------------------------------------------------------------##
 ## This file contains functions for creating and managing compressed     ##
-## files and packs  												     ##
+## files and packs                                                       ##
 ###########################################################################
 
 # Ensure that compression.mk exists for compatibility with older CPCtelera projects
@@ -44,8 +44,9 @@ define ADD2PACK
 endef
 
 #################
-# PACKZX7B: Creates a compressed file out of all the files previously added with ADD2PACK.
-# Updates IMGASMFILES and OBJS2CLEAN adding new C files that result from the pack generation.
+# PACKZX7B: Creates a compressed file out of all the files previously added with ADD2PACK,
+# using ZX7 Backwards compression method. Updates IMGASMFILES and OBJS2CLEAN adding new C
+# files that result from the pack generation.
 #
 # $(1): Compressed pack file name
 # $(2): Output folder for generated files
@@ -72,7 +73,81 @@ define PACKZX7B
 .SECONDARY: $(PACK_$(1)_target)
 $(PACK_$(1)_target): $(PACK_$(1)) $(A2P_DEPEND)
 	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
-	$(CPCTPACK) $(A2P_OPTS) $(_A) $(PACK_$(1)_outfile) $(PACK_$(1))
+	$(CPCTPACK) $(A2P_OPTS) -c zx7b $(_A) $(PACK_$(1)_outfile) $(PACK_$(1))
+
+# Variables that need to be updated to keep up with generated files and erase them on clean
+IMGASMFILES := $(PACK_$(1)_outfile).s $(IMGASMFILES)
+OBJS2CLEAN  := $(PACK_$(1)_outfile).h.s $(PACK_$(1)_target) $(OBJS2CLEAN)
+endef
+
+#################
+# PACKZX0: Creates a compressed file out of all the files previously added with ADD2PACK,
+# using ZX0 compression method. Updates IMGASMFILES and OBJS2CLEAN adding new C files
+# that result from the pack generation.
+#
+# $(1): Compressed pack file name
+# $(2): Output folder for generated files
+# $(3): Origin absolute address for the generated packed data
+#
+define PACKZX0
+	# First, check that a PACK name has been passed
+	$(if $(1),,$(error <<ERROR>> PACKZX0 requires a PACK filename as first parameter))
+	# Now, check that $(1) is non-empty to ensure that some files have been previously added to variable
+	$(if $(PACK_$(1)),,$(error <<ERROR>> PACK filename '$(1)' does not contain any file to be packed. Is the PACK filename correctly spelled?))
+	# Check if there is a valid origin absolute address
+	$(eval _A := $(strip $(3)))
+	$(if $(_A)\
+		, $(call ENSURE_ADDRESS_VALID,$(_A),PACKZX0) \
+		  $(eval _A := -org $(_A)) \
+	)
+
+	# Now generate output filename depending on output folder
+	$(eval PACK_$(1)_outfile := $(if $(2),$(2:/=)/$(1),$(1)))
+	# Construct the build target
+	$(eval PACK_$(1)_target := $(PACK_$(1)_outfile).s $(PACK_$(1)_outfile).h)
+
+# Generate target for file compression
+.SECONDARY: $(PACK_$(1)_target)
+$(PACK_$(1)_target): $(PACK_$(1)) $(A2P_DEPEND)
+	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
+	$(CPCTPACK) $(A2P_OPTS) -c zx0 $(_A) $(PACK_$(1)_outfile) $(PACK_$(1))
+
+# Variables that need to be updated to keep up with generated files and erase them on clean
+IMGASMFILES := $(PACK_$(1)_outfile).s $(IMGASMFILES)
+OBJS2CLEAN  := $(PACK_$(1)_outfile).h.s $(PACK_$(1)_target) $(OBJS2CLEAN)
+endef
+
+#################
+# PACKZX0B: Creates a compressed file out of all the files previously added with ADD2PACK,
+# using ZX0 Backwards compression method. Updates IMGASMFILES and OBJS2CLEAN adding new C
+# files that result from the pack generation.
+#
+# $(1): Compressed pack file name
+# $(2): Output folder for generated files
+# $(3): Origin absolute address for the generated packed data
+#
+define PACKZX0B
+	# First, check that a PACK name has been passed
+	$(if $(1),,$(error <<ERROR>> PACKZX0B requires a PACK filename as first parameter))
+	# Now, check that $(1) is non-empty to ensure that some files have been previously added to variable
+	$(if $(PACK_$(1)),,$(error <<ERROR>> PACK filename '$(1)' does not contain any file to be packed. Is the PACK filename correctly spelled?))
+	# Check if there is a valid origin absolute address
+	$(eval _A := $(strip $(3)))
+	$(if $(_A)\
+		, $(call ENSURE_ADDRESS_VALID,$(_A),PACKZX0B) \
+		  $(eval _A := -org $(_A)) \
+	)
+
+	# Now generate output filename depending on output folder
+	$(eval PACK_$(1)_outfile := $(if $(2),$(2:/=)/$(1),$(1)))
+	# Construct the build target
+	$(eval PACK_$(1)_target := $(PACK_$(1)_outfile).s $(PACK_$(1)_outfile).h)
+
+# Generate target for file compression
+.SECONDARY: $(PACK_$(1)_target)
+$(PACK_$(1)_target): $(PACK_$(1)) $(A2P_DEPEND)
+	@$(call PRINT,$(PROJNAME),"Compressing files to generate $(PACK_$(1)_outfile)...")
+	$(CPCTPACK) $(A2P_OPTS) -c zx0b $(_A) $(PACK_$(1)_outfile) $(PACK_$(1))
 
 # Variables that need to be updated to keep up with generated files and erase them on clean
 IMGASMFILES := $(PACK_$(1)_outfile).s $(IMGASMFILES)
