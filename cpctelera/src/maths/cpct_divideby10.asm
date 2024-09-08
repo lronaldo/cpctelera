@@ -5,7 +5,7 @@
 ;;  Copyright (C) 2021 Joaquín Ferrero (https://github.com/joaquinferrero)
 ;;  Copyright (C) 2021 Nestornillo (https://github.com/nestornillo)
 ;;  Copyright (C) 2024 raulgarfer (https://github.com/raulgarfer)
-;;  Copyright (C) 2024 cpcitor (https://github.com/fidergo-stephane-gourichon/)
+;;  Copyright (C) 2024 cpcitor ( https://github.com/cpcitor)
 ;;  Copyright (C) 2024 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -52,8 +52,16 @@
 ;; a remainder, nor does it use decimals in its operations. 
 ;; If the input number is greater than 127, function does a calculation
 ;; to make corrections to avoid possible failures.
+;
+;; This is a simplified explanation, the code actually groups partial results 
+;; together so as to minimize the number of shift-right operations,
+;; and it happens that the result is more precise that way.
 ;;
-;; A number divided by 10 is equal to that number divided by 2 and multiplied
+;; We could compute something different, like:
+;; ( M + M>>1 + M>>3 ) >> 3
+;; This would be smaller because of the lost bits to the right.
+;;
+; A number divided by 10 is equal to that number divided by 2 and multiplied
 ;; by 1/5 (0.20). For example, if we consider N = 20, then:
 ;; 1) 20/2 * 1/5 
 ;; 2) 10/1 * 1/5 
@@ -106,9 +114,7 @@
 ;; What if we tried to multiply instead?
 ;; 13/64 = 0.203125 which is a little bigger than 0.2 .
 ;; So we consider M*13/64 as a guide and we'll make it exact with some nudge.
-;; Let's go!
 
-;; 13 = 0x0D = 0b00001101
 ;; We'll do something that looks like
 ;; M*13/64 = (M<<3 + M<<2 + M) >> 6
 
@@ -116,7 +122,7 @@
 
 ;; Also, M*13 will overflow a byte as soon as M reaches 20, so we
 ;; don't want to do this on a Z80.
-
+;; Remember, it's explained before.
 ;; We could compute something different, like:
 ;; ( M + M>>1 + M>>3 ) >> 3
 ;; This would be smaller because of the lost bits to the right.
@@ -128,48 +134,40 @@
 ;; Even better, it is enough to subtract 2 to N for 128<=N<256 to get
 ;; it exact there too.
 
-;; Things fall into place marvelously now.
-
-	; The combined effect of the next two instructions is to
-	; decrement A if bigger than 64 in only 2 bytes 2µs
+;; The combined effect of the next two instructions is to
+;; decrement A if bigger than 64 in only 2 bytes 2µs
 	add b   ; [1]  Corrupt A, also set Carry flag if b>=64 (eqv N>=128 or M>=64 )
 	sbc b   ; [1]  Restore A, minus one if N>=128.
-	; The instructions above can be skipped if the input range is
-	; known to be restricted to 0<=N<128
+;; The instructions above can be skipped if the input range is
+;; known to be restricted to 0<=N<128
 
 ;; let X=N/2 if N<=127, or N/2-1 if N>=128
-
 	ld b,a   ; [1] A = B = X
 
-	; Next trick: quickly shift right.
-	; `srl a` consumes 2 bytes and 2µs.
-	; `rra` with a clear Carry does the same as `srl a` in only 1 byte 1µs.
-	; A nice trick is to prefix two `rra` instructions with one
-	; instruction that make both behave like `srl a` but cheaper.
-
-	; The combined effect of the next 3 instructions is to shift A
-	; by 2 bits to the right (divide by 4) in 3µs, 3 bytes.
+;; Next trick: quickly shift right.
+;; `srl a` consumes 2 bytes and 2µs.
+;; `rra` with a clear Carry does the same as `srl a` in only 1 byte 1µs.
+;; A nice trick is to prefix two `rra` instructions with one
+;; instruction that make both behave like `srl a` but cheaper.
+;; The combined effect of the next 3 instructions is to shift A
+;; by 2 bits to the right (divide by 4) in 3µs, 3 bytes.
 	and c   ; [1]  clear bit 0 and Carry,
-	        ; to allow use of two `rra` to perform two right shifts
+;; to allow use of two `rra` to perform two right shifts
 	rra     ; [1]  A = X >> 1, Carry clear
 	rra     ; [1]  A = X >> 2, Carry might be set
-
 	add b   ; [1]  A = (X >> 2) + X,
 	        ; also clear Carry so that next `rra` is actually a right shift
 	rra     ; [1]  A = ((X >> 2) + X) >> 1
-
 	add b   ; [1]  A = (((X >> 2) + X) >> 1) + X,
 	        ; also clear Carry so that next `rra` is actually a right shift
 
-	; Let's call the value Y = (((X >> 2) + X) >> 1) + X
-
-	; Now we only need 3 right shifts to compute Y >> 3.
-	; Since Carry is cleared, the first one is straightforward.
-
+;; Let's call the value Y = (((X >> 2) + X) >> 1) + X
+;; Now we only need 3 right shifts to compute Y >> 3.
+;; Since Carry is cleared, the first one is straightforward.
 	rra     ; [1]  A = Y >> 1, also Carry might be set.
 
-	; the combined effect of the next 3 instructions is to shift A
-	; by 2 bits to the right (divide by 4) in 3µs, 3 bytes
+;; the combined effect of the next 3 instructions is to shift A
+;; by 2 bits to the right (divide by 4) in 3µs, 3 bytes
 	and c   ; [1]  clear bit 0 and Carry,
 	        ; to allow use of two `rra` to perform two right shifts
 	rra     ; [1]  A = Y >> 2, Carry clear

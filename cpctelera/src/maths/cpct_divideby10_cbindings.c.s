@@ -24,7 +24,7 @@
 ;;
 _cpct_divideby10::
 
-  ;; Get Parameters from stack
+;; Get Parameters from stack
   pop  hl   ;; [3] AF = Return Address
   dec sp    ;; [6] Substract one from SP
   pop  af   ;; [3] AF = Destination address
