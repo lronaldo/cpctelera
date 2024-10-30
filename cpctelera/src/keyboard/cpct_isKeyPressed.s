@@ -73,6 +73,29 @@
 ;; -------------------------------------------
 ;; Any         |      17        |    68 
 ;; -------------------------------------------
+;;
+;; Example of use of cpct_isKeyPressed_asm
+;;
+;;    We want that the player pushes the [Space Key]. So, 
+;; let's make a routine that waits until this key is pressed
+;;wait_until_space_key_is_pressed::
+;;    scan all the keyboard reading every key and notates
+;; call cpct_scanKeyboard_asm
+;;    load the desired key in the register HL
+;; ld hl,#Key_Space
+;;    call the routine to check if the key is pressed
+;;
+;;    return in flag Z the result of the check. 
+;;    1 if key is NOT pressed, 0 if pressed
+;; call cpct_isKeyPressed_asm
+;;
+;;    check against Zero in flag Z 
+;;
+;;    flag is 1, so key is not pressed 
+;; jr nz,wait_until_space_key_is_pressed
+;;    key was pressed, flag was 0.end of routine
+;; ret
+;;    
 ;; (end code)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
