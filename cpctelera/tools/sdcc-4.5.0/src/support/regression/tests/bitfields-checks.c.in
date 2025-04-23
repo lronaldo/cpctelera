@@ -1,0 +1,237 @@
+/** Test for checks of bitfields or bits in a byte.
+    struct: 0, 1
+    varType: 0, 1, 2, 3, 4, 5, 6
+    bit: 0, 1, 2, 3, 4, 5, 6, 7
+*/
+
+#pragma disable_warning 88
+
+// Disable for ds390: bug #3211
+// Absolute addressing has some issues for pdk. And if those are fixed, there might be a lack of memory, still.
+// mcs51 creates invalid assembler. Don't know if that is a bug or just a bad choice for ABS_ADDR1 and ABS_ADDR2 below.
+#if defined(__SDCC_ds390) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15) || defined(__SDCC_mcs51)
+#define DUMMY_CASE
+#endif
+
+#include <testfwk.h>
+#ifdef __sun__
+#include <inttypes.h>
+#else
+#include <stdint.h>
+#endif
+
+#define VAR_TYPE ({varType})
+#define BIT_TO_TEST {bit}
+#define TYPE_IS_STRUCT ({struct})
+
+
+typedef struct
+{
+// Use MSB to LSB order for hosts that use this order for bitfields
+#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__) || defined(__sparc) || defined(__sparc64__))
+    unsigned int bit7       : 1;
+    unsigned int bit6       : 1;
+    unsigned int bit5       : 1;
+    unsigned int bit4       : 1;
+    unsigned int bit3       : 1;
+    unsigned int bit2       : 1;
+    unsigned int bit1       : 1;
+    unsigned int bit0       : 1;
+#else
+// Use LSB to MSB order for SDCC and generic hosts (likely to be
+// x86 or other little endian)
+    unsigned int bit0       : 1;
+    unsigned int bit1       : 1;
+    unsigned int bit2       : 1;
+    unsigned int bit3       : 1;
+    unsigned int bit4       : 1;
+    unsigned int bit5       : 1;
+    unsigned int bit6       : 1;
+    unsigned int bit7       : 1;
+#endif
+}struct_8bits;
+
+#define bitToTest__(b) bit ## b
+#define bitToTest_(b) bitToTest__(b)
+
+#define bitToTest bitToTest_(BIT_TO_TEST)
+
+#if TYPE_IS_STRUCT
+    #define TYPE struct_8bits
+#else
+    #define TYPE uint8_t
+#endif
+
+#if defined(__SDCC_pic16)
+    #define ABS_ADDR1 0x0200
+    #define ABS_ADDR2 0x0204
+#elif defined(__SDCC_pic14)
+    #define ABS_ADDR1 0x0100
+    #define ABS_ADDR2 0x0104
+#elif defined(__SDCC_stm8)
+    #define ABS_ADDR1 0x1000
+    #define ABS_ADDR2 0x1004
+#elif defined(__SDCC_f8)
+    #define ABS_ADDR1 0x3000
+    #define ABS_ADDR2 0x3004
+#else
+    #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Make test suitable for pdk
+        #if !defined(PORT_HOST) // Never do absolute address test with host
+            #define ABS_ADDR1 0xCA00
+            #define ABS_ADDR2 0xCA04
+        #endif
+    #endif
+#endif
+
+#if VAR_TYPE == 0
+    volatile TYPE volatileBits;
+#elif VAR_TYPE == 1
+    #ifdef ABS_ADDR1
+        #define volatileBits (*(volatile TYPE*)ABS_ADDR1)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 2
+    #ifdef ABS_ADDR2
+        #define volatileBits (*(volatile TYPE*)ABS_ADDR2)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 3
+    #define VOLATILE_BITS_DEF volatile TYPE volatileBits
+#elif VAR_TYPE == 4
+    #define VOLATILE_BITS_DEF static volatile TYPE volatileBits
+#elif VAR_TYPE == 5
+    #ifdef ABS_ADDR1
+        #define VOLATILE_BITS_DEF static volatile TYPE __at(ABS_ADDR1) volatileBits
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 6
+    #ifdef ABS_ADDR2
+        #define VOLATILE_BITS_DEF static volatile TYPE __at(ABS_ADDR2) volatileBits
+        #define USE_ONLY_1_BYTE
+    #else
+        #define DUMMY_CASE
+    #endif
+#else
+    #error "Unknown VAR_TYPE case"
+#endif
+
+#ifndef VOLATILE_BITS_DEF
+    #define VOLATILE_BITS_DEF
+#endif
+
+
+#ifndef DUMMY_CASE
+
+#if TYPE_IS_STRUCT
+    #define AS_UINT8(x) (*(uint8_t *)&x)
+    void 
+    bit_test_byte(void)
+    {
+        VOLATILE_BITS_DEF;
+        volatile uint8_t dummy;
+        
+        AS_UINT8(volatileBits) = 1 << BIT_TO_TEST;
+        ASSERT(AS_UINT8(volatileBits) == (1 << BIT_TO_TEST));
+        ASSERT(volatileBits.bitToTest);
+        dummy = 0;
+        if(volatileBits.bitToTest) dummy = 1;
+        ASSERT(dummy);
+    
+        AS_UINT8(volatileBits) = ~(1 << BIT_TO_TEST);
+        ASSERT(AS_UINT8(volatileBits) == (uint8_t)(~(1 << BIT_TO_TEST)));
+        ASSERT(!volatileBits.bitToTest);
+        dummy = 0;
+        if(!volatileBits.bitToTest) dummy = 1;
+        ASSERT(dummy);
+        
+        AS_UINT8(volatileBits) = 0x00;
+        volatileBits.bitToTest = 1;
+        ASSERT(AS_UINT8(volatileBits) == (1 << BIT_TO_TEST));
+    
+        AS_UINT8(volatileBits) = 0xFF;
+        volatileBits.bitToTest = 1;
+        ASSERT(AS_UINT8(volatileBits) == 0xFF);
+    
+        AS_UINT8(volatileBits) = 0x00;
+        volatileBits.bitToTest = 0;
+        ASSERT(AS_UINT8(volatileBits) == 0x00);
+    
+        AS_UINT8(volatileBits) = 0xFF;
+        volatileBits.bitToTest = 0;
+        ASSERT(AS_UINT8(volatileBits) == (uint8_t)(~(1 << BIT_TO_TEST)));
+        
+        AS_UINT8(volatileBits) = 0x00;
+        volatileBits.bitToTest ^= 1;
+        ASSERT(AS_UINT8(volatileBits) == (1 << BIT_TO_TEST));
+    
+        AS_UINT8(volatileBits) = 0xFF;
+        volatileBits.bitToTest ^= 1;
+        ASSERT(AS_UINT8(volatileBits) == (uint8_t)(~(1 << BIT_TO_TEST)));
+        
+        AS_UINT8(volatileBits) = 0x00; // keep it to keep environment of all assert calls the same way
+    }
+#else
+    void 
+    bit_test_byte(void)
+    {
+        VOLATILE_BITS_DEF;
+        volatile uint8_t dummy;
+    
+        // Casts to int16_t are used because the code generator generates different code
+        // and as a result also different peephole rules are applied
+        
+        volatileBits = 1 << BIT_TO_TEST;
+        ASSERT(volatileBits & (1 << BIT_TO_TEST));
+        ASSERT(volatileBits & (int16_t)(1 << BIT_TO_TEST));
+        dummy = 0;
+        if(volatileBits & (int16_t)(1 << BIT_TO_TEST)) dummy = 1;
+        ASSERT(dummy);
+    
+        volatileBits = ~(1 << BIT_TO_TEST);
+        ASSERT(!(volatileBits & (1 << BIT_TO_TEST)));
+        ASSERT(!(volatileBits & (int16_t)(1 << BIT_TO_TEST)));
+        dummy = 0;
+        if(!(volatileBits & (int16_t)(1 << BIT_TO_TEST))) dummy = 1;
+        ASSERT(dummy);
+        
+        volatileBits = 0x00;
+        volatileBits |= 1 << BIT_TO_TEST;
+        ASSERT(volatileBits == (1 << BIT_TO_TEST));
+    
+        volatileBits = 0xFF;
+        volatileBits |= 1 << BIT_TO_TEST;
+        ASSERT(volatileBits == 0xFF);
+    
+        volatileBits = 0x00;
+        volatileBits &= (uint8_t)(~(1 << BIT_TO_TEST));
+        ASSERT(volatileBits == 0x00);
+    
+        volatileBits = 0xFF;
+        volatileBits &= (uint8_t)(~(1 << BIT_TO_TEST));
+        ASSERT(volatileBits == (uint8_t)(~(1 << BIT_TO_TEST)));
+        
+        volatileBits = 0x00;
+        volatileBits ^= 1 << BIT_TO_TEST;
+        ASSERT(volatileBits == (1 << BIT_TO_TEST));
+    
+        volatileBits = 0xFF;
+        volatileBits ^= 1 << BIT_TO_TEST;
+        ASSERT(volatileBits == (uint8_t)(~(1 << BIT_TO_TEST)));
+        
+        volatileBits = 0x00; // keep it to keep environment of all assert calls the same way
+    }
+#endif
+
+#endif // DUMMY_CASE
+
+static void
+testBitfieldsChecks(void)
+{
+    #ifndef DUMMY_CASE
+        bit_test_byte();
+    #endif
+}
+

@@ -1,0 +1,526 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+step
+
+Stop at 0x008004: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08004  ? 35 00 50 c6    mov    0x50c6,#0x00                        
+F 0x008004
+timer get
+timer #1("time") ON 0.000000250000000 sec (2 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008008: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08008  ? 35 08 50 c6    mov    0x50c6,#0x08                        
+F 0x008008
+timer get
+timer #1("time") ON 0.000000375000000 sec (3 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x00800c: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c  ? 35 10 50 c6    mov    0x50c6,#0x10                        
+F 0x00800c
+timer get
+timer #1("time") ON 0.000000500000000 sec (4 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008010: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08010  ? 35 18 50 c6    mov    0x50c6,#0x18                        
+F 0x008010
+timer get
+timer #1("time") ON 0.000000625000000 sec (5 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008014: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08014  ? 35 00 50 c6    mov    0x50c6,#0x00                        
+F 0x008014
+timer get
+timer #1("time") ON 0.000000750000000 sec (6 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008018: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08018  ? 35 01 50 c6    mov    0x50c6,#0x01                        
+F 0x008018
+timer get
+timer #1("time") ON 0.000000875000000 sec (7 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x00801c: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0801c  ? 35 02 50 c6    mov    0x50c6,#0x02                        
+F 0x00801c
+timer get
+timer #1("time") ON 0.000001000000000 sec (8 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008020: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08020  ? 35 03 50 c6    mov    0x50c6,#0x03                        
+F 0x008020
+timer get
+timer #1("time") ON 0.000001125000000 sec (9 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008024: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08024  ? 35 04 50 c6    mov    0x50c6,#0x04                        
+F 0x008024
+timer get
+timer #1("time") ON 0.000001250000000 sec (10 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008028: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08028  ? 35 05 50 c6    mov    0x50c6,#0x05                        
+F 0x008028
+timer get
+timer #1("time") ON 0.000001375000000 sec (11 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x00802c: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0802c  ? 35 06 50 c6    mov    0x50c6,#0x06                        
+F 0x00802c
+timer get
+timer #1("time") ON 0.000001500000000 sec (12 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008030: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08030  ? 35 07 50 c6    mov    0x50c6,#0x07                        
+F 0x008030
+timer get
+timer #1("time") ON 0.000001625000000 sec (13 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008034: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08034  ? 72 16 48 05    bset   0x4805,#3                           
+F 0x008034
+timer get
+timer #1("time") ON 0.000001750000000 sec (14 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+
+step 5
+
+Stop at 0x008044: (109) stepped 7 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+
+timer get
+timer #1("time") ON 0.000002625000000 sec (21 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000003000000000 sec (24 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000003375000000 sec (27 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000003750000000 sec (30 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000004125000000 sec (33 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000004500000000 sec (36 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000004875000000 sec (39 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000005250000000 sec (42 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000005625000000 sec (45 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000006000000000 sec (48 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000006375000000 sec (51 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000006750000000 sec (54 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+step
+
+Stop at 0x008044: (109) stepped 3 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x00   0 .
+0-101001  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08044  ? 72 00 50 c5 fb btjt   0x50c5,#0,0x8044                    
+F 0x008044
+timer get
+timer #1("time") ON 0.000007125000000 sec (57 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump CLK_CKDIVR[7:0]
+dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...
+                    Dump memory of specified type or bit(s)
+info hw clk
+clk[0] ON
+Configuration memory of clk
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)

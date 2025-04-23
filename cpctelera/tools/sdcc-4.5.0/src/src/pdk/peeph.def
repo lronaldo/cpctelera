@@ -1,0 +1,306 @@
+// peeph.def - PDK peephole rules
+
+// Reads from RAM or I/O change z flag.
+replace restart {
+	mo%3	%1, %2
+} by {
+	; peephole 0 removed dead load into %1 from %2.
+} if notUsed(%1), notUsed('z'), notVolatile(%1), notVolatile(%2)
+
+// Write to memory or I/O does not change z flag.
+replace restart {
+	mo%3	%1, a
+} by {
+	; peephole 0a removed dead load into %1 from %2.
+} if notUsed(%1), notVolatile(%1)
+
+replace restart {
+	mo%3	%1, #%2
+} by {
+	; peephole 0b removed dead load into %1 from #%2.
+} if notUsed(%1)
+
+replace restart {
+	clear	%1
+} by {
+	; peephole 1 removed dead clear of %1.
+} if notUsed(%1)
+
+replace restart {
+	mo%3	%1, a
+	mo%3	a, %1
+} by {
+	mo%3	%1, a
+	; peephole 2 removed redundant load from %1 into a.
+} if notVolatile(%1), notUsed('z')
+
+replace restart {
+	push	%1
+	pop	%1
+} by {
+	; peephole 3 removed redundant push / pop.
+}
+
+replace restart {
+	pop	af
+	push	af
+} by {
+	; peephole 3a removed redundant pop af / push af.
+} if notUsed('a'), notUsed('z'), notUsed('c'), notUsed('ov')
+
+replace restart {
+	mo%3	a, #%1
+	ret
+} by {
+	; peephole 4 moved load to ret.
+	ret	#%1
+}
+
+replace restart {
+	xch	a, %1
+	xch	a, %1
+} by {
+	; peephole 5 removed redundant double exchange between a and %1.
+} if notVolatile(%1)
+
+replace restart {
+	mo%3	a, #0x00
+	slc	a
+	and	a, #0x01
+} by {
+	mo%3	a, #0x00
+	slc	a
+	; peephole 6 removed redundant and.
+}
+
+replace restart {
+    mov a, %1
+    %9  %2, a
+    mov a, %1
+} by {
+    mov a, %1
+    %9  %2, a
+    ; peephole 7 removed redundant mov a, %1
+} if notUsed('z'), notVolatile(%1)
+
+replace restart {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    mov a,  %1
+} by {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    ; peephole 8 removed redundant mov a, %1
+} if notUsed('z'), notVolatile(%1)
+
+replace restart {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    %9  %4, a
+    %9  %5, a
+    mov a,  %1
+} by {
+    mov a,  %1
+    %9  %2, a
+    %9  %3, a
+    %9  %4, a
+    %9  %5, a
+    ; peephole 9 removed redundant mov a, %1
+} if notUsed('z'), notVolatile(%1)
+
+replace restart {
+	ret	%1
+	ret
+} by {
+	ret	%1
+	; peephole j1 removed redundant ret after ret k.
+}
+
+replace restart {
+	t0sn.io	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	t1sn.io	%1, %2
+	; peephole j2 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t0sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	t1sn.io	%1, %2
+	; peephole j3 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t0sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	t1sn.io	%1, %2
+	; peephole j4 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t1sn.io	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	t0sn.io	%1, %2
+	; peephole j5 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t1sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	t0sn.io	%1, %2
+	; peephole j6 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	t1sn.io	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	t0sn.io	%1, %2
+	; peephole j7 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	ceqsn	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	cneqsn	%1, %2
+	; peephole j8 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if isPort('pdk14' 'pdk15'), labelRefCountChange(%4 -1)
+
+replace restart {
+	ceqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	cneqsn	%1, %2
+	; peephole j9 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if isPort('pdk14' 'pdk15'), labelRefCountChange(%4 -1)
+
+replace restart {
+	ceqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	cneqsn	%1, %2
+	; peephole j10 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if isPort('pdk14' 'pdk15'), labelRefCountChange(%4 -1)
+
+replace restart {
+	cneqsn	%1, %2
+	goto	%3
+%4:
+	%5
+%3:
+} by {
+	ceqsn	%1, %2
+	; peephole j11 removed goto by inverting test condition.
+%4:
+	%5
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	cneqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6
+%3:
+} by {
+	ceqsn	%1, %2
+	; peephole j12 removed goto by inverting test condition.
+%4:
+	%5	%6
+%3:
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	cneqsn	%1, %2
+	goto	%3
+%4:
+	%5	%6, %7
+%3:
+} by {
+	ceqsn	%1, %2
+	; peephole j13 removed goto by inverting test condition.
+%4:
+	%5	%6, %7
+%3:
+} if labelRefCountChange(%4 -1)
+
+// Should be one of the last ones. Opens the code to further peephole optimization.
+replace restart {
+%1:
+} by {
+	; peephole j14 removed unused label %1.
+} if labelRefCount(%1 0)
+
+barrier
+
+replace restart {
+	goto	%1
+} by {
+	ret
+	; peephole j15 replaced goto by ret.
+} if labelIsReturnOnly(%1), labelRefCountChange(%1 -1)
+
+

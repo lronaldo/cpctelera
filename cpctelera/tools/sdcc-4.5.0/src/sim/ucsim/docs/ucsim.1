@@ -1,0 +1,309 @@
+.TH UCSIM 1
+
+.SH NAME
+uCsim \- Micro\-controller simulator
+
+.SH SYNOPSIS
+.B ucsim_i8051
+.br
+.B ucsim_51
+.br
+.B ucsim_xa
+.br
+.B ucsim_z80
+.br
+.B ucsim_tlcs
+.br
+.B ucsim_rxk
+.br
+.B ucsim_i8085
+.br
+.B ucsim_avr
+.br
+.B ucsim_pdk
+.br
+.B ucsim_st7
+.br
+.B ucsim_stm8
+.br
+.B ucsim_p1516
+.br
+.B ucsim_m6800
+.br
+.B ucsim_m6809
+.br
+.B ucsim_m68hc08
+.br
+.B ucsim_m68hc11
+.br
+.B ucsim_m68hc12
+.br
+.B ucsim_mos6502
+.br
+.B ucsim_plaze
+.br
+.B ucsim_f8
+.br
+.B ucsim_oisc
+.br
+.RS
+.B \-a nr
+.B \-b
+.B \-B
+.B \-c file
+.B \-C cfg_file
+
+.B \-e command
+.B \-E
+.B \-g
+.B \-G
+.B \-h
+.B \-H
+.B \-I options
+.B \-k portnum
+.B \-l
+.B \-o colors
+.B \-p prompt
+.B \-P
+.B \-R seed
+.B \-s file
+.B \-S options
+.B \-t cpu_type
+.B \-U uartnr
+.B \-u hw
+.B \-v
+.B \-V
+.B \-w
+.B \-X freq[k|M]
+.B \-z portnum
+.B \-Z portnum
+.RE
+
+.SH DESCRIPTION
+uCsim is a microcontroller, microprocessor simulator for several
+processor families. It can be started as
+.B ucsim_XXXX
+command, where XXXX specifies the simulated processor type. Eg.
+.I ucsim_51
+starts Intel MCS51 microcontroller simulator,
+.I ucsim_z80
+starts Zilog Z80 microprocessor simulator, etc.
+
+.SH OPTIONS
+
+.B Options of the command
+
+.TP
+.B \-a nr
+Specify size of variable space (default=256).
+
+.TP
+.B \-b
+Black & white (non-color) theme.
+
+.TP
+.B \-B
+Beep on breakpoints.
+
+.TP
+.B \-c file
+Open command console on
+.I file
+(use \- for std in/out).
+
+.TP
+.B \-C file
+Read initial commands from
+.I file
+and execute them.
+
+
+.TP
+.B \-e command
+Execute
+.I command
+at program startup (before config file).
+
+.TP
+.B \-E
+Go, start simulation in emulation mode.
+
+.TP
+.B \-g
+Go, start simulation.
+
+.TP
+.B \-G
+Go, start simulation, quit on stop.
+
+.TP
+.B \-h
+Print out this help and quit.
+
+.TP
+.B \-H
+Print out types of known CPUs and quit.
+
+.TP
+.B \-I options
+.I options
+is a comma separated list of options according to simulator
+interface. Known options are:
+.br
+.I if=memory[address]
+turn on interface on given memory location.
+.br
+.I in=file
+specify input file for IO.
+.br
+.I out=file
+specify output file for IO.
+.PP
+
+.TP
+.B \-k portnum
+Use
+.I localhost:portnum
+for serial I/O. This option is obsolete, use \-S instead.
+
+.TP
+.B \-l
+Use colors of the light theme (default is dark).
+.PP
+
+.TP
+.B \-o colors
+List of color specification: what=colspec,... where colspec is :
+separated list of color options e.g.: prompt=b:white:black (bold white
+on black).
+
+.TP
+.B \-p prompt
+Specify string for prompt.
+
+.TP
+.B \-P
+Prompt is a null ('\\0') character.
+.PP
+
+.TP
+.B \-q
+Quiet mode (implies -b).
+
+.TP
+.B \-R seed
+Set the random number generator seed.
+
+.TP
+.B \-s file
+Connect serial interface uart0 to
+.I file
+This option is obsolete, use \-S instead.
+
+.TP
+.B \-S options
+.I options
+is a comma separated list of options according to serial interface. Know options are:
+.br
+.I uart=nr
+number of uart (default=0)
+.br
+.I in=file
+serial input will be read from file named `file'.
+.br
+.I out=file
+serial output will be written to `file'.
+.br
+.I port=nr
+use localhost:nr as server for serial line.
+.br
+.I iport=nr
+use localhost:nr as server for serial input.
+.br
+.I oport=nr
+use localhost:nr as server for serial onput.
+.br
+.I raw
+perform non-interactive communication even on tty.
+
+.TP
+.B \-t cpu_type
+Specifies type of the controller. Use \-H to list possible values.
+
+.TP
+.B \-U uartnr
+Use std console as terminal for UART id=uartnr.
+
+.TP
+.B \-u hw
+Use std console as display for specified hw.
+
+.TP
+.B \-v
+Print out version number and quit.
+
+.TP
+.B \-V
+Verbose mode.
+
+.TP
+.B \-w
+Writable flash.
+
+.TP
+.B \-X freq[k|M]
+XTAL frequency in Hz, Use
+.I k
+or
+.I M
+suffix to specify frequency in kHz or MHz.
+
+.TP
+.B \-z portnum
+Listen
+.I portnum
+for command console.
+
+.TP
+.B \-Z portnum
+Listen
+.I portnum
+for command console (no console on stdio).
+
+
+
+.SH EXAMPLES
+None yet.
+
+.SH "SEE ALSO"
+sdcc(1), sdcdb(1), serialview(1).
+
+.SH BUGS
+Probably many.
+
+.SH AUTHORS, CONTRIBUTORS
+Daniel Drotos,
+Gunar Holm,
+Sandeep Dutta,
+Salvador Eduardo Tropea,
+Josef Wolf,
+Stephane Meyer,
+Larry Doolittle,
+Timothy Hurman,
+Karl-Max Wagner,
+Edmar Wienskoski Jr,
+Alexandre Frey,
+Kaido Karner,
+Kalr Bongers,
+Alexis Pavlov,
+Davine Zanni,
+Anton Persson,
+Nicolas Lesser,
+Mike Jagdis,
+Jiri Simek,
+Zbynek Krivka,
+Vaclav Peroutka,
+Valentin Dudouyt,
+Erik Petrich,
+Leland Morrison,
+Johan Knol.

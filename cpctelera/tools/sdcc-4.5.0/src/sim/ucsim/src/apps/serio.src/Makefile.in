@@ -1,0 +1,31 @@
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+include $(srcdir)/objs.mk
+include ../../common.mk
+
+LOCAL_LIB_PREREQU	=
+LOCAL_LIB_OPTIONS	=
+
+APP		= $(PKG)$(EXEEXT)
+
+all: $(APP)
+
+include $(top_srcdir)/src/app.mk
+
+$(APP): $(OBJECTS) $(UCSIM_LIB_TARGETS)
+ifeq ($(SILENT),yes)
+	@echo LNK-$(PKG)
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(UCSIM_LIBS) -o $@
+else
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -L$(top_builddir) $(UCSIM_LIBS) -o $@
+endif
+
+local_install:
+	$(INSTALL) $(APP) $(DESTDIR)$(bindir)/$(APP)
+	$(STRIP) $(DESTDIR)$(bindir)/$(APP)
+
+local_uninstall:
+	rm -f $(DESTDIR)$(bindir)/$(APP)

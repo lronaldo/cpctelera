@@ -1,0 +1,214 @@
+<?xml version="1.0" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.7a -->
+<!-- CreationDate: 2019-06-14 09:02:36 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="519pt" height="192pt"
+	viewBox="2581 1170 8231 3043">
+<g fill="none">
+<!-- Ellipse -->
+<ellipse cx="10236" cy="2746" rx="562" ry="135"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Arc -->
+<path d="M 9675,3555 A 1238 1238 0 0 0 10800 3555"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Arc -->
+<path d="M 9675,3420 A 1238 1238 0 0 0 10800 3420"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Arc -->
+<path d="M 9675,3285 A 1238 1238 0 0 0 10800 3285"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Arc -->
+<path d="M 9675,3150 A 1238 1238 0 0 0 10800 3150"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Arc -->
+<path d="M 9675,3015 A 1238 1238 0 0 0 10800 3015"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Arc -->
+<path d="M 9675,2880 A 1238 1238 0 0 0 10800 2880"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="1395" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="1620" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="1845" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="2070" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="2745" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="3420" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="3645" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 2655,2295 2880,2295 2880,2070"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 2655,3870 4320,3870 4320,2070 2880,2070 2655,2295 2655,3870"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="2295" width="540" height="225"
+	stroke="#000000" stroke-width="30px"/>
+<!-- Line -->
+<rect x="5175" y="2970" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="3195" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5175" y="2520" width="540" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp0">
+	<path clip-rule="evenodd" d="M 2581,1170 H 10812 V 4213 H 2581 z
+		M 4945,2335 5069,2343 4956,2394 5093,2345 5090,2332z"/>
+</clipPath>
+</defs>
+<polyline points=" 3870,2565 5085,2340" clip-path="url(#cp0)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 5085,2340 -->
+<polyline points=" 4945,2335 5069,2343 4956,2394"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp1">
+	<path clip-rule="evenodd" d="M 2581,1170 H 10812 V 4213 H 2581 z
+		M 4548,2722 4425,2739 4526,2666 4401,2741 4406,2754z"/>
+</clipPath>
+</defs>
+<polyline points=" 5085,2475 4410,2745" clip-path="url(#cp1)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 4410,2745 -->
+<polyline points=" 4548,2722 4425,2739 4526,2666"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp2">
+	<path clip-rule="evenodd" d="M 2581,1170 H 10812 V 4213 H 2581 z
+		M 6658,2355 6778,2385 6658,2415 6802,2392 6802,2378z
+		M 5942,2415 5822,2385 5942,2355 5798,2378 5798,2392z"/>
+</clipPath>
+</defs>
+<polyline points=" 5805,2385 6795,2385" clip-path="url(#cp2)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 6795,2385 -->
+<polyline points=" 6658,2355 6778,2385 6658,2415"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 5805,2385 -->
+<polyline points=" 5942,2415 5822,2385 5942,2355"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<polyline points=" 9675,2745 9675,3555"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 10800,2745 10800,3555"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp3">
+	<path clip-rule="evenodd" d="M 2581,1170 H 10812 V 4213 H 2581 z
+		M 6658,2355 6778,2385 6658,2415 6802,2392 6802,2378z
+		M 8282,3495 8162,3465 8282,3435 8138,3458 8138,3472z"/>
+</clipPath>
+</defs>
+<polyline points=" 8145,3465 9630,3465" clip-path="url(#cp3)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Backward arrow to point 8145,3465 -->
+<polyline points=" 8282,3495 8162,3465 8282,3435"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp4">
+	<path clip-rule="evenodd" d="M 2581,1170 H 10812 V 4213 H 2581 z
+		M 10290,2653 10260,2773 10230,2653 10253,2797 10267,2797z
+		M 8282,3495 8162,3465 8282,3435 8138,3458 8138,3472z"/>
+</clipPath>
+</defs>
+<polyline points=" 8100,2520 10260,2520 10260,2790" clip-path="url(#cp4)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 10260,2790 -->
+<polyline points=" 10290,2653 10260,2773 10230,2653"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<polygon points=" 7650,1665 7674,1663 7696,1665 7717,1670 7736,1677 7754,1688 7771,1700 7788,1715
+ 7803,1731 7818,1748 7833,1766 7847,1785 7861,1804 7875,1822 7888,1840 7902,1858
+ 7915,1874 7928,1890 7941,1906 7953,1920 7965,1935 7977,1951 7987,1968 7997,1985
+ 8004,2002 8011,2019 8016,2037 8021,2055 8025,2073 8028,2090 8032,2108 8036,2126
+ 8041,2144 8047,2162 8054,2180 8063,2197 8074,2215 8086,2232 8100,2250 8113,2264
+ 8127,2279 8142,2293 8159,2306 8176,2320 8195,2334 8215,2347 8236,2360 8257,2373
+ 8279,2386 8300,2399 8322,2412 8344,2425 8365,2439 8386,2453 8406,2467 8425,2482
+ 8443,2497 8460,2513 8476,2530 8491,2547 8505,2565 8518,2584 8530,2603 8542,2624
+ 8553,2646 8565,2668 8576,2691 8587,2716 8598,2740 8609,2765 8620,2791 8631,2817
+ 8641,2842 8651,2868 8660,2893 8668,2917 8675,2941 8681,2963 8685,2985 8688,3006
+ 8689,3025 8688,3043 8685,3060 8679,3077 8670,3093 8659,3107 8645,3120 8629,3131
+ 8610,3140 8590,3149 8568,3157 8545,3164 8522,3170 8498,3177 8475,3184 8452,3192
+ 8430,3201 8409,3211 8389,3222 8371,3235 8354,3250 8339,3267 8325,3285 8313,3303
+ 8302,3323 8293,3344 8284,3367 8277,3391 8271,3417 8267,3444 8263,3473 8259,3502
+ 8257,3531 8254,3561 8251,3591 8248,3621 8243,3650 8238,3677 8231,3704 8222,3729
+ 8211,3752 8198,3773 8183,3792 8165,3810 8145,3825 8126,3836 8105,3847 8083,3856
+ 8059,3864 8033,3872 8006,3878 7977,3884 7948,3890 7917,3895 7886,3899 7854,3903
+ 7821,3907 7788,3910 7755,3913 7721,3916 7688,3918 7655,3920 7622,3922 7590,3923
+ 7559,3924 7527,3924 7497,3924 7467,3923 7438,3921 7409,3919 7380,3915 7354,3910
+ 7327,3905 7300,3898 7273,3891 7245,3883 7217,3874 7188,3864 7159,3854 7129,3843
+ 7099,3832 7069,3820 7039,3808 7008,3795 6978,3783 6948,3770 6918,3757 6889,3744
+ 6861,3731 6834,3718 6808,3705 6783,3692 6760,3679 6739,3666 6719,3653 6701,3640
+ 6685,3627 6672,3614 6660,3600 6648,3581 6640,3560 6636,3539 6637,3516 6642,3493
+ 6651,3469 6662,3444 6676,3418 6692,3393 6709,3367 6725,3341 6742,3315 6757,3290
+ 6771,3266 6782,3243 6791,3221 6796,3201 6799,3182 6798,3165 6795,3150 6789,3135
+ 6779,3122 6767,3111 6751,3102 6733,3094 6713,3089 6691,3085 6668,3081 6644,3078
+ 6620,3075 6596,3072 6574,3068 6552,3063 6533,3057 6516,3049 6502,3039 6490,3028
+ 6480,3015 6472,3001 6466,2985 6461,2967 6457,2948 6454,2928 6451,2906 6449,2884
+ 6447,2861 6446,2837 6446,2814 6446,2790 6447,2768 6449,2746 6452,2725 6456,2706
+ 6462,2687 6470,2671 6480,2655 6491,2642 6505,2630 6521,2619 6539,2609 6560,2601
+ 6583,2593 6608,2587 6634,2580 6661,2575 6689,2569 6716,2564 6743,2558 6769,2551
+ 6793,2544 6815,2536 6835,2527 6852,2516 6866,2504 6877,2490 6885,2475 6890,2459
+ 6893,2440 6892,2420 6889,2399 6883,2375 6875,2350 6865,2324 6853,2296 6840,2268
+ 6826,2239 6812,2211 6799,2183 6786,2157 6775,2131 6766,2108 6758,2086 6753,2067
+ 6750,2050 6749,2036 6750,2025 6755,2013 6763,2007 6772,2007 6784,2011 6796,2020
+ 6810,2032 6825,2045 6840,2059 6857,2071 6875,2080 6896,2085 6919,2086 6945,2080
+ 6975,2070 6992,2063 7010,2055 7029,2045 7049,2034 7071,2021 7094,2007 7118,1991
+ 7143,1975 7169,1957 7196,1938 7223,1918 7251,1898 7280,1878 7308,1857 7337,1836
+ 7365,1816 7394,1796 7421,1777 7448,1759 7475,1742 7500,1726 7525,1712 7549,1700
+ 7571,1689 7592,1680 7613,1673 7632,1668"
+	stroke="#000000" stroke-width="8px" stroke-linejoin="bevel"/>
+<!-- Text -->
+<g transform="translate(7875,3420) rotate(-335)" >
+<text xml:space="preserve" x="0" y="0" fill="#0000d1" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">read</text>
+</g><!-- Text -->
+<text xml:space="preserve" x="3330" y="1980" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">prg.c</text>
+<!-- Text -->
+<text xml:space="preserve" x="2745" y="2610" fill="#000000" font-family="Courier" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">*sif=cmd;</text>
+<!-- Text -->
+<text xml:space="preserve" x="2745" y="2820" fill="#000000" font-family="Courier" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">answer= *sif;</text>
+<!-- Text -->
+<text xml:space="preserve" x="5445" y="1305" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">memory</text>
+<!-- Text -->
+<text xml:space="preserve" x="5445" y="2475" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">sif</text>
+<!-- Text -->
+<g transform="translate(7380,2340) rotate(-10)" >
+<text xml:space="preserve" x="0" y="0" fill="#008f00" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">run</text>
+</g><!-- Text -->
+<g transform="translate(7200,3510) rotate(-30)" >
+<text xml:space="preserve" x="0" y="0" fill="#ffa1a1" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">print</text>
+</g><!-- Text -->
+<g transform="translate(7425,2970) rotate(-20)" >
+<text xml:space="preserve" x="0" y="0" fill="#ff0000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">stop</text>
+</g><!-- Text -->
+<g transform="translate(7875,2655) rotate(-350)" >
+<text xml:space="preserve" x="0" y="0" fill="#ff00ff" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">write</text>
+</g><!-- Text -->
+<text xml:space="preserve" x="3420" y="4140" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">simulated program</text>
+<!-- Text -->
+<text xml:space="preserve" x="7560" y="1575" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">simulator</text>
+</g>
+</svg>

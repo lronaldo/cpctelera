@@ -1,0 +1,35 @@
+#
+# S51 sim.src/Makefile
+#
+# (c) Drotos Daniel, Talker Bt. 1997,99
+#
+
+PKG		= sim
+
+include ../../common.mk
+
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: libs
+
+include $(top_srcdir)/src/lib.mk
+
+
+# Performing self-test
+# --------------------
+check:
+
+test:
+
+baseline:
+
+
+# End of sim.src/Makefile

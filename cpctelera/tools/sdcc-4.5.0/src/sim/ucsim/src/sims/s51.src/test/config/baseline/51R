@@ -1,0 +1,65 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: 51R CMOS cmos
+Controller has 15 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on timer0[0]
+   on timer1[1]
+   on uart[0]
+   on dreg[0]
+   on dport[0]
+   on port[0]
+   on port[1]
+   on port[2]
+   on port[3]
+   on irq[0]
+   on timer2[2]
+   on wdt[0]
+     R0 R1 R2 R3 R4 R5 R6 R7
+     41 58 fc c9 8b bc 95 6b
+@R0 76 v  ACC= 0x00   0 .  B= 0x00
+@R1 73 s  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 6b 95 bc 8b c9 fc 58 41
+   DPTR= 0x0000 @DPTR= 0xe4 228 .
+0x0000  ? ff       MOV    R7,A                                       
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+  0x000000-0x0000ff      256 eram_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000001        2 dptr (8,%02x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0xff -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x0000 0x00ff -> banked
+    bank selector: sfr[0x8e] mask=0x2 banks=2 act=0
+    banks:
+      *  0. eram_chip 0x00
+         1. xram_chip 0x0000
+  xram 0x0100 0xffff -> xram_chip 0x0100 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=0
+    banks:
+      *  0. iram_chip 0x00
+         1. iram_chip 0x08
+         2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> sfr_chip 0x02 activated

@@ -1,0 +1,38 @@
+/* bug-3410.c.in
+   ?
+   type: unsigned char, unsigned int, bint
+ */
+
+#include <testfwk.h>
+#include <stdbool.h>
+
+#if defined(__SDCC) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_mos6502) && !defined(__SDCC_mos65c02) // Lack of _BitInt support for hc08 and s08.
+typedef unsigned _BitInt(8) bint;
+#elif __clang_major__ == 11
+typedef unsigned _ExtInt(8) bint;
+#else
+typedef unsigned int bint;
+#endif
+
+typedef struct {
+    {type} a : 6;
+    {type} b : 2;
+
+} Part;
+
+bool test( {type} c, const Part *part ) {
+
+    if ( c < part->a ) return true;
+    return false;
+}
+
+void testBug( void ) {
+	Part part = { .a = 48, .b = 1 };
+	ASSERT (!test( 254, &part )); // Wrong result here for unsigned char
+	ASSERT (!test( 128, &part )); // Wrong result here for unsigned char
+	ASSERT (!test( 127, &part ));
+	ASSERT (!test( 64, &part ));
+	ASSERT (!test( 63, &part ));
+	ASSERT (test( 40, &part ));
+}
+

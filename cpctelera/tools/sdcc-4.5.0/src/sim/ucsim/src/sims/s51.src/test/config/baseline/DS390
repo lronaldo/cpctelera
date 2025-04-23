@@ -1,0 +1,60 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: DS390 CMOS cmos
+Controller has 15 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on timer0[0]
+   on timer1[1]
+   on uart[0]
+   on dreg[0]
+   on dport[0]
+   on port[0]
+   on port[1]
+   on port[2]
+   on port[3]
+   on irq[0]
+   on timer2[2]
+   on ds390hw[0]
+     R0 R1 R2 R3 R4 R5 R6 R7
+     00 00 00 00 00 00 00 00
+@R0 00 .  ACC= 0x00   0 .  B= 0x00
+@R1 00 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 00 00 00 00 00 00 00 00
+   DPTR= 0x0000 @DPTR= 0x00   0 .
+0x00000  ? ff       MOV    R7,A                                      
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x01ffff   131072 rom_chip (8,%02x,0x%05x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x10007f  1048704 xram_chip (8,%02x,0x%06x)
+  0x000000-0x000fff     4096 ixram_chip (8,%02x,0x%03x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x01ffff   131072 rom (8,%02x,0x%05x)
+  0x000000-0x0000ff      256 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x10007f  1048704 xram (8,%02x,0x%06x)
+  0x000000-0x000fff     4096 ixram (8,%02x,0x%03x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x00000 0x1ffff -> rom_chip 0x00000 activated
+  iram 0x00 0xff -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x000000 0x10007f -> xram_chip 0x000000 activated
+  ixram 0x000 0xfff -> ixram_chip 0x000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=0
+    banks:
+      *  0. iram_chip 0x00
+         1. iram_chip 0x08
+         2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated

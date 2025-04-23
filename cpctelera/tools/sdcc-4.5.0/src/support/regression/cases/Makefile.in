@@ -1,0 +1,1068 @@
+# Makefile for "cases"
+# C code generated from "tests"
+
+srcdir = @srcdir@
+top_builddir = @top_builddir@
+PYTHON = @PYTHON@
+M4 = @M4@
+
+# Script that takes a source test suite and generates the iterations
+GENERATE_CASES = $(srcdir)/generate-cases.py
+MAKE_DRV = $(srcdir)/mkdrv.py # BUG? use 1 line of sed?
+TESTS_DIR = $(srcdir)/../tests
+GTE_TESTS_DIR = $(srcdir)/../gte
+QC_TESTS_DIR = $(srcdir)/../qct
+TCC_TESTS_DIR = $(srcdir)/../tcc
+
+TEST_DIRS = \
+	${TESTS_DIR} \
+	${GTE_TESTS_DIR} \
+	${QC_TESTS_DIR} \
+	${TCC_TESTS_DIR}
+
+vpath %.c.in $(TESTS_DIR)
+vpath %.c $(TESTS_DIR)
+
+TPL_TESTS = $(shell (cd $(TESTS_DIR); ls *.c.in))
+C_TESTS = $(shell (cd $(TESTS_DIR); ls *.c))
+M4_TESTS = $(shell (cd $(TESTS_DIR); ls *.m4))
+GTE_TESTS_WC = $(shell (cd $(GTE_TESTS_DIR); ls *.c))
+QC_TESTS_WC = $(shell (cd $(QC_TESTS_DIR); ls *.c))
+TCC_TESTS_WC = $(shell (cd $(TCC_TESTS_DIR); ls *.c))
+
+# GTE tests using asm (TODO: generate automatically)
+# these don't seem to work.
+GTE_SKIP_TESTS = \
+	20001009-2.c \
+	20020107-1.c \
+	20030222-1.c \
+	20050203-1.c \
+	20061031-1.c \
+	20061220-1.c \
+	20071220-1.c \
+	20071220-2.c \
+	20080122-1.c \
+	960312-1.c \
+	990130-1.c \
+	pr103376.c \
+	pr38533.c \
+	pr40022.c \
+	pr40657.c \
+	pr41239.c \
+	pr43385.c \
+	pr43560.c \
+	pr44852.c \
+	pr45695.c \
+	pr46309.c \
+	pr47925.c \
+	pr49218.c \
+	pr49279.c \
+	pr49390.c \
+	pr51447.c \
+	pr51877.c \
+	pr51933.c \
+	pr52286.c \
+	pr53645-2.c \
+	pr53645.c \
+	pr56205.c \
+	pr56866.c \
+	pr57344-1.c \
+	pr57344-2.c \
+	pr57344-3.c \
+	pr57344-4.c \
+	pr58277-1.c \
+	pr58419.c \
+	pr65053-1.c \
+	pr65053-2.c \
+	pr65648.c \
+	pr65956.c \
+	pr68328.c \
+	pr69320-2.c \
+	pr69691.c \
+	pr78438.c \
+	pr78726.c \
+	pr79354.c \
+	pr79737-2.c \
+	pr80421.c \
+	pr82954.c \
+	pr84478.c \
+	pr84524.c \
+	pr85156.c \
+	pr85756.c \
+	pr88904.c \
+	pr93945.c \
+	pr94130.c \
+	stkalign.c
+
+# uses typeof. typeof was a GCC extension, which became standard in C23. RFE #738.
+GTE_SKIP_TESTS += \
+	20020412-1.c \
+	builtin-types-compatible-p.c \
+	va-arg-22.c
+
+# gnu extension (inline varargs, -fgnu89-inline..)
+GTE_SKIP_TESTS += \
+	bcp-1.c \
+	va-arg-7.c \
+	va-arg-8.c \
+	980608-1.c
+
+# SDCC does not yet support compound literals (RFE #332)
+GTE_SKIP_TESTS += \
+	20000917-1.c \
+	20020206-2.c
+
+# Uses GCC implementation-defined long long bit-fields not supported in SDCC
+GTE_SKIP_TESTS += \
+	991118-1.c
+
+# SDCC does not yet support K&R-style style functions (RFE #450)
+GTE_SKIP_TESTS += \
+	20000914-1.c \
+	20000112-1.c \
+	20000808-1.c \
+	930921-1.c \
+	931228-1.c \
+	940115-1.c \
+	950221-1.c \
+	960209-1.c \
+	970923-1.c
+
+# __SIZE_TYPE__ something. TODO: retry
+GTE_SKIP_TESTS += \
+	20001203-2.c \
+	simd-6.c \
+	pr36321.c \
+	pr35472.c \
+	pr30778.c \
+	pr103405.c \
+	nestfunc-6.c \
+	991014-1.c \
+	20070919-1.c \
+	20051113-1.c \
+	20050215-1.c \
+	strlen-6.c
+
+# Test for GCC implementation-defined bit-field layout
+GTE_SKIP_TESTS += \
+	bitfld-2.c
+
+# Test for GCC implementation-defined floating-point behaviour
+GTE_SKIP_TESTS += \
+	990127-2.c
+
+# Requires int of at least 32 bits.
+GTE_SKIP_TESTS += \
+	20061101-1.c \
+	cmpsi-2.c \
+	pr29797-1.c \
+	pr45262.c \
+	pr66556.c \
+	vrp-5.c \
+	vrp-6.c
+
+# Bugs? These fail on stm8.
+GTE_SKIP_TESTS += \
+	pr48197.c
+
+# BUGs? abnormal stop on stm8
+GTE_SKIP_TESTS += \
+	printf-1.c \
+	vprintf-1.c
+
+# timeout on ucsim stm8 (revisit later..)
+GTE_SKIP_TESTS += \
+	20000819-1.c \
+	20000910-1.c \
+	20001111-1.c \
+	20020404-1.c \
+	20021024-1.c \
+	921110-1.c \
+	941014-2.c \
+	960521-1.c \
+	960802-1.c \
+	991030-1.c \
+	loop-2b.c \
+	nestfunc-4.c \
+	pr58640.c \
+	pr58943.c \
+	pr7284-1.c \
+	va-arg-21.c \
+	va-arg-24.c \
+	va-arg-trap-1.c \
+	zerolen-1.c
+
+# Test for implementation-defined struct layout
+GTE_SKIP_TESTS += \
+	20000223-1.c
+
+# Test for GCC behaviour when library function is locally overwritten
+GTE_SKIP_TESTS += \
+	20021127-1.c
+
+# Test for GCC implementation-defined behaviour (GIMPLE memory model)
+GTE_SKIP_TESTS += \
+	alias-access-path-1.c
+
+# misc syntax error
+GTE_SKIP_TESTS += \
+	20000801-3.c \
+	20000822-1.c \
+	20010904-2.c \
+	20020320-1.c \
+	20030109-1.c \
+	20030224-2.c \
+	20030501-1.c \
+	20030910-1.c \
+	20040302-1.c \
+	20040520-1.c \
+	20041218-2.c \
+	20050107-1.c \
+	20050119-1.c \
+	20050119-2.c \
+	20050121-1.c \
+	20070614-1.c \
+	20071018-1.c \
+	20071029-1.c \
+	20071120-1.c \
+	20080502-1.c \
+	20081117-1.c \
+	20081218-1.c \
+	20090113-2.c \
+	20090113-3.c \
+	20090219-1.c \
+	20090711-1.c \
+	20120105-1.c \
+	20190820-1.c \
+	20190901-1.c \
+	920302-1.c \
+	920415-1.c \
+	920428-2.c \
+	920501-3.c \
+	920501-4.c \
+	920501-5.c \
+	920501-7.c \
+	920612-2.c \
+	920721-4.c \
+	921017-1.c \
+	921215-1.c \
+	930930-1.c \
+	931002-1.c \
+	950906-1.c \
+	960512-1.c \
+	980526-1.c \
+	980605-1.c \
+	990208-1.c \
+	990326-1.c \
+	990413-2.c \
+	991228-1.c \
+	alias-1.c \
+	alias-2.c \
+	align-nest.c \
+	builtin-bitops-1.c \
+	built-in-setjmp.c \
+	comp-goto-1.c \
+	comp-goto-2.c \
+	complex-1.c \
+	complex-2.c \
+	complex-4.c \
+	complex-5.c \
+	complex-6.c \
+	complex-7.c \
+	eeprof-1.c \
+	ffs-1.c \
+	ffs-2.c \
+	fprintf-2.c \
+	fprintf-chk-1.c \
+	ipa-sra-1.c \
+	ipa-sra-2.c \
+	loop-2e.c \
+	mayalias-1.c \
+	mayalias-2.c \
+	mayalias-3.c \
+	nestfunc-1.c \
+	nestfunc-2.c \
+	nestfunc-3.c \
+	nestfunc-5.c \
+	nestfunc-7.c \
+	nest-stdar-1.c \
+	packed-aligned.c \
+	pr103209.c \
+	pr103255.c \
+	pr104604.c \
+	pr19687.c \
+	pr22061-3.c \
+	pr22061-4.c \
+	pr22098-1.c \
+	pr22098-2.c \
+	pr22098-3.c \
+	pr22141-1.c \
+	pr23135.c \
+	pr23324.c \
+	pr23467.c \
+	pr24135.c \
+	pr28403.c \
+	pr28865.c \
+	pr28982b.c \
+	pr29006.c \
+	pr33992.c \
+	pr34154.c \
+	pr34768-1.c \
+	pr34768-2.c \
+	pr35456.c \
+	pr36034-1.c \
+	pr36034-2.c \
+	pr36339.c \
+	pr36343.c \
+	pr36765.c \
+	pr37573.c \
+	pr37780.c \
+	pr38151.c \
+	pr38819.c \
+	pr38969.c \
+	pr39228.c \
+	pr40579.c \
+	pr41395-1.c \
+	pr41395-2.c \
+	pr41463.c \
+	pr42154.c \
+	pr42231.c \
+	pr42248.c \
+	pr43008.c \
+	pr43784.c \
+	pr43987.c \
+	pr44164.c \
+	pr44683.c \
+	pr44858.c \
+	pr45070.c \
+	pr46316.c \
+	pr48571-1.c \
+	pr48814-1.c \
+	pr49644.c \
+	pr51323.c \
+	pr52129.c \
+	pr52760.c \
+	pr52979-1.c \
+	pr52979-2.c \
+	pr53084.c \
+	pr53688.c \
+	pr54471.c \
+	pr54937.c \
+	pr54985.c \
+	pr55750.c \
+	pr55875.c \
+	pr56799.c \
+	pr56962.c \
+	pr56982.c \
+	pr57124.c \
+	pr57130.c \
+	pr57144.c \
+	pr57568.c \
+	pr57829.c \
+	pr58209.c \
+	pr58277-2.c \
+	pr58574.c \
+	pr58831.c \
+	pr59014-2.c \
+	pr59101.c \
+	pr59229.c \
+	pr59358.c \
+	pr59643.c \
+	pr59747.c \
+	pr60822.c \
+	pr61375.c \
+	pr64006.c \
+	pr64242.c \
+	pr65215-3.c \
+	pr65215-4.c \
+	pr65215-5.c \
+	pr65369.c \
+	pr65401.c \
+	pr67037.c \
+	pr68249.c \
+	pr68381.c \
+	pr68648.c \
+	pr69447.c \
+	pr70222-1.c \
+	pr70429.c \
+	pr70460.c \
+	pr70602.c \
+	pr71083.c \
+	pr71494.c \
+	pr71554.c \
+	pr78436.c \
+	pr78622.c \
+	pr79043.c \
+	pr79737-1.c \
+	pr80692.c \
+	pr81423.c \
+	pr81588.c \
+	pr82192.c \
+	pr82524.c \
+	pr84169.c \
+	pr84339.c \
+	pr84748.c \
+	pr85095.c \
+	pr86492.c \
+	pr86528.c \
+	pr86659-1.c \
+	pr86659-2.c \
+	pr86844.c \
+	pr87623.c \
+	pr89195.c \
+	pr90025.c \
+	pr91450-1.c \
+	pr91450-2.c \
+	pr91597.c \
+	pr91632.c \
+	pr92140.c \
+	pr92904.c \
+	pr93213.c \
+	pr93402.c \
+	pr93582.c \
+	pr93908.c \
+	pr94524-1.c \
+	pr94524-2.c \
+	pr94591.c \
+	pr94734.c \
+	pr95731.c \
+	pr97073.c \
+	pr97386-1.c \
+	pr97386-2.c \
+	pr97421-1.c \
+	pr97764.c \
+	pr98474.c \
+	pr98681.c \
+	pr98727.c \
+	pr99079.c \
+	printf-2.c \
+	printf-chk-1.c \
+	return-addr.c \
+	scal-to-vec1.c \
+	scal-to-vec2.c \
+	scal-to-vec3.c \
+	simd-1.c \
+	simd-2.c \
+	simd-4.c \
+	strlen-7.c \
+	struct-aliasing-1.c \
+	user-printf.c \
+	usmul.c \
+	va-arg-pack-1.c \
+	vfprintf-chk-1.c \
+	vprintf-chk-1.c \
+	zerolen-2.c \
+	zero-struct-1.c \
+	zero-struct-2.c
+
+# too many parameters (various reasons)
+GTE_SKIP_TESTS += \
+	20051012-1.c \
+	921208-2.c \
+	980709-1.c \
+	990826-0.c \
+	gofast.c \
+	pr103052.c \
+	pr15262-1.c \
+	pr19449.c \
+	pr34982.c \
+	pr36038.c \
+	pr40668.c \
+	pr47237.c \
+	pr61725.c \
+	pr71550.c \
+	pr79327.c \
+	pr84521.c \
+	pr93494.c \
+	pr97325.c \
+	vfprintf-1.c
+
+# too many parameters try #pragma std_c90?
+GTE_SKIP_TESTS += \
+	990628-1.c
+
+# BUG? flexible array 'dims' in otherwise empty struct
+GTE_SKIP_TESTS += 920728-1.c
+
+# stm8 only?: bit-field size too wide for type (max 16 bits)
+GTE_SKIP_TESTS += \
+	20040629-1.c \
+	20040705-1.c \
+	20040705-2.c \
+	bitfld-4.c \
+	bitfld-6.c \
+	bitfld-7.c \
+	pr103417.c \
+	pr19689.c \
+	pr31448-2.c \
+	pr31448.c \
+	pr32244-1.c \
+	pr34971.c \
+	pr40404.c \
+	pr58570.c \
+	pr78170.c \
+	pr98366.c
+
+# SDCC does not yet support omission of braces in initialization. RFE #562.
+GTE_SKIP_TESTS += \
+	20040703-1.c \
+	991201-1.c \
+	complex-3.c \
+	pr33631.c \
+	pr41919.c
+
+# Uses GCC extension __builtin_classify_type
+GTE_SKIP_TESTS += \
+	20040709-1.c
+
+# sys/types.h unavailable (POSIX, not part of C standard)
+GTE_SKIP_TESTS += \
+	loop-2f.c \
+	loop-2g.c
+
+# VLA
+GTE_SKIP_TESTS += \
+	pr41935.c \
+	pr43220.c \
+	pr43220.c
+
+# __builtin_unreachable
+GTE_SKIP_TESTS += \
+	pr97888-1.c
+
+# __builtin_abs
+GTE_SKIP_TESTS += \
+	pr34130.c
+
+# __builtin_strcmp
+GTE_SKIP_TESTS += \
+	921007-1.c
+
+# __builtin_va_list
+GTE_SKIP_TESTS += \
+	20041214-1.c
+
+# __builtin_add_overflow
+GTE_SKIP_TESTS += \
+	pr90311.c
+
+# __builtin_strlen
+GTE_SKIP_TESTS += \
+	widechar-3.c
+
+# __builtin_memcpy
+GTE_SKIP_TESTS += \
+	20011121-1.c
+
+# __builtin_expect
+GTE_SKIP_TESTS += \
+	20020418-1.c
+
+# # TODO: __builtin_abort
+# GTE_SKIP_TESTS += \
+# 	strlen-5.c \
+# 	pr101335.c \
+# 	alias-access-path-1.c
+
+# TODO? __builtin_printf
+GTE_SKIP_TESTS += \
+	strlen-5.c
+
+# __builtin_prefetch
+GTE_SKIP_TESTS += \
+	builtin-prefetch-1.c \
+	builtin-prefetch-2.c \
+	builtin-prefetch-3.c \
+	builtin-prefetch-4.c \
+	builtin-prefetch-5.c \
+	builtin-prefetch-6.c
+
+# __builtin_strncpy
+GTE_SKIP_TESTS += pr93249.c
+
+# TODO?: __complex__, _Complex
+GTE_SKIP_TESTS += \
+	20020227-1.c \
+	20020411-1.c \
+	20010605-2.c \
+	20041201-1.c \
+	20041124-1.c
+
+# TODO?: printf
+GTE_SKIP_TESTS += 20020406-1.c
+
+# Initializer element is not a constant expression
+GTE_SKIP_TESTS += \
+	20040308-1.c \
+	20040811-1.c
+
+# Bug #3405
+GTE_SKIP_TESTS += \
+	931004-12.c
+
+#BUG? incompatible types
+GTE_SKIP_TESTS += \
+	930608-1.c \
+	pr57321.c
+
+# BUG? increment in function declaration args
+GTE_SKIP_TESTS += \
+	970217-1.c \
+	pr22061-2.c
+
+# BUG?: preprocessor ellipsis
+GTE_SKIP_TESTS += \
+	fprintf-1.c
+
+# various __attribute__ (not implemented?)
+GTE_SKIP_TESTS += \
+	20010518-2.c \
+	20010904-1.c \
+	20010904-2.c \
+	20020108-1.c \
+	20031201-1.c \
+	20040625-1.c \
+	20040709-2.c \
+	20040709-3.c \
+	20050316-1.c \
+	20050316-2.c \
+	20050316-3.c \
+	20050604-1.c \
+	20050607-1.c \
+	20060420-1.c \
+	20071211-1.c \
+	20101011-1.c \
+	20110418-1.c \
+	20111212-1.c \
+	20120919-1.c \
+	20191023-1.c \
+	960117-1.c \
+	alias-3.c \
+	alias-4.c \
+	align-1.c \
+	align-3.c \
+	alloca-1.c \
+	bitfld-10.c \
+	bitfld-8.c \
+	bitfld-9.c \
+	bswap-1.c \
+	bswap-3.c \
+	cbrt.c \
+	frame-address.c \
+	memset-4.c \
+	nest-align-1.c \
+	pr17377.c \
+	pr22141-2.c \
+	pr25125.c \
+	pr28289.c \
+	pr32500.c \
+	pr38051.c \
+	pr42614.c \
+	pr43835.c \
+	pr49886.c \
+	pr56837.c \
+	pr60960.c \
+	pr65427.c \
+	pr70903.c \
+	pr71626-1.c \
+	pr71626-2.c \
+	pr82210.c \
+	pr85169.c \
+	pr85331.c \
+	pr92618.c \
+	pr94412.c \
+	pr97888-2.c \
+	simd-5.c \
+	strcpy-2.c \
+	strct-pack-1.c \
+	strct-pack-2.c \
+	strct-pack-3.c \
+	strct-pack-4.c \
+	struct-ret-2.c
+
+# mpn
+GTE_SKIP_TESTS += \
+	921202-1.c
+
+# __builtin_return_address
+GTE_SKIP_TESTS += \
+	20030323-1.c \
+	20030811-1.c
+
+# __builtin_alloca
+GTE_SKIP_TESTS += \
+	20070824-1.c
+
+# __builtin_constant_p
+GTE_SKIP_TESTS += \
+	20030330-1.c \
+	builtin-constant.c
+
+# nested function
+GTE_SKIP_TESTS += \
+	20010605-1.c
+
+# BUG? sizeof applied to an incomplete type
+GTE_SKIP_TESTS += \
+	pr42570.c
+
+# use of alloca (not defined? yet?)
+GTE_SKIP_TESTS += \
+	20010122-1.c \
+	20020314-1.c \
+	20021113-1.c \
+	20040223-1.c \
+	941202-1.c \
+	pr22061-1.c
+
+# error: token "{" is not valid
+GTE_SKIP_TESTS += \
+	bitintarith.c
+
+# Needs far too much memory for SDCC targets
+GTE_SKIP_TESTS += \
+	920410-1.c \
+	921113-1.c \
+	multi-ix.c
+
+GTE_TESTS = $(filter-out $(GTE_SKIP_TESTS), $(GTE_TESTS_WC))
+
+##############
+# QuickC tests
+
+# some preprocessor testing, needs careful flags.
+QC_SKIP_TESTS += \
+	0064-sysinclude.c
+
+# snprintf is missing
+QC_SKIP_TESTS += \
+	0108-callvararg.c
+
+# syntax error
+QC_SKIP_TESTS += \
+	0047-anonexport.c \
+	0101-bug.c
+
+# Tests for QuickC implementation-defined behaviour
+QC_SKIP_TESTS += \
+	0039-sizeof.c
+
+# Takes far too much time for SDCC targets
+QC_SKIP_TESTS += \
+	0041-queen.c \
+	0042-prime.c
+
+QC_TESTS = $(filter-out $(QC_SKIP_TESTS), $(QC_TESTS_WC))
+
+##############
+# Tiny C tests
+
+# SDCC does not yet support compound literals (RFE #332)
+TCC_SKIP_TESTS += \
+	94_generic.c
+
+# Uses POSIX threads
+TCC_SKIP_TESTS += \
+	106_versym.c \
+	114_bound_signal.c \
+	116_bound_setjmp2.c \
+	124_atomic_counter.c
+
+# SDCC does not yet support long double.
+TCC_SKIP_TESTS += \
+	111_conversion.c
+
+# misc syntax error
+TCC_SKIP_TESTS += \
+	03_struct.c \
+	100_c99array-decls.c \
+	101_cleanup.c \
+	102_alignas.c \
+	103_implicit_memmove.c \
+	108_constructor.c \
+	118_switch.c \
+	119_random_stuff.c \
+	120_alias.c \
+	123_vla_bug.c \
+	18_include.c \
+	33_ternary_op.c \
+	39_typedef.c \
+	40_stdio.c \
+	42_function_pointer.c \
+	46_grep.c \
+	76_dollars_in_identifiers.c \
+	82_attribs_position.c \
+	85_asm-outside-function.c \
+	87_dead_code.c \
+	88_codeopt.c \
+	89_nocode_wanted.c \
+	90_struct-init.c \
+	95_bitfields.c \
+	98_al_ax_extend.c \
+	99_fastcall.c
+
+# strdup declaration collision (old standard?)
+TCC_SKIP_TESTS += \
+	112_backtrace.c
+
+# multiple compilation units
+TCC_SKIP_TESTS += \
+	104_inline.c \
+	104+_inline.c \
+	113_btdll.c \
+	120_alias.c \
+	120+_alias.c
+
+# bultins
+TCC_SKIP_TESTS += \
+	117_builtins.c \
+
+# incompatible types
+TCC_SKIP_TESTS += \
+	17_enum.c
+
+# pp bug?
+TCC_SKIP_TESTS += \
+	77_push_pop_macro.c
+
+# heterogeneous main arguments
+TCC_SKIP_TESTS += \
+	32_led.c \
+	96_nodata_wanted.c
+
+# cannot assign values to arrays
+TCC_SKIP_TESTS += \
+	34_array_assignment.c
+
+# Initializer element is not a constant expression
+TCC_SKIP_TESTS += \
+	78_vla_label.c \
+	79_vla_continue.c \
+	115_bound_setjmp.c \
+	122_vla_reuse.c
+
+# Relies on TinyC implementation-defined support for long long bit-fields and integer width of 32 bits.
+TCC_SKIP_TESTS += \
+	93_integer_promotion.c \
+	95_bitfields.c \
+	95_bitfields_ms.c
+
+# Relies on implicit 0 return by main, but the test framework renames the mainfunction from the test.
+TCC_SKIP_TESTS += \
+	121_struct_return.c
+
+# sin function etc.
+TCC_SKIP_TESTS += \
+	22_floating_point.c \
+	24_math_library.c
+
+# ?ASlink-Warning-Undefined Global '_main_' referenced
+TCC_SKIP_TESTS += \
+	60_errors_and_warnings.c \
+	125_atomic_misc.c
+
+# SDCC does not yet support omission of braces in initialization. RFE #562.
+TCC_SKIP_TESTS += \
+	73_arm64.c \
+	75_array_in_struct_init.c
+
+# int f9 (int ((int)), int);
+# BUG? Syntax error, declaration ignored at ','. Possibly related to bug #3358?
+TCC_SKIP_TESTS += \
+	81_types.c
+
+# abnormal stop (on all ports but host)
+TCC_SKIP_TESTS += \
+	107_stack_safe.c \
+	71_macro_empty_arg.c
+
+# assertion failed (on all ports but host)
+TCC_SKIP_TESTS += \
+	84_hex-float.c
+
+# Relies on implementation extensions common on GNU/Linux
+TCC_SKIP_TESTS += \
+	86_memory-model.c
+
+TCC_TESTS = $(filter-out $(TCC_SKIP_TESTS), $(TCC_TESTS_WC))
+
+TPL_TEST_STEMS = $(TPL_TESTS:%.c.in=%)
+QC_TEST_STEMS = $(QC_TESTS_WC:%.c=%)
+TCC_TEST_STEMS = $(TCC_TESTS_WC:%.c=%)
+
+# maybe this is not necessary, just ship the tst_%.c files?
+# (does it matter?)
+C_TEST_SRCS = $(C_TESTS:%.c=tst_%.c)
+M4_TEST_SRCS = $(M4_TESTS:%.m4=m4_%.c)
+GTE_TEST_SRCS = $(GTE_TESTS:%.c=gte_%.c)
+QC_TEST_SRCS = $(QC_TESTS_WC:%.c=qct_%.c)
+TCC_TEST_SRCS = $(TCC_TESTS_WC:%.c=tcc_%.c)
+
+# Generate .c files from .m4 files
+# bug/feature? run MAKE_DRV as well (requires magic filenames and paths)
+m4_%.c: $(TESTS_DIR)/%.m4
+	@printf .
+	@$(M4) -I $(srcdir)/../m4include rtmacros.m4 $< > $*.m4c
+	@$(PYTHON) $(MAKE_DRV) $*.m4c $@
+	@touch $@
+
+qct_%.c: $(QC_TESTS_DIR)/%.c Makefile
+	@echo '#include <testfwk.h>' > $@
+	@echo '#ifdef __SDCC' >> $@
+	@echo '#pragma std_sdcc99' >> $@
+	@echo '#endif // __SDCC' >> $@
+	@echo 'const int __numCases = 1;' >> $@
+	@echo '__code const char * __getSuiteName(void) { return "qct/$*"; }' >> $@
+	@echo '#define main main_' >> $@
+
+	@#find matching main arguments, none or 2
+	@#(using printf instead of echo -n for better portability)
+	@printf '#define MAINARGS' >> $@
+	@(grep -q main.*argv $< && echo " 0, 0" || \
+	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
+	@echo '#include "$<"' >> $@
+	@printf 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
+	@echo >> $@
+
+tcc_%.c: $(TCC_TESTS_DIR)/%.c Makefile
+	@echo '#include <testfwk.h>' > $@
+	@echo '#ifdef __SDCC' >> $@
+	@echo '#pragma std_sdcc99' >> $@
+	@echo '#endif // __SDCC' >> $@
+	@echo 'const int __numCases = 1;' >> $@
+	@echo '__code const char * __getSuiteName(void) { return "tcc/$*"; }' >> $@
+	@echo '#define main main_' >> $@
+
+	@#find matching main arguments, none or 2
+	@printf '#define MAINARGS' >> $@
+	@(grep -q main.*argv $< && echo " 0, 0" || \
+	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
+
+# non-standard __FUNCTION__
+	@grep -q __FUNCTION__ $< && echo "#define __FUNCTION__ __func__" >> $@ || :
+	@grep -q tcc_backtrace $< && echo "#define tcc_backtrace printf" >> $@ || :
+	@echo '#include "$<"' >> $@
+	@echo '#undef abort' >> $@ # yikes, 77_push_pop_macro.c
+
+	@echo '#ifdef __SDCC' >> $@
+	@echo 'extern void _putchar(char c);' >> $@
+	@echo 'int putchar(int c){_putchar(c);return(c);}' >> $@
+	@echo 'void abort(void) {ASSERT(0);}' >> $@
+	@echo '#endif' >> $@
+
+	@printf 'void __runSuite(void) { __prints("Running main\\n"); ASSERT(!main_(MAINARGS)); }' >> $@
+	@echo >> $@
+
+gte_%.c: $(GTE_TESTS_DIR)/%.c Makefile
+	@printf .
+	@echo '#include <testfwk.h>' > $@
+	@echo '#ifdef __SDCC' >> $@
+	@echo '#pragma std_sdcc99' >> $@
+
+# stuff defined in gcc, but not in sdcc
+	@grep -q __CHAR_BIT__ $< && (echo "#include <limits.h>"; echo "#define __CHAR_BIT__ CHAR_BIT") >> $@ || :
+	@grep -q __INT_MAX__ $< && (echo "#include <limits.h>"; echo "#define __INT_MAX__ INT_MAX") >> $@ || :
+	@grep -q __SIZE_TYPE__ $< && (echo "#include <stddef.h>" ;echo "#define __SIZE_TYPE__ size_t") >> $@ || :
+	@grep -q __LONG_LONG_MAX__ $< && (echo "#include <limits.h>"; echo "#define __LONG_LONG_MAX__ LLONG_MAX") >> $@ || :
+	@grep -q __INTPTR_TYPE__ $< && echo "#define __INTPTR_TYPE__ intptr_t" >> $@ || :
+	@grep -q __builtin_abort $< && echo "void __builtin_abort(void){ASSERT(0);}" >> $@ || :
+	@grep -q __builtin_unreachable $< && echo "void __builtin_unreachable(void){}" >> $@ || :
+	@grep -q __builtin_memset $< && (echo "#include <string.h>"; echo "#define __builtin_memset memset") >> $@ || :
+
+	@echo '#endif // __SDCC' >> $@
+
+# redirect stuff a bit.
+	@grep -q exit $< && echo "#include <setjmp.h>" >> $@ \
+	                 && echo "jmp_buf after_main;" >> $@ \
+	                 && echo "void exit__substitute(int i){ASSERT(!i); longjmp(after_main, 1);}" >> $@ \
+	                 && echo "#define exit exit__substitute" >> $@ || :
+	@printf '#define main main_\n#define assert ASSERT\nvoid abort(void) {ASSERT(0);}\n' >> $@
+
+	@#find matching main arguments, none or 2
+	@printf '#define MAINARGS' >> $@
+	@(grep -q main.*argv $< && echo " 0, 0" || \
+	 (grep -q main.*argc $< && echo " 0" || echo )) >> $@
+
+	@echo '#include "$<"' >> $@
+	@printf 'void __runSuite(void) { __prints("Running main\\n");' >> $@
+	@grep -q exit $< && echo 'if(!setjmp(after_main))' >> $@ || :
+	@printf 'main_(MAINARGS); }\n' >> $@
+	@echo 'const int __numCases = 1;' >> $@
+	@echo '__code const char * __getSuiteName(void) { return "gte/$*"; }' >> $@
+
+# expand tests with python script
+%/stamp: %.c.in $(GENERATE_CASES)
+	rm -rf $*
+	mkdir -p $*
+	@printf .
+	@$(PYTHON) $(GENERATE_CASES) $< $*
+	touch $@
+
+tst_%.c: %.c $(MAKE_DRV)
+	@printf .
+	@$(PYTHON) $(MAKE_DRV) $< $@
+
+all: MakeList
+
+TEST_SRCS = \
+	$(C_TEST_SRCS) \
+	$(GTE_TEST_SRCS) \
+	$(M4_TEST_SRCS) \
+	$(QC_TEST_SRCS) \
+	$(TCC_TEST_SRCS)
+
+MakeList: $(TPL_TEST_STEMS:%=%/stamp) $(TEST_DIRS) $(TEST_SRCS) Makefile
+	@echo
+	@echo populated MakeList...
+	@echo GTE_TEST_STEMS = $(GTE_TESTS:%.c=gte_%) > MakeList
+	@printf "gce: gcc torture execute.. "
+	@echo $(GTE_TESTS) | wc -w
+	@printf "m4: macro tests.. "
+	@echo $(M4_TESTS) | wc -w
+	@printf "qct: QuickC tests.. "
+	@echo $(QC_TEST_STEMS) | wc -w
+	@printf "tcc: tinycc tests.. "
+	@echo $(TCC_TEST_STEMS) | wc -w
+
+	@printf "tpl: template tests.. "
+	@echo $(TPL_TEST_STEMS) | wc -w
+	@printf "tst: plain tests.. "
+	@echo $(C_TEST_SRCS) | wc -w
+
+	@echo QC_TEST_STEMS = $(QC_TESTS:%.c=qct_%) >> MakeList
+	@echo TCC_TEST_STEMS = $(TCC_TESTS:%.c=tcc_%) >> MakeList
+	@echo TPL_TEST_STEMS = $(TPL_TEST_STEMS) >> MakeList
+	@echo C_TEST_STEMS = $(C_TEST_SRCS:%.c=%) >> MakeList
+	@echo M4_TEST_STEMS = $(M4_TEST_SRCS:%.c=%) >> MakeList
+	@echo GTE_TEST_STEMS = $(GTE_TEST_SRCS:%.c=%) >> MakeList
+
+	@echo TEST_STEMS = '$$(M4_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(GTE_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(C_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(TPL_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(QC_TEST_STEMS)' >> MakeList
+	@echo TEST_STEMS += '$$(TCC_TEST_STEMS)' >> MakeList
+
+.PHONY: clean distclean info
+
+clean:
+	rm -f */*.c */*/stamp
+	rm -f *.m4c *.c */stamp
+	rm -rf MakeList
+	rmdir * 2> /dev/null || :
+
+distclean: clean
+	rm -f Makefile
+
+.PRECIOUS: %/stamp
+
+info:
+	@echo TESTS_DIR $(TESTS_DIR)
+	@echo VPATH $(VPATH)
+	@echo TPL_TEST_STEMS $(TPL_TEST_STEMS)
+	@echo C_TEST_SRCS $(C_TEST_SRCS)
+	@echo M4_TESTS $(M4_TESTS)
+	@echo GTE_TESTS $(GTE_TESTS)
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status support/regression/cases/Makefile

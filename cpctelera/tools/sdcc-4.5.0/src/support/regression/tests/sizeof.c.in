@@ -1,0 +1,386 @@
+/** Test results of sizeof operator for unusual cases
+    size: 1, 8, 16
+    test : 0, 1, 2, 3, 4, 5
+    vol : 0, 1
+*/
+
+#include <testfwk.h>
+
+#pragma disable_warning 259
+#pragma disable_warning 88
+
+#ifdef __sun__
+#include <inttypes.h>
+#else
+#include <stdint.h>
+#endif
+#include <stddef.h>
+#include <stdbool.h>
+
+#define VAR_SIZE ({size})
+#define TEST ({test})
+#define TEST_VOLATILE ({vol})
+
+// Test is split in several parts to be smaller and for debugging purposes
+#if TEST == 0
+  #define TEST_BASIC
+  #define TEST_ASSING
+  #define TEST_POINTERS
+#elif TEST == 1
+  #define TEST_LITERAL
+  #if VAR_SIZE != 1
+    #define DUMMY_TEST
+  #endif
+#elif TEST == 2
+  #define TEST_VARIABLE
+#elif TEST == 3
+  #define TEST_LITERAL_BOOL_OP
+  #if VAR_SIZE != 1
+    #define DUMMY_TEST
+  #endif
+#elif TEST == 4
+  #define TEST_VARIABLE_BOOL_OP
+#elif TEST == 5
+  #define TEST_VARIABLE_ZERO_RESULT
+#else
+  #error "Unknown test"
+#endif
+
+#if TEST_VOLATILE == 1
+  #define VAR_QUALIFIER volatile
+#else
+  #define VAR_QUALIFIER
+#endif
+
+// Variables for the test.
+typedef struct structBitFields
+{
+  #if VAR_SIZE == 1
+    unsigned int bitField : 1;
+    unsigned int dummy : 7;
+  #elif VAR_SIZE == 8
+    unsigned int bitField : 7;
+    unsigned int dummy : 1;
+  #else
+    unsigned int bitField : 15;
+    unsigned int dummy : 1;
+  #endif
+}
+structBitFields;
+
+VAR_QUALIFIER structBitFields bf;
+
+VAR_QUALIFIER bool b, bt;
+VAR_QUALIFIER uint8_t c, c2, ct;
+VAR_QUALIFIER int16_t i, i2, it;
+
+VAR_QUALIFIER bool    * VAR_QUALIFIER  pb;
+VAR_QUALIFIER uint8_t * VAR_QUALIFIER  pc;
+VAR_QUALIFIER int16_t * VAR_QUALIFIER  pi;
+
+
+// Main test macro, assigns the sizeof expression to the result and checks if result is correct.
+#if defined (__SDCC_pdk13) || defined (__SDCC_pdk14) || defined (__SDCC_pdk15)
+  // Keep the assignment out of the assert, same result, but less memory required by assert strings (worse for debugging).
+  #define DO_TEST(expression, result, type) result = sizeof (expression); ASSERT(sizeof(type)==result)
+#else
+  #define DO_TEST(expression, result, type) ASSERT((result = sizeof (expression), sizeof (type) == result))
+#endif
+
+// Prepare macros depending on variable size to test.
+#if VAR_SIZE == 1
+  #define VAR_TYPE            bool
+  #define TEST_VAR            b
+  #define TEST_VAR2           bt
+  #define TEST_PTR_VAR        pb
+  #define TEST_VAR_OTHER      i
+
+  #define TEST_OP(x)          DO_TEST(x, c2, int) //Test with promotion, int type expected.
+#elif VAR_SIZE == 8
+  #define VAR_TYPE            uint8_t
+  #define TEST_VAR            c
+  #define TEST_VAR2           ct
+  #define TEST_PTR_VAR        pc
+  #define TEST_VAR_OTHER      i
+
+  #define TEST_OP(x)          DO_TEST(x, c2, int) //Test with promotion, int type expected.
+#elif VAR_SIZE == 16
+  #define VAR_TYPE            int16_t
+  #define TEST_VAR            i
+  #define TEST_VAR2           it
+  #define TEST_PTR_VAR        pi
+  #define TEST_VAR_OTHER      c
+
+  #define TEST_OP(x)          DO_TEST(x, i2, int) //Test with promotion, int type expected.
+#else
+  #error "Unknown test size"
+#endif
+
+#define TEST_OP_NOPROMO(x)  DO_TEST(x, c2, VAR_TYPE)    // Test without promotion, same type expected.
+#define TEST_OP_CHAR_PTR(x) DO_TEST(x, c2, VAR_TYPE *)  // Test for pointers, pointer of type expected.
+#define TEST_OP_INT_PTR(x)  DO_TEST(x, i2, VAR_TYPE *)  // Same using integer for the result.
+
+#define TEST_OP_CHAR_PTR_DIFF(x) DO_TEST(x, c2, ptrdiff_t)  // Test for pointers, ptrdiff_t type expected.
+#define TEST_OP_INT_PTR_DIFF(x)  DO_TEST(x, i2, ptrdiff_t)  // Same using integer for the result.
+
+// Check default address space to check the size of the default pointer size correctly
+#if defined (__SDCC_pdk13) || defined (__SDCC_pdk14) || defined (__SDCC_pdk15) || defined (__SDCC_mcs51) || defined (__SDCC_ds390)
+  #if defined (__SDCC_mcs51)
+    #if defined (__SDCC_MODEL_SMALL) || (__SDCC_MODEL_MEDIUM)
+      #define DEFAULT_ADDR_SPACE __near
+    #elif defined (__SDCC_MODEL_LARGE)  || (__SDCC_MODEL_HUGE)
+      #define DEFAULT_ADDR_SPACE __far
+    #endif
+  #elif defined(__SDCC_ds390)
+    #define DEFAULT_ADDR_SPACE __far
+  #else
+    #define DEFAULT_ADDR_SPACE __data // pdk
+  #endif
+#endif
+
+#ifdef DEFAULT_ADDR_SPACE // Tests for backends that need the default address space qualifier
+  #define TEST_OP_CHAR_PTR_DAS(x) DO_TEST(x, c2, VAR_TYPE DEFAULT_ADDR_SPACE *) // Test for pointers, pointer of type default address space expected.
+  #define TEST_OP_INT_PTR_DAS(x)  DO_TEST(x, i2, VAR_TYPE DEFAULT_ADDR_SPACE *) // Same using integer for the result
+#else
+  #define TEST_OP_CHAR_PTR_DAS TEST_OP_CHAR_PTR
+  #define TEST_OP_INT_PTR_DAS  TEST_OP_INT_PTR
+#endif
+
+
+static void
+testSizeof(void)
+{
+#ifndef DUMMY_TEST
+
+#ifdef TEST_BASIC // Macro self test
+  TEST_OP_NOPROMO (VAR_TYPE);
+  TEST_OP_CHAR_PTR (VAR_TYPE *);
+  TEST_OP_INT_PTR (VAR_TYPE *);
+  #ifdef DEFAULT_ADDR_SPACE
+    TEST_OP_CHAR_PTR_DAS (VAR_TYPE DEFAULT_ADDR_SPACE *);
+    TEST_OP_INT_PTR_DAS (VAR_TYPE DEFAULT_ADDR_SPACE *);
+  #endif
+#endif
+
+#ifdef TEST_ASSING
+  TEST_OP_NOPROMO (TEST_VAR = 1);
+  TEST_OP_NOPROMO (TEST_VAR = 1 + 1);
+
+  TEST_OP_NOPROMO (TEST_VAR += 1);
+  TEST_OP_NOPROMO (TEST_VAR -= 1);
+  TEST_OP_NOPROMO (TEST_VAR &= 1);
+  TEST_OP_NOPROMO (TEST_VAR |= 1);
+  TEST_OP_NOPROMO (TEST_VAR ^= 1);
+  TEST_OP_NOPROMO (TEST_VAR *= 5);
+  TEST_OP_NOPROMO (TEST_VAR /= 5);
+  TEST_OP_NOPROMO (TEST_VAR /= 2);
+
+  TEST_OP_NOPROMO (TEST_VAR <<= 2);
+  TEST_OP_NOPROMO (TEST_VAR >>= 2);
+
+  TEST_OP_NOPROMO ((TEST_VAR_OTHER++, TEST_VAR += 1));
+#endif
+
+#ifdef TEST_POINTERS
+
+  TEST_OP_CHAR_PTR(VAR_TYPE *);
+  TEST_OP_INT_PTR (VAR_TYPE *);
+
+  TEST_OP (+(*TEST_PTR_VAR));
+  TEST_OP (-(*TEST_PTR_VAR));
+  TEST_OP (~(*TEST_PTR_VAR));
+
+  TEST_OP_CHAR_PTR(TEST_PTR_VAR);
+  TEST_OP_INT_PTR (TEST_PTR_VAR);
+
+  TEST_OP_CHAR_PTR(TEST_PTR_VAR + 1);
+  TEST_OP_INT_PTR (TEST_PTR_VAR + 1);
+
+  TEST_OP_CHAR_PTR(TEST_PTR_VAR - 1);
+  TEST_OP_INT_PTR (TEST_PTR_VAR - 1);
+
+  TEST_OP_CHAR_PTR(TEST_PTR_VAR++);
+  TEST_OP_INT_PTR (TEST_PTR_VAR--);
+
+  TEST_OP_CHAR_PTR(TEST_PTR_VAR += 1);
+  TEST_OP_INT_PTR (TEST_PTR_VAR -= 1);
+
+  TEST_OP_CHAR_PTR(TEST_PTR_VAR = (void *)1);
+  TEST_OP_INT_PTR (TEST_PTR_VAR = (void *)1);
+
+  TEST_OP_CHAR_PTR_DAS(&TEST_VAR);
+  TEST_OP_INT_PTR_DAS (&TEST_VAR);
+
+  TEST_OP_CHAR_PTR_DAS(&TEST_VAR + 1);
+  TEST_OP_INT_PTR_DAS (&TEST_VAR + 1);
+  TEST_OP_CHAR_PTR_DAS(&TEST_VAR - 1);
+  TEST_OP_INT_PTR_DAS (&TEST_VAR - 1);
+#endif
+
+#ifdef TEST_LITERAL
+  TEST_OP ( 8);
+  TEST_OP (+8);
+  TEST_OP (-8);
+  TEST_OP (~0);
+
+  TEST_OP (1 ? 0 : 0);
+  TEST_OP (0 ? 0 : 0);
+  TEST_OP (1 ? 0 : 1);
+  TEST_OP (0 ? 0 : 1);
+  TEST_OP (1 ? 1 : 0);
+  TEST_OP (0 ? 1 : 0);
+  TEST_OP (1 ? 1 : 1);
+  TEST_OP (0 ? 1 : 1);
+
+  TEST_OP (8 << 1);
+  TEST_OP (8 >> 1);
+  TEST_OP (8 & 8);
+  TEST_OP (8 | 8);
+  TEST_OP (8 ^ 8);
+  TEST_OP (8 + 8);
+  TEST_OP (8 - 8);
+  TEST_OP (8 * 8);
+  TEST_OP (8 / 8);
+  TEST_OP (8 % 2);
+#endif
+
+#ifdef TEST_LITERAL_BOOL_OP
+  TEST_OP (!8);
+  TEST_OP (!0);
+
+  TEST_OP (8 > 1);
+  TEST_OP (8 < 1);
+  TEST_OP (8 >= 1);
+  TEST_OP (8 <= 1);
+  TEST_OP (8 == 1);
+  TEST_OP (8 != 1);
+
+  TEST_OP (1 > 8);
+  TEST_OP (1 < 8);
+  TEST_OP (1 >= 8);
+  TEST_OP (1 <= 8);
+  TEST_OP (1 == 8);
+  TEST_OP (1 != 8);
+
+
+  TEST_OP (1 && 1);
+  TEST_OP (1 && 0);
+  TEST_OP (0 && 0);
+
+  TEST_OP (1 || 1);
+  TEST_OP (1 || 0);
+  TEST_OP (0 || 0);
+#endif
+
+#ifdef TEST_VARIABLE_ZERO_RESULT
+  #if VAR_SIZE == 1 // Do test only once
+    TEST_OP ((1>0) - (1>0));
+  #endif
+
+  TEST_OP (TEST_VAR - TEST_VAR);
+  TEST_OP (*TEST_PTR_VAR - *TEST_PTR_VAR);
+  TEST_OP (bf.bitField - bf.bitField);
+
+  #ifdef __SDCC
+    // Do these tests only for SDCC, behavior is undefined by standard.
+    // SDCC implementation defines the result as 0. 
+    // Type of that value should follow standard promotion for shift.
+    TEST_OP (TEST_VAR >> 32);
+    TEST_OP (TEST_VAR >> -1);
+  #endif
+
+  TEST_OP_CHAR_PTR_DIFF(TEST_PTR_VAR - TEST_PTR_VAR);
+  TEST_OP_INT_PTR_DIFF (TEST_PTR_VAR - TEST_PTR_VAR);
+#endif
+
+#ifdef TEST_VARIABLE
+  TEST_OP_NOPROMO (TEST_VAR);
+  TEST_OP (+TEST_VAR);
+  TEST_OP (-TEST_VAR);
+  TEST_OP (~TEST_VAR);
+
+  TEST_OP_NOPROMO (TEST_VAR++);
+  TEST_OP_NOPROMO (TEST_VAR--);
+
+  TEST_OP_NOPROMO (++TEST_VAR);
+  TEST_OP_NOPROMO (--TEST_VAR);
+
+  TEST_OP (TEST_VAR ? 0 : 0);
+  TEST_OP (TEST_VAR ? 0 : 1);
+  TEST_OP (TEST_VAR ? 1 : 0);
+  TEST_OP (TEST_VAR ? 1 : 1);
+  TEST_OP (1 ? TEST_VAR : 1);
+  TEST_OP (1 ? TEST_VAR : 1);
+  TEST_OP (1 ? 1 : TEST_VAR);
+  TEST_OP (1 ? 1 : TEST_VAR);
+  TEST_OP (0 ? TEST_VAR : 1);
+  TEST_OP (0 ? TEST_VAR : 1);
+  TEST_OP (0 ? 1 : TEST_VAR);
+  TEST_OP (0 ? 1 : TEST_VAR);
+
+  TEST_OP (TEST_VAR << 1);
+  TEST_OP (TEST_VAR << (2 + 1));
+  TEST_OP (TEST_VAR << (2 << 1));
+
+  TEST_OP (TEST_VAR >> 1);
+  TEST_OP (TEST_VAR >> (2 + 1));
+  TEST_OP (TEST_VAR >> (2 << 1));
+
+  TEST_OP (TEST_VAR & 8);
+  TEST_OP (TEST_VAR & (2 + 1));
+  TEST_OP (TEST_VAR & (2 << 1));
+
+  TEST_OP (TEST_VAR | 8);
+  TEST_OP (TEST_VAR | (2 + 1));
+  TEST_OP (TEST_VAR | (2 << 1));
+
+  TEST_OP (TEST_VAR ^ 8);
+  TEST_OP (TEST_VAR ^ (2 + 1));
+  TEST_OP (TEST_VAR ^ (2 << 1));
+
+  TEST_OP (TEST_VAR + 8);
+  TEST_OP (TEST_VAR + (2 + 1));
+  TEST_OP (TEST_VAR + (2 << 1));
+
+  TEST_OP (TEST_VAR - 8);
+  TEST_OP (TEST_VAR - (2 + 1));
+  TEST_OP (TEST_VAR - (2 << 1));
+
+  TEST_OP (TEST_VAR * 8);
+  TEST_OP (TEST_VAR * (2 + 1));
+  TEST_OP (TEST_VAR * (2 << 1));
+
+  TEST_OP (TEST_VAR - TEST_VAR2);
+  #if VAR_SIZE == 8
+    TEST_OP ((TEST_VAR >> 1) | (TEST_VAR << 7));
+  #endif
+#endif
+
+#ifdef TEST_VARIABLE_BOOL_OP
+  TEST_OP (!TEST_VAR);
+
+  TEST_OP (TEST_VAR > 0);
+  TEST_OP (TEST_VAR < 0);
+  TEST_OP (TEST_VAR >= 1);
+  TEST_OP (TEST_VAR <= 1);
+  TEST_OP (TEST_VAR == 1);
+  TEST_OP (TEST_VAR != 1);
+
+  TEST_OP (1 > c);
+  TEST_OP (1 < c);
+  TEST_OP (1 >= c);
+  TEST_OP (1 <= c);
+  TEST_OP (1 == c);
+  TEST_OP (1 != c);
+
+  TEST_OP (c && c);
+  TEST_OP (c && 0);
+  TEST_OP (0 && c);
+  TEST_OP (c || c);
+  TEST_OP (c || 0);
+  TEST_OP (0 || c);
+#endif
+
+#endif //DUMMY_TEST
+}
+

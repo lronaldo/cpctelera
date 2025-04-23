@@ -1,0 +1,493 @@
+/** Operations with 1-bit sized bitfields
+    preBits: 0, 8, 16
+    pattern: 0, 1
+    varType: 0, 1, 2, 3, 4, 5, 6
+*/
+
+#pragma disable_warning 88
+
+// Disable for ds390: bug #3211
+// Absolute addressing has some issues for pdk. And if those are fixed, there might be  alack of memory, still.
+// mcs51 fails tests. Don't know if that is a bug or just a bad choice for ABS_ADDR1 and ABS_ADDR2 below.
+#if defined(__SDCC_ds390) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15) || defined(__SDCC_mcs51)
+#define DUMMY_CASE
+#endif
+
+// These tests assume the bitfields are allocated in LSB to MSB order
+// but some hosts allocate them in MSB to LSB order. Disable the
+// tests on these hosts
+#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__) || defined(__sparc) || defined(__sparc64__))
+#define DUMMY_CASE
+#endif
+
+#include <testfwk.h>
+#ifdef __sun__
+#include <inttypes.h>
+#else
+#include <stdint.h>
+#endif
+
+#define PRE_BITS ({preBits})
+#define PATTERN ({pattern})
+#define VAR_TYPE ({varType})
+
+typedef struct
+{
+    #if PRE_BITS > 0
+        unsigned int preBits   : PRE_BITS;
+    #endif
+    unsigned int bit0       : 1;
+    unsigned int bit1       : 1;
+    unsigned int bit2       : 1;
+    unsigned int bit3       : 1;
+    unsigned int bit4       : 1;
+    unsigned int bit5       : 1;
+    unsigned int bit6       : 1;
+    unsigned int bit7       : 1;
+    
+    unsigned int postBits   : 8;
+}struct_8bits;
+
+typedef struct
+{
+    #if PRE_BITS > 0
+        unsigned int preBits   : PRE_BITS;
+    #endif
+    unsigned int bits       : 8;
+    unsigned int postBits   : 8;
+}struct_8bits_joined;
+
+
+#define bitToTest__(b) bit ## b
+#define bitToTest_(b) bitToTest__(b)
+#define bitToTest bitToTest_(BIT_TO_TEST)
+
+#if defined(__SDCC_pic16)
+    #define ABS_ADDR1 0x0200
+    #define ABS_ADDR2 0x0204
+#elif defined(__SDCC_pic14)
+    #define ABS_ADDR1 0x0100
+    #define ABS_ADDR2 0x0104
+#elif defined(__SDCC_stm8)
+    #define ABS_ADDR1 0x1000
+    #define ABS_ADDR2 0x1004
+#elif defined(__SDCC_f8)
+    #define ABS_ADDR1 0x3000
+    #define ABS_ADDR2 0x3004
+#else
+    #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Make test suitable for pdk
+        #if !defined(PORT_HOST) // Never do absolute address test with host
+            #define ABS_ADDR1 0xCA00
+            #define ABS_ADDR2 0xCA04
+        #endif
+    #endif
+#endif
+
+#if VAR_TYPE == 0
+    volatile struct_8bits volatileBits;
+#elif VAR_TYPE == 1
+    #ifdef ABS_ADDR1
+        #define volatileBits (*(volatile struct_8bits*)ABS_ADDR1)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 2
+    #ifdef ABS_ADDR2
+        #define volatileBits (*(volatile struct_8bits*)ABS_ADDR2)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 3
+    #define VOLATILE_BITS_DEF volatile struct_8bits volatileBits
+#elif VAR_TYPE == 4
+    #define VOLATILE_BITS_DEF static volatile struct_8bits volatileBits
+#elif VAR_TYPE == 5
+    #ifdef ABS_ADDR1
+        #define VOLATILE_BITS_DEF static volatile struct_8bits __at(ABS_ADDR1) volatileBits
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 6
+    #ifdef ABS_ADDR2
+        #define VOLATILE_BITS_DEF static volatile struct_8bits __at(ABS_ADDR2) volatileBits
+        #define USE_ONLY_1_BYTE
+    #else
+        #define DUMMY_CASE
+    #endif
+#else
+    #error "Unknown VAR_TYPE case"
+#endif
+
+#ifndef VOLATILE_BITS_DEF
+    #define VOLATILE_BITS_DEF
+#endif
+
+#if PATTERN == 0
+    #define PRE_BIT_VALUE 0
+    #define POST_BIT_VALUE 0
+#else
+    #define PRE_BIT_VALUE ((1UL << PRE_BITS) - 1)
+    #define POST_BIT_VALUE 0xFF
+#endif
+
+#ifndef DUMMY_CASE
+
+void dummy_f(void)
+{
+    return;
+}
+
+// Return type of this function is uint16_t to trigger some peephole rules for STM8
+uint16_t 
+bits_check_value(const struct_8bits * const var, const uint8_t value)
+{
+    #if PRE_BITS > 0
+        if(var->preBits != PRE_BIT_VALUE) return 0;
+    #endif
+    if(var->postBits != POST_BIT_VALUE) return 0;
+    
+    if(((struct_8bits_joined*)var)->bits != value) return 0;
+    
+    return 1;
+}
+void 
+bits_set_value(struct_8bits * const var, const uint8_t value)
+{
+    #if PRE_BITS > 0
+        var->preBits = PRE_BIT_VALUE;
+    #endif
+    var->postBits = POST_BIT_VALUE;
+    
+    ((struct_8bits_joined*)var)->bits = value;
+}
+
+
+void 
+bit_test_0(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 0
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+
+void 
+bit_test_1(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 1
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+
+void 
+bit_test_2(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 2
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+
+void 
+bit_test_3(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 3
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+
+void 
+bit_test_4(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 4
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+
+void 
+bit_test_5(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 5
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+
+void 
+bit_test_6(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 6
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+
+void 
+bit_test_7(void)
+{
+    VOLATILE_BITS_DEF;
+    
+    #undef BIT_TO_TEST
+    #define BIT_TO_TEST 7
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = 0;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest = ! volatileBits.bitToTest;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+    
+    bits_set_value(&volatileBits, 0x00);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits,   1 << BIT_TO_TEST));
+    
+    bits_set_value(&volatileBits, 0xFF);
+    volatileBits.bitToTest ^= 1;
+    dummy_f();
+    ASSERT(bits_check_value(&volatileBits, ~(1 << BIT_TO_TEST)));
+}
+#endif
+
+static void
+testBitfields(void)
+{
+    #ifndef DUMMY_CASE
+        bit_test_0();
+        bit_test_1();
+        bit_test_2();
+        bit_test_3();
+        
+        bit_test_4();
+        bit_test_5();
+        bit_test_6();
+        bit_test_7();
+    #endif
+}
+

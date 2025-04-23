@@ -1,0 +1,60 @@
+/** rotation of bit-precise integers
+
+    width: 2, 4, 6, 7, 8, 9, 15, 16, 17, 24, 32, 33, 40, 48, 63, 64, 65
+    dist: 1, 2, 3, 4, 5, 6, 7, 8, 9, 16, 20, 32
+    storage: auto, static
+*/
+
+#include <testfwk.h>
+
+#include <limits.h>
+
+// clang 11 supports bit-precise types, but deviates a bit from C23.
+#if __clang_major__ == 11
+#define __SDCC_BITINT_MAXWIDTH 128
+#define _BitInt _ExtInt
+#endif
+
+#if __SDCC_BITINT_MAXWIDTH >= {width} && ({width} <= 8 || !defined(__SDCC_pdk14)) && ({width} <= 16 || !defined(__SDCC_pdk15)) // Lack of memory for pdk. TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
+typedef unsigned _BitInt({width}) bitinttype;
+#define WIDTH {width}
+#else
+typedef unsigned int bitinttype;
+#define WIDTH (sizeof(unsigned int) * CHAR_BIT)
+#endif
+
+#define DIST ({dist} % WIDTH)
+#define ROL(a) ((a << DIST) | (a >> ((WIDTH - DIST) % WIDTH))) // Rotate left
+#define ROR(a) ((a >> DIST) | (a << ((WIDTH - DIST) % WIDTH))) // Rotate right
+#define NROL(a) ((a << 8) | (a >> ((WIDTH - DIST) % WIDTH))) // Nearly a rotation, was sometimes assumed to be a real one by optimizations though (e.g. for WIDTH == 15, DIST == 8).
+#define NROL2(a) ((a >> 8) | (a << ((WIDTH - DIST) % WIDTH))) // Nearly a rotation, was sometimes assumed to be a real one by optimizations though (e.g. for WIDTH == 15, DIST == 8).
+
+#define TESTVECT1 ((bitinttype)0xa5)
+#define TESTVECT2 ((bitinttype)0xaa55)
+
+void
+testRot (void)
+{
+	volatile {storage} bitinttype t1 = TESTVECT1;
+	volatile {storage} bitinttype t2 = TESTVECT2;
+
+	ASSERT (ROL (t1) == ROL (TESTVECT1));
+	ASSERT (ROL (t2) == ROL (TESTVECT2));
+	ASSERT (ROR (t1) == ROR (TESTVECT1));
+	ASSERT (ROR (t2) == ROR (TESTVECT2));
+	ASSERT (NROL (t1) == NROL (TESTVECT1));
+	ASSERT (NROL (t2) == NROL (TESTVECT2));
+	ASSERT (NROL2 (t1) == NROL2 (TESTVECT1));
+	ASSERT (NROL2 (t2) == NROL2 (TESTVECT2));
+
+	t1 = ROL(t1);
+	t2 = ROL(t2);
+	ASSERT (t1 == ROL (TESTVECT1));
+	ASSERT (t2 == ROL (TESTVECT2));
+
+	t1 = ROR(t1);
+	t2 = ROR(t2);
+	ASSERT (t1 == TESTVECT1);
+	ASSERT (t2 == TESTVECT2);
+}
+

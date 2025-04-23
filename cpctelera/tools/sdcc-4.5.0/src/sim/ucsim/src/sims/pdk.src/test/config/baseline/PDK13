@@ -1,0 +1,28 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: pdk13
+Controller has 3 hardware element(s).
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+A= 0x00(  0)
+Flag= 0x00(  0)  
+SP= 0x00(  0)
+0x000  ? 5a41 UNKNOWN/INVALID                                        
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x0003ff     1024 rom_chip (16,%04x,0x%03x)
+  0x000000-0x00003f       64 ram_chip (8,%02x,0x%02x)
+  0x000000-0x00003f       64 io_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x0003ff     1024 rom (16,%04x,0x%03x)
+  0x000000-0x00003f       64 ram (8,%02x,0x%02x)
+  0x000000-0x000040       65 regs8 (8,%02x,0x%02x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x000 0x3ff -> rom_chip 0x000 activated
+  ram 0x00 0x3f -> ram_chip 0x00 activated
+  regs8 0x00 0x3f -> io_chip 0x00 activated

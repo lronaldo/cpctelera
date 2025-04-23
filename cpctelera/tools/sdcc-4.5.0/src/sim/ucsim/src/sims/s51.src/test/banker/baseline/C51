@@ -1,0 +1,237 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+# There are four banks of registers available. Which bank is
+# currently in use is selected via two bits in sfr[0xd0]
+info mem
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0x7f -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x0000 0xffff -> xram_chip 0x0000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=0
+    banks:
+      *  0. iram_chip 0x00
+         1. iram_chip 0x08
+         2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> sfr_chip 0x02 activated
+
+# The bank switcher should have an operator on sfr[0xd0]
+memory cell sfr[0xd0]
+sfr[0xd0] sfr_0000d0
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[10]
+Operators:
+  [0] bank_switcher
+
+# Define the control bits
+var bank sfr[0xd0][4:3]
+
+# Now the current bank is 0 and we have a set of registers
+#dump regs 0 7
+
+# Note that the R<n> vars are defined on the "regs" space
+info var R3
+R3 regs[0x3][7:0] = 0b11001001,201U,201
+
+# Let's label the banks in the underlying chip
+var bank0 iram_chip[0x00]
+iram_chip is not address space
+var bank1 iram_chip[0x08]
+iram_chip is not address space
+var bank2 iram_chip[0x10]
+iram_chip is not address space
+var bank3 iram_chip[0x18]
+iram_chip is not address space
+
+# and prime the banks with recognisable data
+set mem iram_chip 0x00 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
+0x00                      00 01 02 03 04 05 06 07 ........
+set mem iram_chip 0x08 0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17
+0x08                      10 11 12 13 14 15 16 17 ........
+set mem iram_chip 0x10 0x20 0x21 0x22 0x23 0x24 0x25 0x26 0x27
+0x10                      20 21 22 23 24 25 26 27  !"#$%&'
+set mem iram_chip 0x18 0x30 0x31 0x32 0x33 0x34 0x35 0x36 0x37
+0x18                      30 31 32 33 34 35 36 37 01234567
+
+# Now when we dump the regs we can see the label on the
+# current bank of the underlying chip as well
+#dump regs 0 7
+
+# Change to bank 1
+set mem bank 1
+0xd0[4:3] bank:                     0b---01--- 0x01 '.'   1
+
+# and check the state
+info mem
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0x7f -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x0000 0xffff -> xram_chip 0x0000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=1
+    banks:
+         0. iram_chip 0x00
+      *  1. iram_chip 0x08
+         2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> sfr_chip 0x02 activated
+
+# If we dump regs again we still see the R<n> labels because
+# they are on the address space however "bank0" has changed
+# to "bank1" because they are on the underlying chip.
+#dump regs 0 7
+
+# Repeat for banks 2 and 3
+set mem bank 2
+0xd0[4:3] bank:                     0b---10--- 0x02 '.'   2
+info mem
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0x7f -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x0000 0xffff -> xram_chip 0x0000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=2
+    banks:
+         0. iram_chip 0x00
+         1. iram_chip 0x08
+      *  2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> sfr_chip 0x02 activated
+#dump regs 0 7
+set mem bank 3
+0xd0[4:3] bank:                     0b---11--- 0x03 '.'   3
+info mem
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0x7f -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x0000 0xffff -> xram_chip 0x0000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=3
+    banks:
+         0. iram_chip 0x00
+         1. iram_chip 0x08
+         2. iram_chip 0x10
+      *  3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> sfr_chip 0x02 activated
+#dump regs 0 7
+
+# And finally check that the registers follow the bank switching correctly
+set mem bank 0
+0xd0[4:3] bank:                     0b---00--- 0x00 '.'   0
+info reg
+     R0 R1 R2 R3 R4 R5 R6 R7
+     00 01 02 03 04 05 06 07
+@R0 00 .  ACC= 0x00   0 .  B= 0x00
+@R1 01 .  PSW= 0x00 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 07 06 05 04 03 02 01 00
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
+0x0000  ? ff       MOV    R7,A                                       
+set mem bank 1
+0xd0[4:3] bank:                     0b---01--- 0x01 '.'   1
+info reg
+     R0 R1 R2 R3 R4 R5 R6 R7
+     10 11 12 13 14 15 16 17
+@R0 20    ACC= 0x00   0 .  B= 0x00
+@R1 21 !  PSW= 0x08 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 07 06 05 04 03 02 01 00
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
+0x0000  ? ff       MOV    R7,A                                       
+set mem bank 2
+0xd0[4:3] bank:                     0b---10--- 0x02 '.'   2
+info reg
+     R0 R1 R2 R3 R4 R5 R6 R7
+     20 21 22 23 24 25 26 27
+@R0 43 C  ACC= 0x00   0 .  B= 0x00
+@R1 84 .  PSW= 0x10 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 07 06 05 04 03 02 01 00
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
+0x0000  ? ff       MOV    R7,A                                       
+set mem bank 3
+0xd0[4:3] bank:                     0b---11--- 0x03 '.'   3
+info reg
+     R0 R1 R2 R3 R4 R5 R6 R7
+     30 31 32 33 34 35 36 37
+@R0 41 A  ACC= 0x00   0 .  B= 0x00
+@R1 e7 .  PSW= 0x18 CY=0 AC=0 OV=0 P=0
+SP 0x07 -> 07 06 05 04 03 02 01 00
+   DPTR= 0x00000000 @DPTR= 0x83 131 .
+0x0000  ? ff       MOV    R7,A                                       

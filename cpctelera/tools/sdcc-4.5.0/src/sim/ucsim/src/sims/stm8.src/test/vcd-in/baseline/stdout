@@ -1,0 +1,501 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+# These are the test locations named in the input vcd.
+var loc1 rom[0x0000]
+var loc2 rom[0x0001]
+
+# Run the initialization code and stop when we reach the
+# first test loop.
+break 0x800c
+Breakpoint 1 at 0x00800c (cond="")
+0x0800c F? cc 80 0c       jp     0x800c                              
+run
+Simulation started, PC=0x008000
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+
+# Start the vcd (we set the input file via the Makefile) and
+# have it stop execution each time an event occurs.
+set hw vcd start
+set hw vcd break
+Break on events enabled
+
+# The VCD data starts at time 0 which will, by default, align
+# with the current simulator time. We can adjust that by setting
+# starttime. This can be done before or after starting the vcd,
+# even part way through. Here we push the vcd 750 ns into the
+# future.
+set hw vcd starttime 750 ns
+
+# Make sure what it is going to do is what we asked.
+conf
+Type of microcontroller: STM8 S,AF 208
+Controller has 24 hardware element(s).
+   on cpu[0]
+   on simif[0]
+   on vcd[0]
+   on dreg[0]
+   on dport[0]
+   on clk[0]
+   on uart[1]
+   on uart[3]
+   on itc[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pe[0]
+   on pf[0]
+   on pg[0]
+   on ph[0]
+   on pi[0]
+   on rst[0]
+   on tim1[1]
+   on tim2[2]
+   on tim3[3]
+   on tim4[4]
+   on flash[0]
+info hw vcd
+vcd[0] value change dump
+  Modul:      ucsim_vcd_0
+  Started:    YES
+  Paused:     no
+  Mode:       input
+  Break:      enabled
+  Time scale: 1 ns
+  Start time: 0.000001375000000 s
+  Next event: 0.000001375000000 s
+  Pause time: 
+  Simul time: 0.000000625000000 s
+  Variables:
+    Address           Symbol
+    rom[0x00000].0    loc1.0
+    rom[0x00000].1    loc1.1
+    rom[0x00000].2    loc1.2
+    rom[0x00000].3    loc1.3
+    rom[0x00000].4    loc1.4
+    rom[0x00000].5    loc1.5
+    rom[0x00000].6    loc1.6
+    rom[0x00000].7    loc1.7
+    rom[0x00001]      loc2
+Configuration memory of vcd
+0x00 00000001 . Turn ticking of this peripheral on/off (bool, RW)
+
+# Continue until an event stops us then dump the locations
+# that the vcd is driving according to the input file.
+# Repeat a sufficient number of times.
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                00    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                00    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                00    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                00    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                00    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                00    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                01    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                01    .
+0x00001 loc2:                00    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+timer get
+timer #1("time") ON 0.000001750000000 sec (14 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump rom 0 1
+0x00000 loc1:                01    .
+0x00001 loc2:                01    .
+
+set hw vcd pause
+Paused
+conf
+Type of microcontroller: STM8 S,AF 208
+Controller has 24 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on dport[0]
+   on clk[0]
+   on uart[1]
+   on uart[3]
+   on itc[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pe[0]
+   on pf[0]
+   on pg[0]
+   on ph[0]
+   on pi[0]
+   on rst[0]
+   on tim1[1]
+   on tim2[2]
+   on tim3[3]
+   on tim4[4]
+   on flash[0]
+step
+
+Stop at 0x00800c: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+step
+
+Stop at 0x00800c: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+step
+
+Stop at 0x00800c: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+step
+
+Stop at 0x00800c: (109) stepped 1 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+set hw vcd pause
+Unpaused
+conf
+Type of microcontroller: STM8 S,AF 208
+Controller has 24 hardware element(s).
+   on cpu[0]
+   on simif[0]
+   on vcd[0]
+   on dreg[0]
+   on dport[0]
+   on clk[0]
+   on uart[1]
+   on uart[3]
+   on itc[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pe[0]
+   on pf[0]
+   on pg[0]
+   on ph[0]
+   on pi[0]
+   on rst[0]
+   on tim1[1]
+   on tim2[2]
+   on tim3[3]
+   on tim4[4]
+   on flash[0]
+timer get
+timer #1("time") ON 0.000002250000000 sec (18 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                03    .
+0x00001 loc2:                01    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+timer get
+timer #1("time") ON 0.000002500000000 sec (20 clks)
+timer #2("isr") ON,ISR 0.000000000000000 sec (0 clks)
+timer #3("idle") ON,IDLE 0.000000000000000 sec (0 clks)
+timer #4("halt") ON,HALT 0.000000000000000 sec (0 clks)
+dump rom 0 1
+0x00000 loc1:                02    .
+0x00001 loc2:                01    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                02    .
+0x00001 loc2:                02    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                06    .
+0x00001 loc2:                02    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                04    .
+0x00001 loc2:                02    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                04    .
+0x00001 loc2:                03    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                0c    .
+0x00001 loc2:                03    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                08    .
+0x00001 loc2:                03    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                08    .
+0x00001 loc2:                04    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                18    .
+0x00001 loc2:                04    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                10    .
+0x00001 loc2:                04    .
+
+cont
+Simulation started, PC=0x00800c
+
+Stop at 0x00800c: (104) Breakpoint
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0800c F? cc 80 0c       jp     0x800c                              
+F 0x00800c
+dump rom 0 1
+0x00000 loc1:                10    .
+0x00001 loc2:                05    .
+
+# Stop now
+set hw vcd stop
+conf
+Type of microcontroller: STM8 S,AF 208
+Controller has 24 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on dport[0]
+   on clk[0]
+   on uart[1]
+   on uart[3]
+   on itc[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pe[0]
+   on pf[0]
+   on pg[0]
+   on ph[0]
+   on pi[0]
+   on rst[0]
+   on tim1[1]
+   on tim2[2]
+   on tim3[3]
+   on tim4[4]
+   on flash[0]

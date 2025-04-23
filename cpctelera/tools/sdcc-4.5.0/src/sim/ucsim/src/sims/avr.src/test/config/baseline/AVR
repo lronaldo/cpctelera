@@ -1,0 +1,28 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: unspecified AVR
+Controller has 4 hardware element(s).
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on port[0]
+0x0000 04 17 b7 70 1f 72 63 12 15 a3 e0 33 71 c1 1c a7 ...p.rc....3q...
+0x0010 75 32 21 90 a5 fe dd 77 d5 15 d7 f1 0c 59 ad 86 u2!....w.....Y..
+ITHSVNZC  SREG= 0xbf 191 .
+10111111  SP  = 0x001df3
+X= 0xf1d7 [X]= 0x00   0 .  Y= 0x590c [Y]= 0x00   0 .  Z= 0x86ad [Z]= 0x00   0 .
+0x0000  ? 5a41      subi   r0,161                                    
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (16,%04x,0x%04x)
+  0x000000-0x00007f      128 iram_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (16,%04x,0x%04x)
+  0x000000-0x00ffff    65536 iram (8,%02x,0x%04x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x0000 0x007f -> iram_chip 0x00 activated

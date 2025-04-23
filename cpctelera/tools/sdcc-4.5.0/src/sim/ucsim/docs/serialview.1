@@ -1,0 +1,79 @@
+.TH SERIALVIEW 1
+
+.SH NAME
+serialview \- Terminal emulator for uCsim
+
+
+.SH SYNOPSIS
+.B serialview
+\-i <filename> \-o <filename> \-L n \-a <pattern> \-A <answer> \-IOh
+
+
+.SH DESCRIPTION
+serialview is a simple terminal emulator which can be used with uCsim.
+
+
+.SH OPTIONS
+
+.TP
+.B \-i filename
+.I filename
+is the pipe to the controllers's serial input. Characters typed into
+the input panel will be written to this file.
+
+.TP
+.B \-o filename
+.I filename
+is the pipe to the controllers's serial output. Content of this file
+is prosented on the output panel.
+
+.TP
+.B \-I
+Use hexadecimal filter on input. Only hexadecimal characters are
+accepted in input panel. Two characters are combined into a
+hexadecimal code and value is written to the input pipe.
+
+.TP
+.B \-O
+Use hexadecimal filter on output. Content of output pipe is presented
+as a hexadecimal dump. \-L option can be used to set how many bytes
+are printed in one line.
+
+.TP
+.B \-a pattern
+.I pattern
+is a string which is recognized in output stream and automatically
+answered by sending an answer string (see \-A option). String can be
+formatted as a C string, non-asci characters can be escaped in C
+style.
+
+.TP
+.B \-A answer
+.I answer
+is a string which is sent when a pattern (see \-a option) is detected
+in simulator's output. This answer string is written to the input pipe
+but not shown in the input panel.
+
+.TP
+.B \-L n
+Set line length of hexadecimal dump in output panel (default=8).
+
+.TP
+.B \-h
+Show summary of options.
+
+.PP
+When no options are provided the input and output pipes are created in
+.B /tmp
+and named respectively
+.B in
+and
+.B out
+
+
+.SH "SEE ALSO"
+sdcc(1), ucsim(1).
+
+
+.SH AUTHOR
+Timothy Hurman

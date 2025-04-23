@@ -1,0 +1,419 @@
+# Exclude lists for testing
+# Tests listed in ${EXCLUDE_${PORT}} will not be tested
+#
+# PORT is the directory name
+#
+# Tests to be excluded completely (i.e. for all PORT can be excluded in cases/Makefile.in more easily.
+
+# does not compile (expected)
+EXCLUDE_host += \
+	tst_genericnonintrinsicnaddr
+
+###############################################
+
+# Relies on feeatures of older C standards not supported by curent host compilers.
+EXCLUDE_host += \
+	qct_0026-implicitret \
+	gte_920908-2 \
+	gte_921204-1 \
+	gte_930621-1 \
+	gte_930630-1 \
+	gte_931031-1 \
+	gte_compndlit-1 \
+	tst_gcc-torture-execute-pr34176
+
+#segfault (BUG?)
+EXCLUDE_host += \
+	gte_20041218-1 \
+	gte_comp-goto-1 \
+	gte_pr22493-1 \
+	gte_20041218 \
+	gte_pr23047 \
+	gte_20040409-1w \
+	gte_20040409-2w \
+	gte_20040409-3w
+
+# Bug #3598
+EXCLUDE_s08-stack-auto += \
+	tst_gcc-torture-execute-pr47148
+
+# Bug #3599
+EXCLUDE_s08-stack-auto += \
+	tst_gcc-torture-execute-ssad-run \
+	tst_gcc-torture-execute-usad-run
+
+# Bug #3600
+EXCLUDE_s08-stack-auto += \
+	tst_gcc-torture-execute-930628-1
+
+# possibly unsupported.
+EXCLUDE_host += \
+	tst_p99-conformance \
+	tcc_83_utf8_in_identifiers
+
+# Fails when compiled with clang on FreeBSD 13.1 on aarch64
+EXCLUDE_host += \
+	gte_20031003-1
+
+# Fails on GCC 7, which we still use on macOS PPC host.
+EXCLUDE_host += \
+	gte_pr94809
+
+# does not compile on ds390
+EXCLUDE_ds390 += \
+	gte_memcpy-1
+
+# FAIL
+EXCLUDE_ds390 += \
+	gte_20041218-1
+
+# ?ASlink-Error-Could not get consecutive bytes in internal RAM for area DSEG.
+EXCLUDE_mcs51-small += \
+	gte_loop-ivopts-1 \
+	gte_pr93434
+
+# Möglich, dass irgendwo die Größe als 16-bit-Wert behandelt wird, und dann (1 <<
+# 17) 0 ergibt, oder so. Da kann man einen Bugreport öffnen, um eine bessere
+# Fehlermeldung zu erhalten
+EXCLUDE_ARCH_mcs51 += \
+	gte_memcpy-1
+EXCLUDE_s08 += \
+	gte_memcpy-1
+# fail
+EXCLUDE_hc08 += \
+	gte_memcpy-1
+# compile issue - test is malformed unless STACK_SIZE is defined
+EXCLUDE_ARCH_mos6502 += \
+	gte_memcpy-1
+
+# Failure
+EXCLUDE_ucr3ka += \
+	gte_20041218-1
+
+# Failure
+EXCLUDE_stm8 += \
+   gte_20041218-1
+
+# For line-by-line comparability with stm8
+EXCLUDE_f8 += \
+   gte_20041218-1
+
+# Fail
+EXCLUDE_stm8-large += \
+	gte_20041218-1
+
+# Failure
+EXCLUDE_ucr2k += \
+	gte_20041218-1
+
+# Failure
+EXCLUDE_ucr2ka += \
+	gte_20041218-1
+
+# Fail
+EXCLUDE_ucgbz80 += \
+	gte_20041218-1 \
+	gte_pr97404
+
+# Fail
+EXCLUDE_ucz180 += \
+	gte_20041218-1
+
+# abnormal stop
+EXCLUDE_ucz80 += \
+	gte_20041218-1
+EXCLUDE_ucz80-resiy += \
+	gte_20041218-1
+EXCLUDE_ucz80-unsafe-read += \
+	gte_20041218-1
+EXCLUDE_ucz180-resiy += \
+	gte_20041218-1
+
+# Fail
+EXCLUDE_ucz180-resiy += \
+	gte_pr97404
+
+# Failure
+EXCLUDE_hc08 += \
+	gte_20041218-1
+
+# Failure
+EXCLUDE_ucz80n += \
+	gte_20041218-1
+
+# Failure
+EXCLUDE_ARCH_z80 += \
+	gte_pr97404
+
+# Fail
+EXCLUDE_ucz80-undoc += \
+	gte_20041218-1
+
+# Stack overflow
+EXCLUDE_pdk14 += \
+	gte_20091229-1
+
+# misc Failure
+EXCLUDE_pdk15-stack-auto += \
+	gte_pr33669
+
+# misc Failure
+EXCLUDE_ucrxk3a += \
+	gte_20041218-1
+
+# abnormal stop
+EXCLUDE_ez80-z80 += \
+	gte_20041218-1
+
+# Failure
+EXCLUDE_ARCH_mcs51 += \
+	gte_20041218-1 \
+	tst_bug3381400 \
+	tst_gcc-torture-execute-961017-1
+
+# Failure
+EXCLUDE_tlcs90 += \
+	gte_20041218-1
+
+# Bug?
+EXCLUDE_pdk15-stack-auto += \
+	gte_pr100453
+
+# SDCC Bug #3395
+EXCLUDE_mcs51-small-stack-auto += \
+	gte_pr30185
+EXCLUDE_mcs51-large-stack-auto += \
+	gte_pr30185
+
+# SDCC Bug #3540
+	EXCLUDE_mcs51-large-stack-auto += \
+	gte_pr58365
+
+# SDCC Bug #3540
+	EXCLUDE_mcs51-small-stack-auto += \
+	gte_pr58365
+
+# Target does not yet support struct/union return
+EXCLUDE_hc08 += \
+	gte_991019-1 \
+	gte_pr30185 \
+	gte_pr58365
+EXCLUDE_s08 += \
+	gte_991019-1 \
+	gte_pr30185 \
+	gte_pr58365
+EXCLUDE_s08-stack-auto += \
+	gte_991019-1 \
+	gte_pr30185 \
+	gte_pr58365
+EXCLUDE_ds390 += \
+	gte_991019-1 \
+	gte_pr30185 \
+	gte_pr58365
+EXCLUDE_ARCH_mos6502 += \
+	gte_pr30185 \
+	gte_pr58365
+
+# TODO: Check these
+EXCLUDE_ARCH_pdk += \
+	gte_980526-2 \
+	gte_991019-1 \
+	gte_call-trap-1
+
+# Target doesn't have enough memory
+EXCLUDE_ARCH_pdk += \
+	gte_20041218-1 \
+	gte_990127-2 \
+	gte_loop-ivopts-1 \
+	gte_loop-ivopts-2 \
+	gte_memcpy-1 \
+	gte_pr29798 \
+	gte_pr40386 \
+	gte_pr57131 \
+	gte_pr58984 \
+	gte_pr93434 \
+	gte_shiftdi-2 \
+	tcc_110_average
+EXCLUDE_pdk15-stack-auto += \
+	gte_991019-1 \
+	gte_pr30185 \
+	gte_pr40386
+EXCLUDE_pdk14 += \
+	gte_align-2 \
+	gte_pr102134 \
+	gte_pr27364 \
+	gte_pr30185 \
+	gte_pr33669 \
+	gte_pr50865 \
+	gte_20001124-1 \
+	gte_991019-1
+EXCLUDE_pdk15 += \
+	gte_20001124-1
+EXCLUDE_mcs51-small += \
+	gte_loop-ivopts-2 \
+	gte_pr58984 \
+	gte_shiftdi-2
+EXCLUDE_mcs51-small-stack-auto += \
+	gte_loop-ivopts-2 \
+	gte_shiftdi-2
+EXCLUDE_mcs51-medium += \
+	gte_loop-ivopts-2 \
+	gte_pr58984 \
+	gte_shiftdi-2
+EXCLUDE_mcs51-large-stack-auto += \
+	gte_loop-ivopts-2
+EXCLUDE_mcs51-xstack-auto += \
+	gte_loop-ivopts-2 \
+	gte_shiftdi-2
+EXCLUDE_uc6502-stack-auto += \
+	gte_loop-ivopts-2
+
+
+###################################################
+# QuickC Tests
+
+# Failure - Bug
+EXCLUDE_uc6502-stack-auto += \
+	qct_0018-structptr
+
+# Failure - Bug #3392
+EXCLUDE_ARCH_mcs51 += \
+	qct_0036-notneg
+EXCLUDE_ds390 += \
+	qct_0036-notneg
+
+# Failure - Bug #3393
+EXCLUDE_ARCH_pdk += \
+	qct_0051-inits
+EXCLUDE_ARCH_mcs51 += \
+	qct_0051-inits
+
+# Target doesn't have enough memory
+EXCLUDE_pdk14 += \
+	qct_0049-inits \
+	qct_0057-duff \
+	qct_0080-arrays
+EXCLUDE_pdk15 += \
+	qct_0080-arrays
+EXCLUDE_mcs51-small += \
+	qct_0080-arrays
+EXCLUDE_mcs51-medium += \
+	qct_0080-arrays	
+
+# Target too slow (fails with timeout)
+#EXCLUDE_ARCH_pdk += \
+#	qct_0042-prime
+#EXCLUDE_uc6502 += \
+#	qct_0042-prime
+#EXCLUDE_uc6502-stack-auto += \
+#	qct_0042-prime
+#EXCLUDE_ARCH_mcs51 += \
+#	qct_0042-prime
+#EXCLUDE_ds390 += \
+#	qct_0042-prime
+#EXCLUDE_ucgbz80 += \
+#	qct_0042-prime
+
+###################################################
+# TinyC Tests
+
+# Stack overflow - target doesn't have enough RAM.
+EXCLUDE_ARCH_pdk += \
+	tcc_00_assignment \
+	tcc_02_printf \
+	tcc_04_for \
+	tcc_06_case \
+	tcc_07_function \
+	tcc_08_while \
+	tcc_09_do_while \
+	tcc_105_local_extern \
+	tcc_11_precedence \
+	tcc_12_hashdefine \
+	tcc_13_integer_literals \
+	tcc_15_recursion \
+	tcc_16_nesting \
+	tcc_19_pointer_arithmetic \
+	tcc_20_pointer_comparison \
+	tcc_21_char_array \
+	tcc_23_type_coercion \
+	tcc_26_character_constants \
+	tcc_27_sizeof \
+	tcc_29_array_address \
+	tcc_31_args \
+	tcc_35_sizeof \
+	tcc_45_empty_for \
+	tcc_48_nested_break \
+	tcc_50_logical_second_arg \
+	tcc_51_static \
+	tcc_52_unnamed_enum \
+	tcc_54_goto \
+	tcc_55_lshift_type \
+	tcc_61_integers \
+	tcc_64_macro_nesting \
+	tcc_67_macro_concat \
+	tcc_70_floating_point_literals \
+	tcc_91_ptr_longlong_arith32
+
+# Target doesn't have enough memory
+EXCLUDE_ARCH_pdk += \
+	tcc_05_array \
+	tcc_10_pointer \
+	tcc_25_quicksort \
+	tcc_28_strings \
+	tcc_30_hanoi \
+	tcc_36_array_initialisers \
+	tcc_37_sprintf \
+	tcc_38_multiple_array_index \
+	tcc_49_bracket_evaluation \
+	tcc_83_utf8_in_identifiers \
+	tcc_97_utf8_string_literal \
+	tcc_109_float_struct_calling
+EXCLUDE_pdk14 += \
+	tcc_92_enum_bitfield
+EXCLUDE_pdk15-stack-auto += \
+	tcc_92_enum_bitfield
+EXCLUDE_mcs51-stack-auto += \
+	tcc_49_bracket_evaluation
+EXCLUDE_mcs51-small-stack-auto += \
+	tcc_49_bracket_evaluation
+EXCLUDE_mcs51-small += \
+	tcc_36_array_initialisers \
+	tcc_37_sprintf \
+	tcc_49_bracket_evaluation \
+	tcc_97_utf8_string_literal
+EXCLUDE_mcs51-medium += \
+	tcc_49_bracket_evaluation
+
+###################################################
+EXCLUDE_ucz80 += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucz80-unsafe-read += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucz80-undoc += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucz80-resiy += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucz180 += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucz180-resiy += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucz80n += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucgbz80 += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucr2k += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucr2ka += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ucr3ka += ${EXCLUDE_ARCH_z80}
+EXCLUDE_ez80-z80 += ${EXCLUDE_ARCH_z80}
+EXCLUDE_tlcs90 += ${EXCLUDE_ARCH_z80}
+###################################################
+EXCLUDE_mcs51-small += ${EXCLUDE_ARCH_mcs51}
+EXCLUDE_mcs51-small-stack-auto += ${EXCLUDE_ARCH_mcs51}
+EXCLUDE_mcs51-medium += ${EXCLUDE_ARCH_mcs51}
+EXCLUDE_mcs51-large += ${EXCLUDE_ARCH_mcs51}
+EXCLUDE_mcs51-huge += ${EXCLUDE_ARCH_mcs51}
+EXCLUDE_mcs51-stack-auto += ${EXCLUDE_ARCH_mcs51}
+EXCLUDE_mcs51-large-stack-auto += ${EXCLUDE_ARCH_mcs51}
+EXCLUDE_mcs51-xstack-auto += ${EXCLUDE_ARCH_mcs51}
+###################################################
+EXCLUDE_pdk14 += ${EXCLUDE_ARCH_pdk}
+EXCLUDE_pdk15 += ${EXCLUDE_ARCH_pdk}
+EXCLUDE_pdk15-stack-auto += ${EXCLUDE_ARCH_pdk}
+###################################################
+EXCLUDE_uc6502 += ${EXCLUDE_ARCH_mos6502}
+EXCLUDE_uc65c02 += ${EXCLUDE_ARCH_mos6502}
+EXCLUDE_uc6502-stack-auto += ${EXCLUDE_ARCH_mos6502}
+###################################################
+

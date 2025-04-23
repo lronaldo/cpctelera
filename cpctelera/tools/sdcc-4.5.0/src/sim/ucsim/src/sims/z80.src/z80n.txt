@@ -1,0 +1,89 @@
+Example code:
+	.zxn			; accept ZX-Next opcodes
+	
+; T=4+	8T*	swapnib         ED 23           A bits 7-4 swap with A bits 3-0
+; T=4+  8T     mul d,e         ED 30           multiply DE = D*E (no flags set)
+; 4T    	add  hl,a       ED 31           Add A to HL (no flags set) not sign extended
+; 4T*    	add  de,a       ED 32           Add A to DE (no flags set) not sign extended
+; 4T*    	add  bc,a       ED 33           Add A to BC (no flags set) not sign extended
+; 12T    	add  hl,NNNN    ED 34 LO HI     Add NNNN to HL (no flags set)	add hl,#32767
+; 12T*   	add  de,NNNN    ED 35 LO HI     Add NNNN to DE (no flags set) add de,#32767
+; 12T*   	add  bc,NNNN    ED 36 LO HI     Add NNNN to BC (no flags set) add bc,#32767
+; 16T*      	outinb          ED 90           out (c),(hl), hl++
+; 16T    	ldix            ED A4           As LDI,  but if byte==A does not copy
+; 21T    	ldirx           ED B4           As LDIR, but if byte==A does not copy
+; 16T*   	lddx            ED AC           As LDD,  but if byte==A does not copy, and DE is incremented
+; 21T*   	lddrx           ED BC           As LDDR,  but if byte==A does not copy
+; 21T*   	ldirscale       ED B6           As LDIRX,  if(hl)!=A then (de)=(hl); HL_A'+=BC'; DE+=DE'; dec BC; Loop.
+; 12T*   	ldpirx          ED B7           (de) = ( (hl&$fff8)+(E&7) ) when != A
+; 8T     	mirror a        ED 24           mirror the bits in A     
+; 8T     	mirror de       ED 26           mirror the bits in DE     
+; 22T*   	push NNNN       ED 8A HI LO     push 16bit immediate value, big endian push #32767
+; 8T*    	pop x           ED 8B           pop value and discard
+	
+; ** reg,val are both 8-bit numbers
+; 16T*   	nextreg reg,val ED 91 reg,val   Set a NEXT register (like doing out($243b),reg then out($253b),val nextreg #31,#63
+; 12T*    	nextreg reg,a   ED 92 reg       Set a NEXT register using A (like doing out($243b),reg then out($253b),A ) nextreg #31,a
+; 8T   		pixeldn         ED 93           Move down a line on the ULA screen
+; 8T   		pixelad         ED 94           using D,E (as Y,X) calculate the ULA screen address and store in HL
+; 8T   		setae           ED 95           Using the lower 3 bits of E (X coordinate), set the correct bit value in A
+; 11T   	test NN         ED 27 NN        And A with NN and set all flags. A is not affected.
+	tst #31
+	test #31
+	tst a,#31
+	test a,#31
+	
+; Memory mapping - specify which 8k ram page is placed into
+; the corresponding 8k slot of the z80's 64k memory space.
+; 
+; 16T*  	mmu0 NN         ED 91 50 NN     macro: Ram page in slot 0-8k
+; 16T*  	mmu1 NN         ED 91 51 NN     macro: Ram page in slot 8k-16k
+; 16T*  	mmu2 NN         ED 91 52 NN     macro: Ram page in slot 16k-24k
+; 16T*  	mmu3 NN         ED 91 53 NN     macro: Ram page in slot 24k-32k
+; 16T*  	mmu4 NN         ED 91 54 NN     macro: Ram page in slot 32k-40k
+; 16T*  	mmu5 NN         ED 91 55 NN     macro: Ram page in slot 40k-48k
+; 16T*  	mmu6 NN         ED 91 56 NN     macro: Ram page in slot 48k-56k
+; 16T*  	mmu7 NN         ED 91 57 NN     macro: Ram page in slot 56k-64k
+
+; 12T*  	mmu0 a          ED 92 50        macro: Ram page in slot 0-8k
+; 12T*  	mmu1 a          ED 92 51        macro: Ram page in slot 8k-16k
+; 12T*  	mmu2 a          ED 92 52        macro: Ram page in slot 16k-24k
+; 12T*  	mmu3 a          ED 92 53        macro: Ram page in slot 24k-32k
+; 12T*  	mmu4 a          ED 92 54        macro: Ram page in slot 32k-40k
+; 12T*  	mmu5 a          ED 92 55        macro: Ram page in slot 40k-48k
+; 12T*  	mmu6 a          ED 92 56        macro: Ram page in slot 48k-56k
+; 12T*  	mmu7 a          ED 92 57        macro: Ram page in slot 56k-64k
+
+
+
+
+; cu.wait VER,HOR   ->  16-bit encoding 0x8000 + (HOR << 9) + VER
+; (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
+
+	cu.wait #0,#1		; 0x82, 0x00
+	cu.wait #0,#2		; 0x84, 0x00
+	cu.wait #0,#55		; 0xEE, 0x00
+	
+	cu.wait #1,#0		; 0x80, 0x01
+	cu.wait #2,#0		; 0x80, 0x02
+	cu.wait #311,#0		; 0x81, 0x37
+
+; cu.move REG,VAL  -> 16-bit encoding (REG << 8) + VAL
+; (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
+
+	cu.move #0,#0		; 0x00, 0x00
+	cu.move #1,#0		; 0x01, 0x00
+	cu.move #127,#0		; 0x7F, 0x00
+	        
+	cu.move #0,#1		; 0x00, 0x01
+	cu.move #0,#2		; 0x00, 0x02
+	cu.move #0,#127		; 0x00, 0x7F
+	cu.move #0,#255		; 0x00, 0xFF
+
+; cu.stop   -> 16-bit encoding 0xffff (impossible cu.wait)
+
+	cu.stop			; 0xFF, 0xFF
+
+; cu.nop  -> 16-bit encoding 0x0000 (do nothing cu.move)
+
+	cu.nop 			; 0x00, 0x00

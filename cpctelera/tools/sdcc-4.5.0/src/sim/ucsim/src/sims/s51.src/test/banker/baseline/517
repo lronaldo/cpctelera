@@ -1,0 +1,143 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+# Banker tests for s51 -t 517
+
+# Registers are banked under control of sfr[0xd0][4:3] as standard.
+# See test-C51.cmd for tests.
+
+# There are 8 dptr banks under control of sfr[0x92][2:0] each consisting
+# of two successive bytes from dptr_chip. Each pair of bytes is mapped
+# to both sfr[0x82]..sfr[0x83] and dptr[0x00]..dptr[0x01].
+info mem
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+  0x000000-0x000017       24 dptr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000001        2 dptr (8,%02x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0xff -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  sfr 0x82 0x83 -> banked
+    bank selector: sfr[0x92] mask=0x7 banks=8 act=0
+    banks:
+      *  0. dptr_chip 0x00
+         1. dptr_chip 0x02
+         2. dptr_chip 0x04
+         3. dptr_chip 0x06
+         4. dptr_chip 0x08
+         5. dptr_chip 0x0a
+         6. dptr_chip 0x0c
+         7. dptr_chip 0x0e
+  xram 0x0000 0xffff -> xram_chip 0x0000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=0
+    banks:
+      *  0. iram_chip 0x00
+         1. iram_chip 0x08
+         2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> banked
+    bank selector: sfr[0x92] mask=0x7 banks=8 act=0
+    banks:
+      *  0. dptr_chip 0x00
+         1. dptr_chip 0x02
+         2. dptr_chip 0x04
+         3. dptr_chip 0x06
+         4. dptr_chip 0x08
+         5. dptr_chip 0x0a
+         6. dptr_chip 0x0c
+         7. dptr_chip 0x0e
+
+# Label and fill
+var bank sfr[0x92][2:0]
+var sfr_curr sfr[0x82]
+var dptr_curr dptr[0x00]
+var dptr0 dptr_chip[0x00]
+dptr_chip is not address space
+var dptr1 dptr_chip[0x02]
+dptr_chip is not address space
+var dptr2 dptr_chip[0x04]
+dptr_chip is not address space
+var dptr3 dptr_chip[0x06]
+dptr_chip is not address space
+var dptr4 dptr_chip[0x08]
+dptr_chip is not address space
+var dptr5 dptr_chip[0x0a]
+dptr_chip is not address space
+var dptr6 dptr_chip[0x0c]
+dptr_chip is not address space
+var dptr7 dptr_chip[0x0e]
+dptr_chip is not address space
+set mem dptr_chip 0x00 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
+0x00                      00 01 02 03 04 05 06 07 ........
+set mem dptr_chip 0x08 0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f
+0x08                      08 09 0a 0b 0c 0d 0e 0f ........
+
+# Bank 0 should be current
+dump bank
+0x92[2:0] bank:                     0b-----000 0x00 '.'   0
+
+# Contents should be 0x00 0x01
+dump sfr 0x82 0x83
+0x82 sfr_curr:            00 01 ..
+#dump dptr 0x00 0x01
+
+# Check all the other banks
+set mem bank 1
+0x92[2:0] bank:                     0b-----001 0x01 '.'   1
+dump sfr 0x82 0x83
+0x82 sfr_curr:            02 03 ..
+#dump dptr 0x00 0x01
+
+set mem bank 2
+0x92[2:0] bank:                     0b-----010 0x02 '.'   2
+dump sfr 0x82 0x83
+0x82 sfr_curr:            04 05 ..
+#dump dptr 0x00 0x01
+
+set mem bank 3
+0x92[2:0] bank:                     0b-----011 0x03 '.'   3
+dump sfr 0x82 0x83
+0x82 sfr_curr:            06 07 ..
+#dump dptr 0x00 0x01
+
+set mem bank 4
+0x92[2:0] bank:                     0b-----100 0x04 '.'   4
+dump sfr 0x82 0x83
+0x82 sfr_curr:            08 09 ..
+#dump dptr 0x00 0x01
+
+set mem bank 5
+0x92[2:0] bank:                     0b-----101 0x05 '.'   5
+dump sfr 0x82 0x83
+0x82 sfr_curr:            0a 0b ..
+#dump dptr 0x00 0x01
+
+set mem bank 6
+0x92[2:0] bank:                     0b-----110 0x06 '.'   6
+dump sfr 0x82 0x83
+0x82 sfr_curr:            0c 0d ..
+#dump dptr 0x00 0x01
+
+set mem bank 7
+0x92[2:0] bank:                     0b-----111 0x07 '.'   7
+dump sfr 0x82 0x83
+0x82 sfr_curr:            0e 0f ..
+#dump dptr 0x00 0x01

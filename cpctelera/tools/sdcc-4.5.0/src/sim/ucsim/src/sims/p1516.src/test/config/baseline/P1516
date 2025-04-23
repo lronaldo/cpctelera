@@ -1,0 +1,40 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: p2223
+Controller has 14 hardware element(s).
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pi[0]
+   on pj[0]
+   on uart[0]
+   on clock[0]
+   on dport[0]
+   on oports[0]
+   on iports[0]
+  F= 0x00  U=0 P=0 O=0 C=0 Z=0 S=0 
+ R0= 0x00000000  [R0]= 0x01f2f038  R1= 0x00000000  [R1]= 0x01f2f038
+ R2= 0x00000000  [R2]= 0x01f2f038  R3= 0x00000000  [R3]= 0x01f2f038
+ R4= 0x00000000  [R4]= 0x01f2f038  R5= 0x00000000  [R5]= 0x01f2f038
+ R6= 0x00000000  [R6]= 0x01f2f038  R7= 0x00000000  [R7]= 0x01f2f038
+ R8= 0x00000000  [R8]= 0x01f2f038  R9= 0x00000000  [R9]= 0x01f2f038
+R10= 0x00000000 [R10]= 0x01f2f038 R11= 0x00000000 [R11]= 0x01f2f038
+R12= 0x00000000 [R12]= 0x01f2f038 R13= 0x00000000 [R13]= 0x01f2f038
+R14= 0x00000000 [R14]= 0x01f2f038 R15= 0x00000000 [R15]= 0x01f2f038
+0x00000  ? 01f2f038    jmp   0xf038                                  
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x01ffff   131072 rom_chip (32,%08x,0x%05x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x01ffff   131072 rom (32,%08x,0x%05x)
+  0x000000-0x00000f       16 regs (32,%08x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x00000 0x1ffff -> rom_chip 0x00000 activated

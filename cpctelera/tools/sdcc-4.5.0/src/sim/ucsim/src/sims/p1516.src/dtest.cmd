@@ -1,0 +1,226 @@
+fill rom 0 0xffff 0xffffffff
+
+# alu rd,rb
+
+expr /n rom[0]=0
+expr /n rom[0x1]=0x00110200
+expr /n rom[0x2]=0x00120200
+expr /n rom[0x3]=0x00130200
+expr /n rom[0x4]=0x00140200
+expr /n rom[0x5]=0x00150200
+expr /n rom[0x6]=0x00160200
+expr /n rom[0x7]=0x00170200
+expr /n rom[0x8]=0x00180200
+expr /n rom[0x9]=0x00190200
+expr /n rom[0xa]=0x001a0200
+expr /n rom[0xb]=0x001b0200
+expr /n rom[0xc]=0x001c0200
+expr /n rom[0xd]=0x001d0200
+expr /n rom[0xe]=0x001e0200
+expr /n rom[0xf]=0x001f0200
+dc 0 0xf
+
+# alu 2op #positive
+
+expr /n rom[0x10]=0x01a00e00
+expr /n rom[0x11]=0x01a10e00
+expr /n rom[0x12]=0x01a20e00
+expr /n rom[0x13]=0x01a30e00
+expr /n rom[0x14]=0x01a40e00
+expr /n rom[0x15]=0x01a50e00
+expr /n rom[0x16]=0x01a60e00
+expr /n rom[0x17]=0x01a70e00
+expr /n rom[0x18]=0x01a80e00
+expr /n rom[0x19]=0x01a90e00
+expr /n rom[0x1a]=0x01aa0e00
+expr /n rom[0x1b]=0x01ab0e00
+expr /n rom[0x1c]=0x01ac0e00
+expr /n rom[0x1d]=0x01ad0e00
+expr /n rom[0x1e]=0x01ae0e00
+expr /n rom[0x1f]=0x01af0e00
+dc 0x10 0x1f
+
+# alu 2op #negative
+
+expr /n rom[0x20]=0x01a0fe00
+expr /n rom[0x21]=0x01a1fe00
+expr /n rom[0x22]=0x01a2fe00
+expr /n rom[0x23]=0x01a3fe00
+expr /n rom[0x24]=0x01a4fe00
+expr /n rom[0x25]=0x01a5fe00
+expr /n rom[0x26]=0x01a6fe00
+expr /n rom[0x27]=0x01a7fe00
+expr /n rom[0x28]=0x01a8fe00
+expr /n rom[0x29]=0x01a9fe00
+expr /n rom[0x2a]=0x01aafe00
+expr /n rom[0x2b]=0x01abfe00
+expr /n rom[0x2c]=0x01acfe00
+expr /n rom[0x2d]=0x01adfe00
+expr /n rom[0x2e]=0x01aefe00
+expr /n rom[0x2f]=0x01affe00
+dc 0x20 0x2f
+
+# alu 1op
+
+expr /n rom[0x30]=0x02a0fe00
+expr /n rom[0x31]=0x02a1fe00
+expr /n rom[0x32]=0x02a2fe00
+expr /n rom[0x33]=0x02a3fe00
+expr /n rom[0x34]=0x02a4fe00
+expr /n rom[0x35]=0x02a5fe00
+expr /n rom[0x36]=0x02a6fe00
+expr /n rom[0x37]=0x02a7fe00
+expr /n rom[0x38]=0x02a8fe00
+expr /n rom[0x39]=0x02a9fe00
+expr /n rom[0x3a]=0x02aafe00
+expr /n rom[0x3b]=0x02abfe00
+expr /n rom[0x3c]=0x02acfe00
+expr /n rom[0x3d]=0x02adfe00
+expr /n rom[0x3e]=0x02aefe00
+expr /n rom[0x3f]=0x02affe00
+dc 0x30 0x3f
+
+expr /n rom[0x40]=0x08980700 # st rd,ra,rb  w=0, u=x, p=x
+expr /n rom[0x41]=0x09980700 # st rd,ra,rb  w=1, u=0, p=0
+expr /n rom[0x42]=0x09984700 # st rd,ra,rb  w=1, u=0, p=1
+expr /n rom[0x43]=0x09988700 # st rd,ra,rb  w=1, u=1, p=0
+expr /n rom[0x44]=0x0998c700 # st rd,ra,rb  w=1, u=1, p=1
+dc 0x40 0x44
+
+expr /n rom[0x48]=0x0a980700 # ld rd,ra,rb  w=0, u=x, p=x
+expr /n rom[0x49]=0x0b980700 # ld rd,ra,rb  w=1, u=0, p=0
+expr /n rom[0x4a]=0x0b984700 # ld rd,ra,rb  w=1, u=0, p=1
+expr /n rom[0x4b]=0x0b988700 # ld rd,ra,rb  w=1, u=1, p=0
+expr /n rom[0x4c]=0x0b98c700 # ld rd,ra,rb  w=1, u=1, p=1
+dc 0x48 0x4c
+
+expr /n F=0 # u=0, p=0
+expr /n rom[0x50]=0x0c980700 # st rd,ra,#pos  w=0
+expr /n rom[0x51]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x52]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x53]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x54]=0x0d980700 # st rd,ra,#pos  w=1
+dc 0x50 0x54
+
+expr /n F=0 # u=0, p=0
+expr /n rom[0x58]=0x0c98fff0 # st rd,ra,#neg  w=0
+expr /n rom[0x59]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x5a]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x5b]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x5c]=0x0d98fff0 # st rd,ra,#neg  w=1
+dc 0x58 0x5c
+
+expr /n F=0x10 # u=0, p=1
+expr /n rom[0x60]=0x0c980700 # st rd,ra,#pos  w=0
+expr /n rom[0x61]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x62]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x63]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x64]=0x0d980700 # st rd,ra,#pos  w=1
+dc 0x60 0x64
+
+expr /n F=0x10 # u=0, p=1
+expr /n rom[0x68]=0x0c98fff0 # st rd,ra,#neg  w=0
+expr /n rom[0x69]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x6a]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x6b]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x6c]=0x0d98fff0 # st rd,ra,#neg  w=1
+dc 0x68 0x6c
+
+expr /n F=0x20 # u=1, p=0
+expr /n rom[0x70]=0x0c980700 # st rd,ra,#pos  w=0
+expr /n rom[0x71]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x72]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x73]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x74]=0x0d980700 # st rd,ra,#pos  w=1
+dc 0x70 0x74
+
+expr /n F=0x20 # u=1, p=0
+expr /n rom[0x78]=0x0c98fff0 # st rd,ra,#neg  w=0
+expr /n rom[0x79]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x7a]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x7b]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x7c]=0x0d98fff0 # st rd,ra,#neg  w=1
+dc 0x78 0x7c
+
+expr /n F=0x30 # u=1, p=1
+expr /n rom[0x80]=0x0c980700 # st rd,ra,#pos  w=0
+expr /n rom[0x81]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x82]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x83]=0x0d980700 # st rd,ra,#pos  w=1
+expr /n rom[0x84]=0x0d980700 # st rd,ra,#pos  w=1
+dc 0x80 0x84
+
+expr /n F=0x30 # u=1, p=1
+expr /n rom[0x88]=0x0c98fff0 # st rd,ra,#neg  w=0
+expr /n rom[0x89]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x8a]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x8b]=0x0d98fff0 # st rd,ra,#neg  w=1
+expr /n rom[0x8c]=0x0d98fff0 # st rd,ra,#neg  w=1
+dc 0x88 0x8c
+
+#####
+
+
+expr /n F=0 # u=0, p=0
+expr /n rom[0x90]=0x0e980700 # ld rd,ra,#pos  w=0
+expr /n rom[0x91]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0x92]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0x93]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0x94]=0x0f980700 # ld rd,ra,#pos  w=1
+dc 0x90 0x94
+
+expr /n F=0 # u=0, p=0
+expr /n rom[0x98]=0x0e98fff0 # ld rd,ra,#neg  w=0
+expr /n rom[0x99]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0x9a]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0x9b]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0x9c]=0x0f98fff0 # ld rd,ra,#neg  w=1
+dc 0x98 0x9c
+
+expr /n F=0x10 # u=0, p=1
+expr /n rom[0xa0]=0x0e980700 # ld rd,ra,#pos  w=0
+expr /n rom[0xa1]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xa2]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xa3]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xa4]=0x0f980700 # ld rd,ra,#pos  w=1
+dc 0xa0 0xa4
+
+expr /n F=0x10 # u=0, p=1
+expr /n rom[0xa8]=0x0e98fff0 # ld rd,ra,#neg  w=0
+expr /n rom[0xa9]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xaa]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xab]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xac]=0x0f98fff0 # ld rd,ra,#neg  w=1
+dc 0xa8 0xac
+
+expr /n F=0x20 # u=1, p=0
+expr /n rom[0xb0]=0x0e980700 # ld rd,ra,#pos  w=0
+expr /n rom[0xb1]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xb2]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xb3]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xb4]=0x0f980700 # ld rd,ra,#pos  w=1
+dc 0xb0 0xb4
+
+expr /n F=0x20 # u=1, p=0
+expr /n rom[0xb8]=0x0e98fff0 # ld rd,ra,#neg  w=0
+expr /n rom[0xb9]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xba]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xbb]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xbc]=0x0f98fff0 # ld rd,ra,#neg  w=1
+dc 0xb8 0xbc
+
+expr /n F=0x30 # u=1, p=1
+expr /n rom[0xc0]=0x0e980700 # ld rd,ra,#pos  w=0
+expr /n rom[0xc1]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xc2]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xc3]=0x0f980700 # ld rd,ra,#pos  w=1
+expr /n rom[0xc4]=0x0f980700 # ld rd,ra,#pos  w=1
+dc 0xc0 0xc4
+
+expr /n F=0x30 # u=1, p=1
+expr /n rom[0xc8]=0x0e98fff0 # ld rd,ra,#neg  w=0
+expr /n rom[0xc9]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xca]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xcb]=0x0f98fff0 # ld rd,ra,#neg  w=1
+expr /n rom[0xcc]=0x0f98fff0 # ld rd,ra,#neg  w=1
+dc 0xc8 0xcc

@@ -1,0 +1,91 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var __interrupt_vect rom[0x0000]
+var __reset_vect rom[0x0003]
+var __sdcc_gsinit_startup rom[0x0023]
+var __sdcc_init_data rom[0x002f]
+var __sdcc_program_startup rom[0x001f]
+var _main rom[0x008e]
+dc 0x0000 0x00090
+
+0x00000    <__interrupt_vect>:
+0x00000  ? 02 00 03 75 LJMP   0x00375
+0x00004  ? 00          NOP                                           
+0x00005  ? aa 75       MOV    R2,0x75                                
+0x00007  ? 00          NOP                                           
+0x00008  ? 55 75       ANL    A,0x75                                 
+0x0000a  ? 9d          SUBB   A,R5                                   
+0x0000b  ? 06          INC    @R0                                    
+0x0000c  ? 75 00 aa    MOV    0x00 <R0>,#0xaa                        
+0x0000f  ? 75 00 55    MOV    0x00 <R0>,#0x55                        
+0x00012  ? 75 c6 90    MOV    0xc6 <MCON>,#0x90                      
+0x00015  ? 75 00 00    MOV    0x00 <R0>,#0x00                        
+0x00018  ? 75 00 00    MOV    0x00 <R0>,#0x00                        
+0x0001b  ? 02 00 00 23 LJMP   0x00023 <__sdcc_gsinit_startup>        
+
+0x0001f    <__sdcc_program_startup>:
+0x0001f  ? 02 00 00 8e LJMP   0x0008e <_main>
+
+0x00023    <__sdcc_gsinit_startup>:
+0x00023  ? 12 00 00 91 LCALL  0x00091
+0x00027  ? e5 82       MOV    A,0x82 <DPL>                           
+0x00029  ? 60 04       JZ     0x0002f <__sdcc_init_data>             
+0x0002b  ? 02 00 00 1f LJMP   0x0001f <__sdcc_program_startup>       
+
+0x0002f    <__sdcc_init_data>:
+0x0002f  ? 74 0a       MOV    A,#0x0a
+0x00031  ? 44 00       ORL    A,#0x00                                
+0x00033  ? 60 27       JZ     0x0005c                                
+0x00035  ? 74 30       MOV    A,#0x30                                
+0x00037  ? 24 0a       ADD    A,#0x0a                                
+0x00039  ? f9          MOV    R1,A                                   
+0x0003a  ? 74 08       MOV    A,#0x08                                
+0x0003c  ? 34 00       ADDC   A,#0x00                                
+0x0003e  ? fa          MOV    R2,A                                   
+0x0003f  ? 90 00 08 30 MOV    DPTR,#0x00830                          
+0x00043  ? 75 86 21    MOV    0x86 <DPS>,#0x21                       
+0x00046  ? 90 00 04 4d MOV    DPTR,#0x0044d                          
+0x0004a  ? e4          CLR    A                                      
+0x0004b  ? 93          MOVC   A,@A+DPTR                              
+0x0004c  ? f0          MOVX   @DPTR,A                                
+0x0004d  ? a3          INC    DPTR                                   
+0x0004e  ? a3          INC    DPTR                                   
+0x0004f  ? e5 82       MOV    A,0x82 <DPL>                           
+0x00051  ? b5 01 f6    CJNE   A,0x01 <R1>,0x0004a                    
+0x00054  ? e5 83       MOV    A,0x83 <DPH>                           
+0x00056  ? b5 02 f1    CJNE   A,0x02 <R2>,0x0004a                    
+0x00059  ? 75 86 00    MOV    0x86 <DPS>,#0x00                       
+0x0005c  ? 78 00       MOV    R0,#0x00                               
+0x0005e  ? e8          MOV    A,R0                                   
+0x0005f  ? 44 00       ORL    A,#0x00                                
+0x00061  ? 60 0a       JZ     0x0006d                                
+0x00063  ? 79 01       MOV    R1,#0x01                               
+0x00065  ? 75 00 00    MOV    0x00 <R0>,#0x00                        
+0x00068  ? e4          CLR    A                                      
+0x00069  ? f3          MOVX   @R1,A                                  
+0x0006a  ? 09          INC    R1                                     
+0x0006b  ? d8 fc       DJNZ   R0,0x00069                             
+0x0006d  ? 78 4c       MOV    R0,#0x4c                               
+0x0006f  ? e8          MOV    A,R0                                   
+0x00070  ? 44 04       ORL    A,#0x04                                
+0x00072  ? 60 0d       JZ     0x00081                                
+0x00074  ? 79 05       MOV    R1,#0x05                               
+0x00076  ? 90 00 00 01 MOV    DPTR,#0x00001                          
+0x0007a  ? e4          CLR    A                                      
+0x0007b  ? f0          MOVX   @DPTR,A                                
+0x0007c  ? a3          INC    DPTR                                   
+0x0007d  ? d8 fc       DJNZ   R0,0x0007b                             
+0x0007f  ? d9 fa       DJNZ   R1,0x0007b                             
+0x00081  ? e4          CLR    A                                      
+0x00082  ? f5 0a       MOV    0x0a,A                                 
+0x00084  ? f5 0b       MOV    0x0b,A                                 
+0x00086  ? f5 0c       MOV    0x0c,A                                 
+0x00088  ? f5 0d       MOV    0x0d,A                                 
+0x0008a  ? 02 00 00 1f LJMP   0x0001f <__sdcc_program_startup>       
+
+0x0008e    <_main>:
+0x0008e  ? 80 fe       SJMP   0x0008e <_main>   
+0x00090  ? 22          RET                                           
+24-bit flat mode, warning: lots of sfr-functions not implemented!

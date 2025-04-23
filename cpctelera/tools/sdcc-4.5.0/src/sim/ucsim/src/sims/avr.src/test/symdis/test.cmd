@@ -1,0 +1,4 @@
+var init rom[0x0000]
+var main rom[0x0002]
+var forever rom[0x0005]
+dc 0x0000 0x0005

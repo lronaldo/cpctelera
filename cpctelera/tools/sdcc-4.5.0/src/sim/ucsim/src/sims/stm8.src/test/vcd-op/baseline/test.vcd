@@ -1,0 +1,55 @@
+$date
+	Date is omitted in quiet mode
+$end
+$version
+	ucsim
+$end
+$timescale 1ns $end
+$scope module ucsim_vcd_0 $end
+$var wire 8 ! rom_0x00100 $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+b10000011 !
+$end
+b00000000 !
+#125
+b00000001 !
+#250
+b00000010 !
+#375
+b00000011 !
+#500
+$comment Paused $end
+$dumpoff
+bxxxxxxxx !
+$end
+#1500
+$comment Unpaused $end
+$dumpon
+b00001011 !
+$end
+b00001100 !
+#1625
+b00001101 !
+#1750
+b00001110 !
+#1875
+b00001111 !
+#2000
+$comment Paused $end
+$dumpoff
+bxxxxxxxx !
+$end
+#2300
+$comment Unpaused. Real duration was 0.000001000000000 seconds $end
+$dumpon
+b00010111 !
+$end
+b00011000 !
+#2425
+b00011001 !
+#2550
+b00011010 !
+#2675

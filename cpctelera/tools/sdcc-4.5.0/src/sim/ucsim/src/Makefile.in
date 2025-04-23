@@ -1,0 +1,102 @@
+#
+# uCsim Makefile
+#
+# (c) Drotos Daniel 1997
+#
+
+include common.mk
+include packages.mk
+
+VPATH		= @srcdir@
+srcdir		= @srcdir@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all:
+	$(MAKE) libs
+	$(MAKE) pkgs apps
+
+pkgs: $(PKGS)
+
+.PHONY: sims
+sims: pkgs
+
+apps: $(APPS)
+
+libs: utils_lib cmd_lib sim_lib gui_lib motorola_lib
+
+utils_lib:
+	$(MAKE) -C core/utils.src libs
+
+cmd_lib:
+	$(MAKE) -C core/cmd.src libs
+
+sim_lib:
+	$(MAKE) -C core/sim.src libs
+
+gui_lib:
+	$(MAKE) -C core/gui.src libs
+
+motorola_lib:
+	$(MAKE) -C core/motorola.src libs
+
+
+.PHONY: $(PKGS)
+
+$(PKGS):
+	$(MAKE) -C sims/$@ simulator
+
+$(APPS):
+	$(MAKE) -C apps/$@ all
+
+
+# Compiling and installing everything and running test
+# ---------------------------------------------------
+.PHONY: install INSTALL Install
+install:
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C sims/$${pkg} install ;\
+	done
+
+
+# Deleting all the installed files
+# --------------------------------
+uninstall:
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C sims/$${pkg} uninstall ;\
+	done
+
+
+
+# Performing self-test
+# --------------------
+check:
+	@for pkg in $(PKGS); do\
+	  $(MAKE) -C sims/$${pkg} check ;\
+	done
+
+# We want tests to be parallelizable so a simple shell loop is
+# not good enough.
+PKGS_TEST = $(foreach pkg, sim.src $(PKGS), $(pkg)/test)
+PKGS_BASELINE = $(patsubst %,%/baseline,$(PKGS_TEST))
+.PHONY:	test $(PKGS_TEST) baseline $(PKGS_BASELINE)
+test: $(PKGS_TEST)
+$(PKGS_TEST):
+	-@$(MAKE) --no-print-directory -C $(dir $@) test
+
+baseline: $(PKGS_BASELINE)
+$(PKGS_BASELINE):
+	-@$(MAKE) --no-print-directory -C $(patsubst %/test/baseline,%,$@) baseline
+
+
+# My rules
+# --------
+putcopyright:
+	'./put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
+
+
+# End of Makefile

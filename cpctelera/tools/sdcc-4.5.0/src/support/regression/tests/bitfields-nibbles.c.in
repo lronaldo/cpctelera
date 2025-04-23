@@ -1,0 +1,474 @@
+/** Operations with 4bit-sized bitfields
+    operation: 0, 1, 2, 3, 4
+    pattern: 0, 1
+    varType: 0, 1, 2, 3, 4, 5, 6
+*/
+
+// Uncomment this line to run the full test
+//#define FULL_TEST
+
+#pragma disable_warning 88 // cast of LITERAL value to 'generic' pointer
+
+// Absolute addressing has some issues for pdk. And if those are fixed, there might be a lack of memory, still.
+#if defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+    #define DUMMY_CASE
+#endif
+
+#include <testfwk.h>
+#ifdef __sun__
+#include <inttypes.h>
+#else
+#include <stdint.h>
+#endif
+
+#include <stdbool.h>
+
+#define OPERATION ({operation})
+#define PATTERN ({pattern})
+#define VAR_TYPE ({varType})
+
+#define OPERATION_ASSING    0
+#define OPERATION_OR        1
+#define OPERATION_AND       2
+#define OPERATION_XOR       3
+#define OPERATION_COM       4
+
+typedef struct
+{
+    unsigned int low    : 4;
+    unsigned int high   : 4;
+} struct_nibbles;
+
+#if defined(__SDCC_pic16)
+    #define ABS_ADDR1 0x0200
+    #define ABS_ADDR2 0x0204
+#elif defined(__SDCC_pic14)
+    #define ABS_ADDR1 0x0100
+    #define ABS_ADDR2 0x0104
+#elif defined(__SDCC_stm8)
+    #define ABS_ADDR1 0x1000
+    #define ABS_ADDR2 0x1004
+#elif defined(__SDCC_f8)
+    #define ABS_ADDR1 0x3000
+    #define ABS_ADDR2 0x3004
+#else
+    // TODO: Make test suitable for pdk
+    // mcs51 creates invalid assembler. Don't know if that is a bug or just a bad choice for ABS_ADDR1 and ABS_ADDR2 below.
+    // Disable for ds390: bug #3211
+    #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_mcs51) && !defined(__SDCC_ds390)
+        #if !defined(PORT_HOST) // Never do absolute address test with host
+            #define ABS_ADDR1 0xCA00
+            #define ABS_ADDR2 0xCA04
+        #endif
+    #endif
+#endif
+
+#if VAR_TYPE == 0
+    volatile struct_nibbles volatileBits;
+#elif VAR_TYPE == 1
+    #ifdef ABS_ADDR1
+        #define volatileBits (*(volatile struct_nibbles*)ABS_ADDR1)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 2
+    #ifdef ABS_ADDR2
+        #define volatileBits (*(volatile struct_nibbles*)ABS_ADDR2)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 3
+    #define VOLATILE_BITS_DEF volatile struct_nibbles volatileBits
+#elif VAR_TYPE == 4
+    #define VOLATILE_BITS_DEF static volatile struct_nibbles volatileBits
+#elif VAR_TYPE == 5
+    #ifdef ABS_ADDR1
+        #define VOLATILE_BITS_DEF static volatile struct_nibbles __at(ABS_ADDR1) volatileBits
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 6
+    #ifdef ABS_ADDR2
+        #define VOLATILE_BITS_DEF static volatile struct_nibbles __at(ABS_ADDR2) volatileBits
+        #define USE_ONLY_1_BYTE
+    #else
+        #define DUMMY_CASE
+    #endif
+#else
+    #error "Unknown VAR_TYPE case"
+#endif
+
+#ifndef VOLATILE_BITS_DEF
+    #define VOLATILE_BITS_DEF
+#endif
+
+
+#if PATTERN == 0
+    #define OTHER_FIELD_VALUE 0x00
+#else
+    #define OTHER_FIELD_VALUE 0x0F
+    #if OPERATION == OPERATION_COM
+        #ifndef DUMMY_CASE
+            // No need to test case, because we have only one case for complement operation
+            #define DUMMY_CASE 
+        #endif
+    #endif
+#endif
+
+#define OTHER_FIELD_high low
+#define OTHER_FIELD_low  high
+
+#define OTHER_FIELD_(x) OTHER_FIELD_##x
+#define OTHER_FIELD(x) OTHER_FIELD_(x)
+
+
+#ifndef DUMMY_CASE
+
+static bool success = false;
+
+#if OPERATION == OPERATION_ASSING
+    #define OP
+    #define TEST(field, value)   \
+        success = true; \
+        volatileBits.OTHER_FIELD(field) = OTHER_FIELD_VALUE; \
+        volatileBits.field = value; \
+        if((volatileBits.field != (value & 0x0F)) || (volatileBits.OTHER_FIELD(field) != OTHER_FIELD_VALUE)) success = false; \
+        ASSERT(success)
+#elif OPERATION == OPERATION_OR
+    #define OP |
+#elif OPERATION == OPERATION_AND
+    #define OP &
+#elif OPERATION == OPERATION_XOR
+    #define OP ^
+#elif OPERATION == OPERATION_COM
+    #define OP ~
+    #define TEST(valueLow, valueHigh)   \
+        volatileBits.low = valueLow;  \
+        volatileBits.high = valueHigh;  \
+        \
+        volatileBits.low = ~volatileBits.low;   \
+        ASSERT(volatileBits.low  == ((~valueLow) & 0x0F)); \
+        ASSERT(volatileBits.high == (valueHigh & 0x0F)); \
+        \
+        volatileBits.high = ~volatileBits.high; \
+        ASSERT(volatileBits.low == ((~valueLow)  & 0x0F)); \
+        ASSERT(volatileBits.high == ((~valueHigh) & 0x0F))
+    
+#else
+    #error "Unknown OPERATION case"
+#endif
+
+#ifndef TEST // GENERIC CASE FOR 'AND', 'OR' & 'XOR'
+    #define OP_EQUALS__(x) x##=
+    #define OP_EQUALS_(x) OP_EQUALS__(x)
+    #define OP_EQUALS OP_EQUALS_(OP)
+
+    #define TEST(field, value)   \
+        success = true; \
+        volatileBits.field = 0x00; \
+        volatileBits.OTHER_FIELD(field) = OTHER_FIELD_VALUE; \
+        if((volatileBits.field != 0x00) || (volatileBits.OTHER_FIELD(field) != OTHER_FIELD_VALUE)) success = false; \
+        \
+        volatileBits.field OP_EQUALS value; \
+        if((volatileBits.field != ((value OP 0x00) & 0x0F)) || (volatileBits.OTHER_FIELD(field) != OTHER_FIELD_VALUE)) success = false; \
+        \
+        volatileBits.field = 0x0F; \
+        if((volatileBits.field != 0x0F) || (volatileBits.OTHER_FIELD(field) != OTHER_FIELD_VALUE)) success = false; \
+        \
+        volatileBits.field OP_EQUALS value; \
+        if((volatileBits.field != ((value OP 0x0F) & 0x0F)) || (volatileBits.OTHER_FIELD(field) != OTHER_FIELD_VALUE)) success = false; \
+        ASSERT(success)
+#endif
+
+#if OPERATION == OPERATION_COM
+    static void
+    nibble_com_test1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0xFF, 0xFF);
+        TEST(0x00, 0x00);
+        TEST(0x0F, 0x0F);
+        TEST(0xF0, 0xF0);
+    }
+    
+    static void
+    nibble_com_test2_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x01, 0x01);
+        TEST(0x01, 0x02);
+        TEST(0x01, 0x04);
+        TEST(0x01, 0x08);
+    }
+    static void
+    nibble_com_test2_2(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x02, 0x01);
+        TEST(0x02, 0x02);
+        TEST(0x02, 0x04);
+        TEST(0x02, 0x08);
+    }
+    static void
+    nibble_com_test2_3(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x04, 0x01);
+        TEST(0x04, 0x02);
+        TEST(0x04, 0x04);
+        TEST(0x04, 0x08);
+    }
+    static void
+    nibble_com_test2_4(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x08, 0x01);
+        TEST(0x08, 0x02);
+        TEST(0x08, 0x04);
+        TEST(0x08, 0x08);
+    }
+    
+    static void
+    nibble_com_test3_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x0E, 0x0E);
+        TEST(0x0E, 0x0D);
+        TEST(0x0E, 0x0B);
+        TEST(0x0E, 0x07);
+    }
+    static void
+    nibble_com_test3_2(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x0D, 0x0E);
+        TEST(0x0D, 0x0D);
+        TEST(0x0D, 0x0B);
+        TEST(0x0D, 0x07);
+    }
+    static void
+    nibble_com_test3_3(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x0B, 0x0E);
+        TEST(0x0B, 0x0D);
+        TEST(0x0B, 0x0B);
+        TEST(0x0B, 0x07);
+    }
+    static void
+    nibble_com_test3_4(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x07, 0x0E);
+        TEST(0x07, 0x0D);
+        TEST(0x07, 0x0B);
+        TEST(0x07, 0x07);
+    }
+    
+    static void
+    nibble_com_test4_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x03, 0x03);
+        TEST(0x03, 0x06);
+        TEST(0x03, 0x0C);
+    }
+    static void
+    nibble_com_test4_2(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(0x06, 0x03);
+        TEST(0x06, 0x06);
+        TEST(0x06, 0x0C);
+    }
+    static void
+    nibble_com_test4_3(void)
+    {
+        VOLATILE_BITS_DEF;        
+        TEST(0x0C, 0x03);
+        TEST(0x0C, 0x06);
+        TEST(0x0C, 0x0C);
+    }
+#else
+    static void
+    nibble_op_test_low1_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(low, 0xFF);
+        TEST(low, 0x00);
+    }
+    static void
+    nibble_op_test_low1_2(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(low, 0x0F);
+        TEST(low, 0xF0);
+    }
+    static void
+    nibble_op_test_low2_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(low, 0x01);
+        TEST(low, 0x02);
+    }
+    #ifdef FULL_TEST
+      static void
+      nibble_op_test_low2_2(void)
+      {
+          VOLATILE_BITS_DEF;
+          TEST(low, 0x04);
+          TEST(low, 0x08);
+      }
+    #endif
+    static void
+    nibble_op_test_low3_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(low, 0x0E);
+        TEST(low, 0x0D);
+    }
+    #ifdef FULL_TEST
+      static void
+      nibble_op_test_low3_2(void)
+      {
+          VOLATILE_BITS_DEF;
+          TEST(low, 0x0B);
+          TEST(low, 0x07);
+      }
+      #endif
+    static void
+    nibble_op_test_low4_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(low, 0x10);
+        TEST(low, 0x20);
+    }
+    #ifdef FULL_TEST
+      static void
+      nibble_op_test_low4_2(void)
+      {
+          VOLATILE_BITS_DEF;
+          TEST(low, 0x40);
+          TEST(low, 0x80);
+      }
+    #endif
+    
+    static void
+    nibble_op_test_high1_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(high, 0xFF);
+        TEST(high, 0x00);
+    }
+    static void
+    nibble_op_test_high1_2(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(high, 0x0F);
+        TEST(high, 0xF0);
+    }
+    static void
+    nibble_op_test_high2_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(high, 0x01);
+        TEST(high, 0x02);
+    }
+    #ifdef FULL_TEST
+      static void
+      nibble_op_test_high2_2(void)
+      {
+          VOLATILE_BITS_DEF;
+          TEST(high, 0x04);
+          TEST(high, 0x08);
+      }
+    #endif
+    static void
+    nibble_op_test_high3_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(high, 0x0E);
+        TEST(high, 0x0D);
+    }
+    #ifdef FULL_TEST
+      static void
+      nibble_op_test_high3_2(void)
+      {
+          VOLATILE_BITS_DEF;
+          TEST(high, 0x0B);
+          TEST(high, 0x07);
+      }
+      #endif
+    static void
+    nibble_op_test_high4_1(void)
+    {
+        VOLATILE_BITS_DEF;
+        TEST(high, 0x10);
+        TEST(high, 0x20);
+    }
+    #ifdef FULL_TEST
+      static void
+      nibble_op_test_high4_2(void)
+      {
+          VOLATILE_BITS_DEF;
+          TEST(high, 0x40);
+          TEST(high, 0x80);
+      }
+    #endif
+#endif
+
+#endif // DUMMY_CASE
+
+static void
+testBitfields(void)
+{
+    #ifndef DUMMY_CASE
+        #if OPERATION == OPERATION_COM
+            nibble_com_test1();
+            
+            nibble_com_test2_1();
+            nibble_com_test2_2();
+            nibble_com_test2_3();
+            nibble_com_test2_4();
+            
+            nibble_com_test3_1();
+            nibble_com_test3_2();
+            nibble_com_test3_3();
+            nibble_com_test3_4();
+            
+            nibble_com_test4_1();
+            nibble_com_test4_2();
+            nibble_com_test4_3();
+        #else
+            nibble_op_test_low1_1();
+            nibble_op_test_low1_2();
+            nibble_op_test_low2_1();
+            #ifdef FULL_TEST
+                nibble_op_test_low2_2();
+            #endif
+            nibble_op_test_low3_1();
+            #ifdef FULL_TEST
+                nibble_op_test_low3_2();
+            #endif
+            nibble_op_test_low4_1();
+            #ifdef FULL_TEST
+                nibble_op_test_low4_2();
+            #endif
+            
+            nibble_op_test_high1_1();
+            nibble_op_test_high1_2();
+            nibble_op_test_high2_1();
+            #ifdef FULL_TEST
+                nibble_op_test_high2_2();
+            #endif
+            nibble_op_test_high3_1();
+            #ifdef FULL_TEST
+                nibble_op_test_high3_2();
+            #endif
+            nibble_op_test_high4_1();
+            #ifdef FULL_TEST
+                nibble_op_test_high4_2();
+            #endif
+        #endif
+    #endif
+}

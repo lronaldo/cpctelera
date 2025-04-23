@@ -1,0 +1,907 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+# We don't want auto-generated labels in the output.
+set option analyzer false
+
+step
+
+Stop at 0x008088: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08088  ? 20 02          jra    0x808c                              
+F 0x008088
+
+# The pipelined examples from PM0044 5.4 are run with fold-on-flush off
+# so that they can be compared with the documentation easily.
+set hw cpu pipetrace fold off
+Nothing to do
+
+step
+
+Stop at 0x00808c: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x0808c  ? 92 ce 50       ldw    X,[0x50.w]                          
+F 0x00808c
+set hw cpu pipetrace title "PM0044 5.4 Conventions, table 3"
+Nothing to do
+set hw cpu pipetrace start "out/test.table3.html"
+Nothing to do
+set hw cpu pipetrace data "<h2>Errata</h2>"
+Nothing to do
+set hw cpu pipetrace data "<ul>"
+Nothing to do
+set hw cpu pipetrace data "<li>The LDW shown in PM0044 table 3 is missing a decode cycle."
+Nothing to do
+set hw cpu pipetrace data "    <br/>"
+Nothing to do
+set hw cpu pipetrace data "    (Confirmed on HW)"
+Nothing to do
+set hw cpu pipetrace data "    </li>"
+Nothing to do
+set hw cpu pipetrace data "<li>The ADDW shown in PM0044 table 3 has one too many decode cycles."
+Nothing to do
+set hw cpu pipetrace data "    <br/>"
+Nothing to do
+set hw cpu pipetrace data "    (Confirmed on HW)"
+Nothing to do
+set hw cpu pipetrace data "    </li>"
+Nothing to do
+set hw cpu pipetrace data "<li>The LD shown in PM0044 table 3 is missing a decode cycle."
+Nothing to do
+set hw cpu pipetrace data "</ul>"
+Nothing to do
+step 3
+
+Stop at 0x008095: (109) stepped 11 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x281f 10271 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08095  ? 20 01          jra    0x8098                              
+F 0x008095
+set hw cpu pipetrace stop
+Nothing to do
+
+step
+
+Stop at 0x008098: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x281f 10271 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08098  ? 40             neg    A                                   
+F 0x008098
+set hw cpu pipetrace title "PM0044 5.4.1 Optimized pipeline example - execution from flash, table 6"
+Nothing to do
+set hw cpu pipetrace start "out/test.table6.html"
+Nothing to do
+step 12
+
+Stop at 0x0080b0: (109) stepped 12 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x17  23 .
+0-101001  X= 0x28e3 10467 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x080b0  ? ae 00 15       ldw    X,#0x0015                           
+F 0x0080b0
+set hw cpu pipetrace stop
+Nothing to do
+
+break 0x0100
+Breakpoint 1 at 0x000100 (cond="")
+0x00100 F? 0b             UNKNOWN/INVALID                            
+cont
+Simulation started, PC=0x0080b0
+
+Stop at 0x000100: (104) Breakpoint
+V-IHINZC  Flags= 0x2b  43 +  A= 0x20  32  
+0-101011  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17fd [SP+1]= 80 128 .  Limit= 0x14ff
+0x00100 F? 20 02          jra    0x0104                              
+F 0x000100
+
+step
+
+Stop at 0x000104: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2b  43 +  A= 0x20  32  
+0-101011  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17fd [SP+1]= 80 128 .  Limit= 0x14ff
+0x00104  ? 40             neg    A                                   
+F 0x000104
+set hw cpu pipetrace title "PM0044 5.4.2 Optimize pipeline example - execution from RAM, table 8"
+Nothing to do
+set hw cpu pipetrace start "out/test.table8.html"
+Nothing to do
+step 10
+
+Stop at 0x000114: (109) stepped 10 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x17  23 .
+0-101001  X= 0x00e3 227 .    Y= 0x0000   0 .
+SP= 0x17fd [SP+1]= 80 128 .  Limit= 0x14ff
+0x00114  ? 81             ret                                        
+F 0x000114
+set hw cpu pipetrace stop
+Nothing to do
+step
+
+Stop at 0x0080c0: (109) stepped 4 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x17  23 .
+0-101001  X= 0x00e3 227 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x080c0  ? 20 02          jra    0x80c4                              
+F 0x0080c0
+
+
+step
+
+Stop at 0x0080c4: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0x17  23 .
+0-101001  X= 0x00e3 227 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x080c4  ? 4c             inc    A                                   
+F 0x0080c4
+set hw cpu pipetrace title "PM0044 5.4.3 Pipeline with Call/Jump, table 10"
+Nothing to do
+set hw cpu pipetrace start "out/test.table10.html"
+Nothing to do
+set hw cpu pipetrace data "<p>PM0044 table 10 shows a fetch stall in the first execution cycle"
+Nothing to do
+set hw cpu pipetrace data "of the call (cycle 7) however it should be possible for a fetch"
+Nothing to do
+set hw cpu pipetrace data "to take place since pushing the return address only busies the"
+Nothing to do
+set hw cpu pipetrace data "data bus (and STM8 is a Harvard architecture with unified address"
+Nothing to do
+set hw cpu pipetrace data "space so the data and program are separate buses).</p>"
+Nothing to do
+set hw cpu pipetrace data "<p>Also note that since the flush happens on the last execute cycle"
+Nothing to do
+set hw cpu pipetrace data "of the call (unlike the jp) there is no overlap and we mark"
+Nothing to do
+set hw cpu pipetrace data "the following cycle as a decode stall. Technically this is correct"
+Nothing to do
+set hw cpu pipetrace data "but table 10 does not and says the call takes 3 cycles which"
+Nothing to do
+set hw cpu pipetrace data "ignores the unavoidable stall cycle. The later instruction documentation"
+Nothing to do
+set hw cpu pipetrace data "for call says it takes 4 cycles which is presumed to include the"
+Nothing to do
+set hw cpu pipetrace data "stall cycle that follows it.</p>"
+Nothing to do
+step 5
+
+Stop at 0x0080d9: (109) stepped 8 ticks
+V-IHINZC  Flags= 0x29  41 )  A= 0xe8 232 .
+0-101001  X= 0x00e4 228 .    Y= 0x0000   0 .
+SP= 0x17fd [SP+1]= 80 128 .  Limit= 0x14ff
+0x080d9  ? 4f             clr    A                                   
+F 0x0080d9
+set hw cpu pipetrace stop
+Nothing to do
+
+
+step 4
+
+Stop at 0x0080e0: (109) stepped 5 ticks
+V-IHINZC  Flags= 0x2b  43 +  A= 0x00   0 .
+0-101011  X= 0x00e4 228 .    Y= 0x0000   0 .
+SP= 0x17fd [SP+1]= 80 128 .  Limit= 0x14ff
+0x080e0  ? 52 14          sub    SP,#0x14                            
+F 0x0080e0
+set hw cpu pipetrace title "PM0044 5.4.4 Pipeline stalled, table 12"
+Nothing to do
+set hw cpu pipetrace start "out/test.table12.html"
+Nothing to do
+set hw cpu pipetrace data "<h2>Errata</h2>"
+Nothing to do
+set hw cpu pipetrace data "<ul>"
+Nothing to do
+set hw cpu pipetrace data "<li>Table 12 shows the BTJT as taking 1 decode, 2 execute cycles but the"
+Nothing to do
+set hw cpu pipetrace data "    later documentation for the instruction implies the second execution"
+Nothing to do
+set hw cpu pipetrace data "    cycle is only used if the branch is taken - and this isn't."
+Nothing to do
+set hw cpu pipetrace data "    </li>"
+Nothing to do
+set hw cpu pipetrace data "<li>Table 12 has a jump in time (cycles) from 4 straight to 7."
+Nothing to do
+set hw cpu pipetrace data "    </li>"
+Nothing to do
+set hw cpu pipetrace data "<li>The last instruction is shown one cycle early in table 12. The decode stall"
+Nothing to do
+set hw cpu pipetrace data "    should line up with the execution cycle of the previous instruction"
+Nothing to do
+set hw cpu pipetrace data "    as the description above the table says."
+Nothing to do
+set hw cpu pipetrace data "    </li>"
+Nothing to do
+set hw cpu pipetrace data "</ul>"
+Nothing to do
+step 7
+
+Stop at 0x0080fb: (109) stepped 10 ticks
+V-IHINZC  Flags= 0x2c  44 ,  A= 0xcb 203 .
+0-101100  X= 0x00e4 228 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x080fb  ? 20 03          jra    0x8100                              
+F 0x0080fb
+set hw cpu pipetrace stop
+Nothing to do
+
+
+# Everything else needs to be folded on flush or it could go sideways very quickly.
+set hw cpu pipetrace fold on
+Nothing to do
+
+set hw cpu pipetrace title "DIV tests - available ST docs simply say '2-17 cycles'"
+Nothing to do
+set hw cpu pipetrace start "out/test.div.html"
+Nothing to do
+set hw cpu pipetrace data "<p>The stated cycle count would seem to imply binary long division and"
+Nothing to do
+set hw cpu pipetrace data "   this is how the STM8 emulator in ucsim currently treats div for."
+Nothing to do
+set hw cpu pipetrace data "   cycle counting. However the cycles measured on actual hardware
+Unterminated string
+Unterminated string
+Unterminated string
+Nothing to do
+set hw cpu pipetrace data "   suggest this is not correct."
+Nothing to do
+set hw cpu pipetrace data "</p>"
+Nothing to do
+
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008100: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2c  44 ,  A= 0xcb 203 .
+0-101100  X= 0x00e4 228 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08100  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008100
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008106: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0100 256 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08106  ? 20 00          jra    0x8108                              
+F 0x008106
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008108: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0100 256 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08108  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008108
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00810e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0200 512 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0810e  ? 20 00          jra    0x8110                              
+F 0x00810e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008110: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0200 512 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08110  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008110
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008116: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0400 1024 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08116  ? 20 00          jra    0x8118                              
+F 0x008116
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008118: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0400 1024 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08118  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008118
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00811e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0800 2048 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0811e  ? 20 00          jra    0x8120                              
+F 0x00811e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008120: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0800 2048 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08120  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008120
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008126: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x1000 4096 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08126  ? 20 00          jra    0x8128                              
+F 0x008126
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008128: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x1000 4096 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08128  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008128
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00812e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x2000 8192 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0812e  ? 20 00          jra    0x8130                              
+F 0x00812e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008130: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x2000 8192 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08130  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008130
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008136: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x4000 16384 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08136  ? 20 00          jra    0x8138                              
+F 0x008136
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008138: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x4000 16384 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08138  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008138
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00813e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x8000 32768 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0813e  ? 20 00          jra    0x8140                              
+F 0x00813e
+
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008140: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x8000 32768 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08140  ? ae 80 00       ldw    X,#0x8000                           
+F 0x008140
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008146: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0100 256 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08146  ? 20 00          jra    0x8148                              
+F 0x008146
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008148: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0100 256 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08148  ? ae 40 00       ldw    X,#0x4000                           
+F 0x008148
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00814e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0080 128 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0814e  ? 20 00          jra    0x8150                              
+F 0x00814e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008150: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0080 128 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08150  ? ae 20 00       ldw    X,#0x2000                           
+F 0x008150
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008156: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0040  64 @    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08156  ? 20 00          jra    0x8158                              
+F 0x008156
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008158: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0040  64 @    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08158  ? ae 10 00       ldw    X,#0x1000                           
+F 0x008158
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00815e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0020  32      Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0815e  ? 20 00          jra    0x8160                              
+F 0x00815e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008160: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0020  32      Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08160  ? ae 08 00       ldw    X,#0x0800                           
+F 0x008160
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008166: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0010  16 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08166  ? 20 00          jra    0x8168                              
+F 0x008166
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008168: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0010  16 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08168  ? ae 04 00       ldw    X,#0x0400                           
+F 0x008168
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00816e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0008   8 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0816e  ? 20 00          jra    0x8170                              
+F 0x00816e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008170: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0008   8 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08170  ? ae 02 00       ldw    X,#0x0200                           
+F 0x008170
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008176: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0004   4 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08176  ? 20 00          jra    0x8178                              
+F 0x008176
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008178: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0004   4 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08178  ? ae 01 00       ldw    X,#0x0100                           
+F 0x008178
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00817e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0002   2 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0817e  ? 20 00          jra    0x8180                              
+F 0x00817e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008180: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0002   2 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08180  ? ae 00 80       ldw    X,#0x0080                           
+F 0x008180
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008186: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0001   1 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08186  ? 20 00          jra    0x8188                              
+F 0x008186
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008188: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0001   1 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08188  ? ae 00 40       ldw    X,#0x0040                           
+F 0x008188
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00818e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x40  64 @
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0818e  ? 20 00          jra    0x8190                              
+F 0x00818e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008190: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x40  64 @
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08190  ? ae 00 20       ldw    X,#0x0020                           
+F 0x008190
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x008196: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x20  32  
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08196  ? 20 00          jra    0x8198                              
+F 0x008196
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x008198: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x20  32  
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08198  ? ae 00 10       ldw    X,#0x0010                           
+F 0x008198
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x00819e: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x10  16 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x0819e  ? 20 00          jra    0x81a0                              
+F 0x00819e
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081a0: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x10  16 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081a0  ? ae 00 08       ldw    X,#0x0008                           
+F 0x0081a0
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081a6: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x08   8 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081a6  ? 20 00          jra    0x81a8                              
+F 0x0081a6
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081a8: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x08   8 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081a8  ? ae 00 04       ldw    X,#0x0004                           
+F 0x0081a8
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081ae: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x04   4 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081ae  ? 20 00          jra    0x81b0                              
+F 0x0081ae
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081b0: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x04   4 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081b0  ? ae 00 02       ldw    X,#0x0002                           
+F 0x0081b0
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081b6: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x02   2 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081b6  ? 20 00          jra    0x81b8                              
+F 0x0081b6
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081b8: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x02   2 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081b8  ? ae 00 01       ldw    X,#0x0001                           
+F 0x0081b8
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081be: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x01   1 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081be  ? 20 00          jra    0x81c0                              
+F 0x0081be
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081c0: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x01   1 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081c0  ? ae 00 00       ldw    X,#0x0000                           
+F 0x0081c0
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081c6: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081c6  ? 20 00          jra    0x81c8                              
+F 0x0081c6
+
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081c8: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x2a  42 *  A= 0x00   0 .
+0-101010  X= 0x0000   0 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081c8  ? ae 00 3f       ldw    X,#0x003f                           
+F 0x0081c8
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081ce: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x07   7 .
+0-101000  X= 0x0007   7 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081ce  ? 20 00          jra    0x81d0                              
+F 0x0081ce
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081d0: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x07   7 .
+0-101000  X= 0x0007   7 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081d0  ? ae 00 40       ldw    X,#0x0040                           
+F 0x0081d0
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081d6: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0008   8 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081d6  ? 20 00          jra    0x81d8                              
+F 0x0081d6
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081d8: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0008   8 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081d8  ? ae 00 41       ldw    X,#0x0041                           
+F 0x0081d8
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081de: (109) stepped 14 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x01   1 .
+0-101000  X= 0x0008   8 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081de  ? 20 00          jra    0x81e0                              
+F 0x0081de
+
+set hw cpu pipetrace pause
+Nothing to do
+step
+
+Stop at 0x0081e0: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x01   1 .
+0-101000  X= 0x0008   8 .    Y= 0x0001   1 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081e0  ? ae 80 00       ldw    X,#0x8000                           
+F 0x0081e0
+set hw cpu pipetrace resume
+Nothing to do
+step 3
+
+Stop at 0x0081e8: (109) stepped 18 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x01   1 .
+0-101000  X= 0x8000 32768 .    Y= 0x0000   0 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x081e8  ? 20 02          jra    0x81ec                              
+F 0x0081e8
+
+set hw cpu pipetrace stop
+Nothing to do
+
+
+step 7
+
+Stop at 0x008201: (109) stepped 9 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x0a  10 .
+0-101000  X= 0x00ff 255 .    Y= 0x0000   0 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08201  ? 62             div    X,A                                 
+F 0x008201
+
+set hw cpu pipetrace title "Interrupted div"
+Nothing to do
+set hw cpu pipetrace start "out/test.int_div.html"
+Nothing to do
+set hw cpu pipetrace data "<p>(Not currently implemented.)</p>"
+Nothing to do
+# FIXME: once we have timer interrupts emulated correctly we need to add
+# the interrupt instructions to the following step count.
+#step 4
+step
+
+Stop at 0x008202: (109) stepped 11 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x05   5 .
+0-101000  X= 0x0019  25 .    Y= 0x0000   0 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08202  ? 20 00          jra    0x8204                              
+F 0x008202
+set hw cpu pipetrace stop
+Nothing to do
+
+step
+
+Stop at 0x008204: (109) stepped 2 ticks
+V-IHINZC  Flags= 0x28  40 (  A= 0x05   5 .
+0-101000  X= 0x0019  25 .    Y= 0x0000   0 .
+SP= 0x17e9 [SP+1]= 41  65 A  Limit= 0x14ff
+0x08204  ? a9 55          adc    A,#0x55                             
+F 0x008204
+
+set hw cpu pipetrace title "All instructions and addressing modes"
+Nothing to do
+set hw cpu pipetrace start "out/test.instrs.html"
+Nothing to do
+set hw cpu pipetrace data "<p>Note that timings given in PM0044 assume a 1 cycle overlap"
+Nothing to do
+set hw cpu pipetrace data "with the previous instruction and are specified as being"
+Nothing to do
+set hw cpu pipetrace data "one cycle less than they are in the no prefetch/stall case."
+Nothing to do
+set hw cpu pipetrace data "Instructions that flush the prefetch buffer such as jumps"
+Nothing to do
+set hw cpu pipetrace data "prevent the overlap with the following instruction. The cycle"
+Nothing to do
+set hw cpu pipetrace data "count for these instructions includes the extra cycles for"
+Nothing to do
+set hw cpu pipetrace data "the unavoidable fetches and stalls that follow them.</p>"
+Nothing to do
+cont
+Simulation started, PC=0x008204
+
+Stop at 0x008e53: (101) Halted
+F 0x008e53
+set hw cpu pipetrace stop
+Nothing to do

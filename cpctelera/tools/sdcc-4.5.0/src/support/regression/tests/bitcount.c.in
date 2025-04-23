@@ -1,0 +1,34 @@
+/* Test count operations from stdbit.h
+
+   type: unsigned short, unsigned int, unsigned long, unsigned long long
+ */
+
+#include <testfwk.h>
+
+#ifdef __SDCC // Todo: Enable for all C23 implementations
+#pragma std_c23
+#include <stdbit.h>
+#endif
+
+volatile {type} i, j;
+
+void
+testCount(void)
+{
+#ifdef __SDCC // Todo: Enable for all C23 implementations
+	i = 0x10;
+	j = ~i;
+	ASSERT (stdc_count_ones(i) == 1);
+	ASSERT (stdc_count_zeros(j) == 1);
+	ASSERT (stdc_has_single_bit(i));
+	ASSERT (!stdc_has_single_bit(j));
+
+	i = 0xff;
+	j = ~i;
+	ASSERT (stdc_count_ones(i) == 8);
+	ASSERT (stdc_count_zeros(j) == 8);
+	ASSERT (!stdc_has_single_bit(i));
+	ASSERT (!stdc_has_single_bit(j));
+#endif
+}
+

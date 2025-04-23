@@ -1,0 +1,145 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+# Bander maps bits one at a time starting from iram_chip[0x20] into
+# the bits address space starting at 0x00
+info mem
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+  0x000000-0x0000ff      256 iram_chip (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram_chip (8,%02x,0x%04x)
+  0x000000-0x00007f      128 sfr_chip (8,%02x,0x%02x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00007f      128 iram (8,%02x,0x%02x)
+  0x000080-0x0000ff      128 sfr (8,%02x,0x%02x)
+  0x000000-0x00ffff    65536 xram (8,%02x,0x%04x)
+  0x000000-0x000007        8 regs (8,%02x,0x%01x)
+  0x000000-0x0000ff      256 bits (1,%01x,0x%02x)
+  0x000000-0x000003        4 dptr (8,%02x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated
+  iram 0x00 0x7f -> iram_chip 0x00 activated
+  sfr 0x80 0xff -> sfr_chip 0x00 activated
+  xram 0x0000 0xffff -> xram_chip 0x0000 activated
+  regs 0x0 0x7 -> banked
+    bank selector: sfr[0xd0] mask=0x18 banks=4 act=0
+    banks:
+      *  0. iram_chip 0x00
+         1. iram_chip 0x08
+         2. iram_chip 0x10
+         3. iram_chip 0x18
+  bits 0x00 0x7f -> bander(8/1) iram_chip 0x20 activated
+  bits 0x80 0xff -> bander(8/8) sfr_chip 0x00 activated
+  dptr 0x0 0x1 -> sfr_chip 0x02 activated
+
+# Set iram_chip[0x20] and iram_chip[0x21] to 0xff
+set mem iram_chip 0x20 0xff 0xff
+0x20                      ff ff ..
+
+# First 16 addresses of bits should all read as 0x01
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 1 1 1 1 1 1 ........
+
+# Set iram_chip[0x20] and iram_chip[0x21] to 0x00
+set mem iram_chip 0x20 0x00 0x00
+0x20                      00 00 ..
+
+# First 16 addresses of bits should all read as 0x00
+dump bits 0 15
+0x00                      0 0 0 0 0 0 0 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+
+# Now set bits in turn starting with the lowest and the
+# corresponding location in bits should change to 0x01
+set mem iram_chip[0x20].0 1
+0x20.0                              0b-------1 0x01 '.'   1
+dump bits 0 15
+0x00                      1 0 0 0 0 0 0 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x20].1 1
+0x20.1                              0b------1- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 0 0 0 0 0 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x20].2 1
+0x20.2                              0b-----1-- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 0 0 0 0 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x20].3 1
+0x20.3                              0b----1--- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 0 0 0 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x20].4 1
+0x20.4                              0b---1---- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 0 0 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x20].5 1
+0x20.5                              0b--1----- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 0 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x20].6 1
+0x20.6                              0b-1------ 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 0 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x20].7 1
+0x20.7                              0b1------- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      0 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x21].0 1
+0x21.0                              0b-------1 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 0 0 0 0 0 0 0 ........
+set mem iram_chip[0x21].1 1
+0x21.1                              0b------1- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 0 0 0 0 0 0 ........
+set mem iram_chip[0x21].2 1
+0x21.2                              0b-----1-- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 1 0 0 0 0 0 ........
+set mem iram_chip[0x21].3 1
+0x21.3                              0b----1--- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 1 1 0 0 0 0 ........
+set mem iram_chip[0x21].4 1
+0x21.4                              0b---1---- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 1 1 1 0 0 0 ........
+set mem iram_chip[0x21].5 1
+0x21.5                              0b--1----- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 1 1 1 1 0 0 ........
+set mem iram_chip[0x21].6 1
+0x21.6                              0b-1------ 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 1 1 1 1 1 0 ........
+set mem iram_chip[0x21].7 1
+0x21.7                              0b1------- 0x01 '.'   1
+dump bits 0 15
+0x00                      1 1 1 1 1 1 1 1 ........
+0x08                      1 1 1 1 1 1 1 1 ........
+
+# If we set bits[0x08] to 0 that should clear bit 0 of iram_chip[0x21]
+set mem bits[0x08] 0
+0x08                      0 .
+dump iram_chip 0x20 0x21
+0x20                      ff fe ..

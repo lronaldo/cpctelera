@@ -1,0 +1,19 @@
+$date
+	Date is omitted in quiet mode
+$end
+$version
+	ucsim
+$end
+$timescale 1ns $end
+$scope module ucsim_vcd_1 $end
+$var wire 8 ! rom_0x00000 $end
+$var wire 1 " rom_0x050a3.2 $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+b01000001 !
+1"
+$end
+#500
+b00000000 !

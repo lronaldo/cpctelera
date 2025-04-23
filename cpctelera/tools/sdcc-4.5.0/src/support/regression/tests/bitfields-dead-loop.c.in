@@ -1,0 +1,220 @@
+/** Test for "dead-loops" over bitfield or bit tests in a byte.
+    struct: 0, 1
+    varType: 0, 1, 2, 3, 4, 5, 6
+*/
+
+#pragma disable_warning 88
+
+// Disable for ds390: bug #3211
+// Absolute addressing has some issues for pdk. And if those are fixed, there might be  alack of memory, still.
+// mcs51 creates invalid assembler. Don't know if that is a bug or just a bad choice for ABS_ADDR1 and ABS_ADDR2 below.
+#if defined(__SDCC_ds390) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15) || defined(__SDCC_mcs51)
+#define DUMMY_CASE
+#endif
+
+// These tests assume the bitfields are allocated in LSB to MSB order
+// but some hosts allocate them in MSB to LSB order. Disable the
+// tests on these hosts
+#if defined(PORT_HOST) && (defined(__ppc__) || defined(__PPC__) || defined(__sparc) || defined(__sparc64__))
+#define DUMMY_CASE
+#endif
+
+#include <testfwk.h>
+#ifdef __sun__
+#include <inttypes.h>
+#else
+#include <stdint.h>
+#endif
+
+#define VAR_TYPE ({varType})
+#define TYPE_IS_STRUCT ({struct})
+
+
+typedef struct
+{
+    unsigned int bit0       : 1;
+    unsigned int bit1       : 1;
+    unsigned int bit2       : 1;
+    unsigned int bit3       : 1;
+    unsigned int high       : 4;
+}struct_8bits;
+
+#if TYPE_IS_STRUCT
+    #define TYPE struct_8bits
+#else
+    #define TYPE uint8_t
+#endif
+
+#if defined(__SDCC_pic16)
+    #define ABS_ADDR1 0x0200
+    #define ABS_ADDR2 0x0204
+#elif defined(__SDCC_pic14)
+    #define ABS_ADDR1 0x0100
+    #define ABS_ADDR2 0x0104
+#elif defined(__SDCC_stm8)
+    #define ABS_ADDR1 0x1000
+    #define ABS_ADDR2 0x1004
+#elif defined(__SDCC_f8)
+    #define ABS_ADDR1 0x3000
+    #define ABS_ADDR2 0x3004
+#else
+    #if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Make test suitable for pdk
+        #if !defined(PORT_HOST) // Never do absolute address test with host
+            #define ABS_ADDR1 0xCA00
+            #define ABS_ADDR2 0xCA04
+        #endif
+    #endif
+#endif
+
+#if VAR_TYPE == 0
+    volatile TYPE volatileBits;
+#elif VAR_TYPE == 1
+    #ifdef ABS_ADDR1
+        #define volatileBits (*(volatile TYPE*)ABS_ADDR1)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 2
+    #ifdef ABS_ADDR2
+        #define volatileBits (*(volatile TYPE*)ABS_ADDR2)
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 3
+    #define VOLATILE_BITS_DEF volatile TYPE volatileBits
+#elif VAR_TYPE == 4
+    #define VOLATILE_BITS_DEF static volatile TYPE volatileBits
+#elif VAR_TYPE == 5
+    #ifdef ABS_ADDR1
+        #define VOLATILE_BITS_DEF static volatile TYPE __at(ABS_ADDR1) volatileBits
+    #else
+        #define DUMMY_CASE
+    #endif
+#elif VAR_TYPE == 6
+    #ifdef ABS_ADDR2
+        #define VOLATILE_BITS_DEF static volatile TYPE __at(ABS_ADDR2) volatileBits
+        #define USE_ONLY_1_BYTE
+    #else
+        #define DUMMY_CASE
+    #endif
+#else
+    #error "Unknown VAR_TYPE case"
+#endif
+
+#ifndef VOLATILE_BITS_DEF
+    #define VOLATILE_BITS_DEF
+#endif
+
+
+#ifndef DUMMY_CASE
+
+#if TYPE_IS_STRUCT
+    #define AS_UINT8(x) (*(uint8_t *)&x)
+    void 
+    loop_test_byte(void)
+    {
+        VOLATILE_BITS_DEF;
+        
+        AS_UINT8(volatileBits) = 0x00;
+        while(AS_UINT8(volatileBits) != 0x00);
+        while(volatileBits.high != 0x00);
+        while(volatileBits.bit0);
+        while(volatileBits.bit1);
+        while(volatileBits.bit2);
+        while(volatileBits.bit3);
+        
+        AS_UINT8(volatileBits) = 0xFF;
+        while(AS_UINT8(volatileBits) != 0xFF);
+        while(volatileBits.high != 0x0F);
+        while(!volatileBits.bit0);
+        while(!volatileBits.bit1);
+        while(!volatileBits.bit2);
+        while(!volatileBits.bit3);
+        
+        AS_UINT8(volatileBits) = 0x01;
+        while(AS_UINT8(volatileBits) != 0x01);
+        while(volatileBits.high != 0x00);
+        while(!volatileBits.bit0);
+        while( volatileBits.bit1);
+        while( volatileBits.bit2);
+        while( volatileBits.bit3);
+        
+        AS_UINT8(volatileBits) = 0x02;
+        while(AS_UINT8(volatileBits) != 0x02);
+        while(volatileBits.high != 0x00);
+        while( volatileBits.bit0);
+        while(!volatileBits.bit1);
+        while( volatileBits.bit2);
+        while( volatileBits.bit3);
+        
+        AS_UINT8(volatileBits) = 0xF0;
+        while(AS_UINT8(volatileBits) != 0xF0);
+        while(volatileBits.high != 0x0F);
+        while(volatileBits.bit0);
+        while(volatileBits.bit1);
+        while(volatileBits.bit2);
+        while(volatileBits.bit3);
+        
+        ASSERT(1);
+    }
+#else
+    #define AS_UINT8(x) x
+    void 
+    loop_test_byte(void)
+    {
+        VOLATILE_BITS_DEF;
+        
+        volatileBits = 0x00;
+        while(volatileBits != 0x00);
+        while((volatileBits & 0xF0) != 0x00);
+        while((volatileBits & 0x01) != 0x00);
+        while((volatileBits & 0x02) != 0x00);
+        while((volatileBits & 0x04) != 0x00);
+        while((volatileBits & 0x08) != 0x00);
+        
+        volatileBits = 0xFF;
+        while(volatileBits != 0xFF);
+        while((uint8_t)(volatileBits & 0xF0) != 0xF0);
+        while((uint8_t)(volatileBits & 0x01) != 0x01);
+        while((uint8_t)(volatileBits & 0x02) != 0x02);
+        while((uint8_t)(volatileBits & 0x04) != 0x04);
+        while((uint8_t)(volatileBits & 0x08) != 0x08);
+        
+        volatileBits = 0x01;
+        while(volatileBits != 0x01);
+        while(         (volatileBits & 0xF0) != 0x00);
+        while((uint8_t)(volatileBits & 0x01) != 0x01);
+        while(         (volatileBits & 0x02) != 0x00);
+        while(         (volatileBits & 0x04) != 0x00);
+        while(         (volatileBits & 0x08) != 0x00);
+        
+        volatileBits = 0x02;
+        while(volatileBits != 0x02);
+        while(         (volatileBits & 0xF0) != 0x00);
+        while(         (volatileBits & 0x01) != 0x00);
+        while((uint8_t)(volatileBits & 0x02) != 0x02);
+        while(         (volatileBits & 0x04) != 0x00);
+        while(         (volatileBits & 0x08) != 0x00);
+        
+        volatileBits = 0xF0;
+        while(volatileBits != 0xF0);
+        while((uint8_t)(volatileBits & 0xF0) != 0xF0);
+        while(         (volatileBits & 0x01) != 0x00);
+        while(         (volatileBits & 0x02) != 0x00);
+        while(         (volatileBits & 0x04) != 0x00);
+        while(         (volatileBits & 0x08) != 0x00);
+        
+        ASSERT(1);
+    }
+#endif
+
+#endif // DUMMY_CASE
+
+static void
+testBitfieldsDeadLoop(void)
+{
+    #ifndef DUMMY_CASE
+        loop_test_byte();
+    #endif
+}
+

@@ -1,0 +1,116 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+# Test of the 8xC5x7 MDU
+
+# MDU is mapped at sfr 0xe9 to 0xef
+dump sfr 0xe9 0xef
+0xe9                      00 00 00 00 00 00 00 .......
+
+# All cells should have hw operators attached
+memory cell sfr 0xe9
+sfr[0xe9] sfr_0000e9
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[13]
+Operators:
+  [0] hw:mdu
+memory cell sfr 0xea
+sfr[0xea] sfr_0000ea
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[13]
+Operators:
+  [0] hw:mdu
+memory cell sfr 0xeb
+sfr[0xeb] sfr_0000eb
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[13]
+Operators:
+  [0] hw:mdu
+memory cell sfr 0xec
+sfr[0xec] sfr_0000ec
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[13]
+Operators:
+  [0] hw:mdu
+memory cell sfr 0xed
+sfr[0xed] sfr_0000ed
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[13]
+Operators:
+  [0] hw:mdu
+memory cell sfr 0xee
+sfr[0xee] sfr_0000ee
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[13]
+Operators:
+  [0] hw:mdu
+memory cell sfr 0xef
+sfr[0xef] sfr_0000ef
+cell width=8 mask=ff flags=0
+  decoded to sfr_chip[13]
+Operators:
+  [0] hw:mdu
+
+# 0x12345678 / 0x4321 = 0x456c r 0x1f8c
+set mem sfr 0xe9 0x78 0x56 0x34 0x12
+0xe9                      00 00 00 00 ....
+set mem sfr 0xed 0x21 0x43
+0xed                      8c 1f ..
+# Quotient
+dump sfr 0xe9 0xec
+0xe9                      6c 45 00 00 lE..
+# Remainder
+dump sfr 0xed 0xee
+0xed                      8c 1f ..
+
+# 0x8765 / 0x1234 = 0x7 r 0x7f9
+set mem sfr 0xe9 0x65 0x87
+0xe9                      6c 45 lE
+set mem sfr 0xed 0x34 0x12
+0xed                      f9 07 ..
+# Quotient
+dump sfr 0xe9 0xea
+0xe9                      07 00 ..
+# Remainder
+dump sfr 0xed 0xee
+0xed                      f9 07 ..
+
+#  0xdead * 0xbeef
+set mem sfr 0xe9 0xad
+0xe9                      07 .
+set mem sfr 0xed 0xef
+0xed                      f9 .
+set mem sfr 0xea 0xde
+0xea                      00 .
+set mem sfr 0xee 0xbe
+0xee                      be .
+# Product
+dump sfr 0xe9 0xec
+0xe9                      83 49 14 a6 .I..
+
+# 0x87654321 << 1
+set mem sfr 0xe9 0x21 0x43 0x65 0x87
+0xe9                      83 49 14 a6 .I..
+set mem sfr 0xef 0x01
+0xef                      01 .
+dump sfr 0xe9 0xec
+0xe9                      90 a1 b2 43 ...C
+
+# >> 1
+set mem sfr 0xef 0x21
+0xef                      21 !
+dump sfr 0xe9 0xec
+0xe9                      42 86 ca 0e B...
+
+# << 4
+set mem sfr 0xef 0x04
+0xef                      04 .
+dump sfr 0xe9 0xec
+0xe9                      32 54 76 08 2Tv.
+
+# << 8
+set mem sfr 0xef 0x08
+0xef                      08 .
+dump sfr 0xe9 0xec
+0xe9                      43 65 87 00 Ce..

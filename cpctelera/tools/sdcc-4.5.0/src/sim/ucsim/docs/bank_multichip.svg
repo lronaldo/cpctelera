@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2023-01-02 17:59:14 -->
+<!-- Magnification: 1.05 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="373pt" height="331pt"
+	viewBox="2025 -981 5907 5239">
+<g fill="none">
+<!-- Line -->
+<rect x="4725" y="-585" width="540" height="1170" fill="#00d1d1"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="5400" y="-585" width="540" height="1170" fill="#00d1d1"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="6075" y="-585" width="540" height="1170" fill="#00d1d1"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="6750" y="-585" width="540" height="1170" fill="#00d1d1"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 3375,1080 3375,4140"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Text -->
+<text xml:space="preserve" x="4995" y="90" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">chip</text>
+<!-- Text -->
+<text xml:space="preserve" x="5670" y="90" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">chip</text>
+<!-- Text -->
+<text xml:space="preserve" x="6345" y="90" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">chip</text>
+<!-- Text -->
+<text xml:space="preserve" x="7020" y="90" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">chip</text>
+<!-- Line -->
+<polyline points=" 3285,1080 3465,1080"
+	stroke="#000000" stroke-width="30px"/>
+<!-- Line -->
+<polyline points=" 3285,4140 3465,4140"
+	stroke="#000000" stroke-width="30px"/>
+<!-- Line -->
+<polyline points=" 3375,2520 3465,2430 3465,1980 3555,1890 3465,1800 3465,1440 3375,1350"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 3375,1350 3375,2520"
+	stroke="#000000" stroke-width="30px"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp0">
+	<path clip-rule="evenodd" d="M 2025,-981 H 7932 V 4258 H 2025 z
+		M 6000,1802 6030,1682 6060,1802 6037,1658 6023,1658z
+		M 3782,1920 3662,1890 3782,1860 3638,1883 3638,1897z"/>
+</clipPath>
+</defs>
+<polyline points=" 3645,1890 6030,1890 6030,1665" clip-path="url(#cp0)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 6030,1665 -->
+<polyline points=" 6000,1802 6030,1682 6060,1802"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 3645,1890 -->
+<polyline points=" 3782,1920 3662,1890 3782,1860"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<polygon points=" 5085,1665 6930,1665 7245,1350 4770,1350"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp1">
+	<path clip-rule="evenodd" d="M 2025,-981 H 7932 V 4258 H 2025 z
+		M 5025,1213 4995,1333 4965,1213 4988,1357 5002,1357z
+		M 4965,722 4995,602 5025,722 5002,578 4988,578z"/>
+</clipPath>
+</defs>
+<polyline points=" 4995,585 4995,1350" clip-path="url(#cp1)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 4995,1350 -->
+<polyline points=" 5025,1213 4995,1333 4965,1213"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 4995,585 -->
+<polyline points=" 4965,722 4995,602 5025,722"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp2">
+	<path clip-rule="evenodd" d="M 2025,-981 H 7932 V 4258 H 2025 z
+		M 5700,1213 5670,1333 5640,1213 5663,1357 5677,1357z
+		M 5640,722 5670,602 5700,722 5677,578 5663,578z"/>
+</clipPath>
+</defs>
+<polyline points=" 5670,585 5670,1350" clip-path="url(#cp2)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 5670,1350 -->
+<polyline points=" 5700,1213 5670,1333 5640,1213"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 5670,585 -->
+<polyline points=" 5640,722 5670,602 5700,722"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp3">
+	<path clip-rule="evenodd" d="M 2025,-981 H 7932 V 4258 H 2025 z
+		M 6375,1213 6345,1333 6315,1213 6338,1357 6352,1357z
+		M 6315,722 6345,602 6375,722 6352,578 6338,578z"/>
+</clipPath>
+</defs>
+<polyline points=" 6345,585 6345,1350" clip-path="url(#cp3)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 6345,1350 -->
+<polyline points=" 6375,1213 6345,1333 6315,1213"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 6345,585 -->
+<polyline points=" 6315,722 6345,602 6375,722"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp4">
+	<path clip-rule="evenodd" d="M 2025,-981 H 7932 V 4258 H 2025 z
+		M 7050,1213 7020,1333 6990,1213 7013,1357 7027,1357z
+		M 6990,722 7020,602 7050,722 7027,578 7013,578z"/>
+</clipPath>
+</defs>
+<polyline points=" 7020,585 7020,1350" clip-path="url(#cp4)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 7020,1350 -->
+<polyline points=" 7050,1213 7020,1333 6990,1213"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 7020,585 -->
+<polyline points=" 6990,722 7020,602 7050,722"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<rect x="7785" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="7650" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="7515" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="7380" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="7245" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="7110" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="6975" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="6840" y="2880" width="135" height="225"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 7650,2835 7695,2790 7740,2790 7785,2745 7830,2790 7875,2790 7920,2835"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp5">
+	<path clip-rule="evenodd" d="M 2025,-981 H 7932 V 4258 H 2025 z
+		M 7247,1560 7127,1530 7247,1500 7103,1523 7103,1537z
+		M 6990,722 7020,602 7050,722 7027,578 7013,578z"/>
+</clipPath>
+</defs>
+<polyline points=" 7785,2700 7785,1530 7110,1530" clip-path="url(#cp5)"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Forward arrow to point 7110,1530 -->
+<polyline points=" 7247,1560 7127,1530 7247,1500"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp6">
+	<path clip-rule="evenodd" d="M 2025,-981 H 7932 V 4258 H 2025 z
+		M 7247,1560 7127,1530 7247,1500 7103,1523 7103,1537z
+		M 6658,2985 6778,3015 6658,3045 6802,3022 6802,3008z"/>
+</clipPath>
+</defs>
+<polyline points=" 6795,3015 3420,3015" clip-path="url(#cp6)"
+	stroke="#000000" stroke-width="8px" stroke-dasharray="40 40"/>
+<!-- Backward arrow to point 6795,3015 -->
+<polyline points=" 6658,2985 6778,3015 6658,3045"
+	stroke="#000000" stroke-width="8px" stroke-miterlimit="8"/>
+<!-- Line -->
+<polyline points=" 3330,3060 3420,3060"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<polyline points=" 3330,2970 3420,2970"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Text -->
+<text xml:space="preserve" x="3285" y="2520" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">banked_start</text>
+<!-- Text -->
+<text xml:space="preserve" x="2835" y="4185" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">begin_as</text>
+<!-- Text -->
+<text xml:space="preserve" x="2880" y="1125" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">end_as</text>
+<!-- Text -->
+<text xml:space="preserve" x="2790" y="810" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">Address Space</text>
+<!-- Text -->
+<text xml:space="preserve" x="7785" y="3060" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">10</text>
+<!-- Text -->
+<text xml:space="preserve" x="6975" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">0</text>
+<!-- Text -->
+<text xml:space="preserve" x="7110" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">0</text>
+<!-- Text -->
+<text xml:space="preserve" x="7245" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">0</text>
+<!-- Text -->
+<text xml:space="preserve" x="7380" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">0</text>
+<!-- Text -->
+<text xml:space="preserve" x="7515" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">0</text>
+<!-- Text -->
+<text xml:space="preserve" x="7650" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">0</text>
+<!-- Text -->
+<text xml:space="preserve" x="7785" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">11</text>
+<!-- Text -->
+<text xml:space="preserve" x="6750" y="3330" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">selection mask:</text>
+<!-- Text -->
+<text xml:space="preserve" x="5985" y="-810" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">Banks (in multi chips)</text>
+<!-- Text -->
+<text xml:space="preserve" x="6030" y="1620" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="middle">banker</text>
+<!-- Text -->
+<text xml:space="preserve" x="3240" y="3060" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="end">bank selector</text>
+</g>
+</svg>

@@ -1,0 +1,33 @@
+#
+# uCsim  simulator Makefile
+#
+# (c) Drotos Daniel, Talker Bt. 1997
+#
+
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+include $(srcdir)/objs.mk
+include ../../common.mk
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: $(LEN)
+
+include $(top_srcdir)/src/app.mk
+
+local_install:
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/ucsim_i8051$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/ucsim_i8051$(EXEEXT)
+	$(INSTALL) $(LEN) $(DESTDIR)$(bindir)/s51$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/s51$(EXEEXT)
+
+local_uninstall:
+	rm -f $(DESTDIR)$(bindir)/ucsim_i8051$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/s51$(EXEEXT)
+
+
+# End of simulator Makefile

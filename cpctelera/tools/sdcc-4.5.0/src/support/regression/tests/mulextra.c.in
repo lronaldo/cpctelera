@@ -1,0 +1,70 @@
+/** Simple test for special multiplication support (wide x narrow)
+
+    type: unsigned char, signed char, unsigned int, signed int
+*/
+#include <testfwk.h>
+
+unsigned long long ull;
+unsigned long l;
+
+void f(void)
+{
+	ull = (unsigned long long)l * 10;
+}
+
+{type} c;
+
+void g(void)
+{
+	ull = (unsigned long long)l * c;
+}
+
+void
+testMul (void)
+{
+	l = 10ull;
+	c = 10;
+	f();
+	ASSERT (ull == 10ull * ({type})10);
+	g();
+	ASSERT (ull == 10ull * ({type})10);
+
+	l = 100;
+	c = 10;
+	f();
+	ASSERT (ull == 100ull * ({type})10);
+	g();
+	ASSERT (ull == 100ull * ({type})10);
+
+	l = 1000ull;
+	c = 10;
+	f();
+	ASSERT (ull == 1000ull * ({type})10);
+	g();
+	ASSERT (ull == 1000ull * ({type})10);
+
+	l = 10000ull;
+	c = 10;
+	f();
+	ASSERT (ull == 10000ull * ({type})10);
+	g();
+	ASSERT (ull == 10000ull * ({type})10);
+
+	l = 100000ull;
+	c = 10;
+	f();
+	ASSERT (ull == 100000ull * ({type})10);
+	g();
+	ASSERT (ull == 100000ull * ({type})10);
+
+	l = 100000ull;
+	c = 100;
+	g();
+	ASSERT (ull == 100000ull * ({type})100);
+
+	l = 100000ull;
+	c = 1000;
+	g();
+	ASSERT (ull == 100000ull * ({type})1000);
+}
+

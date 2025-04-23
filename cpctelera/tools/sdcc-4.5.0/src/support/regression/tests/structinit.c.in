@@ -1,0 +1,86 @@
+/** struct initalization test.
+
+    type: char, int, long
+*/
+
+#include <testfwk.h>
+
+struct s
+{
+	char c;
+	{type} t;
+	unsigned u;
+};
+
+union u
+{
+	int i;
+	char c;
+};
+
+struct S
+{
+	char c;
+	struct s s;
+	union u u;
+};
+
+struct s sg = {0x55, 0x5a, 0xa5a5};
+const union u ug = {0xa555};
+
+void f0(void)
+{
+	struct s sl = sg;
+
+	ASSERT(sl.c == 0x55);
+	ASSERT(sl.t == 0x5a);
+	ASSERT(sl.u == 0xa5a5);
+}
+
+void f1(void)
+{
+	auto struct s sl = sg;
+
+	ASSERT(sl.c == 0x44);
+	ASSERT(sl.t == 0x4a);
+	ASSERT(sl.u == 0xa4a4);
+}
+
+void f2(void)
+{
+	union u ul = ug;
+
+	ASSERT(ug.i == 0xa555);
+}
+
+void f3(void)
+{
+	struct S sl = {0x55, sg, ug};
+
+	ASSERT(sl.c == 0x55);
+	ASSERT(sl.s.c == 0x44);
+	ASSERT(sl.s.t == 0x4a);
+	ASSERT(sl.s.u == 0xa4a4);
+	ASSERT(sl.u.i == 0xa555);
+}
+
+void f4(void)
+{
+	struct s sl0 = sg;
+	sl0.t = 0x5a;
+	struct s sl1 = sl0;
+
+	ASSERT(sl1.c == 0x44);
+	ASSERT(sl1.t == 0x5a);
+	ASSERT(sl1.u == 0xa4a4);
+}
+
+void testStructInit(void)
+{
+	f0();
+	sg.c = 0x44; sg.t = 0x4a; sg.u = 0xa4a4;
+	f1();
+	f3();
+	f4();
+}
+

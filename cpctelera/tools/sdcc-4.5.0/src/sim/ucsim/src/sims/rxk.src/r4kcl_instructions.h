@@ -1,0 +1,82 @@
+virtual int instruction_4k42(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k45(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k48(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k4c(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k4d(t_mem code) { return resNOT_DONE; }
+
+virtual int instruction_4k50(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k51(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k54(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k55(t_mem code) { return resNOT_DONE; }
+
+virtual int instruction_4k60(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k61(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k62(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k63(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k65(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k6d(t_mem code) { return resNOT_DONE; }
+
+virtual int instruction_4k7f(t_mem code) { return resNOT_DONE; }
+
+virtual int instruction_4k81(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k82(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k83(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k84(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k85(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k86(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k87(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k89(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k8a(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k8b(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k8c(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k8d(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k8e(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k8f(t_mem code) { return resNOT_DONE; }
+
+virtual int instruction_4k91(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k92(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k93(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k94(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k95(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k96(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k97(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k98(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k99(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k9a(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k9b(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k9c(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k9d(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k9e(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4k9f(t_mem code) { return resNOT_DONE; }
+
+virtual int instruction_4ka0(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka1(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka2(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka3(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka4(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka5(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka6(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka7(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka8(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4ka9(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kaa(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kab(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kac(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kad(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kae(t_mem code) { return resNOT_DONE; }
+
+virtual int instruction_4kb0(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb1(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb2(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb3(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb4(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb5(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb6(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb8(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kb9(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kba(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kbb(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kbc(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kbd(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kbe(t_mem code) { return resNOT_DONE; }
+virtual int instruction_4kbf(t_mem code) { return resNOT_DONE; }

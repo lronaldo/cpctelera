@@ -1,0 +1,37 @@
+#
+# uCsim motorola.src/Makefile
+#
+# (c) 1997 Drotos Daniel
+#
+
+PKG		= motorola
+
+include ../../common.mk
+
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+CPPFLAGS	+= -I$(top_srcdir)/src/sims/m6800.src
+CPPFLAGS	+= -I$(top_srcdir)/src/sims/m68hc11.src
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: libs
+
+include $(top_srcdir)/src/lib.mk
+
+
+# Performing self-test
+# --------------------
+check:
+
+test:
+
+baseline:
+
+
+# End of motorola.src/Makefile

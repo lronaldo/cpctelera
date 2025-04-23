@@ -1,0 +1,444 @@
+# Test suite Makefile
+# Part of SDCC - http://sdcc.sourceforge.net/
+# Michael Hope <michaelh@juju.net.nz> 2001
+# refactored: Felix Salfelder 2022
+#
+# This Makefile builds and runs the test suites under tests/ for each
+# one of the supported ports located under ports/.  The test suite
+# results are summarised and individual test failures are logged.  The
+# expected result is a single line per port summarising the number of
+# failures, test points, and test cases.  The philosophy is that
+# checked in code should always pass the suite with no failures, as
+# then if there are failures then it is in the current developers code.
+#
+# Only the required suites are run.  Changing sdcc causes all to be
+# re-run.  Changing one suite causes just that to be run.  Changing
+# one of the library files should cause all to re-run
+#
+# Test individual ports using the command
+# $ make test-$port
+# For port=rrz80 port=rrgbz80, tests will use rrz80 and rrgbz80 simulators
+# respectively.
+# mos6502 uses sim65.
+# pic1{4,6} uses gpsim.
+# port=host does not simulate.
+# The others use uCsim.
+
+# Dependencies:
+#   * The sdcc-extra package, available from svn.
+#       o svn co https://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc-extra
+#       o Provides the emulators
+#   * The gbdk-lib package from gbdk.
+#       o cvs -d cvs.gbdk.sourceforge.net:/cvsroot/gbdk co gbdk-lib
+#       o Provides mul, div, and include files for the z80 tests.
+#   * python 1.5 or above
+#   * uCsim for the mcs51 port
+#
+# The paths below assume that sdcc, sdcc-extra, and gbdk-lib all reside in
+# the same directory.
+
+# Old notes:
+# Starting at the bottom
+# Set of source test suites
+# Each source suite is processed producing multiple device specific test suites.
+# Each device specific test suite is compiled.
+# Each device specific test suite is run, and the output recorded.
+# The output from each device specific test suite derived from a source
+# test suite are collated.
+
+# set V=0 for normal verbosity
+# set V=1 for more verbosity
+V ?= silent
+ifeq (${V},silent)
+MAKEFLAGS += --silent
+endif
+
+# TEST_PREFIX: select tests matching a pattern
+# All tests (default)
+TEST_PREFIX =
+#
+# only run m4 test
+# TEST_PREFIX = m4_
+
+# TEST_SLICE. Subselect tests from list of all tests.
+# This is Python syntax for slicing, start:stop:step
+#
+# All tests, 0 1 2... (default)
+TEST_SLICE = 0::1
+#
+# Select first 10
+# TEST_SLICE = 0:10
+#
+# Select 2 9 16...
+# TEST_SLICE = 2::7
+
+# delete failed attempts (so make will retry...)
+.DELETE_ON_ERROR:
+
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -DNO_VARARGS
+EXEEXT = @EXEEXT@
+PYTHON = @PYTHON@
+M4 = @M4@
+
+MAKE_SUB_FLAGS = --no-print-directory
+
+srcdir       = @srcdir@
+top_srcdir   = @top_srcdir@
+top_builddir = @top_builddir@
+
+DEFAULT_VERBOSITY = silent
+M_V_at = $(m__v_at_$(V))
+m__v_at_ = $(m__v_at_$(DEFAULT_VERBOSITY))
+m__v_at_silent = @
+m__v_at_0 = @
+m__v_at_1 =
+
+M_V_GEN = $(m__v_GEN_$(V))
+m__v_GEN_ = $(m__v_GEN_$(DEFAULT_VERBOSITY))
+m__v_GEN_silent = @
+m__v_GEN_0 = @echo "  GEN     " $@;
+m__v_GEN_1 =
+
+M_V_EMU = $(m__v_EMU_$(V))
+m__v_EMU_silent =
+m__v_EMU_ = $(m__v_EMU_$(DEFAULT_VERBOSITY))
+m__v_EMU_0 = echo "  EMU     " $@;
+m__v_EMU_1 =
+
+M_V_echo = $(m__v_echo_$(V))
+m__v_echo_ = $(m__v_EMU_$(DEFAULT_VERBOSITY))
+m__v_echo_silent = echo > /dev/null
+m__v_echo_0 = echo > /dev/null
+m__v_echo_1 = echo
+
+M_V_CC = $(m__v_CC_$(V))
+m__v_CC_ = $(m__v_CC_$(DEFAULT_VERBOSITY))
+m__v_CC_silent = @
+m__v_CC_0 = @echo "  CC      " $@;
+m__v_CC_1 =
+
+M_V_CCLD = $(m__v_CCLD_$(V))
+m__v_CCLD_ = $(m__v_CCLD_$(DEFAULT_VERBOSITY))
+m__v_CCLD_silent = @
+m__v_CCLD_0 = @echo "  CCLD    " $@;
+m__v_CCLD_1 =
+
+# All original tests live in TESTS_DIR and below
+TESTS_DIR = $(srcdir)/tests
+# All suite results go in RESULTS_DIR
+RESULTS_DIR = results
+# All data relating to supported ports live in their own directory
+# under PORTS_DIR.
+PORTS_DIR = $(srcdir)/ports
+
+# Intermediate data directories
+# Directory where test cases and the generated object code go.
+CASES_DIR = cases
+TMP_DIR = gen
+
+# The directories in PORTS_DIR correspond to ports.
+PORTS = $(filter-out .svn, $(notdir $(wildcard $(PORTS_DIR)/*)))
+
+# not a port.
+EXCLUDE_PORTS = \
+	mcs51-common
+
+# unstable
+EXCLUDE_PORTS += \
+	mcs51-xstack-auto \
+	uc6502-stack-auto
+
+# not enough ram
+EXCLUDE_PORTS += \
+	pdk13
+
+# simulator may be unavailable
+EXCLUDE_PORTS += \
+	mos6502 \
+	mos6502-stack-auto
+
+# unstable
+EXCLUDE_PORTS += \
+	pic14 \
+	pic16
+
+# redundant, uCSim works better.
+EXCLUDE_PORTS += \
+	rrz80 \
+	rrgbz80
+
+# Generate the list of ports to test. Each port has a spec.mk with build and
+# emulator flags. Some ports are tested by default, these are the tests
+# associated to the "all" target.
+ALL_PORTS = $(filter-out ${EXCLUDE_PORTS}, $(PORTS))
+
+# These  ports will be cleaned with 'make clean'
+CLEAN_PORTS = $(filter-out mcs51-common host, $(PORTS))
+
+MAKE_LIBRARY =
+
+# support VPATH:
+vpath %.c $(CASES_DIR)
+vpath %.c.in $(TESTS_DIR)
+
+all: print-summary
+
+print-summary: test-ports
+	@cat $(RESULTS_DIR)/*.sum
+
+.PHONY: print-summary
+
+# Test all ports that you normally would want to test,
+# normally a subset of all ports.
+test-ports:
+	$(MAKE) $(MAKE_SUB_FLAGS) test-common
+	for i in $(ALL_PORTS); \
+	  do $(MAKE) $(MAKE_SUB_FLAGS) make_library test-port PORT=$$i; \
+	done
+
+# Helper rule for testing various ports
+${PORTS:%=test-%} : test-%: test-common
+	$(MAKE) test-port PORT=$*
+	cat $(RESULTS_DIR)/$*.sum
+
+# Shorthand for testing the mcs51 port only
+TEST_MCS51 = \
+	test-mcs51-small \
+	test-mcs51-medium \
+	test-mcs51-large \
+	test-mcs51-huge \
+	test-mcs51-small-stack-auto \
+	test-mcs51-large-stack-auto \
+	test-mcs51-xstack-auto
+test-mcs51: $(filter-out ${EXCLUDE_PORTS:%=test-%}, $(TEST_MCS51))
+
+# Shorthand for testing the z80 related ports only
+test-z80: test-ucz80 test-ucz80-undoc test-ucz80-resiy test-ucz180 test-ucz180-resiy test-ucz80n test-ucgbz80 test-ucr2k test-ucr2ka test-ucr3ka test-ez80-z80 test-tlcs90 test-ucr800
+
+# Shorthand for testing the pdk ports only
+test-pdk: test-pdk14 test-pdk15 test-pdk15-stack-auto
+
+# what is this?
+test-host2:
+	$(MAKE) $(MAKE_SUB_FLAGS) test-common
+	$(MAKE) $(MAKE_SUB_FLAGS) test-port PORT=host
+
+# generate test list (and possibly expand tests)
+cases/MakeList:
+	$(MAKE) -C cases MakeList
+
+ifdef PORT
+include cases/MakeList
+endif
+
+# Intermediate directory
+PORT_TMP_DIR = $(TMP_DIR)/$(PORT)
+# BUG. used in spec.mk
+PORT_CASES_DIR = $(TMP_DIR)/$(PORT)
+# PORT_CASES_DIRR = $(TMP_DIR)/$(PORT)
+PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
+
+##### per-port exclude (cases, not tests) #####
+## BUG/Feature: after excluding tests, manually delete .sum
+include $(srcdir)/MakeList
+
+SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
+
+# Defaults.  Override in spec.mk if required.
+# Simulation timeout in seconds.
+SIM_TIMEOUT = 120
+PORT_BASE = $(PORT)
+# Path to SDCC
+ifdef SDCC_BIN_PATH
+  SDCC = export PATH=$(SDCC_BIN_PATH); sdcc$(EXEEXT)
+else
+  SDCC = $(top_builddir)/bin/sdcc$(EXEEXT)
+  INC_DIR ?= $(top_srcdir)/device/include
+endif
+# Base flags.
+SDCCFLAGS += --fverbose-asm -DNO_VARARGS
+# Extension of object intermediate files
+OBJEXT = .rel
+# Extension of files that can be run in the emulator
+BINEXT = .bin
+# Currently unused.  Extension to append to intermediate directories.
+DIREXT =
+
+CC_FOR_BUILD = $(CC)
+
+# Only include if we're in a per-port call.
+ifdef PORT
+
+EMU_INPUT = < $(PORTS_DIR)/$(PORT_BASE)/uCsim.cmd
+
+# run simulator with SIM_TIMEOUT seconds timeout
+  # include ./$(PORT)/spec.mk if exists, else include $(PORTS_DIR)/$(PORT)/spec.mk
+  ifeq ($(shell if test -f ./ports/$(PORT)/spec.mk; then echo OK; fi),OK)
+    include ./ports/$(PORT)/spec.mk
+  else
+    include $(PORTS_DIR)/$(PORT)/spec.mk
+  endif
+
+$(RESULTS_DIR)/$(PORT)/%.out: $(CASES_DIR)/%.c $(TMP_DIR)/timeout
+	@mkdir -p $(dir $@)
+	@# BUG: need "Running" in .out, regardless of whether we run anything.
+	@echo --- Running: $< > $@;
+
+	@# BUG: does not respect --dry-run
+	-${M_V_at}if $(MAKE) $(MAKE_SUB_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) PORT=$(PORT); then \
+	  ${M_V_echo} "$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@"; \
+	  ${M_V_EMU}$(TMP_DIR)/timeout $(SIM_TIMEOUT) $(EMU) $(EMU_PORT_FLAG) $(EMU_FLAGS) $(TMP_DIR)/$(PORT)/$*$(BINEXT) ${EMU_INPUT} > $@; \
+	  if [ 0 -ne $$? ]; then \
+	    echo --- FAIL: \"timeout, simulation killed\" in $< >> $@; \
+	    echo --- Summary: 1/1/1: timeout >> $@; \
+	  fi \
+	else \
+	  echo --- FAIL: cannot compile/link $< >> $@; \
+	  echo --- Summary: 1/1/1: compile >> $@; \
+	fi
+
+	@# always count ticks?
+	@$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
+	@grep -n FAIL $@ /dev/null | head -n 20 || true
+
+endif # PORT
+
+# For each test we produce a result log file, %.log
+ifndef CASES
+TEST_STEMS_FILTERED_ = $(filter-out ${EXCLUDE_${PORT}}, $(TEST_STEMS))
+TEST_STEMS_FILTERED__ = $(filter ${TEST_PREFIX}%, $(TEST_STEMS_FILTERED_))
+TEST_STEMS_FILTERED = $(shell ${PYTHON} -c 'for i in "${TEST_STEMS_FILTERED__}".split(" ")[${TEST_SLICE}]: print(i)')
+PORT_RESULTS = $(TEST_STEMS_FILTERED:%=$(PORT_RESULTS_DIR)/%.log)
+endif
+
+make_library: $(MAKE_LIBRARY)
+
+SDCCFLAGS += -I$(srcdir)/fwk/include -I$(srcdir)/tests
+ifdef INC_DIR
+  SDCCFLAGS += -I$(INC_DIR)
+endif
+
+# List of intermediate files to keep.  Pretty much keep everything as
+# disk space is free.
+.SECONDARY: $(RESULTS_DIR) $(CASES_DIR)/% $(PORT_TMP_DIR)/% %$(OBJEXT) %$(EXEEXT) %$(BINEXT) \
+	$(CASES_DIR)/%/stamp \
+	${TEST_STEMS:%=$(RESULTS_DIR)/$(PORT)/%.out}
+
+# $(TMP_DIR)/stamp is really a proxy for $(TMP_DIR). We shouldn't use
+# $(TMP_DIR) as a dependency directly, because as a directory its time
+# stamp updates every time something in the directory is updated (which
+# can then cause spurious rebuilds of other targets that can conflict
+# with parallel make jobs)
+$(TMP_DIR)/stamp:
+	mkdir -p $(TMP_DIR)
+	touch $@
+
+# Rule linking the combined results log to all of the files in the
+# iteration directory.
+$(PORT_RESULTS_DIR)/%.out: $(CASES_DIR)/%/stamp
+	@ # mkdir -p $(dir $@)/$*
+	${M_V_at}$(MAKE) $(MAKE_SUB_FLAGS) iterations PORT=$(PORT) CASES=$*/
+
+$(PORT_RESULTS_DIR)/%.log: $(PORT_RESULTS_DIR)/%.out
+	@# compact-results prints the stats. Do once per test.
+	${M_V_GEN}$(PYTHON) $(srcdir)/compact-results.py $* < $< | tee $@
+
+# Rule to summarise the results for one port after all of the tests
+# have been run.
+$(RESULTS_DIR)/$(PORT).sum: $(PORT_RESULTS) cases/MakeList
+	${M_V_at}echo | cat - $(PORT_RESULTS:%.log=%.out) | $(PYTHON) $(srcdir)/collate-results.py $(PORT) > $@
+
+port-fwklib: port-dirs $(EXTRAS) $(FWKLIB)
+
+port-dirs:
+	${M_V_GEN}mkdir -p $(PORT_TMP_DIR) $(PORT_RESULTS_DIR)
+
+# Files shared between all ports need to be built by the test-common target,
+# which should always be built before the port specific targets.
+test-common: $(TMP_DIR)/timeout
+	@[ "$(PYTHON)" != ":" ] || ( echo "need python" >&2; exit 1 )
+	$(MAKE) -C cases
+
+ifdef PORT
+test-port: test-common port-dirs
+	@# recurse: force vpath to re-read the $(CASES_DIR)
+	${M_V_at}$(MAKE) $(MAKE_SUB_FLAGS) port-fwklib PORT=$(PORT) V=${V}
+	@echo Running ${PORT} regression tests
+	${M_V_at}$(MAKE) $(MAKE_SUB_FLAGS) $(RESULTS_DIR)/$(PORT).sum PORT=$(PORT)
+endif
+
+# Begin rules that process each iteration generated from the source
+# test
+
+# List of all of the generated iteration source files.
+SUB_CASES = $(sort $(wildcard $(CASES_DIR)/$(CASES)*.c))
+# List of all the sub result logs generated from the iterations.
+# these are stored in TMP_DIR...
+SUB_RESULTS_ = $(SUB_CASES:%.c=%.out)
+SUB_RESULTS = $(SUB_RESULTS_:cases%=$(RESULTS_DIR)/$(PORT)%)
+SUB_RESULTS_FILES = $(SUB_RESULTS_:cases/%=%)
+SUB_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
+# Overall target.  Concatenation of all of the sub results.
+RESULTS = $(CASES:%/$(DIREXT)=$(PORT_RESULTS_DIR)/%.out)
+
+iterations: $(RESULTS)
+
+# Rule to generate the overall target from the sub results.
+$(RESULTS): $(SUB_RESULTS)
+	${M_V_at}( cd $(SUB_RESULTS_DIR); echo | cat - $(SUB_RESULTS_FILES) ) > $@ # subresult rule
+
+$(TMP_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(TMP_DIR)/stamp
+	$(CC_FOR_BUILD) $(CFLAGS) $< -o $@
+
+# The remainder of the rules are in $PORT/spec.mk.  The port needs to
+# be able to turn an iterated test suite into a sub result, normally
+# by:
+#    1. Compile the required library files
+#    2. Compile this test suite.
+#    3. Link 1, 2, and any required stdlib into an executable.
+#    4. Run the executable inside an emulator, and capture the text
+#    output into %.out.
+#
+# The emulator must exit when main() returns.
+
+# BeginGeneric rules
+
+clean: clean-results
+	$(MAKE) -C $(CASES_DIR) clean
+
+clean-results:
+	rm -rf $(TMP_DIR) $(RESULTS_DIR) *.pyc __pycache__
+	for i in $(CLEAN_PORTS); do \
+	  $(MAKE) $(MAKE_RECURSE_FLAGS) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); \
+	done
+
+distclean: clean
+	$(MAKE) -C $(CASES_DIR) distclean
+	rm -f $(PORTS_DIR)/host/spec.mk
+	rm -f Makefile
+
+# Rule to link into .ihx
+%$(BINEXT): %$(OBJEXT) $(EXTRAS) $(FWKLIB) $(PORT_CASES_DIR)/fwk.lib
+	${M_V_CCLD}$(SDCC) $(SDCCFLAGS) $(LINKFLAGS) $(EXTRAS) $(PORT_CASES_DIR)/fwk.lib $< -o $@
+
+# ignore (preprocessor) warnings
+gen/%/tst_p99-conformance.rel: EXTRA_COMPILE_HACK=2>/dev/null
+
+$(PORT_CASES_DIR)/%$(OBJEXT): %.c
+	@mkdir -p $(dir $@) # BUG?
+	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@ ${EXTRA_COMPILE_HACK}
+
+$(PORT_CASES_DIR)/%$(OBJEXT): $(PORTS_DIR)/$(PORT_BASE)/%.c
+	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/%$(OBJEXT): $(srcdir)/fwk/lib/%.c
+	${M_V_CC}$(SDCC) $(SDCCFLAGS) -c $< -o $@
+
+$(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib ${SPEC_LIB}
+	${M_V_GEN}cat $(srcdir)/fwk/lib/fwk.lib ${SPEC_LIB} > $@
+
+Makefile: $(srcdir)/Makefile.in
+	 cd $(top_builddir); ./config.status support/regression/Makefile
+

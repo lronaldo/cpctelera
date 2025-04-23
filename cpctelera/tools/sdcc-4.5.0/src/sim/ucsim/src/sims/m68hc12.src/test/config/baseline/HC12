@@ -1,0 +1,32 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: M68HC12
+Controller has 10 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on irq[0]
+   on uart[0]
+   on uart[1]
+   on pia[0]
+   on pia[1]
+   on dport[0]
+A= $00   0   +0 .  B= $00   0   +0 .     D= $0000     0    +0 
+CC= 11010000                          TMP2= $0000     0    +0
+    SXHINZVC                          TMP3= $0000     0    +0
+IX= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
+IY= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
+SP= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
+0xf17c  ? 19 ee             LEAY   D,Y                ; [0000]=$4158fc
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x3fffff  4194304 rom_chip (8,%02x,0x%06x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x000000 activated

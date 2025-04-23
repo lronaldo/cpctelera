@@ -1,0 +1,153 @@
+/** Tests covering the shift operators when some bits of the
+    result are known to be the same (since this allows some
+    optimization, see RFE #935, that we want to test here).
+
+    type: char, int, long
+
+*/
+#include <testfwk.h>
+
+const int C0[] = {0,1,2};
+int S0[] = {5,0,1};
+
+int r0(void)
+{
+	
+	static signed {type} cy,sy;
+	static signed char x0,x1;
+	static signed char xx0,xx1;
+	
+	int y = 0;
+	
+
+	while(y<3)
+	{
+
+		cy = C0[y];		
+		sy = S0[y];
+		
+		x0 = cy/64;
+		x1 = sy/32;  
+		
+		xx0 = (cy<<2)>>8;
+		xx1 = (sy<<3)>>8;
+		y++;
+
+	}
+
+
+	return x0+x1;
+}
+
+#if !defined(__SDCC_pdk14) // Lack of memory
+const int C1[] = {0,1,80};
+int S1[] = {5,0,40};
+
+int r1(void)
+{
+	
+	static signed {type} cy,sy;
+	static signed char x0,x1;
+	static signed char xx0,xx1;
+	
+	int y = 0;
+	
+
+	while(y<3)
+	{
+
+		cy = C1[y];		
+		sy = S1[y];
+		
+		x0 = cy/64;
+		x1 = sy/32;  
+		
+		xx0 = (cy<<2)>>8;
+		xx1 = (sy<<3)>>8;
+		y++;
+
+	}
+
+
+	return x0+x1;
+}
+
+#if !defined(__SDCC_pdk15) // Lack of memory
+const int C2[] = {0,1,-2};
+int S2[] = {5,0,-1};
+
+int r2(void)
+{
+	
+	static signed {type} cy,sy;
+	static signed char x0,x1;
+	static signed char xx0,xx1;
+	
+	int y = 0;
+	
+
+	while(y<3)
+	{
+
+		cy = C2[y];		
+		sy = S2[y];
+		
+		x0 = cy/64;
+		x1 = sy/32;  
+		
+		xx0 = (cy<<2)>>8;
+		xx1 = (sy<<3)>>8;
+		y++;
+
+	}
+
+
+	return x0+x1;
+}
+
+const int C3[] = {0,1,-80};
+int S3[] = {5,0,-40};
+
+int r3(void)
+{
+	
+	static signed {type} cy,sy;
+	static signed char x0,x1;
+	static signed char xx0,xx1;
+	
+	int y = 0;
+	
+
+	while(y<3)
+	{
+
+		cy = C3[y];		
+		sy = S3[y];
+		
+		x0 = cy/64;
+		x1 = sy/32;  
+		
+		xx0 = (cy<<2)>>8;
+		xx1 = (sy<<3)>>8;
+		y++;
+
+	}
+
+
+	return x0+x1;
+}
+#endif
+#endif
+
+void testShift(void)
+{
+	ASSERT (r0() == 0);
+#if !defined(__SDCC_pdk14)
+	ASSERT (r1() == 2);
+#if !defined(__SDCC_pdk15)
+	ASSERT (r2() == 0);
+	ASSERT (r3() == -2);
+#endif
+#endif
+}
+

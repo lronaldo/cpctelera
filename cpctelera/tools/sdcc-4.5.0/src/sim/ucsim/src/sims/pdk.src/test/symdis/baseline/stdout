@@ -1,0 +1,55 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var __interrupt_vect rom[0x20]
+var __sdcc_external_startup rom[0x1f]
+var __sdcc_program_startup rom[0x11]
+var __sdcc_gs_init_startup rom[0x12]
+var __sdcc_init_data rom[0x12]
+var _main rom[0x1d]
+dc 0x0000 0x0020 
+0x000  ? 0000 nop                                                    
+0x001  ? 2601 clear  0x1                                             
+0x002  ? 5702 mov    a, #0x2                                         
+0x003  ? 5001 add    #0x1                                            
+0x004  ? 54fe and    #0xfe                                           
+0x005  ? 0102 mov    [0x2], a                                        
+0x006  ? 701f call   #0x1f                                           
+0x007  ? 6012 goto   #0x12                                           
+0x008  ? f772 UNKNOWN/INVALID                                        
+0x009  ? f526 UNKNOWN/INVALID                                        
+0x00a  ? f96b UNKNOWN/INVALID                                        
+0x00b  ? 7bc5 call   #0xbc5                                          
+0x00c  ? 5b5e UNKNOWN/INVALID                                        
+0x00d  ? 34af t1sn   [0x2f], #0x1                                    
+0x00e  ? c785 UNKNOWN/INVALID                                        
+0x00f  ? d38c UNKNOWN/INVALID                                        
+0x010  ? 007b reti                                                   
+
+0x011    <__sdcc_program_startup>:
+0x011  ? 601d goto   #0x1d       
+
+0x012    <__sdcc_gs_init_startup>:
+0x012    <__sdcc_init_data>:
+0x012  ? 5702 mov    a, #0x2
+0x013  ? 1700 mov    0x0, a                                          
+0x014  ? 6019 goto   #0x19                                           
+0x015  ? 5700 mov    a, #0x0                                         
+0x016  ? 0700 idxm   0x0, a                                          
+0x017  ? 2400 inc    0x0                                             
+0x018  ? 5702 mov    a, #0x2                                         
+0x019  ? 5000 add    #0x0                                            
+0x01a  ? 2e00 ceqsn  0x0                                             
+0x01b  ? 6015 goto   #0x15                                           
+0x01c  ? 6011 goto   #0x11                                           
+
+0x01d    <_main>:
+0x01d  ? 601d goto   #0x1d                        
+0x01e  ? 007a ret                                                    
+
+0x01f    <__sdcc_external_startup>:
+0x01f  ? 0200 ret    #0x0       
+
+0x020    <__interrupt_vect>:
+0x020  ? 2f43 cneqsn 0x43              

@@ -1,0 +1,31 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var _main nas[0x020b]
+dc 0x0100 0x0121
+0x0100  ? 3e a0 ff          LD SP,0xffa0                             
+0x0103  ? 1c 07 02          CALL 0x0207                              
+0x0106  ? 1c 07 02          CALL 0x0207                              
+0x0109  ? 1c 0d 02          CALL 0x020d                              
+0x010c  ? 1c 0b 02          CALL 0x020b <_main>                      
+0x010f  ? 01                HALT                                     
+0x0110  ? 81                INC C                                    
+0x0111  ? a7                SRLA                                     
+0x0112  ? fe                ?                                        
+0x0113  ? 2a                LD D,A                                   
+0x0114  ? cf e1             JR NC,0x00f7                             
+0x0116  ? b2 ab             RES 2,(0xffab)                           
+0x0118  ? b1 08             RES 1,(0xff08)                           
+0x011a  ? cc d9             JR NOV,0x00f5                            
+0x011c  ? fb                ?                                        
+0x011d  ? cc c5             JR NOV,0x00e4                            
+0x011f  ? db                ?                                        
+0x0120  ? 22                LD A,D                                   
+0x0121  ? 36 7b             LD A,7b                                  
+dc 0x0207 0x020c
+0x0207  ? 37 d3 4e          LD (0xffd3),4e                           
+0x020a  ? 1e                RET                                      
+
+0x020b    <_main>:
+0x020b  ? c8 fe             JR 0x020b <_main>    

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2.8b -->
+<!-- CreationDate: 2022-02-27 19:00:14 -->
+<!-- Magnification: 1 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="353pt" height="227pt"
+	viewBox="2763 3588 5874 3777">
+<g fill="none">
+<!-- Line -->
+<polygon points=" 2775,4875 3075,3600 5325,3600 5625,4875" fill="#0000b0"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="3150" y="3750" width="2100" height="975" rx="105" fill="#ffffff"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="2775" y="4875" width="2850" height="450" fill="#87cfff"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="2775" y="5325" width="2850" height="825" fill="#00d1d1"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<rect x="7350" y="6000" width="1275" height="900" fill="#00b0b0"
+	stroke="#000000" stroke-width="8px"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp0">
+	<path clip-rule="evenodd" d="M 2763,3588 H 8637 V 7365 H 2763 z
+		M 5172,5670 5292,5700 5172,5730 5336,5711 5336,5690z
+		M 4920,5403 4950,5283 4980,5403 4961,5240 4940,5240z"/>
+</clipPath>
+</defs>
+<polyline points=" 4950,5250 4950,5700 5325,5700" clip-path="url(#cp0)"
+	stroke="#000000" stroke-width="15px"/>
+<!-- Forward arrow to point 5325,5700 -->
+<polyline points=" 5172,5670 5292,5700 5172,5730"
+	stroke="#000000" stroke-width="15px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 4950,5250 -->
+<polyline points=" 4920,5403 4950,5283 4980,5403"
+	stroke="#000000" stroke-width="15px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp1">
+	<path clip-rule="evenodd" d="M 2763,3588 H 8637 V 7365 H 2763 z
+		M 4122,5070 4242,5100 4122,5130 4286,5111 4286,5090z
+		M 4020,4728 4050,4608 4080,4728 4061,4565 4040,4565z"/>
+</clipPath>
+</defs>
+<polyline points=" 4050,4575 4050,5100 4275,5100" clip-path="url(#cp1)"
+	stroke="#000000" stroke-width="15px"/>
+<!-- Forward arrow to point 4275,5100 -->
+<polyline points=" 4122,5070 4242,5100 4122,5130"
+	stroke="#000000" stroke-width="15px" stroke-miterlimit="8"/>
+<!-- Backward arrow to point 4050,4575 -->
+<polyline points=" 4020,4728 4050,4608 4080,4728"
+	stroke="#000000" stroke-width="15px" stroke-miterlimit="8"/>
+<!-- Line -->
+<defs>
+<clipPath id="cp2">
+	<path clip-rule="evenodd" d="M 2763,3588 H 8637 V 7365 H 2763 z
+		M 4122,5070 4242,5100 4122,5130 4286,5111 4286,5090z
+		M 5778,5672 5656,5688 5757,5616 5611,5694 5619,5714z"/>
+</clipPath>
+</defs>
+<polyline points=" 5625,5700 5653,5689 5671,5682 5693,5674 5720,5663 5752,5652 5787,5639 5825,5625
+ 5864,5611 5904,5598 5943,5585 5981,5573 6018,5562 6053,5553 6085,5546 6114,5541
+ 6141,5538 6166,5537 6187,5539 6207,5543 6225,5550 6243,5560 6260,5573 6276,5588
+ 6291,5606 6305,5626 6319,5649 6333,5674 6346,5700 6359,5727 6371,5755 6383,5784
+ 6395,5814 6406,5843 6416,5872 6425,5900 6433,5928 6440,5955 6446,5981 6450,6006
+ 6452,6030 6452,6053 6450,6075 6446,6095 6439,6115 6430,6135 6419,6154 6405,6172
+ 6390,6191 6372,6209 6352,6227 6331,6244 6309,6262 6286,6279 6262,6296 6239,6314
+ 6216,6331 6194,6349 6173,6367 6153,6385 6135,6403 6120,6422 6106,6442 6095,6462
+ 6086,6482 6079,6503 6075,6525 6073,6547 6073,6570 6074,6594 6077,6619 6082,6645
+ 6087,6673 6094,6701 6101,6731 6110,6761 6119,6791 6128,6822 6138,6853 6149,6884
+ 6160,6914 6171,6943 6183,6971 6195,6998 6208,7023 6221,7046 6235,7067 6250,7085
+ 6265,7101 6282,7114 6300,7125 6318,7133 6337,7138 6358,7142 6381,7143 6404,7143
+ 6429,7142 6455,7139 6483,7135 6511,7130 6540,7124 6570,7118 6600,7111 6630,7103
+ 6661,7095 6691,7086 6721,7077 6751,7068 6780,7059 6808,7050 6835,7040 6861,7030
+ 6886,7020 6910,7010 6933,6999 6954,6987 6975,6975 6996,6960 7017,6944 7037,6925
+ 7058,6904 7078,6881 7098,6856 7119,6828 7141,6797 7162,6765 7184,6731 7206,6696
+ 7228,6661 7248,6627 7268,6593 7286,6563 7302,6535 7316,6510 7327,6490 7336,6475
+ 7350,6450" clip-path="url(#cp2)"
+	stroke="#000000" stroke-width="15px" stroke-linejoin="bevel"/>
+<!-- Backward arrow to point 5625,5700 -->
+<polyline points=" 5778,5672 5656,5688 5757,5616"
+	stroke="#000000" stroke-width="15px" stroke-miterlimit="8"/>
+<!-- Text -->
+<text xml:space="preserve" x="2850" y="5100" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="bold" font-size="144" text-anchor="start">OS</text>
+<!-- Text -->
+<text xml:space="preserve" x="2850" y="5550" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="bold" font-size="144" text-anchor="start">HW</text>
+<!-- Text -->
+<text xml:space="preserve" x="3225" y="3975" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="bold" font-size="144" text-anchor="start">App</text>
+<!-- Text -->
+<text xml:space="preserve" x="4350" y="5175" fill="#000000" font-family="Courier" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">/dev/ttyS1</text>
+<!-- Text -->
+<g transform="translate(7650,6750) rotate(-90)" >
+<text xml:space="preserve" x="0" y="0" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">UART</text>
+</g><!-- Text -->
+<text xml:space="preserve" x="5850" y="7350" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">Serial cable</text>
+<!-- Text -->
+<text xml:space="preserve" x="7575" y="5925" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">Equipment</text>
+<!-- Text -->
+<g transform="translate(5550,6000) rotate(-90)" >
+<text xml:space="preserve" x="0" y="0" fill="#000000" font-family="Helvetica" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">UART</text>
+</g><!-- Text -->
+<text xml:space="preserve" x="3225" y="4275" fill="#0000ff" font-family="Courier" font-style="normal" font-weight="bold" font-size="144" text-anchor="start">ucsim_51 \</text>
+<!-- Text -->
+<text xml:space="preserve" x="3300" y="4500" fill="#0000ff" font-family="Courier" font-style="normal" font-weight="bold" font-size="144" text-anchor="start">-s/dev/ttyS1</text>
+</g>
+</svg>

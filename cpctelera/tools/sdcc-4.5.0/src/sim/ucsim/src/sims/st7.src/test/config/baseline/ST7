@@ -1,0 +1,25 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: unspecified ST7
+Controller has 4 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+---HINZC  Flags= 0x00   0 .  A= 0x00   0 .
+---00000  X= 0x00   0     .  Y= 0x00   0 .
+SP= 0x017f [SP+1]= a1 161 .  Limit= 0x0000
+0x0000  ? 41             UNKNOWN/INVALID                             
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x000001        2 regs8 (8,%02x,0x%01x)
+  0x000000-0x000002        3 regs16 (16,%04x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated

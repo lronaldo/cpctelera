@@ -1,0 +1,97 @@
+0.9
+
+- Intel 8048 simulator.
+
+- New device type in z80 simulator: r800.
+
+- FPGA displays for p2223.
+
+- One Instruction Set Computer simulators: URISC, MISC16
+
+
+0.8.x
+
+- Bugfixes, pre-relases of 0.9: partial implmentations of
+  new features.
+
+
+0.8
+
+- Motorola HC12 simulator.
+
+- Intel 8080 and 8085 simulator.
+
+- Stm8 stack pointer roll-over function (configurable).
+
+- F8 simulator.
+
+- p2223 simulator (variant of p1516).
+
+- "display", "undisplay" and "echo" commands.
+
+
+0.7.x
+
+- Bugfix releases. Partial implementations of 0.8 functionalities.
+
+
+0.7
+
+- New sub-option for -S option: raw, serial input will be
+non-interactive even on tty.
+
+
+0.6.x
+
+- Bugfix releases.
+
+
+0.6
+
+- New simulators: TLCS90, Padauk, M6809, PicoBlaze, MCS6502, MC6800
+
+- New commands: "memory info" (same as "info memory"), "get error"
+  (same as "show error").
+
+- Simulator interface (virtual hw element).
+
+- Simulator control over serial line terminal. Escape character is ^x
+  (CTRL-x) but it is configurable for every uarts. Available functions
+  are: start, stop, quit, reset, close.
+
+- Command line editing and history.
+
+- More operators for expressions.
+
+- VCD output.
+
+- Read information from cdb and omf files.
+
+- Variables.
+
+- New option: "-e command" to specify startup command.
+
+- Colors. New program option "-o colspec" to specify color values and
+  -b to omit coloring. New options "color_XXX" to hold values.
+  
+
+0.5
+
+- Bug fixes to run sdcc regression tests.
+
+- Implementation of missing instruction ORL C,\bit of MCS51.
+
+- Fix of AVR instruction decoder.
+
+- Expressions.
+
+- Memory simulation redesigned: address space, chip, address decoder.
+
+
+0.4
+
+- Stack tracking.
+
+- Error handling.
+
+- Redirection of output of commands.

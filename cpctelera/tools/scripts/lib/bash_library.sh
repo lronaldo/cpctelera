@@ -47,7 +47,7 @@ COLOR_WHITE=$'\033[0;37;49m'
 COLOR_NORMAL=$'\033[0;39;49m'
 
 ## Control variables
-ENABLED_MACHINE_ECHO_SLEEP=true
+ENABLED_MACHINE_ECHO_SLEEP=false
 
 ## Show a big error message for an unrecoverable error and exit
 ## $1: Error Message

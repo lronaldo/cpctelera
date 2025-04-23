@@ -1,0 +1,25 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: unspecified HC08
+Controller has 4 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+V--HINZC  Flags= $60  96 `  A= $00   0 .
+0--00000      H= $00   0 .  X= $00   0 .
+SP= $00ff [SP+1]= 00   0 .  Limit= $7000
+0xf17c  ? 19 ee       bclr   #4,*$ee                                 
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x000003        4 regs8 (8,%02x,0x%01x)
+  0x000000-0x000000        1 regs16 (16,%04x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated

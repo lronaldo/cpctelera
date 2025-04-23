@@ -1,0 +1,35 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: M6809
+Controller has 9 hardware element(s).
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on irq[0]
+   on uart[0]
+   on uart[1]
+   on pia[0]
+   on pia[1]
+   on dport[0]
+A= $00   0   +0 .  B= $00   0   +0 .  D= $0000     0     +0
+CC= 01010000
+    EFHINZVC
+DP= $00
+X= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
+Y= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
+S= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
+U= 0x0000 41 58 fc c9 8b bc 95 6b AX.....k
+0xf17c  ? 19             DAA                                         
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom_chip (8,%02x,0x%04x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x000003        4 regs8 (8,%02x,0x%01x)
+  0x000000-0x000004        5 regs16 (16,%04x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x0000 0xffff -> rom_chip 0x0000 activated

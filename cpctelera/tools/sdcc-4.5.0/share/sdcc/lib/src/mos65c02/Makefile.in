@@ -1,0 +1,112 @@
+# libc/mos65c02 Makefile
+
+VPATH  = @srcdir@
+srcdir = @srcdir@
+top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
+
+LIB_TYPE     = @LIB_TYPE@
+
+EXTRA_CFLAGS = -mmos65c02 --max-allocs-per-node 25000 --opt-code-speed
+SAS = $(top_builddir)/bin/sdas6500
+
+# override PORTDIR defined by super (parent) makefile
+override PORTDIR = ../build/mos65c02
+
+%.rel: %.s
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
+
+include $(srcdir)/../incl.mk
+
+M6502_FLOAT = $(COMMON_FLOAT)
+
+M6502_INT = $(COMMON_INT) \
+  _muluchar.c \
+  _mulschar.c \
+  _mulint.c \
+  _divuchar.c \
+  _divschar.c \
+  _divuint.c \
+  _divsint.c \
+  _moduchar.c \
+  _modschar.c \
+  _moduint.c \
+  _modsint.c
+
+M6502_LONG = $(COMMON_LONG) \
+  _divulong.c \
+  _mullong.c
+
+M6502_LONGLONG = $(COMMON_LONGLONG) \
+  _srulonglong.c \
+  _srslonglong.c \
+  _slulonglong.c \
+  _slslonglong.c \
+  _mullonglong.c \
+  _divslonglong.c \
+  _divulonglong.c \
+  _modslonglong.c \
+  _modulonglong.c
+
+M6502_SDCC = $(COMMON_SDCC) \
+  __itoa.c \
+  __ltoa.c \
+  _heap.c \
+  _memmove.c \
+  _startup.c \
+  _strcmp.c \
+  _strcpy.c \
+  strlen.c \
+  strnlen.c \
+  memcpy.c \
+  div.c \
+  ldiv.c \
+  sprintf.c \
+  vprintf.c \
+  atomic_flag_clear.c
+
+M6502SOURCES = $(addprefix ../,$(M6502_FLOAT) $(M6502_INT) $(M6502_LONG) $(M6502_LONGLONG) $(M6502_SDCC))
+M6502OBJECTS = $(patsubst %.c,%.rel,$(M6502_FLOAT) $(M6502_INT) $(M6502_LONG) $(M6502_LONGLONG) $(M6502_SDCC))
+
+OBJ = _dptr.rel _temp.rel _ret01.rel _ret23.rel _ret4567.rel _setjmp.rel atomic_flag_test_and_set.rel __sdcc_indirect_jsr.rel
+
+LIB = mos65c02.lib
+AS = $(SAS)
+ASFLAGS = -plosgff
+
+CFLAGS = -I$(srcdir)/../../include -I. --std-c23
+
+all: $(PORTDIR)/$(LIB) $(PORTDIR)/crt0.rel
+
+$(PORTDIR)/crt0.rel: crt0.rel
+	cp crt0.rel $(PORTDIR)/crt0.rel
+
+$(PORTDIR)/$(LIB): $(OBJ) $(M6502OBJECTS) Makefile
+ifeq ($(LIB_TYPE), SDCCLIB)
+	rm -f $@; \
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(M6502OBJECTS)
+else
+  ifeq ($(LIB_TYPE), AR)
+	$(SDAR) -rcSD $@ $(OBJ) $(M6502OBJECTS)
+  else
+    ifeq ($(LIB_TYPE), RANLIB)
+	$(SDAR) -rcD $@ $(OBJ) $(M6502OBJECTS)
+    else
+	rm -f $@
+	for i in $(basename $(OBJ) $(M6502OBJECTS)); do echo $$i >>$@; done
+	cp $(OBJ) $(M6502OBJECTS) $(PORTDIR)
+    endif
+  endif
+endif
+
+clean:
+	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib
+
+distclean: clean
+	rm -f Makefile
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/mos65c02/Makefile

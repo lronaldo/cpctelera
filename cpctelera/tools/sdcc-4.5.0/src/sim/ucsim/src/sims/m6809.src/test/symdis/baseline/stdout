@@ -1,0 +1,19 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var init rom[0x0000]
+var main rom[0x0002]
+var forever rom[0x0008]
+dc 0x0000 0x0008 
+
+0x0000    <init>:
+0x0000  ? 0e 02          JMP    DP:$02            
+
+0x0002    <main>:
+0x0002  ? 86 00          LDA    #$00              
+0x0004  ? 27 02          BEQ    $0008 <forever>                      
+0x0006  ? 86 01          LDA    #$01                                 
+
+0x0008    <forever>:
+0x0008  ? 20 fe          BRA    $0008 <forever>

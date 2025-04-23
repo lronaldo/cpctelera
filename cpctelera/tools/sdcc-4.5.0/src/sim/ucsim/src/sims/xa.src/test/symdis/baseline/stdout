@@ -1,0 +1,21 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var init rom[0x0000]
+var main rom[0x0004]
+var forever rom[0x0008]
+dc 0x0000 0x0009
+
+0x0000    <init>:
+0x0000  ? d5 00 01          JMP   0x0004 <main>   
+0x0003  ? 00                NOP                                      
+
+0x0004    <main>:
+0x0004  ? 00                NOP                   
+0x0005  ? f3 01             BEQ   0x0008 <forever>                   
+0x0007  ? 00                NOP                                      
+
+0x0008    <forever>:
+0x0008  ? fe ff             BR    0x0008 <forever>
+The XA Simulator is in development, UNSTABLE, DEVELOPERS ONLY!

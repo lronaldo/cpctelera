@@ -1,0 +1,111 @@
+// peeph-ez80_z80.def - eZ80_Z80 specific peephole rules
+//
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2020
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+replace {
+	inc	%1
+	inc	%1
+} by {
+	;peephole ez80-1: replace 2 increments of index register by one LEA instruction
+	lea	%1, %1, #+2
+} if canAssign('d' '0' %1)
+
+replace {
+	lea	%1, %2, #%3
+	inc	%1
+} by {
+	lea	%1, %2, #%4
+	;peephole ez80-2: replace decrement by decreased index of LEA instruction
+} if immdInRange(-128 127 '+' %3 1 %4)
+
+replace {
+	dec	%1
+	dec	%1
+} by {
+	;peephole ez80-3: replace 2 decrements of index register by one LEA instruction
+	lea	%1, %1, #-2
+} if canAssign('e' '0' %1)
+
+replace {
+	lea	%1, %2, #%3
+	dec	%1
+} by {
+	lea	%1, %2, #%4
+	;peephole ez80-4: replace increment by incremented index of LEA instruction
+} if immdInRange(-128 127 '-' %3 1 %4)
+
+replace restart {
+	ld      %3, %4 (%1)
+	ld      %2, %5 (%1)
+} by {
+	;eZ80 peephole 5: replace 2 8-bit indirect loads to register pair by one 16-bit
+	ld      %6, %4 (%1)
+} if canJoinRegs(%2 %3 %6), immdInRange(-128 127 '+' %4 1 %7), same(%5 %7)
+
+replace restart {
+	ld	a, (hl)
+	inc	hl
+	ld	h, (hl)
+	ld	l, a
+} by {
+	;eZ80 peephole 6: replace Z80 style load to HL from memory addressed by HL itself
+	ld	hl, (hl)
+} if notUsed('a')
+
+replace restart {
+	ld	%2, (hl)
+	inc	hl
+	ld	%1, (hl)
+} by {
+	;eZ80 peephole 7: replace Z80 style load to register pair from memory addressed by HL
+	ld	%3, (hl)
+	inc	hl
+} if canJoinRegs(%1 %2 %3)
+
+replace restart {
+	ld	%4 (%1), %3
+	ld	%5 (%1), %2
+} by {
+	;eZ80 peephole 8: replace 2 8-bit indirect register pair stores by one 16-bit
+	ld	%4 (%1), %6
+} if canJoinRegs(%2 %3 %6), immdInRange(-128 127 '+' %4 1 %7), same(%5 %7)
+
+replace restart {
+	ld	a, %1 (%2)
+	ld	%3 (%4), a
+	ld	a, %5 (%2)
+	ld	%6 (%4), a
+} by {
+	;eZ80 peephole 9hl: replace byte copy by word copy
+	ld	hl, %1 (%2)
+	ld	%3 (%4), hl
+	ld	a, h
+} if notUsed('hl'), immdInRange(-128 127 '+' %1 1 %7), same(%5 %7), immdInRange(-128 127 '+' %3 1 %8), same(%6 %8)
+
+replace restart {
+	ld	a, %1 (%2)
+	ld	%3 (%4), a
+	ld	a, %5 (%2)
+	ld	%6 (%4), a
+} by {
+	;eZ80 peephole 9de: replace byte copy by word copy
+	ld	de, %1 (%2)
+	ld	%3 (%4), de
+	ld	a, d
+} if notUsed('de'), immdInRange(-128 127 '+' %1 1 %7), same(%5 %7), immdInRange(-128 127 '+' %3 1 %8), same(%6 %8)
+
+barrier

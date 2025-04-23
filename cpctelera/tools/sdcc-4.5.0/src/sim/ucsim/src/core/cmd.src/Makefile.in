@@ -1,0 +1,35 @@
+#
+# ucsim cmd.src/Makefile
+#
+# (c) Drotos Daniel, Talker Bt. 1997
+#
+
+PKG		= cmd
+
+include ../../common.mk
+
+srcdir          = @srcdir@
+VPATH           = @srcdir@
+
+top_builddir	= @top_builddir@
+top_srcdir	= @top_srcdir@
+
+
+# Compiling entire program or any subproject
+# ------------------------------------------
+all: libs
+
+include $(top_srcdir)/src/lib.mk
+
+cmdlex.cc: cmdlex.l cmdpars.y
+
+# Performing self-test
+# --------------------
+check:
+
+test:
+
+baseline:
+
+
+# End of cmd.src/Makefile.in

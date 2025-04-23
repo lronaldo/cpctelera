@@ -1,0 +1,39 @@
+/** user-implemented saturating counters using unsigned integer wraparound
+
+    type: unsigned char, unsigned int, unsigned long
+*/
+
+#include <testfwk.h>
+
+{type} cnt;
+
+void satinc(void)
+{
+  cnt++;
+  if (!cnt)
+    cnt--;
+}
+
+void satdec(void)
+{
+  cnt--;
+  if (cnt == ({type})-1)
+    cnt++;
+}
+
+void testSat(void)
+{
+  cnt = 0;
+  satinc ();
+  ASSERT (cnt == 1);
+  satdec ();
+  satdec ();
+  ASSERT (cnt == 0);
+
+  cnt = -2;
+  satinc ();
+  ASSERT (cnt == ({type})-1);
+  satinc ();
+  ASSERT (cnt == ({type})-1);
+}
+

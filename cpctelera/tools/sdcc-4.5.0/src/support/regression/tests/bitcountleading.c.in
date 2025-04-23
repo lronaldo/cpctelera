@@ -1,0 +1,53 @@
+/* Test count trailing bits operations from stdbit.h
+
+   type: unsigned short, unsigned int, unsigned long, unsigned long long
+ */
+
+#include <testfwk.h>
+
+#ifdef __SDCC // Todo: Enable for all C23 implementations
+#pragma std_c23
+#include <stdbit.h>
+#endif
+
+#include <limits.h>
+
+volatile {type} i;
+
+#define OTHERBYTEBITS(x) (sizeof(x) - 1) * CHAR_BIT
+
+void
+testTrailing(void)
+{
+#ifdef __SDCC // Todo: Enable for all C23 implementations
+
+	i = 0x0;
+	ASSERT (stdc_count_leading_ones(i) == 0);
+	ASSERT (stdc_count_leading_zeros(i) == OTHERBYTEBITS(i) + 8);
+
+	i = 0x1;
+	ASSERT (stdc_count_leading_ones(i) == 0);
+	ASSERT (stdc_count_leading_zeros(i) == OTHERBYTEBITS(i) + 7);
+
+	i = 0x2;
+	ASSERT (stdc_count_leading_ones(i) == 0);
+	ASSERT (stdc_count_leading_zeros(i) == OTHERBYTEBITS(i) + 6);
+
+	i = 0x3;
+	ASSERT (stdc_count_leading_ones(i) == 0);
+	ASSERT (stdc_count_leading_zeros(i) == OTHERBYTEBITS(i) + 6);
+
+	i = 0x7;
+	ASSERT (stdc_count_leading_ones(i) == 0);
+	ASSERT (stdc_count_leading_zeros(i) == OTHERBYTEBITS(i) + 5);
+
+	i = 0x8;
+	ASSERT (stdc_count_leading_ones(i) == 0);
+	ASSERT (stdc_count_leading_zeros(i) == OTHERBYTEBITS(i) + 4);
+
+	i = 0x9;
+	ASSERT (stdc_count_leading_ones(i) == 0);
+	ASSERT (stdc_count_leading_zeros(i) == OTHERBYTEBITS(i) + 4);
+#endif
+}
+

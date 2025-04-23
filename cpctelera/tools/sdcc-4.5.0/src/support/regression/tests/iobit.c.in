@@ -1,0 +1,44 @@
+/** Tests for bit access in I/O space.
+
+    pin: 0, 1, 2, 3, 4, 5, 6, 7
+ */
+#include <testfwk.h>
+
+#include <stdint.h>
+
+#if (defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15) || defined(__SDCC_z80) || defined(__SDCC_z80n) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80))
+__sfr __at(0x10) PORT;
+#elif defined(__SDCC_mcs51)
+__sfr __at(0x99) PORT;
+#else
+unsigned char PORT;
+#endif
+
+#define PIN {pin}
+
+void foo_a(void) {
+    static char cnt;
+    PORT = (cnt++ & 5) ? (PORT | (1<<PIN)) : (PORT & ~(1<<PIN));
+}
+
+void foo_b(void) {
+    static char cnt;
+    PORT = (cnt & (1<<5)) ? (PORT | (1<<PIN)) : (PORT & ~(1<<PIN));
+    cnt++;
+}
+
+void bar1(void) {
+	if (PORT & (1 << PIN))
+		foo_a();
+}
+
+void bar0(void) {
+	if (!(PORT & (1 << PIN)))
+		foo_a();
+}
+
+void
+testBug (void)
+{
+}
+

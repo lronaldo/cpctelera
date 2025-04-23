@@ -1,0 +1,335 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var __interrupt_vect rom[0x8000]
+var _isr_unused rom[0x807c]
+var tx_bit_1 rom[0x8115]
+var tx_stop rom[0x811b]
+var tx_done rom[0x8121]
+var tx_idle rom[0x8145]
+var rx rom[0x8153]
+var rx_have_a rom[0x8156]
+var rx_active rom[0x8158]
+var rx_sample_1 rom[0x8165]
+var rx_next_bit rom[0x8169]
+var rx_done rom[0x817b]
+var rx_data rom[0x817c]
+var rx_idle rom[0x8189]
+var rx_stop rom[0x818e]
+var vuart_tx_put rom[0x81ba]
+var _boot rom[0x81db]
+var forever rom[0x82a1]
+var uart1_tx_buf rom[0x1]
+var vuart_tx_state rom[0x21]
+var vuart_tx rom[0x22]
+var vuart_rx_state rom[0x23]
+var vuart_rx rom[0x24]
+var vuart_rx_bit rom[0x25]
+var vuart_tx_buf rom[0x26]
+var uart1_tx_w rom[0x36]
+var uart1_tx_r rom[0x38]
+var vuart_tx_w rom[0x3a]
+var vuart_tx_r rom[0x3c]
+var IRQ_EXTI3 rom[0x80d3]
+var IRQ_TIM2 rom[0x80f5]
+var IRQ_UART1_TX rom[0x80a5]
+var IRQ_UART1_RX rom[0x807d]
+# Set some core vars
+var CLK_PCKENR1       rom[0x50c7][7:0]
+var CLK_PCKENR1_UART1 rom[0x50c7].3
+var CLK_PCKENR1_TIM2  rom[0x50c7].5
+var UART1_SR          rom[0x5230]
+var UART1_SR_TXE      rom[0x5230].7
+var UART1_SR_TC       rom[0x5230].6
+var UART1_SR_RXNE     rom[0x5230].5
+
+dump rom[0x00] 0x3d
+0x00000                      41                      A
+0x00001 uart1_tx_buf:        58 fc c9 8b bc 95 6b 72 X.....kr
+0x00009                      26 6b c5 5e af 85 8c d8 &k.^....
+0x00011                      65 df a8 d9 9f a6 f2 07 e.......
+0x00019                      e9 4a 03 c9 d0 94 31 43 .J....1C
+0x00021 vuart_tx_state:      84                      .
+0x00022 vuart_tx:            1d                      .
+0x00023 vuart_rx_state:      b3                      .
+0x00024 vuart_rx:            ea                      .
+0x00025 vuart_rx_bit:        be                      .
+0x00026 vuart_tx_buf:        d3 5d 26 37 cd 24 50 ed .]&7.$P.
+0x0002e                      77 50 41 e7 3e 6a 8f a1 wPA.>j..
+0x00036 uart1_tx_w:          f2 6b                   .k
+0x00038 uart1_tx_r:          f1 48                   .H
+0x0003a vuart_tx_w:          0c 99                   ..
+0x0003c vuart_tx_r:          bb 0c                   ..
+dc 0x8000 0x082a4 
+
+0x08000    <__interrupt_vect>:
+0x08000  ? 82 00 81 db    int    #0x0081db <_boot>
+0x08004  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08008  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x0800c  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08010  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08014  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08018  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x0801c  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08020  ? 82 00 80 d3    int    #0x0080d3 <IRQ_EXTI3>               
+0x08024  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08028  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x0802c  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08030  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08034  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08038  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x0803c  ? 82 00 80 f5    int    #0x0080f5 <IRQ_TIM2>                
+0x08040  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08044  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08048  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x0804c  ? 82 00 80 a5    int    #0x0080a5 <IRQ_UART1_TX>            
+0x08050  ? 82 00 80 7d    int    #0x00807d <IRQ_UART1_RX>            
+0x08054  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08058  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x0805c  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08060  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08064  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08068  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x0806c  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08070  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08074  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+0x08078  ? 82 00 80 7c    int    #0x00807c <_isr_unused>             
+
+0x0807c    <_isr_unused>:
+0x0807c  ? 80             iret            
+
+0x0807d    <IRQ_UART1_RX>:
+0x0807d  ? 4b 00          push   #0x00   
+0x0807f  ? 86             pop    CC                                  
+0x08080  ? 9b             sim                                        
+0x08081  ? c6 52 31       ld     A,0x5231                            
+0x08084  ? ce 00 3a       ldw    X,0x003a <vuart_tx_w>               
+0x08087  ? d7 00 26       ld     (0x0026 <vuart_tx_buf>,X),A         
+0x0808a  ? 5a             decw   X                                   
+0x0808b  ? 2a 03          jrpl   0x8090                              
+0x0808d  ? ae 00 0f       ldw    X,#0x000f                           
+0x08090  ? cf 00 3a       ldw    0x003a <vuart_tx_w>,X               
+0x08093  ? 72 00 53 00 0c btjt   0x5300,#0,0x80a4                    
+0x08098  ? 72 1a 50 c7    bset   0x50c7 <CLK_PCKENR1>,#5 <TIM2>      
+0x0809c  ? 72 10 53 00    bset   0x5300,#0                           
+0x080a0  ? 72 10 53 06    bset   0x5306,#0                           
+0x080a4  ? 80             iret                                       
+
+0x080a5    <IRQ_UART1_TX>:
+0x080a5  ? 4b 08          push   #0x08   
+0x080a7  ? 86             pop    CC                                  
+0x080a8  ? 9b             sim                                        
+0x080a9  ? 72 0c 52 30 20 btjt   0x5230 <UART1_SR>,#6 <TC>,0x80ce    
+0x080ae  ? ce 00 38       ldw    X,0x0038 <uart1_tx_r>               
+0x080b1  ? c3 00 36       cpw    X,0x0036 <uart1_tx_w>               
+0x080b4  ? 27 13          jreq   0x80c9                              
+0x080b6  ? ce 00 38       ldw    X,0x0038 <uart1_tx_r>               
+0x080b9  ? d6 00 01       ld     A,(0x0001 <uart1_tx_buf>,X)         
+0x080bc  ? 5a             decw   X                                   
+0x080bd  ? 2a 03          jrpl   0x80c2                              
+0x080bf  ? ae 00 1f       ldw    X,#0x001f                           
+0x080c2  ? cf 00 38       ldw    0x0038 <uart1_tx_r>,X               
+0x080c5  ? c7 52 31       ld     0x5231,A                            
+0x080c8  ? 80             iret                                       
+0x080c9  ? 72 1f 52 35    bres   0x5235,#7                           
+0x080cd  ? 80             iret                                       
+0x080ce  ? 72 1d 52 30    bres   0x5230 <UART1_SR>,#6 <TC>           
+0x080d2  ? 80             iret                                       
+
+0x080d3    <IRQ_EXTI3>:
+0x080d3  ? 4b 28          push   #0x28      
+0x080d5  ? 86             pop    CC                                  
+0x080d6  ? 9b             sim                                        
+0x080d7  ? 72 17 50 13    bres   0x5013,#3                           
+0x080db  ? 35 0a 00 23    mov    0x0023 <vuart_rx_state>,#0x0a       
+0x080df  ? 35 ff 00 25    mov    0x0025 <vuart_rx_bit>,#0xff         
+0x080e3  ? 72 00 53 00 0c btjt   0x5300,#0,0x80f4                    
+0x080e8  ? 72 1a 50 c7    bset   0x50c7 <CLK_PCKENR1>,#5 <TIM2>      
+0x080ec  ? 72 10 53 00    bset   0x5300,#0                           
+0x080f0  ? 72 10 53 06    bset   0x5306,#0                           
+0x080f4  ? 80             iret                                       
+
+0x080f5    <IRQ_TIM2>:
+0x080f5  ? 4b 28          push   #0x28       
+0x080f7  ? 86             pop    CC                                  
+0x080f8  ? 9b             sim                                        
+0x080f9  ? 72 11 53 04    bres   0x5304,#0                           
+0x080fd  ? c6 00 21       ld     A,0x0021 <vuart_tx_state>           
+0x08100  ? 2b 1f          jrmi   0x8121 <tx_done>                    
+0x08102  ? 72 5a 00 21    dec    0x0021 <vuart_tx_state>             
+0x08106  ? 2b 13          jrmi   0x811b <tx_stop>                    
+0x08108  ? 72 56 00 22    rrc    0x0022 <vuart_tx>                   
+0x0810c  ? 25 07          jrult  0x8115 <tx_bit_1>                   
+0x0810e  ? 9d             nop                                        
+0x0810f  ? 72 15 50 0f    bres   0x500f <pd_odr>,#2                  
+0x08113  ? 20 3e          jra    0x8153 <rx>                         
+
+0x08115    <tx_bit_1>:
+0x08115  ? 72 14 50 0f    bset   0x500f <pd_odr>,#2
+0x08119  ? 20 38          jra    0x8153 <rx>                         
+
+0x0811b    <tx_stop>:
+0x0811b  ? 72 14 50 0f    bset   0x500f <pd_odr>,#2
+0x0811f  ? 20 32          jra    0x8153 <rx>                         
+
+0x08121    <tx_done>:
+0x08121  ? ce 00 3c       ldw    X,0x003c <vuart_tx_r>
+0x08124  ? c3 00 3a       cpw    X,0x003a <vuart_tx_w>               
+0x08127  ? 27 1c          jreq   0x8145 <tx_idle>                    
+0x08129  ? 72 15 50 0f    bres   0x500f <pd_odr>,#2                  
+0x0812d  ? ce 00 3c       ldw    X,0x003c <vuart_tx_r>               
+0x08130  ? d6 00 26       ld     A,(0x0026 <vuart_tx_buf>,X)         
+0x08133  ? 5a             decw   X                                   
+0x08134  ? 2a 03          jrpl   0x8139                              
+0x08136  ? ae 00 0f       ldw    X,#0x000f                           
+0x08139  ? cf 00 3c       ldw    0x003c <vuart_tx_r>,X               
+0x0813c  ? c7 00 22       ld     0x0022 <vuart_tx>,A                 
+0x0813f  ? 35 08 00 21    mov    0x0021 <vuart_tx_state>,#0x08       
+0x08143  ? 20 0e          jra    0x8153 <rx>                         
+
+0x08145    <tx_idle>:
+0x08145  ? c6 00 23       ld     A,0x0023 <vuart_rx_state>
+0x08148  ? 2a 0c          jrpl   0x8156 <rx_have_a>                  
+0x0814a  ? 72 11 53 00    bres   0x5300,#0                           
+0x0814e  ? 72 1b 50 c7    bres   0x50c7 <CLK_PCKENR1>,#5 <TIM2>      
+0x08152  ? 80             iret                                       
+
+0x08153    <rx>:
+0x08153  ? c6 00 23       ld     A,0x0023 <vuart_rx_state>
+
+0x08156    <rx_have_a>:
+0x08156  ? 2b 23          jrmi   0x817b <rx_done>
+
+0x08158    <rx_active>:
+0x08158  ? 72 07 50 10 08 btjf   0x5010 <pd_idr>,#3,0x8165 <rx_sample_1>
+0x0815d  ? 72 5a 00 25    dec    0x0025 <vuart_rx_bit>               
+0x08161  ? 72 5a 00 25    dec    0x0025 <vuart_rx_bit>               
+
+0x08165    <rx_sample_1>:
+0x08165  ? 72 5c 00 25    inc    0x0025 <vuart_rx_bit>
+
+0x08169    <rx_next_bit>:
+0x08169  ? 4a             dec    A        
+0x0816a  ? c7 00 23       ld     0x0023 <vuart_rx_state>,A           
+0x0816d  ? 2b 1a          jrmi   0x8189 <rx_idle>                    
+0x0816f  ? 27 1d          jreq   0x818e <rx_stop>                    
+0x08171  ? a1 0a          cp     A,#0x0a                             
+0x08173  ? 26 07          jrne   0x817c <rx_data>                    
+0x08175  ? 72 59 00 25    rlc    0x0025 <vuart_rx_bit>               
+0x08179  ? 25 0e          jrult  0x8189 <rx_idle>                    
+
+0x0817b    <rx_done>:
+0x0817b  ? 80             iret                
+
+0x0817c    <rx_data>:
+0x0817c  ? 72 59 00 25    rlc    0x0025 <vuart_rx_bit>
+0x08180  ? 72 56 00 24    rrc    0x0024 <vuart_rx>                   
+0x08184  ? 72 5f 00 25    clr    0x0025 <vuart_rx_bit>               
+0x08188  ? 80             iret                                       
+
+0x08189    <rx_idle>:
+0x08189  ? 72 16 50 13    bset   0x5013,#3    
+0x0818d  ? 80             iret                                       
+
+0x0818e    <rx_stop>:
+0x0818e  ? c6 00 24       ld     A,0x0024 <vuart_rx>
+0x08191  ? 8a             push   CC                                  
+0x08192  ? 9b             sim                                        
+0x08193  ? ce 00 38       ldw    X,0x0038 <uart1_tx_r>               
+0x08196  ? c3 00 36       cpw    X,0x0036 <uart1_tx_w>               
+0x08199  ? 26 0e          jrne   0x81a9                              
+0x0819b  ? 72 0f 52 30 09 btjf   0x5230 <UART1_SR>,#7 <TXE>,0x81a9   
+0x081a0  ? c7 52 31       ld     0x5231,A                            
+0x081a3  ? 72 1e 52 35    bset   0x5235,#7                           
+0x081a7  ? 20 0f          jra    0x81b8                              
+0x081a9  ? ce 00 36       ldw    X,0x0036 <uart1_tx_w>               
+0x081ac  ? d7 00 01       ld     (0x0001 <uart1_tx_buf>,X),A         
+0x081af  ? 5a             decw   X                                   
+0x081b0  ? 2a 03          jrpl   0x81b5                              
+0x081b2  ? ae 00 1f       ldw    X,#0x001f                           
+0x081b5  ? cf 00 36       ldw    0x0036 <uart1_tx_w>,X               
+0x081b8  ? 86             pop    CC                                  
+0x081b9  ? 80             iret                                       
+
+0x081ba    <vuart_tx_put>:
+0x081ba  ? ce 00 3a       ldw    X,0x003a <vuart_tx_w>
+0x081bd  ? d7 00 26       ld     (0x0026 <vuart_tx_buf>,X),A         
+0x081c0  ? 5a             decw   X                                   
+0x081c1  ? 2a 03          jrpl   0x81c6                              
+0x081c3  ? ae 00 0f       ldw    X,#0x000f                           
+0x081c6  ? cf 00 3a       ldw    0x003a <vuart_tx_w>,X               
+0x081c9  ? 72 00 53 00 0c btjt   0x5300,#0,0x81da                    
+0x081ce  ? 72 1a 50 c7    bset   0x50c7 <CLK_PCKENR1>,#5 <TIM2>      
+0x081d2  ? 72 10 53 00    bset   0x5300,#0                           
+0x081d6  ? 72 10 53 06    bset   0x5306,#0                           
+0x081da  ? 81             ret                                        
+
+0x081db    <_boot>:
+0x081db  ? 35 00 50 c6    mov    0x50c6,#0x00   
+0x081df  ? 35 00 50 c7    mov    0x50c7 <CLK_PCKENR1>,#0x00          
+0x081e3  ? 35 00 50 ca    mov    0x50ca,#0x00                        
+0x081e7  ? ae 00 08       ldw    X,#0x0008                           
+0x081ea  ? 27 07          jreq   0x81f3                              
+0x081ec  ? 72 4f 00 35    clr    (0x0035,X)                          
+0x081f0  ? 5a             decw   X                                   
+0x081f1  ? 26 f9          jrne   0x81ec                              
+0x081f3  ? ae 00 00       ldw    X,#0x0000                           
+0x081f6  ? 27 09          jreq   0x8201                              
+0x081f8  ? d6 81 da       ld     A,(0x81da,X)                        
+0x081fb  ? d7 00 3d       ld     (0x003d,X),A                        
+0x081fe  ? 5a             decw   X                                   
+0x081ff  ? 26 f7          jrne   0x81f8                              
+0x08201  ? c6 7f 74       ld     A,0x7f74                            
+0x08204  ? a4 f3          and    A,#0xf3                             
+0x08206  ? aa 04          or     A,#0x04                             
+0x08208  ? c7 7f 74       ld     0x7f74,A                            
+0x0820b  ? c6 7f 74       ld     A,0x7f74                            
+0x0820e  ? a4 cf          and    A,#0xcf                             
+0x08210  ? aa 00          or     A,#0x00                             
+0x08212  ? c7 7f 74       ld     0x7f74,A                            
+0x08215  ? c6 7f 73       ld     A,0x7f73                            
+0x08218  ? a4 f3          and    A,#0xf3                             
+0x0821a  ? aa 0c          or     A,#0x0c                             
+0x0821c  ? c7 7f 73       ld     0x7f73,A                            
+0x0821f  ? 35 20 52 34    mov    0x5234,#0x20                        
+0x08223  ? 35 2c 52 35    mov    0x5235,#0x2c                        
+0x08227  ? 35 00 52 36    mov    0x5236,#0x00                        
+0x0822b  ? 35 0b 52 33    mov    0x5233,#0x0b                        
+0x0822f  ? 35 08 52 32    mov    0x5232,#0x08                        
+0x08233  ? 72 16 50 c7    bset   0x50c7 <CLK_PCKENR1>,#3 <UART1>     
+0x08237  ? 72 1b 52 34    bres   0x5234,#5                           
+0x0823b  ? 35 0f 00 3c    mov    0x003c <vuart_tx_r>,#0x0f           
+0x0823f  ? 35 0f 00 3a    mov    0x003a <vuart_tx_w>,#0x0f           
+0x08243  ? 35 ff 00 21    mov    0x0021 <vuart_tx_state>,#0xff       
+0x08247  ? 35 ff 00 23    mov    0x0023 <vuart_rx_state>,#0xff       
+0x0824b  ? 72 14 50 11    bset   0x5011 <pd_ddr>,#2                  
+0x0824f  ? 72 14 50 12    bset   0x5012,#2                           
+0x08253  ? 72 15 50 13    bres   0x5013,#2                           
+0x08257  ? 72 14 50 0f    bset   0x500f <pd_odr>,#2                  
+0x0825b  ? 72 17 50 11    bres   0x5011 <pd_ddr>,#3                  
+0x0825f  ? 72 17 50 12    bres   0x5012,#3                           
+0x08263  ? 72 16 50 13    bset   0x5013,#3                           
+0x08267  ? c6 50 a1       ld     A,0x50a1                            
+0x0826a  ? a4 fc          and    A,#0xfc                             
+0x0826c  ? aa 02          or     A,#0x02                             
+0x0826e  ? c7 50 a1       ld     0x50a1,A                            
+0x08271  ? 35 00 53 0e    mov    0x530e,#0x00                        
+0x08275  ? 35 00 53 0f    mov    0x530f,#0x00                        
+0x08279  ? 35 8b 53 10    mov    0x5310,#0x8b                        
+0x0827d  ? 72 15 53 00    bres   0x5300,#2                           
+0x08281  ? 72 10 53 03    bset   0x5303,#0                           
+0x08285  ? a6 48          ld     A,#0x48                             
+0x08287  ? cd 81 ba       call   0x81ba <vuart_tx_put>               
+0x0828a  ? a6 69          ld     A,#0x69                             
+0x0828c  ? cd 81 ba       call   0x81ba <vuart_tx_put>               
+0x0828f  ? a6 0d          ld     A,#0x0d                             
+0x08291  ? cd 81 ba       call   0x81ba <vuart_tx_put>               
+0x08294  ? a6 0a          ld     A,#0x0a                             
+0x08296  ? cd 81 ba       call   0x81ba <vuart_tx_put>               
+0x08299  ? 72 12 7f 60    bset   0x7f60,#1                           
+0x0829d  ? 72 16 50 5a    bset   0x505a,#3                           
+
+0x082a1    <forever>:
+0x082a1  ? 8f             wfi                 
+0x082a2  ? cc 82 a1       jp     0x82a1 <forever>                    

@@ -1,0 +1,38 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: R5K
+Controller has 4 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+A= 0x00   0 .  F= 00000000 0x00   0 .  Mode:3k
+                  SZxxxVxC
+XPC= 0x000 IP= 0xff IIR= 0x00 EIR= 0x00
+BC= 0x0000 00 00 00 00 00 00 00 00 ........
+DE= 0x0000 00 00 00 00 00 00 00 00 ........
+HL= 0x0000 00 00 00 00 00 00 00 00 ........
+IX= 0x0000 00 00 00 00 00 00 00 00 ........
+IY= 0x0000 00 00 00 00 00 00 00 00 ........
+JK= 0x0000 00 00 00 00 00 00 00 00 ........
+SP= 0x0000 00 00 00 00 00 00 00 00 ........
+aAF= 0x00-00  aBC= 0x00-00  aDE= 0x00-00  aHL= 0x00-00  aJK= 0x00-00  
+ PW= 0x0000-0000   PX= 0x0000-0000   PY= 0x0000-0000   PZ= 0x0000-0000  
+aPW= 0x0000-0000  aPX= 0x0000-0000  aPY= 0x0000-0000  aPZ= 0x0000-0000  
+0x0000  ? 00                NOP                                      
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0xffffff 16777216 rom_chip (8,%02x,0x%06x)
+  0x000000-0x00ffff    65536 ioi_chip (8,%02x,0x%04x)
+  0x000000-0x00ffff    65536 ioe_chip (8,%02x,0x%04x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x00ffff    65536 rom (8,%02x,0x%04x)
+  0x000000-0x00ffff    65536 ioi (8,%02x,0x%04x)
+  0x000000-0x00ffff    65536 ioe (8,%02x,0x%04x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  ioi 0x0000 0xffff -> ioi_chip 0x0000 activated
+  ioe 0x0000 0xffff -> ioe_chip 0x0000 activated

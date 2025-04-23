@@ -1,0 +1,239 @@
+// peeph-r2k.def - Rabbit 2000 (derived from Z80 peephole rules)
+//
+// Some of these peepholes could be potentially moved to peeph.def, but a
+// GBZ80 expert should have a look at them before.
+//
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2020
+// *** modified by Leland Morrison for rabbit 2000 processor 2011
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+replace restart {
+	ld	iy, #%1
+	ld	a, 1 (iy)
+	or	a, 0 (iy)
+} by {
+	ld	hl, #%1
+	ld	a, (hl)
+	inc	hl
+	or	a, (hl)
+	; peephole 65rab used hl instead of iy.
+} if notUsed('iy'), notUsed('hl')
+
+replace restart {
+	ld	%1,(hl)
+	or	a,%1
+} by {
+	or	a,(hl)
+	; peephole 68rab used (hl) directly instead of going through %1.
+} if notUsed(%1), notSame(%1 'a')
+
+replace restart {
+	or	a,%1
+	or	a,a
+} by {
+	or	a,%1
+	; peephole 73 removed redundant or after or.
+}
+
+replace restart {
+	or	a,%1 (%2)
+	or	a,a
+} by {
+	or	a,%1 (%2)
+	; peephole 74 removed redundant or after or.
+}
+
+replace restart {
+	and	a,%1
+	or	a,a
+} by {
+	and	a,%1
+	; peephole 75 removed redundant or after and.
+}
+
+replace restart {
+	xor	a,%1
+	or	a,a
+} by {
+	xor	a,%1
+	; peephole 76 removed redundant or after xor.
+}
+
+replace restart {
+	xor	a,%1 (%2)
+	or	a,a
+} by {
+	xor	a,%1 (%2)
+	; peephole 77 removed redundant or after xor.
+}
+
+replace restart {
+	sbc	hl, %1
+	ld	a, h
+	or	a, l
+	jp	NZ, %2
+} by {
+	sbc	hl, %1
+	jp	NZ, %2
+	; common peephole 102c removed redundant or after sbc.
+}
+
+replace restart {
+	sbc	hl, %1
+	ld	a, h
+	or	a, l
+	jp	Z, %2
+} by {
+	sbc	hl, %1
+	jp	Z, %2
+	; common peephole 102d removed redundant or after sbc.
+}
+
+replace restart {
+	ld	%1, %2 (%3)
+	inc	%1
+	ld	%2 (%3), %1
+} by {
+	inc	%2 (%3)
+	ld	%1, %2 (%3)
+	; peephole 93a incremented in %2 (%3) instead of going through %1.
+} if notSame(%3 'sp')
+
+replace restart {
+	inc	hl
+	ld	%1,#%2
+	add	hl,%1
+} by {
+	ld	%1,#%2+1
+	add	hl,%1
+	; peephole 129rab moved increment of hl to constant.
+} if notUsed(%1)
+
+replace restart {
+	dec	hl
+	ld	%1,#%2
+	add	hl,%1
+} by {
+	ld	%1,#%2-1
+	add	hl,%1
+	; peephole 129rab' moved decrement of hl to constant.
+} if notUsed(%1)
+
+replace restart {
+	inc	iy
+	ld	%1, %2 (iy)
+} by {
+	ld	%1, %2+1 (iy)
+	; peephole 129rab'' moved increment of iy to offset.
+} if notUsed('iy')
+
+replace restart {
+	ld	%1, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	ld	%6, %1
+} by {
+	ld	%6, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	; peephole 138rab loaded %6 from a directly instead of going through %1.
+} if notUsed(%1)
+
+replace restart {
+	ld	%1, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	ld	%5, a
+	ld	%6, %1
+} by {
+	ld	%6, a
+	ld	a, %2 (%3)
+	adc	a, #%4
+	ld	%5, a
+	; peephole 138rab' loaded %6 from a directly instead of going through %1.
+} if notUsed(%1), notSame(%5 %1), notSame(%5 '(hl)' '(de)' '(bc)'), notSame(%5 %6), notSame(%6 '(hl)' '(de)' '(bc)'), notSame(%5 'a'), notSame(%6 'a')
+
+replace restart {
+	pop	af
+	push	hl
+} by {
+	; peephole 142rab used 0(sp) to move hl onto the stack.
+	ld	0(sp), hl
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	pop	af
+	ld	hl, #%1
+	push	hl
+} by {
+	ld	hl, #%1
+	; peephole 143rab used 0(sp) to move hl onto the stack.
+	ld	0(sp), hl
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	pop	af
+	inc	sp
+	ld	hl,#%1
+	push	hl
+} by {
+	inc	sp
+	ld	hl,#%1
+	; peephole 145rab used 0(sp) to move #%1 onto the stack.
+	ld	0(sp), hl
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	pop	af
+	ld	a,#%1
+	push	af
+	inc	sp
+} by {
+	ld	h,#%1
+	ld	0(sp), hl
+	; peephole 146rab used 0(sp) to move #%1 onto the stack.
+	inc	sp
+} if notUsed('a'), notUsed('hl')
+
+// those are not in z80
+replace restart {
+	sbc	a,%1
+	bit	7,a
+	jp	Z,%2
+} by {
+	sbc	a,%1
+	jp	P,%2
+	; peephole 140 used sign flag instead of testing bit 7.
+}
+
+replace restart {
+	sbc	a,%1
+	bit	7,a
+	jp	NZ,%2
+} by {
+	sbc	a,%1
+	jp	M,%2
+	; peephole 141 used sign flag instead of testing bit 7.
+}
+
+replace restart {
+	dec %1
+	ld	a, %1
+	or	a, a
+} by {
+	dec %1
+	; peephole 141a removed redundant transfer and flag setting in a
+} if notUsed('a')

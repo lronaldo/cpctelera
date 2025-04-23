@@ -1,0 +1,93 @@
+# libc/stm8-large Makefile
+
+VPATH  = @srcdir@
+srcdir = @srcdir@
+top_builddir = @top_builddir@
+abs_top_builddir = @abs_top_builddir@
+
+LIB_TYPE     = @LIB_TYPE@
+
+EXTRA_CFLAGS = -mstm8 --model-large --max-allocs-per-node 25000
+SAS = $(top_builddir)/bin/sdasstm8
+
+# override PORTDIR defined by super (parent) makefile
+override PORTDIR = ../build/stm8-large
+
+%.rel: %.s
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
+
+include $(srcdir)/../incl.mk
+
+STM8_FLOAT = $(COMMON_FLOAT)
+
+STM8_INT = _mulschar.c _divschar.c _modschar.c
+
+STM8_LONG =
+
+STM8_LONGLONG = $(COMMON_LONGLONG) \
+  _srulonglong.c \
+  _srslonglong.c \
+  _slulonglong.c \
+  _slslonglong.c \
+  _mullonglong.c \
+  _divslonglong.c \
+  _divulonglong.c \
+  _modslonglong.c \
+  _modulonglong.c
+
+STM8_SDCC = $(COMMON_SDCC) \
+  __itoa.c \
+  __ltoa.c \
+  _startup.c \
+  strlen.c \
+  strnlen.c \
+  _memmove.c \
+  div.c \
+  ldiv.c \
+  lldiv.c \
+  sprintf.c \
+  vprintf.c \
+  atomic_flag_clear.c
+
+STM8SOURCES = $(addprefix ../,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
+STM8OBJECTS = $(patsubst %.c,%.rel,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
+
+OBJ = setjmp.rel _mulint.rel __mulsint2slong.rel __mululonguchar2ulonglong.rel _divsint.rel _modsint.rel _mullong.rel _divulong.rel _modulong.rel _divslong.rel _modslong.rel _fast_long_neg.rel heap.rel strcpy.rel strcmp.rel memcpy.rel atomic_flag_test_and_set.rel
+
+LIB = stm8.lib
+AS = $(SAS)
+ASFLAGS = -plosgff
+
+CFLAGS = -I$(srcdir)/../../include -I. --std-c23
+
+all: $(PORTDIR)/$(LIB)
+
+$(PORTDIR)/$(LIB): $(OBJ) $(STM8OBJECTS) Makefile
+ifeq ($(LIB_TYPE), SDCCLIB)
+	rm -f $@; \
+	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(STM8OBJECTS)
+else
+  ifeq ($(LIB_TYPE), AR)
+	$(SDAR) -rcSD $@ $(OBJ) $(STM8OBJECTS)
+  else
+    ifeq ($(LIB_TYPE), RANLIB)
+	$(SDAR) -rcD $@ $(OBJ) $(STM8OBJECTS)
+    else
+	rm -f $@
+	for i in $(basename $(OBJ) $(STM8OBJECTS)); do echo $$i >>$@; done
+	cp $(OBJ) $(STM8OBJECTS) $(PORTDIR)
+    endif
+  endif
+endif
+
+clean:
+	rm -f *.rel *.sym *.lst *~ $(CLEANSPEC) *.dump* *.asm *.lib
+
+distclean: clean
+	rm -f Makefile
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/stm8-large/Makefile

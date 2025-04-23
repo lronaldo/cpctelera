@@ -1,0 +1,518 @@
+// peeph-sm83.def - SM83 peephole rules
+//
+//
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2007
+// (c) Sebastian 'basxto' Riedel (sdcc@basxto.de) 2020 - 2022
+//
+// This program is free software; you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 2, or (at your option) any
+// later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+replace{
+	ld	hl, #%1
+	ld	a, (hl)
+} by {
+	; sm83 peephole 0 used ldh instead of ld a, (hl).
+	ldh	a, (#%1)
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2), notUsed('hl')
+
+replace{
+	ld	a, (#%1)
+} by {
+	; sm83 peephole 0b used ldh instead of ld.
+	ldh	a, (#%1)
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2)
+
+replace{
+	ld	hl, #%1
+	ld	(hl), a
+} by {
+	; sm83 peephole 1 used ldh instead of ld (hl), a.
+	ldh	(#%1), a
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2), notUsed('hl')
+
+replace{
+	ld	(#%1), a
+} by {
+	; sm83 peephole 1b used ldh instead of ld.
+	ldh	(#%1), a
+} if operandsLiteral(%1), immdInRange(0xff00 0xffff '|' %1 0 %2)
+
+replace {
+	ld	a, (hl)
+	inc	hl
+} by {
+	ld	a, (hl+)
+	; sm83 peephole 2 used ldi to increment hl after load
+}
+
+replace {
+	ld	%1, (hl)
+	inc	hl
+} by {
+	ld	a, (hl+)
+	ld	%1, a
+	; sm83 peephole 2b used ldi to increment hl after load
+} if notUsed('a')
+
+replace {
+	ld	%1, (hl)
+	dec	hl
+} by {
+	ld	a, (hl-)
+	ld	%1, a
+	; sm83 peephole 3 used ldd to decrement hl after load
+} if notUsed('a')
+
+replace {
+	ld	a, (hl)
+	dec	hl
+} by {
+	ld	a, (hl-)
+	; sm83 peephole 3b used ldd to decrement hl after load
+}
+
+replace {
+	ld	(hl), a
+	inc	hl
+} by {
+	ld	(hl+), a
+	; sm83 peephole 4 used ldi to increment hl after load
+}
+
+replace {
+	ld	(hl), %1
+	inc	hl
+} by {
+	ld	a, %1
+	ld	(hl+), a
+	; sm83 peephole 4b used ldi to increment hl after load
+} if notUsed('a')
+
+replace {
+	ld	(hl), a
+	dec	hl
+} by {
+	ld	(hl-), a
+	; sm83 peephole 5 used ldd to decrement hl after load
+}
+
+replace {
+	ld	(hl), %1
+	dec	hl
+} by {
+	ld	a, %1
+	ld	(hl-), a
+	; sm83 peephole 5b used ldd to decrement hl after load
+} if notUsed('a')
+
+replace {
+	ld	(hl), a
+	inc	%2
+	ld	a, (%2)
+	inc	hl
+} by {
+	ld	(hl+), a
+	; sm83 peephole 7 used ldi to increment hl
+	inc	%2
+	ld	a, (%2)
+} if notSame('hl' %2)
+
+replace {
+	ld	a, (hl)
+	ld	(%2), a
+	inc	%2
+	inc	hl
+} by {
+	ld	a, (hl+)
+	; sm83 peephole 8 used ldi to increment hl
+	ld	(%2), a
+	inc	%2
+} if notSame('hl' %2)
+
+replace {
+	dec	hl
+	ld	a, (hl+)
+	ld	h, (hl)
+	ld	l, a
+} by {
+	; sm83 peephole 9 reversed loading order of hl
+	ld	a, (hl-)
+	ld	l, (hl)
+	ld	h, a
+} if notUsed('a')
+
+replace restart {
+	ldhl	sp,#%1
+	ld	%2, %3
+	ldhl	sp,#%1
+} by {
+	; sm83 peephole 10a removed redundant ldhl.
+	ldhl	sp,#%1
+	ld	%2, %3
+} if notSame('(hl+)' %2 %3),  notSame('(hl+)' %2 %3)
+
+// 10b and c are for pushing stack addresses
+replace restart {
+	ldhl	sp,	#%1
+	ld	%3, %4
+	ld	%5, %6
+	ldhl	sp,	#%2
+} by {
+	ldhl	sp,	#1
+	ld	%3, %4
+	ld	%5, %6
+	; sm83 peephole 10b turned ldhl into dec hl
+	dec	hl
+} if operandsLiteral(%1 %2), notSame('l' %3 %5), notSame('l' %3 %5), immdInRange(0x01 0x01 '-' %1 %2 %3), operandsNotRelated('hl' %3 %4 %5 %6)
+
+replace restart {
+	ldhl	sp,	#%1
+	ld	%3, %4
+	ld	%5, %6
+	ldhl	sp,	#%2
+} by {
+	ldhl	sp,	#1
+	ld	%3, %4
+	ld	%5, %6
+	; sm83 peephole 10c turned ldhl into inc hl
+	inc	hl
+} if operandsLiteral(%1 %2), notSame('l' %3 %5), notSame('l' %3 %5), immdInRange(0x01 0x01 '-' %2 %1 %3), operandsNotRelated('hl' %3 %4 %5 %6)
+
+replace restart {
+	ldhl	sp,#%1
+	dec	hl
+} by {
+	; sm83 peephole 10d combined ld and dec.
+	ldhl	sp,#%2
+} if immdInRange(-128 127 '-' %1 1 %2)
+
+replace restart {
+	ldhl	sp,#%1
+	inc	hl
+} by {
+	; sm83 peephole 10e combined ld and inc.
+	ldhl	sp,#%2
+} if immdInRange(-128 127 '+' %1 1 %2)
+
+replace restart {
+	and	a, #%1
+	swap a
+	and	a, #%2
+} by {
+	; sm83 peephole 11 combined redundant ANDs #%2 and swapped #%1.
+	swap a
+	and	a, #%7
+} if operandsLiteral(%1 %2), immdInRange(0x00 0xff '/' %1 0x10 %3), immdInRange(0x00 0xfff '*' %1 0x10 %4), immdInRange(0x00 0xff '&' %4 0xF0 %5), immdInRange(0x00 0xff '|' %3 %5 %6), immdInRange(0x00 0xff '&' %2 %6 %x7)
+
+replace restart {
+	ldh a, (%1)
+	inc a
+	ldh (%1), a
+} by {
+	; sm83 peephole 12 turned ldh into inc (hl).
+	ld hl, #((%1) | 0xFF00)
+	inc (hl)
+} if notSame(%1 'c'), notUsed('a' 'hl')
+
+replace restart {
+	ldh a, (%1)
+	dec a
+	ldh (%1), a
+} by {
+	; sm83 peephole 13 turned ldh into dec (hl).
+	ld hl, #((%1) | 0xFF00)
+	dec (hl)
+} if notSame(%1 'c'), notUsed('a' 'hl')
+
+replace restart {
+	ldh a, (%1)
+	srl a
+	ldh (%1), a
+} by {
+	; sm83 peephole 14 turned ldh into srl (hl).
+	ld hl, #((%1) | 0xFF00)
+	srl (hl)
+} if notSame(%1 'c'), notUsed('a' 'hl')
+
+replace restart {
+	rra
+	rla
+} by {
+	; sm83 peephole 16 removed redundant rra/rla
+} if notUsed('cf' 'hf' 'nf' 'zf')
+
+replace {
+	xor	a, a
+	push 	af
+	inc	sp
+	xor	a, a
+	push 	af
+	inc	sp
+} by {
+	; sm83 peephole 17a pushed double `xor a` fast
+	xor	a, a
+	rrca
+	push	af
+	xor	a, a
+}
+
+//TODO: fails for unknown reasons
+//replace {
+//	ld	%1, #%2
+//	push	%1
+//} by {
+//	; sm83 peephole 17b pushed #%2 faster
+//	xor	a, a
+//	rra
+//	push	af
+//} if operandsLiteral(%2), immdInRange(0 0 '+' %2 0 %3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18a pushed #%2 faster
+	sub	a, a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x00C0 0x00C0 '+' %2 0 %x3), notUsed(%1 'af')
+
+
+// Those rules save 1 byte and 4 cycles each
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18b pushed #%2 faster
+	xor	a, a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x0080 0x0080 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18c pushed #%2 faster
+	xor	a, a
+	scf
+	push	af
+} if operandsLiteral(%2), immdInRange(0x0090 0x0090 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18d pushed #%2 faster
+	xor	a, a
+	and	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x00A0 0x00A0 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18e pushed #%2 faster
+	xor	a, a
+	scf
+	push	af
+} if operandsLiteral(%2), immdInRange(0x00D0 0x00D0 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18f pushed #%2 faster
+	xor	a, a
+	inc	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0x0100 0x0100 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18g pushed #%2 faster
+	scf
+	sbc	a, a
+	push	af
+} if operandsLiteral(%2), immdInRange(0xFF30 0xFF30 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	ld	%1, #%2
+	push	%1
+} by {
+	; sm83 peephole 18h pushed #%2 faster
+	xor	a, a
+	dec	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0xFF60 0xFF60 '+' %2 0 %x3), notUsed(%1 'af')
+
+replace {
+	push	af
+	inc	sp
+	ld	a, #%2
+	push	af
+	inc	sp
+} by {
+	; sm83 peephole 19 pushed #%2 via flags
+	cp	a
+	push	af
+} if operandsLiteral(%2), immdInRange(0xC0 0xC0 '+' %2 0 %x3), notUsed('f')
+
+replace restart {
+	inc	hl
+	ld	a, (hl-)
+	or	a, (hl)
+} by {
+	ld	a, (hl+)
+	or	a, (hl)
+	; sm83 peephole 20 reversed ld and or.
+} if notUsed('hl')
+
+replace restart {
+%1:
+	ld	a, (hl+)
+	ld	%3, a
+	ld	a, (%6)
+	inc	%6
+	sub	a, %3
+	ld	%4, a
+	jp	NZ, %2
+	or	a,%3
+	jp	NZ, %1
+%2:
+} by {
+%1:
+	ld	a, (hl+)
+	ld	%3, a
+	ld	a, (%6)
+	inc	%6
+	sub	a, %3
+	jp	NZ, %2
+	cp	a,%3
+	jp	NZ, %1
+%2:
+	; sm83 peephole 21 sped up loop body.
+	ld	%4, a
+} if canSplitReg(%6 %9 %10), operandsNotRelated(%3 %6 'hl'), operandsNotRelated(%3 %6 'hl'), notSame(%3 %4), labelRefCount(%2 1)
+
+replace restart {
+	ld	(hl+), a
+	ld	(hl), %1
+	ld	a, (hl-)
+	or	a, (hl)
+} by {
+	ld	(hl+), a
+	ld	(hl), %1
+	; sm83 peephole 22 remove unnecessary load back
+	or	a, %1
+	dec	hl
+}
+
+replace {
+	pop	%1
+	push	%1
+} by {
+	; peephole sp1 removed not needed push
+	pop	%1
+} if notUsed('sp')
+
+replace {
+	pop	%1
+	pop	%2
+	push	%2
+	push	%1
+} by {
+	; peephole sp2 removed not needed push
+	pop	%1
+	pop	%2
+} if notUsed('sp'), notSame(%1 %2)
+
+replace {
+	add	sp, %1
+} by {
+	; peephole sp3 removed not needed add sp
+} if notUsed('sp')
+
+replace {
+	pop	%1
+} by {
+	; peephole sp6 removed not needed pop
+} if notUsed(%1), notUsed('sp')
+
+// for 2B it wouldn't be worth it
+replace {
+	inc	sp
+	inc	sp
+	inc	sp
+} by {
+	; peephole sp7 increased SP by addition
+	add	sp, #3
+} if notUsed('f')
+
+replace restart {
+	add	sp, #%1
+	inc	sp
+} by {
+	; peephole sp8a increased SP by addition
+	add	sp, #%2
+} if immdInRange(-128 127 '+' %1 1 %2), notUsed('hf' 'cf')
+
+replace restart {
+	inc	sp
+	add	sp, #%1
+} by {
+	; peephole sp8b increased SP by addition
+	add	sp, #%2
+} if immdInRange(-128 127 '+' %1 1 %2)
+
+replace restart {
+	add	sp, #%1
+	add	sp, #%2
+} by {
+	; peephole sp9 combined SP additions
+	add	sp, #%3
+} if immdInRange(-128 127 '+' %1 %2 %3), notUsed('hf' 'cf')
+
+// only handle stack adjustment after calls to not 
+// disturb detection of uninitialized reads in emulators
+replace {
+	call	%2
+	add	sp, #%1
+} by {
+	call	%2
+	; peephole sp10a increased SP by %1 through pop
+	pop	%3
+} if immdInRange(2 2 '+' %1 0 %2), unusedReg(%3 'bc' 'de' 'hl'), notUsed('f')
+
+// unusedReg does not support 'af'
+replace {
+	call	%2
+	add	sp, #%1
+} by {
+	call	%2
+	; peephole sp10b increased SP by %1 through pop
+	pop	af
+} if immdInRange(2 2 '+' %1 0 %2), notUsed('af')
+
+// if f was used
+replace {
+	call	%2
+	inc	sp
+	inc	sp
+} by {
+	call	%2
+	; peephole sp10c increased SP by 2 through pop
+	pop	%3
+} if unusedReg(%3 'bc' 'de' 'hl')

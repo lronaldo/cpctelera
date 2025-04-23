@@ -1,0 +1,54 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+Type of microcontroller: STM8 AL,L 31[346]x, 3L[46]x
+Controller has 21 hardware element(s).
+   on cpu[0]
+   on simif[0]
+  off vcd[0]
+   on dreg[0]
+   on dport[0]
+   on clk[0]
+   on uart[1]
+   on itc[0]
+   on pa[0]
+   on pb[0]
+   on pc[0]
+   on pd[0]
+   on pe[0]
+   on pf[0]
+   on rst[0]
+   on tim2[2]
+   on tim3[3]
+   on tim4[4]
+   on tim1[1]
+   on uid[0]
+   on flash[0]
+V-IHINZC  Flags= 0x28  40 (  A= 0x00   0 .
+0-101000  X= 0x0000   0 .    Y= 0x0000   0 .
+SP= 0x17ff [SP+1]= 00   0 .  Limit= 0x14ff
+0x08000  ? 00 00          neg    (0x00,SP)                           
+Memory chips:
+  0x000000-0x0000ff      256 variable_storage (32,%08x,0x%02x)
+  0x000000-0x0017ff     6144 ram_chip (8,%02x,0x%04x)
+  0x000000-0x0007ff     2048 eeprom_chip (8,%02x,0x%03x)
+  0x000000-0x0007ff     2048 option_chip (8,%02x,0x%03x)
+  0x000000-0x0007ff     2048 io_chip (8,%02x,0x%03x)
+  0x000000-0x0007ff     2048 boot_chip (8,%02x,0x%03x)
+  0x000000-0x0000ff      256 cpu_chip (8,%02x,0x%02x)
+  0x000000-0x01ffff   131072 flash_chip (8,%02x,0x%05x)
+Address spaces:
+  0x000000-0x0000ff      256 variables (32,%08x,0x%02x)
+  0x000000-0x027fff   163840 rom (8,%02x,0x%05x)
+  0x000000-0x000001        2 regs8 (8,%02x,0x%01x)
+  0x000000-0x000002        3 regs16 (16,%04x,0x%01x)
+Address decoders:
+  variables 0x00 0xff -> variable_storage 0x00 activated
+  rom 0x00000 0x017ff -> ram_chip 0x0000 activated
+  rom 0x04000 0x047ff -> eeprom_chip 0x000 activated
+  rom 0x04800 0x04fff -> option_chip 0x000 activated
+  rom 0x05000 0x057ff -> io_chip 0x000 activated
+  rom 0x06000 0x067ff -> boot_chip 0x000 activated
+  rom 0x07f00 0x07fff -> cpu_chip 0x00 activated
+  rom 0x08000 0x27fff -> flash_chip 0x00000 activated

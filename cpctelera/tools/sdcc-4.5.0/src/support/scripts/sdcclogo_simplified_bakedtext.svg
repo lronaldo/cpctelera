@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="64" height="64">
+  <title>SDCC Logo</title>
+  <defs>
+    <linearGradient x1="0" y2="1" id="lg1">
+      <stop stop-color="#404040" offset="0" />
+      <stop stop-color="#ffffff" offset="1" />
+    </linearGradient>
+    <linearGradient x1="0" y1="0" x2="1" y2="1" id="lg2">
+      <stop stop-color="#cccccc" offset="0" />
+      <stop stop-color="#eeeeee" offset="0.45" />
+      <stop stop-color="#383838" offset="0.55" />
+      <stop stop-color="#8c8c8c" offset="1" />
+    </linearGradient>
+    <linearGradient x2="0" y2="1" id="lg3">
+      <stop stop-color="#b0b0b0" offset="0" />
+      <stop stop-color="#bebebe" offset="0.25" />
+      <stop stop-color="#ffffff" offset="0.35" />
+      <stop stop-color="#e0e0e0" offset="0.45" />
+      <stop stop-color="#ffffff" offset="0.55" />
+      <stop stop-color="#c0c0c0" offset="0.66" />
+      <stop stop-color="#c8c8c8" offset="1" />
+    </linearGradient>
+    <linearGradient x2="0" y2="1" id="lg4">
+      <stop stop-color="#808080" offset="0" />
+      <stop stop-color="#f0f0f0" offset="0.33" />
+      <stop stop-color="#383838" offset="0.5" />
+      <stop stop-color="#e0e0e0" offset="0.66" />
+      <stop stop-color="#bebebe" offset="1" />
+    </linearGradient>
+    <linearGradient x1="0" x2="1" id="lg5">
+      <stop stop-color="#bebebe" offset="0" />
+      <stop stop-color="#ffffff" offset="0.2" />
+      <stop stop-color="#585858" offset="0.8" />
+      <stop stop-color="#8c8c8c" offset="1" />
+    </linearGradient>
+    <linearGradient x1="0" x2="1" id="lg6">
+      <stop stop-color="#bebebe" offset="0" />
+      <stop stop-color="#ffffff" offset="0.2" />
+      <stop stop-color="#383838" offset="0.8" />
+      <stop stop-color="#8c8c8c" offset="1" />
+    </linearGradient>
+    <radialGradient r="0.85" id="rg1">
+      <stop stop-color="#808080" offset="0" />
+      <stop stop-color="#b0b0b0" offset="1" />
+    </radialGradient>
+    <radialGradient id="rg2">
+      <stop stop-color="#000000" stop-opacity="0.5" offset="0" />
+      <stop stop-color="#000000" stop-opacity="0" offset="1" />
+    </radialGradient>
+    <path id="SDCC" d="m 18.640625,21.703125 -0.484375,2.46875 q -0.882813,-0.4375 -1.742188,-0.648438 -0.859374,-0.21875 -1.679687,-0.21875 -1.125,0 -1.757812,0.351563 -0.625,0.351562 -0.625,0.976562 0,0.398438 0.273437,0.625 0.28125,0.21875 1.148438,0.429688 l 1.234375,0.304687 Q 16.554687,26.382812 17.273437,27.125 18,27.859375 18,29.03125 q 0,1.898437 -1.445313,3.046875 -1.437499,1.148437 -3.867187,1.148437 -1.132812,0 -2.257812,-0.210937 -1.117188,-0.210938 -2.1875005,-0.625 L 8.71875,29.851562 q 1.0390625,0.601563 2.015625,0.898438 0.984375,0.296875 1.9375,0.296875 1.03125,0 1.671875,-0.421875 0.648438,-0.421875 0.648438,-1.078125 0,-0.429688 -0.289063,-0.664063 Q 14.414063,28.640625 13.4375,28.390625 L 12.210938,28.085937 Q 10.851563,27.75 10.1875,27.023437 9.5234375,26.296875 9.5234375,25.140625 q 0,-1.820313 1.3906255,-2.914063 Q 12.3125,21.125 14.671875,21.125 q 0.945313,0 1.9375,0.148437 1,0.140625 2.03125,0.429688 z m 6.070312,1.90625 -1.398437,7.117187 h 1.078125 q 2.101562,0 3.328125,-1.179687 1.226562,-1.179688 1.226562,-3.1875 0,-1.359375 -0.804687,-2.054688 -0.796875,-0.695312 -2.375,-0.695312 z m -2.578125,-2.273438 h 3.164063 q 2.265625,0 3.398437,0.273438 1.132813,0.265625 1.882813,0.898437 0.757812,0.632813 1.140625,1.539063 0.382812,0.898437 0.382812,2.039062 0,1.585938 -0.65625,2.992188 -0.648437,1.398437 -1.828125,2.351562 -1.03125,0.851563 -2.398437,1.210938 Q 25.859375,33 23.03125,33 H 19.859375 Z M 42.5,32.453125 q -1.078125,0.382812 -2.070313,0.578125 -0.992187,0.195312 -1.882812,0.195312 -2.351563,0 -3.757813,-1.289062 -1.40625,-1.289063 -1.40625,-3.414063 0,-1.398437 0.445313,-2.632812 0.445312,-1.242188 1.3125,-2.265625 1.023437,-1.203125 2.460937,-1.851563 1.445313,-0.648437 3.109375,-0.648437 0.90625,0 1.820313,0.21875 0.914062,0.210937 1.859375,0.648437 L 43.90625,24.40625 q -0.75,-0.570313 -1.507813,-0.835938 -0.757812,-0.265625 -1.625,-0.265625 -1.804687,0 -3.023437,1.390625 -1.21875,1.390625 -1.21875,3.476563 0,1.34375 0.75,2.109375 0.75,0.765625 2.070312,0.765625 0.789063,0 1.671875,-0.28125 0.890625,-0.289063 1.992188,-0.898438 z m 11.742187,0 q -1.078125,0.382812 -2.070312,0.578125 -0.992188,0.195312 -1.882813,0.195312 -2.351562,0 -3.757812,-1.289062 -1.40625,-1.289063 -1.40625,-3.414063 0,-1.398437 0.445312,-2.632812 0.445313,-1.242188 1.3125,-2.265625 1.023438,-1.203125 2.460938,-1.851563 1.445312,-0.648437 3.109375,-0.648437 0.90625,0 1.820312,0.21875 0.914063,0.210937 1.859375,0.648437 l -0.484375,2.414063 q -0.75,-0.570313 -1.507812,-0.835938 -0.757813,-0.265625 -1.625,-0.265625 -1.804688,0 -3.023438,1.390625 -1.21875,1.390625 -1.21875,3.476563 0,1.34375 0.75,2.109375 0.75,0.765625 2.070313,0.765625 0.789062,0 1.671875,-0.28125 0.890625,-0.289063 1.992187,-0.898438 z" />
+  </defs>
+  <pattern id="pat1" width="8" height="64" patternUnits="userSpaceOnUse" patternTransform="translate(-4,0)" style="stroke-linejoin:round">
+    <!-- shadows -->
+    <rect width="4" height="12" x="4" y="5" fill="url(#rg2)" />
+    <rect width="4" height="12" x="4" y="49" fill="url(#rg2)" />
+    <!-- 1 top & bottom row pin -->
+    <rect width="4" height="12" rx="0.5" ry="0.5" x="2" y="4" style="fill:url(#lg3);stroke:url(#lg5)" />
+    <rect width="4" height="12" rx="0.5" ry="0.5" x="2" y="48" style="fill:url(#lg4);stroke:url(#lg6)" />
+  </pattern>
+  <g style="stroke-linejoin:round">
+    <!-- shadows -->
+    <rect width="64" height="20" x="0" y="38" fill="url(#rg2)" />
+    <rect width="4" height="35" x="60" y="15" fill="url(#rg2)" />
+    <!-- pins and chip body -->
+    <rect width="56" height="64" x="4" fill="url(#pat1)" />
+    <rect width="60" height="32" rx="2" ry="2" x="2" y="16" style="stroke-width:2;fill:url(#rg1);stroke:url(#lg2)" />
+  </g>
+  <g>
+    <use x="1" y="5" href="#SDCC" />
+    <use x="-0.5" y="3.5" style="fill:#ff80ff" href="#SDCC" />
+    <use y="4" style="fill:#800080" href="#SDCC" />
+  </g>
+  <circle cx="8" cy="42" r="2" style="fill:none;stroke:url(#lg1);stroke-width:0.75" />
+</svg>

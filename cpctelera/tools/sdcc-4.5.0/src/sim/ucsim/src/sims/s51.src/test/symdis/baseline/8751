@@ -1,0 +1,80 @@
+uCsim, Copyright (C)  Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+var __sdcc_program_startup rom[0x0003]
+var __sdcc_gsinit_startup rom[0x0006]
+var __mcs51_genXINIT rom[0x0013]
+var __mcs51_genRAMCLEAR rom[0x0035]
+var __mcs51_genXRAMCLEAR rom[0x003b]
+var _main rom[0x0062]
+var __sdcc_external_startup rom[0x0064]
+dc 0x0000 0x00067
+0x0000  ? 02 00 06 LJMP   0x0006 <__sdcc_gsinit_startup>             
+
+0x0003    <__sdcc_program_startup>:
+0x0003  ? 02 00 62 LJMP   0x0062 <_main>
+
+0x0006    <__sdcc_gsinit_startup>:
+0x0006  ? 75 81 0a MOV    0x81 <SP>,#0x0a
+0x0009  ? 12 00 64 LCALL  0x0064 <__sdcc_external_startup>           
+0x000c  ? e5 82    MOV    A,0x82 <DPL>                               
+0x000e  ? 60 03    JZ     0x0013 <__mcs51_genXINIT>                  
+0x0010  ? 02 00 03 LJMP   0x0003 <__sdcc_program_startup>            
+
+0x0013    <__mcs51_genXINIT>:
+0x0013  ? 79 00    MOV    R1,#0x00    
+0x0015  ? e9       MOV    A,R1                                       
+0x0016  ? 44 00    ORL    A,#0x00                                    
+0x0018  ? 60 1b    JZ     0x0035 <__mcs51_genRAMCLEAR>               
+0x001a  ? 7a 00    MOV    R2,#0x00                                   
+0x001c  ? 90 00 68 MOV    DPTR,#0x0068                               
+0x001f  ? 78 01    MOV    R0,#0x01                                   
+0x0021  ? 75 a0 00 MOV    0xa0 <P2>,#0x00                            
+0x0024  ? e4       CLR    A                                          
+0x0025  ? 93       MOVC   A,@A+DPTR                                  
+0x0026  ? f2       MOVX   @R0,A                                      
+0x0027  ? a3       INC    DPTR                                       
+0x0028  ? 08       INC    R0                                         
+0x0029  ? b8 00 02 CJNE   R0,#0x00,0x002e                            
+0x002c  ? 05 a0    INC    0xa0 <P2>                                  
+0x002e  ? d9 f4    DJNZ   R1,0x0024                                  
+0x0030  ? da f2    DJNZ   R2,0x0024                                  
+0x0032  ? 75 a0 ff MOV    0xa0 <P2>,#0xff                            
+
+0x0035    <__mcs51_genRAMCLEAR>:
+0x0035  ? e4       CLR    A        
+0x0036  ? 78 ff    MOV    R0,#0xff                                   
+0x0038  ? f6       MOV    @R0,A                                      
+0x0039  ? d8 fd    DJNZ   R0,0x0038                                  
+
+0x003b    <__mcs51_genXRAMCLEAR>:
+0x003b  ? 78 00    MOV    R0,#0x00
+0x003d  ? e8       MOV    A,R0                                       
+0x003e  ? 44 00    ORL    A,#0x00                                    
+0x0040  ? 60 0a    JZ     0x004c                                     
+0x0042  ? 79 01    MOV    R1,#0x01                                   
+0x0044  ? 75 a0 00 MOV    0xa0 <P2>,#0x00                            
+0x0047  ? e4       CLR    A                                          
+0x0048  ? f3       MOVX   @R1,A                                      
+0x0049  ? 09       INC    R1                                         
+0x004a  ? d8 fc    DJNZ   R0,0x0048                                  
+0x004c  ? 78 00    MOV    R0,#0x00                                   
+0x004e  ? e8       MOV    A,R0                                       
+0x004f  ? 44 00    ORL    A,#0x00                                    
+0x0051  ? 60 0c    JZ     0x005f                                     
+0x0053  ? 79 00    MOV    R1,#0x00                                   
+0x0055  ? 90 00 01 MOV    DPTR,#0x0001                               
+0x0058  ? e4       CLR    A                                          
+0x0059  ? f0       MOVX   @DPTR,A                                    
+0x005a  ? a3       INC    DPTR                                       
+0x005b  ? d8 fc    DJNZ   R0,0x0059                                  
+0x005d  ? d9 fa    DJNZ   R1,0x0059                                  
+0x005f  ? 02 00 03 LJMP   0x0003 <__sdcc_program_startup>            
+
+0x0062    <_main>:
+0x0062  ? 80 fe    SJMP   0x0062 <_main>         
+
+0x0064    <__sdcc_external_startup>:
+0x0064  ? 75 82 00 MOV    0x82 <DPL>,#0x00
+0x0067  ? 22       RET                                               

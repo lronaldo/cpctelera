@@ -1,0 +1,43 @@
+/** integer constants of bit-precise integer types
+
+    width: 2, 4, 6, 7, 8, 9, 15, 16, 17, 24, 32, 33, 40, 48, 63, 64, 65
+*/
+
+#include <testfwk.h>
+
+#pragma disable_warning 264
+#pragma disable_warning 273
+
+#include <limits.h>
+
+// clang 11 supports bit-precise types, but deviates a bit from C23.
+#if __clang_major__ == 11
+#define __SDCC_BITINT_MAXWIDTH 128
+#define _BitInt _ExtInt
+#endif
+
+#if __SDCC_BITINT_MAXWIDTH >= {width} // TODO: When we can regression-test in --std-c23 mode, use the standard macro from limits.h instead!
+
+typedef unsigned _BitInt({width}) bitinttype;
+
+volatile bitinttype i = 0x01wb;
+volatile bitinttype j = 0x0'1'0wb;
+volatile bitinttype k = 0b1wb;
+volatile bitinttype l = 0x01wbu;
+volatile bitinttype m = 0x0'1'0wbu;
+volatile bitinttype n = 0b1uwb;
+
+#endif
+
+void testBitInt(void)
+{
+#if __SDCC_BITINT_MAXWIDTH >= {width}
+	ASSERT(i == 0x01wb);
+	ASSERT(j == (bitinttype)0x0'1'0wb);
+	ASSERT(k == 0b1wb);
+	ASSERT(l == 0x01uwb);
+	ASSERT(m == (bitinttype)0x0'1'0wbu);
+	ASSERT(n == 0b1wbu);
+#endif
+}
+

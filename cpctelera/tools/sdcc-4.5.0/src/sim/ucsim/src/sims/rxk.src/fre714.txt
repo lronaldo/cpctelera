@@ -1,0 +1,44 @@
+and iy, de		+ fd dc
+or iy, de		+ fd ec
+test iy			+ fd 4c
+
+cbm 			+ ed 00 n
+sbox a 			+ ed 02
+dwjnz label		+ ed 10 e
+ibox a	 		+ ed 12
+cp hl, de		+ ed 48
+test bc			+ ed 4c
+lljp cx, lxpc, mn	+ ed a2,aa,b2,ba n m
+jre cx, label		+ ed a3,b3,ab,bb n m
+push mn			+ ed a5 n m
+lljp cc, lxpc, mn	+ ed c2,ca,d2,da n m
+jre cc, label		+ ed c3,cb,d3,db n m
+flag cc, hl		+ ed c4,cc,d4,dc,a4,b4,ac,bc
+
+ld bcde, (hl)		+ dd 1a
+ld bcde, d(ix)		+ dd ce d
+ld bcde, d(iy)		+ dd de d
+ld bcde, n(sp)		+ dd ee n
+ld (hl), bcde		+ dd 1b
+ld d(ix), bcde		+ dd cf d
+ld d(iy), bcde		+ dd df d
+ld n(sp), bcde		+ dd ef n
+neg bcde       		+ dd 4d
+pop bcde		+ dd f1
+push bcde		+ dd f5
+
+rl bb, bcde		+ dd 68,69,6b
+rlc bb, bcde		+ dd 48,49,4b
+rlc 8, bcde		+ dd 4f
+rlb a, bcde		+ dd 6f
+sla bb, bcde		+ dd 88,89,8b
+sll bb, bcde		+ dd a8,a9,ab
+
+rr bb, bcde		+ dd 78,79,7b
+rrc bb, bcde		+ dd 58,59,5b
+rrc 8, bcde		+ dd 5f
+rrb a, bcde		+ dd 7f
+sra bb, bcde		+ dd 98,99,9b
+srl bb, bcde		+ dd b8,b9,bb
+
+test bcde		+ dd 5c
