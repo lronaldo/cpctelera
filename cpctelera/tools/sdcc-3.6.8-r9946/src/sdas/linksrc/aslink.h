@@ -1308,7 +1308,7 @@ extern  VOID            s19(int i);
 extern  VOID            sflush(void);
 
 /* EEP: lkelf.c */
-extern  VOID            elf();
+extern  VOID            elf(int i);
 
 /* JCF: lkmem.c */
 extern int summary(struct area * xp);
