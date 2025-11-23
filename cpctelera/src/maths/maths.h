@@ -1,6 +1,6 @@
 //-----------------------------LICENSE NOTICE------------------------------------
 //  This file is part of CPCtelera: An Amstrad CPC Game Engine
-//  Copyright (C) 2014-2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+//  Copyright (C) 2024 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published by
@@ -16,22 +16,17 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //-------------------------------------------------------------------------------
 
-#ifndef CPCTELERA_ALL_H
-#define CPCTELERA_ALL_H
+//#####################################################################
+//### MODULE: Maths                                                 ###
+//#####################################################################
+//### This module contains mathematical functions.                  ###
+//#####################################################################
+//
 
-#include <types.h>
-#include <firmware/firmware.h>
-#include <memutils/memutils.h>
-#include <keyboard/keyboard.h>
-#include <bitarray/bitarray.h>
-#include <sprites/sprites.h>
-#include <strings/strings.h>
-#include <video/videomode.h>
-#include <audio/audio.h>
-#include <random/random.h>
-#include <macros/allmacros.h>
-#include <easytilemaps/easytilemaps.h>
-#include <compression/compression.h>
-#include <loaders/loaders.h>
-#include <maths/maths.h>
+#ifndef CPCT_MATHS_H
+#define CPCT_MATHS_H
+
+//Function to divide a given value by 10
+extern   u8 cpct_divideby10 (u8 dividend) __z88dk_fastcall;
+
 #endif
