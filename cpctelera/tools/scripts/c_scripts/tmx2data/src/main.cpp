@@ -88,6 +88,8 @@ selected as CSV in tilemap properties."
       << C_CYAN         << "\n          Selects the output numerical base. Valid values are: { dec, hex, bin }. Default: dec (Decimal)"
       << C_LIGHT_BLUE   << "\n   -nm  | --do-not-use-cpct-macros"
       << C_CYAN         << "\n          Does not use CPCtelera macros when producing array values. Default: macros used"
+      << C_LIGHT_BLUE   << "\n   -iul | --ignore-unknown-layers"
+      << C_CYAN         << "\n          Ignores non-visible non-tiled layers. (Default: no)"
       << C_LIGHT_BLUE   << "\n   -of  | --output-folder <folder>"
       << C_CYAN         << "\n          Changes the output folder for generated C/H files (Default: .)"
       << "\n\n" << C_NORMAL;
@@ -174,7 +176,9 @@ void parseArguments(const TArgs& args) {
       //------------------------ DO NOT USE CPCTELERA MACROS
       } else if (a == "-nm" || a == "--do-not-use-cpct-macros") {
          g_theTilemap.setUseCPCTMacros(false);
-
+      //------------------------ IGNORE UNKOWN LAYERS
+      } else if (a == "-iul" || a == "--ignore-unknown-layers") {
+         g_theTilemap.setIgnoreUnkownLayer(true);
       //------------------------ SELECT OUTPUT FOLDER
       } else if (a == "-of" || a == "--output-folder") {
          if (i + 1 >= args.size()) error( { "Modifier '-of | --output-folder' needs to be followed by a folder, but nothing found."} );

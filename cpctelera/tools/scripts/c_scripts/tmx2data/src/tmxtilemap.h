@@ -47,6 +47,7 @@ public:
    void  setOutputNumberFormat(TNumberFormat f) noexcept { m_bitarray.setOutFormat(f);       }
    void  setInitialTileID(uint8_t id)           noexcept { m_initialTileID = id;             }
    void  setUseCPCTMacros(bool use)             noexcept { m_bitarray.setUseCPCTMacros(use); }
+   void  setIgnoreUnkownLayer(bool ignore)      noexcept { m_ignoreUnknownLayers = ignore; }
    void  setASMVariablesPrefix(char p)          noexcept { m_asmVarsPrefix = p;              }
    void  setASMConstantsLocal(bool b)           noexcept { m_asmConstantsLocal = b;          }
    void  setASMGenerateGlobal(bool g)           noexcept { m_asmGenerateGlobal = g;          }
@@ -70,12 +71,13 @@ private:
    uint8_t        m_initialTileID = 0;          // This will be considered the ID of the first tile
    uint8_t        m_maxValidTileID = 255;       // Max valid Tile ID number depending on bits per item
    uint32_t       m_visibleLayers;              // Number of visible layers in the TMX
+   bool           m_ignoreUnknownLayers = false;// Ignore unknown layers in the TMX while processing it.
+   bool           m_asmGenerateGlobal = true;   // Decide if generated assembly header contains a .globl declaration for each label in the source file
    uint32_t       m_tw = 0, m_th = 0;           // Tile Width and Height
    uint32_t       m_total_bytes;                // Total bytes for a given output array
    std::string    m_theTime;                    // Current time string
    char           m_asmVarsPrefix = 0;          // Prefix for assembly variable names (Default: none)
    bool           m_asmConstantsLocal = true;   // Decide if assembly generated constants have to be local or global
-   bool           m_asmGenerateGlobal = true;   // Decide if generated assembly header contains a .globl declaration for each label in the source file
 
    // Useful methods
    void           output_asmVar(std::ostream& out, const std::string& var) const;
