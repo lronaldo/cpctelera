@@ -1,0 +1,27 @@
+{
+  "splash": {
+    "enabled": true,
+    "background": "#eaeffd",
+    "delay": 3000,
+    "orientation": "auto"
+  },
+  "layout": {
+    "type": "gamepad",
+    "orientation": "auto"
+  },
+  "keymap": {
+    "up": "joy_up",
+    "down": "joy_down",
+    "left": "joy_left",
+    "right": "joy_right",
+    "a": "disabled",
+    "b": "disabled",
+    "x": "joy_fire1",
+    "y": "joy_fire2",
+    "start": "return",
+    "select": "space"
+  },
+  "video": {
+    "overscan": 0.6
+  }
+}
