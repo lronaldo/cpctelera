@@ -1,5 +1,5 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
 ;;  Copyright (C) 2018 César Nicolás González (CNGSoft)
 ;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
@@ -19,7 +19,7 @@
 .module cpct_loaders
 
 ;;
-;; C bindings for <cpct_miniload_asm>
+;; ASM bindings for <cpct_miniload>
 ;;
 ;;   3 us, 1 byte
 ;;

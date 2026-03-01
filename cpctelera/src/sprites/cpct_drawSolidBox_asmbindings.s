@@ -1,5 +1,5 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
 ;;  Copyright (C) 2019 Arnaud bouche (@Arnaud6128)
 ;;  Copyright (C) 2019 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
@@ -22,11 +22,11 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; AS; bindings for <cpct_drawSolidBox>
+;; ASM bindings for <cpct_drawSolidBox>
 ;;
 ;;   1 us, 1 bytes
 ;;
-cpct_drawSolidBox_asm:: 
+cpct_drawSolidBox_asm::
 
    ld     l, a             ;; [1] L=A (Colour pattern)
 

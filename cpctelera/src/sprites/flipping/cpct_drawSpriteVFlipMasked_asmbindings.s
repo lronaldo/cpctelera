@@ -1,5 +1,5 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
-;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
+;;  This file is part of CPCtelera: An Amstrad CPC Game Engine
 ;;  Copyright (C) 2018 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 .include "macros/cpct_undocumentedOpcodes.h.s"
 
 ;;
-;; ASM bindings for <cpct_drawSpriteVFlipMasked_asm>
+;; ASM bindings for <cpct_drawSpriteVFlipMasked>
 ;;
 ;;   3 us, 1 byte
 ;;
