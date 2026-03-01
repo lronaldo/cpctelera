@@ -57,7 +57,7 @@ FILE *fi,*fo;
 char *si=0,*so=0,*sn=0,*mode=0;
 
 int flag_n=0,flag_b=1000,flag_bb,flag_m=0,flag_i=255,flag_o=4096,flag_t=0,flag_h=2560,flag_p=10240,flag_z=4;
-int filetype=0,filesize=0,fileload=-1,fileboot=-1,pulselength=-1,bitspersec=-1,bytesperpage=-1,bitsize,detectedHeader=0;
+int filetype=0,filesize=0,fileload=-1,fileboot=-1,pulselength=-1,bitspersec=-1,bytesperpage=-1,bitsize,detectedHeader=0,skipHeaderCheck=0;
 
 int i,j,k,status=0;
 
@@ -185,6 +185,7 @@ void usage() {
 		"\n   -p  N    pause after the final block, in milliseconds (Default 10240)"
 		"\n   -l  N    load address (Default 16384)"
 		"\n   -x  N    run/execute address (Default 16384)"
+		"\n   -s       skip header detection"
 		"\n"
 		"\nSPECIFIC OPTIONS FOR TINY MODES"
 		"\n   -rl N    length of a single pulse (half) in Ts (1T=1/3500000s)"
@@ -292,6 +293,7 @@ void parseCommandLineArgs(int argc, char *argv[]) {
 		else if ( flag("-z")  ) { get16bitFlag(flag_z, "-z");   }
 		else if ( flag("-l")  ) { get16bitFlag(fileload, "-l"); }
 		else if ( flag("-x")  ) { get16bitFlag(fileboot, "-x"); }
+		else if ( flag("-s")  ) { skipHeaderCheck=1;            }
 		else if ( flag("-rl") ) { get16bitFlag(pulselength, "-rl"); }
 		else if ( flag("-rb") ) { get16bitFlag(bitspersec, "-rb"); }
 		else if ( flag("-rp") ) { get16bitFlag(bytesperpage, "-rp"); }
@@ -327,23 +329,25 @@ void detectHeaderInInputFile() {
 			i=j=0;
 			while (i<0x43)
 				j+=body[i++];
-			if ((body[0x43]+256*body[0x44])==j) { // AMSDOS!
-				filetype=body[0x12];
-				filesize=body[0x40]+body[0x41]*256;
-				fileload=body[0x15]+body[0x16]*256;
-				fileboot=body[0x1A]+body[0x1B]*256;
-				if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading AMSDOS header");
-				detectedHeader = 1;
-			} else {
-				while (i<0x7F)
-					j+=body[i++];
-				if ((j&0xFF)==body[0x7F]) { // PLUS3DOS!
-					filetype=body[0x0F];
-					filesize=body[0x10]+body[0x11]*256;
-					fileload=body[0x12]+body[0x13]*256;
-					fileboot=body[0x14]+body[0x15]*256;
-					if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading PLUS3DOS header");
+			if (skipHeaderCheck==0) {
+				if (((body[0x43]+256*body[0x44])==j)&&(j!=0)) { // AMSDOS!
+					filetype=body[0x12];
+					filesize=body[0x40]+body[0x41]*256;
+					fileload=body[0x15]+body[0x16]*256;
+					fileboot=body[0x1A]+body[0x1B]*256;
+					if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading AMSDOS header");
 					detectedHeader = 1;
+				} else {
+					while (i<0x7F)
+						j+=body[i++];
+					if ((j&0xFF)==body[0x7F]) { // PLUS3DOS!
+						filetype=body[0x0F];
+						filesize=body[0x10]+body[0x11]*256;
+						fileload=body[0x12]+body[0x13]*256;
+						fileboot=body[0x14]+body[0x15]*256;
+						if (fread(body,1,filesize,fi)<1) error(1, "ERROR: short read while reading PLUS3DOS header");
+						detectedHeader = 1;
+					}
 				}
 			}
 		}
