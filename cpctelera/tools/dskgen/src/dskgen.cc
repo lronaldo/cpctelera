@@ -11,7 +11,7 @@ int initializeParser(ezOptionParser &parser) {
     parser.add("NONE", false, 1, 0, "Catalog type. Valid values are: NONE, RAW or CPM.\n\nNONE: No catalog is added. This can be used if sectors will be read in raw mode, or if the first file to add contains CATART data.\n\nRAW: A catalog is created in RAW mode. This catalog is not understood by the OS, see the docs.\n\nCPM: Standard CPM catalog, understood by AMSDOS.", "-c", "--catalog", vCat);
     ezOptionValidator* vDskType = new ezOptionValidator("t", "in", "SYSTEM,DATA,IBM,CUSTOM", true);
     parser.add("SYSTEM", false, 1, 0, "Disk type. Valid values are SYSTEM, DATA, IBM and CUSTOM.", "-t", "--type", vDskType);
-    parser.add("", true, 1, ';', "Specifies the files to insert. File Specified as path,header,loadAddr,exeAddr. Header values can be NONE or AMSDOS. Default header value is NONE, default addresses are 0x0.", "-f", "--files");
+    parser.add("", true, 1, ';', "Specifies the files to insert. File Specified as path,header,loadAddr,exeAddr. Header values can be NONE, AMSDOS or CREATEAMSDOS. Default header value is NONE, default addresses are 0x0.", "-f", "--files");
     parser.add("2", false, 1, 0, "Specifies the sides of the disk. Default value is 2 sides.", "-s", "--sides");
     parser.add("", false, 1, 0, "Specifies the file that contains boot code por |CPM booting. Only valid for SYSTEM or CUSTOM files.", "-b");
     parser.add("80", false, 1, 0, "Specifies the number of tracks in the disk. Default value is 80.", "--tracks");
@@ -49,7 +49,7 @@ int extractOptions(ezOptionParser &switches, Options &options) {
 
         if(switches.isSet("--initialTrack")) {
             if(options.OutputDiskType != DSK_CUSTOM) {
-                cout << "WARNING: Custom initial track specification is only allowed for CUSTOM files. This setting will be ignored." << endl;                
+                cout << "WARNING: Custom initial track specification is only allowed for CUSTOM files. This setting will be ignored." << endl;
             } else {
                 int initialTrack;
                 switches.get("--initialTrack")->getInt(initialTrack);
@@ -76,10 +76,10 @@ int extractOptions(ezOptionParser &switches, Options &options) {
                 int sectorsPerBlock = (blockSize / sectorSize);
                 options.DiskParams.numBlocks = (u8) (((tracks - options.DiskParams.reservedTracks) * options.DiskParams.sectorsPerTrack) / sectorsPerBlock) - 1;
             }
-        }        
+        }
         if(switches.isSet("--sectors")) {
             if(options.OutputDiskType != DSK_CUSTOM) {
-                cout << "WARNING: Custom sector number specification is only allowed for CUSTOM files. This setting will be ignored." << endl;                
+                cout << "WARNING: Custom sector number specification is only allowed for CUSTOM files. This setting will be ignored." << endl;
             } else {
                 int sectorsPerTrack;
                 int blockSize = DSK_RECORD_SIZE * (1 << options.DiskParams.blockShift);
@@ -94,7 +94,7 @@ int extractOptions(ezOptionParser &switches, Options &options) {
         }
         if(switches.isSet("--initialSector")) {
             if(options.OutputDiskType != DSK_CUSTOM) {
-                cout << "WARNING: Custom initial sector specification is only allowed for CUSTOM files. This setting will be ignored." << endl;                
+                cout << "WARNING: Custom initial sector specification is only allowed for CUSTOM files. This setting will be ignored." << endl;
             } else {
                 int initalSector;
                 switches.get("--initialSector")->getInt(initalSector);
@@ -150,11 +150,11 @@ int main(int argc, const char** argv)
         showUsage(switches);
         return -1;
     }
- 
+
     Dsk disk(opt.NumSides, opt.DiskParams, opt.Catalog);
     if(!opt.BootFile.empty()) {
         if(disk.AddBootFile(opt.BootFile)) {
-            cout << "ERROR: Couldn't process file '" << opt.BootFile << "'." << endl;            
+            cout << "ERROR: Couldn't process file '" << opt.BootFile << "'." << endl;
         }
     }
 

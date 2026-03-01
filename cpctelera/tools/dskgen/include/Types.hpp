@@ -12,7 +12,7 @@ using namespace std;
 
 #define        AMSDOS_EMPTY_BYTE        0xE5
 
-typedef enum { HDR_NONE=0, HDR_AMSDOS=1 } HeaderType;
+typedef enum { HDR_NONE=0, HDR_AMSDOS=1, HDR_CREATE_AMSDOS=2 } HeaderType;
 
 // RAW catalog: it stores in the first sector the following info for each file:
 //       Side (1byte), 
