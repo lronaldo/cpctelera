@@ -24,12 +24,12 @@ int main(int argc, char** argv) {
        ModeRemoveFile,
        ModeDisaFile, ModeListBasic, 
        ModeListDams,ModeListHex, 
-       ModeGetFile, ModeNewDsk, Force_Overwrite;
+       ModeGetFile, ModeNewDsk, Force_Overwrite, SkipHeaderDetection;
        
   ModeListDsk =  ModeImportFile =
   ModeRemoveFile  = ModeDisaFile = 
   ModeListBasic = ModeListDams = ModeListHex = ModeNewDsk =
-  ModeGetFile = IsDskLoc = IsDskSet = Force_Overwrite = false ;
+  ModeGetFile = IsDskLoc = IsDskSet = Force_Overwrite = SkipHeaderDetection = false ;
   
   string DskFile, AmsdosFile;
   vector<string> AmsdosFileList;
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
   IsDsk = IsDskValid = false;
   IsDskSaved = true;
 
-  // Récupération des arguments avec getopt_pp
+  // RÃ©cupÃ©ration des arguments avec getopt_pp
 {using namespace GetOpt;
   GetOpt_pp opts(argc,argv);
 
@@ -78,6 +78,8 @@ int main(int argc, char** argv) {
 	>> Option('g',"get",AmsdosFileList)
 
 	>> OptionPresent('f',"force",Force_Overwrite)
+
+	>> OptionPresent('m',"skipheadercheck",SkipHeaderDetection)
 	;
 
 	if(opts.options_remain())
@@ -89,7 +91,7 @@ int main(int argc, char** argv) {
 }//namespace getopt
 
     if ( ! IsDskSet ) {
-	    cerr << "Vous n'avez pas selectionné de fichier image DSK" << endl;
+	    cerr << "Vous n'avez pas selectionnÃ© de fichier image DSK" << endl;
 	    help();
     }
     else cerr << "DSK : " << DskFile <<  endl;
@@ -102,7 +104,7 @@ int main(int argc, char** argv) {
     		exit(EXIT_FAILURE);
     	}
     	if ( ! MyDsk.CheckDsk() ) {
-    		cerr <<"Fichier image non supporté ("<< DskFile << ")."<<endl;
+    		cerr <<"Fichier image non supportÃ© ("<< DskFile << ")."<<endl;
     		exit(EXIT_FAILURE);
     	}
     	int Indice;
@@ -119,7 +121,7 @@ int main(int argc, char** argv) {
 		if ( ModeListBasic ) 
 			cout << ViewBasic( ) << endl;
 		else if ( ModeListDams )
-			cout << "Pas implementé pour le moment."<<endl;
+			cout << "Pas implementÃ© pour le moment."<<endl;
 		else if ( ModeListHex ) {
 			MyDsk.Hexdecimal();
 			cout << Listing << endl;
@@ -161,7 +163,7 @@ int main(int argc, char** argv) {
     	}
 
     	if ( ! MyDsk.CheckDsk() ) {
-    		cerr <<"Fichier image non supporté ("<< DskFile << ")."<<endl;
+    		cerr <<"Fichier image non supportÃ© ("<< DskFile << ")."<<endl;
     		exit(EXIT_FAILURE);
     	}
 
@@ -194,7 +196,7 @@ int main(int argc, char** argv) {
 	
     		cerr << "Fichier Amsdos : "<< nomBase << endl;
 	
-		   MyDsk.PutFileInDsk(*iter,AmsdosType,loadAdress,exeAdress);
+		   MyDsk.PutFileInDsk(*iter,AmsdosType,loadAdress,exeAdress,SkipHeaderDetection);
     	}
 	if ( MyDsk.WriteDsk (DskFile) )
 		cout << MyDsk.ReadDskDir(); 
@@ -208,7 +210,7 @@ int main(int argc, char** argv) {
     			exit(EXIT_FAILURE);
     		}
     		if ( ! MyDsk.CheckDsk() ) {
-    			cerr <<"Fichier image non supporté ("<< DskFile << ")."<<endl;
+    			cerr <<"Fichier image non supportÃ© ("<< DskFile << ")."<<endl;
     			exit(EXIT_FAILURE);
     		}
     		int Indice;
@@ -217,7 +219,7 @@ int main(int argc, char** argv) {
 			char* amsdosF = GetNomAmsdos(basename( (char*)(*iter).c_str()));			 
 			cerr << "Fichier Amsdos : " << amsdosF << endl;
 			if ( (Indice= MyDsk.FileIsIn( amsdosF ))<0) {
-				cerr << "Erreur Fichier : "<< amsdosF << " non trouvé."<< endl;
+				cerr << "Erreur Fichier : "<< amsdosF << " non trouvÃ©."<< endl;
 				exit(EXIT_FAILURE);
 			}
 			MyDsk.RemoveFile(Indice);
@@ -286,6 +288,7 @@ void help(void)
   cout << " -e : hex Execute address of file           ... -e C000 -t 1" << endl;
   cout << " -c : hex loading address of file           ... -e C000 -c 4000 -t 1" << endl;
   cout << " -f : Force overwriting if file exists      ... -f" << endl
+       << " -m : Skip Amsdos header detection          ... -m" << endl
        << " -o : insert a read-Only file               ... -o" << endl
        << " -s : insert a System file                  ... -s" << endl
        << " -u : insert file with User number          ... -u 3" << endl;
