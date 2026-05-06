@@ -1,6 +1,7 @@
 ;;-----------------------------LICENSE NOTICE------------------------------------
 ;;  This file is part of CPCtelera: An Amstrad CPC Game Engine 
-;;  Copyright (C) 2015 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2026 ronaldo / Fremos / Cheesetea / ByteRealms (@FranGallegoBR)
+;;  Copyright (C) 2026 Lachlan Keown (github @lmkz)
 ;;
 ;;  This program is free software: you can redistribute it and/or modify
 ;;  it under the terms of the GNU Lesser General Public License as published by
@@ -84,7 +85,7 @@
 ;;
 ;;   Note - Colour conversion table is shared with <cpct_drawCharM1>. If you use both
 ;; functions, only one copy of the colour table is loaded into memory.
-;;
+;; 
 ;; Time Measures:
 ;; (start code)
 ;; Case  | microSecs (us) | CPU Cycles
@@ -92,6 +93,11 @@
 ;; Any   |      96        |   384
 ;; ------------------------------------
 ;; (end code)
+;;
+;; Additional Notes:
+;;  - 05/may/26 Bugfix proposed by Lachlan Keown: failure to properly compute 
+;;    carry on DE += Pixel0 resulted in an error on the rare ocasion when 
+;;    `dc_mode1_ct` is misaligned (`dc_mode1_ct >= 0x??FD)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Pixel colour table defined in cpct_drawCharM1
@@ -114,9 +120,9 @@ px1_repeat:
    ;; Compute DE += Pixel 0 (A)
    add   e               ;; [1] | E += A
    ld    e, a            ;; [1] |
-   sub   a               ;; [1] A = 0 (preserving Carry Flag)
-   adc   d               ;; [1] | D += Carry
-   ld    d, a            ;; [1] |
+   adc   d               ;; [1] A += D + Carry || totalling A = E + D + Carry
+   sub   e               ;; [1] A -= E         || totalling A = D + Carry
+   ld    d, a            ;; [1] D = D + Carry
 
    ld    a, (de)         ;; [2] A = Screen format for Firmware colour for Pixel
    or    c               ;; [1] Mix (OR) pixel format with accumulated previous pixel format conversions
