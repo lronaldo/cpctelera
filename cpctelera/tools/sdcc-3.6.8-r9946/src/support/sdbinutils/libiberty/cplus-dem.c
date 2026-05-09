@@ -493,7 +493,7 @@ recursively_demangle (struct work_stuff *, const char **, string *, int);
 static int
 consume_count (const char **type)
 {
-  int count = 0;
+  volatile int count = 0;
 
   if (! ISDIGIT ((unsigned char)**type))
     return -1;
