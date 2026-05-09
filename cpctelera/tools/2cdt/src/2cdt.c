@@ -20,6 +20,7 @@
 /* The following program is designed to create a .tzx/.cdt from a tape-file stored
 on the PC */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
