@@ -1,0 +1,15 @@
+
+xdms:	
+	$(MAKE) -C src
+
+clean:	
+	$(MAKE) -C src clean
+
+install:	xdms
+	mkdir -p {PREFIX}/bin {PREFIX}/share/doc/xdms-{VERSION} {PREFIX}/share/man/man1
+	install src/xdms {PREFIX}/bin/
+	install xdms.txt COPYING ChangeLog.txt {PREFIX}/share/doc/xdms-{VERSION}/
+	chmod og+rx {PREFIX}/bin {PREFIX}/bin/xdms
+	chmod -R og+rX {PREFIX}/share/doc/xdms-{VERSION}
+	gzip < xdms.1 > xdms.1.gz
+	install xdms.1.gz {PREFIX}/share/man/man1/

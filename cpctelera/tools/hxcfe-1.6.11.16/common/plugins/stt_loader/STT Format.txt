@@ -1,0 +1,145 @@
+                STT Disk Image Format
+
+I've tried to make this format as forward and backward compatible
+as I can, it may seem a little over the top but you never know what
+may happen in the future.
+
+The version numbers must remain the same for all compatible formats:
+
+STT version:
+	1=First version (1st May 2001)
+
+All unused flags must be 0 for future compatibility, do not fail if
+a flag is set that isn't supported:
+
+STT flags:
+	None yet defined
+
+Data flags:
+	Bit 0=Sectors and ID field data
+	Bit 1=Raw track data
+
+Sectors flags:
+	None yet defined
+
+Raw flags:
+	None yet defined
+
+All LONGs and WORDs in little endian format.
+
+Header
+------
+L Magic: 'STEM' ($53 $54 $45 $4d)
+W STT Version
+W STT Flags - flags that affect this header or all tracks
+W All Track Data Flags - specifies what data is contained for every
+                         track, individual tracks may have more but
+                         can't have less.
+W Number of Tracks - maximum 86
+W Number of Sides - maximum 2
+L Track 0 Side 0 Data Section Offset
+W Track 0 Side 0 Data Section Length
+L Track 1 Side 0 Data Section Offset
+W Track 1 Side 0 Data Section Length
+L Track 2 Side 0 Data Section Offset
+W Track 2 Side 0 Data Section Length
+....
+L Track NumTracks-1 Side NumSides-1 Data Section Offset
+W Track NumTracks-1 Side NumSides-1 Data Section Length
+
+(any future header data should be added here)
+
+
+Track Data - cannot exceed 65535 bytes
+----------
+L Magic: 'TRCK' ($54 $52 $43 $4b)
+W Track Data Flags
+
+..Sectors section (bit 0 of data flags set)
+------------------------------------------
+W Offset to End of Section - From start of track data.
+                             All sections must start with this so
+                             unsupported sections can be skipped
+W Sectors Flags
+W Number of Sectors
+--
+B First Sector Track Number             \
+B First Sector Side Number               \
+B First Sector Sector Number              \ The address id field
+B First Sector Sector Length Index        / of the sector
+B First Sector Address Field CRC byte 1  /
+B First Sector Address Field CRC byte 2 /
+W First Sector Data Offset (from start of track data)
+W First Sector Data Length
+-- Repeat up to and including Number of Sectors-1
+
+(any future data should be added here)
+
+SECTORS DATA (in one big block)
+
+..Raw section (bit 1 of data flags set)
+--------------------------------------
+W Offset to End of Section - From start of track data
+W Raw Flags
+W Raw Data Start Offset (from start of track data)
+W Raw Data Length
+
+(any future data should be added here)
+
+RAW DATA (in one big block)
+
+..Undefined section (if bit 2 of data flags set)
+-------------------------------
+W Offset to End of Section - From start of track data
+
+..Undefined section (if bit 3 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 4 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 5 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 6 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 7 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 8 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 9 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 10 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 11 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 12 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 13 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 14 of data flags set)
+-------------------------------
+W Offset to End of Section
+
+..Undefined section (if bit 15 of data flags set)
+-------------------------------
+W Offset to End of Section

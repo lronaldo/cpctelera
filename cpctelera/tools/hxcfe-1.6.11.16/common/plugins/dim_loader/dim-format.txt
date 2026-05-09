@@ -1,0 +1,19 @@
+Here is the info that Darren Birks has managed to extract from the DIM header: 
+
+Code: 
+
+Offset Size Description 
+------     ---- ----------- 
+0x0000 Word ID Header (0x4242('BB')) 
+0x0003 Byte Image contains all sectors (0) or used sectors (1) 
+0x0006 Byte Sides (0 or 1; add 1 to this to get correct number of sides) 
+0x0008 Byte Sectors per track 
+0x000A Byte Start Track (0 based) 
+0x000C Byte Ending Track (0 based) 
+0x000D Byte Double-Density(0) or High-Density (1) 
+ 
+
+
+I keep meaning to have a look at the used sectors format, it surely can't be too complex. Also I keep meaning to write some generic read routines for STT files, make it easier for people to add support, another few things on my todo list.  I didn't bother too much with making the STT format available before as I wasn't sure that anyone would find the Steem disk imager any good, fortunately people seem to find it useful. 
+
+Russ

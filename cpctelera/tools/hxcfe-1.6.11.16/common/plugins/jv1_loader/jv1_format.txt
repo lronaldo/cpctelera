@@ -1,0 +1,14 @@
+Tim Mann
+http://tim-mann.org
+Last revised 4 Jul 2008 
+
+
+The JV1 format originated in Jeff's Model I emulator for MS-DOS. It's a very simple, limited format that can represent only single-density media with 256 byte sectors and a Model I directory on track 17.
+
+
+The JV1 Format
+
+The JV1 format is simply an array of 256-byte sectors stored in a file. Byte 0 of the file is byte 0 of track 0, sector 0; byte 256 is byte 0 of track 0, sector 1, and so forth. There are 10 sectors per track (i.e., single density), numbered 0 through 9, and only one side. Tracks are numbered starting at 0. All sectors on track 17 are formatted with the nonstandard data address mark 0xFA, indicating a TRSDOS 2.3 directory. All other sectors are formatted with the standard data address mark 0xFB.
+
+Note: In emulations of the WD1791/3 floppy disk controller used in the Model III and 4, it is best to present track 17 as being formatted with the standard deleted data address mark 0xF8. The WD1791/3 cannot write 0xFA, and upon reading, returns it as 0xFB. So Model III/4 operating systems use 0xF8 on the directory track instead. 
+
