@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 GPUTILS="$1";
 PIC16DEVICES="${2:-pic16devices.txt}";

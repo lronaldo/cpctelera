@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # This script can be used to recreate the device library files from
 # gputils' .inc files.

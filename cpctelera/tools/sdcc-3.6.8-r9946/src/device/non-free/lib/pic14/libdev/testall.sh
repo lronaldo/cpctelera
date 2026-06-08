@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 BASE="$(pwd)";
 BUILD_LOG="$BASE/build.log";

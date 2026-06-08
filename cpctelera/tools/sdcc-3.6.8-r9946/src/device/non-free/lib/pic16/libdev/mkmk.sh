@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #
 # Consider using running 'sh update.sh' in '..' instead to

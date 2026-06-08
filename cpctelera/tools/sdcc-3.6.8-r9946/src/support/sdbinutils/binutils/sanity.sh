@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 ### quick sanity test for the binutils.
 ###
 # This file was written K. Richard Pixley.

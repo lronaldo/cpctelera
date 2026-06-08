@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # This script is supposed to recreate all device libraries and their
 # accompanying header files from the gputils' header/*.inc files
