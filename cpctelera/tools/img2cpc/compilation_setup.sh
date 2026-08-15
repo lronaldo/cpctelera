@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ##
 ## This scripts checks in which system is going to be compiled img2cpc
 ## and setups Makefiles and libraries for appropriate compilation.

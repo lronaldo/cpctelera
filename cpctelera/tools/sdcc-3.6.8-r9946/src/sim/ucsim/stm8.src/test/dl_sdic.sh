@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 stm8flash -c stlink -p stm8s105c6 -w ${1}
