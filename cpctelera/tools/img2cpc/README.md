@@ -1,5 +1,10 @@
 # img2cpc
-Tool to convert images in a lot of formats to data that can be used in Amstrad CPC software
+Tool to convert images to data that can be used in Amstrad CPC software.
+
+Supported input formats: PNG, GIF (first frame), BMP, PCX and TGA.
+img2cpc has no external library dependencies: it only needs a C++20 compiler
+(GCC 10+ or Clang 10+). PNG support is provided by the bundled
+[LodePNG](https://github.com/lvandeve/lodepng) library (zlib license).
 
 img2cpc - (c) 2007-2015 Retroworks.
 

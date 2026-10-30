@@ -3,9 +3,10 @@
 
 #include <vector>
 #include <iostream>
+#include <sstream>
+#include "Image.hpp"
 #include "Palette.hpp"
 #include "FileUtils.hpp"
-#include <FreeImage.h>
 
 using namespace std;
 
@@ -16,6 +17,9 @@ public:
 	vector<unsigned char> MaskData;
 	vector<unsigned char> SourceValues;
 	vector<unsigned char> MaskValues;
+	// Palette index of every pixel, row-major and unflipped. Used to generate PNG previews.
+	vector<unsigned char> PreviewValues;
+	static constexpr unsigned char NoPreviewValue = 0xFF;
 
 	int TileWidth;
 	int TileHeight;
@@ -66,49 +70,32 @@ public:
 			 << "}";
 	}
 
+	// Writes the tile as converted to the palette. Pixels without a palette colour are magenta.
 	void GenImage() {
-		unsigned char *rgbValues = new unsigned char[this->TileHeight * this->TileWidth * 3];
-		unsigned char *pos = rgbValues;
-
-		for(unsigned char s : this->SourceValues) {
-			Color c = this->Palette.Current[s];
-			if (c.A) {
-				pos[FI_RGBA_RED] = c.R;
-				pos[FI_RGBA_GREEN] = c.G;
-				pos[FI_RGBA_BLUE] = c.B;
+		Image image(this->TileWidth, this->TileHeight);
+		auto pixel = image.Pixels().begin();
+		for(unsigned char s : this->PreviewValues) {
+			if (s < this->Palette.Current.size() && this->Palette.Current[s].A) {
+				const Color& c = this->Palette.Current[s];
+				*pixel = { c.R, c.G, c.B, 255 };
 			}
 			else {
-				pos[FI_RGBA_RED] = 255;
-				pos[FI_RGBA_GREEN] = 0;
-				pos[FI_RGBA_BLUE] = 255;
+				*pixel = { 255, 0, 255, 255 };
 			}
-			pos += 3;
+			++pixel;
 		}
-
-		stringstream ss;
-		ss << this->Name << ".out.png";
-		string fileName = ss.str();
-		FileUtils::SaveImage(fileName, this->TileWidth, this->TileHeight, rgbValues);
-
-		delete[] rgbValues;
+		image.SavePNG(this->Name + ".out.png");
 	}
 
+	// Writes the transparency mask of the tile: white for transparent pixels, black otherwise.
 	void GenMaskImage() {
-		unsigned char *rgbValues = new unsigned char[this->TileHeight * this->TileWidth * 3];
-		int pos = 0;
-
-		for(unsigned char s : this->MaskValues) {
-			rgbValues[pos++] = s == 0 ? 0 : 0xFF;
-			rgbValues[pos++] = s == 0 ? 0 : 0xFF;
-			rgbValues[pos++] = s == 0 ? 0 : 0xFF;
+		Image image(this->TileWidth, this->TileHeight);
+		auto pixel = image.Pixels().begin();
+		for(unsigned char s : this->PreviewValues) {
+			const unsigned char v = (s == this->Palette.TransparentIndex) ? 0xFF : 0;
+			*pixel++ = { v, v, v, 255 };
 		}
-
-		stringstream ss;
-		ss << this->Name << "_mask.png";
-		string fileName = ss.str();
-		FileUtils::SaveImage(fileName, this->TileWidth, this->TileHeight, rgbValues);
-
-		delete[] rgbValues;
+		image.SavePNG(this->Name + "_mask.png");
 	}
 
 };

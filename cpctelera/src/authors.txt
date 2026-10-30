@@ -109,9 +109,8 @@ Section: 3rdparty software authors
  <Img2CPC at https://github.com/AugustoRuiz/Img2CPC>, <DSKGen at https://github.com/AugustoRuiz/dskgen>: 
    * <Augusto Ruiz at https://twitter.com/augurui> / <RetroWorks at http://retroworks.es> (augusto.ruiz@gmail.com)
 
- <libfreeimage at http://freeimage.sourceforge.net/>:
-   * <Hervé Drolon at mailto:drolon@infonie.fr>
-   * <Floris van den Berg at mailto:flvdberg@wxs.nl> (Stopped development and support on FreeImage. However, you can still contact him.)
+ <LodePNG at https://github.com/lvandeve/lodepng> (used by Img2CPC):
+   * <Lode Vandevenne at https://lodev.org>
 
  <WinApe emulator at http://winape.net>: 
    * <Richard Wilson at mailto:rich@bitwise-systems.com>

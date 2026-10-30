@@ -179,10 +179,8 @@ if ! checkSystem "osx"; then
    REQUIRED_LIBRARIES+=( "libintl.h" )
    LIBRARIES_EXPLANATION+=( "Libintl (development) is required to build SDCC, which makes use of internationalization. Please, install intltool / libintl-dev / libint-devel or similar in your system and run setup again." )
 fi
-## Freeimage is not required in Cygwin (binaries already included)
+## Mono is not required in Cygwin (.NET is used instead)
 if ! checkSystem "cygwin"; then
-   REQUIRED_LIBRARIES+=( "FreeImage.h" )
-   LIBRARIES_EXPLANATION+=( "Freeimage (development) is required to build Img2CPC. Please, install freeimage / libfreeimage-dev / freeimage-devel or similar in your system and run setup again." )
    REQUIRED_COMMANDS+=( mono )
    COMMAND_EXPLANATION[$COMM_NUM]="${REQUIRED_COMMANDS[$COMM_NUM]} is required to convert arkos audio files to code automatically. Please, install it \
 and run setup again." 
@@ -292,6 +290,11 @@ else
       ;;
    esac
 fi
+
+## img2cpc requires a C++20 compiler
+coloredMachineEcho "${COLOR_CYAN}" 0.005 ">>> C++20 support..."
+ensureCXX20Support
+drawOK
 
 # Check installed libraries
 coloredMachineEcho "${COLOR_CYAN}" 0.005 "> Checking required libraries..."$'\n'

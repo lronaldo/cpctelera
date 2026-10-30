@@ -4,7 +4,8 @@
 #include <vector>
 #include <string>
 #include <iomanip>
-#include <FreeImage.h>
+#include <stdexcept>
+#include "Image.hpp"
 #include "Palette.hpp"
 #include "ConversionOptions.hpp"
 #include "Tile.hpp"
@@ -15,16 +16,17 @@
 using namespace std;
 
 class TileExtractor {
-	Tile* getTile(FIBITMAP* bmp);
+	Tile* getTile(const Image& img);
 	
-	void fillTileByRows(Tile* tile, FIBITMAP* bmp);
-	void fillTileByCols(Tile* tile, FIBITMAP* bmp);
-	void fillTileRLE(Tile* tile, FIBITMAP* bmp);
-	void fillTileSCR(Tile* tile, FIBITMAP* bmp);
-	void getByteAt(Tile* tile, FIBITMAP* bmp, int col, int row, bool flip, bool halfFlip);
+	void fillTileByRows(Tile* tile, const Image& img);
+	void fillTileByCols(Tile* tile, const Image& img);
+	void fillTileRLE(Tile* tile, const Image& img);
+	void fillTileSCR(Tile* tile, const Image& img);
+	void checkSCRSize();
+	void getByteAt(Tile* tile, const Image& img, int col, int row, bool flip, bool halfFlip);
 
-	ColorAndMaskValues getColorAndMask(FIBITMAP* bmp, int x, int y, bool flip, bool halfFlip);
-	vector<unsigned char> extractPixels(FIBITMAP* bmp, int x, int y, bool flip, bool halfFlip);
+	ColorAndMaskValues getColorAndMask(Tile* tile, const Image& img, int x, int y, bool flip, bool halfFlip);
+	vector<unsigned char> extractPixels(Tile* tile, const Image& img, int x, int y, bool flip, bool halfFlip);
 	vector<unsigned char> extractTransPixels(vector<unsigned char> colors);
 	unsigned int getModeIncrement();
 	string removeExtension(const string &fileName);

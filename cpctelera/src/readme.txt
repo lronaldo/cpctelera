@@ -114,7 +114,7 @@ _Under Linux_:
    Install these packages on your Linux distribution. Although they are pretty standard, names may slightly vary on some distributions.
 
    * Commands: *gcc*, *g++*, *make*, *bison*, *flex*, *mono* (mono-complete)
-   * Libraries: *libboost-dev*, *libfreeimage-dev*
+   * Libraries: *libboost-dev*
 
    Next are recommented packages. They are not required for CPCtelera to work, but some included tool may require them (like *cpct_winape* script):
 
@@ -142,15 +142,15 @@ _Under macOS_:
    3. - Open a terminal and install XCode Command Line tools with this command,
    > xcode-select --install
    4. - Install required packages from homebrew with these commands:
-   > brew install boost freeimage mono wine wget
+   > brew install boost mono wine wget
    Note: If you're not going to use WinAPE you can just install:
-   > brew install boost freeimage wget
+   > brew install boost wget
 
 Some things to take into account on macOS,
    * Some previous macOS systems may not understand the xcode-select --install command. On those systems, there usually are menu options from the XCode GUI to install Command Line Tools. If you need more advice, there is a <nice explanation on stack overflow about the XCode Command Line Tools at http://stackoverflow.com/questions/9329243/xcode-4-4-and-later-install-command-line-tools>. 
-   * In macOS Big Sur (Version 11.5.x) *setup.sh* fails because can't find the header files, and the binaries for the libraries installed with Homebrew (*boost* and *freeimage*). So before running *setup.sh* we need to tell the system where those files are. Type this before calling *setup.sh* (or put in your shell startup file)
-   > export CPLUS_INCLUDE_PATH=`brew --prefix boost`/include:`brew --prefix freeimage`/include
-   > export LIBRARY_PATH=`brew --prefix boost`/lib:`brew --prefix freeimage`/lib
+   * In macOS Big Sur (Version 11.5.x) *setup.sh* fails because can't find the header files, and the binaries for the libraries installed with Homebrew (*boost*). So before running *setup.sh* we need to tell the system where those files are. Type this before calling *setup.sh* (or put in your shell startup file)
+   > export CPLUS_INCLUDE_PATH=`brew --prefix boost`/include
+   > export LIBRARY_PATH=`brew --prefix boost`/lib
 
 Topic: Installing CPCtelera in your system
 

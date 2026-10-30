@@ -6,7 +6,6 @@
 *.disabled
 *.bak
 **/sdcc-3.5.5/**/*.asm
-**/img2cpc/Makefile.this
 **/sdcc-3.5.5/share/
 **/winape/
 *.mp3

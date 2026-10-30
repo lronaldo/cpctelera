@@ -6,11 +6,17 @@ vector<Tile*> TileExtractor::GetTiles(const string &fileName) {
 
 	vector<Tile*> result;
 
-	FIBITMAP *dib = FileUtils::LoadImage(fileName);
 	cout << "Processing image '" << fileName << "'... ";
-	if (dib != NULL) {
-		unsigned int imageWidth = FreeImage_GetWidth(dib);
-		unsigned int imageHeight = FreeImage_GetHeight(dib);
+	Image dib;
+	try {
+		dib = Image::Load(fileName);
+	} catch (const ImageError& e) {
+		cout << "Error loading image! (" << e.what() << ")" << endl;
+		throw;
+	}
+	{
+		unsigned int imageWidth = dib.Width();
+		unsigned int imageHeight = dib.Height();
 
 		unsigned int tileWidth = this->Options.TileWidth > 0 ? this->Options.TileWidth : imageWidth;
 		unsigned int tileHeight = this->Options.TileHeight > 0 ? this->Options.TileHeight : imageHeight;
@@ -36,10 +42,9 @@ vector<Tile*> TileExtractor::GetTiles(const string &fileName) {
 				unsigned int realTileWidth = remainingWidth < tileWidth ? remainingWidth : tileWidth;
 				this->TileWidth = realTileWidth;
 
-				FIBITMAP *tileBitmap = FreeImage_Copy(dib, imgPosX, imgPosY, imgPosX + realTileWidth, imgPosY + realTileHeight);
+				Image tileBitmap = dib.Crop(imgPosX, imgPosY, realTileWidth, realTileHeight);
 				Tile* theTile = this->getTile(tileBitmap);
 				theTile->SourceFileName = fileName;
-				FreeImage_Unload(tileBitmap);
 
 				theTile->TileHeight = this->TileHeight;
 				theTile->TileWidth = this->TileWidth;
@@ -64,17 +69,17 @@ vector<Tile*> TileExtractor::GetTiles(const string &fileName) {
 				result.push_back(theTile);
 			}
 		}
-		FreeImage_Unload(dib);
 		cout << "Done!" << endl;
-	}
-	else {
-		cout << "Error loading image!" << endl;
 	}
 	return result;
 }
 
-Tile* TileExtractor::getTile(FIBITMAP* bmp) {
+Tile* TileExtractor::getTile(const Image& bmp) {
+	if(this->Options.IsScr && !this->Options.RLE) {
+		this->checkSCRSize();
+	}
 	Tile* result = new Tile();
+	result->PreviewValues.assign(this->TileWidth * this->TileHeight, Tile::NoPreviewValue);
 	if(this->Options.RLE) {
 		this->fillTileRLE(result, bmp);
 	} else if(this->Options.IsScr) {
@@ -90,7 +95,18 @@ Tile* TileExtractor::getTile(FIBITMAP* bmp) {
 	return result;
 }
 
-void TileExtractor::fillTileSCR(Tile* tile, FIBITMAP* bmp) {
+// SCR data stores each scanline of the 8 character rows in its own 2KB block.
+void TileExtractor::checkSCRSize() {
+	const unsigned int scanlineCount = this->Options.ScanlineOrder.size();
+	const unsigned int charCount = (this->TileHeight + scanlineCount - 1) / scanlineCount;
+	const unsigned int bytesPerRow = (this->TileWidth + this->ModeIncrement - 1) / this->ModeIncrement;
+	if (charCount * bytesPerRow > 0x800) {
+		throw runtime_error("Image too big for SCR format: " + to_string(this->TileWidth) + "x" + to_string(this->TileHeight)
+			+ " pixels need " + to_string(charCount * bytesPerRow) + " bytes per scanline block (maximum is 2048).");
+	}
+}
+
+void TileExtractor::fillTileSCR(Tile* tile, const Image& bmp) {
 	unsigned int scanlineCount = this->Options.ScanlineOrder.size();
 	unsigned int charCount = this->TileHeight / scanlineCount;
 	if((this->TileHeight % scanlineCount) != 0) {
@@ -128,7 +144,7 @@ void TileExtractor::fillTileSCR(Tile* tile, FIBITMAP* bmp) {
 #define END_OF_SPRITE 0xFE
 #define TRANSPARENT_PIXELS_MASK 0xFF
 
-void TileExtractor::fillTileRLE(Tile* tile, FIBITMAP* bmp) {
+void TileExtractor::fillTileRLE(Tile* tile, const Image& bmp) {
 	int scanlineCount = this->Options.ScanlineOrder.size();
 	int scanlineIdx = 0;
 	int counterIdx = -1;
@@ -151,7 +167,7 @@ void TileExtractor::fillTileRLE(Tile* tile, FIBITMAP* bmp) {
 		// Current line to process is rowIndex.
 		for (unsigned int x = 0; x < this->TileWidth; x += this->ModeIncrement) {
 
-			ColorAndMaskValues byteValues = getColorAndMask(bmp, x, rowIndex, flip, halfFlip);
+			ColorAndMaskValues byteValues = getColorAndMask(tile, bmp, x, rowIndex, flip, halfFlip);
 //			cout << "byteValues(" << x <<", " << rowIndex << "):\tM=" << (int)byteValues.MaskByte << ",\tC=" << (int)byteValues.ColorByte << endl << flush;
 
 			for (unsigned char palIdx : byteValues.ColorValues) {
@@ -205,7 +221,7 @@ void TileExtractor::fillTileRLE(Tile* tile, FIBITMAP* bmp) {
 	}
 }
 
-void TileExtractor::fillTileByRows(Tile* tile, FIBITMAP* bmp) {
+void TileExtractor::fillTileByRows(Tile* tile, const Image& bmp) {
 	int scanlineCount = this->Options.ScanlineOrder.size();
 	int scanlineIdx = 0;
 	for (unsigned int y = 0; y < this->TileHeight; ++y) {
@@ -227,7 +243,7 @@ void TileExtractor::fillTileByRows(Tile* tile, FIBITMAP* bmp) {
 	}
 }
 
-void TileExtractor::fillTileByCols(Tile* tile, FIBITMAP* bmp) {
+void TileExtractor::fillTileByCols(Tile* tile, const Image& bmp) {
 	int scanlineCount = this->Options.ScanlineOrder.size();
 	int scanlineIdx = 0;
 	// Current line to process is rowIndex.
@@ -249,8 +265,8 @@ void TileExtractor::fillTileByCols(Tile* tile, FIBITMAP* bmp) {
 	}
 }
 
-void TileExtractor::getByteAt(Tile* tile, FIBITMAP* bmp, int col, int row, bool flip, bool halfFlip) {
-	ColorAndMaskValues byteValues = getColorAndMask(bmp, col, row, flip, halfFlip);
+void TileExtractor::getByteAt(Tile* tile, const Image& bmp, int col, int row, bool flip, bool halfFlip) {
+	ColorAndMaskValues byteValues = getColorAndMask(tile, bmp, col, row, flip, halfFlip);
 
 	tile->Data.push_back(byteValues.ColorByte);
 	tile->MaskData.push_back(byteValues.MaskByte);
@@ -262,17 +278,17 @@ void TileExtractor::getByteAt(Tile* tile, FIBITMAP* bmp, int col, int row, bool 
 	}
 }
 
-ColorAndMaskValues TileExtractor::getColorAndMask(FIBITMAP* bmp, int x, int y, bool flip, bool halfFlip) {
+ColorAndMaskValues TileExtractor::getColorAndMask(Tile* tile, const Image& bmp, int x, int y, bool flip, bool halfFlip) {
 	ColorAndMaskValues result;
 
-	result.ColorValues = extractPixels(bmp, x, y, flip, halfFlip);
+	result.ColorValues = extractPixels(tile, bmp, x, y, flip, halfFlip);
 	result.TransparentValues = extractTransPixels(result.ColorValues);
 	result.ColorByte = ColorCombinator::CombineColData(result.ColorValues);
 	result.MaskByte = ColorCombinator::CombineColData(result.TransparentValues);
 	return result;
 }
 
-vector<unsigned char> TileExtractor::extractPixels(FIBITMAP* bmp, int x, int y, bool flip, bool halfFlip) {
+vector<unsigned char> TileExtractor::extractPixels(Tile* tile, const Image& bmp, int x, int y, bool flip, bool halfFlip) {
 	vector<unsigned char> result;
 	for (unsigned int offset = 0; offset < this->ModeIncrement; ++offset) {
 		if ((x + offset) < this->TileWidth)
@@ -291,11 +307,16 @@ vector<unsigned char> TileExtractor::extractPixels(FIBITMAP* bmp, int x, int y, 
 					sourceX = x + offset;					
 				}
 			}
-			RGBQUAD rgb;
-			FreeImage_GetPixelColor(bmp, sourceX, this->TileHeight - y - 1, &rgb);
-			Color current = Color(rgb.rgbReserved, rgb.rgbRed, rgb.rgbGreen, rgb.rgbBlue);
-			unsigned char color = (unsigned char) this->Options.Palette.getNearestIndex(current);
-			result.push_back(color);
+			// Flipped bytes at the right edge can point outside the tile: treat them as padding.
+			if (bmp.Contains(sourceX, y)) {
+				const RGBA& rgb = bmp.At(sourceX, y);
+				Color current = Color(rgb.a, rgb.r, rgb.g, rgb.b);
+				unsigned char color = (unsigned char) this->Options.Palette.getNearestIndex(current);
+				result.push_back(color);
+				tile->PreviewValues[y * this->TileWidth + sourceX] = color;
+			} else {
+				result.push_back((unsigned char)this->Options.Palette.TransparentIndex);
+			}
 		}
 		else {
 			result.push_back((unsigned char)this->Options.Palette.TransparentIndex);

@@ -59,21 +59,28 @@ void showUsage(ezOptionParser &options) {
 	cout << usage << endl;
 }
 
-int initializeImageLoader() {
-	FreeImage_Initialise();
-	return 0;
-}
-
 int processImage(const string& filename, vector<Tile*>& tiles, ConversionOptions &convOptions, ezOptionParser &options) {
 	TileExtractor extractor;
 	extractor.Options = convOptions;
-	vector<Tile*> tmp = extractor.GetTiles(filename);
+	vector<Tile*> tmp;
+	try {
+		tmp = extractor.GetTiles(filename);
+	} catch (const ImageError&) {
+		return 1;
+	} catch (const exception& e) {
+		cout << "Error!" << endl << e.what() << endl;
+		return 1;
+	}
 	for (Tile* t : tmp) {
 		//t.Dump();
 		if (options.isSet("-g")) {
-			t->GenImage();
-			if (convOptions.Palette.TransparentIndex!=-1) {
-				t->GenMaskImage();
+			try {
+				t->GenImage();
+				if (convOptions.Palette.TransparentIndex!=-1) {
+					t->GenMaskImage();
+				}
+			} catch (const ImageError& e) {
+				cerr << "Warning: " << e.what() << endl;
 			}
 		}
 	}
@@ -341,7 +348,7 @@ void createAndOrTables(ConversionOptions &convOptions) {
 			break;
 		case ConversionOptions::PURE_C:
 			generator.DumpTableC(convOptions.AndMaskLut, 0x100, "andMasks");
-			generator.DumpTableC(convOptions.AndMaskLut, 0x100, "andMasks");
+			generator.DumpTableC(convOptions.OrMaskLut, 0x100, "orMasks");
 		    if(convOptions.CreateFlipLut) {
 				generator.DumpTableC(convOptions.FlippedAndMaskLut, 0x100, "flippedAndMasks");
 				generator.DumpTableC(convOptions.FlippedOrMaskLut, 0x100, "flippedOrMasks");
@@ -353,11 +360,11 @@ void createAndOrTables(ConversionOptions &convOptions) {
 int outputImageWidthAndHeightOnly(const vector<string*> lastArgs) {
 	int result = 0;
 	for (auto* fileName : lastArgs) {
-		FIBITMAP *dib = FileUtils::LoadImage(*fileName);
-		if ( dib ) {
-			cout << FreeImage_GetWidth(dib) << '\t' << FreeImage_GetHeight(dib) << '\t' << *fileName << '\n';
-		} else {
-			cerr << "xxx" << '\t' << "xxx" << '\t' << "Error processing image '"<< *fileName << "' Please check that file is readable and is a valid image file." << '\n';
+		try {
+			Image image = Image::Load(*fileName);
+			cout << image.Width() << '\t' << image.Height() << '\t' << *fileName << '\n';
+		} catch (const ImageError& e) {
+			cerr << "xxx" << '\t' << "xxx" << '\t' << "Error processing image '"<< *fileName << "' (" << e.what() << "). Please check that file is readable and is a valid image file." << '\n';
 			result = 1;
 		}
 	}
@@ -367,9 +374,6 @@ int outputImageWidthAndHeightOnly(const vector<string*> lastArgs) {
 
 int main(int argc, const char** argv)
 {
-	if (initializeImageLoader()) {
-		return -1;
-	}
 	ezOptionParser options;
 	if (initializeParser(options)) {
 		return -1;

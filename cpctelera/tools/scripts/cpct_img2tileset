@@ -32,8 +32,8 @@
 ##
 ## Requisites:
 ##    This scripts uses Img2CPC utility by Augusto Ruiz to convert the PNG
-## file into screen pixel definitions. This requires freeimage libraries to be
-## installed under Linux and MacOSX (they are already included for Windows/Cygwin)
+## file into screen pixel definitions. Img2CPC reads PNG, GIF, BMP, PCX and TGA
+## files and has no external library dependencies.
 ##
 ## Description:
 ##    This script converts an image file containing a set of tile or sprite definitions
@@ -140,8 +140,8 @@ CPCtelera C-array tileset along with arrays for all tiles/sprites."
    echo 
    echo "${COLOR_LIGHT_YELLOW}Requisites:"
    echo "${COLOR_CYAN}    This scripts uses Img2CPC utility by Augusto Ruiz to convert the PNG \
-file into screen pixel definitions. This requires freeimage libraries to be \
-installed under Linux and MacOSX (they are already included for Windows/Cygwin)"
+file into screen pixel definitions. Img2CPC reads PNG, GIF, BMP, PCX and TGA \
+files and has no external library dependencies."
    echo 
    echo "${COLOR_LIGHT_YELLOW}Description:"
    echo "${COLOR_CYAN}    This script converts an image file containing a set of tile or sprite \
